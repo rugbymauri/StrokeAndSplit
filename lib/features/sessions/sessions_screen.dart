@@ -15,7 +15,16 @@ class SessionsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessions = ref.watch(sessionsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Sessions')),
+      appBar: AppBar(
+        title: const Text('Sessions'),
+        actions: [
+          IconButton(
+            tooltip: 'Importieren',
+            icon: const Icon(Icons.file_open_outlined),
+            onPressed: () => importSession(context, ref),
+          ),
+        ],
+      ),
       body: switch (sessions) {
         AsyncData(value: []) => const Center(child: Text('Noch keine Sessions aufgezeichnet.')),
         AsyncData(:final value) => ListView.builder(
@@ -29,7 +38,7 @@ class SessionsScreen extends ConsumerWidget {
   }
 }
 
-enum _Action { replay, delete }
+enum _Action { replay, export, delete }
 
 class _SessionTile extends ConsumerWidget {
   const _SessionTile({required this.session});
@@ -55,10 +64,12 @@ class _SessionTile extends ConsumerWidget {
         tooltip: 'Aktionen',
         onSelected: (action) => switch (action) {
           _Action.replay => replaySession(context, ref, session),
+          _Action.export => exportSession(context, ref, session),
           _Action.delete => deleteSession(context, ref, session),
         },
         itemBuilder: (context) => const [
           PopupMenuItem(value: _Action.replay, child: Text('Abspielen')),
+          PopupMenuItem(value: _Action.export, child: Text('Exportieren')),
           PopupMenuItem(value: _Action.delete, child: Text('Löschen')),
         ],
       ),

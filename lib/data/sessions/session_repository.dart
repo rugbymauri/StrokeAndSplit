@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 import 'package:pm5_protocol/pm5_protocol.dart';
 
@@ -116,5 +120,54 @@ class SessionRepository {
           RawPacket(time: Duration(milliseconds: r.tMs), characteristicId: r.characteristicId, bytes: r.bytes),
       ],
     );
+  }
+
+  /// The session as an `.aergrow` file (Design D8): gzip-compressed lines in
+  /// the AergRow raw format, with the summary in the header.
+  Future<List<int>> export(int id) async {
+    final session = (await get(id))!;
+    final recording = await rawRecording(id);
+    final metadata = {
+      ...recording.metadata,
+      'session': {
+        'status': session.status.name,
+        'endedAt': ?session.endedAt?.toUtc().toIso8601String(),
+        'durationMs': session.durationMs,
+        'distanceDm': session.distanceDm,
+        'averagePaceCs': ?session.averagePaceCs,
+        'averageWatts': ?session.averageWatts,
+        'averageStrokeRate': ?session.averageStrokeRate,
+        'strokeCount': session.strokeCount,
+      },
+    };
+    final lines = RawRecording(metadata: metadata, packets: recording.packets).toLines();
+    return gzip.encode(utf8.encode('${lines.join('\n')}\n'));
+  }
+
+  /// Imports an `.aergrow` file or an uncompressed raw recording. Samples,
+  /// strokes and summary are derived from the raw notifications again, so
+  /// decoder fixes apply to imported sessions too. Returns the new id.
+  Future<int> import(List<int> bytes) async {
+    final isGzip = bytes.length > 2 && bytes[0] == 0x1f && bytes[1] == 0x8b;
+    final text = utf8.decode(isGzip ? gzip.decode(bytes) : bytes);
+    final recording = RawRecording.parseLines(const LineSplitter().convert(text));
+    final metadata = recording.metadata;
+    final session = metadata['session'] as Map<String, Object?>? ?? const {};
+
+    final id = await create(
+      startedAt: DateTime.tryParse(metadata['recordedAt'] as String? ?? '') ?? clock.now(),
+      source: ErgSourceKind.values.asNameMap()[metadata['source']] ?? ErgSourceKind.pm5,
+      deviceName: metadata['device'] as String?,
+    );
+    final accumulator = SessionAccumulator(id);
+    recording.packets.forEach(accumulator.add);
+    accumulator.finish();
+    await write(accumulator.takeBatch());
+    await finish(
+      id,
+      status: session['status'] == SessionStatus.incomplete.name ? SessionStatus.incomplete : SessionStatus.complete,
+      endedAt: DateTime.tryParse(session['endedAt'] as String? ?? ''),
+    );
+    return id;
   }
 }

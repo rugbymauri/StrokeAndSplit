@@ -42,7 +42,7 @@ class StartScreen extends ConsumerWidget {
               _SourceOption(
                 icon: Icons.replay,
                 title: 'Sessions',
-                subtitle: 'Aufgezeichnete Sessions ansehen und abspielen',
+                subtitle: 'Aufgezeichnete Sessions ansehen, abspielen und austauschen',
                 onTap: () => Navigator.of(context)
                     .push(MaterialPageRoute<void>(builder: (_) => const SessionsScreen())),
               ),

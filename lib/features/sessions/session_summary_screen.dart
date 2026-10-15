@@ -27,6 +27,11 @@ class SessionSummaryScreen extends ConsumerWidget {
               onPressed: () => replaySession(context, ref, row),
             ),
             IconButton(
+              tooltip: 'Exportieren',
+              icon: const Icon(Icons.ios_share),
+              onPressed: () => exportSession(context, ref, row),
+            ),
+            IconButton(
               tooltip: 'Löschen',
               icon: const Icon(Icons.delete_outline),
               onPressed: () async {

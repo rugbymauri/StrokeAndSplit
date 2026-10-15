@@ -10,15 +10,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
+import '../../support/fake_session_files.dart';
 import '../../support/fixtures.dart';
 import '../../support/test_database.dart';
 
 class _Setup {
   final db = openTestDatabase();
   late final repository = SessionRepository(db);
+  final files = FakeSessionFiles();
   late final container = ProviderContainer(overrides: [
     databaseProvider.overrideWithValue(db),
     wakelockProvider.overrideWithValue(FakeWakelock()),
+    sessionFilesProvider.overrideWithValue(files),
   ]);
 
   /// Stores a finished session, recorded from [fixture] when given.
@@ -129,6 +132,40 @@ void main() {
       find.descendant(of: find.byKey(const Key('metric-distance')), matching: find.byType(Text)).last,
     );
     expect(int.parse(distance.data!), greaterThan(0));
+    await setup.tearDown(tester);
+  });
+
+  testWidgets('exports a session and imports the file again', (tester) async {
+    final setup = _Setup();
+    await setup.addSession(tester, DateTime(2026, 10, 15, 18, 30), fixture: 'just_row');
+    await setup.pump(tester);
+
+    await tester.tap(find.byTooltip('Aktionen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Exportieren'));
+    for (var i = 0; i < 5; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.pump();
+    }
+    expect(setup.files.saved.keys, ['aergrow-2026-10-15-1830.aergrow']);
+    expect(find.text('Session exportiert.'), findsOneWidget);
+
+    setup.files.toOpen = setup.files.saved.values.single;
+    await tester.tap(find.byTooltip('Importieren'));
+    for (var i = 0; i < 5; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.pump();
+    }
+    expect(find.text('Session importiert.'), findsOneWidget);
+    expect(find.text('15.10.2026, 18:30'), findsNWidgets(2));
+
+    setup.files.toOpen = [1, 2, 3];
+    await tester.tap(find.byTooltip('Importieren'));
+    for (var i = 0; i < 5; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.pump();
+    }
+    expect(find.textContaining('keine lesbare AergRow-Session'), findsOneWidget);
     await setup.tearDown(tester);
   });
 }
