@@ -1,0 +1,59 @@
+# Development commands for AergRow. Run `make` to list them.
+
+FLUTTER ?= $(or $(shell command -v flutter 2>/dev/null),$(HOME)/dev/flutter/bin/flutter)
+DART    ?= $(dir $(FLUTTER))dart
+ADB     ?= $(or $(shell command -v adb 2>/dev/null),$(HOME)/Android/Sdk/platform-tools/adb)
+
+PROTOCOL       := packages/pm5_protocol
+SPIKE          := lib/spike/spike_main.dart
+RECORDINGS     := recordings
+ANDROID_FILES  := /sdcard/Android/data/ch.aergrow.aergrow/files
+
+.DEFAULT_GOAL := help
+.PHONY: help doctor deps analyze test check codegen run run-android spike spike-android pull-recordings build-linux clean
+
+help: ## Show this help
+	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+doctor: ## Check the Flutter installation
+	$(FLUTTER) doctor
+
+deps: ## Fetch dependencies of the app and the local packages
+	$(FLUTTER) pub get
+	cd $(PROTOCOL) && $(DART) pub get
+
+analyze: ## Run static analysis on the app and the local packages
+	$(FLUTTER) analyze
+	cd $(PROTOCOL) && $(DART) analyze --fatal-infos
+
+test: ## Run all tests of the app and the local packages
+	$(FLUTTER) test
+	cd $(PROTOCOL) && $(DART) test
+
+check: analyze test ## Run analysis and tests (same as tool/check.sh)
+
+codegen: ## Generate code (drift, ...) with build_runner
+	$(DART) run build_runner build --delete-conflicting-outputs
+
+run: ## Start the app on the Linux desktop
+	$(FLUTTER) run -d linux
+
+run-android: ## Start the app on a connected Android device
+	$(FLUTTER) run -d android
+
+spike: ## Start the PM5 BLE spike on the Linux desktop (recordings go to ~/Documents)
+	$(FLUTTER) run -d linux -t $(SPIKE)
+
+spike-android: ## Start the PM5 BLE spike on a connected Android device
+	$(FLUTTER) run -d android -t $(SPIKE)
+
+pull-recordings: ## Copy spike recordings from the Android device to ./recordings
+	mkdir -p $(RECORDINGS)
+	$(ADB) pull $(ANDROID_FILES)/. $(RECORDINGS)/
+
+build-linux: ## Build a Linux release bundle
+	$(FLUTTER) build linux --release
+
+clean: ## Remove build output
+	$(FLUTTER) clean
+	rm -rf $(PROTOCOL)/.dart_tool

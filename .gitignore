@@ -42,3 +42,6 @@ app.*.map.json
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Raw spike recordings (curated ones go to packages/pm5_protocol/test/fixtures)
+/recordings/
