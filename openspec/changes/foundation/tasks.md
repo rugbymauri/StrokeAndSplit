@@ -17,14 +17,14 @@
 
 ## 3. Protokoll-Package `pm5_protocol` (Capability rowing-telemetry)
 
-- [ ] 3.1 Modelle definieren: `RawPacket`, `RowingEvent` (`StatusTick`, `Stroke`, `WorkoutStateChanged`), Workout-Typ und Workout-Zustand als Enums. Verifikation: `dart analyze` ohne Fehler
+- [x] 3.1 Modelle definieren: `RawPacket`, `RowingEvent` (`StatusTick`, `Stroke`, `WorkoutStateChanged`), Workout-Typ und Workout-Zustand als Enums. Verifikation: `dart analyze` ohne Fehler
 - [ ] 3.2 Decoder für `0x0031`, `0x0032`, `0x0033` zu `StatusTick` implementieren, inklusive HR „nicht vorhanden“. Verifikation: Unit-Tests gegen Spike-Fixtures prüfen konkrete Werte (Zeit, Distanz, Pace, Watt, SPM, HR, Kalorien)
 - [ ] 3.3 Decoder für `0x0035`/`0x0036` zu `Stroke` implementieren, mit genau einem Ereignis pro Schlag. Verifikation: Unit-Test zählt Schläge in einer Fixture und prüft fortlaufende Schlagnummern
 - [ ] 3.4 Workout-Zustandswechsel und PM5-Reset als `WorkoutStateChanged` erkennen. Verifikation: Unit-Test mit der Reset-Fixture meldet den Wechsel
 - [ ] 3.5 Multiplexed-Format (`0x0080`) im Decoder unterstützen. Verifikation: Unit-Test mit selbst gebauten Multiplexed-Paketen ergibt dieselben Events wie die Einzel-Characteristics
 - [ ] 3.6 Robustheit: unbekannte oder zu kurze Pakete werden verworfen und geloggt, ohne Exception. Verifikation: Unit-Tests mit kaputten Paketen
 - [ ] 3.7 `Pm5Encoder` implementieren (Events zu Bytes). Verifikation: Roundtrip-Tests encode→decode für alle Event-Typen
-- [ ] 3.8 Session-Offset-Akkumulator (Design D6) als reine Funktion implementieren. Verifikation: Unit-Tests für Start bei PM5 ≠ 0, Reset mitten in der Session und mehrfachen Reset
+- [x] 3.8 Session-Offset-Akkumulator (Design D6) als reine Funktion implementieren. Verifikation: Unit-Tests für Start bei PM5 ≠ 0, Reset mitten in der Session und mehrfachen Reset
 
 ## 4. Datenquellen (Capabilities erg-connection, erg-simulation)
 

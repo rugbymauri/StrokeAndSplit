@@ -3,4 +3,5 @@ library;
 
 export 'src/raw_packet.dart';
 export 'src/rowing_event.dart';
+export 'src/session_offset.dart';
 export 'src/workout.dart';
