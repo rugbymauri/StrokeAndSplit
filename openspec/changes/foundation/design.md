@@ -84,7 +84,7 @@ Wir abonnieren `0x0031`, `0x0032`, `0x0033`, `0x0035`, `0x0036` einzeln und setz
 
 ### D4: BLE mit `flutter_blue_plus`
 
-Es unterstützt Android, iOS, macOS und Linux (BlueZ) mit einer API. Die Suche filtert auf den Rowing-Service bzw. das Namenspräfix `PM5`. Die Wiederverbindung (30 s) liegt in `Pm5BleSource` als Zustandsautomat:
+Es unterstützt Android, iOS, macOS und Linux (BlueZ) mit einer API. Linux-Support gibt es erst ab Version 2.x. Diese Version steht unter der FlutterBluePlus License: Für ein privates Projekt ist sie frei nutzbar (`License.nonprofit`), bei kommerzieller Nutzung braucht es eine kostenpflichtige Lizenz. Ausserdem sendet sie beim Build Telemetrie. Wird AergRow kommerziell, ist `universal_ble` (BSD-3, ebenfalls mit Linux) die vorgesehene Alternative. `wakelock_plus` ist auf < 1.8.1 gepinnt, weil 1.8.1 eine `dbus`-Version verlangt, die mit dem Linux-Teil von `flutter_blue_plus` kollidiert. Die Suche filtert auf den Rowing-Service bzw. das Namenspräfix `PM5`. Die Wiederverbindung (30 s) liegt in `Pm5BleSource` als Zustandsautomat:
 
 ```
  disconnected --scan--> scanning --select--> connecting --ok--> connected
