@@ -28,7 +28,7 @@
 
 ## 4. Datenquellen (Capabilities erg-connection, erg-simulation)
 
-- [ ] 4.1 Interface `ErgSource` (Stream von `RawPacket`, Verbindungszustand, Quelltyp) und den austauschbaren Riverpod-Provider der aktiven Quelle anlegen. Verifikation: Widget-Test wechselt die Quelle per Provider-Override
+- [x] 4.1 Interface `ErgSource` (Stream von `RawPacket`, Verbindungszustand, Quelltyp) und den austauschbaren Riverpod-Provider der aktiven Quelle anlegen. Verifikation: Widget-Test wechselt die Quelle per Provider-Override
 - [ ] 4.2 `Pm5BleSource`: Scan mit Filter auf PM5 und 15-s-Timeout, Verbinden, Subscriptions, Sample Rate setzen. Verifikation: manuell auf Android, PM5 erscheint in der Liste und liefert Pakete
 - [ ] 4.3 Verbindungs-Zustandsautomat mit 30-s-Reconnect und bewusstem Trennen ohne Reconnect (Design D4). Logik testbar vom BLE-Plugin getrennt halten. Verifikation: Unit-Tests mit Fake-Transport für alle Übergänge, plus manueller Test „PM5 kurz aus der Reichweite tragen“
 - [ ] 4.4 Bluetooth-Voraussetzungen prüfen (Adapter aus, Berechtigung verweigert), Android-12+-Permissions und iOS-`Info.plist` eintragen. Verifikation: manuell auf Android mit ausgeschaltetem Bluetooth und verweigerter Berechtigung, die Hinweise erscheinen
