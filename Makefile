@@ -44,7 +44,7 @@ run: ## Start the app on the Linux desktop
 run-android: ## Start the app on a connected Android device
 	$(FLUTTER) run -d android
 
-spike: ## Start the PM5 BLE spike on the Linux desktop (recordings go to ~/Documents)
+spike: ## Start the PM5 BLE spike on the Linux desktop (recordings go to the documents folder, e.g. ~/Dokumente)
 	$(FLUTTER) run -d linux -t $(SPIKE)
 
 spike-android: ## Start the PM5 BLE spike on a connected Android device
