@@ -33,8 +33,8 @@
 - [ ] 4.3 Verbindungs-Zustandsautomat mit 30-s-Reconnect und bewusstem Trennen ohne Reconnect (Design D4). Logik testbar vom BLE-Plugin getrennt halten. Verifikation: Unit-Tests mit Fake-Transport für alle Übergänge, plus manueller Test „PM5 kurz aus der Reichweite tragen“
 - [ ] 4.4 Bluetooth-Voraussetzungen prüfen (Adapter aus, Berechtigung verweigert), Android-12+-Permissions und iOS-`Info.plist` eintragen. Verifikation: manuell auf Android mit ausgeschaltetem Bluetooth und verweigerter Berechtigung, die Hinweise erscheinen
 - [ ] 4.5 Fehlermeldung bei fehlgeschlagener Verbindung mit Hinweis auf „nur eine Verbindung“. Verifikation: manuell mit parallel verbundenem ErgData
-- [ ] 4.6 `SimulatedSource` mit Ziel-Pace, Ziel-SPM, Pause/Fortsetzen, Schwankung und Seed (Design D9), die Bytes über `Pm5Encoder` erzeugt. Verifikation: Unit-Test mit festem Seed zeigt, dass sich die Pace nach Änderung innerhalb von ≤ 5 Schlägen dem Ziel nähert und während Pause keine Distanzzunahme stattfindet
-- [ ] 4.7 `ReplaySource` aus gespeicherten Rohpaketen mit Geschwindigkeitsfaktor (1×, 10×). Verifikation: Unit-Test zeigt, dass Replay einer Fixture dieselben Events wie direktes Dekodieren ergibt und 10× die Laufzeit entsprechend verkürzt
+- [x] 4.6 `SimulatedSource` mit Ziel-Pace, Ziel-SPM, Pause/Fortsetzen, Schwankung und Seed (Design D9), die Bytes über `Pm5Encoder` erzeugt. Verifikation: Unit-Test mit festem Seed zeigt, dass sich die Pace nach Änderung innerhalb von ≤ 5 Schlägen dem Ziel nähert und während Pause keine Distanzzunahme stattfindet
+- [x] 4.7 `ReplaySource` aus gespeicherten Rohpaketen mit Geschwindigkeitsfaktor (1×, 10×). Verifikation: Unit-Test zeigt, dass Replay einer Fixture dieselben Events wie direktes Dekodieren ergibt und 10× die Laufzeit entsprechend verkürzt
 
 ## 5. Verbindungs-UI (Capability erg-connection, erg-simulation)
 
