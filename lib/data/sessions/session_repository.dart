@@ -1,0 +1,120 @@
+import 'package:drift/drift.dart';
+import 'package:pm5_protocol/pm5_protocol.dart';
+
+import '../db/database.dart';
+import '../sources/erg_source.dart';
+import 'session_accumulator.dart';
+
+/// Stores sessions with their samples, strokes and raw notifications.
+class SessionRepository {
+  SessionRepository(this._db);
+
+  final AppDatabase _db;
+
+  Future<int> create({required DateTime startedAt, required ErgSourceKind source, String? deviceName}) {
+    return _db.into(_db.sessions).insert(SessionsCompanion.insert(
+          startedAt: startedAt,
+          status: SessionStatus.recording,
+          source: source,
+          deviceName: Value(deviceName),
+        ));
+  }
+
+  /// Writes all rows of [batch] in one transaction.
+  Future<void> write(SessionBatch batch) async {
+    if (batch.isEmpty) return;
+    await _db.batch((b) {
+      b.insertAll(_db.samples, batch.samples);
+      b.insertAll(_db.strokes, batch.strokes);
+      b.insertAll(_db.rawPackets, batch.rawPackets);
+    });
+  }
+
+  /// Computes the summary from the stored rows and closes the session.
+  Future<void> finish(int id, {SessionStatus status = SessionStatus.complete, DateTime? endedAt}) async {
+    final samples = _db.samples;
+    final values = await (_db.selectOnly(samples)
+          ..addColumns([samples.tMs.max(), samples.distanceDm.max(), samples.watts.avg()])
+          ..where(samples.sessionId.equals(id)))
+        .getSingle();
+    final strokeCount = await (_db.selectOnly(_db.strokes)
+          ..addColumns([countAll()])
+          ..where(_db.strokes.sessionId.equals(id)))
+        .map((row) => row.read(countAll())!)
+        .getSingle();
+
+    final durationMs = values.read(samples.tMs.max()) ?? 0;
+    final distanceDm = values.read(samples.distanceDm.max()) ?? 0;
+    final averageWatts = values.read(samples.watts.avg());
+    await (_db.update(_db.sessions)..where((s) => s.id.equals(id))).write(SessionsCompanion(
+      status: Value(status),
+      endedAt: Value(endedAt),
+      durationMs: Value(durationMs),
+      distanceDm: Value(distanceDm),
+      // Pace per 500 m in centiseconds: duration / distance * 500 m.
+      averagePaceCs: Value(distanceDm > 0 ? (durationMs / 10 * 5000 / distanceDm).round() : null),
+      averageWatts: Value(averageWatts?.round()),
+      averageStrokeRate: Value(durationMs > 0 && strokeCount > 0 ? strokeCount * 60000 / durationMs : null),
+      strokeCount: Value(strokeCount),
+    ));
+  }
+
+  /// Closes sessions that were still recording when the app ended and marks
+  /// them as incomplete. Returns how many there were.
+  Future<int> recoverInterrupted() async {
+    final interrupted = await (_db.select(_db.sessions)..where((s) => s.status.equalsValue(SessionStatus.recording))).get();
+    for (final session in interrupted) {
+      await finish(session.id, status: SessionStatus.incomplete);
+    }
+    return interrupted.length;
+  }
+
+  /// All sessions, newest first.
+  Stream<List<SessionRow>> watchAll() {
+    return (_db.select(_db.sessions)..orderBy([(s) => OrderingTerm.desc(s.startedAt)])).watch();
+  }
+
+  Stream<SessionRow?> watch(int id) => (_db.select(_db.sessions)..where((s) => s.id.equals(id))).watchSingleOrNull();
+
+  Future<SessionRow?> get(int id) => (_db.select(_db.sessions)..where((s) => s.id.equals(id))).getSingleOrNull();
+
+  Future<void> delete(int id) {
+    return _db.transaction(() async {
+      await (_db.delete(_db.samples)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(_db.strokes)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(_db.rawPackets)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(_db.sessions)..where((s) => s.id.equals(id))).go();
+    });
+  }
+
+  Future<bool> hasRawPackets(int id) async {
+    final row = await (_db.select(_db.rawPackets)
+          ..where((r) => r.sessionId.equals(id))
+          ..limit(1))
+        .getSingleOrNull();
+    return row != null;
+  }
+
+  /// The raw notifications of a session, in the AergRow raw format.
+  Future<RawRecording> rawRecording(int id) async {
+    final session = await get(id);
+    if (session == null) throw StateError('No session $id');
+    final rows = await (_db.select(_db.rawPackets)
+          ..where((r) => r.sessionId.equals(id))
+          ..orderBy([(r) => OrderingTerm.asc(r.tMs), (r) => OrderingTerm.asc(r.rowId)]))
+        .get();
+    return RawRecording(
+      metadata: {
+        'format': RawRecording.formatName,
+        'version': 1,
+        'source': session.source.name,
+        'device': ?session.deviceName,
+        'recordedAt': session.startedAt.toUtc().toIso8601String(),
+      },
+      packets: [
+        for (final r in rows)
+          RawPacket(time: Duration(milliseconds: r.tMs), characteristicId: r.characteristicId, bytes: r.bytes),
+      ],
+    );
+  }
+}

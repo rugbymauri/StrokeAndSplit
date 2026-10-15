@@ -10,7 +10,7 @@ RECORDINGS     := recordings
 ANDROID_FILES  := /sdcard/Android/data/ch.aergrow.aergrow/files
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor deps analyze test check codegen run run-android spike spike-android pull-recordings build-linux clean
+.PHONY: help doctor deps analyze test check codegen schema run run-android spike spike-android pull-recordings build-linux clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -34,6 +34,9 @@ check: analyze test ## Run analysis and tests (same as tool/check.sh)
 
 codegen: ## Generate code (drift, ...) with build_runner
 	$(DART) run build_runner build --delete-conflicting-outputs
+
+schema: ## Snapshot the drift schema and generate migration tests (after bumping schemaVersion)
+	$(DART) run drift_dev make-migrations
 
 run: ## Start the app on the Linux desktop
 	$(FLUTTER) run -d linux

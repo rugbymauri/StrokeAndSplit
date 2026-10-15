@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pm5_protocol/pm5_protocol.dart';
 
 import '../../app/platform_providers.dart';
+import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/simulated_source.dart';
 import '../connection/connection_indicator.dart';
+import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
 import 'formatters.dart';
 
@@ -76,32 +78,69 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   }
 
   Future<void> _disconnect() async {
+    // A running session is kept; it ends here like with "Session beenden".
+    await ref.read(sessionRecorderProvider.notifier).stop();
     await ref.read(activeErgSourceProvider.notifier).clear();
     if (mounted) Navigator.of(context).pop();
+  }
+
+  Future<void> _startSession() => ref.read(sessionRecorderProvider.notifier).start();
+
+  Future<void> _stopSession() async {
+    final id = await ref.read(sessionRecorderProvider.notifier).stop();
+    if (id == null || !mounted) return;
+    await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SessionSummaryScreen(sessionId: id)));
   }
 
   @override
   Widget build(BuildContext context) {
     final source = ref.watch(activeErgSourceProvider);
     final connected = ref.watch(ergConnectionStateProvider).value == ErgConnectionState.connected;
-    return Scaffold(
-      appBar: AppBar(
-        title: const ConnectionIndicator(),
-        actions: [
-          TextButton.icon(onPressed: _disconnect, icon: const Icon(Icons.link_off), label: const Text('Trennen')),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            if (_stale && connected)
-              MaterialBanner(
-                content: const Text('Keine Daten seit 3 Sekunden, die Werte sind veraltet.'),
-                actions: [const SizedBox.shrink()],
-              ),
-            Expanded(child: _Metrics(tick: _tick, outdated: _stale)),
-            if (source is SimulatedSource) SimulatorControls(source: source),
+    final recording = ref.watch(sessionRecorderProvider);
+    return PopScope(
+      canPop: false,
+      // Going back ends the connection, the same as "Trennen".
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _disconnect();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const ConnectionIndicator(),
+          actions: [
+            TextButton.icon(onPressed: _disconnect, icon: const Icon(Icons.link_off), label: const Text('Trennen')),
           ],
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              if (_stale && connected)
+                MaterialBanner(
+                  content: const Text('Keine Daten seit 3 Sekunden, die Werte sind veraltet.'),
+                  actions: [const SizedBox.shrink()],
+                ),
+              Expanded(
+                child: _Metrics(tick: _tick, session: recording?.progress, outdated: _stale),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: recording == null
+                      ? FilledButton.icon(
+                          onPressed: connected ? _startSession : null,
+                          icon: const Icon(Icons.fiber_manual_record),
+                          label: const Text('Session starten'),
+                        )
+                      : FilledButton.tonalIcon(
+                          onPressed: _stopSession,
+                          icon: const Icon(Icons.stop),
+                          label: const Text('Session beenden'),
+                        ),
+                ),
+              ),
+              if (source is SimulatedSource) SimulatorControls(source: source),
+            ],
+          ),
         ),
       ),
     );
@@ -109,20 +148,28 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 }
 
 class _Metrics extends StatelessWidget {
-  const _Metrics({required this.tick, required this.outdated});
+  const _Metrics({required this.tick, required this.session, required this.outdated});
 
   final StatusTick? tick;
+
+  /// Time and distance of the running session, shown instead of the PM5's.
+  final SessionProgress? session;
   final bool outdated;
 
   @override
   Widget build(BuildContext context) {
     final tick = this.tick;
     final secondary = [
-      _Metric(key: const Key('metric-elapsed'), label: 'Zeit', value: formatElapsed(tick?.elapsed ?? Duration.zero)),
       _Metric(
-          key: const Key('metric-distance'),
-          label: 'Meter',
-          value: formatDistance(tick?.distanceMeters ?? 0)),
+        key: const Key('metric-elapsed'),
+        label: 'Zeit',
+        value: formatElapsed(session?.elapsed ?? tick?.elapsed ?? Duration.zero),
+      ),
+      _Metric(
+        key: const Key('metric-distance'),
+        label: 'Meter',
+        value: formatDistance(session?.distanceMeters ?? tick?.distanceMeters ?? 0),
+      ),
       _Metric(key: const Key('metric-watts'), label: 'Watt', value: formatWhole(tick?.watts)),
       _Metric(key: const Key('metric-spm'), label: 'Schläge/min', value: formatWhole(tick?.strokeRate)),
       if (tick?.heartRate != null)
@@ -132,16 +179,28 @@ class _Metrics extends StatelessWidget {
 
     return Opacity(
       opacity: outdated ? 0.4 : 1,
-      child: LayoutBuilder(builder: (context, constraints) {
-        final landscape = constraints.maxWidth > constraints.maxHeight;
-        final grid = _Grid(columns: 2, children: secondary);
-        return Padding(
-          padding: const EdgeInsets.all(8),
-          child: landscape
-              ? Row(children: [Expanded(flex: 3, child: pace), Expanded(flex: 2, child: grid)])
-              : Column(children: [Expanded(flex: 2, child: pace), Expanded(flex: 3, child: grid)]),
-        );
-      }),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final landscape = constraints.maxWidth > constraints.maxHeight;
+          final grid = _Grid(columns: 2, children: secondary);
+          return Padding(
+            padding: const EdgeInsets.all(8),
+            child: landscape
+                ? Row(
+                    children: [
+                      Expanded(flex: 3, child: pace),
+                      Expanded(flex: 2, child: grid),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Expanded(flex: 2, child: pace),
+                      Expanded(flex: 3, child: grid),
+                    ],
+                  ),
+          );
+        },
+      ),
     );
   }
 }
@@ -161,10 +220,12 @@ class _Grid extends StatelessWidget {
       children: [
         for (final row in rows)
           Expanded(
-            child: Row(children: [
-              for (final cell in row) Expanded(child: cell),
-              for (var i = row.length; i < columns; i++) const Spacer(),
-            ]),
+            child: Row(
+              children: [
+                for (final cell in row) Expanded(child: cell),
+                for (var i = row.length; i < columns; i++) const Spacer(),
+              ],
+            ),
           ),
       ],
     );

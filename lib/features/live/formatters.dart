@@ -27,4 +27,13 @@ String formatDistance(double meters) => meters.floor().toString();
 /// Whole numbers like watts or strokes per minute; a dash when unknown.
 String formatWhole(int? value) => value?.toString() ?? _noValue;
 
+/// Average stroke rate with one decimal, e.g. `22.5`.
+String formatStrokeRate(double? strokeRate) => strokeRate?.toStringAsFixed(1) ?? _noValue;
+
+/// Local date and time, e.g. `15.10.2026, 18:30`.
+String formatDateTime(DateTime time) {
+  final t = time.toLocal();
+  return '${_two(t.day)}.${_two(t.month)}.${t.year}, ${_two(t.hour)}:${_two(t.minute)}';
+}
+
 String _two(int value) => value.toString().padLeft(2, '0');

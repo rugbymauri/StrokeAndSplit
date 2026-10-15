@@ -38,4 +38,13 @@ void main() {
     expect(formatWhole(203), '203');
     expect(formatWhole(null), '–');
   });
+
+  test('formatStrokeRate shows one decimal', () {
+    expect(formatStrokeRate(22.46), '22.5');
+    expect(formatStrokeRate(null), '–');
+  });
+
+  test('formatDateTime shows the local date and time', () {
+    expect(formatDateTime(DateTime(2026, 10, 5, 8, 7)), '05.10.2026, 08:07');
+  });
 }
