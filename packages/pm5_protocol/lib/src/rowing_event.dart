@@ -16,6 +16,7 @@ final class StatusTick extends RowingEvent {
     required this.distanceMeters,
     required this.workoutType,
     required this.workoutState,
+    required this.isRowing,
     this.pace,
     this.watts,
     this.strokeRate,
@@ -27,8 +28,13 @@ final class StatusTick extends RowingEvent {
   final WorkoutType workoutType;
   final WorkoutState workoutState;
 
+  /// False while the rower sits still; the PM5 clock stops in that case.
+  final bool isRowing;
+
   /// Current pace per 500 m; null while not rowing.
   final Duration? pace;
+
+  /// Power derived from [pace], as the PM5 display shows it.
   final int? watts;
 
   /// Strokes per minute.
@@ -37,6 +43,11 @@ final class StatusTick extends RowingEvent {
   /// Beats per minute; null when no heart rate monitor is connected.
   final int? heartRate;
   final int? calories;
+
+  @override
+  String toString() => 'StatusTick(elapsed: $elapsed, distance: $distanceMeters, type: ${workoutType.name}, '
+      'state: ${workoutState.name}, rowing: $isRowing, pace: $pace, watts: $watts, spm: $strokeRate, '
+      'hr: $heartRate, calories: $calories)';
 }
 
 /// Data of one completed stroke.
@@ -61,6 +72,11 @@ final class Stroke extends RowingEvent {
   final double peakForceNewtons;
   final double averageForceNewtons;
   final int? watts;
+
+  @override
+  String toString() => 'Stroke(#$strokeNumber, elapsed: $elapsed, distance: $distanceMeters, '
+      'driveLength: $driveLengthMeters, drive: $driveTime, recovery: $recoveryTime, '
+      'peak: ${peakForceNewtons.toStringAsFixed(1)} N, avg: ${averageForceNewtons.toStringAsFixed(1)} N, watts: $watts)';
 }
 
 /// The PM5 moved to another workout state.
@@ -77,4 +93,8 @@ final class WorkoutStateChanged extends RowingEvent {
 
   /// True when the PM5 started a new workout and time and distance restarted.
   final bool isReset;
+
+  @override
+  String toString() =>
+      'WorkoutStateChanged(elapsed: $elapsed, ${previous.name} -> ${current.name}, reset: $isReset)';
 }
