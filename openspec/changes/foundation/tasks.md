@@ -2,7 +2,7 @@
 
 ## 1. Setup
 
-- [ ] 1.1 Flutter-SDK (stable) auf Fedora installieren und `flutter doctor` für Linux-Desktop und Android grün bekommen. Verifikation: `flutter doctor` ohne Fehler für Linux und Android
+- [x] 1.1 Flutter-SDK (stable) auf Fedora installieren und `flutter doctor` für Linux-Desktop und Android grün bekommen. Verifikation: `flutter doctor` ohne Fehler für Linux und Android
 - [x] 1.2 Git-Repo initialisieren, `.gitignore` für Flutter anlegen und das OpenSpec-Verzeichnis committen. Verifikation: `git log` zeigt den Initial-Commit
 - [x] 1.3 Flutter-App `aergrow` im Repo-Root anlegen (Plattformen: android, ios, linux, macos) und Riverpod, drift, flutter_blue_plus, wakelock_plus hinzufügen. Verifikation: `flutter run -d linux` startet eine leere App
 - [x] 1.4 Dart-Package `packages/pm5_protocol` anlegen und per `path:` einbinden. Verifikation: `dart test` im Package läuft (leerer Test grün)
