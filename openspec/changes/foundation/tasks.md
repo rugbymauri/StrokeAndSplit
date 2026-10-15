@@ -11,9 +11,9 @@
 ## 2. BLE-Spike am echten PM5
 
 - [ ] 2.1 Minimalen Spike-Screen bauen: PM5 scannen, verbinden, Characteristics `0x0031`–`0x0036` abonnieren, Sample Rate auf 250 ms setzen und Rohpakete mit Zeitstempel in eine Datei schreiben. Verifikation: auf Android am PM5 läuft ein Log mit Paketen aller abonnierten Characteristics
-- [ ] 2.2 Aufnahmen erstellen: ca. 2 min Just Row, Rudern–Stopp–Pause (≥ 60 s)–Weiterrudern, sowie Workout-Reset am PM5. Ablage unter `packages/pm5_protocol/test/fixtures/`. Verifikation: drei Fixture-Dateien sind committed
-- [ ] 2.3 Byte-Layouts aus den Dumps gegen die PM5-Interface-Definition prüfen und Abweichungen in `packages/pm5_protocol/README.md` festhalten. Dabei auch das Verhalten der Elapsed Time bei Pause notieren (Open Question aus dem Design). Verifikation: README enthält die Layout-Tabelle und die Pausen-Beobachtung
-- [ ] 2.4 Den Spike auch unter Linux-Desktop ausführen und das Ergebnis (funktioniert / Probleme) im README festhalten. Verifikation: README-Eintrag zu Linux-BLE vorhanden
+- [x] 2.2 Aufnahmen erstellen: ca. 2 min Just Row, Rudern–Stopp–Pause (≥ 60 s)–Weiterrudern, sowie Workout-Reset am PM5. Ablage unter `packages/pm5_protocol/test/fixtures/`. Verifikation: drei Fixture-Dateien sind committed
+- [x] 2.3 Byte-Layouts aus den Dumps gegen die PM5-Interface-Definition prüfen und Abweichungen in `packages/pm5_protocol/README.md` festhalten. Dabei auch das Verhalten der Elapsed Time bei Pause notieren (Open Question aus dem Design). Verifikation: README enthält die Layout-Tabelle und die Pausen-Beobachtung
+- [x] 2.4 Den Spike auch unter Linux-Desktop ausführen und das Ergebnis (funktioniert / Probleme) im README festhalten. Verifikation: README-Eintrag zu Linux-BLE vorhanden
 
 ## 3. Protokoll-Package `pm5_protocol` (Capability rowing-telemetry)
 
