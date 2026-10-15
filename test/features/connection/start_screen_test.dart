@@ -9,12 +9,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fake_ble_transport.dart';
 
 void main() {
-  testWidgets('offers PM5, simulator and replay as data sources', (tester) async {
+  testWidgets('offers PM5, simulator and the recorded sessions', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: StartScreen())));
 
     expect(find.text('PM5 suchen'), findsOneWidget);
     expect(find.text('Simulator'), findsOneWidget);
-    expect(find.text('Session abspielen'), findsOneWidget);
+    expect(find.text('Sessions'), findsOneWidget);
   });
 
   testWidgets('starts the simulator and opens the live display', (tester) async {

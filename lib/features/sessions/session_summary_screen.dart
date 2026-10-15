@@ -5,6 +5,7 @@ import '../../data/db/database.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
 import '../live/formatters.dart';
+import 'session_actions.dart';
 
 /// The summary of one stored session.
 class SessionSummaryScreen extends ConsumerWidget {
@@ -16,7 +17,25 @@ class SessionSummaryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(sessionProvider(sessionId));
     return Scaffold(
-      appBar: AppBar(title: Text(session.value == null ? 'Session' : formatDateTime(session.value!.startedAt))),
+      appBar: AppBar(
+        title: Text(session.value == null ? 'Session' : formatDateTime(session.value!.startedAt)),
+        actions: [
+          if (session.value case final row?) ...[
+            IconButton(
+              tooltip: 'Abspielen',
+              icon: const Icon(Icons.play_arrow),
+              onPressed: () => replaySession(context, ref, row),
+            ),
+            IconButton(
+              tooltip: 'Löschen',
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () async {
+                if (await deleteSession(context, ref, row) && context.mounted) Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ],
+      ),
       body: switch (session) {
         AsyncData(value: final session?) => _Summary(session: session),
         AsyncData() => const Center(child: Text('Diese Session gibt es nicht mehr.')),

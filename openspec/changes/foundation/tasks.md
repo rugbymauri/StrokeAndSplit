@@ -56,8 +56,8 @@
 - [x] 7.2 Recorder: Start/Stopp, session-relative Werte über den Offset-Akkumulator, gepufferte Batch-Writes alle 2 s, Zusammenfassung beim Beenden. Verifikation: Unit-Test mit Replay-Fixture und In-Memory-DB prüft Zusammenfassungswerte
 - [x] 7.3 Crash-Recovery: beim Start `recording` zu `incomplete` setzen und Zusammenfassung nachberechnen. Verifikation: Unit-Test simuliert einen Abbruch mitten in der Session
 - [x] 7.4 Session-Start/-Stopp-Bedienung im Live-Display und Zusammenfassungs-Screen nach dem Beenden. Verifikation: Widget-Test für den Ablauf Start, Ticks, Stopp, Zusammenfassung mit Simulator
-- [ ] 7.5 Session-Liste (neueste zuerst) und Löschen mit Bestätigung. Verifikation: Widget-Test für Sortierung und Löschen
-- [ ] 7.6 „Session abspielen“ aus der Liste mit `ReplaySource`. Verifikation: Widget-Test startet Replay und das Live-Display zeigt Werte, Kennzeichnung „Replay“
+- [x] 7.5 Session-Liste (neueste zuerst) und Löschen mit Bestätigung. Verifikation: Widget-Test für Sortierung und Löschen
+- [x] 7.6 „Session abspielen“ aus der Liste mit `ReplaySource`. Verifikation: Widget-Test startet Replay und das Live-Display zeigt Werte, Kennzeichnung „Replay“
 - [ ] 7.7 Export/Import `.aergrow` (Design D8) über den System-Teilen-Dialog bzw. Dateiauswahl. Verifikation: Unit-Test Export→Import-Roundtrip ergibt identische Zusammenfassung; manuell Handy→Laptop
 
 ## 8. Integration
