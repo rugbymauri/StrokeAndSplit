@@ -45,3 +45,7 @@ app.*.map.json
 
 # Raw spike recordings (curated ones go to packages/pm5_protocol/test/fixtures)
 /recordings/
+
+# Git worktrees for parallel work
+/.claude/worktrees/
+/worktrees/
