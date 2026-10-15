@@ -30,24 +30,24 @@
 
 - [x] 4.1 Interface `ErgSource` (Stream von `RawPacket`, Verbindungszustand, Quelltyp) und den austauschbaren Riverpod-Provider der aktiven Quelle anlegen. Verifikation: Widget-Test wechselt die Quelle per Provider-Override
 - [ ] 4.2 `Pm5BleSource`: Scan mit Filter auf PM5 und 15-s-Timeout, Verbinden, Subscriptions, Sample Rate setzen. Verifikation: manuell auf Android, PM5 erscheint in der Liste und liefert Pakete
-- [ ] 4.3 Verbindungs-Zustandsautomat mit 30-s-Reconnect und bewusstem Trennen ohne Reconnect (Design D4). Logik testbar vom BLE-Plugin getrennt halten. Verifikation: Unit-Tests mit Fake-Transport für alle Übergänge, plus manueller Test „PM5 kurz aus der Reichweite tragen“
+- [x] 4.3 Verbindungs-Zustandsautomat mit 30-s-Reconnect und bewusstem Trennen ohne Reconnect (Design D4). Logik testbar vom BLE-Plugin getrennt halten. Verifikation: Unit-Tests mit Fake-Transport für alle Übergänge, plus manueller Test „PM5 kurz aus der Reichweite tragen“
 - [ ] 4.4 Bluetooth-Voraussetzungen prüfen (Adapter aus, Berechtigung verweigert), Android-12+-Permissions und iOS-`Info.plist` eintragen. Verifikation: manuell auf Android mit ausgeschaltetem Bluetooth und verweigerter Berechtigung, die Hinweise erscheinen
-- [ ] 4.5 Fehlermeldung bei fehlgeschlagener Verbindung mit Hinweis auf „nur eine Verbindung“. Verifikation: manuell mit parallel verbundenem ErgData
+- [x] 4.5 Fehlermeldung bei fehlgeschlagener Verbindung mit Hinweis auf „nur eine Verbindung“. Verifikation: manuell mit parallel verbundenem ErgData
 - [x] 4.6 `SimulatedSource` mit Ziel-Pace, Ziel-SPM, Pause/Fortsetzen, Schwankung und Seed (Design D9), die Bytes über `Pm5Encoder` erzeugt. Verifikation: Unit-Test mit festem Seed zeigt, dass sich die Pace nach Änderung innerhalb von ≤ 5 Schlägen dem Ziel nähert und während Pause keine Distanzzunahme stattfindet
 - [x] 4.7 `ReplaySource` aus gespeicherten Rohpaketen mit Geschwindigkeitsfaktor (1×, 10×). Verifikation: Unit-Test zeigt, dass Replay einer Fixture dieselben Events wie direktes Dekodieren ergibt und 10× die Laufzeit entsprechend verkürzt
 
 ## 5. Verbindungs-UI (Capability erg-connection, erg-simulation)
 
-- [ ] 5.1 Startscreen mit Quellenwahl: „PM5 suchen“, „Simulator“, „Session abspielen“. Verifikation: Widget-Test zeigt alle drei Optionen
-- [ ] 5.2 Geräteliste mit Suchzustand, Leerzustand und Tipps nach 15 s. Verifikation: Widget-Test mit Fake-Quelle für die Zustände „gefunden“, „keiner gefunden“ und „Bluetooth aus“
-- [ ] 5.3 Permanenter Verbindungs- und Quellen-Indikator (inkl. deutlicher Kennzeichnung „Simulator“/„Replay“). Verifikation: Widget-Tests für alle Zustände und Quelltypen
-- [ ] 5.4 Simulator-Steuerung (Ziel-Pace, Ziel-SPM, Pause). Verifikation: Widget-Test, bei dem eine Änderung der Steuerung den Simulator-Zielwert setzt
+- [x] 5.1 Startscreen mit Quellenwahl: „PM5 suchen“, „Simulator“, „Session abspielen“. Verifikation: Widget-Test zeigt alle drei Optionen
+- [x] 5.2 Geräteliste mit Suchzustand, Leerzustand und Tipps nach 15 s. Verifikation: Widget-Test mit Fake-Quelle für die Zustände „gefunden“, „keiner gefunden“ und „Bluetooth aus“
+- [x] 5.3 Permanenter Verbindungs- und Quellen-Indikator (inkl. deutlicher Kennzeichnung „Simulator“/„Replay“). Verifikation: Widget-Tests für alle Zustände und Quelltypen
+- [x] 5.4 Simulator-Steuerung (Ziel-Pace, Ziel-SPM, Pause). Verifikation: Widget-Test, bei dem eine Änderung der Steuerung den Simulator-Zielwert setzt
 
 ## 6. Live-Display (Capability live-display)
 
-- [ ] 6.1 Formatierer für Pace (`2:05.3`), Zeit (`12:34` / `1:02:03`), Distanz, Watt, SPM. Verifikation: Unit-Tests inklusive Grenzfällen (0, > 1 h, keine Pace)
-- [ ] 6.2 Live-Display-Layout mit Pace als grösstem Wert, responsiv für Hoch-/Querformat und Desktop-Fenster, HR nur wenn vorhanden. Verifikation: Golden- oder Widget-Tests für Handy hoch, Handy quer und Desktop; keine Overflow-Fehler
-- [ ] 6.3 Veraltet-Markierung nach 3 s ohne Daten. Verifikation: Widget-Test mit Fake-Clock
+- [x] 6.1 Formatierer für Pace (`2:05.3`), Zeit (`12:34` / `1:02:03`), Distanz, Watt, SPM. Verifikation: Unit-Tests inklusive Grenzfällen (0, > 1 h, keine Pace)
+- [x] 6.2 Live-Display-Layout mit Pace als grösstem Wert, responsiv für Hoch-/Querformat und Desktop-Fenster, HR nur wenn vorhanden. Verifikation: Golden- oder Widget-Tests für Handy hoch, Handy quer und Desktop; keine Overflow-Fehler
+- [x] 6.3 Veraltet-Markierung nach 3 s ohne Daten. Verifikation: Widget-Test mit Fake-Clock
 - [ ] 6.4 Wakelock aktiv, solange Live-Display sichtbar und Quelle verbunden ist. Verifikation: manuell auf Android, Bildschirm bleibt bei > Display-Timeout an
 
 ## 7. Session-Aufzeichnung (Capability session-recording)

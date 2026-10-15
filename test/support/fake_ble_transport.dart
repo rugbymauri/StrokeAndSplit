@@ -5,17 +5,27 @@ import 'package:aergrow/data/sources/ble/ble_transport.dart';
 
 /// A [BleTransport] whose answers are set by the test.
 class FakeBleTransport implements BleTransport {
-  FakeBleTransport({this.readinessValue = BluetoothReadiness.ready, this.found = const [], this.connectError});
+  FakeBleTransport({
+    this.readinessValue = BluetoothReadiness.ready,
+    this.found = const [],
+    this.connectError,
+    this.scanError,
+  });
 
   BluetoothReadiness readinessValue;
   List<FoundPm5> found;
   Pm5ConnectException? connectError;
+
+  /// Thrown by [scan] after the readiness check passed.
+  Object? scanError;
 
   @override
   Future<BluetoothReadiness> readiness() async => readinessValue;
 
   @override
   Stream<List<FoundPm5>> scan({Duration timeout = const Duration(seconds: 15)}) async* {
+    final error = scanError;
+    if (error != null) throw error;
     if (found.isNotEmpty) yield found;
     await Future<void>.delayed(timeout);
   }
