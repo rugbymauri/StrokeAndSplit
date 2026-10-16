@@ -4,7 +4,7 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 
 ## 1. Grundlagen
 
-- [ ] 1.1 Schriften Barlow Condensed und IBM Plex Sans als Assets einbinden, Lizenzen (OFL) ablegen. Verifikation: `make check` grün, Schriften erscheinen ohne Netz
+- [x] 1.1 Schriften Barlow Condensed und IBM Plex Sans als Assets einbinden, Lizenzen (OFL) ablegen. Verifikation: `make check` grün, Schriften erscheinen ohne Netz
 - [ ] 1.2 Theme mit den Tokens aus Design D1 (Farben, Schriftstile, Radien, Abstände) in `lib/app`. Bestehende Screens nutzen es. Verifikation: bestehende Widget-Tests grün
 - [ ] 1.3 `CourseStrip` aus `zones` (`lib/features/courses/course_strip.dart`) nach Design D4 ausbauen statt ein neues Widget `SegmentBar` zu bauen: Tokens, Breite, frei/Zone, Helligkeit nach Tempo, Auswahl, Höhen. Bestehende Aufrufe in Streckenliste und Strecken-Editor bleiben. Verifikation: Widget-Tests für freie Strecke, eine Zone und abgestufte Pace-Bänder
 
