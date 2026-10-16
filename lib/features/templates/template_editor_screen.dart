@@ -59,6 +59,27 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  Future<void> _delete() async {
+    final template = widget.template!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        final l10n = context.l10n;
+        return AlertDialog(
+          title: Text(l10n.templateDeleteTitle),
+          content: Text(l10n.templateDeleteBody(template.name)),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.actionCancel)),
+            FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.actionDelete)),
+          ],
+        );
+      },
+    );
+    if (confirmed != true) return;
+    await ref.read(templateRepositoryProvider).delete(template.id);
+    if (mounted) Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final courses = ref.watch(coursesProvider).value ?? const <Course>[];
@@ -68,7 +89,11 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.template == null ? l10n.templateNew : l10n.templateEdit),
-        actions: [IconButton(tooltip: l10n.actionSave, icon: const Icon(Icons.check), onPressed: _save)],
+        actions: [
+          if (widget.template != null)
+            IconButton(tooltip: l10n.actionDelete, icon: const Icon(Icons.delete_outline), onPressed: _delete),
+          IconButton(tooltip: l10n.actionSave, icon: const Icon(Icons.check), onPressed: _save),
+        ],
       ),
       body: Center(
         child: ConstrainedBox(

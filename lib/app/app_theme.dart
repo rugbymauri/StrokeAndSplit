@@ -109,11 +109,17 @@ ThemeData appTheme() {
         borderSide: BorderSide(color: AppColors.text, width: 2),
       ),
     ),
-    tabBarTheme: const TabBarThemeData(
+    // Segmented tabs as in the canvas: the chosen tab on a lighter pill.
+    tabBarTheme: TabBarThemeData(
       labelColor: AppColors.text,
       unselectedLabelColor: AppColors.textMuted,
-      indicatorColor: AppColors.text,
-      dividerColor: AppColors.line,
+      labelStyle: AppTextStyles.button.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
+      unselectedLabelStyle: AppTextStyles.button.copyWith(fontSize: 15),
+      indicator: BoxDecoration(color: AppColors.line, borderRadius: BorderRadius.circular(AppRadii.small - 3)),
+      indicatorSize: TabBarIndicatorSize.tab,
+      dividerHeight: 0,
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      splashBorderRadius: BorderRadius.circular(AppRadii.small - 3),
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.text, linearTrackColor: AppColors.track),
   );

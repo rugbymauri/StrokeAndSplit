@@ -754,19 +754,19 @@ abstract class AppLocalizations {
   /// Summary: label of the average pace per 500 metres
   ///
   /// In de, this message translates to:
-  /// **'⌀ Pace'**
+  /// **'Ø Pace'**
   String get sessionAveragePace;
 
   /// Summary: label of the average power
   ///
   /// In de, this message translates to:
-  /// **'⌀ Watt'**
+  /// **'Ø Watt'**
   String get sessionAverageWatts;
 
   /// Summary: label of the average stroke rate
   ///
   /// In de, this message translates to:
-  /// **'⌀ spm'**
+  /// **'Ø spm'**
   String get sessionAverageStrokeRate;
 
   /// Summary: label of the number of strokes
@@ -936,6 +936,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Vorlage anlegen'**
   String get templateCreate;
+
+  /// Templates: button in the opened template that starts rowing it
+  ///
+  /// In de, this message translates to:
+  /// **'Starten'**
+  String get templateStart;
 
   /// Templates: there is no template
   ///

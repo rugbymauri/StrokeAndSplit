@@ -11,6 +11,7 @@ import 'package:aergrow/features/connection/start_screen.dart';
 import 'package:aergrow/features/sessions/session_summary_screen.dart';
 import 'package:aergrow/features/templates/template_editor_screen.dart';
 import 'package:aergrow/features/templates/templates_screen.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,18 +22,36 @@ import '../../support/test_database.dart';
 import '../../support/localized_app.dart';
 
 class _Setup {
+  _Setup({this.rower = const RowerChoice.simulator()});
+
+  final RowerChoice rower;
   final db = openTestDatabase();
   late final courses = CourseRepository(db);
   late final templates = TemplateRepository(db);
   late final container = ProviderContainer(overrides: [
     databaseProvider.overrideWithValue(db),
     wakelockProvider.overrideWithValue(FakeWakelock()),
-    rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(const RowerChoice.simulator())),
+    rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(rower)),
   ]);
 
   Future<int> addCourse(WidgetTester tester, String name, {int length = 1000}) async => (await tester.runAsync(
         () => courses.create(name, CourseDefinition.single(axis: CourseAxis.distance, length: length)),
       ))!;
+
+  /// A course of 1000 m with the zone „Tempo“ from 200 to 800 m.
+  Future<int> addCourseWithZone(WidgetTester tester, String name) async => (await tester.runAsync(
+        () => courses.create(
+          name,
+          const CourseDefinition(axis: CourseAxis.distance, length: 1000, segments: [
+            CourseSegment(length: 200),
+            CourseSegment(length: 600, paceFastCs: 12500, paceSlowCs: 13000, spmMin: 20, spmMax: 22, zoneName: 'Tempo'),
+            CourseSegment(length: 200),
+          ]),
+        ),
+      ))!;
+
+  Future<int> addTemplate(WidgetTester tester, String name, {required int courseId, int? laps = 3}) async =>
+      (await tester.runAsync(() => templates.create(name, courseId: courseId, laps: laps)))!;
 
   Future<void> pump(
     WidgetTester tester, {
@@ -65,8 +84,9 @@ void main() {
     await setup.pump(tester);
 
     expect(find.text('Seerunde x3'), findsOneWidget);
-    expect(find.text('Seerunde · 3 Runden'), findsOneWidget);
-    expect(find.text('Seerunde · offen'), findsOneWidget);
+    expect(find.text('Seerunde · 1000 m · 3 Runden'), findsOneWidget);
+    expect(find.text('Seerunde · 1000 m · offen'), findsOneWidget);
+    expect(find.text('Starten'), findsNothing);
     await disposeWidgetsWithDatabase(tester);
   });
 
@@ -93,8 +113,8 @@ void main() {
     await create('Seerunde x3');
     await create('Seerunde offen', open: true);
 
-    expect(find.text('Seerunde · 3 Runden'), findsOneWidget);
-    expect(find.text('Seerunde · offen'), findsOneWidget);
+    expect(find.text('Seerunde · 1000 m · 3 Runden'), findsOneWidget);
+    expect(find.text('Seerunde · 1000 m · offen'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 
@@ -137,17 +157,136 @@ void main() {
     await tester.runAsync(() => setup.templates.create('Seerunde x3', courseId: id, laps: 3));
     await setup.pump(tester);
 
-    await tester.tap(find.byTooltip('Aktionen'));
+    await tester.tap(find.text('Seerunde x3'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Bearbeiten'));
+    await tester.tap(find.byTooltip('Vorlage bearbeiten'));
     await tester.pumpAndSettle();
     await tester.tap(find.bySemanticsLabel('1 Runde mehr'));
     await tester.pump();
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
-    expect(find.text('Seerunde · 4 Runden'), findsOneWidget);
+    expect(find.text('Seerunde · 1000 m · 4 Runden'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
+  });
+
+  group('choosing a template', () {
+    Finder inCard(int id, Finder finder) => find.descendant(of: find.byKey(Key('template-$id')), matching: finder);
+
+    testWidgets('opens a template with its bands and closes it again', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourseWithZone(tester, 'Seerunde');
+      final x3 = await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+      final open = await setup.addTemplate(tester, 'Seerunde offen', courseId: course, laps: null);
+      await setup.pump(tester);
+
+      expect(find.text('Starten'), findsNothing);
+      expect(find.byTooltip('Vorlage bearbeiten'), findsNothing);
+      await tester.tap(find.text('Seerunde x3'));
+      await tester.pumpAndSettle();
+
+      expect(inCard(x3, find.text('Tempo 2:05–2:10 · 20–22 spm')), findsOneWidget);
+      expect(inCard(x3, find.text('Starten')), findsOneWidget);
+      expect(inCard(x3, find.byTooltip('Vorlage bearbeiten')), findsOneWidget);
+
+      // Choosing another template closes the first.
+      await tester.tap(find.text('Seerunde offen'));
+      await tester.pumpAndSettle();
+      expect(inCard(x3, find.text('Starten')), findsNothing);
+      expect(inCard(open, find.text('Starten')), findsOneWidget);
+
+      await tester.tap(find.text('Seerunde offen'));
+      await tester.pumpAndSettle();
+      expect(find.text('Starten'), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('says that a course without zones is rowed freely', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourse(tester, 'Seerunde');
+      await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Seerunde x3'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('ohne Zonen'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows the template chosen with "Nochmal" opened and in view', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourseWithZone(tester, 'Seerunde');
+      final ids = [
+        for (var i = 1; i <= 8; i++) await setup.addTemplate(tester, 'Vorlage $i', courseId: course),
+      ];
+      await setup.pump(tester, home: TemplatesScreen(selectedTemplateId: ids.last));
+
+      expect(inCard(ids.last, find.text('Starten')).hitTestable(), findsOneWidget);
+      expect(find.text('Starten'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('starts the opened template with the chosen FTMS simulator', (tester) async {
+      final setup = _Setup(rower: const RowerChoice.simulator(ErgProtocol.ftms));
+      final course = await setup.addCourseWithZone(tester, 'Seerunde');
+      await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+      await setup.addTemplate(tester, 'Seerunde offen', courseId: course, laps: null);
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Seerunde x3'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Starten'));
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
+      final source = setup.container.read(activeErgSourceProvider);
+      expect((source?.kind, source?.protocol), (ErgSourceKind.simulator, ErgProtocol.ftms));
+      expect(setup.container.read(sessionRecorderProvider)?.template?.name, 'Seerunde x3');
+      expect(find.text('Runde 1 / 3'), findsOneWidget);
+
+      await setup.container.read(sessionRecorderProvider.notifier).stop();
+      await setup.container.read(activeErgSourceProvider.notifier).clear();
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('deletes a template in its editor', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourse(tester, 'Seerunde');
+      await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Seerunde x3'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Vorlage bearbeiten'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Löschen'));
+      await tester.pumpAndSettle();
+      expect(find.text('Vorlage löschen?'), findsOneWidget);
+      await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Löschen')));
+      await setup.settle(tester);
+
+      expect(find.byType(TemplatesScreen), findsOneWidget);
+      expect(find.text('Seerunde x3'), findsNothing);
+      expect(find.text('Noch keine Vorlagen angelegt.'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows the opened template in English', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourseWithZone(tester, 'Seerunde');
+      final id = await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+      await setup.pump(tester, home: TemplatesScreen(selectedTemplateId: id), locale: const Locale('en'));
+
+      expect(find.text('Templates'), findsOneWidget);
+      expect(find.text('Seerunde · 1000 m · 3 laps'), findsOneWidget);
+      expect(find.text('Tempo 2:05–2:10 · 20–22 spm'), findsOneWidget);
+      expect(find.text('Start'), findsOneWidget);
+      expect(find.byTooltip('Edit template'), findsOneWidget);
+      expect(find.text('New template'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
   });
 
   group('number of laps', () {
@@ -259,6 +398,8 @@ void main() {
     await setup.pump(tester);
 
     await tester.tap(find.text('Seerunde x3'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Starten'));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }
@@ -281,6 +422,8 @@ void main() {
     await setup.pump(tester);
 
     await tester.tap(find.text('Sprint x3'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Starten'));
     // 3 × 100 m at 2:10 /500 m take 78 s.
     for (var i = 0; i < 90 * 4; i++) {
       await tester.pump(const Duration(milliseconds: 250));
