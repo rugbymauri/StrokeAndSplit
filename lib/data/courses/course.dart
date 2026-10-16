@@ -1,0 +1,131 @@
+import 'package:flutter/foundation.dart' show immutable, listEquals;
+
+import '../db/database.dart';
+
+export '../db/database.dart' show CourseAxis;
+
+/// A part of a course, with optional bands to row in.
+@immutable
+class CourseSegment {
+  const CourseSegment({required this.length, this.paceFastCs, this.paceSlowCs, this.spmMin, this.spmMax});
+
+  /// In the unit of the course: metres or seconds.
+  final int length;
+
+  /// Fastest and slowest pace per 500 m, in centiseconds.
+  final int? paceFastCs;
+  final int? paceSlowCs;
+  final int? spmMin;
+  final int? spmMax;
+
+  bool get hasPaceBand => paceFastCs != null && paceSlowCs != null;
+  bool get hasSpmBand => spmMin != null && spmMax != null;
+
+  /// A segment without any band is rowed freely.
+  bool get isFree => !hasPaceBand && !hasSpmBand;
+
+  CourseSegment withLength(int length) =>
+      CourseSegment(length: length, paceFastCs: paceFastCs, paceSlowCs: paceSlowCs, spmMin: spmMin, spmMax: spmMax);
+
+  @override
+  bool operator ==(Object other) =>
+      other is CourseSegment &&
+      other.length == length &&
+      other.paceFastCs == paceFastCs &&
+      other.paceSlowCs == paceSlowCs &&
+      other.spmMin == spmMin &&
+      other.spmMax == spmMax;
+
+  @override
+  int get hashCode => Object.hash(length, paceFastCs, paceSlowCs, spmMin, spmMax);
+
+  @override
+  String toString() => 'CourseSegment($length, pace $paceFastCs–$paceSlowCs, spm $spmMin–$spmMax)';
+}
+
+/// What a course asks for: its axis, its length and its segments.
+@immutable
+class CourseDefinition {
+  const CourseDefinition({required this.axis, required this.length, required this.segments});
+
+  /// A new course starts with a single segment over its whole length.
+  CourseDefinition.single({required CourseAxis axis, required int length})
+      : this(axis: axis, length: length, segments: [CourseSegment(length: length)]);
+
+  final CourseAxis axis;
+
+  /// In metres or seconds, depending on [axis].
+  final int length;
+  final List<CourseSegment> segments;
+
+  /// Where each segment ends, from the start of the course.
+  List<int> get segmentEnds {
+    var end = 0;
+    return [for (final s in segments) end += s.length];
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is CourseDefinition && other.axis == axis && other.length == length && listEquals(other.segments, segments);
+
+  @override
+  int get hashCode => Object.hash(axis, length, Object.hashAll(segments));
+}
+
+/// A stored course in its newest version.
+@immutable
+class Course {
+  const Course({
+    required this.id,
+    required this.name,
+    required this.versionId,
+    required this.version,
+    required this.definition,
+  });
+
+  final int id;
+  final String name;
+  final int versionId;
+  final int version;
+  final CourseDefinition definition;
+
+  CourseAxis get axis => definition.axis;
+}
+
+/// A course length as entered: `1000 m` or `4:00`.
+String formatCourseLength(CourseAxis axis, int length) => switch (axis) {
+      CourseAxis.distance => '$length m',
+      CourseAxis.time => '${length ~/ 60}:${(length % 60).toString().padLeft(2, '0')}',
+    };
+
+/// What is wrong with [definition], in words for the user; empty when it can
+/// be saved.
+List<String> courseErrors(CourseDefinition definition) {
+  final errors = <String>[];
+  final axis = definition.axis;
+  if (definition.length <= 0) {
+    errors.add('Die Länge fehlt.');
+    return errors;
+  }
+  for (final (i, segment) in definition.segments.indexed) {
+    final name = 'Segment ${i + 1}';
+    if (segment.length <= 0) errors.add('$name hat keine Länge.');
+    if ((segment.paceFastCs == null) != (segment.paceSlowCs == null)) {
+      errors.add('$name: Für das Pace-Band fehlt eine Grenze.');
+    } else if (segment.hasPaceBand && segment.paceFastCs! > segment.paceSlowCs!) {
+      errors.add('$name: Die schnellste Pace ist langsamer als die langsamste.');
+    }
+    if ((segment.spmMin == null) != (segment.spmMax == null)) {
+      errors.add('$name: Für das Schlagzahl-Band fehlt eine Grenze.');
+    } else if (segment.hasSpmBand && segment.spmMin! > segment.spmMax!) {
+      errors.add('$name: Die niedrigste Schlagzahl liegt über der höchsten.');
+    }
+  }
+  final sum = definition.segments.fold(0, (sum, s) => sum + s.length);
+  final difference = sum - definition.length;
+  if (difference != 0) {
+    errors.add('Die Segmente ergeben ${formatCourseLength(axis, sum)}, '
+        'das sind ${formatCourseLength(axis, difference.abs())} ${difference < 0 ? 'zu wenig' : 'zu viel'}.');
+  }
+  return errors;
+}
