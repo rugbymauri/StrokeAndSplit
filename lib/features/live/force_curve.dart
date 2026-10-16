@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../app/design_tokens.dart';
 import '../../l10n/l10n.dart';
 import 'formatters.dart';
+import 'live_text_styles.dart';
 
 /// Where the force curve sits in the live display (force-curve, Design D2 and the table in its context).
 enum ForceCurveVariant {
@@ -106,7 +107,7 @@ class ForceCurve extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(child: Text(context.l10n.liveForceCurveShort, style: _small, maxLines: 1)),
+              Center(child: Text(context.l10n.liveForceCurveShort, style: _title, maxLines: 1)),
               const SizedBox(width: AppSpacing.m),
               Expanded(child: _withNote(context, curve)),
             ],
@@ -122,7 +123,7 @@ class ForceCurve extends StatelessWidget {
                 Expanded(
                   child: Text(
                     context.l10n.liveForceCurve,
-                    style: _small.copyWith(color: foreground),
+                    style: _title.copyWith(color: foreground),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -139,6 +140,9 @@ class ForceCurve extends StatelessWidget {
   }
 
   static const _small = TextStyle(fontFamily: AppFonts.text, fontSize: 12, color: AppColors.textMuted);
+
+  /// The title, small like the names of the tiles.
+  static const _title = LiveTextStyles.caption;
 
   Widget _framed({required EdgeInsets padding, required Widget child}) => DecoratedBox(
         key: const Key('force-curve'),
@@ -187,7 +191,7 @@ class ForceCurve extends StatelessWidget {
           Expanded(
             child: Text(
               l10n.liveForceCurve,
-              style: AppTextStyles.caption,
+              style: _title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -255,7 +259,7 @@ class _LegendEntry extends StatelessWidget {
             decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
           ),
           const SizedBox(width: 6),
-          Text(text, style: AppTextStyles.caption),
+          Text(text, style: LiveTextStyles.caption),
         ],
       );
 }

@@ -5,6 +5,7 @@ import '../../data/courses/course.dart';
 import '../../data/courses/lap_tracker.dart';
 import '../../l10n/l10n.dart';
 import 'formatters.dart';
+import 'live_text_styles.dart';
 import 'zone_hint.dart';
 
 /// The stroke rate while rowing a template, coloured by its zone status and
@@ -45,7 +46,7 @@ class StrokeRateCard extends StatelessWidget {
     final band = segment.hasSpmBand ? '${segment.spmMin}–${segment.spmMax} spm' : null;
     final label = Text(
       l10n.metricStrokeRate.toUpperCase(),
-      style: AppTextStyles.label.copyWith(fontSize: 12, color: foreground),
+      style: LiveTextStyles.label.copyWith(color: foreground),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
@@ -75,7 +76,8 @@ class StrokeRateCard extends StatelessWidget {
           children: [
             TextSpan(
               text: landscape && band != null ? ' $band' : ' spm',
-              style: AppTextStyles.caption.copyWith(fontSize: 15, color: foreground),
+              // In proportion to the value; the band in landscape is longer, so a little smaller.
+              style: AppTextStyles.caption.copyWith(fontSize: fontSize * (landscape ? 0.3 : 0.36), color: foreground),
             ),
           ],
         ),

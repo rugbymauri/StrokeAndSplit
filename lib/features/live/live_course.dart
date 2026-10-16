@@ -86,8 +86,8 @@ class CourseLiveView extends StatelessWidget {
       AppSpacing.pagePortrait,
       AppSpacing.s,
     );
-    const strokeHeight = 76.0;
-    const tilesHeight = 60.0;
+    const strokeHeight = 88.0;
+    const tilesHeight = 76.0;
     const curveHeight = 72.0;
     const buttonHeight = 52.0;
     final inner = padding.deflateSize(size);
@@ -104,14 +104,14 @@ class CourseLiveView extends StatelessWidget {
         children: [
           SizedBox(height: boxHeight, child: _dim(_paceBox())),
           const SizedBox(height: _gap),
-          SizedBox(height: strokeHeight, child: _dim(_strokeRate(math.min(52, cap)))),
+          SizedBox(height: strokeHeight, child: _dim(_strokeRate(math.min(80, cap)))),
           const SizedBox(height: _gap),
           SizedBox(
             height: tilesHeight,
             child: _dim(Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (final (i, tile) in _tiles(context, math.min(22, cap)).indexed) ...[
+                for (final (i, tile) in _tiles(context, math.min(48, cap)).indexed) ...[
                   if (i > 0) const SizedBox(width: AppSpacing.s),
                   Expanded(child: tile),
                 ],
@@ -138,7 +138,7 @@ class CourseLiveView extends StatelessWidget {
     final boxWidth = math.min(inner.height, (inner.width - sideWidth - 2 * AppSpacing.m) * 0.65);
     final cap = PaceBox.paceFontSizeFor(Size(boxWidth, inner.height)) * valueShareOfPace;
     final curve = forceCurves != null && inner.height >= 260;
-    final tiles = _tiles(context, math.min(22, cap));
+    final tiles = _tiles(context, math.min(48, cap));
     return Padding(
       key: const ValueKey(LiveLayout.landscape),
       padding: padding,
@@ -153,7 +153,7 @@ class CourseLiveView extends StatelessWidget {
               children: [
                 Expanded(
                   child: _dim(_strokeRate(
-                    math.min(72, cap),
+                    math.min(AppTextStyles.value.fontSize!, cap),
                     landscape: true,
                     footer: curve
                         ? (foreground) => forceCurves!.widget(variant: ForceCurveVariant.tinted, foreground: foreground)

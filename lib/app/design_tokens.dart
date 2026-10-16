@@ -66,8 +66,8 @@ abstract final class AppTextStyles {
   /// The pace, always the largest value.
   static const pace = TextStyle(fontFamily: AppFonts.display, fontSize: 128, fontWeight: FontWeight.w700, height: 1);
 
-  /// A value in a tile, e.g. stroke rate or watts.
-  static const value = TextStyle(fontFamily: AppFonts.display, fontSize: 56, fontWeight: FontWeight.w700, height: 1);
+  /// A value in a tile, e.g. stroke rate or watts, at most; it shrinks to fit its tile.
+  static const value = TextStyle(fontFamily: AppFonts.display, fontSize: 112, fontWeight: FontWeight.w700, height: 1);
 
   /// The unit after a [value], e.g. "spm".
   static const valueUnit = TextStyle(

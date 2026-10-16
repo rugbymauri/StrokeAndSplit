@@ -9,6 +9,7 @@ import 'force_curve.dart';
 import 'formatters.dart';
 import 'live_layout.dart';
 import 'live_status.dart';
+import 'live_text_styles.dart';
 import 'metric_tile.dart';
 
 /// The live display without a template (ui-design, Design D2): the pace on
@@ -45,7 +46,7 @@ class FreeLiveView extends StatelessWidget {
   final Widget? status;
 
   /// Room the label above the pace takes at most.
-  static const _labelHeight = 20.0;
+  static const _labelHeight = 16.0;
   static const _gap = AppSpacing.m;
 
   @override
@@ -74,7 +75,7 @@ class FreeLiveView extends StatelessWidget {
         children: [
           SizedBox(height: paceHeight, child: _dim(_pace(context, pace))),
           const SizedBox(height: _gap),
-          Expanded(child: _dim(_tiles(context, math.min(AppTextStyles.value.fontSize!, pace * valueShareOfPace)))),
+          Expanded(child: _dim(_tiles(context, _valueSize(pace)))),
           const SizedBox(height: _gap),
           SizedBox(height: 48, child: _dim(_SideValues(tick: tick, rrIntervalMs: rrIntervalMs, session: session, card: true))),
           if (curve) ...[
@@ -147,7 +148,7 @@ class FreeLiveView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _dim(_tiles(context, math.min(52, pace * valueShareOfPace)))),
+                Expanded(child: _dim(_tiles(context, _valueSize(pace)))),
                 const SizedBox(height: _gap),
                 SizedBox(height: 52, child: LiveActionRow(action: action, status: status)),
               ],
@@ -158,6 +159,9 @@ class FreeLiveView extends StatelessWidget {
     );
   }
 
+  /// The values in the tiles, as large as the tiles allow while staying below [pace].
+  static double _valueSize(double pace) => math.min(AppTextStyles.value.fontSize!, pace * valueShareOfPace);
+
   Widget _dim(Widget child) => Opacity(opacity: outdated ? 0.4 : 1, child: child);
 
   Widget _pace(BuildContext context, double fontSize) {
@@ -166,7 +170,7 @@ class FreeLiveView extends StatelessWidget {
       children: [
         Text(
           context.l10n.metricPace.toUpperCase(),
-          style: AppTextStyles.label,
+          style: LiveTextStyles.label,
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -282,12 +286,12 @@ class _SideValues extends StatelessWidget {
               children: [
                 TextSpan(
                   text: value,
-                  style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 18, color: AppColors.text, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             key: key,
-            style: AppTextStyles.caption.copyWith(fontSize: 14, fontFeatures: const [FontFeature.tabularFigures()]),
+            style: AppTextStyles.caption.copyWith(fontSize: 12, fontFeatures: const [FontFeature.tabularFigures()]),
           ),
           if (note != null) ...[
             const SizedBox(width: 6),

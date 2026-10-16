@@ -29,6 +29,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 import '../../support/fake_ble_transport.dart';
 import '../../support/fake_erg_source.dart';
 import '../../support/fixtures.dart';
+import '../../support/fonts.dart';
 import '../../support/ghost_sessions.dart';
 import '../../support/localized_app.dart';
 import '../../support/rowed_sessions.dart';
@@ -330,6 +331,7 @@ void main() {
       (true, ErgConnectionState.connected, false, false),
       (true, ErgConnectionState.reconnecting, true, false),
       (false, ErgConnectionState.connected, true, true),
+      (true, ErgConnectionState.connected, false, true),
     ]) {
       final what = '${template ? ' with a template' : ''}'
           '${state == ErgConnectionState.connected ? '' : ' while ${state.name}'}'
@@ -778,6 +780,58 @@ void main() {
       expect(find.byType(ProgressFrame), findsNothing);
       expect(find.textContaining('Ghost'), findsNothing);
       await disposeWidgetsWithDatabase(tester);
+    });
+  });
+
+  // Last, as the fonts stay loaded for every test after.
+  group('large values and small labels', () {
+    setUpAll(loadAppFonts);
+
+    /// The height on screen of the text with [key], after its tile shrank it to fit.
+    double height(WidgetTester tester, String key) => tester.getRect(find.byKey(Key(key))).height;
+
+    double fontSize(WidgetTester tester, String text) => tester.widget<Text>(find.text(text)).style!.fontSize!;
+
+    testWidgets('fills the tiles in portrait with values larger than before', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+      await harness.emit(tester, _tick(heartRate: 151));
+
+      // At most 56 before.
+      expect(height(tester, 'metric-watts'), greaterThan(80));
+      expect(height(tester, 'metric-spm'), greaterThan(56));
+      expect(height(tester, 'metric-elapsed'), greaterThan(56));
+      expect(height(tester, 'metric-pace'), greaterThan(height(tester, 'metric-watts')));
+      // 13 before.
+      for (final label in ['PACE /500 M', 'Watt', 'Zeit', 'Kraftkurve']) {
+        expect(fontSize(tester, label), lessThanOrEqualTo(11), reason: label);
+      }
+    });
+
+    testWidgets('fills the tiles on a template with values larger than before', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, recording: _onCourse());
+      await harness.emit(tester, _tick(heartRate: 151));
+
+      // 22 and 52 before.
+      for (final key in ['metric-lap-time', 'metric-watts', 'metric-hr', 'metric-zone-share']) {
+        expect(height(tester, key), greaterThan(30), reason: key);
+      }
+      expect(height(tester, 'metric-spm'), greaterThan(60));
+      // 12 and 13 before.
+      expect(fontSize(tester, 'Watt'), lessThanOrEqualTo(10));
+      expect(fontSize(tester, 'SCHLAGZAHL'), lessThanOrEqualTo(11));
+      expect(fontSize(tester, 'PACE /500 M'), lessThanOrEqualTo(11));
+    });
+
+    testWidgets('fills the pace box when it shrinks in landscape', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, size: const Size(844, 390), recording: _onCourse());
+      await harness.emit(tester, _tick());
+
+      // 68 before; the shrunk content kept its full width.
+      expect(height(tester, 'pace-box-pace'), greaterThan(90));
+      expect(height(tester, 'metric-watts'), greaterThan(40));
     });
   });
 }
