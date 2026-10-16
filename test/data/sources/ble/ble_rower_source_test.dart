@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:aergrow/data/sources/ble/ble_transport.dart';
 import 'package:aergrow/data/sources/ble/ble_rower_source.dart';
+import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
+
+import '../../../support/fake_heart_rate_transport.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
@@ -245,6 +248,96 @@ void main() {
         expect(link.disconnected, isTrue);
         expect(transport.connectAttempts, 1);
         expect(ftms.connectionState, ErgConnectionState.disconnected);
+      });
+    });
+  });
+
+  group('with a heart rate strap', () {
+    const strap = FoundHeartRateMonitor(id: 'A0:9E:1A:12:34:56', name: 'Polar H10 1A2B3C4D');
+    late FakeHeartRateTransport straps;
+
+    setUp(() => straps = FakeHeartRateTransport());
+
+    /// Starts [rower], attaches a strap after 1 s and returns its link and
+    /// the packets of the source.
+    (FakeHeartRateLink, List<RawPacket>) startWithStrap(FakeAsync async, BleRowerSource rower) {
+      final packets = <RawPacket>[];
+      rower.packets.listen(packets.add);
+      rower.start();
+      async.elapse(const Duration(seconds: 1));
+      straps.connectHeartRateMonitor(strap).then((link) => rower.attachHeartRate(link.notifications));
+      async.flushMicrotasks();
+      return (straps.links.single, packets);
+    }
+
+    for (final device in [_pm5, _ftms]) {
+      test('puts strap packets on the time line of the ${device.protocol.name} rower', () {
+        fakeAsync((async) {
+          final rower = BleRowerSource(transport: transport, device: device);
+          final (strapLink, packets) = startWithStrap(async, rower);
+          final rowerId = device.protocol == ErgProtocol.pm5 ? '0031' : '2ad1';
+
+          async.elapse(const Duration(milliseconds: 500));
+          transport.links.single.notify(rowerId, [1]);
+          async.elapse(const Duration(milliseconds: 250));
+          strapLink.notify([0x00, 72]);
+          async.flushMicrotasks();
+
+          expect([for (final p in packets) (p.characteristicId, p.time)], [
+            (rowerId, const Duration(milliseconds: 1500)),
+            ('2a37', const Duration(milliseconds: 1750)),
+          ]);
+          expect(packets.last.bytes, [0x00, 72]);
+        });
+      });
+    }
+
+    test('keeps the strap while the rower reconnects', () {
+      fakeAsync((async) {
+        final (strapLink, packets) = startWithStrap(async, source);
+
+        transport.reachable = false;
+        transport.links.single.drop();
+        async.elapse(const Duration(seconds: 2));
+        strapLink.notify([0x00, 70]);
+        transport.reachable = true;
+        async.elapse(const Duration(seconds: 3));
+        strapLink.notify([0x00, 71]);
+        async.flushMicrotasks();
+
+        expect(source.connectionState, ErgConnectionState.connected);
+        expect(transport.links, hasLength(2));
+        expect([for (final p in packets) (p.characteristicId, p.bytes[1], p.time)], [
+          ('2a37', 70, const Duration(seconds: 3)),
+          ('2a37', 71, const Duration(seconds: 6)),
+        ]);
+        expect(strapLink.disconnected, isFalse);
+      });
+    });
+
+    test('forwards nothing from the strap once detached', () {
+      fakeAsync((async) {
+        final (strapLink, packets) = startWithStrap(async, source);
+
+        source.detachHeartRate();
+        strapLink.notify([0x00, 72]);
+        async.flushMicrotasks();
+
+        expect(packets, isEmpty);
+      });
+    });
+
+    test('forwards only the strap attached last', () {
+      fakeAsync((async) {
+        final (first, packets) = startWithStrap(async, source);
+        straps.connectHeartRateMonitor(strap).then((link) => source.attachHeartRate(link.notifications));
+        async.flushMicrotasks();
+
+        first.notify([0x00, 60]);
+        straps.links.last.notify([0x00, 80]);
+        async.flushMicrotasks();
+
+        expect([for (final p in packets) p.bytes[1]], [80]);
       });
     });
   });

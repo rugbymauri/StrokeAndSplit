@@ -28,6 +28,7 @@ class BleRowerSource implements ErgSource {
   ErgConnectionState _state = ErgConnectionState.disconnected;
   RowerLink? _link;
   StreamSubscription<(String, List<int>)>? _notifications;
+  StreamSubscription<(String, List<int>)>? _heartRate;
   DateTime? _startedAt;
   var _stopped = false;
 
@@ -74,12 +75,31 @@ class BleRowerSource implements ErgSource {
     _setState(ErgConnectionState.disconnected);
   }
 
+  /// Feeds the measurements of a heart rate strap into [packets], stamped
+  /// with the clock of this source (Design D1).
+  ///
+  /// Replaces a strap attached before. The strap stays attached while the
+  /// rower reconnects; only [detachHeartRate] ends it.
+  void attachHeartRate(Stream<(String, List<int>)> notifications) {
+    _heartRate?.cancel();
+    _startedAt ??= clock.now();
+    _heartRate = notifications.listen(_forward);
+  }
+
+  /// Stops feeding the strap attached with [attachHeartRate].
+  void detachHeartRate() {
+    _heartRate?.cancel();
+    _heartRate = null;
+  }
+
+  void _forward((String, List<int>) notification) {
+    final (id, bytes) = notification;
+    _packets.add(RawPacket(time: clock.now().difference(_startedAt!), characteristicId: id, bytes: bytes));
+  }
+
   void _attach(RowerLink link) {
     _link = link;
-    _notifications = link.notifications.listen((notification) {
-      final (id, bytes) = notification;
-      _packets.add(RawPacket(time: clock.now().difference(_startedAt!), characteristicId: id, bytes: bytes));
-    });
+    _notifications = link.notifications.listen(_forward);
     _setState(ErgConnectionState.connected);
     link.lost.then((_) {
       if (!_stopped && identical(_link, link)) _reconnect();
