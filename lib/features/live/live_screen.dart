@@ -17,6 +17,7 @@ import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
 import 'course_bar.dart';
 import 'formatters.dart';
+import 'live_layout.dart';
 
 /// After this long without data the shown values are marked as outdated.
 const staleAfter = Duration(seconds: 3);
@@ -245,13 +246,13 @@ class _Metrics extends StatelessWidget {
 
     return Opacity(
       opacity: outdated ? 0.4 : 1,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final landscape = constraints.maxWidth > constraints.maxHeight;
+      child: LiveLayoutBuilder(
+        builder: (context, layout) {
           final grid = _Grid(columns: 2, children: secondary);
           return Padding(
+            key: ValueKey(layout),
             padding: const EdgeInsets.all(8),
-            child: landscape
+            child: layout == LiveLayout.landscape
                 ? Row(
                     children: [
                       Expanded(flex: 3, child: pace),

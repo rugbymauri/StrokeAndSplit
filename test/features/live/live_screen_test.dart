@@ -7,6 +7,7 @@ import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/data/templates/session_template.dart';
+import 'package:aergrow/features/live/live_layout.dart';
 import 'package:aergrow/features/live/live_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -145,6 +146,18 @@ void main() {
 
     expect(find.text('Puls'), findsNothing);
   });
+
+  for (final (size, layout) in const [
+    (Size(1200, 700), LiveLayout.landscape),
+    (Size(390, 844), LiveLayout.portrait),
+  ]) {
+    testWidgets('chooses the ${layout.name} layout at ${size.width.toInt()} × ${size.height.toInt()}', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, size: size);
+
+      expect(find.byKey(ValueKey(layout)), findsOneWidget);
+    });
+  }
 
   final layouts = {
     'phone portrait': const Size(390, 844),
