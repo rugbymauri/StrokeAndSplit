@@ -273,6 +273,9 @@ class SessionRepository {
         'averageWatts': ?session.averageWatts,
         'averageStrokeRate': ?session.averageStrokeRate,
         'strokeCount': session.strokeCount,
+        'averageHeartRate': ?session.averageHeartRate,
+        'maxHeartRate': ?session.maxHeartRate,
+        'rmssdMs': ?session.rmssdMs,
       },
     };
     final lines = RawRecording(metadata: metadata, packets: recording.packets).toLines();
@@ -280,7 +283,8 @@ class SessionRepository {
   }
 
   /// Imports an `.aergrow` file or an uncompressed raw recording. Samples,
-  /// strokes and summary are derived from the raw notifications again, so
+  /// strokes, RR intervals and summary are derived from the raw notifications
+  /// again, so
   /// decoder fixes apply to imported sessions too. The session is marked as
   /// imported and counts in no ranking (Change statistics, Design D3).
   /// Returns the new id.

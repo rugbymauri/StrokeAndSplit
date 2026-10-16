@@ -32,6 +32,9 @@ Map<String, Object?> _summary(SessionRow s) => {
       'averageWatts': s.averageWatts,
       'averageStrokeRate': s.averageStrokeRate,
       'strokeCount': s.strokeCount,
+      'averageHeartRate': s.averageHeartRate,
+      'maxHeartRate': s.maxHeartRate,
+      'rmssdMs': s.rmssdMs,
     };
 
 Future<int> _record(SessionRepository repository, String fixture) async {

@@ -1,4 +1,7 @@
 import 'package:aergrow/data/db/database.dart';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:aergrow/data/sessions/session_accumulator.dart';
 import 'package:aergrow/data/sessions/session_repository.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
@@ -32,6 +35,10 @@ List<RawPacket> _pm5Rowing(List<int?> heartRates) => [
 /// Records [packets] as a finished session.
 Future<SessionRow> _record(List<RawPacket> packets, {ErgProtocol protocol = ErgProtocol.ftms}) async {
   final repository = SessionRepository(openTestDatabase());
+  return (await repository.get(await _recordIn(repository, packets, protocol: protocol)))!;
+}
+
+Future<int> _recordIn(SessionRepository repository, List<RawPacket> packets, {required ErgProtocol protocol}) async {
   final id = await repository.create(
     startedAt: DateTime.utc(2026, 10, 16, 7),
     source: ErgSourceKind.values.byName(protocol.name),
@@ -42,16 +49,19 @@ Future<SessionRow> _record(List<RawPacket> packets, {ErgProtocol protocol = ErgP
   accumulator.finish();
   await repository.write(accumulator.takeBatch());
   await repository.finish(id);
-  return (await repository.get(id))!;
+  return id;
 }
 
 /// FTMS rowing with a strap that measures once per second from 0.5 s on.
-List<RawPacket> _ftmsWithStrap(List<(int, List<int>)> measurements) {
+List<RawPacket> _ftmsWithStrap(List<(int, List<int>)> measurements) =>
+    _withStrap(ftmsRowing(seconds: measurements.length), measurements);
+
+List<RawPacket> _withStrap(List<RawPacket> rowing, List<(int, List<int>)> measurements) {
   final strap = [
     for (final (s, (heartRate, intervals)) in measurements.indexed)
       _strap.encode(heartRate: heartRate, intervalsMs: intervals, at: Duration(milliseconds: s * 1000 + 500)),
   ];
-  return [...ftmsRowing(seconds: measurements.length), ...strap]..sort((a, b) => a.time.compareTo(b.time));
+  return [...rowing, ...strap]..sort((a, b) => a.time.compareTo(b.time));
 }
 
 void main() {
@@ -128,5 +138,52 @@ void main() {
       expect((session.averageHeartRate, session.maxHeartRate, session.rmssdMs), (null, null, null));
       expect(session.distanceDm, 400);
     });
+  });
+
+  group('export and import', () {
+    const measurements = [(140, [800]), (150, [810, 790]), (151, [820]), (149, [805])];
+
+    final sessions = {
+      ErgProtocol.pm5: _withStrap(_pm5Rowing([120, 121, 122, 123, 124]), measurements),
+      ErgProtocol.ftms: _ftmsWithStrap(measurements),
+    };
+
+    for (final MapEntry(key: protocol, value: packets) in sessions.entries) {
+      test('keep pulse, RR intervals and summary of a ${protocol.name} session with strap', () async {
+        final phoneDb = openTestDatabase();
+        final laptopDb = openTestDatabase();
+        final phone = SessionRepository(phoneDb);
+        final laptop = SessionRepository(laptopDb);
+        final recorded = await _recordIn(phone, packets, protocol: protocol);
+
+        final bytes = await phone.export(recorded);
+        final imported = await laptop.import(bytes);
+
+        final header = jsonDecode(const LineSplitter().convert(utf8.decode(gzip.decode(bytes))).first) as Map;
+        final original = (await phone.get(recorded))!;
+        final copy = (await laptop.get(imported))!;
+        expect(header['session'], containsPair('rmssdMs', original.rmssdMs));
+        expect(header['session'], containsPair('averageHeartRate', original.averageHeartRate));
+        expect(header['session'], containsPair('maxHeartRate', 151));
+        expect(
+          (copy.averageHeartRate, copy.maxHeartRate, copy.rmssdMs),
+          (original.averageHeartRate, original.maxHeartRate, original.rmssdMs),
+        );
+        expect(copy.rmssdMs, isNotNull);
+
+        Future<List<int?>> pulse(AppDatabase db, int id) async => [
+              for (final s in await (db.select(db.samples)..where((s) => s.sessionId.equals(id))).get()) s.heartRate,
+            ];
+        Future<List<(int, int)>> rr(AppDatabase db, int id) async => [
+              for (final r in await (db.select(db.rrIntervals)..where((r) => r.sessionId.equals(id))).get())
+                (r.tMs, r.rrMs),
+            ];
+        // The strap wins over the PM5 from its first measurement on.
+        expect(await pulse(phoneDb, recorded), [if (protocol == ErgProtocol.pm5) 120 else null, 140, 150, 151, 149]);
+        expect(await pulse(laptopDb, imported), await pulse(phoneDb, recorded));
+        expect(await rr(phoneDb, recorded), [(500, 800), (710, 810), (1500, 790), (2500, 820), (3500, 805)]);
+        expect(await rr(laptopDb, imported), await rr(phoneDb, recorded));
+      });
+    }
   });
 }
