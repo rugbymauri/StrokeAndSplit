@@ -23,6 +23,7 @@ Map<String, Object?> _summary(SessionRow s) => {
       'endedAt': s.endedAt,
       'status': s.status,
       'source': s.source,
+      'protocol': s.protocol,
       'deviceName': s.deviceName,
       'durationMs': s.durationMs,
       'distanceDm': s.distanceDm,
@@ -89,10 +90,38 @@ void main() {
 
     expect(session.status, SessionStatus.complete);
     expect(session.deviceName, 'PM5 430000001 Row');
+    // The file is older than FTMS support and names no protocol.
+    expect(session.protocol, ErgProtocol.pm5);
     expect(session.startedAt.isAtSameMomentAs(DateTime.parse('2026-10-15T20:31:33Z')), isTrue);
     expect(session.distanceDm, greaterThan(0));
     expect(session.courseVersionId, isNull);
     expect(await repository.laps(id), isEmpty);
+  });
+
+  test('names the protocol in the header and recomputes an FTMS session on import', () async {
+    final phone = SessionRepository(openTestDatabase());
+    final laptop = SessionRepository(openTestDatabase());
+    final id = await phone.create(
+      startedAt: DateTime.utc(2026, 10, 16, 7),
+      source: ErgSourceKind.ftms,
+      protocol: ErgProtocol.ftms,
+      deviceName: 'Rower 42',
+    );
+    final accumulator = SessionAccumulator(id, protocol: ErgProtocol.ftms);
+    ftmsRowing(seconds: 120).forEach(accumulator.add);
+    accumulator.finish();
+    await phone.write(accumulator.takeBatch());
+    await phone.finish(id, endedAt: DateTime.utc(2026, 10, 16, 7, 5));
+
+    final bytes = await phone.export(id);
+    final header = jsonDecode(const LineSplitter().convert(utf8.decode(gzip.decode(bytes))).first) as Map;
+    expect(header['protocol'], 'ftms');
+
+    final imported = await laptop.import(bytes);
+    final original = (await phone.get(id))!;
+    final copy = (await laptop.get(imported))!;
+    expect(_summary(copy), _summary(original));
+    expect((copy.protocol, copy.strokeCount, copy.distanceDm), (ErgProtocol.ftms, 48, 4800));
   });
 
   test('keeps an incomplete session incomplete', () async {
@@ -123,7 +152,7 @@ void main() {
 
     /// Records just_row as "Seerunde x3" on the phone, by default on a course
     /// with the zone "Tempo" from 20 to 40 m.
-    Future<(AppDatabase, int)> recordOnPhone({CourseDefinition? definition}) async {
+    Future<(AppDatabase, int)> recordOnPhone({CourseDefinition? definition, bool ftms = false}) async {
       final db = openTestDatabase();
       final zoneId = await ZoneRepository(db).create(tempo);
       final course = definition ??
@@ -139,11 +168,13 @@ void main() {
       final repository = SessionRepository(db);
       final id = await repository.create(
         startedAt: DateTime.utc(2026, 10, 16, 7),
-        source: ErgSourceKind.pm5,
+        source: ftms ? ErgSourceKind.ftms : ErgSourceKind.pm5,
+        protocol: ftms ? ErgProtocol.ftms : ErgProtocol.pm5,
         template: template,
       );
-      final accumulator = SessionAccumulator(id, course: course, plannedLaps: 3);
-      loadFixture('just_row').packets.forEach(accumulator.add);
+      final protocol = ftms ? ErgProtocol.ftms : ErgProtocol.pm5;
+      final accumulator = SessionAccumulator(id, protocol: protocol, course: course, plannedLaps: 3);
+      (ftms ? ftmsRowing(seconds: 40) : loadFixture('just_row').packets).forEach(accumulator.add);
       accumulator.finish();
       await repository.write(accumulator.takeBatch());
       await repository.finish(id);
@@ -175,6 +206,18 @@ void main() {
       expect(course.definition.placements, [ZonePlacement(zoneId: zone.id, start: 20)]);
       expect(course.definition.sameAs((await CourseRepository(phone).all()).single.definition), isTrue);
       expect(course.versionId, session.courseVersionId);
+    });
+
+    test('gives the same laps for an FTMS session after export and import', () async {
+      final (phone, recorded) = await recordOnPhone(ftms: true);
+      final laptop = openTestDatabase();
+
+      final imported = await SessionRepository(laptop).import(await SessionRepository(phone).export(recorded));
+
+      expect(await results(laptop, imported), await results(phone, recorded));
+      expect((await SessionRepository(laptop).laps(imported)).where((l) => l.complete), hasLength(3));
+      expect((await SessionRepository(laptop).get(imported))!.protocol, ErgProtocol.ftms);
+      expect((await ZoneRepository(laptop).all()).single.sameAs(tempo), isTrue);
     });
 
     test('reuses a course and its zone with the same name and definition', () async {

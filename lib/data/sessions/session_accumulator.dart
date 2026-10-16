@@ -32,13 +32,20 @@ class SessionBatch {
 /// so an imported session ends up with the same rows as the recorded one.
 /// On a [course] it also follows the laps (Design D2).
 class SessionAccumulator {
-  SessionAccumulator(this.sessionId, {CourseDefinition? course, int? plannedLaps})
-      : _tracker = course == null ? null : LapTracker(course, plannedLaps: plannedLaps);
+  SessionAccumulator(
+    this.sessionId, {
+    this.protocol = ErgProtocol.pm5,
+    CourseDefinition? course,
+    int? plannedLaps,
+  })  : _tracker = course == null ? null : LapTracker(course, plannedLaps: plannedLaps),
+        _decoder = ErgDecoder.forProtocol(protocol, onWarning: (message) => debugPrint('${protocol.name}: $message'));
 
   final int sessionId;
-  final LapTracker? _tracker;
 
-  final _decoder = Pm5Decoder(onWarning: (message) => debugPrint('PM5: $message'));
+  /// Protocol of the raw notifications; picks the decoder.
+  final ErgProtocol protocol;
+  final LapTracker? _tracker;
+  final ErgDecoder _decoder;
   Duration? _firstPacketTime;
   var _wallMs = 0;
   SessionOffset? _offset;

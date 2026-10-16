@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../support/fake_erg_source.dart';
+import '../../support/fixtures.dart';
 
 class _SourceLabel extends ConsumerWidget {
   const _SourceLabel();
@@ -78,5 +79,23 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     expect(events.whereType<StatusTick>().single.pace, const Duration(minutes: 2));
+  });
+
+  test('decodes the packets of an FTMS source with the FTMS decoder', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final source = FakeErgSource(kind: ErgSourceKind.ftms, name: 'Rower 42', protocol: ErgProtocol.ftms);
+    await container.read(activeErgSourceProvider.notifier).use(source);
+
+    final events = <RowingEvent>[];
+    container.read(rowingEventsProvider).listen(events.add);
+    ftmsRowing(seconds: 10).forEach(source.emit);
+    await Future<void>.delayed(Duration.zero);
+
+    final tick = events.whereType<StatusTick>().last;
+    expect(tick.distanceMeters, 40);
+    expect(tick.pace, const Duration(minutes: 2, seconds: 5));
+    expect(tick.workoutState, WorkoutState.unknown);
+    expect(events.whereType<Stroke>().map((s) => s.strokeNumber), [1, 2, 3, 4]);
   });
 }

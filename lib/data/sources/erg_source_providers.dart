@@ -32,7 +32,10 @@ final rowingEventsProvider = Provider<Stream<RowingEvent>>((ref) {
   final source = ref.watch(activeErgSourceProvider);
   if (source == null) return const Stream.empty();
 
-  final decoder = Pm5Decoder(onWarning: (message) => debugPrint('PM5: $message'));
+  final decoder = ErgDecoder.forProtocol(
+    source.protocol,
+    onWarning: (message) => debugPrint('${source.protocol.name}: $message'),
+  );
   final controller = StreamController<RowingEvent>.broadcast();
   final subscription = source.packets.listen(
     (packet) => decoder.decode(packet).forEach(controller.add),

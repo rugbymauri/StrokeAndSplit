@@ -20,7 +20,8 @@ class _Fixed extends ActiveErgSource {
 }
 
 class _Setup {
-  _Setup({ErgSourceKind kind = ErgSourceKind.pm5}) : source = FakeErgSource(kind: kind, name: 'PM5 430000001 Row') {
+  _Setup({ErgSourceKind kind = ErgSourceKind.pm5, String name = 'PM5 430000001 Row', ErgProtocol? protocol})
+      : source = FakeErgSource(kind: kind, name: name, protocol: protocol ?? ErgProtocol.pm5) {
     container = ProviderContainer(overrides: [
       databaseProvider.overrideWithValue(db),
       activeErgSourceProvider.overrideWith(() => _Fixed(source)),
@@ -118,6 +119,62 @@ void main() {
       expect(distances[i], greaterThanOrEqualTo(distances[i - 1]), reason: 'sample $i');
     }
     expect((await setup.session(id)).distanceDm, (rowed * 10).round());
+  });
+
+  group('with an FTMS rower', () {
+    _Setup ftms() => _Setup(kind: ErgSourceKind.ftms, name: 'Rower 42', protocol: ErgProtocol.ftms);
+
+    test('stores the session as FTMS with strokes without details', () async {
+      final setup = ftms();
+
+      await setup.recorder.start();
+      await setup.emitAll(ftmsRowing(seconds: 300));
+      final id = (await setup.recorder.stop())!;
+      final session = await setup.session(id);
+
+      expect(
+        (session.source, session.protocol, session.deviceName),
+        (ErgSourceKind.ftms, ErgProtocol.ftms, 'Rower 42'),
+      );
+      expect(session.strokeCount, 120);
+      expect(session.distanceDm, 12000);
+      expect(session.durationMs, 300000);
+      final strokes = await setup.db.select(setup.db.strokes).get();
+      expect(strokes, hasLength(120));
+      expect(strokes.every((s) => s.driveLengthMeters == null && s.peakForceNewtons == null), isTrue);
+    });
+
+    test('counts from zero although the rower already shows 800 m', () async {
+      final setup = ftms();
+
+      await setup.recorder.start();
+      await setup.emitAll(ftmsRowing(seconds: 30, startDistance: 800, startStrokes: 300));
+      final id = (await setup.recorder.stop())!;
+
+      final first = (await setup.db.select(setup.db.samples).get()).first;
+      expect((first.tMs, first.distanceDm), (0, 0));
+      expect((await setup.session(id)).distanceDm, 1200);
+    });
+
+    test('keeps counting when the rower resets its distance', () async {
+      final setup = ftms();
+
+      await setup.recorder.start();
+      await setup.emitAll(ftmsRowing(seconds: 300));
+      // The rower jumps back to 0 m and is rowed on for 10 s.
+      final after = [
+        for (final p in ftmsRowing(seconds: 10))
+          RawPacket(time: p.time + const Duration(seconds: 301), characteristicId: p.characteristicId, bytes: p.bytes),
+      ];
+      await setup.emitAll(after);
+      final id = (await setup.recorder.stop())!;
+
+      final distances = [for (final s in await setup.db.select(setup.db.samples).get()) s.distanceDm];
+      for (var i = 1; i < distances.length; i++) {
+        expect(distances[i], greaterThanOrEqualTo(distances[i - 1]), reason: 'sample $i');
+      }
+      expect((await setup.session(id)).distanceDm, 12400);
+    });
   });
 
   test('shows the progress of the running session', () async {

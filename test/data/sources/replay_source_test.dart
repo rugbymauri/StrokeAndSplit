@@ -60,4 +60,13 @@ void main() {
       expect(_decode(replayed), orderedEquals(_decode(_recording.packets)));
     });
   });
+
+  test('takes the protocol from the header of the recording', () {
+    expect(ReplaySource(_recording).protocol, ErgProtocol.pm5, reason: 'the fixture names no protocol');
+    final ftms = RawRecording(
+      metadata: {'format': RawRecording.formatName, 'version': 1, 'protocol': 'ftms'},
+      packets: const [],
+    );
+    expect(ReplaySource(ftms).protocol, ErgProtocol.ftms);
+  });
 }

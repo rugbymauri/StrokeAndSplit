@@ -90,11 +90,13 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
     final id = await _repository.create(
       startedAt: clock.now(),
       source: source.kind,
-      deviceName: source.kind == ErgSourceKind.pm5 ? source.name : null,
+      protocol: source.protocol,
+      deviceName: source.kind == ErgSourceKind.pm5 || source.kind == ErgSourceKind.ftms ? source.name : null,
       template: template,
     );
     final accumulator = _accumulator = SessionAccumulator(
       id,
+      protocol: source.protocol,
       course: template?.course.definition,
       plannedLaps: template?.laps,
     );
