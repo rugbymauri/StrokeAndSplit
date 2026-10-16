@@ -787,12 +787,6 @@ abstract class AppLocalizations {
   /// **'Session beendet'**
   String get summaryTitle;
 
-  /// Summary: label of the share of time within the bands over all laps
-  ///
-  /// In de, this message translates to:
-  /// **'In der Zone'**
-  String get summaryInZone;
-
   /// Summary: heading above the laps, written in capitals
   ///
   /// In de, this message translates to:

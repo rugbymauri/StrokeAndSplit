@@ -429,9 +429,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get summaryTitle => 'Session beendet';
 
   @override
-  String get summaryInZone => 'In der Zone';
-
-  @override
   String get summaryLaps => 'Runden';
 
   @override

@@ -427,9 +427,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryTitle => 'Session finished';
 
   @override
-  String get summaryInZone => 'In the zone';
-
-  @override
   String get summaryLaps => 'Laps';
 
   @override
