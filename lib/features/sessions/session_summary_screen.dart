@@ -8,6 +8,7 @@ import '../../data/courses/course_providers.dart';
 import '../../data/db/database.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
+import '../../data/statistics/session_places.dart';
 import '../../l10n/l10n.dart';
 import '../live/formatters.dart';
 import 'session_actions.dart';
@@ -78,6 +79,7 @@ class _Summary extends ConsumerWidget {
     final versionId = session.courseVersionId;
     final course = versionId == null ? null : ref.watch(courseVersionProvider(versionId)).value;
     final laps = versionId == null ? const <LapRow>[] : ref.watch(sessionLapsProvider(session.id)).value ?? const [];
+    final places = ref.watch(sessionPlacesProvider(session.id)).value ?? SessionPlaces.none;
 
     return Center(
       child: ConstrainedBox(
@@ -94,7 +96,7 @@ class _Summary extends ConsumerWidget {
                   AppSpacing.xl,
                 ),
                 children: [
-                  _Header(session: session, course: course, laps: laps),
+                  _Header(session: session, course: course, laps: laps, place: places.session),
                   if (session.status == SessionStatus.incomplete)
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.s),
@@ -104,7 +106,7 @@ class _Summary extends ConsumerWidget {
                   _Totals(session: session),
                   if (course != null && laps.isNotEmpty) ...[
                     const SizedBox(height: AppSpacing.xl),
-                    _Laps(laps: laps, byTime: course.axis == CourseAxis.distance),
+                    _Laps(laps: laps, course: course, places: places),
                   ],
                   const SizedBox(height: AppSpacing.xl),
                   _Averages(session: session),
@@ -152,11 +154,14 @@ const _buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.all(Radiu
 
 /// Date and course, the title, and template and source.
 class _Header extends StatelessWidget {
-  const _Header({required this.session, required this.course, required this.laps});
+  const _Header({required this.session, required this.course, required this.laps, required this.place});
 
   final SessionRow session;
   final Course? course;
   final List<LapRow> laps;
+
+  /// The place of the session in its template's ranking, if 1–3.
+  final int? place;
 
   @override
   Widget build(BuildContext context) {
@@ -177,8 +182,21 @@ class _Header extends StatelessWidget {
           style: AppTextStyles.subtitle,
         ),
         const SizedBox(height: AppSpacing.xs),
-        // Room for the place of the session in its template's ranking (change `statistics`).
-        Text(l10n.summaryTitle, style: AppTextStyles.screenTitle.copyWith(fontSize: 40, height: 1.1)),
+        Wrap(
+          spacing: AppSpacing.m,
+          runSpacing: AppSpacing.xs,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(l10n.summaryTitle, style: AppTextStyles.screenTitle.copyWith(fontSize: 40, height: 1.1)),
+            if (place case final place?)
+              _PlaceMark(
+                key: const Key('session-place'),
+                text: l10n.summaryPlace(place),
+                semanticsLabel: l10n.summarySessionPlace(place),
+                large: true,
+              ),
+          ],
+        ),
         const SizedBox(height: AppSpacing.xs),
         Wrap(
           children: [
@@ -295,18 +313,22 @@ class _Card extends StatelessWidget {
 }
 
 /// The laps with a bar for their share in the zone; the best complete lap is
-/// marked, unfinished ones are muted.
+/// marked, unfinished ones are muted. Laps and zone runs on places 1–3 of
+/// their rankings carry their place.
 class _Laps extends StatelessWidget {
-  const _Laps({required this.laps, required this.byTime});
+  const _Laps({required this.laps, required this.course, required this.places});
 
   final List<LapRow> laps;
+  final Course course;
+  final SessionPlaces places;
 
   /// Whether laps compare by time (distance course) or by distance.
-  final bool byTime;
+  bool get byTime => course.axis == CourseAxis.distance;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final segments = course.definition.segments;
     final complete = laps.where((l) => l.complete);
     final best = complete.isEmpty
         ? null
@@ -327,7 +349,17 @@ class _Laps extends StatelessWidget {
             children: [
               for (final (i, lap) in laps.indexed) ...[
                 if (i > 0) const Divider(),
-                _LapRow(lap: lap, byTime: byTime, best: identical(lap, best)),
+                _LapRow(
+                  lap: lap,
+                  byTime: byTime,
+                  best: identical(lap, best),
+                  marks: [
+                    if (places.laps[lap.lapNo] case final place?) l10n.summaryPlace(place),
+                    for (final (position, segment) in segments.indexed)
+                      if (places.zones[(lap.lapNo, position)] case final place?)
+                        l10n.summaryZonePlace(segment.zoneName ?? '', place),
+                  ],
+                ),
               ],
             ],
           ),
@@ -342,11 +374,14 @@ class _Laps extends StatelessWidget {
 }
 
 class _LapRow extends StatelessWidget {
-  const _LapRow({required this.lap, required this.byTime, required this.best});
+  const _LapRow({required this.lap, required this.byTime, required this.best, this.marks = const []});
 
   final LapRow lap;
   final bool byTime;
   final bool best;
+
+  /// The places of the lap and its zone runs.
+  final List<String> marks;
 
   @override
   Widget build(BuildContext context) {
@@ -379,6 +414,15 @@ class _LapRow extends StatelessWidget {
                     padding: EdgeInsets.only(top: share == null ? 0 : AppSpacing.xs),
                     child: Text('${l10n.sessionIncomplete} · $time', style: AppTextStyles.caption),
                   ),
+                if (marks.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(top: share == null ? 0 : AppSpacing.s),
+                    child: Wrap(
+                      spacing: AppSpacing.xs,
+                      runSpacing: AppSpacing.xs,
+                      children: [for (final mark in marks) _PlaceMark(text: mark)],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -397,7 +441,7 @@ class _LapRow extends StatelessWidget {
               ),
             ),
           ),
-          // Slot for marks of the lap: the best lap here, places 1–3 with `statistics`.
+          // The best lap of this session; places in the rankings stand below the bar.
           SizedBox(
             width: 28,
             child: best
@@ -408,6 +452,34 @@ class _LapRow extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A place in a ranking, e.g. "Platz 2".
+class _PlaceMark extends StatelessWidget {
+  const _PlaceMark({super.key, required this.text, this.semanticsLabel, this.large = false});
+
+  final String text;
+  final String? semanticsLabel;
+
+  /// For the session next to the title.
+  final bool large;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: const BoxDecoration(
+          color: AppColors.line,
+          borderRadius: BorderRadius.all(Radius.circular(AppRadii.small)),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: large ? AppSpacing.m : AppSpacing.s, vertical: large ? 6 : 2),
+          child: Text(
+            text,
+            semanticsLabel: semanticsLabel,
+            style: (large ? AppTextStyles.button : AppTextStyles.caption)
+                .copyWith(color: AppColors.text, fontWeight: FontWeight.w600),
+          ),
+        ),
+      );
 }
 
 /// The share of a lap in the zone as a bar.

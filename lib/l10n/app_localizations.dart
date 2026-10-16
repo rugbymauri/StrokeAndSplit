@@ -805,6 +805,24 @@ abstract class AppLocalizations {
   /// **'Beste Runde'**
   String get summaryBestLap;
 
+  /// Summary: mark of a lap or the session on place 1 to 3 of its ranking
+  ///
+  /// In de, this message translates to:
+  /// **'Platz {place}'**
+  String summaryPlace(int place);
+
+  /// Summary: mark of a run through a zone on place 1 to 3 of the zone's ranking; zone is its name
+  ///
+  /// In de, this message translates to:
+  /// **'{zone} · Platz {place}'**
+  String summaryZonePlace(String zone, int place);
+
+  /// Summary: screen reader label of the mark of a session on place 1 to 3 of its template's ranking
+  ///
+  /// In de, this message translates to:
+  /// **'Platz {place} der Vorlage'**
+  String summarySessionPlace(int place);
+
   /// Closes the summary of a session
   ///
   /// In de, this message translates to:

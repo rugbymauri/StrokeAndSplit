@@ -27,7 +27,7 @@ Sie starten deshalb erst, wenn `ui-design` umgesetzt ist (siehe `docs/implementa
 
 ## 4. Plätze in der Zusammenfassung
 
-- [ ] 4.1 Die Zusammenfassung markiert jede Runde und jede Zonenfahrt mit ihrem aktuellen Platz, wenn er 1–3 ist, und ebenso die Session in der Rangliste ihrer Vorlage (D6). Verifikation: Widget-Tests für „Neue zweitbeste Runde“, „Später überholt“, eine simulierte Session ohne Marken und eine Session auf Platz 1 ihrer Vorlage
+- [x] 4.1 Die Zusammenfassung markiert jede Runde und jede Zonenfahrt mit ihrem aktuellen Platz, wenn er 1–3 ist, und ebenso die Session in der Rangliste ihrer Vorlage (D6). Verifikation: Widget-Tests für „Neue zweitbeste Runde“, „Später überholt“, eine simulierte Session ohne Marken und eine Session auf Platz 1 ihrer Vorlage
 
 ## 5. Abschluss
 
