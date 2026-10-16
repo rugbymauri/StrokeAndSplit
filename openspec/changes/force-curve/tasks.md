@@ -2,7 +2,8 @@
 
 ## 1. Protokoll
 
-- [ ] 1.1 Spike um das Abonnement der Kraftkurven-Characteristic erweitern und einige Minuten am PM5 mitschneiden. UUID, Paketaufbau und Werte pro Schlag in `packages/pm5_protocol/README.md` festhalten. Verifikation: Mitschnitt liegt als Fixture unter `recordings`
+- [x] 1.0 Spike um das Abonnement der Kraftkurven-Characteristic `003d` erweitern. Verifikation: `flutter analyze lib/spike` ohne Befund; eine fehlende Characteristic meldet der Spike und nimmt weiter auf
+- [ ] 1.1 Einige Minuten am PM5 mitschneiden (`make spike`), UUID, Paketaufbau, Einheit und Werte pro Schlag in `packages/erg_protocol/README.md` und im Abschnitt „Stand des Spikes“ von `design.md` festhalten. Der Mitschnitt vom 2026-10-16 enthält noch keine Kurve. Verifikation: Ausschnitt von wenigen Schlägen liegt als Fixture unter `packages/erg_protocol/test/fixtures/force_curve.jsonl`, Maximum jeder Kurve passt zur Spitzenkraft aus `0x0035`
 - [ ] 1.2 Decoder für die Kurvenpakete mit Zusammensetzen pro Schlag und Verwerfen unvollständiger Kurven (Design D1). Verifikation: Unit-Tests mit dem Mitschnitt und mit einem künstlich entfernten Paket
 
 ## 2. Quellen und Aufzeichnung
