@@ -54,6 +54,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get devicesNotFound => 'not found';
 
   @override
+  String get devicesHeartRateMonitor => 'Heart rate strap';
+
+  @override
+  String get devicesNoStrap => 'No strap';
+
+  @override
+  String get devicesNoStrapHint =>
+      'Optional, for heart rate and RR intervals straight from the strap';
+
+  @override
+  String get devicesStrapPaired => 'Paired';
+
+  @override
+  String get devicesStrapPair => 'Pair strap';
+
+  @override
+  String get devicesStrapChange => 'Change strap';
+
+  @override
+  String get devicesStrapForget => 'Forget';
+
+  @override
+  String get strapSearchTitle => 'Find heart rate strap';
+
+  @override
+  String get strapSearchNothingFound =>
+      'No strap found.\n\n• Moisten the electrodes and put the strap on, only then does it transmit.\n• Disconnect the strap from other apps or watches, many straps allow only a few connections at a time.\n• Move closer to the strap.';
+
+  @override
+  String strapSearchFailed(String detail) {
+    return 'Searching for heart rate straps failed.\n\n$detail';
+  }
+
+  @override
+  String get strapBluetoothOff =>
+      'Bluetooth is switched off. Switch Bluetooth on to search for your heart rate strap.';
+
+  @override
   String launchSearching(String device) {
     return 'Looking for $device …';
   }

@@ -9,14 +9,18 @@ import '../../app/platform_providers.dart';
 import '../../app/widgets/language_button.dart';
 import '../../data/sources/ble/ble_transport.dart';
 import '../../data/sources/erg_source_providers.dart';
+import '../../data/sources/heart_rate_choice.dart';
 import '../../data/sources/rower_choice.dart';
 import '../../l10n/l10n.dart';
+import 'heart_rate_search_screen.dart';
 import 'option_card.dart';
 import 'rower_connection.dart';
 import 'start_screen.dart';
 
 /// "Geräte wählen": the rower from the rowers in range or a simulator
-/// (Design D6). "Weiter" connects it and leads to the start screen.
+/// (Design D6) and an optional heart rate strap (heart-rate, Design D8).
+/// "Weiter" connects the rower and leads to the start screen; it does not
+/// wait for a strap.
 class ChooseDevicesScreen extends ConsumerStatefulWidget {
   const ChooseDevicesScreen({super.key, this.scanTimeout = const Duration(seconds: 15)});
 
@@ -125,7 +129,7 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
     final busy = _connecting || _phase == _Phase.scanning || _phase == _Phase.checking;
     final missing = selected?.device;
     final message = switch (_phase) {
-      _Phase.notReady => _notReadyText(l10n, _readiness),
+      _Phase.notReady => bluetoothNotReadyText(l10n, _readiness),
       _Phase.failed => l10n.deviceListScanFailed('$_scanError'),
       _Phase.done when _found.isEmpty => l10n.deviceListNothingFound,
       _ => null,
@@ -175,7 +179,7 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
                           : '${_kind(missing.protocol)} · ${l10n.devicesNotFound}',
                       key: Key('rower-${missing.id}'),
                     ),
-                  if (message != null) _Message(text: message, onRetry: _connecting ? null : _startScan),
+                  if (message != null) ScanMessage(text: message, onRetry: _connecting ? null : _startScan),
                   if (message == null && _phase == _Phase.done)
                     Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.m),
@@ -198,7 +202,8 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
                     l10n.startSimulatorFtmsHint,
                     key: const Key('rower-simulator-ftms'),
                   ),
-                  // The heart rate strap gets its section here with the change heart-rate (Design D6).
+                  const SizedBox(height: AppSpacing.l),
+                  _StrapSection(scanTimeout: widget.scanTimeout, enabled: !_connecting),
                 ],
               ),
             ),
@@ -224,21 +229,72 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
     );
   }
 
-  static String _notReadyText(AppLocalizations l10n, BluetoothReadiness readiness) => switch (readiness) {
-        BluetoothReadiness.off => l10n.bluetoothOff,
-        BluetoothReadiness.unauthorized => l10n.bluetoothUnauthorized(l10n.appTitle),
-        BluetoothReadiness.unsupported => l10n.bluetoothUnsupported,
-        BluetoothReadiness.ready => '',
-      };
-
   static String _kind(ErgProtocol protocol) => switch (protocol) {
         ErgProtocol.pm5 => 'Concept2 PM5',
         ErgProtocol.ftms => 'FTMS',
       };
 }
 
-class _Message extends StatelessWidget {
-  const _Message({required this.text, required this.onRetry});
+/// Why Bluetooth cannot be used for a scan.
+String bluetoothNotReadyText(AppLocalizations l10n, BluetoothReadiness readiness) => switch (readiness) {
+      BluetoothReadiness.off => l10n.bluetoothOff,
+      BluetoothReadiness.unauthorized => l10n.bluetoothUnauthorized(l10n.appTitle),
+      BluetoothReadiness.unsupported => l10n.bluetoothUnsupported,
+      BluetoothReadiness.ready => '',
+    };
+
+/// The paired heart rate strap or "Kein Gurt", with the actions to pair,
+/// change and forget it (heart-rate, Design D8).
+class _StrapSection extends ConsumerWidget {
+  const _StrapSection({required this.scanTimeout, required this.enabled});
+
+  final Duration scanTimeout;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final paired = ref.watch(chosenHeartRateMonitorProvider);
+    void search() => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => HeartRateSearchScreen(scanTimeout: scanTimeout)),
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionLabel(l10n.devicesHeartRateMonitor),
+        OptionCard(
+          key: const Key('strap'),
+          icon: paired == null ? Icons.favorite_border : Icons.favorite,
+          title: paired?.name ?? l10n.devicesNoStrap,
+          subtitle: paired == null ? l10n.devicesNoStrapHint : '${l10n.devicesStrapPaired} · ${paired.id}',
+          onTap: enabled ? search : null,
+        ),
+        const SizedBox(height: AppSpacing.m),
+        Wrap(
+          spacing: AppSpacing.m,
+          runSpacing: AppSpacing.s,
+          children: [
+            OutlinedButton(
+              key: const Key('strap-search'),
+              onPressed: enabled ? search : null,
+              child: Text(paired == null ? l10n.devicesStrapPair : l10n.devicesStrapChange),
+            ),
+            if (paired != null)
+              TextButton(
+                key: const Key('strap-forget'),
+                onPressed: enabled ? () => ref.read(chosenHeartRateMonitorProvider.notifier).forget() : null,
+                child: Text(l10n.devicesStrapForget),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// A hint below a scan, with a button to search again.
+class ScanMessage extends StatelessWidget {
+  const ScanMessage({super.key, required this.text, required this.onRetry});
 
   final String text;
   final VoidCallback? onRetry;
