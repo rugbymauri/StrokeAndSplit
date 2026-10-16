@@ -2,6 +2,7 @@ import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 
 import '../db/database.dart';
+import '../db/watch.dart';
 import 'course.dart';
 
 /// Stores courses with their versions (Design D4).
@@ -28,12 +29,8 @@ class CourseRepository {
     return [for (final row in rows) await _withNewestVersion(row)];
   }
 
-  Stream<List<Course>> watchAll() {
-    return _db
-        .customSelect('SELECT 1', readsFrom: {_db.courses, _db.courseVersions, _db.courseSegments, _db.zones})
-        .watch()
-        .asyncMap((_) => all());
-  }
+  Stream<List<Course>> watchAll() =>
+      _db.watchTables([_db.courses, _db.courseVersions, _db.courseSegments, _db.zones], all);
 
   /// The course in its newest version, also when it is deleted.
   Future<Course?> get(int id) async {

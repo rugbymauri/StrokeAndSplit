@@ -5,6 +5,7 @@ import '../courses/course.dart';
 import '../courses/course_layout.dart';
 import '../courses/course_repository.dart';
 import '../db/database.dart';
+import '../db/watch.dart';
 import 'zone.dart';
 
 /// A change to a zone that would leave [courses] invalid, e.g. because the
@@ -100,12 +101,8 @@ class ZoneRepository {
     return [for (final zone in await all()) ZoneUsage(zone, counts[zone.id] ?? 0)];
   }
 
-  Stream<List<ZoneUsage>> watchAllWithUsage() {
-    return _db
-        .customSelect('SELECT 1', readsFrom: {_db.zones, _db.courses, _db.courseVersions, _db.courseSegments})
-        .watch()
-        .asyncMap((_) => allWithUsage());
-  }
+  Stream<List<ZoneUsage>> watchAllWithUsage() =>
+      _db.watchTables([_db.zones, _db.courses, _db.courseVersions, _db.courseSegments], allWithUsage);
 
   /// The zone, also when it is deleted.
   Future<Zone?> get(int id) async {

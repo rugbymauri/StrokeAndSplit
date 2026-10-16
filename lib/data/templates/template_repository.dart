@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 
 import '../courses/course_repository.dart';
 import '../db/database.dart';
+import '../db/watch.dart';
 import 'session_template.dart';
 
 /// Stores templates, each with a single block for now (Design D4).
@@ -33,12 +34,10 @@ class TemplateRepository {
     return [for (final row in rows) await _template(row)];
   }
 
-  Stream<List<SessionTemplate>> watchAll() {
-    return _db
-        .customSelect('SELECT 1', readsFrom: {_db.templates, _db.templateBlocks, _db.courses, _db.courseVersions})
-        .watch()
-        .asyncMap((_) => all());
-  }
+  Stream<List<SessionTemplate>> watchAll() => _db.watchTables(
+        [_db.templates, _db.templateBlocks, _db.courses, _db.courseVersions, _db.courseSegments],
+        all,
+      );
 
   Future<SessionTemplate?> get(int id) async {
     final row = await (_db.select(_db.templates)..where((t) => t.id.equals(id))).getSingleOrNull();

@@ -200,4 +200,108 @@ void main() {
     await setup.container.read(activeErgSourceProvider.notifier).clear();
     await disposeWidgetsWithDatabase(tester);
   });
+
+  group('across the tabs', () {
+    Future<void> createZone(WidgetTester tester, _Setup setup, String name) async {
+      await tester.tap(find.text('Zonen'));
+      await setup.settle(tester);
+      await tester.tap(find.text('Zone anlegen'));
+      await setup.settle(tester);
+      await tester.enterText(find.byKey(const Key('zone-name')), name);
+      await tester.enterText(find.byKey(const Key('zone-length')), '100');
+      await tester.enterText(find.byKey(const Key('zone-spm-min')), '20');
+      await tester.enterText(find.byKey(const Key('zone-spm-max')), '22');
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+    }
+
+    Future<void> openPlaceDialog(WidgetTester tester, _Setup setup) async {
+      await tester.tap(find.text('Strecken'));
+      await setup.settle(tester);
+      await tester.tap(find.text('Strecke anlegen'));
+      await setup.settle(tester);
+      await tester.enterText(find.byKey(const Key('course-length')), '2000');
+      await tester.pump();
+      await tester.tap(find.text('Zone einbauen'));
+      await setup.settle(tester);
+    }
+
+    testWidgets('offers every zone created in the zones tab when placing', (tester) async {
+      final setup = _Setup();
+      await setup.pump(tester);
+
+      await createZone(tester, setup, 'Sprint');
+      await openPlaceDialog(tester, setup);
+      expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Sprint')), findsOneWidget);
+      await tester.tap(find.text('Abbrechen'));
+      await setup.settle(tester);
+      await tester.pageBack();
+      await setup.settle(tester);
+
+      await createZone(tester, setup, 'Ausdauer');
+      await openPlaceDialog(tester, setup);
+
+      expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Sprint')), findsOneWidget);
+      expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Ausdauer')), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('places zones created right in the dialog one after the other', (tester) async {
+      final setup = _Setup();
+      await setup.pump(tester);
+      await tester.tap(find.text('Strecken'));
+      await setup.settle(tester);
+      await tester.tap(find.text('Strecke anlegen'));
+      await setup.settle(tester);
+      await tester.enterText(find.byKey(const Key('course-name')), 'Intervall');
+      await tester.enterText(find.byKey(const Key('course-length')), '2000');
+      await tester.pump();
+
+      for (final (name, start) in [('Sprint', '500'), ('Ausdauer', '1000')]) {
+        await tester.tap(find.text('Zone einbauen'));
+        await setup.settle(tester);
+        await tester.tap(find.text('Neue Zone anlegen'));
+        await setup.settle(tester);
+        await tester.enterText(find.byKey(const Key('zone-name')), name);
+        await tester.enterText(find.byKey(const Key('zone-length')), '100');
+        await tester.enterText(find.byKey(const Key('zone-spm-min')), '20');
+        await tester.enterText(find.byKey(const Key('zone-spm-max')), '22');
+        await tester.tap(find.byTooltip('Speichern'));
+        await setup.settle(tester);
+        await tester.enterText(find.byKey(const Key('place-start')), start);
+        await tester.pump();
+        await tester.tap(find.text('Einbauen'));
+        await setup.settle(tester);
+      }
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+
+      expect(find.text('2000 m · Sprint, Ausdauer'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('offers a course created in the courses tab for a new template', (tester) async {
+      final setup = _Setup();
+      await setup.addCourse(tester, 'Seerunde');
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Strecken'));
+      await setup.settle(tester);
+      await tester.tap(find.text('Strecke anlegen'));
+      await setup.settle(tester);
+      await tester.enterText(find.byKey(const Key('course-name')), 'Sprintstrecke');
+      await tester.enterText(find.byKey(const Key('course-length')), '500');
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+      await tester.tap(find.text('Vorlagen'));
+      await setup.settle(tester);
+      await tester.tap(find.text('Vorlage anlegen'));
+      await setup.settle(tester);
+      await tester.tap(find.byKey(const Key('template-course')));
+      await setup.settle(tester);
+
+      expect(find.text('Sprintstrecke · 500 m · frei'), findsWidgets);
+      await disposeWidgetsWithDatabase(tester);
+    });
+  });
 }
