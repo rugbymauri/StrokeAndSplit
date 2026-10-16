@@ -33,6 +33,8 @@ Alle Befehle zeigt `make help`.
 | `make ftms-rower FILE=…` | Software-FTMS-Rudergerät, das eine Aufnahme über Bluetooth abspielt (siehe unten) |
 | `make pull-recordings` | Mitschnitte vom Android-Gerät nach `./recordings` kopieren |
 | `make build-linux` | Linux-Release-Bundle bauen |
+| `make apk` | Universal-APK für Android bauen, Version optional mit `BUILD_NAME=1.2.0 BUILD_NUMBER=42` |
+| `make appimage` | Linux-Bundle nach `make build-linux` als AppImage nach `build/appimage/` packen |
 
 ## Verwendung
 
@@ -184,6 +186,59 @@ Getestet wird vom **Android-Handy** aus: `make run-android`, in der Geräteliste
 
 Vom selben Linux-Rechner aus geht es nicht: Der Bluetooth-Adapter kann nicht gleichzeitig Peripheral für den Software-Rower und Central für die App sein. Wer ein zweites Linux-Gerät hat, kann die App dort starten.
 
+## CI und Releases
+
+Die Pipeline steht in `.gitlab-ci.yml` und läuft auf den geteilten Linux-Runnern.
+
+| Anlass | Was läuft |
+|---|---|
+| Merge Request | `check` (`make deps check`, also Analyse und Tests von App und `erg_protocol`) |
+| Push auf `main` | `check` |
+| Tag `vX.Y.Z` | `verify-tag`, `check`, dann `build-apk` und `build-appimage`, dann `upload` und `release` |
+| anderer Tag | `check` |
+| von Hand gestartet („Run pipeline“, `glab ci run`) | `check`, auf jedem Branch |
+
+Ein Branch mit offener Merge Request bekommt nur die MR-Pipeline, ein Branch ohne MR keine.
+
+**Release erstellen**: Einen Commit von `main` mit der neuen Version taggen und den Tag pushen.
+
+```sh
+git checkout main && git pull
+git tag v1.2.0
+git push origin v1.2.0
+```
+
+`verify-tag` bricht ab, wenn der Commit nicht auf `main` liegt oder es das Release schon gibt. Ein Release wird nie überschrieben, ein fehlerhaftes Release in GitLab löschen und mit einer neuen Version taggen. Der Versionsname der Pakete kommt aus dem Tag (`1.2.0`), der Android-Versionscode ist die Pipeline-Nummer (`CI_PIPELINE_IID`) und steigt damit mit jedem Release. `pubspec.yaml` bleibt unverändert. Das Release enthält `aergrow-1.2.0-android.apk` und `aergrow-1.2.0-x86_64.AppImage`. Die Dateien liegen dauerhaft in der Package Registry („Deploy → Package Registry“), die Release-Seite verlinkt sie.
+
+### Einrichtung in GitLab (einmalig)
+
+Alle APKs aus der Pipeline sind mit demselben Debug-Schlüssel signiert, damit eine neue Version über eine ältere installiert werden kann. Der Schlüssel ist ein gewöhnlicher Android-Debug-Keystore und nicht für den Play Store gedacht.
+
+1. Keystore erzeugen:
+   ```sh
+   keytool -genkeypair -v -keystore aergrow-debug.keystore -storetype PKCS12 \
+     -alias androiddebugkey -storepass android -keypass android \
+     -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+   ```
+2. Den Keystore Base64-kodieren (`base64 -w0 aergrow-debug.keystore`) und unter „Settings → CI/CD → Variables“ als Variable `ANDROID_DEBUG_KEYSTORE` vom Typ **File** mit diesem Text als Wert anlegen. GitLab speichert Variablen als Text, die Binärdatei selbst liesse sich nicht hinterlegen, `build-apk` dekodiert sie wieder. Flags: **Protect variable** an, Sichtbarkeit **Visible** (eine Datei-Variable muss nicht maskiert werden).
+3. Unter „Settings → Repository → Protected tags“ `v*` als geschützten Tag anlegen. Nur Pipelines zu geschützten Tags sehen die geschützte Variable.
+4. Die Keystore-Datei sicher aufbewahren. Geht sie verloren, müssen alle Nutzer die App vor dem nächsten Update deinstallieren.
+
+Fehlt die Variable, bricht `build-apk` mit einer Meldung ab, statt mit einem Zufallsschlüssel zu signieren.
+
+### Installation
+
+**Android**: Die APK von der Release-Seite laden. Das Projekt ist privat, im Handy-Browser muss man also bei GitLab angemeldet sein, sonst die Datei am Rechner laden und aufs Handy übertragen (z. B. `adb install aergrow-1.2.0-android.apk`). Beim Öffnen fragt Android, ob der Browser bzw. Dateimanager Apps aus unbekannten Quellen installieren darf. Eine neuere APK aus der Pipeline lässt sich über eine ältere installieren, die Sessions bleiben erhalten. Eine selbst gebaute APK (`make apk`, `make run-android`) hat einen anderen Schlüssel, vor dem Wechsel muss die App deinstalliert werden.
+
+**Linux**: Das AppImage für x86_64 laden, ausführbar machen und starten. GTK 3 muss installiert sein, auf GNOME- und KDE-Desktops ist es das in der Regel.
+
+```sh
+chmod +x aergrow-1.2.0-x86_64.AppImage
+./aergrow-1.2.0-x86_64.AppImage
+```
+
+Mit einem Werkzeug wie Gear Lever oder AppImageLauncher erscheint die App mit Name und Icon im Anwendungsmenü.
+
 ## Plattform-Status
 
 | Plattform | Stand |
@@ -193,6 +248,7 @@ Vom selben Linux-Rechner aus geht es nicht: Der Bluetooth-Adapter kann nicht gle
 | FTMS-Rudergeräte | Nach Spezifikation umgesetzt, nur mit Software-Rower getestet, ungetestet an echter Hardware |
 | iOS | Konfiguriert (`Info.plist`), ungetestet, da kein Mac verfügbar |
 | macOS | Konfiguriert (Entitlements), ungetestet |
+| Pakete aus CI | APK (debug-signiert) und AppImage x86_64 per Tag `vX.Y.Z`, lokal im CI-Image gebaut, noch ohne Probe-Release |
 
 ## Lizenzhinweis
 
