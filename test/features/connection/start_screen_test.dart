@@ -2,15 +2,15 @@ import 'package:aergrow/app/platform_providers.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/features/connection/start_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
+import '../../support/localized_app.dart';
 
 void main() {
   testWidgets('offers PM5, simulator, templates and the recorded sessions', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: StartScreen())));
+    await tester.pumpWidget(const ProviderScope(child: LocalizedApp(home: StartScreen())));
 
     expect(find.text('Rudergerät suchen'), findsOneWidget);
     expect(find.text('Simulator'), findsOneWidget);
@@ -22,7 +22,7 @@ void main() {
     final container = ProviderContainer(overrides: [wakelockProvider.overrideWithValue(FakeWakelock())]);
     addTearDown(container.dispose);
     await tester.pumpWidget(
-        UncontrolledProviderScope(container: container, child: const MaterialApp(home: StartScreen())));
+        UncontrolledProviderScope(container: container, child: const LocalizedApp(home: StartScreen())));
 
     await tester.tap(find.text('Simulator'));
     await tester.pumpAndSettle(const Duration(milliseconds: 300));

@@ -15,6 +15,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../support/fake_ble_transport.dart';
 import '../../support/fake_erg_source.dart';
+import '../../support/localized_app.dart';
 
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
@@ -108,7 +109,7 @@ class _Harness {
         wakelockProvider.overrideWithValue(wakelock),
         if (recording != null) sessionRecorderProvider.overrideWith(() => _Recording(recording)),
       ],
-      child: const MaterialApp(home: LiveScreen()),
+      child: const LocalizedApp(home: LiveScreen()),
     ));
   }
 

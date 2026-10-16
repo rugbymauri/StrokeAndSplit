@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
 import '../../support/test_database.dart';
+import '../../support/localized_app.dart';
 
 class _Setup {
   final db = openTestDatabase();
@@ -30,7 +31,7 @@ class _Setup {
 
   Future<void> pump(WidgetTester tester, {Widget home = const TemplatesScreen()}) async {
     addTearDown(container.dispose);
-    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: MaterialApp(home: home)));
+    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: LocalizedApp(home: home)));
     await settle(tester);
   }
 
@@ -235,7 +236,7 @@ void main() {
       expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Sprint')), findsOneWidget);
       await tester.tap(find.text('Abbrechen'));
       await setup.settle(tester);
-      await tester.pageBack();
+      await tester.tap(find.byType(BackButton));
       await setup.settle(tester);
 
       await createZone(tester, setup, 'Ausdauer');

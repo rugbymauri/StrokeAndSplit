@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
 import '../../support/test_database.dart';
+import '../../support/localized_app.dart';
 
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
@@ -34,7 +35,7 @@ void main() {
         activeErgSourceProvider.overrideWith(() => _Fixed(source)),
         wakelockProvider.overrideWithValue(FakeWakelock()),
       ],
-      child: const MaterialApp(home: LiveScreen()),
+      child: const LocalizedApp(home: LiveScreen()),
     ));
     await source.start();
     for (var i = 0; i < 20; i++) {

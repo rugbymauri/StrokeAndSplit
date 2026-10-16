@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
+import '../../support/localized_app.dart';
 
 /// Stores a session on [course] with laps of the given (seconds, metres).
 Future<int> _session(AppDatabase db, String name, CourseDefinition course, List<(int, int, bool)> laps) async {
@@ -46,7 +47,7 @@ Future<void> _pump(WidgetTester tester, AppDatabase db, int id) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(ProviderScope(
     overrides: [databaseProvider.overrideWithValue(db)],
-    child: MaterialApp(home: SessionSummaryScreen(sessionId: id)),
+    child: LocalizedApp(home: SessionSummaryScreen(sessionId: id)),
   ));
   for (var i = 0; i < 5; i++) {
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));

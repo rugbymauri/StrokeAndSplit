@@ -4,11 +4,11 @@ import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/features/connection/device_list_screen.dart';
 import 'package:erg_protocol/erg_protocol.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
+import '../../support/localized_app.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
@@ -21,7 +21,7 @@ Future<ProviderContainer> _pump(WidgetTester tester, FakeBleTransport transport)
   addTearDown(container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(
     container: container,
-    child: const MaterialApp(home: DeviceListScreen(scanTimeout: Duration(seconds: 15))),
+    child: const LocalizedApp(home: DeviceListScreen(scanTimeout: Duration(seconds: 15))),
   ));
   await tester.pump();
   return container;

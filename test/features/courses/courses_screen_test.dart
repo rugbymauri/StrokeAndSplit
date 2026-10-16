@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
+import '../../support/localized_app.dart';
 
 class _Setup {
   final db = openTestDatabase();
@@ -24,7 +25,7 @@ class _Setup {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      UncontrolledProviderScope(container: container, child: const MaterialApp(home: CoursesScreen())),
+      UncontrolledProviderScope(container: container, child: const LocalizedApp(home: CoursesScreen())),
     );
     await settle(tester);
   }

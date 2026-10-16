@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_erg_source.dart';
+import '../../support/localized_app.dart';
 
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
@@ -29,7 +30,7 @@ Future<void> _pump(
       activeErgSourceProvider.overrideWith(() => _Fixed(FakeErgSource(kind: kind, name: name, protocol: protocol))),
       ergConnectionStateProvider.overrideWithValue(AsyncData(state)),
     ],
-    child: const MaterialApp(home: Scaffold(body: ConnectionIndicator())),
+    child: const LocalizedApp(home: Scaffold(body: ConnectionIndicator())),
   ));
 }
 

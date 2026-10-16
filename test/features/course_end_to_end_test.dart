@@ -13,12 +13,12 @@ import 'package:aergrow/data/zones/zone_repository.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:aergrow/features/connection/start_screen.dart';
 import 'package:aergrow/features/sessions/session_summary_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_ble_transport.dart';
 import '../support/test_database.dart';
+import '../support/localized_app.dart';
 
 /// Laps and segments of a session, to compare two copies.
 Future<List<Object>> _results(AppDatabase db, int id) async => [
@@ -49,7 +49,7 @@ void main() {
     });
     await tester.pumpWidget(UncontrolledProviderScope(
       container: container,
-      child: const MaterialApp(home: StartScreen()),
+      child: const LocalizedApp(home: StartScreen()),
     ));
 
     await tester.tap(find.text('Vorlage rudern'));
@@ -123,7 +123,7 @@ void main() {
     });
     await tester.pumpWidget(UncontrolledProviderScope(
       container: container,
-      child: const MaterialApp(home: StartScreen()),
+      child: const LocalizedApp(home: StartScreen()),
     ));
 
     await tester.tap(find.text('Vorlage rudern'));

@@ -3,7 +3,7 @@
 ## 1. Grundlagen
 
 - [x] 1.1 `flutter_localizations`, `intl` und `shared_preferences` einbinden, `l10n.yaml` nach D1, `lib/l10n/app_de.arb` und `app_en.arb` mit dem App-Titel, `make l10n`, `context.l10n`; `MaterialApp` mit Delegates und `supportedLocales`. Verifikation: `make check` grün, `flutter gen-l10n` ohne Warnung
-- [ ] 1.2 `test/support/localized_app.dart` (D7) und Test, der die Keys aller ARB-Dateien mit der Vorlage vergleicht. Bestehende Widget-Tests nutzen den Helfer. Verifikation: alle bestehenden Tests grün, der Key-Test schlägt mit einem fehlenden Key fehl
+- [x] 1.2 `test/support/localized_app.dart` (D7) und Test, der die Keys aller ARB-Dateien mit der Vorlage vergleicht. Bestehende Widget-Tests nutzen den Helfer. Verifikation: alle bestehenden Tests grün, der Key-Test schlägt mit einem fehlenden Key fehl
 
 ## 2. Sprachwahl
 
