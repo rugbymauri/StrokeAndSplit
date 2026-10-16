@@ -300,4 +300,121 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get simResume => 'Resume';
+
+  @override
+  String get actionCancel => 'Cancel';
+
+  @override
+  String get actionDelete => 'Delete';
+
+  @override
+  String get actionSave => 'Save';
+
+  @override
+  String get actionReplay => 'Play back';
+
+  @override
+  String get actionExport => 'Export';
+
+  @override
+  String get actionImport => 'Import';
+
+  @override
+  String get actionMore => 'Actions';
+
+  @override
+  String get sessionsTitle => 'Sessions';
+
+  @override
+  String get sessionsEmpty => 'No sessions recorded yet.';
+
+  @override
+  String sessionsLoadFailed(String error) {
+    return 'Sessions could not be loaded: $error';
+  }
+
+  @override
+  String get sessionIncomplete => 'incomplete';
+
+  @override
+  String get sessionTitle => 'Session';
+
+  @override
+  String get sessionGone => 'This session no longer exists.';
+
+  @override
+  String sessionLoadFailed(String error) {
+    return 'The session could not be loaded: $error';
+  }
+
+  @override
+  String get sessionIncompleteNote =>
+      'Incomplete: the app was closed during the session. Everything up to shortly before is saved.';
+
+  @override
+  String get sessionDistance => 'Distance';
+
+  @override
+  String get sessionTime => 'Time';
+
+  @override
+  String get sessionAveragePace => '⌀ Pace /500 m';
+
+  @override
+  String get sessionAverageWatts => '⌀ Watts';
+
+  @override
+  String get sessionAverageStrokeRate => '⌀ Strokes/min';
+
+  @override
+  String get sessionStrokes => 'Strokes';
+
+  @override
+  String sessionLap(int lap) {
+    return 'Lap $lap';
+  }
+
+  @override
+  String get sourceRower => 'Rower';
+
+  @override
+  String get sourceSimulatorName => 'Simulator';
+
+  @override
+  String get sourceSimulatorFtmsName => 'Simulator (FTMS)';
+
+  @override
+  String get sourceReplayName => 'Replay';
+
+  @override
+  String replayName(String date) {
+    return 'Replay $date';
+  }
+
+  @override
+  String get replayNoData => 'This session has no raw data to play back.';
+
+  @override
+  String get sessionDeleteTitle => 'Delete session?';
+
+  @override
+  String sessionDeleteBody(String date) {
+    return 'The session of $date is deleted for good with its history and raw data.';
+  }
+
+  @override
+  String get sessionExported => 'Session exported.';
+
+  @override
+  String sessionExportFailed(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get sessionImported => 'Session imported.';
+
+  @override
+  String sessionImportFailed(String app, String error) {
+    return 'The file is not a readable $app session: $error';
+  }
 }

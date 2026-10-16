@@ -303,4 +303,122 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get simResume => 'Weiterrudern';
+
+  @override
+  String get actionCancel => 'Abbrechen';
+
+  @override
+  String get actionDelete => 'Löschen';
+
+  @override
+  String get actionSave => 'Speichern';
+
+  @override
+  String get actionReplay => 'Abspielen';
+
+  @override
+  String get actionExport => 'Exportieren';
+
+  @override
+  String get actionImport => 'Importieren';
+
+  @override
+  String get actionMore => 'Aktionen';
+
+  @override
+  String get sessionsTitle => 'Sessions';
+
+  @override
+  String get sessionsEmpty => 'Noch keine Sessions aufgezeichnet.';
+
+  @override
+  String sessionsLoadFailed(String error) {
+    return 'Sessions konnten nicht geladen werden: $error';
+  }
+
+  @override
+  String get sessionIncomplete => 'unvollständig';
+
+  @override
+  String get sessionTitle => 'Session';
+
+  @override
+  String get sessionGone => 'Diese Session gibt es nicht mehr.';
+
+  @override
+  String sessionLoadFailed(String error) {
+    return 'Session konnte nicht geladen werden: $error';
+  }
+
+  @override
+  String get sessionIncompleteNote =>
+      'Unvollständig: Die App wurde während der Session beendet. Gespeichert ist alles bis kurz davor.';
+
+  @override
+  String get sessionDistance => 'Distanz';
+
+  @override
+  String get sessionTime => 'Zeit';
+
+  @override
+  String get sessionAveragePace => '⌀ Pace /500 m';
+
+  @override
+  String get sessionAverageWatts => '⌀ Watt';
+
+  @override
+  String get sessionAverageStrokeRate => '⌀ Schläge/min';
+
+  @override
+  String get sessionStrokes => 'Schläge';
+
+  @override
+  String sessionLap(int lap) {
+    return 'Runde $lap';
+  }
+
+  @override
+  String get sourceRower => 'Rudergerät';
+
+  @override
+  String get sourceSimulatorName => 'Simulator';
+
+  @override
+  String get sourceSimulatorFtmsName => 'Simulator (FTMS)';
+
+  @override
+  String get sourceReplayName => 'Replay';
+
+  @override
+  String replayName(String date) {
+    return 'Replay $date';
+  }
+
+  @override
+  String get replayNoData =>
+      'Für diese Session gibt es keine Rohdaten zum Abspielen.';
+
+  @override
+  String get sessionDeleteTitle => 'Session löschen?';
+
+  @override
+  String sessionDeleteBody(String date) {
+    return 'Die Session vom $date wird mit Verlauf und Rohdaten endgültig gelöscht.';
+  }
+
+  @override
+  String get sessionExported => 'Session exportiert.';
+
+  @override
+  String sessionExportFailed(String error) {
+    return 'Export fehlgeschlagen: $error';
+  }
+
+  @override
+  String get sessionImported => 'Session importiert.';
+
+  @override
+  String sessionImportFailed(String app, String error) {
+    return 'Die Datei ist keine lesbare $app-Session: $error';
+  }
 }

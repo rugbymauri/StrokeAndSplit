@@ -570,6 +570,210 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Weiterrudern'**
   String get simResume;
+
+  /// Button that closes a dialog without doing anything
+  ///
+  /// In de, this message translates to:
+  /// **'Abbrechen'**
+  String get actionCancel;
+
+  /// Button or tooltip that deletes something
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get actionDelete;
+
+  /// Button or tooltip that saves an editor
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern'**
+  String get actionSave;
+
+  /// Plays a recorded session back in the live display
+  ///
+  /// In de, this message translates to:
+  /// **'Abspielen'**
+  String get actionReplay;
+
+  /// Exports a session as a file
+  ///
+  /// In de, this message translates to:
+  /// **'Exportieren'**
+  String get actionExport;
+
+  /// Imports a session from a file
+  ///
+  /// In de, this message translates to:
+  /// **'Importieren'**
+  String get actionImport;
+
+  /// Tooltip of the menu with the actions of a list entry
+  ///
+  /// In de, this message translates to:
+  /// **'Aktionen'**
+  String get actionMore;
+
+  /// Sessions list: title
+  ///
+  /// In de, this message translates to:
+  /// **'Sessions'**
+  String get sessionsTitle;
+
+  /// Sessions list: nothing recorded yet
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Sessions aufgezeichnet.'**
+  String get sessionsEmpty;
+
+  /// Sessions list: loading failed; error is the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Sessions konnten nicht geladen werden: {error}'**
+  String sessionsLoadFailed(String error);
+
+  /// A session or lap that was not finished
+  ///
+  /// In de, this message translates to:
+  /// **'unvollständig'**
+  String get sessionIncomplete;
+
+  /// Summary: title while the session is loading
+  ///
+  /// In de, this message translates to:
+  /// **'Session'**
+  String get sessionTitle;
+
+  /// Summary: the session was deleted
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Session gibt es nicht mehr.'**
+  String get sessionGone;
+
+  /// Summary: loading failed; error is the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Session konnte nicht geladen werden: {error}'**
+  String sessionLoadFailed(String error);
+
+  /// Summary: the app ended while recording
+  ///
+  /// In de, this message translates to:
+  /// **'Unvollständig: Die App wurde während der Session beendet. Gespeichert ist alles bis kurz davor.'**
+  String get sessionIncompleteNote;
+
+  /// Summary: label of the distance rowed
+  ///
+  /// In de, this message translates to:
+  /// **'Distanz'**
+  String get sessionDistance;
+
+  /// Summary: label of the time rowed
+  ///
+  /// In de, this message translates to:
+  /// **'Zeit'**
+  String get sessionTime;
+
+  /// Summary: label of the average pace per 500 metres
+  ///
+  /// In de, this message translates to:
+  /// **'⌀ Pace /500 m'**
+  String get sessionAveragePace;
+
+  /// Summary: label of the average power
+  ///
+  /// In de, this message translates to:
+  /// **'⌀ Watt'**
+  String get sessionAverageWatts;
+
+  /// Summary: label of the average stroke rate
+  ///
+  /// In de, this message translates to:
+  /// **'⌀ Schläge/min'**
+  String get sessionAverageStrokeRate;
+
+  /// Summary: label of the number of strokes
+  ///
+  /// In de, this message translates to:
+  /// **'Schläge'**
+  String get sessionStrokes;
+
+  /// Summary: a lap of the course
+  ///
+  /// In de, this message translates to:
+  /// **'Runde {lap}'**
+  String sessionLap(int lap);
+
+  /// Source of a session from an FTMS rower without a name
+  ///
+  /// In de, this message translates to:
+  /// **'Rudergerät'**
+  String get sourceRower;
+
+  /// Source of a session from the simulator
+  ///
+  /// In de, this message translates to:
+  /// **'Simulator'**
+  String get sourceSimulatorName;
+
+  /// Source of a session from the simulator as an FTMS rower
+  ///
+  /// In de, this message translates to:
+  /// **'Simulator (FTMS)'**
+  String get sourceSimulatorFtmsName;
+
+  /// Source of a session recorded during a replay
+  ///
+  /// In de, this message translates to:
+  /// **'Replay'**
+  String get sourceReplayName;
+
+  /// Name of a replayed session in the live display; date is the start of the session
+  ///
+  /// In de, this message translates to:
+  /// **'Replay {date}'**
+  String replayName(String date);
+
+  /// Sessions: the session cannot be played back
+  ///
+  /// In de, this message translates to:
+  /// **'Für diese Session gibt es keine Rohdaten zum Abspielen.'**
+  String get replayNoData;
+
+  /// Sessions: title of the delete confirmation
+  ///
+  /// In de, this message translates to:
+  /// **'Session löschen?'**
+  String get sessionDeleteTitle;
+
+  /// Sessions: delete confirmation; date is the start of the session
+  ///
+  /// In de, this message translates to:
+  /// **'Die Session vom {date} wird mit Verlauf und Rohdaten endgültig gelöscht.'**
+  String sessionDeleteBody(String date);
+
+  /// Sessions: the export was saved
+  ///
+  /// In de, this message translates to:
+  /// **'Session exportiert.'**
+  String get sessionExported;
+
+  /// Sessions: the export failed; error is the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Export fehlgeschlagen: {error}'**
+  String sessionExportFailed(String error);
+
+  /// Sessions: the file was imported
+  ///
+  /// In de, this message translates to:
+  /// **'Session importiert.'**
+  String get sessionImported;
+
+  /// Sessions: the file could not be imported; app is the app name, error the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Die Datei ist keine lesbare {app}-Session: {error}'**
+  String sessionImportFailed(String app, String error);
 }
 
 class _AppLocalizationsDelegate

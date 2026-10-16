@@ -16,7 +16,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones` un
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
-| 2 | `translations` | 9/16 | in Arbeit auf `feature/translations` | – |
+| 2 | `translations` | 10/16 | in Arbeit auf `feature/translations` | – |
 | 3 | `ui-design` | 0/18 | nach 2 | Entscheid Puls-Herkunft (F1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |

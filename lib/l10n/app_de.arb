@@ -408,5 +408,179 @@
   "simResume": "Weiterrudern",
   "@simResume": {
     "description": "Simulator: button that resumes rowing"
+  },
+  "actionCancel": "Abbrechen",
+  "@actionCancel": {
+    "description": "Button that closes a dialog without doing anything"
+  },
+  "actionDelete": "Löschen",
+  "@actionDelete": {
+    "description": "Button or tooltip that deletes something"
+  },
+  "actionSave": "Speichern",
+  "@actionSave": {
+    "description": "Button or tooltip that saves an editor"
+  },
+  "actionReplay": "Abspielen",
+  "@actionReplay": {
+    "description": "Plays a recorded session back in the live display"
+  },
+  "actionExport": "Exportieren",
+  "@actionExport": {
+    "description": "Exports a session as a file"
+  },
+  "actionImport": "Importieren",
+  "@actionImport": {
+    "description": "Imports a session from a file"
+  },
+  "actionMore": "Aktionen",
+  "@actionMore": {
+    "description": "Tooltip of the menu with the actions of a list entry"
+  },
+  "sessionsTitle": "Sessions",
+  "@sessionsTitle": {
+    "description": "Sessions list: title"
+  },
+  "sessionsEmpty": "Noch keine Sessions aufgezeichnet.",
+  "@sessionsEmpty": {
+    "description": "Sessions list: nothing recorded yet"
+  },
+  "sessionsLoadFailed": "Sessions konnten nicht geladen werden: {error}",
+  "@sessionsLoadFailed": {
+    "description": "Sessions list: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionIncomplete": "unvollständig",
+  "@sessionIncomplete": {
+    "description": "A session or lap that was not finished"
+  },
+  "sessionTitle": "Session",
+  "@sessionTitle": {
+    "description": "Summary: title while the session is loading"
+  },
+  "sessionGone": "Diese Session gibt es nicht mehr.",
+  "@sessionGone": {
+    "description": "Summary: the session was deleted"
+  },
+  "sessionLoadFailed": "Session konnte nicht geladen werden: {error}",
+  "@sessionLoadFailed": {
+    "description": "Summary: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionIncompleteNote": "Unvollständig: Die App wurde während der Session beendet. Gespeichert ist alles bis kurz davor.",
+  "@sessionIncompleteNote": {
+    "description": "Summary: the app ended while recording"
+  },
+  "sessionDistance": "Distanz",
+  "@sessionDistance": {
+    "description": "Summary: label of the distance rowed"
+  },
+  "sessionTime": "Zeit",
+  "@sessionTime": {
+    "description": "Summary: label of the time rowed"
+  },
+  "sessionAveragePace": "⌀ Pace /500 m",
+  "@sessionAveragePace": {
+    "description": "Summary: label of the average pace per 500 metres"
+  },
+  "sessionAverageWatts": "⌀ Watt",
+  "@sessionAverageWatts": {
+    "description": "Summary: label of the average power"
+  },
+  "sessionAverageStrokeRate": "⌀ Schläge/min",
+  "@sessionAverageStrokeRate": {
+    "description": "Summary: label of the average stroke rate"
+  },
+  "sessionStrokes": "Schläge",
+  "@sessionStrokes": {
+    "description": "Summary: label of the number of strokes"
+  },
+  "sessionLap": "Runde {lap}",
+  "@sessionLap": {
+    "description": "Summary: a lap of the course",
+    "placeholders": {
+      "lap": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceRower": "Rudergerät",
+  "@sourceRower": {
+    "description": "Source of a session from an FTMS rower without a name"
+  },
+  "sourceSimulatorName": "Simulator",
+  "@sourceSimulatorName": {
+    "description": "Source of a session from the simulator"
+  },
+  "sourceSimulatorFtmsName": "Simulator (FTMS)",
+  "@sourceSimulatorFtmsName": {
+    "description": "Source of a session from the simulator as an FTMS rower"
+  },
+  "sourceReplayName": "Replay",
+  "@sourceReplayName": {
+    "description": "Source of a session recorded during a replay"
+  },
+  "replayName": "Replay {date}",
+  "@replayName": {
+    "description": "Name of a replayed session in the live display; date is the start of the session",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "replayNoData": "Für diese Session gibt es keine Rohdaten zum Abspielen.",
+  "@replayNoData": {
+    "description": "Sessions: the session cannot be played back"
+  },
+  "sessionDeleteTitle": "Session löschen?",
+  "@sessionDeleteTitle": {
+    "description": "Sessions: title of the delete confirmation"
+  },
+  "sessionDeleteBody": "Die Session vom {date} wird mit Verlauf und Rohdaten endgültig gelöscht.",
+  "@sessionDeleteBody": {
+    "description": "Sessions: delete confirmation; date is the start of the session",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionExported": "Session exportiert.",
+  "@sessionExported": {
+    "description": "Sessions: the export was saved"
+  },
+  "sessionExportFailed": "Export fehlgeschlagen: {error}",
+  "@sessionExportFailed": {
+    "description": "Sessions: the export failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionImported": "Session importiert.",
+  "@sessionImported": {
+    "description": "Sessions: the file was imported"
+  },
+  "sessionImportFailed": "Die Datei ist keine lesbare {app}-Session: {error}",
+  "@sessionImportFailed": {
+    "description": "Sessions: the file could not be imported; app is the app name, error the technical error",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
   }
 }
