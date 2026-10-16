@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/design_tokens.dart';
+import '../../app/widgets/ghost_symbol.dart';
 import '../../data/courses/course.dart';
 import '../../data/statistics/ranking.dart';
 import '../../data/statistics/ranking_providers.dart';
@@ -10,7 +11,7 @@ import '../../data/templates/session_template.dart';
 import '../../l10n/l10n.dart';
 import '../live/formatters.dart';
 
-/// Room next to the value of place 1 for the ghost symbol of `ghost`.
+/// Room next to the value of place 1 for the ghost symbol (Change ghost, Design D6).
 const templateGhostSlotWidth = 20.0;
 
 /// Places 1–3 of [template] for its current course length and number of
@@ -105,8 +106,18 @@ class _Place extends StatelessWidget {
             child: Text('$place', style: AppTextStyles.cardTitle.copyWith(color: AppColors.textMuted)),
           ),
           Text(value, style: AppTextStyles.cardTitle.copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
-          // Place 1 keeps room for the ghost symbol; the others keep the columns aligned.
-          SizedBox(key: place == 1 ? const Key('template-ghost-slot') : null, width: templateGhostSlotWidth),
+          // Place 1 is the ghost and carries its symbol; the others keep the columns aligned.
+          SizedBox(
+            key: place == 1 ? const Key('template-ghost-slot') : null,
+            width: templateGhostSlotWidth,
+            child: place == 1
+                ? Text.rich(
+                    const WidgetSpan(alignment: PlaceholderAlignment.middle, child: GhostSymbol()),
+                    style: AppTextStyles.cardTitle,
+                    textAlign: TextAlign.center,
+                  )
+                : null,
+          ),
           Expanded(
             child: Text(
               l10n.templatePodiumPace(formatPace(paceCs == null ? null : Duration(milliseconds: paceCs * 10))),

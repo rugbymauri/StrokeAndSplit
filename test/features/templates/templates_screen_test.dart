@@ -1,4 +1,5 @@
 import 'package:aergrow/app/platform_providers.dart';
+import 'package:aergrow/app/widgets/ghost_symbol.dart';
 import 'package:aergrow/app/widgets/oar_stepper.dart';
 import 'package:aergrow/data/courses/course.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
@@ -570,9 +571,39 @@ void main() {
       expect(inPlace(2, '1.10.2026'), findsOneWidget);
       expect(find.byKey(const Key('template-place-3')), findsNothing);
       expect(find.byKey(const Key('template-podium-hint')), findsNothing);
-      // Place 1 keeps room for the ghost symbol.
+      // Only place 1 carries the ghost symbol.
       final ghostSlot = find.byKey(const Key('template-ghost-slot'));
       expect(find.descendant(of: find.byKey(const Key('template-place-1')), matching: ghostSlot), findsOneWidget);
+      expect(find.descendant(of: ghostSlot, matching: find.byType(GhostSymbol)), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const Key('template-place-2')), matching: find.byType(GhostSymbol)),
+          findsNothing);
+      expect(find.byType(GhostSymbol), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows the ghost symbol only at place 1 of three', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourse(tester, 'Seerunde');
+      final id = await setup.addTemplate(tester, 'Seerunde x1', courseId: course, laps: 1);
+      await tester.runAsync(() async {
+        final x1 = (await setup.templates.get(id))!;
+        for (final (day, ms) in [(1, 250000), (2, 246000), (3, 248000)]) {
+          await storeRowedSession(setup.db, template: x1, startedAt: DateTime(2026, 10, day, 7), laps: [
+            RowedLap.single(ms, 1000),
+          ]);
+        }
+      });
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Seerunde x1'));
+      await setup.settle(tester);
+
+      Finder ghostIn(int place) =>
+          find.descendant(of: find.byKey(Key('template-place-$place')), matching: find.byType(GhostSymbol));
+      expect(ghostIn(1), findsOneWidget);
+      expect(ghostIn(2), findsNothing);
+      expect(ghostIn(3), findsNothing);
+      expect(find.byType(GhostSymbol), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -590,6 +621,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.byKey(const Key('template-podium')), findsNothing);
+      expect(find.byType(GhostSymbol), findsNothing);
       await disposeWidgetsWithDatabase(tester);
     });
 
