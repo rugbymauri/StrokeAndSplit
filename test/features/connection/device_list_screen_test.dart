@@ -3,6 +3,7 @@ import 'package:aergrow/data/sources/ble/ble_transport.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/features/connection/device_list_screen.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fake_ble_transport.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
 
 Future<ProviderContainer> _pump(WidgetTester tester, FakeBleTransport transport) async {
   final container = ProviderContainer(overrides: [
@@ -30,17 +32,26 @@ void main() {
     await _pump(tester, FakeBleTransport(found: [_pm5]));
 
     expect(find.text('PM5 430000001 Row'), findsOneWidget);
+    expect(find.text('Concept2 PM5 · C0:00:00:00:00:01'), findsOneWidget);
     await tester.pump(const Duration(seconds: 15));
   });
 
-  testWidgets('shows tips when no PM5 was found within 15 seconds', (tester) async {
+  testWidgets('lists an FTMS rower with its kind', (tester) async {
+    await _pump(tester, FakeBleTransport(found: [_pm5, _ftms]));
+
+    expect(find.text('AergRow FTMS Rower'), findsOneWidget);
+    expect(find.text('FTMS · AA:BB:CC:DD:EE:FF'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 15));
+  });
+
+  testWidgets('shows tips when no rower was found within 15 seconds', (tester) async {
     await _pump(tester, FakeBleTransport());
 
-    expect(find.textContaining('Kein PM5 gefunden'), findsNothing);
+    expect(find.textContaining('Kein Rudergerät gefunden'), findsNothing);
     await tester.pump(const Duration(seconds: 15));
     await tester.pump();
 
-    expect(find.textContaining('Kein PM5 gefunden'), findsOneWidget);
+    expect(find.textContaining('Kein Rudergerät gefunden'), findsOneWidget);
     expect(find.textContaining('ErgData'), findsOneWidget);
   });
 
@@ -72,7 +83,7 @@ void main() {
     await _pump(tester, FakeBleTransport(scanError: StateError('adapter busy')));
     await tester.pump();
 
-    expect(find.textContaining('Suche nach dem PM5 ist fehlgeschlagen'), findsOneWidget);
+    expect(find.textContaining('Suche nach Rudergeräten ist fehlgeschlagen'), findsOneWidget);
     expect(find.textContaining('adapter busy'), findsOneWidget);
     expect(find.textContaining('kein Bluetooth LE'), findsNothing);
   });
@@ -89,6 +100,21 @@ void main() {
     expect(container.read(activeErgSourceProvider), isNull);
   });
 
+  testWidgets('says that only rowers are supported when the device is no rower', (tester) async {
+    const error = RowerConnectException('Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem BikeErg.',
+        notARower: true);
+    final container = await _pump(tester, FakeBleTransport(found: [_pm5], connectError: error));
+
+    await tester.tap(find.text('PM5 430000001 Row'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Kein Rudergerät'), findsOneWidget);
+    expect(find.textContaining('Nur Rudergeräte werden unterstützt'), findsOneWidget);
+    expect(find.textContaining('BikeErg'), findsOneWidget);
+    expect(find.textContaining('nur eine Bluetooth-Verbindung'), findsNothing);
+    expect(container.read(activeErgSourceProvider), isNull);
+  });
+
   testWidgets('opens the live display after connecting', (tester) async {
     final container = await _pump(tester, FakeBleTransport(found: [_pm5]));
 
@@ -96,6 +122,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(container.read(activeErgSourceProvider)?.kind, ErgSourceKind.pm5);
+    expect(find.text('Verbunden'), findsOneWidget);
+    await container.read(activeErgSourceProvider.notifier).clear();
+  });
+
+  testWidgets('connects to an FTMS rower as an FTMS source', (tester) async {
+    final container = await _pump(tester, FakeBleTransport(found: [_ftms]));
+
+    await tester.tap(find.text('AergRow FTMS Rower'));
+    await tester.pumpAndSettle();
+
+    final source = container.read(activeErgSourceProvider);
+    expect((source?.kind, source?.protocol), (ErgSourceKind.ftms, ErgProtocol.ftms));
     expect(find.text('Verbunden'), findsOneWidget);
     await container.read(activeErgSourceProvider.notifier).clear();
   });

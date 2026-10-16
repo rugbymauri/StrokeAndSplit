@@ -12,7 +12,7 @@ void main() {
   testWidgets('offers PM5, simulator, templates and the recorded sessions', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: StartScreen())));
 
-    expect(find.text('PM5 suchen'), findsOneWidget);
+    expect(find.text('Rudergerät suchen'), findsOneWidget);
     expect(find.text('Simulator'), findsOneWidget);
     expect(find.text('Vorlage rudern'), findsOneWidget);
     expect(find.text('Sessions'), findsOneWidget);

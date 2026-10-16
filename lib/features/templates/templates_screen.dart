@@ -146,7 +146,7 @@ class _TemplateTile extends ConsumerWidget {
         children: [
           SimpleDialogOption(
             onPressed: () => Navigator.of(context).pop(_Source.pm5),
-            child: const ListTile(leading: Icon(Icons.bluetooth_searching), title: Text('PM5 suchen')),
+            child: const ListTile(leading: Icon(Icons.bluetooth_searching), title: Text('Rudergerät suchen')),
           ),
           SimpleDialogOption(
             onPressed: () => Navigator.of(context).pop(_Source.simulator),
