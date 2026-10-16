@@ -569,12 +569,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get courseNameMissing => 'The name is missing.';
 
   @override
-  String get courseLengthFirst => 'Enter the length of the course first.';
-
-  @override
-  String get courseLengthHint => 'Enter a length to place zones.';
-
-  @override
   String get courseSequence => 'Sequence';
 
   @override
@@ -628,16 +622,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String fieldLength(String unit) {
     return 'Length ($unit)';
-  }
-
-  @override
-  String invalidLength(String text) {
-    return 'The length “$text” is not valid.';
-  }
-
-  @override
-  String invalidStart(String text) {
-    return 'The start “$text” is not valid.';
   }
 
   @override
@@ -699,36 +683,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zoneNameHint => 'e.g. Sprint';
 
   @override
-  String get zonePaceBand => 'Pace per 500 m';
+  String get zonePaceBand => 'Pace band';
 
   @override
-  String get zonePaceFastest => 'fastest';
+  String get zonePaceFastest => 'Fastest';
 
   @override
-  String get zonePaceSlowest => 'slowest';
+  String get zonePaceSlowest => 'Slowest';
 
   @override
-  String get zoneSpmBand => 'Stroke rate';
+  String get zoneSpmBand => 'Stroke rate band';
 
   @override
-  String get zoneSpmFrom => 'from';
+  String get zoneSpmFrom => 'At least';
 
   @override
-  String get zoneSpmTo => 'to';
+  String get zoneSpmTo => 'At most';
 
   @override
   String get zoneBandHint =>
       'At least one band is needed: pace, stroke rate or both.';
-
-  @override
-  String invalidPace(String text) {
-    return 'The pace “$text” is not valid.';
-  }
-
-  @override
-  String invalidStrokeRate(String text) {
-    return 'The stroke rate “$text” is not valid.';
-  }
 
   @override
   String get dateTimePattern => 'MMM d, y, HH:mm';

@@ -1,3 +1,4 @@
+import 'package:aergrow/app/widgets/oar_stepper.dart';
 import 'package:aergrow/data/courses/course.dart';
 import 'package:aergrow/data/courses/course_layout.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/oar_steppers.dart';
 import '../../support/test_database.dart';
 import '../../support/localized_app.dart';
 
@@ -48,7 +50,7 @@ class _Setup {
     }
   }
 
-  /// The sprint, placed at 500 m in two courses.
+  /// The sprint, placed at the end of two courses of 2000 m.
   Future<int> sprintInTwoCourses(WidgetTester tester) async {
     return (await tester.runAsync(() async {
       final id = await zones.create(_sprint);
@@ -56,7 +58,7 @@ class _Setup {
         final layout = resolveCourse(
           axis: CourseAxis.distance,
           length: 2000,
-          placements: [ZonePlacement(zoneId: id, start: 500)],
+          placements: [ZonePlacement(zoneId: id, start: 1900)],
           zones: {id: (await zones.get(id))!},
         );
         await courses.create(name, layout.definition!);
@@ -66,10 +68,20 @@ class _Setup {
   }
 }
 
-Future<void> _enter(WidgetTester tester, Map<String, String> fields) async {
+Future<void> _name(WidgetTester tester, String name) async {
+  await tester.enterText(find.byKey(const Key('zone-name')), name);
+  await tester.pump();
+}
+
+/// Sets the steppers of the zone editor, e.g. `{'pace-fast': 10500}`.
+Future<void> _step(WidgetTester tester, Map<String, int> fields) async {
   for (final MapEntry(:key, :value) in fields.entries) {
-    await tester.enterText(find.byKey(Key('zone-$key')), value);
+    await stepTo(tester, Key('zone-$key'), value);
   }
+}
+
+Future<void> _switch(WidgetTester tester, String band) async {
+  await tester.tap(find.byKey(Key('zone-$band-band')));
   await tester.pump();
 }
 
@@ -80,14 +92,12 @@ void main() {
 
     await tester.tap(find.text('Zone anlegen'));
     await tester.pumpAndSettle();
-    await _enter(tester, {
-      'name': 'Sprint',
-      'length': '100',
-      'pace-fast': '1:45',
-      'pace-slow': '1:50',
-      'spm-min': '30',
-      'spm-max': '34',
-    });
+    await _name(tester, 'Sprint');
+    expect(stepperValue(tester, const Key('zone-length')), 100);
+    await _step(tester, {'pace-fast': 10500, 'pace-slow': 11000});
+    expect(find.byKey(const Key('zone-spm-min')), findsNothing);
+    await _switch(tester, 'spm');
+    await _step(tester, {'spm-max': 34, 'spm-min': 30});
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
@@ -106,7 +116,8 @@ void main() {
 
     await tester.tap(find.text('Zone anlegen'));
     await tester.pumpAndSettle();
-    await _enter(tester, {'name': 'Nichts', 'length': '100'});
+    await _name(tester, 'Nichts');
+    await _switch(tester, 'pace');
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
@@ -122,12 +133,15 @@ void main() {
       container: setup.container,
       child: const LocalizedApp(locale: Locale('en'), home: ZoneEditorScreen()),
     ));
-    await _enter(tester, {'name': 'Halb', 'length': '100', 'pace-fast': '1:45', 'spm-min': '34', 'spm-max': '30'});
-    await tester.tap(find.byType(FilledButton));
+    expect(find.text('Pace band'), findsOneWidget);
+    expect(find.text('Fastest'), findsOneWidget);
+    expect(find.bySemanticsLabel('5 seconds more'), findsNWidgets(2));
+    await _switch(tester, 'pace');
+    await tester.tap(find.byTooltip('Save'));
     await setup.settle(tester);
 
-    expect(find.text('The pace band is missing a bound.'), findsOneWidget);
-    expect(find.text('The lowest stroke rate is above the highest.'), findsOneWidget);
+    expect(find.text('The name is missing.'), findsOneWidget);
+    expect(find.text('A band is missing: pace, stroke rate or both.'), findsOneWidget);
     expect(await tester.runAsync(setup.zones.all), isEmpty);
     await disposeWidgetsWithDatabase(tester);
   });
@@ -167,13 +181,70 @@ void main() {
 
     await tester.tap(find.text('Sprint'));
     await setup.settle(tester);
-    await _enter(tester, {'length': '1600'});
+    await tapStep(tester, const Key('zone-length'), more: true);
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
     expect(find.textContaining('Die Änderung passt nicht in „2 km Intervall“, „Kurz“'), findsOneWidget);
     expect((await tester.runAsync(setup.zones.all))!.single.length, 100);
     await disposeWidgetsWithDatabase(tester);
+  });
+
+  group('steps', () {
+    Future<_Setup> openSprint(WidgetTester tester) async {
+      final setup = _Setup();
+      await tester.runAsync(() => setup.zones.create(_sprint));
+      await setup.pump(tester);
+      await tester.tap(find.text('Sprint'));
+      await setup.settle(tester);
+      return setup;
+    }
+
+    testWidgets('makes the fastest pace of the band 5 s slower', (tester) async {
+      final setup = await openSprint(tester);
+      final fastest = find.byKey(const Key('zone-pace-fast'));
+      expect(find.descendant(of: fastest, matching: find.text('1:45')), findsOneWidget);
+
+      await tester.tap(find.descendant(of: fastest, matching: find.bySemanticsLabel('5 Sekunden mehr')));
+      await tester.pump();
+
+      expect(find.descendant(of: fastest, matching: find.text('1:50')), findsOneWidget);
+      // Not slower than the slowest pace.
+      expect(tester.widget<OarStepper>(fastest).canIncrease, isFalse);
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+      expect(find.text('100 m · 1:50–1:50 · 30–34 spm'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('lengthens the zone by 10 m', (tester) async {
+      final setup = await openSprint(tester);
+
+      await tapStep(tester, const Key('zone-length'), more: true);
+
+      expect(stepperValue(tester, const Key('zone-length')), 110);
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+      expect(find.text('110 m · 1:45–1:50 · 30–34 spm'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('steps the stroke rate by one stroke within the band', (tester) async {
+      final setup = await openSprint(tester);
+      final lowest = find.byKey(const Key('zone-spm-min'));
+
+      await tester.tap(find.descendant(of: lowest, matching: find.bySemanticsLabel('1 Schlag weniger')));
+      await tester.pump();
+      expect(stepperValue(tester, const Key('zone-spm-min')), 29);
+      await _step(tester, {'spm-min': 34});
+
+      expect(tester.widget<OarStepper>(lowest).canIncrease, isFalse);
+      expect(tester.widget<OarStepper>(find.byKey(const Key('zone-spm-max'))).canDecrease, isFalse);
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+      expect(find.text('100 m · 1:45–1:50 · 34–34 spm'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
   });
 
   testWidgets('deletes a zone after confirming the courses it frees', (tester) async {

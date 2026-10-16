@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/design_tokens.dart';
+import '../../app/widgets/oar_stepper.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_layout.dart';
 import '../../data/courses/course_providers.dart';
@@ -28,42 +30,33 @@ class CourseEditorScreen extends ConsumerStatefulWidget {
 class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
   late final _name = TextEditingController(text: widget.course?.name);
   late var _axis = widget.course?.axis ?? CourseAxis.distance;
-  late final _length = TextEditingController(
-    text: widget.course == null ? '' : _lengthText(widget.course!.definition.length),
-  );
+  late var _length = widget.course?.definition.length ?? _defaultLength(_axis);
   late var _placements = widget.course?.definition.placements ?? const <ZonePlacement>[];
   var _errors = <String>[];
 
   bool get _isNew => widget.course == null;
 
-  String _lengthText(int length) => _axis == CourseAxis.distance ? '$length' : formatCourseLength(_axis, length);
-
-  int? get _lengthValue => parseCourseLength(_axis, _length.text);
+  /// 2000 m or 4:00.
+  static int _defaultLength(CourseAxis axis) => axis == CourseAxis.distance ? 2000 : 240;
 
   @override
   void dispose() {
     _name.dispose();
-    _length.dispose();
     super.dispose();
   }
 
   Map<int, Zone> get _zones => _zonesById(ref.read(zonesProvider).value);
 
   CourseLayout _layout(Map<int, Zone> zones) =>
-      resolveCourse(axis: _axis, length: _lengthValue ?? 0, placements: _placements, zones: zones);
+      resolveCourse(axis: _axis, length: _length, placements: _placements, zones: zones);
 
   /// Places a zone, or moves the placement at [index] when given.
   Future<void> _place({int? index, int? start}) async {
-    final length = _lengthValue;
-    if (length == null || length <= 0) {
-      setState(() => _errors = [context.l10n.courseLengthFirst]);
-      return;
-    }
     final placement = await showDialog<ZonePlacement>(
       context: context,
       builder: (_) => _PlaceZoneDialog(
         axis: _axis,
-        length: length,
+        length: _length,
         others: [for (final (i, p) in _placements.indexed) if (i != index) p],
         initial: index == null ? null : _placements[index],
         start: start,
@@ -88,12 +81,8 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     final errors = <String>[];
     final name = _name.text.trim();
     if (name.isEmpty) errors.add(l10n.courseNameMissing);
-    final lengthText = _length.text.trim();
-    if (lengthText.isNotEmpty && _lengthValue == null) errors.add(l10n.invalidLength(lengthText));
     final layout = _layout(_zones);
-    if (_lengthValue != null || lengthText.isEmpty) {
-      errors.addAll([for (final e in layout.errors) placementErrorText(l10n, e)]);
-    }
+    errors.addAll([for (final e in layout.errors) placementErrorText(l10n, e)]);
     if (errors.isNotEmpty) {
       setState(() => _errors = errors);
       return;
@@ -114,7 +103,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final zones = _zonesById(ref.watch(zonesProvider).value);
-    final unit = _axis == CourseAxis.distance ? 'm' : 'm:ss';
+    final distance = _axis == CourseAxis.distance;
     final layout = _layout(zones);
     final theme = Theme.of(context);
     final l10n = context.l10n;
@@ -153,16 +142,33 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                 selected: {_axis},
                 // The axis of a stored course stays, its laps would not compare;
                 // placed zones keep it too.
-                onSelectionChanged:
-                    _isNew && _placements.isEmpty ? (axis) => setState(() => _axis = axis.single) : null,
+                onSelectionChanged: _isNew && _placements.isEmpty
+                    ? (axis) => setState(() {
+                          _axis = axis.single;
+                          _length = _defaultLength(_axis);
+                        })
+                    : null,
               ),
               const SizedBox(height: 16),
-              TextField(
-                key: const Key('course-length'),
-                controller: _length,
-                keyboardType: _axis == CourseAxis.distance ? TextInputType.number : TextInputType.datetime,
-                decoration: InputDecoration(labelText: l10n.fieldLength(unit)),
-                onChanged: (_) => setState(() {}),
+              Text(l10n.fieldLength(distance ? 'm' : 'm:ss'), style: AppTextStyles.caption),
+              const SizedBox(height: 6),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 240),
+                  child: OarStepper(
+                    key: const Key('course-length'),
+                    value: _length,
+                    step: _courseStep(_axis),
+                    min: _courseStep(_axis),
+                    stepLabel: distance ? '${_courseStep(_axis)} m' : l10n.stepSeconds(_courseStep(_axis)),
+                    format: distance ? null : (v) => formatCourseLength(_axis, v),
+                    unit: distance ? 'm' : 'min',
+                    label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
+                    size: OarStepperSize.compact,
+                    onChanged: (v) => setState(() => _length = v),
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
               Text(l10n.courseSequence, style: theme.textTheme.titleMedium),
@@ -185,7 +191,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                     onMove: segment.zoneId == null ? null : () => _place(index: _indexAt(definition, i)),
                     onRemove: segment.zoneId == null ? null : () => _remove(_indexAt(definition, i)),
                   ),
-              ] else if (_lengthValue != null && _lengthValue! > 0) ...[
+              ] else ...[
                 // The length no longer fits the zones: show them as placed.
                 ErrorCard(errors: [for (final e in layout.errors) placementErrorText(l10n, e)]),
                 for (final (i, p) in _placements.indexed)
@@ -198,8 +204,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                       onMove: () => _place(index: i),
                       onRemove: () => _remove(i),
                     ),
-              ] else
-                Text(l10n.courseLengthHint, style: theme.textTheme.bodySmall),
+              ],
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerLeft,
@@ -292,12 +297,7 @@ class _PlaceZoneDialog extends ConsumerStatefulWidget {
 
 class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
   late int? _zoneId = widget.initial?.zoneId;
-  late final _start = TextEditingController(
-    text: _startText(widget.initial?.start ?? widget.start ?? _firstFree()),
-  );
-
-  String _startText(int value) =>
-      widget.axis == CourseAxis.distance ? '$value' : formatCourseLength(widget.axis, value);
+  late var _start = widget.initial?.start ?? widget.start ?? _firstFree();
 
   /// The end of the last placed zone, or 0.
   int _firstFree() {
@@ -310,19 +310,11 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
 
   Map<int, Zone> get _zones => _zonesById(ref.read(zonesProvider).value);
 
-  @override
-  void dispose() {
-    _start.dispose();
-    super.dispose();
-  }
-
-  /// The placement and why it does not fit; null without a zone or start.
+  /// The placement and why it does not fit; null without a zone.
   (ZonePlacement?, String?) _check(Map<int, Zone> zones) {
     final zone = zones[_zoneId];
     if (zone == null) return (null, null);
-    final start = parseCourseLength(widget.axis, _start.text);
-    if (start == null) return (null, context.l10n.invalidStart(_start.text.trim()));
-    final placement = ZonePlacement(zoneId: zone.id, start: start);
+    final placement = ZonePlacement(zoneId: zone.id, start: _start);
     final placements = [...widget.others, placement];
     final layout = resolveCourse(axis: widget.axis, length: widget.length, placements: placements, zones: zones);
     final error = layout.errors.where((e) => e.placements.contains(placements.length - 1)).firstOrNull;
@@ -342,7 +334,8 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
     final zone = zones[_zoneId];
     final theme = Theme.of(context);
     final l10n = context.l10n;
-    final unit = widget.axis == CourseAxis.distance ? 'm' : 'm:ss';
+    final distance = widget.axis == CourseAxis.distance;
+    final step = _startStep(widget.axis);
 
     return AlertDialog(
       title: Text(widget.initial == null ? l10n.coursePlaceZone : l10n.courseMoveZone),
@@ -372,15 +365,25 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
               ),
             ),
             const SizedBox(height: 8),
-            TextField(
+            Text(l10n.courseStart(distance ? 'm' : 'm:ss'), style: AppTextStyles.caption),
+            const SizedBox(height: 6),
+            OarStepper(
               key: const Key('place-start'),
-              controller: _start,
-              keyboardType: widget.axis == CourseAxis.distance ? TextInputType.number : TextInputType.datetime,
-              decoration: InputDecoration(
-                labelText: l10n.courseStart(unit),
-                helperText: l10n.courseRange(formatCourseRange(widget.axis, 0, widget.length)),
-              ),
-              onChanged: (_) => setState(() {}),
+              value: _start,
+              step: step,
+              min: 0,
+              // The zone has to end with the course.
+              max: widget.length - (zone?.length ?? 0),
+              stepLabel: distance ? '$step m' : l10n.stepSeconds(step),
+              format: distance ? null : (v) => formatCourseLength(widget.axis, v),
+              unit: distance ? 'm' : 'min',
+              label: l10n.courseStart(distance ? 'm' : 'm:ss'),
+              onChanged: (v) => setState(() => _start = v),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              l10n.courseRange(formatCourseRange(widget.axis, 0, widget.length)),
+              style: AppTextStyles.caption,
             ),
             const SizedBox(height: 12),
             if (zone != null && placement != null && error == null)
@@ -430,6 +433,12 @@ class _ZoneOption extends StatelessWidget {
     );
   }
 }
+
+/// Steps of design D7 for the length of a course: 100 m or 30 s.
+int _courseStep(CourseAxis axis) => axis == CourseAxis.distance ? 100 : 30;
+
+/// Steps of design D7 for the start of a zone: 50 m or 10 s.
+int _startStep(CourseAxis axis) => axis == CourseAxis.distance ? 50 : 10;
 
 Map<int, Zone> _zonesById(List<ZoneUsage>? usages) =>
     {for (final u in usages ?? const <ZoneUsage>[]) u.zone.id: u.zone};

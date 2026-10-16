@@ -783,14 +783,6 @@
   "@courseNameMissing": {
     "description": "Course editor: the course has no name"
   },
-  "courseLengthFirst": "Gib zuerst die Länge der Strecke ein.",
-  "@courseLengthFirst": {
-    "description": "Course editor: a zone is placed before the length is known"
-  },
-  "courseLengthHint": "Gib eine Länge ein, um Zonen einzubauen.",
-  "@courseLengthHint": {
-    "description": "Course editor: shown instead of the parts while there is no length"
-  },
   "courseSequence": "Ablauf",
   "@courseSequence": {
     "description": "Course editor: heading above the parts of the course"
@@ -878,24 +870,6 @@
       }
     }
   },
-  "invalidLength": "Die Länge „{text}“ ist ungültig.",
-  "@invalidLength": {
-    "description": "Editors: the length typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
-  "invalidStart": "Der Start „{text}“ ist ungültig.",
-  "@invalidStart": {
-    "description": "Place dialog: the start typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
   "zonesTitle": "Zonen",
   "@zonesTitle": {
     "description": "Zones: title"
@@ -973,51 +947,33 @@
   "@zoneNameHint": {
     "description": "Zone editor: example of a zone name"
   },
-  "zonePaceBand": "Pace pro 500 m",
+  "zonePaceBand": "Pace-Band",
   "@zonePaceBand": {
-    "description": "Zone editor: heading of the pace band"
+    "description": "Zone editor: title and switch of the pace band per 500 m"
   },
-  "zonePaceFastest": "schnellste",
+  "zonePaceFastest": "Schnellste",
   "@zonePaceFastest": {
-    "description": "Zone editor: the fastest pace of the band"
+    "description": "Zone editor: label of the fastest pace of the band"
   },
-  "zonePaceSlowest": "langsamste",
+  "zonePaceSlowest": "Langsamste",
   "@zonePaceSlowest": {
-    "description": "Zone editor: the slowest pace of the band"
+    "description": "Zone editor: label of the slowest pace of the band"
   },
-  "zoneSpmBand": "Schlagzahl",
+  "zoneSpmBand": "Schlagzahl-Band",
   "@zoneSpmBand": {
-    "description": "Zone editor: heading of the stroke rate band"
+    "description": "Zone editor: title and switch of the stroke rate band"
   },
-  "zoneSpmFrom": "ab",
+  "zoneSpmFrom": "Mindestens",
   "@zoneSpmFrom": {
-    "description": "Zone editor: the lowest stroke rate of the band"
+    "description": "Zone editor: label of the lowest stroke rate of the band"
   },
-  "zoneSpmTo": "bis",
+  "zoneSpmTo": "Höchstens",
   "@zoneSpmTo": {
-    "description": "Zone editor: the highest stroke rate of the band"
+    "description": "Zone editor: label of the highest stroke rate of the band"
   },
   "zoneBandHint": "Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.",
   "@zoneBandHint": {
     "description": "Zone editor: what a zone needs"
-  },
-  "invalidPace": "Die Pace „{text}“ ist ungültig.",
-  "@invalidPace": {
-    "description": "Zone editor: the pace typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
-  "invalidStrokeRate": "Die Schlagzahl „{text}“ ist ungültig.",
-  "@invalidStrokeRate": {
-    "description": "Zone editor: the stroke rate typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
   },
   "dateTimePattern": "dd.MM.yyyy, HH:mm",
   "@dateTimePattern": {

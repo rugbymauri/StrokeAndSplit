@@ -15,6 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
+import '../../support/oar_steppers.dart';
 import '../../support/test_database.dart';
 import '../../support/localized_app.dart';
 
@@ -304,9 +305,6 @@ void main() {
       await tester.tap(find.text('Zone anlegen'));
       await setup.settle(tester);
       await tester.enterText(find.byKey(const Key('zone-name')), name);
-      await tester.enterText(find.byKey(const Key('zone-length')), '100');
-      await tester.enterText(find.byKey(const Key('zone-spm-min')), '20');
-      await tester.enterText(find.byKey(const Key('zone-spm-max')), '22');
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
     }
@@ -316,8 +314,6 @@ void main() {
       await setup.settle(tester);
       await tester.tap(find.text('Strecke anlegen'));
       await setup.settle(tester);
-      await tester.enterText(find.byKey(const Key('course-length')), '2000');
-      await tester.pump();
       await tester.tap(find.text('Zone einbauen'));
       await setup.settle(tester);
     }
@@ -344,30 +340,27 @@ void main() {
 
     testWidgets('places zones created right in the dialog one after the other', (tester) async {
       final setup = _Setup();
+      // Room for the course with both zones.
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       await setup.pump(tester);
       await tester.tap(find.text('Strecken'));
       await setup.settle(tester);
       await tester.tap(find.text('Strecke anlegen'));
       await setup.settle(tester);
       await tester.enterText(find.byKey(const Key('course-name')), 'Intervall');
-      await tester.enterText(find.byKey(const Key('course-length')), '2000');
       await tester.pump();
 
-      for (final (name, start) in [('Sprint', '500'), ('Ausdauer', '1000')]) {
-        await tester.ensureVisible(find.text('Zone einbauen'));
-        await tester.pump();
+      for (final (name, start) in [('Sprint', 500), ('Ausdauer', 1000)]) {
         await tester.tap(find.text('Zone einbauen'));
         await setup.settle(tester);
         await tester.tap(find.text('Neue Zone anlegen'));
         await setup.settle(tester);
         await tester.enterText(find.byKey(const Key('zone-name')), name);
-        await tester.enterText(find.byKey(const Key('zone-length')), '100');
-        await tester.enterText(find.byKey(const Key('zone-spm-min')), '20');
-        await tester.enterText(find.byKey(const Key('zone-spm-max')), '22');
         await tester.tap(find.byTooltip('Speichern'));
         await setup.settle(tester);
-        await tester.enterText(find.byKey(const Key('place-start')), start);
-        await tester.pump();
+        await stepTo(tester, const Key('place-start'), start);
         await tester.tap(find.text('Einbauen'));
         await setup.settle(tester);
       }
@@ -388,7 +381,6 @@ void main() {
       await tester.tap(find.text('Strecke anlegen'));
       await setup.settle(tester);
       await tester.enterText(find.byKey(const Key('course-name')), 'Sprintstrecke');
-      await tester.enterText(find.byKey(const Key('course-length')), '500');
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
       await tester.tap(find.text('Vorlagen'));
@@ -398,7 +390,7 @@ void main() {
       await tester.tap(find.byKey(const Key('template-course')));
       await setup.settle(tester);
 
-      expect(find.text('Sprintstrecke · 500 m · frei'), findsWidgets);
+      expect(find.text('Sprintstrecke · 2000 m · frei'), findsWidgets);
       await disposeWidgetsWithDatabase(tester);
     });
   });
