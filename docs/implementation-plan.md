@@ -123,7 +123,7 @@ Manuelle Tests archivierter Changes (Nutzer):
 - iOS und macOS bleiben ungetestet, es gibt keinen Mac.
 
 Nacharbeit:
-- [ ] Platzhalter-Test `packages/pm5_protocol/test/pm5_protocol_test.dart` („package loads“) löschen.
+- [x] Platzhalter-Test `packages/pm5_protocol/test/pm5_protocol_test.dart` („package loads“) gelöscht.
 - [ ] `lib/data/sessions/session_repository.dart`, `recoverInterrupted`: Zeile über 120 Zeichen umbrechen.
 - [ ] Kein Git-Remote: Sobald es eines gibt, pushen und künftig per MR arbeiten.
 
