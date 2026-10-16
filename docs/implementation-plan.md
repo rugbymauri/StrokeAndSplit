@@ -101,7 +101,8 @@ Vor dem Start angepasst (2026-10-16, in Proposal, Design, Specs und Tasks eingea
 - [x] Sprachwahl (D8).
 
 Vorläufig, vom Nutzer zu bestätigen:
-- [ ] D6 Quelle: „Rudergerät“ (PM5 und FTMS), „Simulator“, „Simulator (FTMS)“ auf dem Startbildschirm gilt für „Rudern“, „Frei rudern“ und „Nochmal“; der Quellen-Dialog beim Start einer Vorlage fällt weg.
+- [x] D6 Geräte zuerst (Nutzer, 2026-10-16): Die App beginnt mit „Geräte wählen“ (Rudergerät inkl. Simulatoren, optional Pulsgurt aus `heart-rate`), dann Startbildschirm mit Gerätezeile. Der Quellen-Dialog beim Start einer Vorlage fällt weg. `heart-rate` 5.1 koppelt den Gurt dort statt auf dem Startbildschirm.
+- [ ] Offen: Beim nächsten App-Start „Geräte wählen“ überspringen, wenn das letzte Rudergerät gefunden wird?
 - [ ] D8 Sprachwahl bleibt Symbol in der App-Leiste des Startbildschirms, zieht in Einstellungen um, sobald es weitere gibt.
 - [x] Legende „Runde 2 / 3“ (Nutzer, 2026-10-16); dafür MODIFIED-Delta zu `course-rowing` nötig (mit 2.3). Vorläufig: Bereich „200–800 m“ entfällt.
 - [ ] OFL-Lizenzen der Schriften in der Lizenzseite der App (`LicenseRegistry`) zeigen? Keinem Task zugeordnet.

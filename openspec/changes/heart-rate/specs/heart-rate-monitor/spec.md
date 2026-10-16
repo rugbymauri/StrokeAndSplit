@@ -18,11 +18,11 @@ Die App SHALL auf Anfrage nach Bluetooth-Geräten suchen, die den Standard-Heart
 - **THEN** zeigt die App einen Hinweis mit Tipps: Gurt anfeuchten und anlegen, Gurt von anderen Apps oder Uhren trennen
 
 ### Requirement: Gurt koppeln und merken
-Der Nutzer SHALL auf dem Startbildschirm einen gefundenen Gurt koppeln können. Die App MUST sich den gekoppelten Gurt über einen Neustart hinweg merken und den Nutzer den Gurt wechseln oder vergessen lassen.
+Der Nutzer SHALL in „Geräte wählen“ vor dem Startbildschirm einen gefundenen Gurt koppeln können. Die App MUST sich den gekoppelten Gurt über einen Neustart hinweg merken und den Nutzer den Gurt wechseln oder vergessen lassen.
 
 #### Scenario: Gurt koppeln
 - **WHEN** der Nutzer einen Gurt aus der Liste wählt
-- **THEN** zeigt der Startbildschirm diesen Gurt als gekoppelt an, auch nach einem Neustart der App
+- **THEN** zeigt „Geräte wählen“ diesen Gurt als gekoppelt an, auch nach einem Neustart der App
 
 #### Scenario: Gurt vergessen
 - **WHEN** der Nutzer den gekoppelten Gurt vergisst

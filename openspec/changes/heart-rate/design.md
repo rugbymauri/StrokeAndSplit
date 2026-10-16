@@ -103,7 +103,7 @@ Die App speichert den Gurt als `heart_rate_monitor.id` und `heart_rate_monitor.n
 
 ### D8: Anzeige
 
-- **Startbildschirm**: ein Bereich „Pulsgurt“ mit dem gekoppelten Gurt oder „Kein Gurt“ sowie den Aktionen Koppeln/Wechseln (öffnet die Gurt-Suche) und Vergessen.
+- **Geräte wählen** (vor dem Startbildschirm, `ui-design` D6, entschieden 2026-10-16): ein Bereich „Pulsgurt“ mit dem gekoppelten Gurt oder „Kein Gurt“ sowie den Aktionen Koppeln/Wechseln (öffnet die Gurt-Suche) und Vergessen. Der Pulsgurt ist optional, „Weiter“ geht auch ohne. Der Startbildschirm zeigt den Gurt in der Gerätezeile.
 - **Live-Display**: Ein zweiter Indikator steht neben dem bestehenden `ConnectionIndicator`. Die Puls-Kachel zeigt unter dem Wert klein das letzte RR-Intervall. Den letzten `HeartBeatIntervals` merkt sich das Display und blendet ihn aus, wenn der jüngste `StatusTick` mehr als 3 s später liegt. Das funktioniert so auch im Replay.
 - **Zusammenfassung**: Ø/Max-Puls als weitere Kennzahlen. Bei RR-Daten kommt eine Kurve mit `CustomPainter` dazu (keine Chart-Dependency, eine einzige Linie) sowie „HRV (RMSSD) xx ms“.
 
