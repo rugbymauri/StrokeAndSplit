@@ -1,15 +1,15 @@
 import 'dart:async';
 
 import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/ble/pm5_ble_source.dart';
+import 'package:aergrow/data/sources/ble/ble_rower_source.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
-const _pm5 = FoundPm5(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 
-class _FakeLink implements Pm5Link {
+class _FakeLink implements RowerLink {
   final _notifications = StreamController<(String, List<int>)>.broadcast();
   final _lost = Completer<void>();
   var disconnected = false;
@@ -35,9 +35,9 @@ class _FakeTransport implements BleTransport {
   final links = <_FakeLink>[];
 
   @override
-  Future<Pm5Link> connect(FoundPm5 device) async {
+  Future<RowerLink> connect(FoundRower device) async {
     connectAttempts++;
-    if (!reachable) throw const Pm5ConnectException('not reachable');
+    if (!reachable) throw const RowerConnectException('not reachable');
     final link = _FakeLink();
     links.add(link);
     return link;
@@ -47,17 +47,17 @@ class _FakeTransport implements BleTransport {
   Future<BluetoothReadiness> readiness() async => BluetoothReadiness.ready;
 
   @override
-  Stream<List<FoundPm5>> scan({Duration timeout = Duration.zero}) => const Stream.empty();
+  Stream<List<FoundRower>> scan({Duration timeout = Duration.zero}) => const Stream.empty();
 }
 
 void main() {
   late _FakeTransport transport;
-  late Pm5BleSource source;
+  late BleRowerSource source;
   late List<ErgConnectionState> states;
 
   setUp(() {
     transport = _FakeTransport();
-    source = Pm5BleSource(transport: transport, device: _pm5);
+    source = BleRowerSource(transport: transport, device: _pm5);
     states = [];
     source.connectionStates.listen(states.add);
   });
@@ -80,7 +80,7 @@ void main() {
       source.start().catchError((Object e) => error = e);
       async.flushMicrotasks();
 
-      expect(error, isA<Pm5ConnectException>());
+      expect(error, isA<RowerConnectException>());
       expect(states, [ErgConnectionState.connecting, ErgConnectionState.disconnected]);
     });
   });

@@ -1,9 +1,11 @@
+import 'package:erg_protocol/erg_protocol.dart';
+
 /// Whether Bluetooth can be used right now.
 enum BluetoothReadiness { ready, off, unauthorized, unsupported }
 
-/// A PM5 found during a scan.
-class FoundPm5 {
-  const FoundPm5({required this.id, required this.name});
+/// A rower found during a scan: a PM5 or an FTMS rower.
+class FoundRower {
+  const FoundRower({required this.id, required this.name, this.protocol = ErgProtocol.pm5});
 
   /// Platform device id (MAC address on Android and Linux).
   final String id;
@@ -11,8 +13,11 @@ class FoundPm5 {
   /// Advertised name, e.g. `PM5 430000001 Row`.
   final String name;
 
+  /// How the rower talks: Concept2 PM5 or FTMS.
+  final ErgProtocol protocol;
+
   @override
-  bool operator ==(Object other) => other is FoundPm5 && other.id == id;
+  bool operator ==(Object other) => other is FoundRower && other.id == id;
 
   @override
   int get hashCode => id.hashCode;
@@ -29,31 +34,31 @@ class BluetoothNotReadyException implements Exception {
 }
 
 /// The connection could not be established.
-class Pm5ConnectException implements Exception {
-  const Pm5ConnectException(this.message);
+class RowerConnectException implements Exception {
+  const RowerConnectException(this.message);
 
   final String message;
 
   @override
-  String toString() => 'Pm5ConnectException: $message';
+  String toString() => 'RowerConnectException: $message';
 }
 
-/// Bluetooth access to PM5 ergs, independent of the BLE plugin in use.
+/// Bluetooth access to rowers, independent of the BLE plugin in use.
 abstract interface class BleTransport {
   Future<BluetoothReadiness> readiness();
 
-  /// Emits the growing list of PM5s in range and closes after [timeout].
-  Stream<List<FoundPm5>> scan({Duration timeout});
+  /// Emits the growing list of rowers in range and closes after [timeout].
+  Stream<List<FoundRower>> scan({Duration timeout});
 
   /// Connects, sets the sample rate and subscribes to the rowing data.
   ///
-  /// Throws [Pm5ConnectException] when the PM5 cannot be reached or is not a
-  /// PM5 with rowing service.
-  Future<Pm5Link> connect(FoundPm5 device);
+  /// Throws [RowerConnectException] when the rower cannot be reached or does
+  /// not offer rowing data.
+  Future<RowerLink> connect(FoundRower device);
 }
 
-/// An established connection to a PM5.
-abstract interface class Pm5Link {
+/// An established connection to a rower.
+abstract interface class RowerLink {
   /// Notifications as (short characteristic id, bytes).
   Stream<(String, List<int>)> get notifications;
 

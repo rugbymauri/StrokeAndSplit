@@ -6,12 +6,12 @@ import 'package:erg_protocol/erg_protocol.dart';
 import '../erg_source.dart';
 import 'ble_transport.dart';
 
-/// A real PM5 connected over Bluetooth LE.
+/// A real rower, PM5 or FTMS, connected over Bluetooth LE.
 ///
 /// When the connection drops unexpectedly it keeps trying to reconnect to the
-/// same PM5 for [reconnectWindow]; after a deliberate [stop] it does not.
-class Pm5BleSource implements ErgSource {
-  Pm5BleSource({
+/// same rower for [reconnectWindow]; after a deliberate [stop] it does not.
+class BleRowerSource implements ErgSource {
+  BleRowerSource({
     required this._transport,
     required this.device,
     this.reconnectWindow = const Duration(seconds: 30),
@@ -19,23 +19,26 @@ class Pm5BleSource implements ErgSource {
   });
 
   final BleTransport _transport;
-  final FoundPm5 device;
+  final FoundRower device;
   final Duration reconnectWindow;
   final Duration retryDelay;
 
   final _packets = StreamController<RawPacket>.broadcast();
   final _states = StreamController<ErgConnectionState>.broadcast();
   ErgConnectionState _state = ErgConnectionState.disconnected;
-  Pm5Link? _link;
+  RowerLink? _link;
   StreamSubscription<(String, List<int>)>? _notifications;
   DateTime? _startedAt;
   var _stopped = false;
 
   @override
-  ErgSourceKind get kind => ErgSourceKind.pm5;
+  ErgSourceKind get kind => switch (protocol) {
+        ErgProtocol.pm5 => ErgSourceKind.pm5,
+        ErgProtocol.ftms => ErgSourceKind.ftms,
+      };
 
   @override
-  ErgProtocol get protocol => ErgProtocol.pm5;
+  ErgProtocol get protocol => device.protocol;
 
   @override
   String get name => device.name;
@@ -71,7 +74,7 @@ class Pm5BleSource implements ErgSource {
     _setState(ErgConnectionState.disconnected);
   }
 
-  void _attach(Pm5Link link) {
+  void _attach(RowerLink link) {
     _link = link;
     _notifications = link.notifications.listen((notification) {
       final (id, bytes) = notification;

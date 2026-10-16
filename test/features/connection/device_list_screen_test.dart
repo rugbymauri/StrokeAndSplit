@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
 
-const _pm5 = FoundPm5(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 
 Future<ProviderContainer> _pump(WidgetTester tester, FakeBleTransport transport) async {
   final container = ProviderContainer(overrides: [
@@ -79,7 +79,7 @@ void main() {
 
   testWidgets('explains a failed connection with the one-connection limit', (tester) async {
     final container = await _pump(
-        tester, FakeBleTransport(found: [_pm5], connectError: const Pm5ConnectException('busy')));
+        tester, FakeBleTransport(found: [_pm5], connectError: const RowerConnectException('busy')));
 
     await tester.tap(find.text('PM5 430000001 Row'));
     await tester.pumpAndSettle();

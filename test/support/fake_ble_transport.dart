@@ -13,8 +13,8 @@ class FakeBleTransport implements BleTransport {
   });
 
   BluetoothReadiness readinessValue;
-  List<FoundPm5> found;
-  Pm5ConnectException? connectError;
+  List<FoundRower> found;
+  RowerConnectException? connectError;
 
   /// Thrown by [scan] after the readiness check passed.
   Object? scanError;
@@ -23,7 +23,7 @@ class FakeBleTransport implements BleTransport {
   Future<BluetoothReadiness> readiness() async => readinessValue;
 
   @override
-  Stream<List<FoundPm5>> scan({Duration timeout = const Duration(seconds: 15)}) async* {
+  Stream<List<FoundRower>> scan({Duration timeout = const Duration(seconds: 15)}) async* {
     final error = scanError;
     if (error != null) throw error;
     if (found.isNotEmpty) yield found;
@@ -31,14 +31,14 @@ class FakeBleTransport implements BleTransport {
   }
 
   @override
-  Future<Pm5Link> connect(FoundPm5 device) async {
+  Future<RowerLink> connect(FoundRower device) async {
     final error = connectError;
     if (error != null) throw error;
     return _IdleLink();
   }
 }
 
-class _IdleLink implements Pm5Link {
+class _IdleLink implements RowerLink {
   @override
   Stream<(String, List<int>)> get notifications => const Stream.empty();
 

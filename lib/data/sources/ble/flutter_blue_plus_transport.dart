@@ -45,17 +45,17 @@ class FlutterBluePlusTransport implements BleTransport {
   }
 
   @override
-  Stream<List<FoundPm5>> scan({Duration timeout = const Duration(seconds: 15)}) async* {
+  Stream<List<FoundRower>> scan({Duration timeout = const Duration(seconds: 15)}) async* {
     final readiness = await this.readiness();
     if (readiness != BluetoothReadiness.ready) throw BluetoothNotReadyException(readiness);
 
-    final found = <FoundPm5>{};
-    final updates = StreamController<List<FoundPm5>>();
+    final found = <FoundRower>{};
+    final updates = StreamController<List<FoundRower>>();
     void add(Iterable<BluetoothDevice> devices) {
       final before = found.length;
       found.addAll(devices
           .where((d) => d.platformName.startsWith('PM5'))
-          .map((d) => FoundPm5(id: d.remoteId.str, name: d.platformName)));
+          .map((d) => FoundRower(id: d.remoteId.str, name: d.platformName)));
       if (found.length != before) updates.add(found.toList());
     }
 
@@ -81,14 +81,14 @@ class FlutterBluePlusTransport implements BleTransport {
   }
 
   @override
-  Future<Pm5Link> connect(FoundPm5 found) async {
+  Future<RowerLink> connect(FoundRower found) async {
     final device = BluetoothDevice.fromId(found.id);
     try {
       await FlutterBluePlus.stopScan();
       await device.connect(license: License.nonprofit, timeout: const Duration(seconds: 10));
       final services = await device.discoverServices();
       final rowing = services.where((s) => s.uuid == _rowingService).firstOrNull;
-      if (rowing == null) throw const Pm5ConnectException('Das Gerät bietet keinen Rudern-Service an.');
+      if (rowing == null) throw const RowerConnectException('Das Gerät bietet keinen Rudern-Service an.');
 
       BluetoothCharacteristic? characteristic(String id) =>
           rowing.characteristics.where((c) => c.uuid == Guid(Pm5Characteristics.uuid(id))).firstOrNull;
@@ -103,17 +103,17 @@ class FlutterBluePlusTransport implements BleTransport {
         await c.setNotifyValue(true);
       }
       return link;
-    } on Pm5ConnectException {
+    } on RowerConnectException {
       await device.disconnect();
       rethrow;
     } catch (e) {
       await device.disconnect();
-      throw Pm5ConnectException('$e');
+      throw RowerConnectException('$e');
     }
   }
 }
 
-class _FlutterBluePlusLink implements Pm5Link {
+class _FlutterBluePlusLink implements RowerLink {
   _FlutterBluePlusLink(this._device) {
     _connection = _device.connectionState.listen((state) {
       if (state == BluetoothConnectionState.disconnected && !_disconnecting && !_lost.isCompleted) {

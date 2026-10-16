@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/platform_providers.dart';
 import '../../data/sources/ble/ble_transport.dart';
-import '../../data/sources/ble/pm5_ble_source.dart';
+import '../../data/sources/ble/ble_rower_source.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/templates/session_template.dart';
 import '../live/live_screen.dart';
@@ -29,8 +29,8 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
   var _phase = _Phase.checking;
   var _readiness = BluetoothReadiness.ready;
   Object? _scanError;
-  var _found = <FoundPm5>[];
-  StreamSubscription<List<FoundPm5>>? _scan;
+  var _found = <FoundRower>[];
+  StreamSubscription<List<FoundRower>>? _scan;
 
   @override
   void initState() {
@@ -78,13 +78,13 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
         );
   }
 
-  Future<void> _connect(FoundPm5 device) async {
+  Future<void> _connect(FoundRower device) async {
     await _scan?.cancel();
     setState(() => _phase = _Phase.connecting);
     final notifier = ref.read(activeErgSourceProvider.notifier);
     try {
-      await notifier.use(Pm5BleSource(transport: ref.read(bleTransportProvider), device: device));
-    } on Pm5ConnectException {
+      await notifier.use(BleRowerSource(transport: ref.read(bleTransportProvider), device: device));
+    } on RowerConnectException {
       await notifier.clear();
       if (!mounted) return;
       setState(() => _phase = _Phase.done);
