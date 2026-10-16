@@ -9,15 +9,18 @@ import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
+import 'package:aergrow/data/sources/simulated_source.dart';
 import 'package:aergrow/data/templates/session_template.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
+import 'package:aergrow/features/connection/heart_rate_indicator.dart';
 import 'package:aergrow/features/live/live_layout.dart';
 import 'package:aergrow/features/live/live_screen.dart';
 import 'package:aergrow/features/live/pace_box.dart';
 import 'package:aergrow/features/live/progress_frame.dart';
 import 'package:aergrow/features/live/stroke_rate_card.dart';
+import 'package:aergrow/features/simulator/simulator_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,6 +29,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 import '../../support/fake_ble_transport.dart';
 import '../../support/fake_erg_source.dart';
 import '../../support/fixtures.dart';
+import '../../support/fonts.dart';
 import '../../support/ghost_sessions.dart';
 import '../../support/localized_app.dart';
 import '../../support/rowed_sessions.dart';
@@ -120,15 +124,39 @@ ActiveRecording _onCourse({
   );
 }
 
-/// The pace, found by [key], is taller on screen than every other text in [view] but the buttons.
+/// The pace, found by [key], is taller on screen than every other text in [view] but the buttons and the status.
 void _expectLargestPace(WidgetTester tester, Finder view, Key key) {
   final pace = tester.getRect(find.byKey(key)).height;
   final buttons = tester.widgetList<Text>(find.descendant(of: find.byType(FilledButton), matching: find.byType(Text)));
+  final status = tester.widgetList<Text>(
+    find.descendant(of: find.byKey(const Key('live-status')), matching: find.byType(Text)),
+  );
   for (final text in tester.widgetList<Text>(find.descendant(of: view, matching: find.byType(Text)))) {
-    if (text.key == key || buttons.contains(text)) continue;
+    if (text.key == key || buttons.contains(text) || status.contains(text)) continue;
     final reason = text.data ?? text.textSpan?.toPlainText();
     expect(tester.getRect(find.byWidget(text)).height, lessThan(pace), reason: reason);
   }
+}
+
+/// A screen that opens the live screen right away, so that it can be left again.
+class _Start extends StatefulWidget {
+  const _Start();
+
+  @override
+  State<_Start> createState() => _StartState();
+}
+
+class _StartState extends State<_Start> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LiveScreen())),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: Text('start'));
 }
 
 class _Harness {
@@ -144,6 +172,7 @@ class _Harness {
     ErgConnectionState state = ErgConnectionState.connected,
     AppDatabase? db,
     ErgSource? source,
+    bool pushed = false,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -157,8 +186,9 @@ class _Harness {
         if (recording != null) sessionRecorderProvider.overrideWith(() => _Recording(recording)),
         if (db != null) databaseProvider.overrideWithValue(db),
       ],
-      child: LocalizedApp(locale: locale, home: const LiveScreen()),
+      child: LocalizedApp(locale: locale, home: pushed ? const _Start() : const LiveScreen()),
     ));
+    if (pushed) await tester.pumpAndSettle();
   }
 
   Future<void> emit(WidgetTester tester, RowingEvent event) async {
@@ -294,16 +324,19 @@ void main() {
     'small desktop window': const Size(640, 480),
   };
   for (final MapEntry(key: name, value: size) in layouts.entries) {
-    for (final (template, state, curves) in const [
-      (false, ErgConnectionState.connected, true),
-      (false, ErgConnectionState.connected, false),
-      (true, ErgConnectionState.connected, true),
-      (true, ErgConnectionState.connected, false),
-      (true, ErgConnectionState.reconnecting, true),
+    for (final (template, state, curves, simulator) in const [
+      (false, ErgConnectionState.connected, true, false),
+      (false, ErgConnectionState.connected, false, false),
+      (true, ErgConnectionState.connected, true, false),
+      (true, ErgConnectionState.connected, false, false),
+      (true, ErgConnectionState.reconnecting, true, false),
+      (false, ErgConnectionState.connected, true, true),
+      (true, ErgConnectionState.connected, false, true),
     ]) {
       final what = '${template ? ' with a template' : ''}'
           '${state == ErgConnectionState.connected ? '' : ' while ${state.name}'}'
-          '${curves ? ' and PM5 force curves' : ' and a source without force curves'}';
+          '${curves ? ' and PM5 force curves' : ' and a source without force curves'}'
+          '${simulator ? ' from the simulator with its controls' : ''}';
       testWidgets('fits all values without overflow on a $name$what', (tester) async {
         final harness = _Harness();
         await harness.pump(
@@ -311,8 +344,13 @@ void main() {
           size: size,
           recording: template ? _onCourse(pace: BandStatus.above) : null,
           state: state,
-          source: curves ? null : FakeErgSource(kind: ErgSourceKind.ftms, protocol: ErgProtocol.ftms),
+          source: switch ((simulator, curves)) {
+            (true, _) => SimulatedSource(seed: 1, protocol: curves ? ErgProtocol.pm5 : ErgProtocol.ftms),
+            (false, true) => null,
+            (false, false) => FakeErgSource(kind: ErgSourceKind.ftms, protocol: ErgProtocol.ftms),
+          },
         );
+        expect(find.byType(SimulatorControls), simulator ? findsOneWidget : findsNothing);
         await harness.emit(tester, _tick(heartRate: 151));
         await harness.emit(tester, HeartBeatIntervals(elapsed: _elapsed, time: Duration.zero, intervalsMs: [812]));
         if (curves) {
@@ -349,7 +387,7 @@ void main() {
         if (!curves) {
           expect(find.byKey(const Key('force-curve')), findsNothing);
           expect(find.byKey(const Key('force-curve-length')), findsNothing);
-        } else if (state == ErgConnectionState.connected) {
+        } else if (state == ErgConnectionState.connected && !simulator) {
           // The drive length of stroke 4 at the last curve, inside the card and the screen.
           final card = tester.getRect(find.byKey(const Key('force-curve')));
           final length = tester.getRect(find.text('1,06 m'));
@@ -475,27 +513,28 @@ void main() {
     }
   });
 
-  group('app bar', () {
-    testWidgets('names the template being rowed', (tester) async {
+  group('without a title bar', () {
+    testWidgets('leaves out the app bar and the name of the template', (tester) async {
       final harness = _Harness();
       await harness.pump(tester, recording: _onCourse());
 
-      expect(find.descendant(of: find.byType(AppBar), matching: find.text('Seerunde x3')), findsOneWidget);
+      expect(find.byType(AppBar), findsNothing);
+      expect(find.text('Seerunde x3'), findsNothing);
     });
 
-    testWidgets('names free rowing without a template', (tester) async {
+    testWidgets('shows the connection as a dot beside the session button and not as text', (tester) async {
       final harness = _Harness();
       await harness.pump(tester);
 
-      expect(find.descendant(of: find.byType(AppBar), matching: find.text('Frei rudern')), findsOneWidget);
-    });
-
-    testWidgets('shows the connection as a dot and not as text', (tester) async {
-      final harness = _Harness();
-      await harness.pump(tester);
-
-      expect(find.descendant(of: find.byType(AppBar), matching: find.byKey(const Key('connection-dot'))), findsOne);
+      final status = find.byKey(const Key('live-status'));
+      expect(find.descendant(of: status, matching: find.byKey(const Key('connection-dot'))), findsOneWidget);
+      expect(find.descendant(of: status, matching: find.byType(HeartRateIndicator)), findsOneWidget);
       expect(find.text('Verbunden'), findsNothing);
+      // In the row of the session button.
+      final button = tester.getRect(find.widgetWithText(FilledButton, 'Session starten'));
+      final dot = tester.getRect(find.byKey(const Key('connection-dot')));
+      expect(dot.center.dy, closeTo(button.center.dy, 1));
+      expect(dot.left, greaterThan(button.right));
     });
 
     testWidgets('shows a lost connection as text', (tester) async {
@@ -505,11 +544,46 @@ void main() {
       expect(find.text('Verbindung unterbrochen, verbinde neu …'), findsOneWidget);
     });
 
-    testWidgets('keeps disconnecting within reach', (tester) async {
-      final harness = _Harness();
-      await harness.pump(tester);
+    for (final (name, size, template) in const [
+      ('portrait', Size(390, 844), false),
+      ('landscape', Size(844, 390), false),
+      ('portrait with a template', Size(390, 844), true),
+      ('landscape with a template', Size(844, 390), true),
+    ]) {
+      testWidgets('keeps disconnecting within reach, $name', (tester) async {
+        final harness = _Harness();
+        await harness.pump(tester, size: size, recording: template ? _onCourse() : null);
 
-      expect(find.byTooltip('Trennen'), findsOneWidget);
+        expect(find.byTooltip('Trennen'), findsOneWidget);
+        expect(find.byKey(const Key('connection-dot')), findsOneWidget);
+        final button = tester.getRect(find.byTooltip('Trennen'));
+        expect(button.bottom, lessThanOrEqualTo(size.height));
+        expect(button.right, lessThanOrEqualTo(size.width));
+      });
+    }
+
+    testWidgets('marks the simulator beside the session button', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, source: FakeErgSource(kind: ErgSourceKind.simulator));
+
+      expect(
+        find.descendant(of: find.byKey(const Key('live-status')), matching: find.text('SIMULATOR')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('disconnects and goes back with the disconnect button', (tester) async {
+      final harness = _Harness();
+      final source = FakeErgSource();
+      await harness.pump(tester, source: source, pushed: true);
+      expect(find.byType(LiveScreen), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Trennen'));
+      await tester.pumpAndSettle();
+
+      expect(source.stopped, isTrue);
+      expect(find.byType(LiveScreen), findsNothing);
+      expect(find.text('start'), findsOneWidget);
     });
   });
 
@@ -706,6 +780,58 @@ void main() {
       expect(find.byType(ProgressFrame), findsNothing);
       expect(find.textContaining('Ghost'), findsNothing);
       await disposeWidgetsWithDatabase(tester);
+    });
+  });
+
+  // Last, as the fonts stay loaded for every test after.
+  group('large values and small labels', () {
+    setUpAll(loadAppFonts);
+
+    /// The height on screen of the text with [key], after its tile shrank it to fit.
+    double height(WidgetTester tester, String key) => tester.getRect(find.byKey(Key(key))).height;
+
+    double fontSize(WidgetTester tester, String text) => tester.widget<Text>(find.text(text)).style!.fontSize!;
+
+    testWidgets('fills the tiles in portrait with values larger than before', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+      await harness.emit(tester, _tick(heartRate: 151));
+
+      // At most 56 before.
+      expect(height(tester, 'metric-watts'), greaterThan(80));
+      expect(height(tester, 'metric-spm'), greaterThan(56));
+      expect(height(tester, 'metric-elapsed'), greaterThan(56));
+      expect(height(tester, 'metric-pace'), greaterThan(height(tester, 'metric-watts')));
+      // 13 before.
+      for (final label in ['PACE /500 M', 'Watt', 'Zeit', 'Kraftkurve']) {
+        expect(fontSize(tester, label), lessThanOrEqualTo(11), reason: label);
+      }
+    });
+
+    testWidgets('fills the tiles on a template with values larger than before', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, recording: _onCourse());
+      await harness.emit(tester, _tick(heartRate: 151));
+
+      // 22 and 52 before.
+      for (final key in ['metric-lap-time', 'metric-watts', 'metric-hr', 'metric-zone-share']) {
+        expect(height(tester, key), greaterThan(30), reason: key);
+      }
+      expect(height(tester, 'metric-spm'), greaterThan(60));
+      // 12 and 13 before.
+      expect(fontSize(tester, 'Watt'), lessThanOrEqualTo(10));
+      expect(fontSize(tester, 'SCHLAGZAHL'), lessThanOrEqualTo(11));
+      expect(fontSize(tester, 'PACE /500 M'), lessThanOrEqualTo(11));
+    });
+
+    testWidgets('fills the pace box when it shrinks in landscape', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, size: const Size(844, 390), recording: _onCourse());
+      await harness.emit(tester, _tick());
+
+      // 68 before; the shrunk content kept its full width.
+      expect(height(tester, 'pace-box-pace'), greaterThan(90));
+      expect(height(tester, 'metric-watts'), greaterThan(40));
     });
   });
 }

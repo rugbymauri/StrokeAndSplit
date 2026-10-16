@@ -11,6 +11,7 @@ import '../../l10n/l10n.dart';
 import '../courses/course_format.dart';
 import 'zone_hint.dart';
 import 'formatters.dart';
+import 'live_text_styles.dart';
 import 'metric_tile.dart';
 import 'progress_frame.dart';
 import 'progress_frame_model.dart';
@@ -77,14 +78,15 @@ class PaceBox extends StatelessWidget {
         builder: (context, constraints) => FittedBox(
           fit: BoxFit.scaleDown,
           child: SizedBox(
-            width: constraints.maxWidth,
+            // Wider by as much as it shrinks, so the shrunk content still fills the width.
+            width: constraints.maxWidth * math.max(1, minContentHeight / constraints.maxHeight),
             height: constraints.maxHeight < minContentHeight ? minContentHeight : constraints.maxHeight,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
                   l10n.metricPace.toUpperCase(),
-                  style: AppTextStyles.label,
+                  style: LiveTextStyles.label,
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

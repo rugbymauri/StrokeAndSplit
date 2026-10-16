@@ -3,10 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../app/design_tokens.dart';
+import 'live_text_styles.dart';
 
 /// Values in tiles stay at most this share of the pace, so the pace is
-/// always the largest value (ui-design, Design D2).
-const valueShareOfPace = 0.8;
+/// always the largest value (ui-design, Design D2), but close to it.
+const valueShareOfPace = 0.9;
 
 /// The font size at which the pace fills [area], at most that of [AppTextStyles.pace].
 /// Measured on a fixed text, so the size does not jump with the digits.
@@ -95,8 +96,8 @@ class MetricTile extends StatelessWidget {
       ),
       child: Padding(
         padding: compact
-            ? const EdgeInsets.symmetric(horizontal: 10, vertical: AppSpacing.xs)
-            : const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.m),
+            ? const EdgeInsets.symmetric(horizontal: AppSpacing.s, vertical: AppSpacing.xs)
+            : const EdgeInsets.symmetric(horizontal: AppSpacing.m, vertical: AppSpacing.s),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -107,7 +108,7 @@ class MetricTile extends StatelessWidget {
                 Flexible(
                   child: Text(
                     label,
-                    style: AppTextStyles.caption.copyWith(fontSize: compact ? 12 : 13),
+                    style: compact ? LiveTextStyles.captionCompact : LiveTextStyles.caption,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -129,7 +130,7 @@ class MetricTile extends StatelessWidget {
                   key: valueKey,
                   style: AppTextStyles.value.copyWith(
                     fontSize: fontSize,
-                    height: compact ? 1.15 : 1,
+                    height: 1,
                     color: AppColors.text,
                     fontFeatures: const [FontFeature.tabularFigures()],
                   ),

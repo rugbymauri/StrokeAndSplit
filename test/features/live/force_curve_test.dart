@@ -1,13 +1,12 @@
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:aergrow/app/design_tokens.dart';
 import 'package:aergrow/features/live/force_curve.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fonts.dart';
 import '../../support/localized_app.dart';
 
 /// A force curve in Newton shaped like one from the PM5: [count] values, starting above 0,
@@ -22,18 +21,6 @@ double _rise(double share) => math.sin(math.pi * math.pow(share, 0.8));
 
 final _last = _curve(60, 620);
 final _previous = _curve(52, 540);
-
-/// The bundled fonts, so texts in the goldens look as in the app.
-Future<void> _loadFonts() async {
-  final manifest = jsonDecode(await rootBundle.loadString('FontManifest.json')) as List<dynamic>;
-  for (final family in manifest.cast<Map<String, dynamic>>()) {
-    final loader = FontLoader(family['family'] as String);
-    for (final font in (family['fonts'] as List<dynamic>).cast<Map<String, dynamic>>()) {
-      loader.addFont(rootBundle.load(font['asset'] as String));
-    }
-    await loader.load();
-  }
-}
 
 const _golden = Key('golden');
 
@@ -92,7 +79,7 @@ void main() {
     });
   });
 
-  setUpAll(_loadFonts);
+  setUpAll(loadAppFonts);
 
   group('in the card', () {
     testWidgets('shows the last stroke over the previous one with a legend', (tester) async {

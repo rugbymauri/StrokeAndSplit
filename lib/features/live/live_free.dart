@@ -8,11 +8,13 @@ import '../../l10n/l10n.dart';
 import 'force_curve.dart';
 import 'formatters.dart';
 import 'live_layout.dart';
+import 'live_status.dart';
+import 'live_text_styles.dart';
 import 'metric_tile.dart';
 
 /// The live display without a template (ui-design, Design D2): the pace on
 /// top or on the left, four tiles, a line with further values, the force
-/// curve and [action], the button that starts or ends the session.
+/// curve and [action], the button that starts or ends the session, with [status] beside it.
 class FreeLiveView extends StatelessWidget {
   const FreeLiveView({
     super.key,
@@ -22,6 +24,7 @@ class FreeLiveView extends StatelessWidget {
     this.rrIntervalMs,
     this.outdated = false,
     this.forceCurves,
+    this.status,
   });
 
   final StatusTick? tick;
@@ -39,8 +42,11 @@ class FreeLiveView extends StatelessWidget {
   /// The force curves of the last strokes; null for a source without them, which leaves the card out.
   final ForceCurves? forceCurves;
 
+  /// Connection and disconnect button beside [action]; null leaves the button alone.
+  final Widget? status;
+
   /// Room the label above the pace takes at most.
-  static const _labelHeight = 20.0;
+  static const _labelHeight = 16.0;
   static const _gap = AppSpacing.m;
 
   @override
@@ -69,7 +75,7 @@ class FreeLiveView extends StatelessWidget {
         children: [
           SizedBox(height: paceHeight, child: _dim(_pace(context, pace))),
           const SizedBox(height: _gap),
-          Expanded(child: _dim(_tiles(context, math.min(AppTextStyles.value.fontSize!, pace * valueShareOfPace)))),
+          Expanded(child: _dim(_tiles(context, _valueSize(pace)))),
           const SizedBox(height: _gap),
           SizedBox(height: 48, child: _dim(_SideValues(tick: tick, rrIntervalMs: rrIntervalMs, session: session, card: true))),
           if (curve) ...[
@@ -77,7 +83,7 @@ class FreeLiveView extends StatelessWidget {
             SizedBox(height: 120, child: forceCurves!.widget()),
           ],
           const SizedBox(height: _gap),
-          SizedBox(height: 56, child: action),
+          SizedBox(height: 56, child: LiveActionRow(action: action, status: status)),
         ],
       ),
     );
@@ -142,9 +148,9 @@ class FreeLiveView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _dim(_tiles(context, math.min(52, pace * valueShareOfPace)))),
+                Expanded(child: _dim(_tiles(context, _valueSize(pace)))),
                 const SizedBox(height: _gap),
-                SizedBox(height: 52, child: action),
+                SizedBox(height: 52, child: LiveActionRow(action: action, status: status)),
               ],
             ),
           ),
@@ -152,6 +158,9 @@ class FreeLiveView extends StatelessWidget {
       ),
     );
   }
+
+  /// The values in the tiles, as large as the tiles allow while staying below [pace].
+  static double _valueSize(double pace) => math.min(AppTextStyles.value.fontSize!, pace * valueShareOfPace);
 
   Widget _dim(Widget child) => Opacity(opacity: outdated ? 0.4 : 1, child: child);
 
@@ -161,7 +170,7 @@ class FreeLiveView extends StatelessWidget {
       children: [
         Text(
           context.l10n.metricPace.toUpperCase(),
-          style: AppTextStyles.label,
+          style: LiveTextStyles.label,
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -277,12 +286,12 @@ class _SideValues extends StatelessWidget {
               children: [
                 TextSpan(
                   text: value,
-                  style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 18, color: AppColors.text, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             key: key,
-            style: AppTextStyles.caption.copyWith(fontSize: 14, fontFeatures: const [FontFeature.tabularFigures()]),
+            style: AppTextStyles.caption.copyWith(fontSize: 12, fontFeatures: const [FontFeature.tabularFigures()]),
           ),
           if (note != null) ...[
             const SizedBox(width: 6),

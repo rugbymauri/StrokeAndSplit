@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
-import '../../app/design_tokens.dart';
 import '../../app/platform_providers.dart';
 import '../../data/courses/lap_tracker.dart';
 import '../../data/ghost/ghost_progress.dart';
@@ -22,6 +21,7 @@ import '../simulator/simulator_controls.dart';
 import 'force_curve.dart';
 import 'live_course.dart';
 import 'live_free.dart';
+import 'live_status.dart';
 import 'progress_frame.dart';
 
 /// After this long without data the shown values are marked as outdated.
@@ -160,19 +160,25 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   }
 
   /// Starts a session, or ends the running one; [short] for the narrow column next to the pace box.
+  /// The label shrinks rather than wraps where the status beside the button leaves little room.
   Widget _sessionButton(ActiveRecording? recording, bool connected, {bool short = false}) => recording == null
       ? FilledButton.icon(
           onPressed: connected ? _startSession : null,
           icon: const Icon(Icons.fiber_manual_record),
-          label: Text(context.l10n.liveStartSession),
+          label: _label(context.l10n.liveStartSession),
         )
       : short
           ? FilledButton.tonal(onPressed: _stopSession, child: Text(context.l10n.liveStopShort, maxLines: 1))
           : FilledButton.tonalIcon(
               onPressed: _stopSession,
               icon: const Icon(Icons.stop),
-              label: Text(context.l10n.liveStopSession),
+              label: _label(context.l10n.liveStopSession),
             );
+
+  static Widget _label(String text) => FittedBox(fit: BoxFit.scaleDown, child: Text(text, maxLines: 1));
+
+  /// Connection, strap, source and the disconnect button, beside the session button in place of a title bar.
+  Widget _status() => LiveStatus(onDisconnect: _disconnect);
 
   /// The live view of [template] at [lap] with its ghosts, recomputed with
   /// every tick (Change ghost, Design D2–D4).
@@ -196,6 +202,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
       ghostGap: ghostGap(lap, template.course.axis, ghosts.course),
       action: _sessionButton(recording, connected),
       shortAction: _sessionButton(recording, connected, short: true),
+      status: _status(),
     );
   }
 
@@ -212,31 +219,6 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
         if (!didPop) _disconnect();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Row(
-            children: [
-              const ConnectionIndicator(),
-              // The strap, if any; it also keeps the strap connected while rowing (Design D7).
-              const HeartRateIndicator(),
-              const SizedBox(width: AppSpacing.m),
-              Flexible(
-                child: Text(
-                  recording?.template?.name ?? widget.template?.name ?? context.l10n.startRowFree,
-                  key: const Key('live-title'),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            const SourceBadge(),
-            IconButton(
-              onPressed: _disconnect,
-              tooltip: context.l10n.liveDisconnect,
-              icon: const Icon(Icons.link_off),
-            ),
-          ],
-        ),
         body: SafeArea(
           child: Column(
             children: [
@@ -257,6 +239,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                       outdated: _stale,
                       forceCurves: forceCurves,
                       action: _sessionButton(recording, connected),
+                      status: _status(),
                     ),
                 },
               ),
