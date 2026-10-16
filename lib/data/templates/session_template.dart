@@ -16,10 +16,3 @@ class SessionTemplate {
   /// Null for an open number of laps.
   final int? laps;
 }
-
-/// `3 Runden`, `1 Runde` or `offen`.
-String formatLaps(int? laps) => switch (laps) {
-      null => 'offen',
-      1 => '1 Runde',
-      final n => '$n Runden',
-    };

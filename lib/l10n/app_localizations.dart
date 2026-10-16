@@ -774,6 +774,180 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die Datei ist keine lesbare {app}-Session: {error}'**
   String sessionImportFailed(String app, String error);
+
+  /// Menu entry that opens the editor
+  ///
+  /// In de, this message translates to:
+  /// **'Bearbeiten'**
+  String get actionEdit;
+
+  /// Label of the name field in the editors
+  ///
+  /// In de, this message translates to:
+  /// **'Name'**
+  String get fieldName;
+
+  /// Number of laps of a template
+  ///
+  /// In de, this message translates to:
+  /// **'{laps, plural, =1{1 Runde} other{{laps} Runden}}'**
+  String lapsCount(int laps);
+
+  /// A template with an open number of laps
+  ///
+  /// In de, this message translates to:
+  /// **'offen'**
+  String get lapsOpen;
+
+  /// Templates: title
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlage rudern'**
+  String get templatesTitle;
+
+  /// Templates: tab with the templates
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlagen'**
+  String get tabTemplates;
+
+  /// Templates: tab with the courses
+  ///
+  /// In de, this message translates to:
+  /// **'Strecken'**
+  String get tabCourses;
+
+  /// Templates: tab with the zones
+  ///
+  /// In de, this message translates to:
+  /// **'Zonen'**
+  String get tabZones;
+
+  /// Templates: button that creates a template
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlage anlegen'**
+  String get templateCreate;
+
+  /// Templates: there is no template
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Vorlagen angelegt.'**
+  String get templatesEmpty;
+
+  /// Templates: loading failed; error is the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlagen konnten nicht geladen werden: {error}'**
+  String templatesLoadFailed(String error);
+
+  /// Templates: dialog title when there is no course
+  ///
+  /// In de, this message translates to:
+  /// **'Zuerst eine Strecke anlegen'**
+  String get templateNeedsCourseTitle;
+
+  /// Templates: dialog text when there is no course
+  ///
+  /// In de, this message translates to:
+  /// **'Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.'**
+  String get templateNeedsCourseBody;
+
+  /// Templates: shown instead of the list when there is no course
+  ///
+  /// In de, this message translates to:
+  /// **'Für eine Vorlage brauchst du zuerst eine Strecke.'**
+  String get templateNeedsCourse;
+
+  /// Button that creates a course
+  ///
+  /// In de, this message translates to:
+  /// **'Strecke anlegen'**
+  String get courseCreate;
+
+  /// Templates: title of the dialog that picks the source; name is the template
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ rudern'**
+  String templateRow(String name);
+
+  /// Templates: source that simulates an FTMS rower
+  ///
+  /// In de, this message translates to:
+  /// **'Simulator (FTMS)'**
+  String get templateSimulatorFtms;
+
+  /// Templates: what the FTMS simulator leaves out
+  ///
+  /// In de, this message translates to:
+  /// **'Wie ein FTMS-Rudergerät, ohne Schlagdetails'**
+  String get templateSimulatorFtmsHint;
+
+  /// Templates: title of the delete confirmation
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlage löschen?'**
+  String get templateDeleteTitle;
+
+  /// Templates: delete confirmation; name is the template
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.'**
+  String templateDeleteBody(String name);
+
+  /// Template editor: title for a new template
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Vorlage'**
+  String get templateNew;
+
+  /// Template editor: title for an existing template
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlage bearbeiten'**
+  String get templateEdit;
+
+  /// Template editor: the template has no name
+  ///
+  /// In de, this message translates to:
+  /// **'Der Name fehlt.'**
+  String get templateNameMissing;
+
+  /// Template editor: no course chosen
+  ///
+  /// In de, this message translates to:
+  /// **'Wähle eine Strecke.'**
+  String get templateCourseMissing;
+
+  /// Template editor: the number of laps is below 1
+  ///
+  /// In de, this message translates to:
+  /// **'Die Rundenzahl muss mindestens 1 sein.'**
+  String get templateLapsInvalid;
+
+  /// Template editor: label of the course field
+  ///
+  /// In de, this message translates to:
+  /// **'Strecke'**
+  String get templateCourse;
+
+  /// Template editor: switch for an open number of laps
+  ///
+  /// In de, this message translates to:
+  /// **'Offene Rundenzahl'**
+  String get templateOpenLaps;
+
+  /// Template editor: what an open number of laps means
+  ///
+  /// In de, this message translates to:
+  /// **'Runden, bis du die Session beendest'**
+  String get templateOpenLapsHint;
+
+  /// Template editor: label of the number of laps
+  ///
+  /// In de, this message translates to:
+  /// **'Runden'**
+  String get templateLaps;
 }
 
 class _AppLocalizationsDelegate

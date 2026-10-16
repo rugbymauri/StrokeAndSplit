@@ -2,7 +2,6 @@ import 'package:aergrow/data/courses/course.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/templates/session_template.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
@@ -40,9 +39,9 @@ void main() {
 
     final list = await templates.all();
 
-    expect([for (final t in list) '${t.name} · ${t.course.name} · ${formatLaps(t.laps)}'], [
-      'Seerunde offen · Seerunde · offen',
-      'Seerunde x3 · Seerunde · 3 Runden',
+    expect([for (final t in list) '${t.name} · ${t.course.name} · ${t.laps}'], [
+      'Seerunde offen · Seerunde · null',
+      'Seerunde x3 · Seerunde · 3',
     ]);
   });
 
@@ -83,11 +82,5 @@ void main() {
     expect(row.templateId, isNull);
     expect(row.templateName, 'Seerunde x3');
     expect(row.courseVersionId, isNotNull);
-  });
-
-  test('formats the number of laps', () {
-    expect(formatLaps(1), '1 Runde');
-    expect(formatLaps(3), '3 Runden');
-    expect(formatLaps(null), 'offen');
   });
 }

@@ -7,6 +7,7 @@ import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/features/connection/start_screen.dart';
 import 'package:aergrow/features/sessions/session_summary_screen.dart';
+import 'package:aergrow/features/templates/template_editor_screen.dart';
 import 'package:aergrow/features/templates/templates_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,9 +30,15 @@ class _Setup {
         () => courses.create(name, CourseDefinition.single(axis: CourseAxis.distance, length: length)),
       ))!;
 
-  Future<void> pump(WidgetTester tester, {Widget home = const TemplatesScreen()}) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    Widget home = const TemplatesScreen(),
+    Locale locale = const Locale('de'),
+  }) async {
     addTearDown(container.dispose);
-    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: LocalizedApp(home: home)));
+    await tester.pumpWidget(
+      UncontrolledProviderScope(container: container, child: LocalizedApp(locale: locale, home: home)),
+    );
     await settle(tester);
   }
 
@@ -102,6 +109,23 @@ void main() {
     expect(find.text('Der Name fehlt.'), findsOneWidget);
     expect(find.text('Wähle eine Strecke.'), findsOneWidget);
     expect(find.text('Die Rundenzahl muss mindestens 1 sein.'), findsOneWidget);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('shows the editor in English', (tester) async {
+    final setup = _Setup();
+    await setup.addCourse(tester, 'Seerunde');
+    await setup.pump(tester, home: const TemplateEditorScreen(), locale: const Locale('en'));
+
+    expect(find.text('New template'), findsOneWidget);
+    expect(find.text('Open number of laps'), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('template-laps')), '0');
+    await tester.tap(find.byTooltip('Save'));
+    await setup.settle(tester);
+
+    expect(find.text('The name is missing.'), findsOneWidget);
+    expect(find.text('Choose a course.'), findsOneWidget);
+    expect(find.text('The number of laps must be at least 1.'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 

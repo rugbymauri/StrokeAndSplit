@@ -21,7 +21,7 @@
 - [x] 4.1 Verbindung: Startbildschirm, Geräteliste, Verbindungsanzeige, Bluetooth-Hinweise. Verifikation: Widget-Tests in `test/features/connection/` grün, ein Test der Geräteliste auf Englisch
 - [x] 4.2 Live-Display, Streckenleiste und Simulator-Bedienung. Verifikation: Layout-Tests grün, ein Live-Test mit Vorlage auf Englisch
 - [x] 4.3 Sessions: Liste, Zusammenfassung, Aktionen (Abspielen, Export, Import, Löschen) und die Bezeichnung der Quelle. Verifikation: Tests in `test/features/sessions/` grün, Zusammenfassung auf Englisch
-- [ ] 4.4 Vorlagen: Liste mit Quellenwahl und Vorlagen-Editor. Verifikation: Tests in `test/features/templates/` grün, Editor auf Englisch
+- [x] 4.4 Vorlagen: Liste mit Quellenwahl und Vorlagen-Editor. Verifikation: Tests in `test/features/templates/` grün, Editor auf Englisch
 - [ ] 4.5 Strecken: Liste und Strecken-Editor. Verifikation: Tests in `test/features/courses/` grün, Editor auf Englisch
 - [ ] 4.6 Zonen: Liste und Zonen-Editor. Verifikation: Tests in `test/features/zones/` grün, Liste auf Englisch
 

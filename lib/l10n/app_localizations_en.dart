@@ -417,4 +417,107 @@ class AppLocalizationsEn extends AppLocalizations {
   String sessionImportFailed(String app, String error) {
     return 'The file is not a readable $app session: $error';
   }
+
+  @override
+  String get actionEdit => 'Edit';
+
+  @override
+  String get fieldName => 'Name';
+
+  @override
+  String lapsCount(int laps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      laps,
+      locale: localeName,
+      other: '$laps laps',
+      one: '1 lap',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lapsOpen => 'open';
+
+  @override
+  String get templatesTitle => 'Row a template';
+
+  @override
+  String get tabTemplates => 'Templates';
+
+  @override
+  String get tabCourses => 'Courses';
+
+  @override
+  String get tabZones => 'Zones';
+
+  @override
+  String get templateCreate => 'New template';
+
+  @override
+  String get templatesEmpty => 'No templates yet.';
+
+  @override
+  String templatesLoadFailed(String error) {
+    return 'Templates could not be loaded: $error';
+  }
+
+  @override
+  String get templateNeedsCourseTitle => 'Create a course first';
+
+  @override
+  String get templateNeedsCourseBody =>
+      'A template rows a course. Create a course first.';
+
+  @override
+  String get templateNeedsCourse => 'For a template you need a course first.';
+
+  @override
+  String get courseCreate => 'New course';
+
+  @override
+  String templateRow(String name) {
+    return 'Row “$name”';
+  }
+
+  @override
+  String get templateSimulatorFtms => 'Simulator (FTMS)';
+
+  @override
+  String get templateSimulatorFtmsHint =>
+      'Like an FTMS rower, without stroke details';
+
+  @override
+  String get templateDeleteTitle => 'Delete template?';
+
+  @override
+  String templateDeleteBody(String name) {
+    return '“$name” is deleted. Sessions rowed with it are kept.';
+  }
+
+  @override
+  String get templateNew => 'New template';
+
+  @override
+  String get templateEdit => 'Edit template';
+
+  @override
+  String get templateNameMissing => 'The name is missing.';
+
+  @override
+  String get templateCourseMissing => 'Choose a course.';
+
+  @override
+  String get templateLapsInvalid => 'The number of laps must be at least 1.';
+
+  @override
+  String get templateCourse => 'Course';
+
+  @override
+  String get templateOpenLaps => 'Open number of laps';
+
+  @override
+  String get templateOpenLapsHint => 'Laps until you end the session';
+
+  @override
+  String get templateLaps => 'Laps';
 }

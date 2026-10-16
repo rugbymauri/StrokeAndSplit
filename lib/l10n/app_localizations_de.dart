@@ -421,4 +421,108 @@ class AppLocalizationsDe extends AppLocalizations {
   String sessionImportFailed(String app, String error) {
     return 'Die Datei ist keine lesbare $app-Session: $error';
   }
+
+  @override
+  String get actionEdit => 'Bearbeiten';
+
+  @override
+  String get fieldName => 'Name';
+
+  @override
+  String lapsCount(int laps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      laps,
+      locale: localeName,
+      other: '$laps Runden',
+      one: '1 Runde',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lapsOpen => 'offen';
+
+  @override
+  String get templatesTitle => 'Vorlage rudern';
+
+  @override
+  String get tabTemplates => 'Vorlagen';
+
+  @override
+  String get tabCourses => 'Strecken';
+
+  @override
+  String get tabZones => 'Zonen';
+
+  @override
+  String get templateCreate => 'Vorlage anlegen';
+
+  @override
+  String get templatesEmpty => 'Noch keine Vorlagen angelegt.';
+
+  @override
+  String templatesLoadFailed(String error) {
+    return 'Vorlagen konnten nicht geladen werden: $error';
+  }
+
+  @override
+  String get templateNeedsCourseTitle => 'Zuerst eine Strecke anlegen';
+
+  @override
+  String get templateNeedsCourseBody =>
+      'Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.';
+
+  @override
+  String get templateNeedsCourse =>
+      'Für eine Vorlage brauchst du zuerst eine Strecke.';
+
+  @override
+  String get courseCreate => 'Strecke anlegen';
+
+  @override
+  String templateRow(String name) {
+    return '„$name“ rudern';
+  }
+
+  @override
+  String get templateSimulatorFtms => 'Simulator (FTMS)';
+
+  @override
+  String get templateSimulatorFtmsHint =>
+      'Wie ein FTMS-Rudergerät, ohne Schlagdetails';
+
+  @override
+  String get templateDeleteTitle => 'Vorlage löschen?';
+
+  @override
+  String templateDeleteBody(String name) {
+    return '„$name“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.';
+  }
+
+  @override
+  String get templateNew => 'Neue Vorlage';
+
+  @override
+  String get templateEdit => 'Vorlage bearbeiten';
+
+  @override
+  String get templateNameMissing => 'Der Name fehlt.';
+
+  @override
+  String get templateCourseMissing => 'Wähle eine Strecke.';
+
+  @override
+  String get templateLapsInvalid => 'Die Rundenzahl muss mindestens 1 sein.';
+
+  @override
+  String get templateCourse => 'Strecke';
+
+  @override
+  String get templateOpenLaps => 'Offene Rundenzahl';
+
+  @override
+  String get templateOpenLapsHint => 'Runden, bis du die Session beendest';
+
+  @override
+  String get templateLaps => 'Runden';
 }
