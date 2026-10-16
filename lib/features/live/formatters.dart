@@ -41,6 +41,9 @@ String formatGrouped(int value) => value.toString().replaceAllMapped(RegExp(r'\B
 /// Whole numbers like watts or strokes per minute; a dash when unknown.
 String formatWhole(int? value) => value?.toString() ?? _noValue;
 
+/// An RR interval in whole milliseconds, e.g. "812 ms".
+String formatRrInterval(int milliseconds) => '$milliseconds ms';
+
 /// Average stroke rate with one decimal, e.g. `22,5` in German, `22.5` in English.
 String formatStrokeRate(AppLocalizations l10n, double? strokeRate) =>
     strokeRate == null ? _noValue : NumberFormat('0.0', l10n.localeName).format(strokeRate);

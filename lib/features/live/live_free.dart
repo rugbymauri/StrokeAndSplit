@@ -19,11 +19,15 @@ class FreeLiveView extends StatelessWidget {
     required this.tick,
     required this.session,
     required this.action,
+    this.rrIntervalMs,
     this.outdated = false,
     this.forces,
   });
 
   final StatusTick? tick;
+
+  /// The last RR interval from the strap, shown after the heart rate; null without a recent one.
+  final int? rrIntervalMs;
 
   /// Time and distance of the running session, shown instead of the rower's.
   final SessionProgress? session;
@@ -67,7 +71,7 @@ class FreeLiveView extends StatelessWidget {
           const SizedBox(height: _gap),
           Expanded(child: _dim(_tiles(context, math.min(AppTextStyles.value.fontSize!, pace * valueShareOfPace)))),
           const SizedBox(height: _gap),
-          SizedBox(height: 48, child: _dim(_SideValues(tick: tick, session: session, card: true))),
+          SizedBox(height: 48, child: _dim(_SideValues(tick: tick, rrIntervalMs: rrIntervalMs, session: session, card: true))),
           if (curve) ...[
             const SizedBox(height: _gap),
             SizedBox(height: 120, child: ForceCurve(forces: forces)),
@@ -126,7 +130,7 @@ class FreeLiveView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: _gap),
-                SizedBox(height: sideHeight, child: _dim(_SideValues(tick: tick, session: session, card: false))),
+                SizedBox(height: sideHeight, child: _dim(_SideValues(tick: tick, rrIntervalMs: rrIntervalMs, session: session, card: false))),
               ],
             ),
           ),
@@ -205,9 +209,10 @@ class FreeLiveView extends StatelessWidget {
 
 /// The line below the tiles: heart rate (only with a monitor), calories and the average pace.
 class _SideValues extends StatelessWidget {
-  const _SideValues({required this.tick, required this.session, required this.card});
+  const _SideValues({required this.tick, required this.rrIntervalMs, required this.session, required this.card});
 
   final StatusTick? tick;
+  final int? rrIntervalMs;
   final SessionProgress? session;
 
   /// On a card as in portrait, or plain as in landscape.
@@ -221,7 +226,14 @@ class _SideValues extends StatelessWidget {
     final calories = tick?.calories;
     final items = [
       if (heartRate != null)
-        _item(l10n.metricHeartRate, formatWhole(heartRate), const Key('metric-hr'), icon: const HeartIcon()),
+        _item(
+          l10n.metricHeartRate,
+          formatWhole(heartRate),
+          const Key('metric-hr'),
+          icon: const HeartIcon(),
+          note: rrIntervalMs == null ? null : formatRrInterval(rrIntervalMs!),
+          noteKey: const Key('metric-rr'),
+        ),
       if (calories != null) _item(l10n.metricCalories, formatWhole(calories), const Key('metric-calories')),
       _item(l10n.metricAveragePace, formatPace(_averagePace()), const Key('metric-average-pace')),
     ];
@@ -249,7 +261,7 @@ class _SideValues extends StatelessWidget {
     return Duration(milliseconds: (elapsed.inMilliseconds * 500 / distance).round());
   }
 
-  Widget _item(String label, String value, Key key, {Widget? icon}) {
+  Widget _item(String label, String value, Key key, {Widget? icon, String? note, Key? noteKey}) {
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Row(
@@ -269,6 +281,14 @@ class _SideValues extends StatelessWidget {
             key: key,
             style: AppTextStyles.caption.copyWith(fontSize: 14, fontFeatures: const [FontFeature.tabularFigures()]),
           ),
+          if (note != null) ...[
+            const SizedBox(width: 6),
+            Text(
+              note,
+              key: noteKey,
+              style: AppTextStyles.caption.copyWith(fontSize: 12, fontFeatures: const [FontFeature.tabularFigures()]),
+            ),
+          ],
         ],
       ),
     );

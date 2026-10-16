@@ -37,8 +37,10 @@ class _Fixed extends ActiveErgSource {
   ErgSource? build() => source;
 }
 
-StatusTick _tick({int? heartRate}) => StatusTick(
-      elapsed: const Duration(minutes: 12, seconds: 34),
+const _elapsed = Duration(minutes: 12, seconds: 34);
+
+StatusTick _tick({int? heartRate, Duration elapsed = _elapsed}) => StatusTick(
+      elapsed: elapsed,
       distanceMeters: 3021.7,
       workoutType: WorkoutType.justRowSplits,
       workoutState: WorkoutState.workoutRow,
@@ -175,6 +177,49 @@ void main() {
     expect(find.textContaining('Puls'), findsNothing);
   });
 
+  group('RR interval', () {
+    HeartBeatIntervals beats(List<int> intervalsMs) =>
+        HeartBeatIntervals(elapsed: _elapsed, time: const Duration(seconds: 754), intervalsMs: intervalsMs);
+
+    for (final template in [false, true]) {
+      testWidgets('shows the last one at the heart rate${template ? ' on a template' : ''}', (tester) async {
+        final harness = _Harness();
+        await harness.pump(tester, recording: template ? _onCourse() : null);
+        await harness.emit(tester, _tick(heartRate: 151));
+        await harness.emit(tester, beats([790, 812]));
+
+        expect(find.byKey(const Key('metric-hr')), findsOneWidget);
+        expect(find.text('812 ms'), findsOneWidget);
+        expect(find.text('790 ms'), findsNothing);
+      });
+    }
+
+    testWidgets('shows none with the heart rate only from the rower, and no source of it', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+      await harness.emit(tester, _tick(heartRate: 151));
+
+      expect(find.text('Puls 151'), findsOneWidget);
+      expect(find.byKey(const Key('metric-rr')), findsNothing);
+      expect(find.textContaining('ms'), findsNothing);
+      expect(find.textContaining('Gurt'), findsNothing);
+    });
+
+    testWidgets('hides an RR interval more than 3 seconds older than the latest tick', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+      await harness.emit(tester, _tick(heartRate: 151));
+      await harness.emit(tester, beats([812]));
+
+      await harness.emit(tester, _tick(heartRate: 151, elapsed: _elapsed + const Duration(seconds: 3)));
+      expect(find.text('812 ms'), findsOneWidget);
+
+      await harness.emit(tester, _tick(heartRate: 151, elapsed: _elapsed + const Duration(milliseconds: 3100)));
+      expect(find.text('812 ms'), findsNothing);
+      expect(find.text('Puls 151'), findsOneWidget);
+    });
+  });
+
   testWidgets('leaves out the force curve without data', (tester) async {
     final harness = _Harness();
     await harness.pump(tester);
@@ -218,6 +263,7 @@ void main() {
           state: state,
         );
         await harness.emit(tester, _tick(heartRate: 151));
+        await harness.emit(tester, HeartBeatIntervals(elapsed: _elapsed, time: Duration.zero, intervalsMs: [812]));
 
         // Overflows would be reported as exceptions and fail the test.
         final view = find.byKey(ValueKey(LiveLayout.of(size)));
@@ -236,6 +282,7 @@ void main() {
             'metric-lap-time',
             'metric-watts',
             'metric-hr',
+            'metric-rr',
             'metric-zone-share',
           ]) {
             final rect = tester.getRect(find.byKey(Key(key)));
