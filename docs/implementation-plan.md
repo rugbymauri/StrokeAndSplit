@@ -9,14 +9,14 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`; `device-types` an diesen Stand angepasst; `translations` neu eingeplant (noch kein OpenSpec-Change).
+Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones` und `device-types`; `translations` in Arbeit.
 
 ## Überblick
 
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
-| 2 | `translations` | – (kein Change) | ja | `/opsx:propose translations`; Entscheide F15, F16 |
+| 2 | `translations` | 0/16 | in Arbeit auf `feature/translations` | – |
 | 3 | `ui-design` | 0/18 | nach 2 | Entscheid Puls-Herkunft (F1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
@@ -78,8 +78,9 @@ Arbeitspunkte:
 - Ab dann für alle Changes: neue Texte nur über die ARB-Dateien, in jeder Sprache.
 
 Vor dem Start:
-- [ ] Change anlegen: `/opsx:propose translations`.
-- [ ] Entscheide F15, F16.
+- [x] Change angelegt (2026-10-16): Capability `app-language`, keine geänderten Specs.
+- [x] F15 und F16 vorläufig nach Vorschlag entschieden (Schweizer Rechtschreibung, `shared_preferences`), im Design als D6 und D2. Der Nutzer kann sie noch kippen.
+- Sprachwahl vorerst als Symbol im Startbildschirm (Design D3); `ui-design` verlegt sie.
 
 ### 3. `ui-design`: Designsprache und neue Screens aus dem Claude-Design-Canvas
 
@@ -153,8 +154,8 @@ Vor dem Start:
 | ~~F12~~ | Schritte der Ruderblatt-Tasten auf der Zeitachse: **Strecke 30 s, Zone und Startposition 10 s** (2026-10-16) | ui-design | entschieden |
 | ~~F13~~ | Rückfallsprache: **keine** (2026-10-16), die Sprache wird in der App gewählt (F14) | translations | entschieden |
 | ~~F14~~ | Sprachwahl: **in der App** (2026-10-16), Start auf Deutsch, Systemsprache wird nicht beachtet | translations | entschieden |
-| F15 | Schweizer Rechtschreibung (`ss` statt `ß`, wie heute im Code) als `de`? Vorschlag: ja | translations | translations |
-| F16 | Wo wird die gewählte Sprache gespeichert? Vorschlag `shared_preferences`: keine Migration, Schemanummern von `heart-rate` bleiben. Drift-Tabelle hiesse Schema 5 und `heart-rate` Schema 6 | translations, heart-rate | translations |
+| F15 | Schweizer Rechtschreibung (`ss` statt `ß`, wie heute im Code) als `de`? **Vorläufig ja** (2026-10-16, nach Vorschlag) | translations | vorläufig entschieden |
+| F16 | Wo wird die gewählte Sprache gespeichert? **Vorläufig `shared_preferences`** (2026-10-16, nach Vorschlag): keine Migration, `heart-rate` bleibt Schema 5 | translations, heart-rate | vorläufig entschieden |
 
 ## Offene Punkte
 
