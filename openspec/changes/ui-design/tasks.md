@@ -6,6 +6,8 @@
 - [ ] 1.2 Theme mit den Tokens aus Design D1 (Farben, Schriftstile, Radien, Abstände) in `lib/app`. Bestehende Screens nutzen es. Verifikation: bestehende Widget-Tests grün
 - [ ] 1.3 Widget `SegmentBar` nach Design D4 (Breite, frei/Band, Helligkeit nach Tempo, Auswahl). Verifikation: Widget-Tests für freie Strecke, ein Band und abgestufte Pace-Bänder
 
+- [ ] 1.4 Widget `OarStepper` nach Design D7 (Ruderblatt-Form, gross und kompakt, Schritt, Grenzen, gesperrte Taste, Wiederholung beim Gedrückthalten, Screenreader-Beschriftung). Verifikation: Widget-Tests für Schritt, Grenze, Gedrückthalten und Semantics
+
 ## 2. Fortschrittsrahmen
 
 - [ ] 2.1 Reine Funktion, die aus Lap-Tracker-Zustand und Vorlage die drei Anteile, die Grenzen und die Restangaben berechnet. Verifikation: Unit-Tests für das Spec-Beispiel 460 m in Runde 2, für eine Zeitstrecke und für offene Rundenzahl
@@ -23,6 +25,8 @@
 - [ ] 4.1 Gemeinsamer Screen mit Tabs „Vorlagen“ und „Strecken“ nach „Vorlage wählen“ und „Streckenliste“, aufklappbare Vorlage mit „Starten“. Verifikation: Widget-Tests für Tabwechsel, Auswahl und Start mit dem Simulator
 - [ ] 4.2 Vorlagen-Editor nach „Vorlagen-Editor“ (Umschalter feste Anzahl/offen, Zähler, Ergebnis-Zeile). Verifikation: Widget-Tests für feste und offene Rundenzahl
 - [ ] 4.3 Gestaltung der Streckenliste und des Strecken-Kopfs (Name, Achse, Länge, Segmentbalken) nach „Streckenliste“ und „Strecken-Editor“. Einbauen von Zonen und Zonen-Editor setzt der Change `zones` um. Verifikation: Widget-Tests für Streckenliste und Versionierungshinweis
+
+- [ ] 4.4 Zahlenfelder durch `OarStepper` ersetzen: Rundenzahl im Vorlagen-Editor, Länge im Strecken-Editor, Länge, Pace- und Schlagzahl-Band im Zonen-Editor, Startposition in „Zone einbauen“, mit den Schritten aus D7. Verifikation: bestehende Editor-Tests auf Tippen umgestellt und grün, Widget-Tests für die Spec-Szenarien „Pace-Band anpassen“ und „Zone verschieben“
 
 ## 5. Start und Zusammenfassung
 
