@@ -11,6 +11,7 @@ import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
+import 'package:aergrow/spike/raw_log_writer.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
@@ -96,6 +97,33 @@ void main() {
     expect(session.distanceDm, greaterThan(0));
     expect(session.courseVersionId, isNull);
     expect(await repository.laps(id), isEmpty);
+  });
+
+  test('imports an FTMS recording of the spike', () async {
+    final dir = await Directory.systemTemp.createTemp('aergrow-spike');
+    addTearDown(() => dir.delete(recursive: true));
+    final writer = await RawLogWriter.create(dir, deviceName: 'AergRow FTMS Rower', protocol: 'ftms');
+    await writer.close();
+    final header = (await writer.file.readAsLines()).first;
+    // The spike also records the control point answers and the machine status.
+    final lines = [
+      header,
+      jsonEncode({'t': 0, 'm': 'Fitness Machine Feature: 26 56 00 00 00 00 00 00'}),
+      jsonEncode({'t': 10, 'c': FtmsIds.controlPoint, 'b': base64Encode([0x80, 0x00, 0x01])}),
+      jsonEncode({'t': 20, 'c': FtmsIds.machineStatus, 'b': base64Encode([0x04])}),
+      ...File('packages/erg_protocol/test/fixtures/ftms_just_row.jsonl').readAsLinesSync().skip(1),
+    ];
+    final db = openTestDatabase();
+    final repository = SessionRepository(db);
+
+    final id = await repository.import(utf8.encode(lines.join('\n')));
+    final session = (await repository.get(id))!;
+
+    expect(writer.file.path, contains('ftms-'));
+    expect((session.source, session.protocol), (ErgSourceKind.ftms, ErgProtocol.ftms));
+    expect(session.deviceName, 'AergRow FTMS Rower');
+    expect(session.distanceDm, closeTo(2100, 10));
+    expect(await db.select(db.strokes).get(), hasLength(43));
   });
 
   test('names the protocol in the header and recomputes an FTMS session on import', () async {

@@ -43,8 +43,8 @@
 
 ## 6. Spike
 
-- [ ] 6.1 Spike sucht auch FTMS-Rower und schneidet `0x2AD1`, `0x2ADA` und Control-Point-Antworten mit `"protocol": "ftms"` im Header mit (D12); ein Mitschnitt des Software-Rowers lässt sich in der App importieren und abspielen
-- [ ] 6.2 README-Abschnitt Spike um FTMS ergänzen
+- [x] 6.1 Spike sucht auch FTMS-Rower und schneidet `0x2AD1`, `0x2ADA` und Control-Point-Antworten mit `"protocol": "ftms"` im Header mit (D12); ein Mitschnitt des Software-Rowers lässt sich in der App importieren und abspielen
+- [x] 6.2 README-Abschnitt Spike um FTMS ergänzen
 
 ## 7. Verifikation und Dokumentation
 

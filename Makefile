@@ -47,10 +47,10 @@ run: ## Start the app on the Linux desktop
 run-android: ## Start the app on a connected Android device
 	$(FLUTTER) run -d $(or $(ANDROID_DEVICE),$(error No Android device found, check `$(ADB) devices`))
 
-spike: ## Start the PM5 BLE spike on the Linux desktop (recordings go to the documents folder, e.g. ~/Dokumente)
+spike: ## Start the BLE spike for PM5 and FTMS rowers on the Linux desktop (recordings go to the documents folder, e.g. ~/Dokumente)
 	$(FLUTTER) run -d linux -t $(SPIKE)
 
-spike-android: ## Start the PM5 BLE spike on a connected Android device
+spike-android: ## Start the BLE spike for PM5 and FTMS rowers on a connected Android device
 	$(FLUTTER) run -d $(or $(ANDROID_DEVICE),$(error No Android device found, check `$(ADB) devices`)) -t $(SPIKE)
 
 ftms-rower: ## Play an FTMS recording as a software FTMS rower over Bluetooth (FILE=recording.jsonl, test from a phone)

@@ -28,7 +28,7 @@ Alle Befehle zeigt `make help`.
 | `make check` | Statische Analyse und Tests von App und `erg_protocol` |
 | `make codegen` | drift-Code neu erzeugen, nach Änderungen an `lib/data/db/database.dart` |
 | `make schema` | Schema-Snapshot und Migrationstests erzeugen, nach dem Erhöhen von `schemaVersion` |
-| `make spike` / `make spike-android` | Minimal-App, die PM5-Rohpakete mitschneidet (siehe unten) |
+| `make spike` / `make spike-android` | Minimal-App, die Rohpakete von PM5 und FTMS-Rudergeräten mitschneidet (siehe unten) |
 | `make ftms-rower FILE=…` | Software-FTMS-Rudergerät, das eine Aufnahme über Bluetooth abspielt (siehe unten) |
 | `make pull-recordings` | Mitschnitte vom Android-Gerät nach `./recordings` kopieren |
 | `make build-linux` | Linux-Release-Bundle bauen |
@@ -103,7 +103,9 @@ Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwe
 
 ## Spike
 
-`make spike` startet eine Minimal-App, die sich mit dem PM5 verbindet und alle Pakete mit Zeitstempel als `pm5-<zeit>.jsonl` speichert. Unter Linux landen sie im Dokumente-Ordner des Benutzers (z.B. `~/Dokumente`), unter Android im externen App-Verzeichnis (`make pull-recordings`). Solche Mitschnitte dienen als Test-Fixtures in `packages/erg_protocol/test/fixtures/`.
+`make spike` startet eine Minimal-App, die sich mit einem PM5 oder einem FTMS-Rudergerät verbindet und alle Pakete mit Zeitstempel als `pm5-<zeit>.jsonl` bzw. `ftms-<zeit>.jsonl` speichert. Unter Linux landen sie im Dokumente-Ordner des Benutzers (z.B. `~/Dokumente`), unter Android im externen App-Verzeichnis (`make pull-recordings`). Solche Mitschnitte dienen als Test-Fixtures in `packages/erg_protocol/test/fixtures/` und lassen sich in der App importieren und abspielen.
+
+Bei einem FTMS-Gerät liest der Spike die Fitness Machine Features (als Marker im Mitschnitt), schneidet Rower Data (`2ad1`), Machine Status (`2ada`) und die Antworten am Control Point (`2ad9`) mit und sendet wie die App Request Control und Start/Resume. Der Header trägt `"protocol": "ftms"`. Wer ein echtes FTMS-Rudergerät hat, liefert so direkt brauchbare Fixtures.
 
 ## Software-Rower
 
