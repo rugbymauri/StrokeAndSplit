@@ -436,6 +436,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryBestLap => 'Best lap';
 
   @override
+  String summaryPlace(int place) {
+    return 'Place $place';
+  }
+
+  @override
+  String summaryZonePlace(String zone, int place) {
+    return '$zone · place $place';
+  }
+
+  @override
+  String summarySessionPlace(int place) {
+    return 'Place $place for the template';
+  }
+
+  @override
   String get actionDone => 'Done';
 
   @override

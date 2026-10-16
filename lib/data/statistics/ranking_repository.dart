@@ -113,7 +113,7 @@ class RankingRepository {
 
   /// [load] now and again after every change to sessions, laps, courses,
   /// zones or templates, e.g. a new, imported or deleted session.
-  Stream<List<Ranking>> watch(Future<List<Ranking>> Function() load) => _db.watchTables([
+  Stream<T> watch<T>(Future<T> Function() load) => _db.watchTables([
         _db.sessions,
         _db.laps,
         _db.lapSegments,

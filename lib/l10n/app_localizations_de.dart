@@ -438,6 +438,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get summaryBestLap => 'Beste Runde';
 
   @override
+  String summaryPlace(int place) {
+    return 'Platz $place';
+  }
+
+  @override
+  String summaryZonePlace(String zone, int place) {
+    return '$zone · Platz $place';
+  }
+
+  @override
+  String summarySessionPlace(int place) {
+    return 'Platz $place der Vorlage';
+  }
+
+  @override
   String get actionDone => 'Fertig';
 
   @override

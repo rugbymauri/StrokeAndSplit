@@ -3,12 +3,17 @@ import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
+import 'package:aergrow/data/templates/session_template.dart';
+import 'package:aergrow/data/templates/template_repository.dart';
+import 'package:aergrow/data/zones/zone.dart';
+import 'package:aergrow/data/zones/zone_repository.dart';
 import 'package:aergrow/features/sessions/session_summary_screen.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 import '../../support/localized_app.dart';
 
@@ -91,6 +96,15 @@ double? _bar(WidgetTester tester, Key key) {
   final bar = find.descendant(of: find.byKey(key), matching: find.byType(FractionallySizedBox));
   return bar.evaluate().isEmpty ? null : tester.widget<FractionallySizedBox>(bar).widthFactor;
 }
+
+/// The place marks in the lap row with [key].
+List<String> _marks(WidgetTester tester, Key key) => [
+      for (final text in tester.widgetList<Text>(find.descendant(
+        of: find.byKey(key),
+        matching: find.byWidgetPredicate((w) => w is Text && (w.data ?? '').contains('Platz')),
+      )))
+        text.data!,
+    ];
 
 String _caption(WidgetTester tester, Key key) =>
     tester.widget<Text>(find.descendant(of: find.byKey(key), matching: find.byType(Text)).at(1)).data!;
@@ -223,5 +237,125 @@ void main() {
     expect(find.widgetWithText(OutlinedButton, 'Play back'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Done'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
+  });
+
+  group('places', () {
+    late AppDatabase db;
+
+    setUp(() => db = openTestDatabase());
+
+    /// A template "Seerunde x[laps]" on a new 1000 m course.
+    Future<SessionTemplate> template(WidgetTester tester, {int laps = 3}) async => (await tester.runAsync(() async {
+          final courseId = await CourseRepository(db).create(
+            'Seerunde',
+            CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+          );
+          final templates = TemplateRepository(db);
+          return (await templates.get(await templates.create('Seerunde x$laps', courseId: courseId, laps: laps)))!;
+        }))!;
+
+    Future<int> row(
+      WidgetTester tester,
+      SessionTemplate template,
+      List<int> seconds, {
+      int day = 1,
+      ErgSourceKind source = ErgSourceKind.pm5,
+    }) async =>
+        (await tester.runAsync(() => storeRowedSession(
+              db,
+              template: template,
+              source: source,
+              startedAt: DateTime(2026, 10, day, 7),
+              laps: [for (final s in seconds) RowedLap.single(s * 1000, 1000)],
+            )))!;
+
+    testWidgets('marks a new second best lap', (tester) async {
+      final seerunde = await template(tester);
+      await row(tester, seerunde, [245, 260, 262]);
+      final id = await row(tester, seerunde, [252, 248, 255], day: 2);
+      await _pump(tester, db, id);
+
+      expect(_marks(tester, const Key('lap-best')), ['Platz 2']);
+      expect(_marks(tester, const Key('lap-1')), ['Platz 3']);
+      expect(_marks(tester, const Key('lap-3')), isEmpty);
+      // 755 s after 767 s of the earlier session.
+      expect(
+        find.descendant(of: find.byKey(const Key('session-place')), matching: find.text('Platz 1')),
+        findsOneWidget,
+      );
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('drops the mark of a lap overtaken later', (tester) async {
+      final seerunde = await template(tester, laps: 1);
+      final id = await row(tester, seerunde, [248]);
+      await row(tester, seerunde, [245], day: 2);
+      await row(tester, seerunde, [240], day: 3);
+      await row(tester, seerunde, [242], day: 4);
+      await _pump(tester, db, id);
+
+      expect(_lap(tester, const Key('lap-best')), '4:08.0');
+      expect(_marks(tester, const Key('lap-best')), isEmpty);
+      expect(find.byKey(const Key('session-place')), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('gives no marks to a simulated session', (tester) async {
+      final seerunde = await template(tester);
+      final id = await row(tester, seerunde, [252, 248, 255], source: ErgSourceKind.simulator);
+      await _pump(tester, db, id);
+
+      expect(find.textContaining('Platz'), findsNothing);
+      expect(find.byKey(const Key('session-place')), findsNothing);
+      // The best lap of the session is still marked.
+      expect(find.byIcon(Icons.star), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('marks the session on place 1 of its template', (tester) async {
+      final seerunde = await template(tester, laps: 2);
+      await row(tester, seerunde, [250, 250]);
+      final id = await row(tester, seerunde, [246, 249], day: 2);
+      await _pump(tester, db, id, locale: const Locale('en'));
+
+      expect(
+        find.descendant(of: find.byKey(const Key('session-place')), matching: find.text('Place 1')),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate((w) => w is Text && w.semanticsLabel == 'Place 1 for the template'),
+        findsOneWidget,
+      );
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('marks the runs through a zone', (tester) async {
+      final sprintrunde = await tester.runAsync(() async {
+        const sprint =
+            Zone(name: 'Sprint', axis: CourseAxis.distance, length: 100, paceFastCs: 9000, paceSlowCs: 10000);
+        final sprintId = await ZoneRepository(db).create(sprint);
+        final placed = sprint.copyWith(id: sprintId).segment;
+        final courseId = await CourseRepository(db).create(
+          'Sprintrunde',
+          CourseDefinition(axis: CourseAxis.distance, length: 1000, segments: [
+            const CourseSegment(length: 400),
+            placed,
+            const CourseSegment(length: 400),
+            placed,
+          ]),
+        );
+        final templates = TemplateRepository(db);
+        return (await templates.get(await templates.create('Sprintrunde x2', courseId: courseId, laps: 2)))!;
+      });
+      final id = (await tester.runAsync(() => storeRowedSession(db, template: sprintrunde!, laps: [
+            const RowedLap([(100000, 400), (20000, 100), (100000, 400), (21000, 100)]),
+            const RowedLap([(100000, 400), (19000, 100), (99000, 400), (22000, 100)]),
+          ])))!;
+      await _pump(tester, db, id);
+
+      expect(_marks(tester, const Key('lap-1')), ['Platz 2', 'Sprint · Platz 2', 'Sprint · Platz 3']);
+      expect(_marks(tester, const Key('lap-best')), ['Platz 1', 'Sprint · Platz 1']);
+      await disposeWidgetsWithDatabase(tester);
+    });
   });
 }

@@ -590,6 +590,36 @@
   "@summaryBestLap": {
     "description": "Summary: marks the fastest lap of a distance course or the longest of a time course"
   },
+  "summaryPlace": "Platz {place}",
+  "@summaryPlace": {
+    "description": "Summary: mark of a lap or the session on place 1 to 3 of its ranking",
+    "placeholders": {
+      "place": {
+        "type": "int"
+      }
+    }
+  },
+  "summaryZonePlace": "{zone} · Platz {place}",
+  "@summaryZonePlace": {
+    "description": "Summary: mark of a run through a zone on place 1 to 3 of the zone's ranking; zone is its name",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "place": {
+        "type": "int"
+      }
+    }
+  },
+  "summarySessionPlace": "Platz {place} der Vorlage",
+  "@summarySessionPlace": {
+    "description": "Summary: screen reader label of the mark of a session on place 1 to 3 of its template's ranking",
+    "placeholders": {
+      "place": {
+        "type": "int"
+      }
+    }
+  },
   "actionDone": "Fertig",
   "@actionDone": {
     "description": "Closes the summary of a session"
