@@ -18,7 +18,7 @@ Future<void> replaySession(BuildContext context, WidgetRef ref, SessionRow sessi
     _notify(ScaffoldMessenger.of(context), context.l10n.replayNoData);
     return;
   }
-  final name = context.l10n.replayName(formatDateTime(session.startedAt));
+  final name = context.l10n.replayName(formatDateTime(context.l10n, session.startedAt));
   await ref.read(activeErgSourceProvider.notifier).use(ReplaySource(recording, name: name));
   if (!context.mounted) return;
   await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LiveScreen()));
@@ -33,7 +33,7 @@ Future<bool> deleteSession(BuildContext context, WidgetRef ref, SessionRow sessi
       final l10n = context.l10n;
       return AlertDialog(
         title: Text(l10n.sessionDeleteTitle),
-        content: Text(l10n.sessionDeleteBody(formatDateTime(session.startedAt))),
+        content: Text(l10n.sessionDeleteBody(formatDateTime(l10n, session.startedAt))),
         actions: [
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.actionCancel)),
           FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.actionDelete)),

@@ -191,5 +191,6 @@
   "zoneSpmTo": "to",
   "zoneBandHint": "At least one band is needed: pace, stroke rate or both.",
   "invalidPace": "The pace “{text}” is not valid.",
-  "invalidStrokeRate": "The stroke rate “{text}” is not valid."
+  "invalidStrokeRate": "The stroke rate “{text}” is not valid.",
+  "dateTimePattern": "MMM d, y, HH:mm"
 }

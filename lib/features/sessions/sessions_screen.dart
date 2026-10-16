@@ -60,7 +60,7 @@ class _SessionTile extends ConsumerWidget {
     ].join(' · ');
 
     return ListTile(
-      title: Text(formatDateTime(session.startedAt)),
+      title: Text(formatDateTime(l10n, session.startedAt)),
       subtitle: Text(session.status == SessionStatus.incomplete ? '$details · ${l10n.sessionIncomplete}' : details),
       onTap: () => Navigator.of(context)
           .push(MaterialPageRoute<void>(builder: (_) => SessionSummaryScreen(sessionId: session.id))),

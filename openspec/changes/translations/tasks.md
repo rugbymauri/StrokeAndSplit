@@ -27,7 +27,7 @@
 
 ## 5. Formate
 
-- [ ] 5.1 Datum mit Uhrzeit und Dezimalzahlen nach Sprache (D5), Muster in der ARB-Datei; „frei“, Nutzung der Zonen mit `plural`. Pace und Zeiten bleiben unverändert. Verifikation: Unit-Tests für „15.10.2026, 18:30“, „Oct 15, 2026, 18:30“, „22,5“, „22.5“ und unveränderte Pace in beiden Sprachen
+- [x] 5.1 Datum mit Uhrzeit und Dezimalzahlen nach Sprache (D5), Muster in der ARB-Datei; „frei“, Nutzung der Zonen mit `plural`. Pace und Zeiten bleiben unverändert. Verifikation: Unit-Tests für „15.10.2026, 18:30“, „Oct 15, 2026, 18:30“, „22,5“, „22.5“ und unveränderte Pace in beiden Sprachen
 
 ## 6. Abschluss
 

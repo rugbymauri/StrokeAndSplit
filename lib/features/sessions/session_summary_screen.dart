@@ -23,7 +23,7 @@ class SessionSummaryScreen extends ConsumerWidget {
     final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text(session.value == null ? l10n.sessionTitle : formatDateTime(session.value!.startedAt)),
+        title: Text(session.value == null ? l10n.sessionTitle : formatDateTime(l10n, session.value!.startedAt)),
         actions: [
           if (session.value case final row?) ...[
             IconButton(
@@ -80,7 +80,7 @@ class _Summary extends StatelessWidget {
       (l10n.sessionTime, formatElapsed(Duration(milliseconds: session.durationMs))),
       (l10n.sessionAveragePace, formatPace(pace == null ? null : Duration(milliseconds: pace * 10))),
       (l10n.sessionAverageWatts, formatWhole(session.averageWatts)),
-      (l10n.sessionAverageStrokeRate, formatStrokeRate(session.averageStrokeRate)),
+      (l10n.sessionAverageStrokeRate, formatStrokeRate(l10n, session.averageStrokeRate)),
       (l10n.sessionStrokes, '${session.strokeCount}'),
     ];
 

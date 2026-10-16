@@ -720,4 +720,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String invalidStrokeRate(String text) {
     return 'Die Schlagzahl „$text“ ist ungültig.';
   }
+
+  @override
+  String get dateTimePattern => 'dd.MM.yyyy, HH:mm';
 }

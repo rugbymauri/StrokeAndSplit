@@ -715,4 +715,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String invalidStrokeRate(String text) {
     return 'The stroke rate “$text” is not valid.';
   }
+
+  @override
+  String get dateTimePattern => 'MMM d, y, HH:mm';
 }

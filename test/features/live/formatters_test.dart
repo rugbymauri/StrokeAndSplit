@@ -1,7 +1,16 @@
 import 'package:aergrow/features/live/formatters.dart';
+import 'package:aergrow/l10n/l10n.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
+  final de = lookupAppLocalizations(const Locale('de'));
+  final en = lookupAppLocalizations(const Locale('en'));
+
+  // The app loads the date symbols with its localizations; plain tests do it here.
+  setUpAll(initializeDateFormatting);
+
   group('formatPace', () {
     test('shows minutes, seconds and tenths', () {
       expect(formatPace(const Duration(milliseconds: 125300)), '2:05.3');
@@ -39,12 +48,21 @@ void main() {
     expect(formatWhole(null), '–');
   });
 
-  test('formatStrokeRate shows one decimal', () {
-    expect(formatStrokeRate(22.46), '22.5');
-    expect(formatStrokeRate(null), '–');
+  test('formatStrokeRate shows one decimal with the decimal mark of the language', () {
+    expect(formatStrokeRate(de, 22.46), '22,5');
+    expect(formatStrokeRate(en, 22.46), '22.5');
+    expect(formatStrokeRate(de, null), '–');
   });
 
-  test('formatDateTime shows the local date and time', () {
-    expect(formatDateTime(DateTime(2026, 10, 5, 8, 7)), '05.10.2026, 08:07');
+  test('formatDateTime shows the local date and time in the format of the language', () {
+    expect(formatDateTime(de, DateTime(2026, 10, 15, 18, 30)), '15.10.2026, 18:30');
+    expect(formatDateTime(en, DateTime(2026, 10, 15, 18, 30)), 'Oct 15, 2026, 18:30');
+    expect(formatDateTime(de, DateTime(2026, 10, 5, 8, 7)), '05.10.2026, 08:07');
+  });
+
+  test('keeps pace and times the same in every language', () {
+    // They take no language: the PM5 shows them the same way everywhere (Design D5).
+    expect(formatPace(const Duration(milliseconds: 125300)), '2:05.3');
+    expect(formatLapTime(const Duration(milliseconds: 239400)), '3:59.4');
   });
 }

@@ -1,5 +1,10 @@
-/// Display formats as rowers know them from the PM5.
+/// Display formats as rowers know them from the PM5; date and decimals
+/// follow the language of the app (Change translations, Design D5).
 library;
+
+import 'package:intl/intl.dart';
+
+import '../../l10n/l10n.dart';
 
 const _noValue = '–';
 
@@ -33,13 +38,12 @@ String formatDistance(double meters) => meters.floor().toString();
 /// Whole numbers like watts or strokes per minute; a dash when unknown.
 String formatWhole(int? value) => value?.toString() ?? _noValue;
 
-/// Average stroke rate with one decimal, e.g. `22.5`.
-String formatStrokeRate(double? strokeRate) => strokeRate?.toStringAsFixed(1) ?? _noValue;
+/// Average stroke rate with one decimal, e.g. `22,5` in German, `22.5` in English.
+String formatStrokeRate(AppLocalizations l10n, double? strokeRate) =>
+    strokeRate == null ? _noValue : NumberFormat('0.0', l10n.localeName).format(strokeRate);
 
-/// Local date and time, e.g. `15.10.2026, 18:30`.
-String formatDateTime(DateTime time) {
-  final t = time.toLocal();
-  return '${_two(t.day)}.${_two(t.month)}.${t.year}, ${_two(t.hour)}:${_two(t.minute)}';
-}
+/// Local date and time, e.g. `15.10.2026, 18:30` in German, `Oct 15, 2026, 18:30` in English.
+String formatDateTime(AppLocalizations l10n, DateTime time) =>
+    DateFormat(l10n.dateTimePattern, l10n.localeName).format(time.toLocal());
 
 String _two(int value) => value.toString().padLeft(2, '0');

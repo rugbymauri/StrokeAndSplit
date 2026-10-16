@@ -1254,6 +1254,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die Schlagzahl „{text}“ ist ungültig.'**
   String invalidStrokeRate(String text);
+
+  /// Pattern of a date with time for the intl package's DateFormat, e.g. '15.10.2026, 18:30'; keep the 24-hour clock
+  ///
+  /// In de, this message translates to:
+  /// **'dd.MM.yyyy, HH:mm'**
+  String get dateTimePattern;
 }
 
 class _AppLocalizationsDelegate
