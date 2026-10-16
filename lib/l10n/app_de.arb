@@ -699,25 +699,38 @@
   "@templateCourseMissing": {
     "description": "Template editor: no course chosen"
   },
-  "templateLapsInvalid": "Die Rundenzahl muss mindestens 1 sein.",
-  "@templateLapsInvalid": {
-    "description": "Template editor: the number of laps is below 1"
-  },
   "templateCourse": "Strecke",
   "@templateCourse": {
     "description": "Template editor: label of the course field"
   },
-  "templateOpenLaps": "Offene Rundenzahl",
-  "@templateOpenLaps": {
-    "description": "Template editor: switch for an open number of laps"
+  "templateFixedLaps": "Feste Anzahl",
+  "@templateFixedLaps": {
+    "description": "Template editor: choice for a fixed number of laps"
   },
-  "templateOpenLapsHint": "Runden, bis du die Session beendest",
-  "@templateOpenLapsHint": {
-    "description": "Template editor: what an open number of laps means"
+  "templateOpenLaps": "Offen bis Stopp",
+  "@templateOpenLaps": {
+    "description": "Template editor: choice for an open number of laps, rowed until the session ends"
   },
   "templateLaps": "Runden",
   "@templateLaps": {
     "description": "Template editor: label of the number of laps"
+  },
+  "templateLapsUnit": "{laps, plural, =1{Runde} other{Runden}}",
+  "@templateLapsUnit": {
+    "description": "Template editor: unit after the number of laps, without the number",
+    "placeholders": {
+      "laps": {
+        "type": "int"
+      }
+    }
+  },
+  "templateResult": "Ergibt",
+  "@templateResult": {
+    "description": "Template editor: label of the line with the total length of all laps"
+  },
+  "templateResultOpen": "pro Runde, bis du die Session beendest",
+  "@templateResultOpen": {
+    "description": "Template editor: after the length of one lap when the number of laps is open"
   },
   "coursesTitle": "Strecken",
   "@coursesTitle": {

@@ -512,19 +512,33 @@ class AppLocalizationsDe extends AppLocalizations {
   String get templateCourseMissing => 'Wähle eine Strecke.';
 
   @override
-  String get templateLapsInvalid => 'Die Rundenzahl muss mindestens 1 sein.';
-
-  @override
   String get templateCourse => 'Strecke';
 
   @override
-  String get templateOpenLaps => 'Offene Rundenzahl';
+  String get templateFixedLaps => 'Feste Anzahl';
 
   @override
-  String get templateOpenLapsHint => 'Runden, bis du die Session beendest';
+  String get templateOpenLaps => 'Offen bis Stopp';
 
   @override
   String get templateLaps => 'Runden';
+
+  @override
+  String templateLapsUnit(int laps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      laps,
+      locale: localeName,
+      other: 'Runden',
+      one: 'Runde',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get templateResult => 'Ergibt';
+
+  @override
+  String get templateResultOpen => 'pro Runde, bis du die Session beendest';
 
   @override
   String get coursesTitle => 'Strecken';

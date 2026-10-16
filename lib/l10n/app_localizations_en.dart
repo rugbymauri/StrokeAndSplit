@@ -507,19 +507,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get templateCourseMissing => 'Choose a course.';
 
   @override
-  String get templateLapsInvalid => 'The number of laps must be at least 1.';
-
-  @override
   String get templateCourse => 'Course';
 
   @override
-  String get templateOpenLaps => 'Open number of laps';
+  String get templateFixedLaps => 'Fixed number';
 
   @override
-  String get templateOpenLapsHint => 'Laps until you end the session';
+  String get templateOpenLaps => 'Open until stop';
 
   @override
   String get templateLaps => 'Laps';
+
+  @override
+  String templateLapsUnit(int laps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      laps,
+      locale: localeName,
+      other: 'laps',
+      one: 'lap',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get templateResult => 'Total';
+
+  @override
+  String get templateResultOpen => 'per lap, until you end the session';
 
   @override
   String get coursesTitle => 'Courses';

@@ -919,35 +919,47 @@ abstract class AppLocalizations {
   /// **'Wähle eine Strecke.'**
   String get templateCourseMissing;
 
-  /// Template editor: the number of laps is below 1
-  ///
-  /// In de, this message translates to:
-  /// **'Die Rundenzahl muss mindestens 1 sein.'**
-  String get templateLapsInvalid;
-
   /// Template editor: label of the course field
   ///
   /// In de, this message translates to:
   /// **'Strecke'**
   String get templateCourse;
 
-  /// Template editor: switch for an open number of laps
+  /// Template editor: choice for a fixed number of laps
   ///
   /// In de, this message translates to:
-  /// **'Offene Rundenzahl'**
-  String get templateOpenLaps;
+  /// **'Feste Anzahl'**
+  String get templateFixedLaps;
 
-  /// Template editor: what an open number of laps means
+  /// Template editor: choice for an open number of laps, rowed until the session ends
   ///
   /// In de, this message translates to:
-  /// **'Runden, bis du die Session beendest'**
-  String get templateOpenLapsHint;
+  /// **'Offen bis Stopp'**
+  String get templateOpenLaps;
 
   /// Template editor: label of the number of laps
   ///
   /// In de, this message translates to:
   /// **'Runden'**
   String get templateLaps;
+
+  /// Template editor: unit after the number of laps, without the number
+  ///
+  /// In de, this message translates to:
+  /// **'{laps, plural, =1{Runde} other{Runden}}'**
+  String templateLapsUnit(int laps);
+
+  /// Template editor: label of the line with the total length of all laps
+  ///
+  /// In de, this message translates to:
+  /// **'Ergibt'**
+  String get templateResult;
+
+  /// Template editor: after the length of one lap when the number of laps is open
+  ///
+  /// In de, this message translates to:
+  /// **'pro Runde, bis du die Session beendest'**
+  String get templateResultOpen;
 
   /// Courses: title
   ///

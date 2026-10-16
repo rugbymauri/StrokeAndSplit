@@ -1,4 +1,5 @@
 import 'package:aergrow/app/platform_providers.dart';
+import 'package:aergrow/app/widgets/oar_stepper.dart';
 import 'package:aergrow/data/courses/course.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
@@ -72,7 +73,7 @@ void main() {
     await setup.pump(tester);
     expect(find.text('Noch keine Vorlagen angelegt.'), findsOneWidget);
 
-    Future<void> create(String name, {String? laps, bool open = false}) async {
+    Future<void> create(String name, {bool open = false}) async {
       await tester.tap(find.text('Vorlage anlegen'));
       await tester.pumpAndSettle();
       await tester.enterText(find.byKey(const Key('template-name')), name);
@@ -80,14 +81,13 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Seerunde · 1000 m · frei').last);
       await tester.pumpAndSettle();
-      if (open) await tester.tap(find.text('Offene Rundenzahl'));
-      if (laps != null) await tester.enterText(find.byKey(const Key('template-laps')), laps);
+      if (open) await tester.tap(find.text('Offen bis Stopp'));
       await tester.pump();
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
     }
 
-    await create('Seerunde x3', laps: '3');
+    await create('Seerunde x3');
     await create('Seerunde offen', open: true);
 
     expect(find.text('Seerunde · 3 Runden'), findsOneWidget);
@@ -95,20 +95,18 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('does not save a template without course and laps', (tester) async {
+  testWidgets('does not save a template without name and course', (tester) async {
     final setup = _Setup();
     await setup.addCourse(tester, 'Seerunde');
     await setup.pump(tester);
 
     await tester.tap(find.text('Vorlage anlegen'));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const Key('template-laps')), '0');
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
     expect(find.text('Der Name fehlt.'), findsOneWidget);
     expect(find.text('Wähle eine Strecke.'), findsOneWidget);
-    expect(find.text('Die Rundenzahl muss mindestens 1 sein.'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 
@@ -118,14 +116,15 @@ void main() {
     await setup.pump(tester, home: const TemplateEditorScreen(), locale: const Locale('en'));
 
     expect(find.text('New template'), findsOneWidget);
-    expect(find.text('Open number of laps'), findsOneWidget);
-    await tester.enterText(find.byKey(const Key('template-laps')), '0');
+    expect(find.text('Fixed number'), findsOneWidget);
+    expect(find.text('Open until stop'), findsOneWidget);
+    expect(find.text('laps'), findsOneWidget);
+    expect(find.bySemanticsLabel('1 lap more'), findsOneWidget);
     await tester.tap(find.byTooltip('Save'));
     await setup.settle(tester);
 
     expect(find.text('The name is missing.'), findsOneWidget);
     expect(find.text('Choose a course.'), findsOneWidget);
-    expect(find.text('The number of laps must be at least 1.'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 
@@ -139,12 +138,84 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Bearbeiten'));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const Key('template-laps')), '4');
+    await tester.tap(find.bySemanticsLabel('1 Runde mehr'));
+    await tester.pump();
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
     expect(find.text('Seerunde · 4 Runden'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
+  });
+
+  group('number of laps', () {
+    Future<_Setup> openEditor(WidgetTester tester, {int? laps = 3}) async {
+      final setup = _Setup();
+      final id = await setup.addCourse(tester, 'Seerunde');
+      await tester.runAsync(() => setup.templates.create('Seerunde', courseId: id, laps: laps));
+      final template = (await tester.runAsync(setup.templates.all))!.single;
+      await setup.pump(tester, home: TemplateEditorScreen(template: template));
+      return setup;
+    }
+
+    OarStepper laps(WidgetTester tester) => tester.widget<OarStepper>(find.byKey(const Key('template-laps')));
+
+    testWidgets('counts a fixed number of laps and shows what they add up to', (tester) async {
+      final setup = await openEditor(tester, laps: 2);
+
+      expect(laps(tester).value, 2);
+      expect(find.text('Runden'), findsWidgets);
+      expect(find.text('2000 m'), findsOneWidget);
+      expect(find.text('2 × 1000 m'), findsOneWidget);
+      await tester.tap(find.bySemanticsLabel('1 Runde weniger'));
+      await tester.pump();
+      expect(laps(tester).value, 1);
+      expect(find.text('Runde'), findsOneWidget);
+      expect(find.text('1000 m'), findsOneWidget);
+
+      // Not below one lap.
+      expect(laps(tester).canDecrease, isFalse);
+      await tester.tap(find.bySemanticsLabel('1 Runde weniger'));
+      await tester.pump();
+      expect(laps(tester).value, 1);
+
+      for (var i = 0; i < 2; i++) {
+        await tester.tap(find.bySemanticsLabel('1 Runde mehr'));
+        await tester.pump();
+      }
+      expect(find.text('3000 m'), findsOneWidget);
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+
+      expect((await tester.runAsync(setup.templates.all))!.single.laps, 3);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('rows an open number of laps until the session ends', (tester) async {
+      final setup = await openEditor(tester);
+
+      await tester.tap(find.text('Offen bis Stopp'));
+      await tester.pump();
+
+      expect(find.byKey(const Key('template-laps')), findsNothing);
+      expect(find.text('1000 m'), findsOneWidget);
+      expect(find.text('pro Runde, bis du die Session beendest'), findsOneWidget);
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+      expect((await tester.runAsync(setup.templates.all))!.single.laps, isNull);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('starts an open template with three laps when it gets a fixed number', (tester) async {
+      await openEditor(tester, laps: null);
+
+      expect(find.byKey(const Key('template-laps')), findsNothing);
+      await tester.tap(find.text('Feste Anzahl'));
+      await tester.pump();
+
+      expect(laps(tester).value, 3);
+      expect(find.text('3000 m'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
   });
 
   testWidgets('offers to create a course first when there is none', (tester) async {
