@@ -121,4 +121,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String zoneConflict(String courses) {
     return 'Die Änderung passt nicht in $courses: Dort würde die Zone über das Streckenende ragen oder eine andere Zone überschneiden.';
   }
+
+  @override
+  String get connectFailedTitle => 'Verbindung fehlgeschlagen';
+
+  @override
+  String connectFailedBody(String app, String device) {
+    return '$app konnte sich nicht mit $device verbinden.\n\nViele Rudergeräte erlauben nur eine Bluetooth-Verbindung gleichzeitig. Trenne andere Apps wie ErgData und versuche es erneut.';
+  }
+
+  @override
+  String get connectNotARowerTitle => 'Kein Rudergerät';
+
+  @override
+  String connectNotARowerHint(String app) {
+    return '$app unterstützt den PM5 am RowErg und Rudergeräte mit FTMS.';
+  }
+
+  @override
+  String get connectErrorSkiErg =>
+      'Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem SkiErg.';
+
+  @override
+  String get connectErrorBikeErg =>
+      'Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem BikeErg.';
+
+  @override
+  String get connectErrorNoRowerData =>
+      'Nur Rudergeräte werden unterstützt. Das Gerät liefert keine Rudern-Daten.';
 }

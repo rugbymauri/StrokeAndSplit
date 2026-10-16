@@ -38,7 +38,7 @@ class _FakeTransport implements BleTransport {
   @override
   Future<RowerLink> connect(FoundRower device) async {
     connectAttempts++;
-    if (!reachable) throw const RowerConnectException('not reachable');
+    if (!reachable) throw const RowerConnectException(RowerConnectError.failed, message: 'not reachable');
     final link = _FakeLink();
     links.add(link);
     return link;

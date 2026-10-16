@@ -33,17 +33,40 @@ class BluetoothNotReadyException implements Exception {
   String toString() => 'BluetoothNotReadyException: ${readiness.name}';
 }
 
+/// Why a connection could not be established; the screens put it into words
+/// (Design D4 of translations).
+enum RowerConnectError {
+  /// The device could not be reached or set up.
+  failed,
+
+  /// The device offers no rowing service.
+  noRowingService,
+
+  /// A PM5 on a SkiErg or a BikeErg.
+  skiErg,
+  bikeErg,
+
+  /// An FTMS machine that sends no rower data.
+  noRowerData,
+}
+
 /// The connection could not be established.
 class RowerConnectException implements Exception {
-  const RowerConnectException(this.message, {this.notARower = false});
+  const RowerConnectException(this.error, {this.message = ''});
 
+  final RowerConnectError error;
+
+  /// A technical detail for the log, not shown to the user.
   final String message;
 
   /// The device was reached but is no rower, e.g. a PM5 on a SkiErg.
-  final bool notARower;
+  bool get notARower => switch (error) {
+        RowerConnectError.skiErg || RowerConnectError.bikeErg || RowerConnectError.noRowerData => true,
+        RowerConnectError.failed || RowerConnectError.noRowingService => false,
+      };
 
   @override
-  String toString() => 'RowerConnectException: $message';
+  String toString() => 'RowerConnectException: ${error.name}${message.isEmpty ? '' : ' ($message)'}';
 }
 
 /// Bluetooth access to rowers, independent of the BLE plugin in use.

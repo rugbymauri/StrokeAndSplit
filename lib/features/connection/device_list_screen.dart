@@ -9,7 +9,9 @@ import '../../data/sources/ble/ble_transport.dart';
 import '../../data/sources/ble/ble_rower_source.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/templates/session_template.dart';
+import '../../l10n/l10n.dart';
 import '../live/live_screen.dart';
+import 'connect_error_text.dart';
 
 /// Scans for rowers in range and connects to the one the user picks.
 class DeviceListScreen extends ConsumerStatefulWidget {
@@ -91,15 +93,17 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
       setState(() => _phase = _Phase.done);
       await showDialog<void>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(e.notARower ? 'Kein Rudergerät' : 'Verbindung fehlgeschlagen'),
-          content: Text(e.notARower
-              ? '${e.message}\n\nAergRow unterstützt den PM5 am RowErg und Rudergeräte mit FTMS.'
-              : 'AergRow konnte sich nicht mit ${device.name} verbinden.\n\n'
-                  'Viele Rudergeräte erlauben nur eine Bluetooth-Verbindung gleichzeitig. Trenne andere Apps '
-                  'wie ErgData und versuche es erneut.'),
-          actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
-        ),
+        builder: (context) {
+          final l10n = context.l10n;
+          final notARower = notARowerText(l10n, e.error);
+          return AlertDialog(
+            title: Text(notARower == null ? l10n.connectFailedTitle : l10n.connectNotARowerTitle),
+            content: Text(notARower == null
+                ? l10n.connectFailedBody(l10n.appTitle, device.name)
+                : '$notARower\n\n${l10n.connectNotARowerHint(l10n.appTitle)}'),
+            actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
+          );
+        },
       );
       return;
     }

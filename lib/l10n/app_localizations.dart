@@ -252,6 +252,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die Änderung passt nicht in {courses}: Dort würde die Zone über das Streckenende ragen oder eine andere Zone überschneiden.'**
   String zoneConflict(String courses);
+
+  /// Device list: dialog title when the rower could not be connected
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung fehlgeschlagen'**
+  String get connectFailedTitle;
+
+  /// Device list: why a connection may fail; app is the app name, device the name the rower announces
+  ///
+  /// In de, this message translates to:
+  /// **'{app} konnte sich nicht mit {device} verbinden.\n\nViele Rudergeräte erlauben nur eine Bluetooth-Verbindung gleichzeitig. Trenne andere Apps wie ErgData und versuche es erneut.'**
+  String connectFailedBody(String app, String device);
+
+  /// Device list: dialog title when the device is no rower
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Rudergerät'**
+  String get connectNotARowerTitle;
+
+  /// Device list: which devices the app supports; app is the app name
+  ///
+  /// In de, this message translates to:
+  /// **'{app} unterstützt den PM5 am RowErg und Rudergeräte mit FTMS.'**
+  String connectNotARowerHint(String app);
+
+  /// Device list: the PM5 reports a SkiErg
+  ///
+  /// In de, this message translates to:
+  /// **'Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem SkiErg.'**
+  String get connectErrorSkiErg;
+
+  /// Device list: the PM5 reports a BikeErg
+  ///
+  /// In de, this message translates to:
+  /// **'Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem BikeErg.'**
+  String get connectErrorBikeErg;
+
+  /// Device list: an FTMS machine that is no rower
+  ///
+  /// In de, this message translates to:
+  /// **'Nur Rudergeräte werden unterstützt. Das Gerät liefert keine Rudern-Daten.'**
+  String get connectErrorNoRowerData;
 }
 
 class _AppLocalizationsDelegate

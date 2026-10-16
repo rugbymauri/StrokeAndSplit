@@ -119,4 +119,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String zoneConflict(String courses) {
     return 'The change does not fit $courses: there the zone would extend past the end of the course or overlap another zone.';
   }
+
+  @override
+  String get connectFailedTitle => 'Connection failed';
+
+  @override
+  String connectFailedBody(String app, String device) {
+    return '$app could not connect to $device.\n\nMany rowers allow only one Bluetooth connection at a time. Disconnect other apps such as ErgData and try again.';
+  }
+
+  @override
+  String get connectNotARowerTitle => 'Not a rower';
+
+  @override
+  String connectNotARowerHint(String app) {
+    return '$app supports the PM5 on a RowErg and rowers with FTMS.';
+  }
+
+  @override
+  String get connectErrorSkiErg =>
+      'Only rowers are supported. This PM5 belongs to a SkiErg.';
+
+  @override
+  String get connectErrorBikeErg =>
+      'Only rowers are supported. This PM5 belongs to a BikeErg.';
+
+  @override
+  String get connectErrorNoRowerData =>
+      'Only rowers are supported. The device sends no rowing data.';
 }

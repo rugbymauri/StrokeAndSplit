@@ -108,14 +108,17 @@ void main() {
       expect(connection.disconnected, isFalse);
     });
 
-    for (final (erg, code) in [('SkiErg', 143), ('BikeErg', 192)]) {
+    for (final (erg, code, expected) in [
+      ('SkiErg', 143, RowerConnectError.skiErg),
+      ('BikeErg', 192, RowerConnectError.bikeErg),
+    ]) {
       test('disconnects from a PM5 on a $erg', () {
         final connection = _pm5Connection(code);
         final (link, error, _) = _setUp(connection, _pm5);
 
         expect(link, isNull);
-        expect(error, isA<RowerConnectException>().having((e) => e.notARower, 'notARower', isTrue));
-        expect((error! as RowerConnectException).message, contains(erg));
+        expect(error, isA<RowerConnectException>().having((e) => e.error, 'error', expected));
+        expect((error! as RowerConnectException).notARower, isTrue);
         expect(connection.disconnected, isTrue);
       });
     }
@@ -143,7 +146,8 @@ void main() {
       final connection = _FakeConnection({});
       final (_, error, _) = _setUp(connection, _pm5);
 
-      expect(error, isA<RowerConnectException>().having((e) => e.notARower, 'notARower', isFalse));
+      expect(error, isA<RowerConnectException>().having((e) => e.error, 'error', RowerConnectError.noRowingService));
+      expect((error! as RowerConnectException).notARower, isFalse);
       expect(connection.disconnected, isTrue);
     });
 
@@ -218,7 +222,8 @@ void main() {
       final connection = _ftmsConnection(rowerData: false);
       final (_, error, _) = _setUp(connection, _ftms);
 
-      expect(error, isA<RowerConnectException>().having((e) => e.notARower, 'notARower', isTrue));
+      expect(error, isA<RowerConnectException>().having((e) => e.error, 'error', RowerConnectError.noRowerData));
+      expect((error! as RowerConnectException).notARower, isTrue);
       expect(connection.disconnected, isTrue);
     });
 

@@ -14,7 +14,7 @@
 
 - [x] 3.1 `ZoneError` und `ZoneValidationException` nach D4; Zonen-Editor übersetzt die Codes. Verifikation: Unit-Tests der Prüfung auf Codes umgestellt, Widget-Test im Zonen-Editor zeigt den Fehler deutsch und englisch
 - [x] 3.2 `PlacementErrorKind` mit Werten nach D4; Strecken-Editor und Zonen-Editor übersetzen die Fehler. Verifikation: Unit-Tests in `course_layout_test.dart` prüfen Art und Werte, Widget-Test zeigt „ragt über das Streckenende“ deutsch und englisch
-- [ ] 3.3 `RowerConnectError` nach D4; Geräteliste übersetzt die Codes. Verifikation: Tests in `rower_connector_test.dart` prüfen die Codes, Widget-Test zeigt die BikeErg-Meldung deutsch und englisch
+- [x] 3.3 `RowerConnectError` nach D4; Geräteliste übersetzt die Codes. Verifikation: Tests in `rower_connector_test.dart` prüfen die Codes, Widget-Test zeigt die BikeErg-Meldung deutsch und englisch
 
 ## 4. Texte der Screens
 

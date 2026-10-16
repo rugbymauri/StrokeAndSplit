@@ -150,5 +150,46 @@
         "type": "String"
       }
     }
+  },
+  "connectFailedTitle": "Verbindung fehlgeschlagen",
+  "@connectFailedTitle": {
+    "description": "Device list: dialog title when the rower could not be connected"
+  },
+  "connectFailedBody": "{app} konnte sich nicht mit {device} verbinden.\n\nViele Rudergeräte erlauben nur eine Bluetooth-Verbindung gleichzeitig. Trenne andere Apps wie ErgData und versuche es erneut.",
+  "@connectFailedBody": {
+    "description": "Device list: why a connection may fail; app is the app name, device the name the rower announces",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "connectNotARowerTitle": "Kein Rudergerät",
+  "@connectNotARowerTitle": {
+    "description": "Device list: dialog title when the device is no rower"
+  },
+  "connectNotARowerHint": "{app} unterstützt den PM5 am RowErg und Rudergeräte mit FTMS.",
+  "@connectNotARowerHint": {
+    "description": "Device list: which devices the app supports; app is the app name",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "connectErrorSkiErg": "Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem SkiErg.",
+  "@connectErrorSkiErg": {
+    "description": "Device list: the PM5 reports a SkiErg"
+  },
+  "connectErrorBikeErg": "Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem BikeErg.",
+  "@connectErrorBikeErg": {
+    "description": "Device list: the PM5 reports a BikeErg"
+  },
+  "connectErrorNoRowerData": "Nur Rudergeräte werden unterstützt. Das Gerät liefert keine Rudern-Daten.",
+  "@connectErrorNoRowerData": {
+    "description": "Device list: an FTMS machine that is no rower"
   }
 }
