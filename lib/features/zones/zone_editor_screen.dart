@@ -34,7 +34,7 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
   // A new zone starts with a pace band; the other band is filled in for when
   // it is switched on.
   late var _hasPace = _zone == null || _zone.paceFastCs != null || _zone.paceSlowCs != null;
-  late var _paceFast = _zone?.paceFastCs ?? _zone?.paceSlowCs ?? 12000;
+  late var _paceFast = _zone?.paceFastCs ?? _zone?.paceSlowCs ?? 16500;
   late var _paceSlow = _zone?.paceSlowCs ?? _paceFast + 500;
   late var _hasSpm = _zone?.spmMin != null || _zone?.spmMax != null;
   late var _spmMin = _zone?.spmMin ?? _zone?.spmMax ?? 24;
