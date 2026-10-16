@@ -1,13 +1,6 @@
 import 'ble_transport.dart';
 
-/// Short ids of the standard Heart Rate Profile (Design D2).
-abstract final class HeartRateIds {
-  /// Heart Rate service.
-  static const service = '180d';
-
-  /// Heart Rate Measurement, notified by the strap.
-  static const measurement = '2a37';
-}
+export 'package:erg_protocol/erg_protocol.dart' show HeartRateIds;
 
 /// A heart rate strap found during a scan.
 class FoundHeartRateMonitor {
