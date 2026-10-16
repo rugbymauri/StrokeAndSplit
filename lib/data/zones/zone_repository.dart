@@ -1,8 +1,23 @@
 import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 
+import '../courses/course.dart';
+import '../courses/course_layout.dart';
+import '../courses/course_repository.dart';
 import '../db/database.dart';
 import 'zone.dart';
+
+/// A change to a zone that would leave [courses] invalid, e.g. because the
+/// zone would overlap another one or reach beyond the end.
+class ZoneConflict implements Exception {
+  const ZoneConflict(this.courses);
+
+  /// The names of the courses.
+  final List<String> courses;
+
+  @override
+  String toString() => 'ZoneConflict(${courses.join(', ')})';
+}
 
 /// Stores zones (Change zones).
 class ZoneRepository {
@@ -76,8 +91,9 @@ class ZoneRepository {
     return [for (final row in rows) row.read<String>('name')];
   }
 
-  /// Changes name, length and bands; the axis only while no course contains
-  /// the zone.
+  /// Changes name, length and bands in every course that contains the zone
+  /// (Design D3); the axis only while no course contains it. Throws a
+  /// [ZoneConflict] and changes nothing when a course would become invalid.
   Future<void> update(Zone zone) {
     _check(zone);
     return _db.transaction(() async {
@@ -94,12 +110,47 @@ class ZoneRepository {
         spmMin: Value(zone.spmMin),
         spmMax: Value(zone.spmMax),
       ));
+      await _relayoutCourses(zone.id, remove: false);
     });
   }
 
-  /// Removes the zone from the list.
+  /// Removes the zone from the list and from the courses containing it,
+  /// which become free there (Design D4); sessions keep the name.
   Future<void> delete(int id) {
-    return (_db.update(_db.zones)..where((z) => z.id.equals(id))).write(ZonesCompanion(deletedAt: Value(clock.now())));
+    return _db.transaction(() async {
+      await (_db.update(_db.zones)..where((z) => z.id.equals(id)))
+          .write(ZonesCompanion(deletedAt: Value(clock.now())));
+      await _relayoutCourses(id, remove: true);
+    });
+  }
+
+  /// Lays out again every course containing zone [id] and stores it with the
+  /// version rule of courses: a rowed version stays, the change becomes a
+  /// new one.
+  Future<void> _relayoutCourses(int id, {required bool remove}) async {
+    final courses = CourseRepository(_db);
+    final zones = {for (final z in await all()) z.id: z};
+    final conflicts = <String>[];
+    final changes = <(int, CourseDefinition)>[];
+    for (final course in await courses.all()) {
+      final placements = course.definition.placements;
+      if (!placements.any((p) => p.zoneId == id)) continue;
+      final layout = resolveCourse(
+        axis: course.axis,
+        length: course.definition.length,
+        placements: [for (final p in placements) if (!remove || p.zoneId != id) p],
+        zones: zones,
+      );
+      if (layout.isValid) {
+        changes.add((course.id, layout.definition!));
+      } else {
+        conflicts.add(course.name);
+      }
+    }
+    if (conflicts.isNotEmpty) throw ZoneConflict(conflicts);
+    for (final (courseId, definition) in changes) {
+      await courses.updateDefinition(courseId, definition);
+    }
   }
 
   static void _check(Zone zone) {

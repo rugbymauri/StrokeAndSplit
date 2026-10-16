@@ -31,6 +31,17 @@ class Zone {
   final int? spmMin;
   final int? spmMax;
 
+  Zone copyWith({int? id, String? name, CourseAxis? axis, int? length}) => Zone(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        axis: axis ?? this.axis,
+        length: length ?? this.length,
+        paceFastCs: paceFastCs,
+        paceSlowCs: paceSlowCs,
+        spmMin: spmMin,
+        spmMax: spmMax,
+      );
+
   /// The zone as a part of a course, with a copy of its bands.
   CourseSegment get segment => CourseSegment(
         length: length,
