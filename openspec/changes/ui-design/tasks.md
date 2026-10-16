@@ -14,7 +14,7 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 
 - [x] 2.1 Reine Funktion, die aus Lap-Tracker-Zustand und Vorlage die drei Anteile, die Grenzen (Runden und Abschnitte) und die Restangaben berechnet (Design D3, Berechnung). Verifikation: Unit-Tests für das Spec-Beispiel 460 m in Runde 2, für eine Zeitstrecke und für offene Rundenzahl
 - [x] 2.2 `ProgressFrame` als `CustomPainter` nach Design D3: drei Spuren in Boxform, Start oben Mitte, Kerben, gerade Enden, Schiffchen mit Tangente, Farbe der Abschnittsspur nach Zonenstatus, optionale Ghost-Positionen. Verifikation: Golden-Tests für 0 %, 46 % (Unterkante), 38 % (in einer Ecke) und 100 %, mit und ohne Streckenspur
-- [ ] 2.3 Pace-Box mit Rahmen, Pace, Zonenstatus und Legende mit Zonenname bzw. „frei“ und „Runde 2 von 3“. Verifikation: Widget-Tests für in der Zone, zu langsam, Zone ohne Name und freier Abschnitt
+- [x] 2.3 Pace-Box mit Rahmen, Pace, Zonenstatus und Legende mit Zonenname bzw. „frei“ und „Runde 2 / 3“. Verifikation: Widget-Tests für in der Zone, zu langsam, Zone ohne Name und freier Abschnitt
 
 ## 3. Live-Display
 
@@ -33,7 +33,7 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 ## 5. Start und Zusammenfassung
 
 - [ ] 5.1 „Geräte wählen“ als erster Screen nach Design D6 (Rudergerät aus der Geräteliste für PM5 und FTMS, „Simulator“ und „Simulator (FTMS)“, Platz für den Pulsgurt, „Weiter“ erst mit Rudergerät; übersprungen, wenn das zuletzt gewählte Rudergerät gefunden wird) und danach der Startbildschirm (Gerätezeile, „Rudern“, „Frei rudern“, Kachel „Nochmal“, Link „Sessions“) und Sprachwahl in der App-Leiste nach D8, Gestaltung nach „Start“ im Canvas. Der Quellen-Dialog beim Start einer Vorlage entfällt. Verifikation: Widget-Tests für Simulator und Simulator (FTMS) wählen, Rudergerät aus der Liste wählen, „Weiter“ gesperrt ohne Rudergerät, Gerätezeile führt zurück zu „Geräte wählen“, beim Start mit gefundenem letztem Rudergerät direkt der Startbildschirm, ohne gefundenes Gerät „Geräte wählen“ mit Vorauswahl, Sprachwahl, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit vorausgewählter Vorlage, keine Kachel ohne Session und keine Kachel, wenn die Vorlage der jüngsten Session gelöscht ist
-- [ ] 5.2 Zusammenfassung nach „Zusammenfassung“ mit Rundenbalken für den Anteil in der Zone. Verifikation: Widget-Tests für Distanz- und Zeitstrecke sowie eine freie Session
+- [x] 5.2 Zusammenfassung nach „Zusammenfassung“ mit Rundenbalken für den Anteil in der Zone. Verifikation: Widget-Tests für Distanz- und Zeitstrecke sowie eine freie Session
 
 ## 6. Abschluss
 

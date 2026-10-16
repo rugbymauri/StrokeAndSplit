@@ -481,6 +481,18 @@ abstract class AppLocalizations {
   /// **'Zone {percent} %'**
   String courseInZoneShare(int percent);
 
+  /// Pace box: legend line of the whole course over all laps, followed by e.g. '1 460 / 3 000 m'
+  ///
+  /// In de, this message translates to:
+  /// **'Gesamt'**
+  String get paceBoxTotal;
+
+  /// Pace box: legend line of the lap track with the current lap and the planned number of laps, e.g. 'Runde 2 / 3'
+  ///
+  /// In de, this message translates to:
+  /// **'Runde {lap} / {laps}'**
+  String paceBoxLapOf(int lap, int laps);
+
   /// Live display: the value is within the zone's band
   ///
   /// In de, this message translates to:
@@ -676,7 +688,7 @@ abstract class AppLocalizations {
   /// Summary: label of the average pace per 500 metres
   ///
   /// In de, this message translates to:
-  /// **'⌀ Pace /500 m'**
+  /// **'⌀ Pace'**
   String get sessionAveragePace;
 
   /// Summary: label of the average power
@@ -688,7 +700,7 @@ abstract class AppLocalizations {
   /// Summary: label of the average stroke rate
   ///
   /// In de, this message translates to:
-  /// **'⌀ Schläge/min'**
+  /// **'⌀ spm'**
   String get sessionAverageStrokeRate;
 
   /// Summary: label of the number of strokes
@@ -702,6 +714,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Runde {lap}'**
   String sessionLap(int lap);
+
+  /// Summary: title above the totals of a session
+  ///
+  /// In de, this message translates to:
+  /// **'Session beendet'**
+  String get summaryTitle;
+
+  /// Summary: label of the share of time within the bands over all laps
+  ///
+  /// In de, this message translates to:
+  /// **'In der Zone'**
+  String get summaryInZone;
+
+  /// Summary: heading above the laps, written in capitals
+  ///
+  /// In de, this message translates to:
+  /// **'Runden'**
+  String get summaryLaps;
+
+  /// Summary: explains the bar in each lap row
+  ///
+  /// In de, this message translates to:
+  /// **'Balken: Anteil in der Zone pro Runde'**
+  String get summaryLapBarHint;
+
+  /// Summary: marks the fastest lap of a distance course or the longest of a time course
+  ///
+  /// In de, this message translates to:
+  /// **'Beste Runde'**
+  String get summaryBestLap;
+
+  /// Closes the summary of a session
+  ///
+  /// In de, this message translates to:
+  /// **'Fertig'**
+  String get actionDone;
 
   /// Source of a session from an FTMS rower without a name
   ///
