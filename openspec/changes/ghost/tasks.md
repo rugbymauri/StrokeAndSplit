@@ -47,7 +47,7 @@ Hängt nur an Gruppe 1.
 
 Hängt nur an Gruppe 1.
 
-- [ ] 6.1 `TemplatePodium` zeigt im Platzhalter `template-ghost-slot` bei Platz 1 das `GhostSymbol`. Den Kommentar-Platzhalter „The ghost's best time of `ghost` goes here.“ in `templates_screen.dart` entfernen, weil Platz 1 die Zeit schon zeigt. Verifikation: Widget-Test in `templates_screen_test.dart`, dass Platz 1 das Symbol trägt, Platz 2 und 3 nicht, und ohne Eintrag kein Symbol erscheint
+- [x] 6.1 `TemplatePodium` zeigt im Platzhalter `template-ghost-slot` bei Platz 1 das `GhostSymbol`. Den Kommentar-Platzhalter „The ghost's best time of `ghost` goes here.“ in `templates_screen.dart` entfernen, weil Platz 1 die Zeit schon zeigt. Verifikation: Widget-Test in `templates_screen_test.dart`, dass Platz 1 das Symbol trägt, Platz 2 und 3 nicht, und ohne Eintrag kein Symbol erscheint
 
 ## 7. Live-Display verbinden
 

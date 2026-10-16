@@ -309,7 +309,6 @@ class _TemplateCardState extends ConsumerState<_TemplateCard> {
                           ],
                         ),
                       ),
-                      // The ghost's best time of `ghost` goes here.
                     ],
                   ),
                   const SizedBox(height: AppSpacing.m),
