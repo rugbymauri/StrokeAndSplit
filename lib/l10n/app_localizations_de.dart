@@ -538,19 +538,33 @@ class AppLocalizationsDe extends AppLocalizations {
   String get templateCourseMissing => 'Wähle eine Strecke.';
 
   @override
-  String get templateLapsInvalid => 'Die Rundenzahl muss mindestens 1 sein.';
-
-  @override
   String get templateCourse => 'Strecke';
 
   @override
-  String get templateOpenLaps => 'Offene Rundenzahl';
+  String get templateFixedLaps => 'Feste Anzahl';
 
   @override
-  String get templateOpenLapsHint => 'Runden, bis du die Session beendest';
+  String get templateOpenLaps => 'Offen bis Stopp';
 
   @override
   String get templateLaps => 'Runden';
+
+  @override
+  String templateLapsUnit(int laps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      laps,
+      locale: localeName,
+      other: 'Runden',
+      one: 'Runde',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get templateResult => 'Ergibt';
+
+  @override
+  String get templateResultOpen => 'pro Runde, bis du die Session beendest';
 
   @override
   String get coursesTitle => 'Strecken';
@@ -584,12 +598,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get courseNameMissing => 'Der Name fehlt.';
-
-  @override
-  String get courseLengthFirst => 'Gib zuerst die Länge der Strecke ein.';
-
-  @override
-  String get courseLengthHint => 'Gib eine Länge ein, um Zonen einzubauen.';
 
   @override
   String get courseSequence => 'Ablauf';
@@ -645,16 +653,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String fieldLength(String unit) {
     return 'Länge ($unit)';
-  }
-
-  @override
-  String invalidLength(String text) {
-    return 'Die Länge „$text“ ist ungültig.';
-  }
-
-  @override
-  String invalidStart(String text) {
-    return 'Der Start „$text“ ist ungültig.';
   }
 
   @override
@@ -716,36 +714,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get zoneNameHint => 'z.B. Sprint';
 
   @override
-  String get zonePaceBand => 'Pace pro 500 m';
+  String get zonePaceBand => 'Pace-Band';
 
   @override
-  String get zonePaceFastest => 'schnellste';
+  String get zonePaceFastest => 'Schnellste';
 
   @override
-  String get zonePaceSlowest => 'langsamste';
+  String get zonePaceSlowest => 'Langsamste';
 
   @override
-  String get zoneSpmBand => 'Schlagzahl';
+  String get zoneSpmBand => 'Schlagzahl-Band';
 
   @override
-  String get zoneSpmFrom => 'ab';
+  String get zoneSpmFrom => 'Mindestens';
 
   @override
-  String get zoneSpmTo => 'bis';
+  String get zoneSpmTo => 'Höchstens';
 
   @override
   String get zoneBandHint =>
       'Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.';
-
-  @override
-  String invalidPace(String text) {
-    return 'Die Pace „$text“ ist ungültig.';
-  }
-
-  @override
-  String invalidStrokeRate(String text) {
-    return 'Die Schlagzahl „$text“ ist ungültig.';
-  }
 
   @override
   String get dateTimePattern => 'dd.MM.yyyy, HH:mm';

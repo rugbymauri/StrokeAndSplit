@@ -1,3 +1,4 @@
+import 'package:aergrow/app/design_tokens.dart';
 import 'package:aergrow/app/widgets/oar_stepper.dart';
 import 'package:aergrow/l10n/l10n.dart';
 import 'package:flutter/material.dart';
@@ -192,5 +193,25 @@ void main() {
 
     expect(find.text('1:40'), findsOneWidget);
     expect(find.bySemanticsLabel('5 seconds more'), findsOneWidget);
+  });
+
+  testWidgets('takes the background of a card', (tester) async {
+    Color fill() {
+      final box = find.descendant(of: find.byType(OarStepper), matching: find.byType(DecoratedBox)).first;
+      return (tester.widget<DecoratedBox>(box).decoration as BoxDecoration).color!;
+    }
+    Widget stepper({Color? background}) => LocalizedApp(
+          locale: const Locale('de'),
+          home: Scaffold(
+            body: background == null
+                ? OarStepper(value: 30, step: 1, stepLabel: '1 Schlag', onChanged: (_) {})
+                : OarStepper(value: 30, step: 1, stepLabel: '1 Schlag', onChanged: (_) {}, background: background),
+          ),
+        );
+
+    await tester.pumpWidget(stepper());
+    expect(fill(), AppColors.surface);
+    await tester.pumpWidget(stepper(background: AppColors.bg));
+    expect(fill(), AppColors.bg);
   });
 }

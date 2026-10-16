@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/design_tokens.dart';
+import '../../app/widgets/oar_stepper.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import '../../data/templates/session_template.dart';
 import '../../data/templates/template_providers.dart';
 import '../../l10n/l10n.dart';
+import '../courses/course_strip.dart';
 import '../courses/courses_screen.dart';
 
 /// Creates a template, or edits [template] when given.
@@ -18,9 +21,12 @@ class TemplateEditorScreen extends ConsumerStatefulWidget {
   ConsumerState<TemplateEditorScreen> createState() => _TemplateEditorScreenState();
 }
 
+/// More laps than anyone rows in one session.
+const _maxLaps = 99;
+
 class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
   late final _name = TextEditingController(text: widget.template?.name);
-  late final _laps = TextEditingController(text: '${widget.template?.laps ?? 3}');
+  late var _laps = widget.template?.laps ?? 3;
   late int? _courseId = widget.template?.course.id;
   late var _open = widget.template != null && widget.template!.laps == null;
   var _errors = <String>[];
@@ -28,18 +34,16 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
   @override
   void dispose() {
     _name.dispose();
-    _laps.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     final name = _name.text.trim();
-    final laps = _open ? null : int.tryParse(_laps.text.trim());
+    final laps = _open ? null : _laps;
     final l10n = context.l10n;
     final errors = [
       if (name.isEmpty) l10n.templateNameMissing,
       if (_courseId == null) l10n.templateCourseMissing,
-      if (!_open && (laps == null || laps < 1)) l10n.templateLapsInvalid,
     ];
     if (errors.isNotEmpty) {
       setState(() => _errors = errors);
@@ -60,6 +64,7 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
     final courses = ref.watch(coursesProvider).value ?? const <Course>[];
     final colors = Theme.of(context).colorScheme;
     final l10n = context.l10n;
+    final course = courses.where((c) => c.id == _courseId).firstOrNull;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.template == null ? l10n.templateNew : l10n.templateEdit),
@@ -92,25 +97,139 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
                 ],
                 onChanged: (id) => setState(() => _courseId = id),
               ),
-              const SizedBox(height: 16),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.templateOpenLaps),
-                subtitle: Text(l10n.templateOpenLapsHint),
-                value: _open,
-                onChanged: (open) => setState(() => _open = open),
-              ),
-              if (!_open)
-                TextField(
+              if (course != null) ...[
+                const SizedBox(height: 8),
+                CourseStrip(definition: course.definition),
+              ],
+              const SizedBox(height: 24),
+              Text(l10n.templateLaps.toUpperCase(), style: AppTextStyles.label),
+              const SizedBox(height: 10),
+              _LapsChoice(open: _open, onChanged: (open) => setState(() => _open = open)),
+              if (!_open) ...[
+                const SizedBox(height: 10),
+                OarStepper(
                   key: const Key('template-laps'),
-                  controller: _laps,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: l10n.templateLaps),
+                  value: _laps,
+                  step: 1,
+                  min: 1,
+                  max: _maxLaps,
+                  stepLabel: l10n.lapsCount(1),
+                  label: l10n.templateLaps,
+                  unit: l10n.templateLapsUnit(_laps),
+                  onChanged: (laps) => setState(() => _laps = laps),
                 ),
+              ],
+              if (course != null) ...[
+                const SizedBox(height: 22),
+                _Result(course: course, laps: _open ? null : _laps),
+              ],
               const SizedBox(height: 24),
               FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The choice between a fixed and an open number of laps.
+class _LapsChoice extends StatelessWidget {
+  const _LapsChoice({required this.open, required this.onChanged});
+
+  final bool open;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    Widget option(bool value, String text) {
+      final selected = open == value;
+      return Expanded(
+        child: Semantics(
+          inMutuallyExclusiveGroup: true,
+          checked: selected,
+          child: Material(
+            color: selected ? AppColors.line : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(9),
+              onTap: () => onChanged(value),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Center(
+                  child: Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.body.copyWith(
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                      color: selected ? AppColors.text : AppColors.textMuted,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return DecoratedBox(
+      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppRadii.small)),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Row(children: [
+          option(false, l10n.templateFixedLaps),
+          const SizedBox(width: 4),
+          option(true, l10n.templateOpenLaps),
+        ]),
+      ),
+    );
+  }
+}
+
+/// What the laps add up to: the whole length, or one lap when [laps] is open.
+class _Result extends StatelessWidget {
+  const _Result({required this.course, required this.laps});
+
+  final Course course;
+  final int? laps;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final lap = course.definition.length;
+    final laps = this.laps;
+    return DecoratedBox(
+      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppRadii.small)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.templateResult, style: AppTextStyles.caption),
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  formatCourseLength(course.axis, laps == null ? lap : lap * laps),
+                  key: const Key('template-result'),
+                  style: const TextStyle(fontFamily: AppFonts.display, fontSize: 32, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    laps == null ? l10n.templateResultOpen : '$laps × ${formatCourseLength(course.axis, lap)}',
+                    key: const Key('template-result-detail'),
+                    textAlign: TextAlign.end,
+                    style: AppTextStyles.subtitle,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

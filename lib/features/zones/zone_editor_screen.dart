@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/design_tokens.dart';
+import '../../app/widgets/oar_stepper.dart';
 import '../../data/courses/course.dart';
 import '../../data/zones/zone.dart';
 import '../../data/zones/zone_providers.dart';
@@ -27,11 +29,16 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
   late final _zone = widget.zone;
   late var _axis = _zone?.axis ?? widget.axis ?? CourseAxis.distance;
   late final _name = TextEditingController(text: _zone?.name);
-  late final _length = TextEditingController(text: _zone == null ? '' : _lengthText(_zone.length));
-  late final _paceFast = TextEditingController(text: _pace(_zone?.paceFastCs));
-  late final _paceSlow = TextEditingController(text: _pace(_zone?.paceSlowCs));
-  late final _spmMin = TextEditingController(text: _zone?.spmMin?.toString());
-  late final _spmMax = TextEditingController(text: _zone?.spmMax?.toString());
+  late var _length = _zone?.length ?? _defaultLength(_axis);
+
+  // A new zone starts with a pace band; the other band is filled in for when
+  // it is switched on.
+  late var _hasPace = _zone == null || _zone.paceFastCs != null || _zone.paceSlowCs != null;
+  late var _paceFast = _zone?.paceFastCs ?? _zone?.paceSlowCs ?? 12000;
+  late var _paceSlow = _zone?.paceSlowCs ?? _paceFast + 500;
+  late var _hasSpm = _zone?.spmMin != null || _zone?.spmMax != null;
+  late var _spmMin = _zone?.spmMin ?? _zone?.spmMax ?? 24;
+  late var _spmMax = _zone?.spmMax ?? _spmMin + 2;
 
   /// The courses containing the zone, by name; empty for a new zone.
   var _courses = <String>[];
@@ -39,9 +46,10 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
 
   bool get _isNew => _zone == null;
 
-  static String _pace(int? cs) => cs == null ? '' : formatPaceBound(cs);
+  static int _defaultLength(CourseAxis axis) => axis == CourseAxis.distance ? 100 : 60;
 
-  String _lengthText(int length) => _axis == CourseAxis.distance ? '$length' : formatCourseLength(_axis, length);
+  /// Steps of design D7: 10 m or 10 s.
+  static const _lengthStep = 10;
 
   @override
   void initState() {
@@ -55,35 +63,23 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
 
   @override
   void dispose() {
-    for (final c in [_name, _length, _paceFast, _paceSlow, _spmMin, _spmMax]) {
-      c.dispose();
-    }
+    _name.dispose();
     super.dispose();
   }
 
   /// The zone as entered, or null with the reasons in [errors].
   Zone? _read(List<String> errors) {
-    final l10n = context.l10n;
-    int? field(TextEditingController c, int? Function(String) parse, String Function(String) invalid) {
-      final text = c.text.trim();
-      if (text.isEmpty) return null;
-      final value = parse(text);
-      if (value == null) errors.add(invalid(text));
-      return value;
-    }
-
     final zone = Zone(
       id: _zone?.id ?? 0,
       name: _name.text.trim(),
       axis: _axis,
-      length: field(_length, (t) => parseCourseLength(_axis, t), l10n.invalidLength) ?? 0,
-      paceFastCs: field(_paceFast, parsePace, l10n.invalidPace),
-      paceSlowCs: field(_paceSlow, parsePace, l10n.invalidPace),
-      spmMin: field(_spmMin, int.tryParse, l10n.invalidStrokeRate),
-      spmMax: field(_spmMax, int.tryParse, l10n.invalidStrokeRate),
+      length: _length,
+      paceFastCs: _hasPace ? _paceFast : null,
+      paceSlowCs: _hasPace ? _paceSlow : null,
+      spmMin: _hasSpm ? _spmMin : null,
+      spmMax: _hasSpm ? _spmMax : null,
     );
-    if (errors.isNotEmpty) return null;
-    errors.addAll([for (final e in zoneErrors(zone)) zoneErrorText(l10n, e)]);
+    errors.addAll([for (final e in zoneErrors(zone)) zoneErrorText(context.l10n, e)]);
     return errors.isEmpty ? zone : null;
   }
 
@@ -137,17 +133,8 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final unit = _axis == CourseAxis.distance ? 'm' : 'm:ss';
+    final distance = _axis == CourseAxis.distance;
     final l10n = context.l10n;
-    Widget field(TextEditingController controller, String key, String label, String hint, TextInputType keyboard) =>
-        Expanded(
-          child: TextField(
-            key: Key('zone-$key'),
-            controller: controller,
-            keyboardType: keyboard,
-            decoration: InputDecoration(labelText: label, hintText: hint),
-          ),
-        );
 
     return Scaffold(
       appBar: AppBar(
@@ -196,35 +183,220 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
                 ],
                 selected: {_axis},
                 // A zone in a course keeps the axis of the course.
-                onSelectionChanged: _courses.isEmpty ? (axis) => setState(() => _axis = axis.single) : null,
+                onSelectionChanged: _courses.isEmpty
+                    ? (axis) => setState(() {
+                          _axis = axis.single;
+                          _length = _defaultLength(_axis);
+                        })
+                    : null,
               ),
               const SizedBox(height: 16),
-              TextField(
-                key: const Key('zone-length'),
-                controller: _length,
-                keyboardType: _axis == CourseAxis.distance ? TextInputType.number : TextInputType.datetime,
-                decoration: InputDecoration(labelText: l10n.fieldLength(unit)),
+              _Field(
+                label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
+                child: OarStepper(
+                  key: const Key('zone-length'),
+                  value: _length,
+                  step: _lengthStep,
+                  min: _lengthStep,
+                  stepLabel: distance ? '$_lengthStep m' : l10n.stepSeconds(_lengthStep),
+                  format: distance ? null : (v) => formatCourseLength(_axis, v),
+                  unit: distance ? 'm' : 'min',
+                  label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
+                  size: OarStepperSize.compact,
+                  onChanged: (v) => setState(() => _length = v),
+                ),
               ),
-              const SizedBox(height: 24),
-              Text(l10n.zonePaceBand, style: Theme.of(context).textTheme.titleSmall),
-              Row(children: [
-                field(_paceFast, 'pace-fast', l10n.zonePaceFastest, '1:45', TextInputType.datetime),
-                const SizedBox(width: 12),
-                field(_paceSlow, 'pace-slow', l10n.zonePaceSlowest, '1:50', TextInputType.datetime),
-              ]),
-              const SizedBox(height: 24),
-              Text(l10n.zoneSpmBand, style: Theme.of(context).textTheme.titleSmall),
-              Row(children: [
-                field(_spmMin, 'spm-min', l10n.zoneSpmFrom, '30', TextInputType.number),
-                const SizedBox(width: 12),
-                field(_spmMax, 'spm-max', l10n.zoneSpmTo, '34', TextInputType.number),
-              ]),
+              const SizedBox(height: 16),
+              _BandCard(
+                switchKey: const Key('zone-pace-band'),
+                title: l10n.zonePaceBand,
+                on: _hasPace,
+                onChanged: (on) => setState(() => _hasPace = on),
+                fields: [
+                  _Field(
+                    label: l10n.zonePaceFastest,
+                    child: _paceStepper(
+                      key: 'zone-pace-fast',
+                      label: l10n.zonePaceFastest,
+                      value: _paceFast,
+                      min: _paceMin,
+                      max: _paceSlow,
+                      onChanged: (v) => _paceFast = v,
+                    ),
+                  ),
+                  _Field(
+                    label: l10n.zonePaceSlowest,
+                    child: _paceStepper(
+                      key: 'zone-pace-slow',
+                      label: l10n.zonePaceSlowest,
+                      value: _paceSlow,
+                      min: _paceFast,
+                      max: _paceMax,
+                      onChanged: (v) => _paceSlow = v,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _BandCard(
+                switchKey: const Key('zone-spm-band'),
+                title: l10n.zoneSpmBand,
+                on: _hasSpm,
+                onChanged: (on) => setState(() => _hasSpm = on),
+                fields: [
+                  _Field(
+                    label: l10n.zoneSpmFrom,
+                    child: _spmStepper(
+                      key: 'zone-spm-min',
+                      label: l10n.zoneSpmFrom,
+                      value: _spmMin,
+                      min: _spmLowest,
+                      max: _spmMax,
+                      onChanged: (v) => _spmMin = v,
+                    ),
+                  ),
+                  _Field(
+                    label: l10n.zoneSpmTo,
+                    child: _spmStepper(
+                      key: 'zone-spm-max',
+                      label: l10n.zoneSpmTo,
+                      value: _spmMax,
+                      min: _spmMin,
+                      max: _spmHighest,
+                      onChanged: (v) => _spmMax = v,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 8),
               Text(l10n.zoneBandHint, style: Theme.of(context).textTheme.bodySmall),
               const SizedBox(height: 16),
               FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _paceStepper({
+    required String key,
+    required String label,
+    required int value,
+    required int min,
+    required int max,
+    required void Function(int) onChanged,
+  }) =>
+      OarStepper(
+        key: Key(key),
+        value: value,
+        step: _paceStep,
+        min: min,
+        max: max,
+        stepLabel: context.l10n.stepSeconds(_paceStep ~/ 100),
+        format: formatPaceBound,
+        unit: '/500 m',
+        label: label,
+        size: OarStepperSize.compact,
+        background: AppColors.bg,
+        onChanged: (v) => setState(() => onChanged(v)),
+      );
+
+  Widget _spmStepper({
+    required String key,
+    required String label,
+    required int value,
+    required int min,
+    required int max,
+    required void Function(int) onChanged,
+  }) =>
+      OarStepper(
+        key: Key(key),
+        value: value,
+        step: 1,
+        min: min,
+        max: max,
+        stepLabel: context.l10n.stepStrokes(1),
+        unit: 'spm',
+        label: label,
+        size: OarStepperSize.compact,
+        background: AppColors.bg,
+        onChanged: (v) => setState(() => onChanged(v)),
+      );
+}
+
+/// Pace in centiseconds per 500 m: steps of 5 s (design D7) between 1:00 and 5:00.
+const _paceStep = 500;
+const _paceMin = 6000;
+const _paceMax = 30000;
+
+/// Stroke rates a rower can hold.
+const _spmLowest = 10;
+const _spmHighest = 60;
+
+/// A [child] with its [label] above.
+class _Field extends StatelessWidget {
+  const _Field({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(label, style: AppTextStyles.caption),
+        const SizedBox(height: 6),
+        child,
+      ],
+    );
+  }
+}
+
+/// A band that can be switched off, with its two bounds side by side.
+class _BandCard extends StatelessWidget {
+  const _BandCard({
+    required this.switchKey,
+    required this.title,
+    required this.on,
+    required this.onChanged,
+    required this.fields,
+  });
+
+  final Key switchKey;
+  final String title;
+  final bool on;
+  final ValueChanged<bool> onChanged;
+  final List<Widget> fields;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppRadii.cardLarge)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            MergeSemantics(
+              child: Row(children: [
+                Expanded(child: Text(title, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600))),
+                Switch(key: switchKey, value: on, onChanged: onChanged),
+              ]),
+            ),
+            if (on) ...[
+              const SizedBox(height: 4),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: fields[0]),
+                  const SizedBox(width: 12),
+                  Expanded(child: fields[1]),
+                ],
+              ),
+            ],
+          ],
         ),
       ),
     );

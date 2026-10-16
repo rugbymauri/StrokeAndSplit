@@ -1,3 +1,4 @@
+import 'package:aergrow/app/widgets/oar_stepper.dart';
 import 'package:aergrow/data/courses/course.dart';
 import 'package:aergrow/data/courses/course_layout.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/oar_steppers.dart';
 import '../../support/test_database.dart';
 import '../../support/localized_app.dart';
 
@@ -67,6 +69,9 @@ List<String> _sections(WidgetTester tester) => [
         ].join(' · '),
     ];
 
+const _length = Key('course-length');
+const _start = Key('place-start');
+
 void main() {
   testWidgets('creates a distance course', (tester) async {
     final setup = _Setup();
@@ -74,8 +79,8 @@ void main() {
     expect(find.text('Noch keine Strecken angelegt.'), findsOneWidget);
 
     await _openNew(tester, 'Seerunde');
-    await tester.enterText(find.byKey(const Key('course-length')), '1000');
-    await tester.pump();
+    expect(stepperValue(tester, _length), 2000);
+    await stepTo(tester, _length, 1000);
     expect(_sections(tester), ['frei · 0–1000 m']);
     await _save(tester, setup);
 
@@ -84,19 +89,22 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('creates a time course entered as m:ss', (tester) async {
+  testWidgets('lengthens a time course by 30 s', (tester) async {
     final setup = _Setup();
     await setup.pump(tester);
 
-    await _openNew(tester, 'Vier Minuten');
+    await _openNew(tester, 'Viereinhalb Minuten');
     await tester.tap(find.text('Zeit'));
     await tester.pump();
-    await tester.enterText(find.byKey(const Key('course-length')), '4:00');
+    expect(find.text('4:00'), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel('30 Sekunden mehr'));
+    await tester.pump();
+    expect(find.text('4:30'), findsOneWidget);
     await _save(tester, setup);
 
-    expect(find.text('4:00 · frei'), findsOneWidget);
+    expect(find.text('4:30 · frei'), findsOneWidget);
     final course = (await setup.stored(tester)).single;
-    expect((course.axis, course.definition.length), (CourseAxis.time, 240));
+    expect((course.axis, course.definition.length), (CourseAxis.time, 270));
     await disposeWidgetsWithDatabase(tester);
   });
 
@@ -136,14 +144,13 @@ void main() {
       await setup.settle(tester);
     }
 
-    Future<void> choose(WidgetTester tester, int zone, String start) async {
+    Future<void> choose(WidgetTester tester, int zone, int start) async {
       await tester.tap(find.byKey(Key('zone-option-$zone')));
       await tester.pump();
-      await tester.enterText(find.byKey(const Key('place-start')), start);
-      await tester.pump();
+      await stepTo(tester, _start, start);
     }
 
-    Future<void> place(WidgetTester tester, int zone, String start) async {
+    Future<void> place(WidgetTester tester, int zone, int start) async {
       await openDialog(tester);
       await choose(tester, zone, start);
       await tester.tap(find.text('Einbauen'));
@@ -156,15 +163,13 @@ void main() {
     testWidgets('builds the interval course from the stored zones', (tester) async {
       await pumpWithZones(tester);
       await _openNew(tester, '2 km Intervall');
-      await tester.enterText(find.byKey(const Key('course-length')), '2000');
-      await tester.pump();
 
       await openDialog(tester);
-      await choose(tester, sprint, '500');
+      await choose(tester, sprint, 500);
       expect(find.text('„Sprint“ liegt bei 500–600 m.'), findsOneWidget);
       await tester.tap(find.text('Einbauen'));
       await tester.pumpAndSettle();
-      await place(tester, endurance, '1000');
+      await place(tester, endurance, 1000);
 
       expect(_sections(tester), [
         'frei · 0–500 m',
@@ -187,11 +192,10 @@ void main() {
     testWidgets('does not place a zone over another one', (tester) async {
       await pumpWithZones(tester);
       await _openNew(tester, '2 km Intervall');
-      await tester.enterText(find.byKey(const Key('course-length')), '2000');
-      await place(tester, endurance, '1000');
+      await place(tester, endurance, 1000);
 
       await openDialog(tester);
-      await choose(tester, endurance, '1300');
+      await choose(tester, endurance, 1300);
 
       expect(find.text('„Ausdauer 2:30“ (1300–1800 m) überschneidet „Ausdauer 2:30“ (1000–1500 m).'), findsOneWidget);
       expect(placeButton(tester).onPressed, isNull);
@@ -201,10 +205,12 @@ void main() {
     testWidgets('does not place a zone beyond the end of the course', (tester) async {
       await pumpWithZones(tester);
       await _openNew(tester, '2 km Intervall');
-      await tester.enterText(find.byKey(const Key('course-length')), '2000');
 
+      // Only the shorter sprint goes as far as 1800 m.
       await openDialog(tester);
-      await choose(tester, endurance, '1800');
+      await choose(tester, sprint, 1800);
+      await tester.tap(find.byKey(Key('zone-option-$endurance')));
+      await tester.pump();
 
       expect(find.text('„Ausdauer 2:30“ (1800–2300 m) ragt über das Streckenende bei 2000 m.'), findsOneWidget);
       expect(placeButton(tester).onPressed, isNull);
@@ -213,10 +219,11 @@ void main() {
 
     testWidgets('says in English that a zone extends past the end of the course', (tester) async {
       await pumpWithZones(tester, home: const CourseEditorScreen(), locale: const Locale('en'));
-      await tester.enterText(find.byKey(const Key('course-length')), '2000');
 
       await openDialog(tester);
-      await choose(tester, endurance, '1800');
+      await choose(tester, sprint, 1800);
+      await tester.tap(find.byKey(Key('zone-option-$endurance')));
+      await tester.pump();
 
       expect(
         find.text('“Ausdauer 2:30” (1800–2300 m) extends past the end of the course at 2000 m.'),
@@ -228,7 +235,6 @@ void main() {
     testWidgets('offers no zone of the other axis', (tester) async {
       await pumpWithZones(tester);
       await _openNew(tester, '2 km Intervall');
-      await tester.enterText(find.byKey(const Key('course-length')), '2000');
 
       await openDialog(tester);
 
@@ -240,12 +246,12 @@ void main() {
     testWidgets('places a zone at a free gap and removes it again', (tester) async {
       await pumpWithZones(tester);
       await _openNew(tester, 'Seerunde');
-      await tester.enterText(find.byKey(const Key('course-length')), '1000');
-      await place(tester, endurance, '200');
+      await stepTo(tester, _length, 1000);
+      await place(tester, endurance, 200);
 
       await tester.tap(find.byTooltip('Hier eine Zone einbauen').last);
       await setup.settle(tester);
-      expect(tester.widget<TextField>(find.byKey(const Key('place-start'))).controller!.text, '700');
+      expect(stepperValue(tester, _start), 700);
       await tester.tap(find.byKey(Key('zone-option-$sprint')));
       await tester.pump();
       await tester.tap(find.text('Einbauen'));
@@ -268,16 +274,55 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
+    testWidgets('moves a zone back by one step', (tester) async {
+      await pumpWithZones(tester);
+      await _openNew(tester, '2 km Intervall');
+      await place(tester, sprint, 1600);
+
+      await tester.tap(find.byKey(const Key('section-1')));
+      await setup.settle(tester);
+      expect(find.text('Zone verschieben'), findsOneWidget);
+      expect(stepperValue(tester, _start), 1600);
+      await tester.tap(find.bySemanticsLabel('50 m weniger'));
+      await tester.pump();
+
+      expect(find.text('1550'), findsOneWidget);
+      expect(find.text('„Sprint“ liegt bei 1550–1650 m.'), findsOneWidget);
+      await tester.tap(find.text('Verschieben'));
+      await tester.pumpAndSettle();
+      expect(_sections(tester).map((s) => s.split(' · ').take(2).join(' · ')), [
+        'frei · 0–1550 m',
+        'Sprint · 1550–1650 m',
+        'frei · 1650–2000 m',
+      ]);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('keeps the start of a zone within the course', (tester) async {
+      await pumpWithZones(tester);
+      await _openNew(tester, '2 km Intervall');
+
+      await openDialog(tester);
+      await tester.tap(find.byKey(Key('zone-option-$endurance')));
+      await tester.pump();
+      final start = tester.widget<OarStepper>(find.byKey(_start));
+      expect((start.value, start.canDecrease), (0, false));
+      await stepTo(tester, _start, 1500);
+
+      expect(tester.widget<OarStepper>(find.byKey(_start)).canIncrease, isFalse);
+      expect(find.text('„Ausdauer 2:30“ liegt bei 1500–2000 m.'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
     testWidgets('does not shorten a course below its zones', (tester) async {
       await pumpWithZones(tester);
       await _openNew(tester, '2 km Intervall');
-      await tester.enterText(find.byKey(const Key('course-length')), '2000');
-      await place(tester, endurance, '1000');
+      await place(tester, endurance, 1000);
       await _save(tester, setup);
 
       await tester.tap(find.text('2 km Intervall'));
       await setup.settle(tester);
-      await tester.enterText(find.byKey(const Key('course-length')), '1200');
+      await stepTo(tester, _length, 1200);
       await _save(tester, setup);
 
       expect(find.text('„Ausdauer 2:30“ (1000–1500 m) ragt über das Streckenende bei 1200 m.'), findsWidgets);
@@ -294,7 +339,6 @@ void main() {
     await _save(tester, setup);
 
     expect(find.text('Der Name fehlt.'), findsOneWidget);
-    expect(find.text('Die Länge fehlt.'), findsOneWidget);
     expect(await setup.stored(tester), isEmpty);
     await disposeWidgetsWithDatabase(tester);
   });
@@ -306,13 +350,11 @@ void main() {
     expect(find.text('New course'), findsOneWidget);
     expect(find.text('Distance'), findsOneWidget);
     expect(find.text('Length (m)'), findsOneWidget);
-    expect(find.text('Enter a length to place zones.'), findsOneWidget);
-    await tester.enterText(find.byKey(const Key('course-length')), '2x');
+    expect(find.bySemanticsLabel('100 m more'), findsOneWidget);
     await tester.tap(find.byTooltip('Save'));
     await setup.settle(tester);
 
     expect(find.text('The name is missing.'), findsOneWidget);
-    expect(find.text('The length “2x” is not valid.'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 
