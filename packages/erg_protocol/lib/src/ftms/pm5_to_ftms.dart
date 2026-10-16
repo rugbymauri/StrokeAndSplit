@@ -32,7 +32,7 @@ RawRecording pm5ToFtms(RawRecording pm5, {Duration interval = const Duration(sec
             lastRecord = packet.time;
             records.add((at: packet.time, tick: event, strokes: strokes));
           }
-        case WorkoutStateChanged():
+        case WorkoutStateChanged() || HeartBeatIntervals():
           break;
       }
     }

@@ -40,9 +40,26 @@ final class StatusTick extends RowingEvent {
   /// Strokes per minute.
   final int? strokeRate;
 
-  /// Beats per minute; null when no heart rate monitor is connected.
+  /// Beats per minute, from the directly connected chest strap or else from
+  /// the rower; null when neither reports one.
   final int? heartRate;
   final int? calories;
+
+  static const _keep = Object();
+
+  /// A copy with another [heartRate]; pass null to mark it as missing.
+  StatusTick copyWith({Object? heartRate = _keep}) => StatusTick(
+        elapsed: elapsed,
+        distanceMeters: distanceMeters,
+        workoutType: workoutType,
+        workoutState: workoutState,
+        isRowing: isRowing,
+        pace: pace,
+        watts: watts,
+        strokeRate: strokeRate,
+        heartRate: identical(heartRate, _keep) ? this.heartRate : heartRate as int?,
+        calories: calories,
+      );
 
   @override
   String toString() => 'StatusTick(elapsed: $elapsed, distance: $distanceMeters, type: ${workoutType.name}, '
@@ -101,4 +118,35 @@ final class WorkoutStateChanged extends RowingEvent {
   @override
   String toString() =>
       'WorkoutStateChanged(elapsed: $elapsed, ${previous.name} -> ${current.name}, reset: $isReset)';
+}
+
+/// The beat-to-beat (RR) intervals of one chest strap measurement.
+///
+/// Only a directly connected chest strap reports them; they are never derived
+/// from the heart rate. [elapsed] is the workout time of the last status tick
+/// before the measurement, as the strap has no workout clock.
+final class HeartBeatIntervals extends RowingEvent {
+  HeartBeatIntervals({required super.elapsed, required this.time, required List<int> intervalsMs})
+      : intervalsMs = List.unmodifiable(intervalsMs);
+
+  /// Receive time of the measurement, on the time axis of the raw packets.
+  final Duration time;
+
+  /// Intervals in milliseconds, oldest first.
+  final List<int> intervalsMs;
+
+  /// When each interval ended: the last one at [time], every earlier one
+  /// before it by the sum of the intervals that follow it.
+  List<Duration> get intervalEnds {
+    final ends = List.filled(intervalsMs.length, time);
+    var end = time;
+    for (var i = intervalsMs.length - 1; i >= 0; i--) {
+      ends[i] = end;
+      end -= Duration(milliseconds: intervalsMs[i]);
+    }
+    return ends;
+  }
+
+  @override
+  String toString() => 'HeartBeatIntervals(elapsed: $elapsed, time: ${time.inMilliseconds} ms, rr: $intervalsMs)';
 }

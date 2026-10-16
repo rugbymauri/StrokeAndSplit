@@ -113,7 +113,11 @@ class SessionAccumulator {
       case Stroke():
         _onStroke(event);
       case WorkoutStateChanged():
-      // A reset shows up as counters going backwards, see SessionOffset.
+        // A reset shows up as counters going backwards, see SessionOffset.
+        break;
+      case HeartBeatIntervals():
+        // RR intervals are not stored yet.
+        break;
     }
   }
 
