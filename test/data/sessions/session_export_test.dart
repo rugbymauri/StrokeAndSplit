@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:aergrow/data/courses/course.dart';
+import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_accumulator.dart';
 import 'package:aergrow/data/sessions/session_repository.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
+import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pm5_protocol/pm5_protocol.dart';
 
@@ -85,6 +88,8 @@ void main() {
     expect(session.deviceName, 'PM5 430000001 Row');
     expect(session.startedAt.isAtSameMomentAs(DateTime.parse('2026-10-15T20:31:33Z')), isTrue);
     expect(session.distanceDm, greaterThan(0));
+    expect(session.courseVersionId, isNull);
+    expect(await repository.laps(id), isEmpty);
   });
 
   test('keeps an incomplete session incomplete', () async {
@@ -102,5 +107,81 @@ void main() {
     final repository = SessionRepository(openTestDatabase());
 
     expect(() => repository.import(utf8.encode('{"format":"other"}\n')), throwsFormatException);
+  });
+
+  group('a session on a course', () {
+    const course = CourseDefinition(axis: CourseAxis.distance, length: 40, segments: [
+      CourseSegment(length: 20),
+      CourseSegment(length: 20, paceFastCs: 10000, paceSlowCs: 20000, spmMin: 15, spmMax: 40),
+    ]);
+
+    /// Records just_row as "Seerunde x3" on the phone.
+    Future<(AppDatabase, int)> recordOnPhone() async {
+      final db = openTestDatabase();
+      final courseId = await CourseRepository(db).create('Seerunde', course);
+      final templates = TemplateRepository(db);
+      final template = (await templates.get(await templates.create('Seerunde x3', courseId: courseId, laps: 3)))!;
+      final repository = SessionRepository(db);
+      final id = await repository.create(
+        startedAt: DateTime.utc(2026, 10, 16, 7),
+        source: ErgSourceKind.pm5,
+        template: template,
+      );
+      final accumulator = SessionAccumulator(id, course: course, plannedLaps: 3);
+      loadFixture('just_row').packets.forEach(accumulator.add);
+      accumulator.finish();
+      await repository.write(accumulator.takeBatch());
+      await repository.finish(id);
+      return (db, id);
+    }
+
+    Future<List<Object>> results(AppDatabase db, int id) async => [
+          for (final l in await SessionRepository(db).laps(id))
+            (l.lapNo, l.startWallMs, l.endWallMs, l.endDistanceDm, l.complete, l.inZoneShare),
+          for (final s in await (db.select(db.lapSegments)..where((s) => s.sessionId.equals(id))).get())
+            (s.lapNo, s.position, s.durationMs, s.distanceDm, s.inZoneShare),
+        ];
+
+    test('gives the same laps after export and import, and creates the missing course', () async {
+      final (phone, recorded) = await recordOnPhone();
+      final laptop = openTestDatabase();
+
+      final bytes = await SessionRepository(phone).export(recorded);
+      final imported = await SessionRepository(laptop).import(bytes);
+
+      expect(await results(laptop, imported), await results(phone, recorded));
+      expect((await SessionRepository(laptop).laps(imported)).where((l) => l.complete), hasLength(3));
+      final session = (await SessionRepository(laptop).get(imported))!;
+      expect((session.templateName, session.plannedLaps, session.templateId), ('Seerunde x3', 3, null));
+      final courses = await CourseRepository(laptop).all();
+      expect(courses.single.name, 'Seerunde');
+      expect(courses.single.definition, course);
+      expect(courses.single.versionId, session.courseVersionId);
+    });
+
+    test('reuses a course with the same name and definition', () async {
+      final (phone, recorded) = await recordOnPhone();
+      final bytes = await SessionRepository(phone).export(recorded);
+
+      final imported = await SessionRepository(phone).import(bytes);
+
+      expect(await CourseRepository(phone).all(), hasLength(1));
+      final original = (await SessionRepository(phone).get(recorded))!;
+      expect((await SessionRepository(phone).get(imported))!.courseVersionId, original.courseVersionId);
+    });
+
+    test('names template and course in the header', () async {
+      final (phone, recorded) = await recordOnPhone();
+
+      final bytes = await SessionRepository(phone).export(recorded);
+      final lines = const LineSplitter().convert(utf8.decode(gzip.decode(bytes)));
+      final header = jsonDecode(lines.first) as Map<String, Object?>;
+
+      expect(header['template'], {'name': 'Seerunde x3', 'laps': 3});
+      expect((header['course'] as Map)['segments'], [
+        {'length': 20},
+        {'length': 20, 'paceFastCs': 10000, 'paceSlowCs': 20000, 'spmMin': 15, 'spmMax': 40},
+      ]);
+    });
   });
 }

@@ -28,7 +28,7 @@
 - [x] 5.2 Accumulator führt einen `LapTracker` mit und legt Runden und Segmentergebnisse in den 2-s-Batch. Verifikation: Unit-Test mit `just_row.jsonl` auf einer kurzen Distanzstrecke ergibt dieselben Runden wie der Tracker direkt auf den Samples
 - [x] 5.3 `SessionRecorder.start(template:)` mit Session-Verweisen und `plannedLaps` sowie automatischem Ende bei `finished` (Design D6). Verifikation: Unit-Test „Seerunde x3“ mit dem Simulator endet nach Runde 3 von selbst
 - [x] 5.4 Crash-Recovery schliesst die letzte Runde aus den Samples ab (Design D5). Verifikation: Unit-Test „Absturz in Runde 3“ ergibt Runden 1 und 2 vollständig, Runde 3 unvollständig
-- [ ] 5.5 Export mit `course` und `template` im Header, Import mit Wiederverwendung oder Anlage der Strecke (Design D7). Verifikation: Roundtrip-Test ergibt identische Runden, Import ohne vorhandene Strecke legt sie an, Import einer alten Datei bleibt eine freie Session
+- [x] 5.5 Export mit `course` und `template` im Header, Import mit Wiederverwendung oder Anlage der Strecke (Design D7). Verifikation: Roundtrip-Test ergibt identische Runden, Import ohne vorhandene Strecke legt sie an, Import einer alten Datei bleibt eine freie Session
 
 ## 6. Live-Display und Zusammenfassung
 
