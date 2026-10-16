@@ -47,6 +47,8 @@ In Arbeit seit 2026-10-16 auf `feature/device-types`. Die manuellen Tests 7.1–
 
 Bei der Umsetzung mitnehmen:
 - [x] Zeile über 120 Zeichen in `Stroke.toString` (Task 2.1) umgebrochen.
+- [ ] Task 3.5: `Pm5ErgType` ist umgesetzt, aber die Ski- und Bike-Werte sind nicht gegen das aktuelle Concept2-Dokument geprüft. Online war die Liste nicht zu finden, nur der Wert 0 (RowErg) ist an den Aufnahmen bestätigt. Der Nutzer prüft sie gegen die *PM5 Bluetooth Smart Interface Definition* oder an einem SkiErg/BikeErg, dann Task abhaken.
+- [ ] Task 3.6: README-Abschnitt FTMS und Erg-Typ steht, die Fixtures-Tabelle folgt mit Task 4.3.
 - Reihenfolge: Abschnitt 3 (FTMS-Protokoll) vor 2.4/2.5 umgesetzt, weil deren Tests den FTMS-Decoder brauchen.
 - Design D8 angepasst: Beim FTMS-Reset beginnt die eigene Uhr wieder bei 0, sonst zählt die Session die Zeit doppelt.
 - [ ] Zeile über 120 Zeichen in `lib/features/connection/device_list_screen.dart` (Fehlertext „Suche nach dem PM5“) mit Task 5.5 umbrechen.

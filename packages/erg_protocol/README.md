@@ -1,12 +1,12 @@
 # erg_protocol
 
-Reines Dart-Package ohne Flutter- und BLE-Abhängigkeit: übersetzt die Bluetooth-Rohdaten eines Concept2 PM5 in Rudermesswerte und Ereignisse und erzeugt umgekehrt PM5-Pakete für den Simulator.
+Reines Dart-Package ohne Flutter- und BLE-Abhängigkeit: übersetzt die Bluetooth-Rohdaten von Rudergeräten in Rudermesswerte und Ereignisse und erzeugt umgekehrt Pakete für den Simulator. Es kennt zwei Protokolle (`ErgProtocol`): den Concept2 PM5 und den Bluetooth-Standard FTMS. `ErgDecoder.forProtocol` liefert den passenden Decoder, beide erzeugen Ereignisse derselben Form und Bedeutung.
 
 ```
 dart test
 ```
 
-## Byte-Layouts
+## Byte-Layouts PM5
 
 Grundlage ist die *Concept2 PM5 Bluetooth Smart Interface Definition*, gegengeprüft mit den Aufnahmen in `test/fixtures/` (PM5 430000001, RowErg, Just Row, Sample Rate 250 ms). Alle Werte sind Little-Endian und vorzeichenlos. Die Paketlängen waren in allen Aufnahmen konstant.
 
@@ -40,7 +40,7 @@ UUID-Schema: `CE06xxxx-43E5-11E4-916C-0800200C9A66`, Rowing-Service `0x0030`.
 | 9–10 | Durchschnittspace | 0.01 s / 500 m |
 | 11–12 | Rest Distance | m |
 | 13–15 | Rest Time | 0.01 s |
-| 16 | Erg-Typ | 0 = RowErg (Modell D) |
+| 16 | Erg-Typ | siehe [Erg-Typ](#erg-typ-des-pm5), 0 = RowErg (Modell D) |
 
 ### `0x0033` Additional Status 2 (20 Bytes)
 
@@ -84,7 +84,79 @@ Kräfte kommen in Pound-force, 1 lbf = 4.44822 N.
 | 9–11 | Projected Work Time | 0.01 s |
 | 12–14 | Projected Work Distance | m |
 
-## Beobachtungen aus den Aufnahmen
+## Erg-Typ des PM5
+
+Byte 16 von `0x0032` meldet, an welchem Erg der PM5 sitzt (`ERGMACHINE_TYPE` der Concept2-Spezifikation). Die App weist SkiErg und BikeErg nach dem Verbinden ab (`Pm5ErgType`). Unbekannte Werte werden zugelassen, damit neue RowErg-Varianten nicht blockiert werden.
+
+| Werte | Gerät | Folge |
+|---|---|---|
+| 0, 1, 2, 3, 5, 7, 8 | RowErg (Modelle D, C, A, B, E, Simulator, Dynamic) | zugelassen |
+| 16–20 | RowErg auf Slides | zugelassen |
+| 32, 64 | Linked Dynamic, Dyno | zugelassen |
+| 224 | Multi-Erg als Rudergerät | zugelassen |
+| 128, 143, 225 | SkiErg (Static, Simulator, Multi-Erg) | abgewiesen |
+| 192, 193, 194, 207, 226 | BikeErg (mit/ohne Arme, Simulator, Multi-Erg) | abgewiesen |
+| alle anderen | unbekannt | zugelassen |
+
+Am echten Gerät bestätigt ist nur der Wert 0 (RowErg Modell D, alle Fixtures). Die übrigen Werte stammen aus der Spezifikation und sind nicht gemessen.
+
+## Byte-Layouts FTMS
+
+Grundlage ist die *Fitness Machine Service 1.0* der Bluetooth SIG. Alle Werte sind Little-Endian. Gemessen an echter FTMS-Hardware ist noch nichts, getestet wird gegen die Spezifikation und den Software-Rower unter `tool/ftms_rower/`.
+
+| UUID | Inhalt | Verwendung |
+|---|---|---|
+| `0x1826` Service | Fitness Machine; Service Data im Advertisement mit Flags-Byte und Fitness Machine Type, Bit 4 = Rower | Suche |
+| `0x2ACC` | Fitness Machine Feature | nicht ausgewertet |
+| `0x2AD1` | Rower Data (Notify) | Messwerte |
+| `0x2AD9` | Fitness Machine Control Point (Write + Indicate) | Steuerung anfordern, Start |
+| `0x2ADA` | Fitness Machine Status (Notify) | nur mitgeschnitten |
+
+### `0x2AD1` Rower Data
+
+Zuerst ein u16 mit Flags, danach nur die Felder, deren Flag gesetzt ist, in dieser Reihenfolge:
+
+| Flag-Bit | Feld | Typ, Einheit |
+|---|---|---|
+| 0 = **0** | Stroke Rate, Stroke Count | u8 0.5/min, u16 |
+| 1 | Average Stroke Rate | u8 0.5/min |
+| 2 | Total Distance | u24 m |
+| 3 | Instantaneous Pace | u16 s/500 m |
+| 4 | Average Pace | u16 s/500 m |
+| 5 | Instantaneous Power | s16 W |
+| 6 | Average Power | s16 W |
+| 7 | Resistance Level | s16 |
+| 8 | Total Energy, Energy/h, Energy/min | u16 kcal, u16 kcal, u8 kcal; `0xFFFF` bzw. `0xFF` = kein Wert |
+| 9 | Heart Rate | u8 1/min |
+| 10 | Metabolic Equivalent | u8 0.1 |
+| 11 | Elapsed Time | u16 s |
+| 12 | Remaining Time | u16 s |
+
+Bit 0 ist invertiert („More Data“): Ist es gesetzt, fehlen Stroke Rate und Count, und weitere Teile desselben Datensatzes folgen. Der Decoder merkt sich den letzten Wert jedes Felds und erzeugt am Ende jedes Datensatzes (Bit 0 = 0) einen `StatusTick`. Ein Paket, das kürzer ist, als seine Flags ankündigen, wird verworfen und gemeldet.
+
+### `0x2AD9` Control Point
+
+Nach dem Verbinden: Indicate aktivieren, `0x00` (Request Control) schreiben und bis zu 2 s auf die Antwort `0x80 0x00 0x01` warten. Bei Erfolg folgt `0x07` (Start or Resume). Ablehnung, Fehler oder Timeout werden ignoriert. `0x01` (Reset) und `0x08` (Stop or Pause) sendet die App nie, auch nicht beim Trennen.
+
+### Eigene Uhr und Rudern-Erkennung
+
+- **Zeit:** Der Decoder summiert die Abstände der Empfangszeiten (`RawPacket.time`) zwischen zwei Datensätzen, aber nur, solange gerudert wird. Die Gerätezeit (Bit 11) wird gelesen, aber nicht verwendet. So bleibt die Zeit bei 1-s-Takt flüssig, steht in Pausen still wie am PM5, und ein Replay liefert exakt dieselben Werte.
+- **Rudert:** solange Distanz oder Schlagzähler in den letzten 4 s gestiegen sind. Die Schlagzahl allein zählt nicht, weil viele Geräte sie nach dem Aufhören weiter melden.
+- **Schläge:** Steigt der Zähler von n auf m, entsteht je ein `Stroke` für n+1 bis m, ohne Durchzugs- und Kraftwerte. Bei mehr als 10 Schlägen Sprung (z.B. Verbinden mitten im Rudern) wird nur der Zählerstand übernommen.
+- **Reset:** Fällt Distanz oder Schlagzähler zurück, meldet der Decoder `WorkoutStateChanged(isReset: true)` und beginnt die eigene Uhr bei 0, wie der PM5 bei einem neuen Workout. Die Session zählt über `SessionOffset` weiter.
+- **Workout:** Typ und Zustand sind immer `unknown`.
+
+### Plausibilitätsgrenzen
+
+| Wert | gilt als „nicht vorhanden“ |
+|---|---|
+| Pace | 0, ausserhalb von 1:00 bis 10:00 pro 500 m oder während nicht gerudert wird |
+| Watt | immer aus der Pace mit `wattsForPace` berechnet, die Geräteleistung (Bit 5) wird ignoriert |
+| Schlagzahl | ausserhalb von 1 bis 60 pro Minute |
+| Herzfrequenz | 0 oder über 250 |
+| Kalorien | Platzhalter `0xFFFF` |
+
+## Beobachtungen aus den PM5-Aufnahmen
 
 - **`0x0035` kommt zweimal pro Schlag.** Das erste Paket kommt am Ende des Durchzugs mit neuer Schlagnummer, aber noch der Erholungszeit des *vorigen* Schlags. Das zweite kommt am Ende der Erholung mit derselben Schlagnummer und der aktuellen Erholungszeit. `0x0036` kommt nur einmal pro Schlag, zusammen mit dem ersten `0x0035`. Ein Schlag ist also erst mit dem zweiten `0x0035` vollständig.
 - **Pause im Just Row (`pause.jsonl`):** Hört man auf zu rudern, **bleiben Elapsed Time und Distanz stehen**. Der Workout-Zustand bleibt 1 (WorkoutRow), nur der Ruderzustand fällt auf 0. Nach ca. 80 s Pause zählte der PM5 einfach weiter, ohne Reset und ohne Workout-Ende. Für zeitbasierte Strecken mit Pausen braucht die App deshalb eine eigene Uhr.

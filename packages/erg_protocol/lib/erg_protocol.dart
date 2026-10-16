@@ -10,6 +10,7 @@ export 'src/ftms/rower_data.dart';
 export 'src/pm5/pm5_characteristics.dart';
 export 'src/pm5/pm5_decoder.dart';
 export 'src/pm5/pm5_encoder.dart';
+export 'src/pm5/pm5_erg_type.dart';
 export 'src/power.dart';
 export 'src/raw_packet.dart';
 export 'src/raw_recording.dart';
