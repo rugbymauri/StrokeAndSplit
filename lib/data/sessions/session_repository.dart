@@ -87,6 +87,8 @@ class SessionRepository {
       await (_db.delete(_db.samples)..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.strokes)..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.rawPackets)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(_db.laps)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(_db.lapSegments)..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.sessions)..where((s) => s.id.equals(id))).go();
     });
   }

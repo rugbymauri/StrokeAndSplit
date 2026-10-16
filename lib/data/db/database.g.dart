@@ -3,6 +3,914 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
+class $TemplatesTable extends Templates
+    with TableInfo<$TemplatesTable, TemplateRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TemplatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'templates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TemplateRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TemplateRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TemplateRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TemplatesTable createAlias(String alias) {
+    return $TemplatesTable(attachedDatabase, alias);
+  }
+}
+
+class TemplateRow extends DataClass implements Insertable<TemplateRow> {
+  final int id;
+  final String name;
+  final DateTime createdAt;
+  const TemplateRow({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  TemplatesCompanion toCompanion(bool nullToAbsent) {
+    return TemplatesCompanion(
+      id: Value(id),
+      name: Value(name),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory TemplateRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TemplateRow(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  TemplateRow copyWith({int? id, String? name, DateTime? createdAt}) =>
+      TemplateRow(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  TemplateRow copyWithCompanion(TemplatesCompanion data) {
+    return TemplateRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TemplateRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TemplateRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.createdAt == this.createdAt);
+}
+
+class TemplatesCompanion extends UpdateCompanion<TemplateRow> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<DateTime> createdAt;
+  const TemplatesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  TemplatesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required DateTime createdAt,
+  }) : name = Value(name),
+       createdAt = Value(createdAt);
+  static Insertable<TemplateRow> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  TemplatesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<DateTime>? createdAt,
+  }) {
+    return TemplatesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TemplatesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CoursesTable extends Courses with TableInfo<$CoursesTable, CourseRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CoursesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<CourseAxis, String> axis =
+      GeneratedColumn<String>(
+        'axis',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<CourseAxis>($CoursesTable.$converteraxis);
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, axis, deletedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'courses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CourseRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CourseRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CourseRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      axis: $CoursesTable.$converteraxis.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}axis'],
+        )!,
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $CoursesTable createAlias(String alias) {
+    return $CoursesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<CourseAxis, String, String> $converteraxis =
+      const EnumNameConverter<CourseAxis>(CourseAxis.values);
+}
+
+class CourseRow extends DataClass implements Insertable<CourseRow> {
+  final int id;
+  final String name;
+  final CourseAxis axis;
+
+  /// Courses are only marked as deleted, as sessions keep pointing to them.
+  final DateTime? deletedAt;
+  const CourseRow({
+    required this.id,
+    required this.name,
+    required this.axis,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    {
+      map['axis'] = Variable<String>($CoursesTable.$converteraxis.toSql(axis));
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  CoursesCompanion toCompanion(bool nullToAbsent) {
+    return CoursesCompanion(
+      id: Value(id),
+      name: Value(name),
+      axis: Value(axis),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory CourseRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CourseRow(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      axis: $CoursesTable.$converteraxis.fromJson(
+        serializer.fromJson<String>(json['axis']),
+      ),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'axis': serializer.toJson<String>(
+        $CoursesTable.$converteraxis.toJson(axis),
+      ),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  CourseRow copyWith({
+    int? id,
+    String? name,
+    CourseAxis? axis,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => CourseRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    axis: axis ?? this.axis,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  CourseRow copyWithCompanion(CoursesCompanion data) {
+    return CourseRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      axis: data.axis.present ? data.axis.value : this.axis,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CourseRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('axis: $axis, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, axis, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CourseRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.axis == this.axis &&
+          other.deletedAt == this.deletedAt);
+}
+
+class CoursesCompanion extends UpdateCompanion<CourseRow> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<CourseAxis> axis;
+  final Value<DateTime?> deletedAt;
+  const CoursesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.axis = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  });
+  CoursesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required CourseAxis axis,
+    this.deletedAt = const Value.absent(),
+  }) : name = Value(name),
+       axis = Value(axis);
+  static Insertable<CourseRow> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? axis,
+    Expression<DateTime>? deletedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (axis != null) 'axis': axis,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+    });
+  }
+
+  CoursesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<CourseAxis>? axis,
+    Value<DateTime?>? deletedAt,
+  }) {
+    return CoursesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      axis: axis ?? this.axis,
+      deletedAt: deletedAt ?? this.deletedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (axis.present) {
+      map['axis'] = Variable<String>(
+        $CoursesTable.$converteraxis.toSql(axis.value),
+      );
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CoursesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('axis: $axis, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CourseVersionsTable extends CourseVersions
+    with TableInfo<$CourseVersionsTable, CourseVersionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CourseVersionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _courseIdMeta = const VerificationMeta(
+    'courseId',
+  );
+  @override
+  late final GeneratedColumn<int> courseId = GeneratedColumn<int>(
+    'course_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES courses (id)',
+    ),
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lengthMeta = const VerificationMeta('length');
+  @override
+  late final GeneratedColumn<int> length = GeneratedColumn<int>(
+    'length',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    courseId,
+    version,
+    length,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'course_versions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CourseVersionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('course_id')) {
+      context.handle(
+        _courseIdMeta,
+        courseId.isAcceptableOrUnknown(data['course_id']!, _courseIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_courseIdMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    if (data.containsKey('length')) {
+      context.handle(
+        _lengthMeta,
+        length.isAcceptableOrUnknown(data['length']!, _lengthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lengthMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CourseVersionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CourseVersionRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      courseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}course_id'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      length: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}length'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CourseVersionsTable createAlias(String alias) {
+    return $CourseVersionsTable(attachedDatabase, alias);
+  }
+}
+
+class CourseVersionRow extends DataClass
+    implements Insertable<CourseVersionRow> {
+  final int id;
+  final int courseId;
+  final int version;
+
+  /// In metres or seconds, depending on the axis of the course.
+  final int length;
+  final DateTime createdAt;
+  const CourseVersionRow({
+    required this.id,
+    required this.courseId,
+    required this.version,
+    required this.length,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['course_id'] = Variable<int>(courseId);
+    map['version'] = Variable<int>(version);
+    map['length'] = Variable<int>(length);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  CourseVersionsCompanion toCompanion(bool nullToAbsent) {
+    return CourseVersionsCompanion(
+      id: Value(id),
+      courseId: Value(courseId),
+      version: Value(version),
+      length: Value(length),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory CourseVersionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CourseVersionRow(
+      id: serializer.fromJson<int>(json['id']),
+      courseId: serializer.fromJson<int>(json['courseId']),
+      version: serializer.fromJson<int>(json['version']),
+      length: serializer.fromJson<int>(json['length']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'courseId': serializer.toJson<int>(courseId),
+      'version': serializer.toJson<int>(version),
+      'length': serializer.toJson<int>(length),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  CourseVersionRow copyWith({
+    int? id,
+    int? courseId,
+    int? version,
+    int? length,
+    DateTime? createdAt,
+  }) => CourseVersionRow(
+    id: id ?? this.id,
+    courseId: courseId ?? this.courseId,
+    version: version ?? this.version,
+    length: length ?? this.length,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  CourseVersionRow copyWithCompanion(CourseVersionsCompanion data) {
+    return CourseVersionRow(
+      id: data.id.present ? data.id.value : this.id,
+      courseId: data.courseId.present ? data.courseId.value : this.courseId,
+      version: data.version.present ? data.version.value : this.version,
+      length: data.length.present ? data.length.value : this.length,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CourseVersionRow(')
+          ..write('id: $id, ')
+          ..write('courseId: $courseId, ')
+          ..write('version: $version, ')
+          ..write('length: $length, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, courseId, version, length, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CourseVersionRow &&
+          other.id == this.id &&
+          other.courseId == this.courseId &&
+          other.version == this.version &&
+          other.length == this.length &&
+          other.createdAt == this.createdAt);
+}
+
+class CourseVersionsCompanion extends UpdateCompanion<CourseVersionRow> {
+  final Value<int> id;
+  final Value<int> courseId;
+  final Value<int> version;
+  final Value<int> length;
+  final Value<DateTime> createdAt;
+  const CourseVersionsCompanion({
+    this.id = const Value.absent(),
+    this.courseId = const Value.absent(),
+    this.version = const Value.absent(),
+    this.length = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  CourseVersionsCompanion.insert({
+    this.id = const Value.absent(),
+    required int courseId,
+    required int version,
+    required int length,
+    required DateTime createdAt,
+  }) : courseId = Value(courseId),
+       version = Value(version),
+       length = Value(length),
+       createdAt = Value(createdAt);
+  static Insertable<CourseVersionRow> custom({
+    Expression<int>? id,
+    Expression<int>? courseId,
+    Expression<int>? version,
+    Expression<int>? length,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (courseId != null) 'course_id': courseId,
+      if (version != null) 'version': version,
+      if (length != null) 'length': length,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  CourseVersionsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? courseId,
+    Value<int>? version,
+    Value<int>? length,
+    Value<DateTime>? createdAt,
+  }) {
+    return CourseVersionsCompanion(
+      id: id ?? this.id,
+      courseId: courseId ?? this.courseId,
+      version: version ?? this.version,
+      length: length ?? this.length,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (courseId.present) {
+      map['course_id'] = Variable<int>(courseId.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (length.present) {
+      map['length'] = Variable<int>(length.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CourseVersionsCompanion(')
+          ..write('id: $id, ')
+          ..write('courseId: $courseId, ')
+          ..write('version: $version, ')
+          ..write('length: $length, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $SessionsTable extends Sessions
     with TableInfo<$SessionsTable, SessionRow> {
   @override
@@ -143,6 +1051,56 @@ class $SessionsTable extends Sessions
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  @override
+  late final GeneratedColumn<int> templateId = GeneratedColumn<int>(
+    'template_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES templates (id) ON DELETE SET NULL',
+    ),
+  );
+  static const VerificationMeta _templateNameMeta = const VerificationMeta(
+    'templateName',
+  );
+  @override
+  late final GeneratedColumn<String> templateName = GeneratedColumn<String>(
+    'template_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _courseVersionIdMeta = const VerificationMeta(
+    'courseVersionId',
+  );
+  @override
+  late final GeneratedColumn<int> courseVersionId = GeneratedColumn<int>(
+    'course_version_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES course_versions (id)',
+    ),
+  );
+  static const VerificationMeta _plannedLapsMeta = const VerificationMeta(
+    'plannedLaps',
+  );
+  @override
+  late final GeneratedColumn<int> plannedLaps = GeneratedColumn<int>(
+    'planned_laps',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -157,6 +1115,10 @@ class $SessionsTable extends Sessions
     averageWatts,
     averageStrokeRate,
     strokeCount,
+    templateId,
+    templateName,
+    courseVersionId,
+    plannedLaps,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -241,6 +1203,39 @@ class $SessionsTable extends Sessions
         ),
       );
     }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    }
+    if (data.containsKey('template_name')) {
+      context.handle(
+        _templateNameMeta,
+        templateName.isAcceptableOrUnknown(
+          data['template_name']!,
+          _templateNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('course_version_id')) {
+      context.handle(
+        _courseVersionIdMeta,
+        courseVersionId.isAcceptableOrUnknown(
+          data['course_version_id']!,
+          _courseVersionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('planned_laps')) {
+      context.handle(
+        _plannedLapsMeta,
+        plannedLaps.isAcceptableOrUnknown(
+          data['planned_laps']!,
+          _plannedLapsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -302,6 +1297,22 @@ class $SessionsTable extends Sessions
         DriftSqlType.int,
         data['${effectivePrefix}stroke_count'],
       )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}template_id'],
+      ),
+      templateName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_name'],
+      ),
+      courseVersionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}course_version_id'],
+      ),
+      plannedLaps: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}planned_laps'],
+      ),
     );
   }
 
@@ -329,6 +1340,14 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
   final int? averageWatts;
   final double? averageStrokeRate;
   final int strokeCount;
+  final int? templateId;
+
+  /// The template name at the time, kept when the template is deleted.
+  final String? templateName;
+  final int? courseVersionId;
+
+  /// Null for an open number of laps.
+  final int? plannedLaps;
   const SessionRow({
     required this.id,
     required this.startedAt,
@@ -342,6 +1361,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     this.averageWatts,
     this.averageStrokeRate,
     required this.strokeCount,
+    this.templateId,
+    this.templateName,
+    this.courseVersionId,
+    this.plannedLaps,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -376,6 +1399,18 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       map['average_stroke_rate'] = Variable<double>(averageStrokeRate);
     }
     map['stroke_count'] = Variable<int>(strokeCount);
+    if (!nullToAbsent || templateId != null) {
+      map['template_id'] = Variable<int>(templateId);
+    }
+    if (!nullToAbsent || templateName != null) {
+      map['template_name'] = Variable<String>(templateName);
+    }
+    if (!nullToAbsent || courseVersionId != null) {
+      map['course_version_id'] = Variable<int>(courseVersionId);
+    }
+    if (!nullToAbsent || plannedLaps != null) {
+      map['planned_laps'] = Variable<int>(plannedLaps);
+    }
     return map;
   }
 
@@ -403,6 +1438,18 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ? const Value.absent()
           : Value(averageStrokeRate),
       strokeCount: Value(strokeCount),
+      templateId: templateId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(templateId),
+      templateName: templateName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(templateName),
+      courseVersionId: courseVersionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(courseVersionId),
+      plannedLaps: plannedLaps == null && nullToAbsent
+          ? const Value.absent()
+          : Value(plannedLaps),
     );
   }
 
@@ -430,6 +1477,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         json['averageStrokeRate'],
       ),
       strokeCount: serializer.fromJson<int>(json['strokeCount']),
+      templateId: serializer.fromJson<int?>(json['templateId']),
+      templateName: serializer.fromJson<String?>(json['templateName']),
+      courseVersionId: serializer.fromJson<int?>(json['courseVersionId']),
+      plannedLaps: serializer.fromJson<int?>(json['plannedLaps']),
     );
   }
   @override
@@ -452,6 +1503,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       'averageWatts': serializer.toJson<int?>(averageWatts),
       'averageStrokeRate': serializer.toJson<double?>(averageStrokeRate),
       'strokeCount': serializer.toJson<int>(strokeCount),
+      'templateId': serializer.toJson<int?>(templateId),
+      'templateName': serializer.toJson<String?>(templateName),
+      'courseVersionId': serializer.toJson<int?>(courseVersionId),
+      'plannedLaps': serializer.toJson<int?>(plannedLaps),
     };
   }
 
@@ -468,6 +1523,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     Value<int?> averageWatts = const Value.absent(),
     Value<double?> averageStrokeRate = const Value.absent(),
     int? strokeCount,
+    Value<int?> templateId = const Value.absent(),
+    Value<String?> templateName = const Value.absent(),
+    Value<int?> courseVersionId = const Value.absent(),
+    Value<int?> plannedLaps = const Value.absent(),
   }) => SessionRow(
     id: id ?? this.id,
     startedAt: startedAt ?? this.startedAt,
@@ -485,6 +1544,12 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         ? averageStrokeRate.value
         : this.averageStrokeRate,
     strokeCount: strokeCount ?? this.strokeCount,
+    templateId: templateId.present ? templateId.value : this.templateId,
+    templateName: templateName.present ? templateName.value : this.templateName,
+    courseVersionId: courseVersionId.present
+        ? courseVersionId.value
+        : this.courseVersionId,
+    plannedLaps: plannedLaps.present ? plannedLaps.value : this.plannedLaps,
   );
   SessionRow copyWithCompanion(SessionsCompanion data) {
     return SessionRow(
@@ -514,6 +1579,18 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       strokeCount: data.strokeCount.present
           ? data.strokeCount.value
           : this.strokeCount,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      templateName: data.templateName.present
+          ? data.templateName.value
+          : this.templateName,
+      courseVersionId: data.courseVersionId.present
+          ? data.courseVersionId.value
+          : this.courseVersionId,
+      plannedLaps: data.plannedLaps.present
+          ? data.plannedLaps.value
+          : this.plannedLaps,
     );
   }
 
@@ -531,7 +1608,11 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ..write('averagePaceCs: $averagePaceCs, ')
           ..write('averageWatts: $averageWatts, ')
           ..write('averageStrokeRate: $averageStrokeRate, ')
-          ..write('strokeCount: $strokeCount')
+          ..write('strokeCount: $strokeCount, ')
+          ..write('templateId: $templateId, ')
+          ..write('templateName: $templateName, ')
+          ..write('courseVersionId: $courseVersionId, ')
+          ..write('plannedLaps: $plannedLaps')
           ..write(')'))
         .toString();
   }
@@ -550,6 +1631,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     averageWatts,
     averageStrokeRate,
     strokeCount,
+    templateId,
+    templateName,
+    courseVersionId,
+    plannedLaps,
   );
   @override
   bool operator ==(Object other) =>
@@ -566,7 +1651,11 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           other.averagePaceCs == this.averagePaceCs &&
           other.averageWatts == this.averageWatts &&
           other.averageStrokeRate == this.averageStrokeRate &&
-          other.strokeCount == this.strokeCount);
+          other.strokeCount == this.strokeCount &&
+          other.templateId == this.templateId &&
+          other.templateName == this.templateName &&
+          other.courseVersionId == this.courseVersionId &&
+          other.plannedLaps == this.plannedLaps);
 }
 
 class SessionsCompanion extends UpdateCompanion<SessionRow> {
@@ -582,6 +1671,10 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
   final Value<int?> averageWatts;
   final Value<double?> averageStrokeRate;
   final Value<int> strokeCount;
+  final Value<int?> templateId;
+  final Value<String?> templateName;
+  final Value<int?> courseVersionId;
+  final Value<int?> plannedLaps;
   const SessionsCompanion({
     this.id = const Value.absent(),
     this.startedAt = const Value.absent(),
@@ -595,6 +1688,10 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.averageWatts = const Value.absent(),
     this.averageStrokeRate = const Value.absent(),
     this.strokeCount = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.templateName = const Value.absent(),
+    this.courseVersionId = const Value.absent(),
+    this.plannedLaps = const Value.absent(),
   });
   SessionsCompanion.insert({
     this.id = const Value.absent(),
@@ -609,6 +1706,10 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.averageWatts = const Value.absent(),
     this.averageStrokeRate = const Value.absent(),
     this.strokeCount = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.templateName = const Value.absent(),
+    this.courseVersionId = const Value.absent(),
+    this.plannedLaps = const Value.absent(),
   }) : startedAt = Value(startedAt),
        status = Value(status),
        source = Value(source);
@@ -625,6 +1726,10 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Expression<int>? averageWatts,
     Expression<double>? averageStrokeRate,
     Expression<int>? strokeCount,
+    Expression<int>? templateId,
+    Expression<String>? templateName,
+    Expression<int>? courseVersionId,
+    Expression<int>? plannedLaps,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -639,6 +1744,10 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       if (averageWatts != null) 'average_watts': averageWatts,
       if (averageStrokeRate != null) 'average_stroke_rate': averageStrokeRate,
       if (strokeCount != null) 'stroke_count': strokeCount,
+      if (templateId != null) 'template_id': templateId,
+      if (templateName != null) 'template_name': templateName,
+      if (courseVersionId != null) 'course_version_id': courseVersionId,
+      if (plannedLaps != null) 'planned_laps': plannedLaps,
     });
   }
 
@@ -655,6 +1764,10 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Value<int?>? averageWatts,
     Value<double?>? averageStrokeRate,
     Value<int>? strokeCount,
+    Value<int?>? templateId,
+    Value<String?>? templateName,
+    Value<int?>? courseVersionId,
+    Value<int?>? plannedLaps,
   }) {
     return SessionsCompanion(
       id: id ?? this.id,
@@ -669,6 +1782,10 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       averageWatts: averageWatts ?? this.averageWatts,
       averageStrokeRate: averageStrokeRate ?? this.averageStrokeRate,
       strokeCount: strokeCount ?? this.strokeCount,
+      templateId: templateId ?? this.templateId,
+      templateName: templateName ?? this.templateName,
+      courseVersionId: courseVersionId ?? this.courseVersionId,
+      plannedLaps: plannedLaps ?? this.plannedLaps,
     );
   }
 
@@ -715,6 +1832,18 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     if (strokeCount.present) {
       map['stroke_count'] = Variable<int>(strokeCount.value);
     }
+    if (templateId.present) {
+      map['template_id'] = Variable<int>(templateId.value);
+    }
+    if (templateName.present) {
+      map['template_name'] = Variable<String>(templateName.value);
+    }
+    if (courseVersionId.present) {
+      map['course_version_id'] = Variable<int>(courseVersionId.value);
+    }
+    if (plannedLaps.present) {
+      map['planned_laps'] = Variable<int>(plannedLaps.value);
+    }
     return map;
   }
 
@@ -732,7 +1861,11 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
           ..write('averagePaceCs: $averagePaceCs, ')
           ..write('averageWatts: $averageWatts, ')
           ..write('averageStrokeRate: $averageStrokeRate, ')
-          ..write('strokeCount: $strokeCount')
+          ..write('strokeCount: $strokeCount, ')
+          ..write('templateId: $templateId, ')
+          ..write('templateName: $templateName, ')
+          ..write('courseVersionId: $courseVersionId, ')
+          ..write('plannedLaps: $plannedLaps')
           ..write(')'))
         .toString();
   }
@@ -828,6 +1961,15 @@ class $SamplesTable extends Samples with TableInfo<$SamplesTable, SampleRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _wallMsMeta = const VerificationMeta('wallMs');
+  @override
+  late final GeneratedColumn<int> wallMs = GeneratedColumn<int>(
+    'wall_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     sessionId,
@@ -838,6 +1980,7 @@ class $SamplesTable extends Samples with TableInfo<$SamplesTable, SampleRow> {
     strokeRate,
     heartRate,
     calories,
+    wallMs,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -905,6 +2048,12 @@ class $SamplesTable extends Samples with TableInfo<$SamplesTable, SampleRow> {
         calories.isAcceptableOrUnknown(data['calories']!, _caloriesMeta),
       );
     }
+    if (data.containsKey('wall_ms')) {
+      context.handle(
+        _wallMsMeta,
+        wallMs.isAcceptableOrUnknown(data['wall_ms']!, _wallMsMeta),
+      );
+    }
     return context;
   }
 
@@ -946,6 +2095,10 @@ class $SamplesTable extends Samples with TableInfo<$SamplesTable, SampleRow> {
         DriftSqlType.int,
         data['${effectivePrefix}calories'],
       ),
+      wallMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}wall_ms'],
+      ),
     );
   }
 
@@ -964,6 +2117,10 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
   final int? strokeRate;
   final int? heartRate;
   final int? calories;
+
+  /// Wall-clock time since the first notification; keeps running while the
+  /// PM5 pauses its clock. Null for sessions recorded before schema 2.
+  final int? wallMs;
   const SampleRow({
     required this.sessionId,
     required this.tMs,
@@ -973,6 +2130,7 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
     this.strokeRate,
     this.heartRate,
     this.calories,
+    this.wallMs,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -994,6 +2152,9 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
     }
     if (!nullToAbsent || calories != null) {
       map['calories'] = Variable<int>(calories);
+    }
+    if (!nullToAbsent || wallMs != null) {
+      map['wall_ms'] = Variable<int>(wallMs);
     }
     return map;
   }
@@ -1018,6 +2179,9 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
       calories: calories == null && nullToAbsent
           ? const Value.absent()
           : Value(calories),
+      wallMs: wallMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wallMs),
     );
   }
 
@@ -1035,6 +2199,7 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
       strokeRate: serializer.fromJson<int?>(json['strokeRate']),
       heartRate: serializer.fromJson<int?>(json['heartRate']),
       calories: serializer.fromJson<int?>(json['calories']),
+      wallMs: serializer.fromJson<int?>(json['wallMs']),
     );
   }
   @override
@@ -1049,6 +2214,7 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
       'strokeRate': serializer.toJson<int?>(strokeRate),
       'heartRate': serializer.toJson<int?>(heartRate),
       'calories': serializer.toJson<int?>(calories),
+      'wallMs': serializer.toJson<int?>(wallMs),
     };
   }
 
@@ -1061,6 +2227,7 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
     Value<int?> strokeRate = const Value.absent(),
     Value<int?> heartRate = const Value.absent(),
     Value<int?> calories = const Value.absent(),
+    Value<int?> wallMs = const Value.absent(),
   }) => SampleRow(
     sessionId: sessionId ?? this.sessionId,
     tMs: tMs ?? this.tMs,
@@ -1070,6 +2237,7 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
     strokeRate: strokeRate.present ? strokeRate.value : this.strokeRate,
     heartRate: heartRate.present ? heartRate.value : this.heartRate,
     calories: calories.present ? calories.value : this.calories,
+    wallMs: wallMs.present ? wallMs.value : this.wallMs,
   );
   SampleRow copyWithCompanion(SamplesCompanion data) {
     return SampleRow(
@@ -1085,6 +2253,7 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
           : this.strokeRate,
       heartRate: data.heartRate.present ? data.heartRate.value : this.heartRate,
       calories: data.calories.present ? data.calories.value : this.calories,
+      wallMs: data.wallMs.present ? data.wallMs.value : this.wallMs,
     );
   }
 
@@ -1098,7 +2267,8 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
           ..write('watts: $watts, ')
           ..write('strokeRate: $strokeRate, ')
           ..write('heartRate: $heartRate, ')
-          ..write('calories: $calories')
+          ..write('calories: $calories, ')
+          ..write('wallMs: $wallMs')
           ..write(')'))
         .toString();
   }
@@ -1113,6 +2283,7 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
     strokeRate,
     heartRate,
     calories,
+    wallMs,
   );
   @override
   bool operator ==(Object other) =>
@@ -1125,7 +2296,8 @@ class SampleRow extends DataClass implements Insertable<SampleRow> {
           other.watts == this.watts &&
           other.strokeRate == this.strokeRate &&
           other.heartRate == this.heartRate &&
-          other.calories == this.calories);
+          other.calories == this.calories &&
+          other.wallMs == this.wallMs);
 }
 
 class SamplesCompanion extends UpdateCompanion<SampleRow> {
@@ -1137,6 +2309,7 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
   final Value<int?> strokeRate;
   final Value<int?> heartRate;
   final Value<int?> calories;
+  final Value<int?> wallMs;
   final Value<int> rowid;
   const SamplesCompanion({
     this.sessionId = const Value.absent(),
@@ -1147,6 +2320,7 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
     this.strokeRate = const Value.absent(),
     this.heartRate = const Value.absent(),
     this.calories = const Value.absent(),
+    this.wallMs = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SamplesCompanion.insert({
@@ -1158,6 +2332,7 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
     this.strokeRate = const Value.absent(),
     this.heartRate = const Value.absent(),
     this.calories = const Value.absent(),
+    this.wallMs = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : sessionId = Value(sessionId),
        tMs = Value(tMs),
@@ -1171,6 +2346,7 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
     Expression<int>? strokeRate,
     Expression<int>? heartRate,
     Expression<int>? calories,
+    Expression<int>? wallMs,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1182,6 +2358,7 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
       if (strokeRate != null) 'stroke_rate': strokeRate,
       if (heartRate != null) 'heart_rate': heartRate,
       if (calories != null) 'calories': calories,
+      if (wallMs != null) 'wall_ms': wallMs,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1195,6 +2372,7 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
     Value<int?>? strokeRate,
     Value<int?>? heartRate,
     Value<int?>? calories,
+    Value<int?>? wallMs,
     Value<int>? rowid,
   }) {
     return SamplesCompanion(
@@ -1206,6 +2384,7 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
       strokeRate: strokeRate ?? this.strokeRate,
       heartRate: heartRate ?? this.heartRate,
       calories: calories ?? this.calories,
+      wallMs: wallMs ?? this.wallMs,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1237,6 +2416,9 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
     if (calories.present) {
       map['calories'] = Variable<int>(calories.value);
     }
+    if (wallMs.present) {
+      map['wall_ms'] = Variable<int>(wallMs.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1254,6 +2436,7 @@ class SamplesCompanion extends UpdateCompanion<SampleRow> {
           ..write('strokeRate: $strokeRate, ')
           ..write('heartRate: $heartRate, ')
           ..write('calories: $calories, ')
+          ..write('wallMs: $wallMs, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2239,13 +3422,1805 @@ class RawPacketsCompanion extends UpdateCompanion<RawPacketRow> {
   }
 }
 
+class $CourseSegmentsTable extends CourseSegments
+    with TableInfo<$CourseSegmentsTable, CourseSegmentRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CourseSegmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _versionIdMeta = const VerificationMeta(
+    'versionId',
+  );
+  @override
+  late final GeneratedColumn<int> versionId = GeneratedColumn<int>(
+    'version_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES course_versions (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lengthMeta = const VerificationMeta('length');
+  @override
+  late final GeneratedColumn<int> length = GeneratedColumn<int>(
+    'length',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _paceFastCsMeta = const VerificationMeta(
+    'paceFastCs',
+  );
+  @override
+  late final GeneratedColumn<int> paceFastCs = GeneratedColumn<int>(
+    'pace_fast_cs',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paceSlowCsMeta = const VerificationMeta(
+    'paceSlowCs',
+  );
+  @override
+  late final GeneratedColumn<int> paceSlowCs = GeneratedColumn<int>(
+    'pace_slow_cs',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _spmMinMeta = const VerificationMeta('spmMin');
+  @override
+  late final GeneratedColumn<int> spmMin = GeneratedColumn<int>(
+    'spm_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _spmMaxMeta = const VerificationMeta('spmMax');
+  @override
+  late final GeneratedColumn<int> spmMax = GeneratedColumn<int>(
+    'spm_max',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    versionId,
+    position,
+    length,
+    paceFastCs,
+    paceSlowCs,
+    spmMin,
+    spmMax,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'course_segments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CourseSegmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('version_id')) {
+      context.handle(
+        _versionIdMeta,
+        versionId.isAcceptableOrUnknown(data['version_id']!, _versionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionIdMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('length')) {
+      context.handle(
+        _lengthMeta,
+        length.isAcceptableOrUnknown(data['length']!, _lengthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lengthMeta);
+    }
+    if (data.containsKey('pace_fast_cs')) {
+      context.handle(
+        _paceFastCsMeta,
+        paceFastCs.isAcceptableOrUnknown(
+          data['pace_fast_cs']!,
+          _paceFastCsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pace_slow_cs')) {
+      context.handle(
+        _paceSlowCsMeta,
+        paceSlowCs.isAcceptableOrUnknown(
+          data['pace_slow_cs']!,
+          _paceSlowCsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('spm_min')) {
+      context.handle(
+        _spmMinMeta,
+        spmMin.isAcceptableOrUnknown(data['spm_min']!, _spmMinMeta),
+      );
+    }
+    if (data.containsKey('spm_max')) {
+      context.handle(
+        _spmMaxMeta,
+        spmMax.isAcceptableOrUnknown(data['spm_max']!, _spmMaxMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {versionId, position};
+  @override
+  CourseSegmentRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CourseSegmentRow(
+      versionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version_id'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      length: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}length'],
+      )!,
+      paceFastCs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pace_fast_cs'],
+      ),
+      paceSlowCs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pace_slow_cs'],
+      ),
+      spmMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}spm_min'],
+      ),
+      spmMax: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}spm_max'],
+      ),
+    );
+  }
+
+  @override
+  $CourseSegmentsTable createAlias(String alias) {
+    return $CourseSegmentsTable(attachedDatabase, alias);
+  }
+}
+
+class CourseSegmentRow extends DataClass
+    implements Insertable<CourseSegmentRow> {
+  final int versionId;
+  final int position;
+
+  /// In the unit of the course length.
+  final int length;
+  final int? paceFastCs;
+  final int? paceSlowCs;
+  final int? spmMin;
+  final int? spmMax;
+  const CourseSegmentRow({
+    required this.versionId,
+    required this.position,
+    required this.length,
+    this.paceFastCs,
+    this.paceSlowCs,
+    this.spmMin,
+    this.spmMax,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['version_id'] = Variable<int>(versionId);
+    map['position'] = Variable<int>(position);
+    map['length'] = Variable<int>(length);
+    if (!nullToAbsent || paceFastCs != null) {
+      map['pace_fast_cs'] = Variable<int>(paceFastCs);
+    }
+    if (!nullToAbsent || paceSlowCs != null) {
+      map['pace_slow_cs'] = Variable<int>(paceSlowCs);
+    }
+    if (!nullToAbsent || spmMin != null) {
+      map['spm_min'] = Variable<int>(spmMin);
+    }
+    if (!nullToAbsent || spmMax != null) {
+      map['spm_max'] = Variable<int>(spmMax);
+    }
+    return map;
+  }
+
+  CourseSegmentsCompanion toCompanion(bool nullToAbsent) {
+    return CourseSegmentsCompanion(
+      versionId: Value(versionId),
+      position: Value(position),
+      length: Value(length),
+      paceFastCs: paceFastCs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paceFastCs),
+      paceSlowCs: paceSlowCs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paceSlowCs),
+      spmMin: spmMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(spmMin),
+      spmMax: spmMax == null && nullToAbsent
+          ? const Value.absent()
+          : Value(spmMax),
+    );
+  }
+
+  factory CourseSegmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CourseSegmentRow(
+      versionId: serializer.fromJson<int>(json['versionId']),
+      position: serializer.fromJson<int>(json['position']),
+      length: serializer.fromJson<int>(json['length']),
+      paceFastCs: serializer.fromJson<int?>(json['paceFastCs']),
+      paceSlowCs: serializer.fromJson<int?>(json['paceSlowCs']),
+      spmMin: serializer.fromJson<int?>(json['spmMin']),
+      spmMax: serializer.fromJson<int?>(json['spmMax']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'versionId': serializer.toJson<int>(versionId),
+      'position': serializer.toJson<int>(position),
+      'length': serializer.toJson<int>(length),
+      'paceFastCs': serializer.toJson<int?>(paceFastCs),
+      'paceSlowCs': serializer.toJson<int?>(paceSlowCs),
+      'spmMin': serializer.toJson<int?>(spmMin),
+      'spmMax': serializer.toJson<int?>(spmMax),
+    };
+  }
+
+  CourseSegmentRow copyWith({
+    int? versionId,
+    int? position,
+    int? length,
+    Value<int?> paceFastCs = const Value.absent(),
+    Value<int?> paceSlowCs = const Value.absent(),
+    Value<int?> spmMin = const Value.absent(),
+    Value<int?> spmMax = const Value.absent(),
+  }) => CourseSegmentRow(
+    versionId: versionId ?? this.versionId,
+    position: position ?? this.position,
+    length: length ?? this.length,
+    paceFastCs: paceFastCs.present ? paceFastCs.value : this.paceFastCs,
+    paceSlowCs: paceSlowCs.present ? paceSlowCs.value : this.paceSlowCs,
+    spmMin: spmMin.present ? spmMin.value : this.spmMin,
+    spmMax: spmMax.present ? spmMax.value : this.spmMax,
+  );
+  CourseSegmentRow copyWithCompanion(CourseSegmentsCompanion data) {
+    return CourseSegmentRow(
+      versionId: data.versionId.present ? data.versionId.value : this.versionId,
+      position: data.position.present ? data.position.value : this.position,
+      length: data.length.present ? data.length.value : this.length,
+      paceFastCs: data.paceFastCs.present
+          ? data.paceFastCs.value
+          : this.paceFastCs,
+      paceSlowCs: data.paceSlowCs.present
+          ? data.paceSlowCs.value
+          : this.paceSlowCs,
+      spmMin: data.spmMin.present ? data.spmMin.value : this.spmMin,
+      spmMax: data.spmMax.present ? data.spmMax.value : this.spmMax,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CourseSegmentRow(')
+          ..write('versionId: $versionId, ')
+          ..write('position: $position, ')
+          ..write('length: $length, ')
+          ..write('paceFastCs: $paceFastCs, ')
+          ..write('paceSlowCs: $paceSlowCs, ')
+          ..write('spmMin: $spmMin, ')
+          ..write('spmMax: $spmMax')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    versionId,
+    position,
+    length,
+    paceFastCs,
+    paceSlowCs,
+    spmMin,
+    spmMax,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CourseSegmentRow &&
+          other.versionId == this.versionId &&
+          other.position == this.position &&
+          other.length == this.length &&
+          other.paceFastCs == this.paceFastCs &&
+          other.paceSlowCs == this.paceSlowCs &&
+          other.spmMin == this.spmMin &&
+          other.spmMax == this.spmMax);
+}
+
+class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
+  final Value<int> versionId;
+  final Value<int> position;
+  final Value<int> length;
+  final Value<int?> paceFastCs;
+  final Value<int?> paceSlowCs;
+  final Value<int?> spmMin;
+  final Value<int?> spmMax;
+  final Value<int> rowid;
+  const CourseSegmentsCompanion({
+    this.versionId = const Value.absent(),
+    this.position = const Value.absent(),
+    this.length = const Value.absent(),
+    this.paceFastCs = const Value.absent(),
+    this.paceSlowCs = const Value.absent(),
+    this.spmMin = const Value.absent(),
+    this.spmMax = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CourseSegmentsCompanion.insert({
+    required int versionId,
+    required int position,
+    required int length,
+    this.paceFastCs = const Value.absent(),
+    this.paceSlowCs = const Value.absent(),
+    this.spmMin = const Value.absent(),
+    this.spmMax = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : versionId = Value(versionId),
+       position = Value(position),
+       length = Value(length);
+  static Insertable<CourseSegmentRow> custom({
+    Expression<int>? versionId,
+    Expression<int>? position,
+    Expression<int>? length,
+    Expression<int>? paceFastCs,
+    Expression<int>? paceSlowCs,
+    Expression<int>? spmMin,
+    Expression<int>? spmMax,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (versionId != null) 'version_id': versionId,
+      if (position != null) 'position': position,
+      if (length != null) 'length': length,
+      if (paceFastCs != null) 'pace_fast_cs': paceFastCs,
+      if (paceSlowCs != null) 'pace_slow_cs': paceSlowCs,
+      if (spmMin != null) 'spm_min': spmMin,
+      if (spmMax != null) 'spm_max': spmMax,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CourseSegmentsCompanion copyWith({
+    Value<int>? versionId,
+    Value<int>? position,
+    Value<int>? length,
+    Value<int?>? paceFastCs,
+    Value<int?>? paceSlowCs,
+    Value<int?>? spmMin,
+    Value<int?>? spmMax,
+    Value<int>? rowid,
+  }) {
+    return CourseSegmentsCompanion(
+      versionId: versionId ?? this.versionId,
+      position: position ?? this.position,
+      length: length ?? this.length,
+      paceFastCs: paceFastCs ?? this.paceFastCs,
+      paceSlowCs: paceSlowCs ?? this.paceSlowCs,
+      spmMin: spmMin ?? this.spmMin,
+      spmMax: spmMax ?? this.spmMax,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (versionId.present) {
+      map['version_id'] = Variable<int>(versionId.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (length.present) {
+      map['length'] = Variable<int>(length.value);
+    }
+    if (paceFastCs.present) {
+      map['pace_fast_cs'] = Variable<int>(paceFastCs.value);
+    }
+    if (paceSlowCs.present) {
+      map['pace_slow_cs'] = Variable<int>(paceSlowCs.value);
+    }
+    if (spmMin.present) {
+      map['spm_min'] = Variable<int>(spmMin.value);
+    }
+    if (spmMax.present) {
+      map['spm_max'] = Variable<int>(spmMax.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CourseSegmentsCompanion(')
+          ..write('versionId: $versionId, ')
+          ..write('position: $position, ')
+          ..write('length: $length, ')
+          ..write('paceFastCs: $paceFastCs, ')
+          ..write('paceSlowCs: $paceSlowCs, ')
+          ..write('spmMin: $spmMin, ')
+          ..write('spmMax: $spmMax, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TemplateBlocksTable extends TemplateBlocks
+    with TableInfo<$TemplateBlocksTable, TemplateBlockRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TemplateBlocksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  @override
+  late final GeneratedColumn<int> templateId = GeneratedColumn<int>(
+    'template_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES templates (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _courseIdMeta = const VerificationMeta(
+    'courseId',
+  );
+  @override
+  late final GeneratedColumn<int> courseId = GeneratedColumn<int>(
+    'course_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES courses (id)',
+    ),
+  );
+  static const VerificationMeta _lapsMeta = const VerificationMeta('laps');
+  @override
+  late final GeneratedColumn<int> laps = GeneratedColumn<int>(
+    'laps',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [templateId, position, courseId, laps];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'template_blocks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TemplateBlockRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_templateIdMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('course_id')) {
+      context.handle(
+        _courseIdMeta,
+        courseId.isAcceptableOrUnknown(data['course_id']!, _courseIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_courseIdMeta);
+    }
+    if (data.containsKey('laps')) {
+      context.handle(
+        _lapsMeta,
+        laps.isAcceptableOrUnknown(data['laps']!, _lapsMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {templateId, position};
+  @override
+  TemplateBlockRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TemplateBlockRow(
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}template_id'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      courseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}course_id'],
+      )!,
+      laps: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}laps'],
+      ),
+    );
+  }
+
+  @override
+  $TemplateBlocksTable createAlias(String alias) {
+    return $TemplateBlocksTable(attachedDatabase, alias);
+  }
+}
+
+class TemplateBlockRow extends DataClass
+    implements Insertable<TemplateBlockRow> {
+  final int templateId;
+  final int position;
+  final int courseId;
+
+  /// Null means open: laps follow until the session is stopped.
+  final int? laps;
+  const TemplateBlockRow({
+    required this.templateId,
+    required this.position,
+    required this.courseId,
+    this.laps,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['template_id'] = Variable<int>(templateId);
+    map['position'] = Variable<int>(position);
+    map['course_id'] = Variable<int>(courseId);
+    if (!nullToAbsent || laps != null) {
+      map['laps'] = Variable<int>(laps);
+    }
+    return map;
+  }
+
+  TemplateBlocksCompanion toCompanion(bool nullToAbsent) {
+    return TemplateBlocksCompanion(
+      templateId: Value(templateId),
+      position: Value(position),
+      courseId: Value(courseId),
+      laps: laps == null && nullToAbsent ? const Value.absent() : Value(laps),
+    );
+  }
+
+  factory TemplateBlockRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TemplateBlockRow(
+      templateId: serializer.fromJson<int>(json['templateId']),
+      position: serializer.fromJson<int>(json['position']),
+      courseId: serializer.fromJson<int>(json['courseId']),
+      laps: serializer.fromJson<int?>(json['laps']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'templateId': serializer.toJson<int>(templateId),
+      'position': serializer.toJson<int>(position),
+      'courseId': serializer.toJson<int>(courseId),
+      'laps': serializer.toJson<int?>(laps),
+    };
+  }
+
+  TemplateBlockRow copyWith({
+    int? templateId,
+    int? position,
+    int? courseId,
+    Value<int?> laps = const Value.absent(),
+  }) => TemplateBlockRow(
+    templateId: templateId ?? this.templateId,
+    position: position ?? this.position,
+    courseId: courseId ?? this.courseId,
+    laps: laps.present ? laps.value : this.laps,
+  );
+  TemplateBlockRow copyWithCompanion(TemplateBlocksCompanion data) {
+    return TemplateBlockRow(
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      position: data.position.present ? data.position.value : this.position,
+      courseId: data.courseId.present ? data.courseId.value : this.courseId,
+      laps: data.laps.present ? data.laps.value : this.laps,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TemplateBlockRow(')
+          ..write('templateId: $templateId, ')
+          ..write('position: $position, ')
+          ..write('courseId: $courseId, ')
+          ..write('laps: $laps')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(templateId, position, courseId, laps);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TemplateBlockRow &&
+          other.templateId == this.templateId &&
+          other.position == this.position &&
+          other.courseId == this.courseId &&
+          other.laps == this.laps);
+}
+
+class TemplateBlocksCompanion extends UpdateCompanion<TemplateBlockRow> {
+  final Value<int> templateId;
+  final Value<int> position;
+  final Value<int> courseId;
+  final Value<int?> laps;
+  final Value<int> rowid;
+  const TemplateBlocksCompanion({
+    this.templateId = const Value.absent(),
+    this.position = const Value.absent(),
+    this.courseId = const Value.absent(),
+    this.laps = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TemplateBlocksCompanion.insert({
+    required int templateId,
+    required int position,
+    required int courseId,
+    this.laps = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : templateId = Value(templateId),
+       position = Value(position),
+       courseId = Value(courseId);
+  static Insertable<TemplateBlockRow> custom({
+    Expression<int>? templateId,
+    Expression<int>? position,
+    Expression<int>? courseId,
+    Expression<int>? laps,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (templateId != null) 'template_id': templateId,
+      if (position != null) 'position': position,
+      if (courseId != null) 'course_id': courseId,
+      if (laps != null) 'laps': laps,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TemplateBlocksCompanion copyWith({
+    Value<int>? templateId,
+    Value<int>? position,
+    Value<int>? courseId,
+    Value<int?>? laps,
+    Value<int>? rowid,
+  }) {
+    return TemplateBlocksCompanion(
+      templateId: templateId ?? this.templateId,
+      position: position ?? this.position,
+      courseId: courseId ?? this.courseId,
+      laps: laps ?? this.laps,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (templateId.present) {
+      map['template_id'] = Variable<int>(templateId.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (courseId.present) {
+      map['course_id'] = Variable<int>(courseId.value);
+    }
+    if (laps.present) {
+      map['laps'] = Variable<int>(laps.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TemplateBlocksCompanion(')
+          ..write('templateId: $templateId, ')
+          ..write('position: $position, ')
+          ..write('courseId: $courseId, ')
+          ..write('laps: $laps, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LapsTable extends Laps with TableInfo<$LapsTable, LapRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LapsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<int> sessionId = GeneratedColumn<int>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES sessions (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _lapNoMeta = const VerificationMeta('lapNo');
+  @override
+  late final GeneratedColumn<int> lapNo = GeneratedColumn<int>(
+    'lap_no',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startWallMsMeta = const VerificationMeta(
+    'startWallMs',
+  );
+  @override
+  late final GeneratedColumn<int> startWallMs = GeneratedColumn<int>(
+    'start_wall_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endWallMsMeta = const VerificationMeta(
+    'endWallMs',
+  );
+  @override
+  late final GeneratedColumn<int> endWallMs = GeneratedColumn<int>(
+    'end_wall_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startDistanceDmMeta = const VerificationMeta(
+    'startDistanceDm',
+  );
+  @override
+  late final GeneratedColumn<int> startDistanceDm = GeneratedColumn<int>(
+    'start_distance_dm',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endDistanceDmMeta = const VerificationMeta(
+    'endDistanceDm',
+  );
+  @override
+  late final GeneratedColumn<int> endDistanceDm = GeneratedColumn<int>(
+    'end_distance_dm',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _completeMeta = const VerificationMeta(
+    'complete',
+  );
+  @override
+  late final GeneratedColumn<bool> complete = GeneratedColumn<bool>(
+    'complete',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("complete" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _inZoneShareMeta = const VerificationMeta(
+    'inZoneShare',
+  );
+  @override
+  late final GeneratedColumn<double> inZoneShare = GeneratedColumn<double>(
+    'in_zone_share',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    sessionId,
+    lapNo,
+    startWallMs,
+    endWallMs,
+    startDistanceDm,
+    endDistanceDm,
+    complete,
+    inZoneShare,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'laps';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LapRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('lap_no')) {
+      context.handle(
+        _lapNoMeta,
+        lapNo.isAcceptableOrUnknown(data['lap_no']!, _lapNoMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lapNoMeta);
+    }
+    if (data.containsKey('start_wall_ms')) {
+      context.handle(
+        _startWallMsMeta,
+        startWallMs.isAcceptableOrUnknown(
+          data['start_wall_ms']!,
+          _startWallMsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_startWallMsMeta);
+    }
+    if (data.containsKey('end_wall_ms')) {
+      context.handle(
+        _endWallMsMeta,
+        endWallMs.isAcceptableOrUnknown(data['end_wall_ms']!, _endWallMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endWallMsMeta);
+    }
+    if (data.containsKey('start_distance_dm')) {
+      context.handle(
+        _startDistanceDmMeta,
+        startDistanceDm.isAcceptableOrUnknown(
+          data['start_distance_dm']!,
+          _startDistanceDmMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_startDistanceDmMeta);
+    }
+    if (data.containsKey('end_distance_dm')) {
+      context.handle(
+        _endDistanceDmMeta,
+        endDistanceDm.isAcceptableOrUnknown(
+          data['end_distance_dm']!,
+          _endDistanceDmMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_endDistanceDmMeta);
+    }
+    if (data.containsKey('complete')) {
+      context.handle(
+        _completeMeta,
+        complete.isAcceptableOrUnknown(data['complete']!, _completeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_completeMeta);
+    }
+    if (data.containsKey('in_zone_share')) {
+      context.handle(
+        _inZoneShareMeta,
+        inZoneShare.isAcceptableOrUnknown(
+          data['in_zone_share']!,
+          _inZoneShareMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sessionId, lapNo};
+  @override
+  LapRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LapRow(
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}session_id'],
+      )!,
+      lapNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lap_no'],
+      )!,
+      startWallMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_wall_ms'],
+      )!,
+      endWallMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_wall_ms'],
+      )!,
+      startDistanceDm: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_distance_dm'],
+      )!,
+      endDistanceDm: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_distance_dm'],
+      )!,
+      complete: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}complete'],
+      )!,
+      inZoneShare: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}in_zone_share'],
+      ),
+    );
+  }
+
+  @override
+  $LapsTable createAlias(String alias) {
+    return $LapsTable(attachedDatabase, alias);
+  }
+}
+
+class LapRow extends DataClass implements Insertable<LapRow> {
+  final int sessionId;
+
+  /// Starting at 1.
+  final int lapNo;
+  final int startWallMs;
+  final int endWallMs;
+  final int startDistanceDm;
+  final int endDistanceDm;
+
+  /// False for a lap that was started but not finished.
+  final bool complete;
+
+  /// Share of time within the bands, 0 to 1; null without bands.
+  final double? inZoneShare;
+  const LapRow({
+    required this.sessionId,
+    required this.lapNo,
+    required this.startWallMs,
+    required this.endWallMs,
+    required this.startDistanceDm,
+    required this.endDistanceDm,
+    required this.complete,
+    this.inZoneShare,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['session_id'] = Variable<int>(sessionId);
+    map['lap_no'] = Variable<int>(lapNo);
+    map['start_wall_ms'] = Variable<int>(startWallMs);
+    map['end_wall_ms'] = Variable<int>(endWallMs);
+    map['start_distance_dm'] = Variable<int>(startDistanceDm);
+    map['end_distance_dm'] = Variable<int>(endDistanceDm);
+    map['complete'] = Variable<bool>(complete);
+    if (!nullToAbsent || inZoneShare != null) {
+      map['in_zone_share'] = Variable<double>(inZoneShare);
+    }
+    return map;
+  }
+
+  LapsCompanion toCompanion(bool nullToAbsent) {
+    return LapsCompanion(
+      sessionId: Value(sessionId),
+      lapNo: Value(lapNo),
+      startWallMs: Value(startWallMs),
+      endWallMs: Value(endWallMs),
+      startDistanceDm: Value(startDistanceDm),
+      endDistanceDm: Value(endDistanceDm),
+      complete: Value(complete),
+      inZoneShare: inZoneShare == null && nullToAbsent
+          ? const Value.absent()
+          : Value(inZoneShare),
+    );
+  }
+
+  factory LapRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LapRow(
+      sessionId: serializer.fromJson<int>(json['sessionId']),
+      lapNo: serializer.fromJson<int>(json['lapNo']),
+      startWallMs: serializer.fromJson<int>(json['startWallMs']),
+      endWallMs: serializer.fromJson<int>(json['endWallMs']),
+      startDistanceDm: serializer.fromJson<int>(json['startDistanceDm']),
+      endDistanceDm: serializer.fromJson<int>(json['endDistanceDm']),
+      complete: serializer.fromJson<bool>(json['complete']),
+      inZoneShare: serializer.fromJson<double?>(json['inZoneShare']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sessionId': serializer.toJson<int>(sessionId),
+      'lapNo': serializer.toJson<int>(lapNo),
+      'startWallMs': serializer.toJson<int>(startWallMs),
+      'endWallMs': serializer.toJson<int>(endWallMs),
+      'startDistanceDm': serializer.toJson<int>(startDistanceDm),
+      'endDistanceDm': serializer.toJson<int>(endDistanceDm),
+      'complete': serializer.toJson<bool>(complete),
+      'inZoneShare': serializer.toJson<double?>(inZoneShare),
+    };
+  }
+
+  LapRow copyWith({
+    int? sessionId,
+    int? lapNo,
+    int? startWallMs,
+    int? endWallMs,
+    int? startDistanceDm,
+    int? endDistanceDm,
+    bool? complete,
+    Value<double?> inZoneShare = const Value.absent(),
+  }) => LapRow(
+    sessionId: sessionId ?? this.sessionId,
+    lapNo: lapNo ?? this.lapNo,
+    startWallMs: startWallMs ?? this.startWallMs,
+    endWallMs: endWallMs ?? this.endWallMs,
+    startDistanceDm: startDistanceDm ?? this.startDistanceDm,
+    endDistanceDm: endDistanceDm ?? this.endDistanceDm,
+    complete: complete ?? this.complete,
+    inZoneShare: inZoneShare.present ? inZoneShare.value : this.inZoneShare,
+  );
+  LapRow copyWithCompanion(LapsCompanion data) {
+    return LapRow(
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      lapNo: data.lapNo.present ? data.lapNo.value : this.lapNo,
+      startWallMs: data.startWallMs.present
+          ? data.startWallMs.value
+          : this.startWallMs,
+      endWallMs: data.endWallMs.present ? data.endWallMs.value : this.endWallMs,
+      startDistanceDm: data.startDistanceDm.present
+          ? data.startDistanceDm.value
+          : this.startDistanceDm,
+      endDistanceDm: data.endDistanceDm.present
+          ? data.endDistanceDm.value
+          : this.endDistanceDm,
+      complete: data.complete.present ? data.complete.value : this.complete,
+      inZoneShare: data.inZoneShare.present
+          ? data.inZoneShare.value
+          : this.inZoneShare,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LapRow(')
+          ..write('sessionId: $sessionId, ')
+          ..write('lapNo: $lapNo, ')
+          ..write('startWallMs: $startWallMs, ')
+          ..write('endWallMs: $endWallMs, ')
+          ..write('startDistanceDm: $startDistanceDm, ')
+          ..write('endDistanceDm: $endDistanceDm, ')
+          ..write('complete: $complete, ')
+          ..write('inZoneShare: $inZoneShare')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    sessionId,
+    lapNo,
+    startWallMs,
+    endWallMs,
+    startDistanceDm,
+    endDistanceDm,
+    complete,
+    inZoneShare,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LapRow &&
+          other.sessionId == this.sessionId &&
+          other.lapNo == this.lapNo &&
+          other.startWallMs == this.startWallMs &&
+          other.endWallMs == this.endWallMs &&
+          other.startDistanceDm == this.startDistanceDm &&
+          other.endDistanceDm == this.endDistanceDm &&
+          other.complete == this.complete &&
+          other.inZoneShare == this.inZoneShare);
+}
+
+class LapsCompanion extends UpdateCompanion<LapRow> {
+  final Value<int> sessionId;
+  final Value<int> lapNo;
+  final Value<int> startWallMs;
+  final Value<int> endWallMs;
+  final Value<int> startDistanceDm;
+  final Value<int> endDistanceDm;
+  final Value<bool> complete;
+  final Value<double?> inZoneShare;
+  final Value<int> rowid;
+  const LapsCompanion({
+    this.sessionId = const Value.absent(),
+    this.lapNo = const Value.absent(),
+    this.startWallMs = const Value.absent(),
+    this.endWallMs = const Value.absent(),
+    this.startDistanceDm = const Value.absent(),
+    this.endDistanceDm = const Value.absent(),
+    this.complete = const Value.absent(),
+    this.inZoneShare = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LapsCompanion.insert({
+    required int sessionId,
+    required int lapNo,
+    required int startWallMs,
+    required int endWallMs,
+    required int startDistanceDm,
+    required int endDistanceDm,
+    required bool complete,
+    this.inZoneShare = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : sessionId = Value(sessionId),
+       lapNo = Value(lapNo),
+       startWallMs = Value(startWallMs),
+       endWallMs = Value(endWallMs),
+       startDistanceDm = Value(startDistanceDm),
+       endDistanceDm = Value(endDistanceDm),
+       complete = Value(complete);
+  static Insertable<LapRow> custom({
+    Expression<int>? sessionId,
+    Expression<int>? lapNo,
+    Expression<int>? startWallMs,
+    Expression<int>? endWallMs,
+    Expression<int>? startDistanceDm,
+    Expression<int>? endDistanceDm,
+    Expression<bool>? complete,
+    Expression<double>? inZoneShare,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (sessionId != null) 'session_id': sessionId,
+      if (lapNo != null) 'lap_no': lapNo,
+      if (startWallMs != null) 'start_wall_ms': startWallMs,
+      if (endWallMs != null) 'end_wall_ms': endWallMs,
+      if (startDistanceDm != null) 'start_distance_dm': startDistanceDm,
+      if (endDistanceDm != null) 'end_distance_dm': endDistanceDm,
+      if (complete != null) 'complete': complete,
+      if (inZoneShare != null) 'in_zone_share': inZoneShare,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LapsCompanion copyWith({
+    Value<int>? sessionId,
+    Value<int>? lapNo,
+    Value<int>? startWallMs,
+    Value<int>? endWallMs,
+    Value<int>? startDistanceDm,
+    Value<int>? endDistanceDm,
+    Value<bool>? complete,
+    Value<double?>? inZoneShare,
+    Value<int>? rowid,
+  }) {
+    return LapsCompanion(
+      sessionId: sessionId ?? this.sessionId,
+      lapNo: lapNo ?? this.lapNo,
+      startWallMs: startWallMs ?? this.startWallMs,
+      endWallMs: endWallMs ?? this.endWallMs,
+      startDistanceDm: startDistanceDm ?? this.startDistanceDm,
+      endDistanceDm: endDistanceDm ?? this.endDistanceDm,
+      complete: complete ?? this.complete,
+      inZoneShare: inZoneShare ?? this.inZoneShare,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sessionId.present) {
+      map['session_id'] = Variable<int>(sessionId.value);
+    }
+    if (lapNo.present) {
+      map['lap_no'] = Variable<int>(lapNo.value);
+    }
+    if (startWallMs.present) {
+      map['start_wall_ms'] = Variable<int>(startWallMs.value);
+    }
+    if (endWallMs.present) {
+      map['end_wall_ms'] = Variable<int>(endWallMs.value);
+    }
+    if (startDistanceDm.present) {
+      map['start_distance_dm'] = Variable<int>(startDistanceDm.value);
+    }
+    if (endDistanceDm.present) {
+      map['end_distance_dm'] = Variable<int>(endDistanceDm.value);
+    }
+    if (complete.present) {
+      map['complete'] = Variable<bool>(complete.value);
+    }
+    if (inZoneShare.present) {
+      map['in_zone_share'] = Variable<double>(inZoneShare.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LapsCompanion(')
+          ..write('sessionId: $sessionId, ')
+          ..write('lapNo: $lapNo, ')
+          ..write('startWallMs: $startWallMs, ')
+          ..write('endWallMs: $endWallMs, ')
+          ..write('startDistanceDm: $startDistanceDm, ')
+          ..write('endDistanceDm: $endDistanceDm, ')
+          ..write('complete: $complete, ')
+          ..write('inZoneShare: $inZoneShare, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LapSegmentsTable extends LapSegments
+    with TableInfo<$LapSegmentsTable, LapSegmentRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LapSegmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<int> sessionId = GeneratedColumn<int>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES sessions (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _lapNoMeta = const VerificationMeta('lapNo');
+  @override
+  late final GeneratedColumn<int> lapNo = GeneratedColumn<int>(
+    'lap_no',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _durationMsMeta = const VerificationMeta(
+    'durationMs',
+  );
+  @override
+  late final GeneratedColumn<int> durationMs = GeneratedColumn<int>(
+    'duration_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _distanceDmMeta = const VerificationMeta(
+    'distanceDm',
+  );
+  @override
+  late final GeneratedColumn<int> distanceDm = GeneratedColumn<int>(
+    'distance_dm',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _inZoneShareMeta = const VerificationMeta(
+    'inZoneShare',
+  );
+  @override
+  late final GeneratedColumn<double> inZoneShare = GeneratedColumn<double>(
+    'in_zone_share',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    sessionId,
+    lapNo,
+    position,
+    durationMs,
+    distanceDm,
+    inZoneShare,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'lap_segments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LapSegmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('lap_no')) {
+      context.handle(
+        _lapNoMeta,
+        lapNo.isAcceptableOrUnknown(data['lap_no']!, _lapNoMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lapNoMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('duration_ms')) {
+      context.handle(
+        _durationMsMeta,
+        durationMs.isAcceptableOrUnknown(data['duration_ms']!, _durationMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_durationMsMeta);
+    }
+    if (data.containsKey('distance_dm')) {
+      context.handle(
+        _distanceDmMeta,
+        distanceDm.isAcceptableOrUnknown(data['distance_dm']!, _distanceDmMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_distanceDmMeta);
+    }
+    if (data.containsKey('in_zone_share')) {
+      context.handle(
+        _inZoneShareMeta,
+        inZoneShare.isAcceptableOrUnknown(
+          data['in_zone_share']!,
+          _inZoneShareMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sessionId, lapNo, position};
+  @override
+  LapSegmentRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LapSegmentRow(
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}session_id'],
+      )!,
+      lapNo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lap_no'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      durationMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_ms'],
+      )!,
+      distanceDm: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}distance_dm'],
+      )!,
+      inZoneShare: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}in_zone_share'],
+      ),
+    );
+  }
+
+  @override
+  $LapSegmentsTable createAlias(String alias) {
+    return $LapSegmentsTable(attachedDatabase, alias);
+  }
+}
+
+class LapSegmentRow extends DataClass implements Insertable<LapSegmentRow> {
+  final int sessionId;
+  final int lapNo;
+  final int position;
+  final int durationMs;
+  final int distanceDm;
+  final double? inZoneShare;
+  const LapSegmentRow({
+    required this.sessionId,
+    required this.lapNo,
+    required this.position,
+    required this.durationMs,
+    required this.distanceDm,
+    this.inZoneShare,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['session_id'] = Variable<int>(sessionId);
+    map['lap_no'] = Variable<int>(lapNo);
+    map['position'] = Variable<int>(position);
+    map['duration_ms'] = Variable<int>(durationMs);
+    map['distance_dm'] = Variable<int>(distanceDm);
+    if (!nullToAbsent || inZoneShare != null) {
+      map['in_zone_share'] = Variable<double>(inZoneShare);
+    }
+    return map;
+  }
+
+  LapSegmentsCompanion toCompanion(bool nullToAbsent) {
+    return LapSegmentsCompanion(
+      sessionId: Value(sessionId),
+      lapNo: Value(lapNo),
+      position: Value(position),
+      durationMs: Value(durationMs),
+      distanceDm: Value(distanceDm),
+      inZoneShare: inZoneShare == null && nullToAbsent
+          ? const Value.absent()
+          : Value(inZoneShare),
+    );
+  }
+
+  factory LapSegmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LapSegmentRow(
+      sessionId: serializer.fromJson<int>(json['sessionId']),
+      lapNo: serializer.fromJson<int>(json['lapNo']),
+      position: serializer.fromJson<int>(json['position']),
+      durationMs: serializer.fromJson<int>(json['durationMs']),
+      distanceDm: serializer.fromJson<int>(json['distanceDm']),
+      inZoneShare: serializer.fromJson<double?>(json['inZoneShare']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sessionId': serializer.toJson<int>(sessionId),
+      'lapNo': serializer.toJson<int>(lapNo),
+      'position': serializer.toJson<int>(position),
+      'durationMs': serializer.toJson<int>(durationMs),
+      'distanceDm': serializer.toJson<int>(distanceDm),
+      'inZoneShare': serializer.toJson<double?>(inZoneShare),
+    };
+  }
+
+  LapSegmentRow copyWith({
+    int? sessionId,
+    int? lapNo,
+    int? position,
+    int? durationMs,
+    int? distanceDm,
+    Value<double?> inZoneShare = const Value.absent(),
+  }) => LapSegmentRow(
+    sessionId: sessionId ?? this.sessionId,
+    lapNo: lapNo ?? this.lapNo,
+    position: position ?? this.position,
+    durationMs: durationMs ?? this.durationMs,
+    distanceDm: distanceDm ?? this.distanceDm,
+    inZoneShare: inZoneShare.present ? inZoneShare.value : this.inZoneShare,
+  );
+  LapSegmentRow copyWithCompanion(LapSegmentsCompanion data) {
+    return LapSegmentRow(
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      lapNo: data.lapNo.present ? data.lapNo.value : this.lapNo,
+      position: data.position.present ? data.position.value : this.position,
+      durationMs: data.durationMs.present
+          ? data.durationMs.value
+          : this.durationMs,
+      distanceDm: data.distanceDm.present
+          ? data.distanceDm.value
+          : this.distanceDm,
+      inZoneShare: data.inZoneShare.present
+          ? data.inZoneShare.value
+          : this.inZoneShare,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LapSegmentRow(')
+          ..write('sessionId: $sessionId, ')
+          ..write('lapNo: $lapNo, ')
+          ..write('position: $position, ')
+          ..write('durationMs: $durationMs, ')
+          ..write('distanceDm: $distanceDm, ')
+          ..write('inZoneShare: $inZoneShare')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    sessionId,
+    lapNo,
+    position,
+    durationMs,
+    distanceDm,
+    inZoneShare,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LapSegmentRow &&
+          other.sessionId == this.sessionId &&
+          other.lapNo == this.lapNo &&
+          other.position == this.position &&
+          other.durationMs == this.durationMs &&
+          other.distanceDm == this.distanceDm &&
+          other.inZoneShare == this.inZoneShare);
+}
+
+class LapSegmentsCompanion extends UpdateCompanion<LapSegmentRow> {
+  final Value<int> sessionId;
+  final Value<int> lapNo;
+  final Value<int> position;
+  final Value<int> durationMs;
+  final Value<int> distanceDm;
+  final Value<double?> inZoneShare;
+  final Value<int> rowid;
+  const LapSegmentsCompanion({
+    this.sessionId = const Value.absent(),
+    this.lapNo = const Value.absent(),
+    this.position = const Value.absent(),
+    this.durationMs = const Value.absent(),
+    this.distanceDm = const Value.absent(),
+    this.inZoneShare = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LapSegmentsCompanion.insert({
+    required int sessionId,
+    required int lapNo,
+    required int position,
+    required int durationMs,
+    required int distanceDm,
+    this.inZoneShare = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : sessionId = Value(sessionId),
+       lapNo = Value(lapNo),
+       position = Value(position),
+       durationMs = Value(durationMs),
+       distanceDm = Value(distanceDm);
+  static Insertable<LapSegmentRow> custom({
+    Expression<int>? sessionId,
+    Expression<int>? lapNo,
+    Expression<int>? position,
+    Expression<int>? durationMs,
+    Expression<int>? distanceDm,
+    Expression<double>? inZoneShare,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (sessionId != null) 'session_id': sessionId,
+      if (lapNo != null) 'lap_no': lapNo,
+      if (position != null) 'position': position,
+      if (durationMs != null) 'duration_ms': durationMs,
+      if (distanceDm != null) 'distance_dm': distanceDm,
+      if (inZoneShare != null) 'in_zone_share': inZoneShare,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LapSegmentsCompanion copyWith({
+    Value<int>? sessionId,
+    Value<int>? lapNo,
+    Value<int>? position,
+    Value<int>? durationMs,
+    Value<int>? distanceDm,
+    Value<double?>? inZoneShare,
+    Value<int>? rowid,
+  }) {
+    return LapSegmentsCompanion(
+      sessionId: sessionId ?? this.sessionId,
+      lapNo: lapNo ?? this.lapNo,
+      position: position ?? this.position,
+      durationMs: durationMs ?? this.durationMs,
+      distanceDm: distanceDm ?? this.distanceDm,
+      inZoneShare: inZoneShare ?? this.inZoneShare,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sessionId.present) {
+      map['session_id'] = Variable<int>(sessionId.value);
+    }
+    if (lapNo.present) {
+      map['lap_no'] = Variable<int>(lapNo.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (durationMs.present) {
+      map['duration_ms'] = Variable<int>(durationMs.value);
+    }
+    if (distanceDm.present) {
+      map['distance_dm'] = Variable<int>(distanceDm.value);
+    }
+    if (inZoneShare.present) {
+      map['in_zone_share'] = Variable<double>(inZoneShare.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LapSegmentsCompanion(')
+          ..write('sessionId: $sessionId, ')
+          ..write('lapNo: $lapNo, ')
+          ..write('position: $position, ')
+          ..write('durationMs: $durationMs, ')
+          ..write('distanceDm: $distanceDm, ')
+          ..write('inZoneShare: $inZoneShare, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $TemplatesTable templates = $TemplatesTable(this);
+  late final $CoursesTable courses = $CoursesTable(this);
+  late final $CourseVersionsTable courseVersions = $CourseVersionsTable(this);
   late final $SessionsTable sessions = $SessionsTable(this);
   late final $SamplesTable samples = $SamplesTable(this);
   late final $StrokesTable strokes = $StrokesTable(this);
   late final $RawPacketsTable rawPackets = $RawPacketsTable(this);
+  late final $CourseSegmentsTable courseSegments = $CourseSegmentsTable(this);
+  late final $TemplateBlocksTable templateBlocks = $TemplateBlocksTable(this);
+  late final $LapsTable laps = $LapsTable(this);
+  late final $LapSegmentsTable lapSegments = $LapSegmentsTable(this);
   late final Index samplesSessionTime = Index(
     'samples_session_time',
     'CREATE INDEX samples_session_time ON samples (session_id, t_ms)',
@@ -2258,21 +5233,40 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'raw_packets_session_time',
     'CREATE INDEX raw_packets_session_time ON raw_packets (session_id, t_ms)',
   );
+  late final Index courseVersionsCourse = Index(
+    'course_versions_course',
+    'CREATE INDEX course_versions_course ON course_versions (course_id, version)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    templates,
+    courses,
+    courseVersions,
     sessions,
     samples,
     strokes,
     rawPackets,
+    courseSegments,
+    templateBlocks,
+    laps,
+    lapSegments,
     samplesSessionTime,
     strokesSessionTime,
     rawPacketsSessionTime,
+    courseVersionsCourse,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'templates',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('sessions', kind: UpdateKind.update)],
+    ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'sessions',
@@ -2294,9 +5288,1266 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       ),
       result: [TableUpdate('raw_packets', kind: UpdateKind.delete)],
     ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'course_versions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('course_segments', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'templates',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('template_blocks', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'sessions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('laps', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'sessions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('lap_segments', kind: UpdateKind.delete)],
+    ),
   ]);
 }
 
+typedef $$TemplatesTableCreateCompanionBuilder = TemplatesCompanion Function({
+  Value<int> id,
+  required String name,
+  required DateTime createdAt,
+});
+typedef $$TemplatesTableUpdateCompanionBuilder = TemplatesCompanion Function({
+  Value<int> id,
+  Value<String> name,
+  Value<DateTime> createdAt,
+});
+
+final class $$TemplatesTableReferences
+    extends BaseReferences<_$AppDatabase, $TemplatesTable, TemplateRow> {
+  $$TemplatesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$SessionsTable, List<SessionRow>>
+  _sessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.sessions,
+    aliasName: 'templates__id__sessions__template_id',
+  );
+
+  $$SessionsTableProcessedTableManager get sessionsRefs {
+    final manager = $$SessionsTableTableManager(
+      $_db,
+      $_db.sessions,
+    ).filter((f) => f.templateId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_sessionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$TemplateBlocksTable, List<TemplateBlockRow>>
+  _templateBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.templateBlocks,
+    aliasName: 'templates__id__template_blocks__template_id',
+  );
+
+  $$TemplateBlocksTableProcessedTableManager get templateBlocksRefs {
+    final manager = $$TemplateBlocksTableTableManager(
+      $_db,
+      $_db.templateBlocks,
+    ).filter((f) => f.templateId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_templateBlocksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$TemplatesTableFilterComposer
+    extends Composer<_$AppDatabase, $TemplatesTable> {
+  $$TemplatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> sessionsRefs(
+    Expression<bool> Function($$SessionsTableFilterComposer f) f,
+  ) {
+    final $$SessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> templateBlocksRefs(
+    Expression<bool> Function($$TemplateBlocksTableFilterComposer f) f,
+  ) {
+    final $$TemplateBlocksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.templateBlocks,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplateBlocksTableFilterComposer(
+            $db: $db,
+            $table: $db.templateBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TemplatesTableOrderingComposer
+    extends Composer<_$AppDatabase, $TemplatesTable> {
+  $$TemplatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TemplatesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TemplatesTable> {
+  $$TemplatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  Expression<T> sessionsRefs<T extends Object>(
+    Expression<T> Function($$SessionsTableAnnotationComposer a) f,
+  ) {
+    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> templateBlocksRefs<T extends Object>(
+    Expression<T> Function($$TemplateBlocksTableAnnotationComposer a) f,
+  ) {
+    final $$TemplateBlocksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.templateBlocks,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplateBlocksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.templateBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TemplatesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TemplatesTable,
+          TemplateRow,
+          $$TemplatesTableFilterComposer,
+          $$TemplatesTableOrderingComposer,
+          $$TemplatesTableAnnotationComposer,
+          $$TemplatesTableCreateCompanionBuilder,
+          $$TemplatesTableUpdateCompanionBuilder,
+          (TemplateRow, $$TemplatesTableReferences),
+          TemplateRow,
+          PrefetchHooks Function({bool sessionsRefs, bool templateBlocksRefs})
+        > {
+  $$TemplatesTableTableManager(_$AppDatabase db, $TemplatesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TemplatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TemplatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TemplatesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) => TemplatesCompanion(id: id, name: name, createdAt: createdAt),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required DateTime createdAt,
+              }) => TemplatesCompanion.insert(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TemplatesTable, TemplateRow>(table),
+                  $$TemplatesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({sessionsRefs = false, templateBlocksRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (sessionsRefs) db.sessions,
+                    if (templateBlocksRefs) db.templateBlocks,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (sessionsRefs)
+                        await $_getPrefetchedData<
+                          TemplateRow,
+                          $TemplatesTable,
+                          SessionRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TemplatesTableReferences
+                              ._sessionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TemplatesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).sessionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.templateId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (templateBlocksRefs)
+                        await $_getPrefetchedData<
+                          TemplateRow,
+                          $TemplatesTable,
+                          TemplateBlockRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TemplatesTableReferences
+                              ._templateBlocksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TemplatesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).templateBlocksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.templateId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$TemplatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TemplatesTable,
+      TemplateRow,
+      $$TemplatesTableFilterComposer,
+      $$TemplatesTableOrderingComposer,
+      $$TemplatesTableAnnotationComposer,
+      $$TemplatesTableCreateCompanionBuilder,
+      $$TemplatesTableUpdateCompanionBuilder,
+      (TemplateRow, $$TemplatesTableReferences),
+      TemplateRow,
+      PrefetchHooks Function({bool sessionsRefs, bool templateBlocksRefs})
+    >;
+typedef $$CoursesTableCreateCompanionBuilder = CoursesCompanion Function({
+  Value<int> id,
+  required String name,
+  required CourseAxis axis,
+  Value<DateTime?> deletedAt,
+});
+typedef $$CoursesTableUpdateCompanionBuilder = CoursesCompanion Function({
+  Value<int> id,
+  Value<String> name,
+  Value<CourseAxis> axis,
+  Value<DateTime?> deletedAt,
+});
+
+final class $$CoursesTableReferences
+    extends BaseReferences<_$AppDatabase, $CoursesTable, CourseRow> {
+  $$CoursesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$CourseVersionsTable, List<CourseVersionRow>>
+  _courseVersionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.courseVersions,
+    aliasName: 'courses__id__course_versions__course_id',
+  );
+
+  $$CourseVersionsTableProcessedTableManager get courseVersionsRefs {
+    final manager = $$CourseVersionsTableTableManager(
+      $_db,
+      $_db.courseVersions,
+    ).filter((f) => f.courseId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_courseVersionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$TemplateBlocksTable, List<TemplateBlockRow>>
+  _templateBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.templateBlocks,
+    aliasName: 'courses__id__template_blocks__course_id',
+  );
+
+  $$TemplateBlocksTableProcessedTableManager get templateBlocksRefs {
+    final manager = $$TemplateBlocksTableTableManager(
+      $_db,
+      $_db.templateBlocks,
+    ).filter((f) => f.courseId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_templateBlocksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CoursesTableFilterComposer
+    extends Composer<_$AppDatabase, $CoursesTable> {
+  $$CoursesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<CourseAxis, CourseAxis, String> get axis =>
+      $composableBuilder(
+        column: $table.axis,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> courseVersionsRefs(
+    Expression<bool> Function($$CourseVersionsTableFilterComposer f) f,
+  ) {
+    final $$CourseVersionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.courseVersions,
+      getReferencedColumn: (t) => t.courseId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseVersionsTableFilterComposer(
+            $db: $db,
+            $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> templateBlocksRefs(
+    Expression<bool> Function($$TemplateBlocksTableFilterComposer f) f,
+  ) {
+    final $$TemplateBlocksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.templateBlocks,
+      getReferencedColumn: (t) => t.courseId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplateBlocksTableFilterComposer(
+            $db: $db,
+            $table: $db.templateBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CoursesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CoursesTable> {
+  $$CoursesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get axis => $composableBuilder(
+    column: $table.axis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CoursesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CoursesTable> {
+  $$CoursesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<CourseAxis, String> get axis =>
+      $composableBuilder(column: $table.axis, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  Expression<T> courseVersionsRefs<T extends Object>(
+    Expression<T> Function($$CourseVersionsTableAnnotationComposer a) f,
+  ) {
+    final $$CourseVersionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.courseVersions,
+      getReferencedColumn: (t) => t.courseId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseVersionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> templateBlocksRefs<T extends Object>(
+    Expression<T> Function($$TemplateBlocksTableAnnotationComposer a) f,
+  ) {
+    final $$TemplateBlocksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.templateBlocks,
+      getReferencedColumn: (t) => t.courseId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplateBlocksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.templateBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CoursesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CoursesTable,
+          CourseRow,
+          $$CoursesTableFilterComposer,
+          $$CoursesTableOrderingComposer,
+          $$CoursesTableAnnotationComposer,
+          $$CoursesTableCreateCompanionBuilder,
+          $$CoursesTableUpdateCompanionBuilder,
+          (CourseRow, $$CoursesTableReferences),
+          CourseRow,
+          PrefetchHooks Function({
+            bool courseVersionsRefs,
+            bool templateBlocksRefs,
+          })
+        > {
+  $$CoursesTableTableManager(_$AppDatabase db, $CoursesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CoursesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CoursesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CoursesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<CourseAxis> axis = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => CoursesCompanion(
+                id: id,
+                name: name,
+                axis: axis,
+                deletedAt: deletedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required CourseAxis axis,
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => CoursesCompanion.insert(
+                id: id,
+                name: name,
+                axis: axis,
+                deletedAt: deletedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CoursesTable, CourseRow>(table),
+                  $$CoursesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({courseVersionsRefs = false, templateBlocksRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (courseVersionsRefs) db.courseVersions,
+                    if (templateBlocksRefs) db.templateBlocks,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (courseVersionsRefs)
+                        await $_getPrefetchedData<
+                          CourseRow,
+                          $CoursesTable,
+                          CourseVersionRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CoursesTableReferences
+                              ._courseVersionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CoursesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).courseVersionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.courseId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (templateBlocksRefs)
+                        await $_getPrefetchedData<
+                          CourseRow,
+                          $CoursesTable,
+                          TemplateBlockRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CoursesTableReferences
+                              ._templateBlocksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CoursesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).templateBlocksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.courseId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$CoursesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CoursesTable,
+      CourseRow,
+      $$CoursesTableFilterComposer,
+      $$CoursesTableOrderingComposer,
+      $$CoursesTableAnnotationComposer,
+      $$CoursesTableCreateCompanionBuilder,
+      $$CoursesTableUpdateCompanionBuilder,
+      (CourseRow, $$CoursesTableReferences),
+      CourseRow,
+      PrefetchHooks Function({bool courseVersionsRefs, bool templateBlocksRefs})
+    >;
+typedef $$CourseVersionsTableCreateCompanionBuilder =
+    CourseVersionsCompanion Function({
+      Value<int> id,
+      required int courseId,
+      required int version,
+      required int length,
+      required DateTime createdAt,
+    });
+typedef $$CourseVersionsTableUpdateCompanionBuilder =
+    CourseVersionsCompanion Function({
+      Value<int> id,
+      Value<int> courseId,
+      Value<int> version,
+      Value<int> length,
+      Value<DateTime> createdAt,
+    });
+
+final class $$CourseVersionsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $CourseVersionsTable, CourseVersionRow> {
+  $$CourseVersionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CoursesTable _courseIdTable(_$AppDatabase db) =>
+      db.courses.createAlias('course_versions__course_id__courses__id');
+
+  $$CoursesTableProcessedTableManager get courseId {
+    final $_column = $_itemColumn<int>('course_id')!;
+
+    final manager = $$CoursesTableTableManager(
+      $_db,
+      $_db.courses,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_courseIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$SessionsTable, List<SessionRow>>
+  _sessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.sessions,
+    aliasName: 'course_versions__id__sessions__course_version_id',
+  );
+
+  $$SessionsTableProcessedTableManager get sessionsRefs {
+    final manager = $$SessionsTableTableManager(
+      $_db,
+      $_db.sessions,
+    ).filter((f) => f.courseVersionId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_sessionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CourseSegmentsTable, List<CourseSegmentRow>>
+  _courseSegmentsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.courseSegments,
+    aliasName: 'course_versions__id__course_segments__version_id',
+  );
+
+  $$CourseSegmentsTableProcessedTableManager get courseSegmentsRefs {
+    final manager = $$CourseSegmentsTableTableManager(
+      $_db,
+      $_db.courseSegments,
+    ).filter((f) => f.versionId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_courseSegmentsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CourseVersionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CourseVersionsTable> {
+  $$CourseVersionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get length => $composableBuilder(
+    column: $table.length,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CoursesTableFilterComposer get courseId {
+    final $$CoursesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseId,
+      referencedTable: $db.courses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CoursesTableFilterComposer(
+            $db: $db,
+            $table: $db.courses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> sessionsRefs(
+    Expression<bool> Function($$SessionsTableFilterComposer f) f,
+  ) {
+    final $$SessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.courseVersionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> courseSegmentsRefs(
+    Expression<bool> Function($$CourseSegmentsTableFilterComposer f) f,
+  ) {
+    final $$CourseSegmentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.courseSegments,
+      getReferencedColumn: (t) => t.versionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseSegmentsTableFilterComposer(
+            $db: $db,
+            $table: $db.courseSegments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CourseVersionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CourseVersionsTable> {
+  $$CourseVersionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get length => $composableBuilder(
+    column: $table.length,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CoursesTableOrderingComposer get courseId {
+    final $$CoursesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseId,
+      referencedTable: $db.courses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CoursesTableOrderingComposer(
+            $db: $db,
+            $table: $db.courses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CourseVersionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CourseVersionsTable> {
+  $$CourseVersionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<int> get length =>
+      $composableBuilder(column: $table.length, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$CoursesTableAnnotationComposer get courseId {
+    final $$CoursesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseId,
+      referencedTable: $db.courses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CoursesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.courses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> sessionsRefs<T extends Object>(
+    Expression<T> Function($$SessionsTableAnnotationComposer a) f,
+  ) {
+    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.courseVersionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> courseSegmentsRefs<T extends Object>(
+    Expression<T> Function($$CourseSegmentsTableAnnotationComposer a) f,
+  ) {
+    final $$CourseSegmentsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.courseSegments,
+      getReferencedColumn: (t) => t.versionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseSegmentsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.courseSegments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CourseVersionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CourseVersionsTable,
+          CourseVersionRow,
+          $$CourseVersionsTableFilterComposer,
+          $$CourseVersionsTableOrderingComposer,
+          $$CourseVersionsTableAnnotationComposer,
+          $$CourseVersionsTableCreateCompanionBuilder,
+          $$CourseVersionsTableUpdateCompanionBuilder,
+          (CourseVersionRow, $$CourseVersionsTableReferences),
+          CourseVersionRow,
+          PrefetchHooks Function({
+            bool courseId,
+            bool sessionsRefs,
+            bool courseSegmentsRefs,
+          })
+        > {
+  $$CourseVersionsTableTableManager(
+    _$AppDatabase db,
+    $CourseVersionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CourseVersionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CourseVersionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CourseVersionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> courseId = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<int> length = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => CourseVersionsCompanion(
+                id: id,
+                courseId: courseId,
+                version: version,
+                length: length,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int courseId,
+                required int version,
+                required int length,
+                required DateTime createdAt,
+              }) => CourseVersionsCompanion.insert(
+                id: id,
+                courseId: courseId,
+                version: version,
+                length: length,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CourseVersionsTable, CourseVersionRow>(table),
+                  $$CourseVersionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                courseId = false,
+                sessionsRefs = false,
+                courseSegmentsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (sessionsRefs) db.sessions,
+                    if (courseSegmentsRefs) db.courseSegments,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (courseId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.courseId,
+                            referencedTable: $$CourseVersionsTableReferences
+                                ._courseIdTable(db),
+                            referencedColumn: $$CourseVersionsTableReferences
+                                ._courseIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (sessionsRefs)
+                        await $_getPrefetchedData<
+                          CourseVersionRow,
+                          $CourseVersionsTable,
+                          SessionRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CourseVersionsTableReferences
+                              ._sessionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CourseVersionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).sessionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.courseVersionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (courseSegmentsRefs)
+                        await $_getPrefetchedData<
+                          CourseVersionRow,
+                          $CourseVersionsTable,
+                          CourseSegmentRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CourseVersionsTableReferences
+                              ._courseSegmentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CourseVersionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).courseSegmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.versionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$CourseVersionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CourseVersionsTable,
+      CourseVersionRow,
+      $$CourseVersionsTableFilterComposer,
+      $$CourseVersionsTableOrderingComposer,
+      $$CourseVersionsTableAnnotationComposer,
+      $$CourseVersionsTableCreateCompanionBuilder,
+      $$CourseVersionsTableUpdateCompanionBuilder,
+      (CourseVersionRow, $$CourseVersionsTableReferences),
+      CourseVersionRow,
+      PrefetchHooks Function({
+        bool courseId,
+        bool sessionsRefs,
+        bool courseSegmentsRefs,
+      })
+    >;
 typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   Value<int> id,
   required DateTime startedAt,
@@ -2310,6 +6561,10 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   Value<int?> averageWatts,
   Value<double?> averageStrokeRate,
   Value<int> strokeCount,
+  Value<int?> templateId,
+  Value<String?> templateName,
+  Value<int?> courseVersionId,
+  Value<int?> plannedLaps,
 });
 typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<int> id,
@@ -2324,11 +6579,50 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<int?> averageWatts,
   Value<double?> averageStrokeRate,
   Value<int> strokeCount,
+  Value<int?> templateId,
+  Value<String?> templateName,
+  Value<int?> courseVersionId,
+  Value<int?> plannedLaps,
 });
 
 final class $$SessionsTableReferences
     extends BaseReferences<_$AppDatabase, $SessionsTable, SessionRow> {
   $$SessionsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $TemplatesTable _templateIdTable(_$AppDatabase db) =>
+      db.templates.createAlias('sessions__template_id__templates__id');
+
+  $$TemplatesTableProcessedTableManager? get templateId {
+    final $_column = $_itemColumn<int>('template_id');
+    if ($_column == null) return null;
+    final manager = $$TemplatesTableTableManager(
+      $_db,
+      $_db.templates,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CourseVersionsTable _courseVersionIdTable(_$AppDatabase db) => db
+      .courseVersions
+      .createAlias('sessions__course_version_id__course_versions__id');
+
+  $$CourseVersionsTableProcessedTableManager? get courseVersionId {
+    final $_column = $_itemColumn<int>('course_version_id');
+    if ($_column == null) return null;
+    final manager = $$CourseVersionsTableTableManager(
+      $_db,
+      $_db.courseVersions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_courseVersionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 
   static MultiTypedResultKey<$SamplesTable, List<SampleRow>> _samplesRefsTable(
     _$AppDatabase db,
@@ -2381,6 +6675,43 @@ final class $$SessionsTableReferences
     ).filter((f) => f.sessionId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_rawPacketsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$LapsTable, List<LapRow>> _lapsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.laps,
+    aliasName: 'sessions__id__laps__session_id',
+  );
+
+  $$LapsTableProcessedTableManager get lapsRefs {
+    final manager = $$LapsTableTableManager(
+      $_db,
+      $_db.laps,
+    ).filter((f) => f.sessionId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_lapsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$LapSegmentsTable, List<LapSegmentRow>>
+  _lapSegmentsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.lapSegments,
+    aliasName: 'sessions__id__lap_segments__session_id',
+  );
+
+  $$LapSegmentsTableProcessedTableManager get lapSegmentsRefs {
+    final manager = $$LapSegmentsTableTableManager(
+      $_db,
+      $_db.lapSegments,
+    ).filter((f) => f.sessionId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_lapSegmentsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2458,6 +6789,62 @@ class $$SessionsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get templateName => $composableBuilder(
+    column: $table.templateName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get plannedLaps => $composableBuilder(
+    column: $table.plannedLaps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TemplatesTableFilterComposer get templateId {
+    final $$TemplatesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.templates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplatesTableFilterComposer(
+            $db: $db,
+            $table: $db.templates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CourseVersionsTableFilterComposer get courseVersionId {
+    final $$CourseVersionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseVersionId,
+      referencedTable: $db.courseVersions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseVersionsTableFilterComposer(
+            $db: $db,
+            $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   Expression<bool> samplesRefs(
     Expression<bool> Function($$SamplesTableFilterComposer f) f,
   ) {
@@ -2524,6 +6911,56 @@ class $$SessionsTableFilterComposer
           }) => $$RawPacketsTableFilterComposer(
             $db: $db,
             $table: $db.rawPackets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> lapsRefs(
+    Expression<bool> Function($$LapsTableFilterComposer f) f,
+  ) {
+    final $$LapsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.laps,
+      getReferencedColumn: (t) => t.sessionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LapsTableFilterComposer(
+            $db: $db,
+            $table: $db.laps,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> lapSegmentsRefs(
+    Expression<bool> Function($$LapSegmentsTableFilterComposer f) f,
+  ) {
+    final $$LapSegmentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.lapSegments,
+      getReferencedColumn: (t) => t.sessionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LapSegmentsTableFilterComposer(
+            $db: $db,
+            $table: $db.lapSegments,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2602,6 +7039,62 @@ class $$SessionsTableOrderingComposer
     column: $table.strokeCount,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get templateName => $composableBuilder(
+    column: $table.templateName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get plannedLaps => $composableBuilder(
+    column: $table.plannedLaps,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TemplatesTableOrderingComposer get templateId {
+    final $$TemplatesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.templates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplatesTableOrderingComposer(
+            $db: $db,
+            $table: $db.templates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CourseVersionsTableOrderingComposer get courseVersionId {
+    final $$CourseVersionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseVersionId,
+      referencedTable: $db.courseVersions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseVersionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$SessionsTableAnnotationComposer
@@ -2662,6 +7155,62 @@ class $$SessionsTableAnnotationComposer
     column: $table.strokeCount,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get templateName => $composableBuilder(
+    column: $table.templateName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get plannedLaps => $composableBuilder(
+    column: $table.plannedLaps,
+    builder: (column) => column,
+  );
+
+  $$TemplatesTableAnnotationComposer get templateId {
+    final $$TemplatesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.templates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplatesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.templates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CourseVersionsTableAnnotationComposer get courseVersionId {
+    final $$CourseVersionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseVersionId,
+      referencedTable: $db.courseVersions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseVersionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<T> samplesRefs<T extends Object>(
     Expression<T> Function($$SamplesTableAnnotationComposer a) f,
@@ -2737,6 +7286,56 @@ class $$SessionsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> lapsRefs<T extends Object>(
+    Expression<T> Function($$LapsTableAnnotationComposer a) f,
+  ) {
+    final $$LapsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.laps,
+      getReferencedColumn: (t) => t.sessionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LapsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.laps,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> lapSegmentsRefs<T extends Object>(
+    Expression<T> Function($$LapSegmentsTableAnnotationComposer a) f,
+  ) {
+    final $$LapSegmentsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.lapSegments,
+      getReferencedColumn: (t) => t.sessionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LapSegmentsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.lapSegments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$SessionsTableTableManager
@@ -2753,9 +7352,13 @@ class $$SessionsTableTableManager
           (SessionRow, $$SessionsTableReferences),
           SessionRow,
           PrefetchHooks Function({
+            bool templateId,
+            bool courseVersionId,
             bool samplesRefs,
             bool strokesRefs,
             bool rawPacketsRefs,
+            bool lapsRefs,
+            bool lapSegmentsRefs,
           })
         > {
   $$SessionsTableTableManager(_$AppDatabase db, $SessionsTable table)
@@ -2783,6 +7386,10 @@ class $$SessionsTableTableManager
                 Value<int?> averageWatts = const Value.absent(),
                 Value<double?> averageStrokeRate = const Value.absent(),
                 Value<int> strokeCount = const Value.absent(),
+                Value<int?> templateId = const Value.absent(),
+                Value<String?> templateName = const Value.absent(),
+                Value<int?> courseVersionId = const Value.absent(),
+                Value<int?> plannedLaps = const Value.absent(),
               }) => SessionsCompanion(
                 id: id,
                 startedAt: startedAt,
@@ -2796,6 +7403,10 @@ class $$SessionsTableTableManager
                 averageWatts: averageWatts,
                 averageStrokeRate: averageStrokeRate,
                 strokeCount: strokeCount,
+                templateId: templateId,
+                templateName: templateName,
+                courseVersionId: courseVersionId,
+                plannedLaps: plannedLaps,
               ),
           createCompanionCallback:
               ({
@@ -2811,6 +7422,10 @@ class $$SessionsTableTableManager
                 Value<int?> averageWatts = const Value.absent(),
                 Value<double?> averageStrokeRate = const Value.absent(),
                 Value<int> strokeCount = const Value.absent(),
+                Value<int?> templateId = const Value.absent(),
+                Value<String?> templateName = const Value.absent(),
+                Value<int?> courseVersionId = const Value.absent(),
+                Value<int?> plannedLaps = const Value.absent(),
               }) => SessionsCompanion.insert(
                 id: id,
                 startedAt: startedAt,
@@ -2824,6 +7439,10 @@ class $$SessionsTableTableManager
                 averageWatts: averageWatts,
                 averageStrokeRate: averageStrokeRate,
                 strokeCount: strokeCount,
+                templateId: templateId,
+                templateName: templateName,
+                courseVersionId: courseVersionId,
+                plannedLaps: plannedLaps,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -2835,9 +7454,13 @@ class $$SessionsTableTableManager
               .toList(),
           prefetchHooksCallback:
               ({
+                templateId = false,
+                courseVersionId = false,
                 samplesRefs = false,
                 strokesRefs = false,
                 rawPacketsRefs = false,
+                lapsRefs = false,
+                lapSegmentsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -2845,8 +7468,50 @@ class $$SessionsTableTableManager
                     if (samplesRefs) db.samples,
                     if (strokesRefs) db.strokes,
                     if (rawPacketsRefs) db.rawPackets,
+                    if (lapsRefs) db.laps,
+                    if (lapSegmentsRefs) db.lapSegments,
                   ],
-                  addJoins: null,
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (templateId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.templateId,
+                            referencedTable: $$SessionsTableReferences
+                                ._templateIdTable(db),
+                            referencedColumn: $$SessionsTableReferences
+                                ._templateIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (courseVersionId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.courseVersionId,
+                            referencedTable: $$SessionsTableReferences
+                                ._courseVersionIdTable(db),
+                            referencedColumn: $$SessionsTableReferences
+                                ._courseVersionIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (samplesRefs)
@@ -2912,6 +7577,44 @@ class $$SessionsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (lapsRefs)
+                        await $_getPrefetchedData<
+                          SessionRow,
+                          $SessionsTable,
+                          LapRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$SessionsTableReferences
+                              ._lapsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$SessionsTableReferences(db, table, p0).lapsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.sessionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (lapSegmentsRefs)
+                        await $_getPrefetchedData<
+                          SessionRow,
+                          $SessionsTable,
+                          LapSegmentRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$SessionsTableReferences
+                              ._lapSegmentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$SessionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).lapSegmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.sessionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -2933,9 +7636,13 @@ typedef $$SessionsTableProcessedTableManager =
       (SessionRow, $$SessionsTableReferences),
       SessionRow,
       PrefetchHooks Function({
+        bool templateId,
+        bool courseVersionId,
         bool samplesRefs,
         bool strokesRefs,
         bool rawPacketsRefs,
+        bool lapsRefs,
+        bool lapSegmentsRefs,
       })
     >;
 typedef $$SamplesTableCreateCompanionBuilder = SamplesCompanion Function({
@@ -2947,6 +7654,7 @@ typedef $$SamplesTableCreateCompanionBuilder = SamplesCompanion Function({
   Value<int?> strokeRate,
   Value<int?> heartRate,
   Value<int?> calories,
+  Value<int?> wallMs,
   Value<int> rowid,
 });
 typedef $$SamplesTableUpdateCompanionBuilder = SamplesCompanion Function({
@@ -2958,6 +7666,7 @@ typedef $$SamplesTableUpdateCompanionBuilder = SamplesCompanion Function({
   Value<int?> strokeRate,
   Value<int?> heartRate,
   Value<int?> calories,
+  Value<int?> wallMs,
   Value<int> rowid,
 });
 
@@ -3024,6 +7733,11 @@ class $$SamplesTableFilterComposer
 
   ColumnFilters<int> get calories => $composableBuilder(
     column: $table.calories,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get wallMs => $composableBuilder(
+    column: $table.wallMs,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3095,6 +7809,11 @@ class $$SamplesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get wallMs => $composableBuilder(
+    column: $table.wallMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$SessionsTableOrderingComposer get sessionId {
     final $$SessionsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -3152,6 +7871,9 @@ class $$SamplesTableAnnotationComposer
 
   GeneratedColumn<int> get calories =>
       $composableBuilder(column: $table.calories, builder: (column) => column);
+
+  GeneratedColumn<int> get wallMs =>
+      $composableBuilder(column: $table.wallMs, builder: (column) => column);
 
   $$SessionsTableAnnotationComposer get sessionId {
     final $$SessionsTableAnnotationComposer composer = $composerBuilder(
@@ -3213,6 +7935,7 @@ class $$SamplesTableTableManager
                 Value<int?> strokeRate = const Value.absent(),
                 Value<int?> heartRate = const Value.absent(),
                 Value<int?> calories = const Value.absent(),
+                Value<int?> wallMs = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SamplesCompanion(
                 sessionId: sessionId,
@@ -3223,6 +7946,7 @@ class $$SamplesTableTableManager
                 strokeRate: strokeRate,
                 heartRate: heartRate,
                 calories: calories,
+                wallMs: wallMs,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3235,6 +7959,7 @@ class $$SamplesTableTableManager
                 Value<int?> strokeRate = const Value.absent(),
                 Value<int?> heartRate = const Value.absent(),
                 Value<int?> calories = const Value.absent(),
+                Value<int?> wallMs = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SamplesCompanion.insert(
                 sessionId: sessionId,
@@ -3245,6 +7970,7 @@ class $$SamplesTableTableManager
                 strokeRate: strokeRate,
                 heartRate: heartRate,
                 calories: calories,
+                wallMs: wallMs,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -4030,10 +8756,1485 @@ typedef $$RawPacketsTableProcessedTableManager =
       RawPacketRow,
       PrefetchHooks Function({bool sessionId})
     >;
+typedef $$CourseSegmentsTableCreateCompanionBuilder =
+    CourseSegmentsCompanion Function({
+      required int versionId,
+      required int position,
+      required int length,
+      Value<int?> paceFastCs,
+      Value<int?> paceSlowCs,
+      Value<int?> spmMin,
+      Value<int?> spmMax,
+      Value<int> rowid,
+    });
+typedef $$CourseSegmentsTableUpdateCompanionBuilder =
+    CourseSegmentsCompanion Function({
+      Value<int> versionId,
+      Value<int> position,
+      Value<int> length,
+      Value<int?> paceFastCs,
+      Value<int?> paceSlowCs,
+      Value<int?> spmMin,
+      Value<int?> spmMax,
+      Value<int> rowid,
+    });
+
+final class $$CourseSegmentsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $CourseSegmentsTable, CourseSegmentRow> {
+  $$CourseSegmentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CourseVersionsTable _versionIdTable(_$AppDatabase db) => db
+      .courseVersions
+      .createAlias('course_segments__version_id__course_versions__id');
+
+  $$CourseVersionsTableProcessedTableManager get versionId {
+    final $_column = $_itemColumn<int>('version_id')!;
+
+    final manager = $$CourseVersionsTableTableManager(
+      $_db,
+      $_db.courseVersions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_versionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CourseSegmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $CourseSegmentsTable> {
+  $$CourseSegmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get length => $composableBuilder(
+    column: $table.length,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get paceFastCs => $composableBuilder(
+    column: $table.paceFastCs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get paceSlowCs => $composableBuilder(
+    column: $table.paceSlowCs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get spmMin => $composableBuilder(
+    column: $table.spmMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get spmMax => $composableBuilder(
+    column: $table.spmMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CourseVersionsTableFilterComposer get versionId {
+    final $$CourseVersionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.versionId,
+      referencedTable: $db.courseVersions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseVersionsTableFilterComposer(
+            $db: $db,
+            $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CourseSegmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CourseSegmentsTable> {
+  $$CourseSegmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get length => $composableBuilder(
+    column: $table.length,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get paceFastCs => $composableBuilder(
+    column: $table.paceFastCs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get paceSlowCs => $composableBuilder(
+    column: $table.paceSlowCs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get spmMin => $composableBuilder(
+    column: $table.spmMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get spmMax => $composableBuilder(
+    column: $table.spmMax,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CourseVersionsTableOrderingComposer get versionId {
+    final $$CourseVersionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.versionId,
+      referencedTable: $db.courseVersions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseVersionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CourseSegmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CourseSegmentsTable> {
+  $$CourseSegmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get length =>
+      $composableBuilder(column: $table.length, builder: (column) => column);
+
+  GeneratedColumn<int> get paceFastCs => $composableBuilder(
+    column: $table.paceFastCs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get paceSlowCs => $composableBuilder(
+    column: $table.paceSlowCs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get spmMin =>
+      $composableBuilder(column: $table.spmMin, builder: (column) => column);
+
+  GeneratedColumn<int> get spmMax =>
+      $composableBuilder(column: $table.spmMax, builder: (column) => column);
+
+  $$CourseVersionsTableAnnotationComposer get versionId {
+    final $$CourseVersionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.versionId,
+      referencedTable: $db.courseVersions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseVersionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CourseSegmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CourseSegmentsTable,
+          CourseSegmentRow,
+          $$CourseSegmentsTableFilterComposer,
+          $$CourseSegmentsTableOrderingComposer,
+          $$CourseSegmentsTableAnnotationComposer,
+          $$CourseSegmentsTableCreateCompanionBuilder,
+          $$CourseSegmentsTableUpdateCompanionBuilder,
+          (CourseSegmentRow, $$CourseSegmentsTableReferences),
+          CourseSegmentRow,
+          PrefetchHooks Function({bool versionId})
+        > {
+  $$CourseSegmentsTableTableManager(
+    _$AppDatabase db,
+    $CourseSegmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CourseSegmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CourseSegmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CourseSegmentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> versionId = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> length = const Value.absent(),
+                Value<int?> paceFastCs = const Value.absent(),
+                Value<int?> paceSlowCs = const Value.absent(),
+                Value<int?> spmMin = const Value.absent(),
+                Value<int?> spmMax = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CourseSegmentsCompanion(
+                versionId: versionId,
+                position: position,
+                length: length,
+                paceFastCs: paceFastCs,
+                paceSlowCs: paceSlowCs,
+                spmMin: spmMin,
+                spmMax: spmMax,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int versionId,
+                required int position,
+                required int length,
+                Value<int?> paceFastCs = const Value.absent(),
+                Value<int?> paceSlowCs = const Value.absent(),
+                Value<int?> spmMin = const Value.absent(),
+                Value<int?> spmMax = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CourseSegmentsCompanion.insert(
+                versionId: versionId,
+                position: position,
+                length: length,
+                paceFastCs: paceFastCs,
+                paceSlowCs: paceSlowCs,
+                spmMin: spmMin,
+                spmMax: spmMax,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CourseSegmentsTable, CourseSegmentRow>(table),
+                  $$CourseSegmentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({versionId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (versionId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.versionId,
+                        referencedTable: $$CourseSegmentsTableReferences
+                            ._versionIdTable(db),
+                        referencedColumn: $$CourseSegmentsTableReferences
+                            ._versionIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CourseSegmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CourseSegmentsTable,
+      CourseSegmentRow,
+      $$CourseSegmentsTableFilterComposer,
+      $$CourseSegmentsTableOrderingComposer,
+      $$CourseSegmentsTableAnnotationComposer,
+      $$CourseSegmentsTableCreateCompanionBuilder,
+      $$CourseSegmentsTableUpdateCompanionBuilder,
+      (CourseSegmentRow, $$CourseSegmentsTableReferences),
+      CourseSegmentRow,
+      PrefetchHooks Function({bool versionId})
+    >;
+typedef $$TemplateBlocksTableCreateCompanionBuilder =
+    TemplateBlocksCompanion Function({
+      required int templateId,
+      required int position,
+      required int courseId,
+      Value<int?> laps,
+      Value<int> rowid,
+    });
+typedef $$TemplateBlocksTableUpdateCompanionBuilder =
+    TemplateBlocksCompanion Function({
+      Value<int> templateId,
+      Value<int> position,
+      Value<int> courseId,
+      Value<int?> laps,
+      Value<int> rowid,
+    });
+
+final class $$TemplateBlocksTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $TemplateBlocksTable, TemplateBlockRow> {
+  $$TemplateBlocksTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TemplatesTable _templateIdTable(_$AppDatabase db) =>
+      db.templates.createAlias('template_blocks__template_id__templates__id');
+
+  $$TemplatesTableProcessedTableManager get templateId {
+    final $_column = $_itemColumn<int>('template_id')!;
+
+    final manager = $$TemplatesTableTableManager(
+      $_db,
+      $_db.templates,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CoursesTable _courseIdTable(_$AppDatabase db) =>
+      db.courses.createAlias('template_blocks__course_id__courses__id');
+
+  $$CoursesTableProcessedTableManager get courseId {
+    final $_column = $_itemColumn<int>('course_id')!;
+
+    final manager = $$CoursesTableTableManager(
+      $_db,
+      $_db.courses,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_courseIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TemplateBlocksTableFilterComposer
+    extends Composer<_$AppDatabase, $TemplateBlocksTable> {
+  $$TemplateBlocksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get laps => $composableBuilder(
+    column: $table.laps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TemplatesTableFilterComposer get templateId {
+    final $$TemplatesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.templates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplatesTableFilterComposer(
+            $db: $db,
+            $table: $db.templates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CoursesTableFilterComposer get courseId {
+    final $$CoursesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseId,
+      referencedTable: $db.courses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CoursesTableFilterComposer(
+            $db: $db,
+            $table: $db.courses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TemplateBlocksTableOrderingComposer
+    extends Composer<_$AppDatabase, $TemplateBlocksTable> {
+  $$TemplateBlocksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get laps => $composableBuilder(
+    column: $table.laps,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TemplatesTableOrderingComposer get templateId {
+    final $$TemplatesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.templates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplatesTableOrderingComposer(
+            $db: $db,
+            $table: $db.templates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CoursesTableOrderingComposer get courseId {
+    final $$CoursesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseId,
+      referencedTable: $db.courses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CoursesTableOrderingComposer(
+            $db: $db,
+            $table: $db.courses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TemplateBlocksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TemplateBlocksTable> {
+  $$TemplateBlocksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get laps =>
+      $composableBuilder(column: $table.laps, builder: (column) => column);
+
+  $$TemplatesTableAnnotationComposer get templateId {
+    final $$TemplatesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.templates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemplatesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.templates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CoursesTableAnnotationComposer get courseId {
+    final $$CoursesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.courseId,
+      referencedTable: $db.courses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CoursesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.courses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TemplateBlocksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TemplateBlocksTable,
+          TemplateBlockRow,
+          $$TemplateBlocksTableFilterComposer,
+          $$TemplateBlocksTableOrderingComposer,
+          $$TemplateBlocksTableAnnotationComposer,
+          $$TemplateBlocksTableCreateCompanionBuilder,
+          $$TemplateBlocksTableUpdateCompanionBuilder,
+          (TemplateBlockRow, $$TemplateBlocksTableReferences),
+          TemplateBlockRow,
+          PrefetchHooks Function({bool templateId, bool courseId})
+        > {
+  $$TemplateBlocksTableTableManager(
+    _$AppDatabase db,
+    $TemplateBlocksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TemplateBlocksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TemplateBlocksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TemplateBlocksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> templateId = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> courseId = const Value.absent(),
+                Value<int?> laps = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TemplateBlocksCompanion(
+                templateId: templateId,
+                position: position,
+                courseId: courseId,
+                laps: laps,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int templateId,
+                required int position,
+                required int courseId,
+                Value<int?> laps = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TemplateBlocksCompanion.insert(
+                templateId: templateId,
+                position: position,
+                courseId: courseId,
+                laps: laps,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TemplateBlocksTable, TemplateBlockRow>(table),
+                  $$TemplateBlocksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({templateId = false, courseId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (templateId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.templateId,
+                        referencedTable: $$TemplateBlocksTableReferences
+                            ._templateIdTable(db),
+                        referencedColumn: $$TemplateBlocksTableReferences
+                            ._templateIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (courseId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.courseId,
+                        referencedTable: $$TemplateBlocksTableReferences
+                            ._courseIdTable(db),
+                        referencedColumn: $$TemplateBlocksTableReferences
+                            ._courseIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TemplateBlocksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TemplateBlocksTable,
+      TemplateBlockRow,
+      $$TemplateBlocksTableFilterComposer,
+      $$TemplateBlocksTableOrderingComposer,
+      $$TemplateBlocksTableAnnotationComposer,
+      $$TemplateBlocksTableCreateCompanionBuilder,
+      $$TemplateBlocksTableUpdateCompanionBuilder,
+      (TemplateBlockRow, $$TemplateBlocksTableReferences),
+      TemplateBlockRow,
+      PrefetchHooks Function({bool templateId, bool courseId})
+    >;
+typedef $$LapsTableCreateCompanionBuilder = LapsCompanion Function({
+  required int sessionId,
+  required int lapNo,
+  required int startWallMs,
+  required int endWallMs,
+  required int startDistanceDm,
+  required int endDistanceDm,
+  required bool complete,
+  Value<double?> inZoneShare,
+  Value<int> rowid,
+});
+typedef $$LapsTableUpdateCompanionBuilder = LapsCompanion Function({
+  Value<int> sessionId,
+  Value<int> lapNo,
+  Value<int> startWallMs,
+  Value<int> endWallMs,
+  Value<int> startDistanceDm,
+  Value<int> endDistanceDm,
+  Value<bool> complete,
+  Value<double?> inZoneShare,
+  Value<int> rowid,
+});
+
+final class $$LapsTableReferences
+    extends BaseReferences<_$AppDatabase, $LapsTable, LapRow> {
+  $$LapsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $SessionsTable _sessionIdTable(_$AppDatabase db) =>
+      db.sessions.createAlias('laps__session_id__sessions__id');
+
+  $$SessionsTableProcessedTableManager get sessionId {
+    final $_column = $_itemColumn<int>('session_id')!;
+
+    final manager = $$SessionsTableTableManager(
+      $_db,
+      $_db.sessions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LapsTableFilterComposer extends Composer<_$AppDatabase, $LapsTable> {
+  $$LapsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get lapNo => $composableBuilder(
+    column: $table.lapNo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startWallMs => $composableBuilder(
+    column: $table.startWallMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endWallMs => $composableBuilder(
+    column: $table.endWallMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startDistanceDm => $composableBuilder(
+    column: $table.startDistanceDm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endDistanceDm => $composableBuilder(
+    column: $table.endDistanceDm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get complete => $composableBuilder(
+    column: $table.complete,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get inZoneShare => $composableBuilder(
+    column: $table.inZoneShare,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$SessionsTableFilterComposer get sessionId {
+    final $$SessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LapsTableOrderingComposer extends Composer<_$AppDatabase, $LapsTable> {
+  $$LapsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get lapNo => $composableBuilder(
+    column: $table.lapNo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startWallMs => $composableBuilder(
+    column: $table.startWallMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endWallMs => $composableBuilder(
+    column: $table.endWallMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startDistanceDm => $composableBuilder(
+    column: $table.startDistanceDm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endDistanceDm => $composableBuilder(
+    column: $table.endDistanceDm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get complete => $composableBuilder(
+    column: $table.complete,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get inZoneShare => $composableBuilder(
+    column: $table.inZoneShare,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$SessionsTableOrderingComposer get sessionId {
+    final $$SessionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LapsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LapsTable> {
+  $$LapsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get lapNo =>
+      $composableBuilder(column: $table.lapNo, builder: (column) => column);
+
+  GeneratedColumn<int> get startWallMs => $composableBuilder(
+    column: $table.startWallMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get endWallMs =>
+      $composableBuilder(column: $table.endWallMs, builder: (column) => column);
+
+  GeneratedColumn<int> get startDistanceDm => $composableBuilder(
+    column: $table.startDistanceDm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get endDistanceDm => $composableBuilder(
+    column: $table.endDistanceDm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get complete =>
+      $composableBuilder(column: $table.complete, builder: (column) => column);
+
+  GeneratedColumn<double> get inZoneShare => $composableBuilder(
+    column: $table.inZoneShare,
+    builder: (column) => column,
+  );
+
+  $$SessionsTableAnnotationComposer get sessionId {
+    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LapsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LapsTable,
+          LapRow,
+          $$LapsTableFilterComposer,
+          $$LapsTableOrderingComposer,
+          $$LapsTableAnnotationComposer,
+          $$LapsTableCreateCompanionBuilder,
+          $$LapsTableUpdateCompanionBuilder,
+          (LapRow, $$LapsTableReferences),
+          LapRow,
+          PrefetchHooks Function({bool sessionId})
+        > {
+  $$LapsTableTableManager(_$AppDatabase db, $LapsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LapsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LapsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LapsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> sessionId = const Value.absent(),
+                Value<int> lapNo = const Value.absent(),
+                Value<int> startWallMs = const Value.absent(),
+                Value<int> endWallMs = const Value.absent(),
+                Value<int> startDistanceDm = const Value.absent(),
+                Value<int> endDistanceDm = const Value.absent(),
+                Value<bool> complete = const Value.absent(),
+                Value<double?> inZoneShare = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LapsCompanion(
+                sessionId: sessionId,
+                lapNo: lapNo,
+                startWallMs: startWallMs,
+                endWallMs: endWallMs,
+                startDistanceDm: startDistanceDm,
+                endDistanceDm: endDistanceDm,
+                complete: complete,
+                inZoneShare: inZoneShare,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int sessionId,
+                required int lapNo,
+                required int startWallMs,
+                required int endWallMs,
+                required int startDistanceDm,
+                required int endDistanceDm,
+                required bool complete,
+                Value<double?> inZoneShare = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LapsCompanion.insert(
+                sessionId: sessionId,
+                lapNo: lapNo,
+                startWallMs: startWallMs,
+                endWallMs: endWallMs,
+                startDistanceDm: startDistanceDm,
+                endDistanceDm: endDistanceDm,
+                complete: complete,
+                inZoneShare: inZoneShare,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LapsTable, LapRow>(table),
+                  $$LapsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({sessionId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (sessionId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.sessionId,
+                        referencedTable: $$LapsTableReferences._sessionIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$LapsTableReferences
+                            ._sessionIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LapsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LapsTable,
+      LapRow,
+      $$LapsTableFilterComposer,
+      $$LapsTableOrderingComposer,
+      $$LapsTableAnnotationComposer,
+      $$LapsTableCreateCompanionBuilder,
+      $$LapsTableUpdateCompanionBuilder,
+      (LapRow, $$LapsTableReferences),
+      LapRow,
+      PrefetchHooks Function({bool sessionId})
+    >;
+typedef $$LapSegmentsTableCreateCompanionBuilder =
+    LapSegmentsCompanion Function({
+      required int sessionId,
+      required int lapNo,
+      required int position,
+      required int durationMs,
+      required int distanceDm,
+      Value<double?> inZoneShare,
+      Value<int> rowid,
+    });
+typedef $$LapSegmentsTableUpdateCompanionBuilder =
+    LapSegmentsCompanion Function({
+      Value<int> sessionId,
+      Value<int> lapNo,
+      Value<int> position,
+      Value<int> durationMs,
+      Value<int> distanceDm,
+      Value<double?> inZoneShare,
+      Value<int> rowid,
+    });
+
+final class $$LapSegmentsTableReferences
+    extends BaseReferences<_$AppDatabase, $LapSegmentsTable, LapSegmentRow> {
+  $$LapSegmentsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $SessionsTable _sessionIdTable(_$AppDatabase db) =>
+      db.sessions.createAlias('lap_segments__session_id__sessions__id');
+
+  $$SessionsTableProcessedTableManager get sessionId {
+    final $_column = $_itemColumn<int>('session_id')!;
+
+    final manager = $$SessionsTableTableManager(
+      $_db,
+      $_db.sessions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LapSegmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $LapSegmentsTable> {
+  $$LapSegmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get lapNo => $composableBuilder(
+    column: $table.lapNo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationMs => $composableBuilder(
+    column: $table.durationMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get distanceDm => $composableBuilder(
+    column: $table.distanceDm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get inZoneShare => $composableBuilder(
+    column: $table.inZoneShare,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$SessionsTableFilterComposer get sessionId {
+    final $$SessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LapSegmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $LapSegmentsTable> {
+  $$LapSegmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get lapNo => $composableBuilder(
+    column: $table.lapNo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationMs => $composableBuilder(
+    column: $table.durationMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get distanceDm => $composableBuilder(
+    column: $table.distanceDm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get inZoneShare => $composableBuilder(
+    column: $table.inZoneShare,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$SessionsTableOrderingComposer get sessionId {
+    final $$SessionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LapSegmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LapSegmentsTable> {
+  $$LapSegmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get lapNo =>
+      $composableBuilder(column: $table.lapNo, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get durationMs => $composableBuilder(
+    column: $table.durationMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get distanceDm => $composableBuilder(
+    column: $table.distanceDm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get inZoneShare => $composableBuilder(
+    column: $table.inZoneShare,
+    builder: (column) => column,
+  );
+
+  $$SessionsTableAnnotationComposer get sessionId {
+    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.sessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.sessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LapSegmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LapSegmentsTable,
+          LapSegmentRow,
+          $$LapSegmentsTableFilterComposer,
+          $$LapSegmentsTableOrderingComposer,
+          $$LapSegmentsTableAnnotationComposer,
+          $$LapSegmentsTableCreateCompanionBuilder,
+          $$LapSegmentsTableUpdateCompanionBuilder,
+          (LapSegmentRow, $$LapSegmentsTableReferences),
+          LapSegmentRow,
+          PrefetchHooks Function({bool sessionId})
+        > {
+  $$LapSegmentsTableTableManager(_$AppDatabase db, $LapSegmentsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LapSegmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LapSegmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LapSegmentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> sessionId = const Value.absent(),
+                Value<int> lapNo = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> durationMs = const Value.absent(),
+                Value<int> distanceDm = const Value.absent(),
+                Value<double?> inZoneShare = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LapSegmentsCompanion(
+                sessionId: sessionId,
+                lapNo: lapNo,
+                position: position,
+                durationMs: durationMs,
+                distanceDm: distanceDm,
+                inZoneShare: inZoneShare,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int sessionId,
+                required int lapNo,
+                required int position,
+                required int durationMs,
+                required int distanceDm,
+                Value<double?> inZoneShare = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LapSegmentsCompanion.insert(
+                sessionId: sessionId,
+                lapNo: lapNo,
+                position: position,
+                durationMs: durationMs,
+                distanceDm: distanceDm,
+                inZoneShare: inZoneShare,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LapSegmentsTable, LapSegmentRow>(table),
+                  $$LapSegmentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({sessionId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (sessionId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.sessionId,
+                        referencedTable: $$LapSegmentsTableReferences
+                            ._sessionIdTable(db),
+                        referencedColumn: $$LapSegmentsTableReferences
+                            ._sessionIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LapSegmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LapSegmentsTable,
+      LapSegmentRow,
+      $$LapSegmentsTableFilterComposer,
+      $$LapSegmentsTableOrderingComposer,
+      $$LapSegmentsTableAnnotationComposer,
+      $$LapSegmentsTableCreateCompanionBuilder,
+      $$LapSegmentsTableUpdateCompanionBuilder,
+      (LapSegmentRow, $$LapSegmentsTableReferences),
+      LapSegmentRow,
+      PrefetchHooks Function({bool sessionId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $$TemplatesTableTableManager get templates =>
+      $$TemplatesTableTableManager(_db, _db.templates);
+  $$CoursesTableTableManager get courses =>
+      $$CoursesTableTableManager(_db, _db.courses);
+  $$CourseVersionsTableTableManager get courseVersions =>
+      $$CourseVersionsTableTableManager(_db, _db.courseVersions);
   $$SessionsTableTableManager get sessions =>
       $$SessionsTableTableManager(_db, _db.sessions);
   $$SamplesTableTableManager get samples =>
@@ -4042,4 +10243,11 @@ class $AppDatabaseManager {
       $$StrokesTableTableManager(_db, _db.strokes);
   $$RawPacketsTableTableManager get rawPackets =>
       $$RawPacketsTableTableManager(_db, _db.rawPackets);
+  $$CourseSegmentsTableTableManager get courseSegments =>
+      $$CourseSegmentsTableTableManager(_db, _db.courseSegments);
+  $$TemplateBlocksTableTableManager get templateBlocks =>
+      $$TemplateBlocksTableTableManager(_db, _db.templateBlocks);
+  $$LapsTableTableManager get laps => $$LapsTableTableManager(_db, _db.laps);
+  $$LapSegmentsTableTableManager get lapSegments =>
+      $$LapSegmentsTableTableManager(_db, _db.lapSegments);
 }

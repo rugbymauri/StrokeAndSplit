@@ -2,8 +2,8 @@
 
 ## 1. Schema und Migration
 
-- [ ] 1.1 Tabellen `courses`, `course_versions`, `course_segments`, `templates`, `template_blocks`, `laps` und `lap_segments` sowie die Spalten `sessions.templateId/templateName/courseVersionId/plannedLaps` und `samples.wallMs` anlegen (Design D4), `schemaVersion` 2 mit Migration `from1To2`. Verifikation: `make codegen` und `make check` sind grün
-- [ ] 1.2 `make schema` ausführen, Snapshot v2 und generierte Migrationstests einchecken, dazu einen Test, der eine Session aus Version 1 migriert und Zusammenfassung, Samples und Replay-Rohdaten unverändert wiederfindet. Verifikation: Migrationstests grün
+- [x] 1.1 Tabellen `courses`, `course_versions`, `course_segments`, `templates`, `template_blocks`, `laps` und `lap_segments` sowie die Spalten `sessions.templateId/templateName/courseVersionId/plannedLaps` und `samples.wallMs` anlegen (Design D4), `schemaVersion` 2 mit Migration `from1To2`. Verifikation: `make codegen` und `make check` sind grün
+- [x] 1.2 `make schema` ausführen, Snapshot v2 und generierte Migrationstests einchecken, dazu einen Test, der eine Session aus Version 1 migriert und Zusammenfassung, Samples und Replay-Rohdaten unverändert wiederfindet. Verifikation: Migrationstests grün
 
 ## 2. Strecken (Capability courses)
 
