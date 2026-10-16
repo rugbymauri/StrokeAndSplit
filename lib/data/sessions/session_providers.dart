@@ -4,9 +4,11 @@ import 'package:clock/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pm5_protocol/pm5_protocol.dart';
 
+import '../courses/lap_tracker.dart';
 import '../db/database.dart';
 import '../sources/erg_source.dart';
 import '../sources/erg_source_providers.dart';
+import '../templates/session_template.dart';
 import 'session_accumulator.dart';
 import 'session_repository.dart';
 
@@ -22,14 +24,38 @@ final sessionProvider = StreamProvider.family<SessionRow?, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).watch(id),
 );
 
+/// The laps of a session on a course, in order.
+final sessionLapsProvider = StreamProvider.family<List<LapRow>, int>(
+  (ref, id) => ref.watch(sessionRepositoryProvider).watchLaps(id),
+);
+
 /// A session being recorded right now.
 class ActiveRecording {
-  const ActiveRecording({required this.sessionId, required this.progress});
+  const ActiveRecording({required this.sessionId, required this.progress, this.template, this.lap});
 
   final int sessionId;
 
   /// Time and distance since the session started.
   final SessionProgress progress;
+
+  /// What is rowed; null for a free session.
+  final SessionTemplate? template;
+
+  /// Where the session is on the course of [template].
+  final LapProgress? lap;
+}
+
+/// A session that ended by itself after its last lap, until the live
+/// display has shown its summary.
+final finishedSessionProvider = NotifierProvider<FinishedSession, int?>(FinishedSession.new);
+
+class FinishedSession extends Notifier<int?> {
+  @override
+  int? build() => null;
+
+  void report(int sessionId) => state = sessionId;
+
+  void clear() => state = null;
 }
 
 /// How often buffered rows are written; at most this much is lost when the
@@ -54,8 +80,9 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
   SessionRepository get _repository => ref.read(sessionRepositoryProvider);
 
   /// Starts a session with the active source; time and distance count from
-  /// zero, whatever the PM5 shows at the moment.
-  Future<void> start() async {
+  /// zero, whatever the PM5 shows at the moment. With a [template] the
+  /// session follows its course and ends by itself after the last lap.
+  Future<void> start({SessionTemplate? template}) async {
     if (state != null) return;
     final source = ref.read(activeErgSourceProvider);
     if (source == null) throw StateError('No data source');
@@ -64,15 +91,32 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
       startedAt: clock.now(),
       source: source.kind,
       deviceName: source.kind == ErgSourceKind.pm5 ? source.name : null,
+      template: template,
     );
-    final accumulator = _accumulator = SessionAccumulator(id);
-    state = ActiveRecording(sessionId: id, progress: accumulator.progress);
+    final accumulator = _accumulator = SessionAccumulator(
+      id,
+      course: template?.course.definition,
+      plannedLaps: template?.laps,
+    );
+    ActiveRecording current() => ActiveRecording(
+          sessionId: id,
+          progress: accumulator.progress,
+          template: template,
+          lap: accumulator.lapProgress,
+        );
+    state = current();
     _packets = source.packets.listen((packet) {
       accumulator.add(packet);
-      final progress = accumulator.progress;
-      if (progress != state?.progress) state = ActiveRecording(sessionId: id, progress: progress);
+      // On a course the rest of a time segment runs on while paused.
+      if (template != null || accumulator.progress != state?.progress) state = current();
+      if (accumulator.lapsFinished) unawaited(_finishAfterLastLap());
     });
     _flushTimer = Timer.periodic(ref.read(recordingFlushIntervalProvider), (_) => _flush());
+  }
+
+  Future<void> _finishAfterLastLap() async {
+    final id = await stop();
+    if (id != null) ref.read(finishedSessionProvider.notifier).report(id);
   }
 
   /// Ends the session, stores its summary and returns its id.

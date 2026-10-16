@@ -6,7 +6,12 @@ import 'package:drift/drift.dart';
 import 'package:pm5_protocol/pm5_protocol.dart';
 
 import '../db/database.dart';
+import '../courses/course.dart';
+import '../courses/course_repository.dart';
+import '../courses/lap_tracker.dart';
+import '../zones/zone_repository.dart';
 import '../sources/erg_source.dart';
+import '../templates/session_template.dart';
 import 'session_accumulator.dart';
 
 /// Stores sessions with their samples, strokes and raw notifications.
@@ -15,12 +20,43 @@ class SessionRepository {
 
   final AppDatabase _db;
 
-  Future<int> create({required DateTime startedAt, required ErgSourceKind source, String? deviceName}) {
+  /// Starts a session; with a [template] it rows the course in the version
+  /// the template uses now.
+  Future<int> create({
+    required DateTime startedAt,
+    required ErgSourceKind source,
+    String? deviceName,
+    SessionTemplate? template,
+  }) {
+    return _insert(
+      startedAt: startedAt,
+      source: source,
+      deviceName: deviceName,
+      templateId: template?.id,
+      templateName: template?.name,
+      courseVersionId: template?.course.versionId,
+      plannedLaps: template?.laps,
+    );
+  }
+
+  Future<int> _insert({
+    required DateTime startedAt,
+    required ErgSourceKind source,
+    String? deviceName,
+    int? templateId,
+    String? templateName,
+    int? courseVersionId,
+    int? plannedLaps,
+  }) {
     return _db.into(_db.sessions).insert(SessionsCompanion.insert(
           startedAt: startedAt,
           status: SessionStatus.recording,
           source: source,
           deviceName: Value(deviceName),
+          templateId: Value(templateId),
+          templateName: Value(templateName),
+          courseVersionId: Value(courseVersionId),
+          plannedLaps: Value(plannedLaps),
         ));
   }
 
@@ -31,6 +67,9 @@ class SessionRepository {
       b.insertAll(_db.samples, batch.samples);
       b.insertAll(_db.strokes, batch.strokes);
       b.insertAll(_db.rawPackets, batch.rawPackets);
+      // Replaced, as the recovery finishes a lap that may be partly stored.
+      b.insertAll(_db.laps, batch.laps, mode: InsertMode.insertOrReplace);
+      b.insertAll(_db.lapSegments, batch.lapSegments, mode: InsertMode.insertOrReplace);
     });
   }
 
@@ -68,9 +107,46 @@ class SessionRepository {
   Future<int> recoverInterrupted() async {
     final interrupted = await (_db.select(_db.sessions)..where((s) => s.status.equalsValue(SessionStatus.recording))).get();
     for (final session in interrupted) {
+      if (session.courseVersionId != null) await _finishLastLap(session);
       await finish(session.id, status: SessionStatus.incomplete);
     }
     return interrupted.length;
+  }
+
+  /// Finishes the lap that was running when the app ended from the stored
+  /// samples (Design D5); the finished laps are stored already.
+  Future<void> _finishLastLap(SessionRow session) async {
+    final course = await CourseRepository(_db).atVersion(session.courseVersionId!);
+    final last = await (_db.select(_db.laps)
+          ..where((l) => l.sessionId.equals(session.id) & l.complete.equals(true))
+          ..orderBy([(l) => OrderingTerm.desc(l.lapNo)])
+          ..limit(1))
+        .getSingleOrNull();
+    final lap = (last?.lapNo ?? 0) + 1;
+    if (session.plannedLaps != null && lap > session.plannedLaps!) return;
+
+    final tracker = LapTracker(
+      course.definition,
+      plannedLaps: session.plannedLaps,
+      startLap: lap,
+      startWallMs: last?.endWallMs ?? 0,
+      startDistanceDm: last?.endDistanceDm ?? 0,
+    );
+    final samples = await (_db.select(_db.samples)
+          ..where((s) => s.sessionId.equals(session.id) & s.wallMs.isBiggerOrEqualValue(last?.endWallMs ?? 0))
+          ..orderBy([(s) => OrderingTerm.asc(s.rowId)]))
+        .get();
+    for (final s in samples) {
+      tracker.add(TrackPoint(wallMs: s.wallMs!, distanceDm: s.distanceDm, paceCs: s.paceCs, strokeRate: s.strokeRate));
+    }
+    tracker.finish();
+    await write(SessionBatch(
+      samples: const [],
+      strokes: const [],
+      rawPackets: const [],
+      laps: [for (final l in tracker.takeLaps()) lapCompanion(session.id, l)],
+      lapSegments: [for (final s in tracker.takeSegments()) segmentCompanion(session.id, s)],
+    ));
   }
 
   /// All sessions, newest first.
@@ -87,8 +163,21 @@ class SessionRepository {
       await (_db.delete(_db.samples)..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.strokes)..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.rawPackets)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(_db.laps)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(_db.lapSegments)..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.sessions)..where((s) => s.id.equals(id))).go();
     });
+  }
+
+  /// The laps of a session on a course, in order.
+  Future<List<LapRow>> laps(int id) => _laps(id).get();
+
+  Stream<List<LapRow>> watchLaps(int id) => _laps(id).watch();
+
+  SimpleSelectStatement<$LapsTable, LapRow> _laps(int id) {
+    return _db.select(_db.laps)
+      ..where((l) => l.sessionId.equals(id))
+      ..orderBy([(l) => OrderingTerm.asc(l.lapNo)]);
   }
 
   Future<bool> hasRawPackets(int id) async {
@@ -123,12 +212,19 @@ class SessionRepository {
   }
 
   /// The session as an `.aergrow` file (Design D8): gzip-compressed lines in
-  /// the AergRow raw format, with the summary in the header.
+  /// the AergRow raw format, with the summary in the header, and template and
+  /// course of a session on a course (Design D7).
   Future<List<int>> export(int id) async {
     final session = (await get(id))!;
     final recording = await rawRecording(id);
+    final versionId = session.courseVersionId;
+    final course = versionId == null ? null : await CourseRepository(_db).atVersion(versionId);
     final metadata = {
       ...recording.metadata,
+      if (course != null) ...{
+        'template': {'name': session.templateName, 'laps': session.plannedLaps},
+        'course': _courseJson(course),
+      },
       'session': {
         'status': session.status.name,
         'endedAt': ?session.endedAt?.toUtc().toIso8601String(),
@@ -153,13 +249,22 @@ class SessionRepository {
     final recording = RawRecording.parseLines(const LineSplitter().convert(text));
     final metadata = recording.metadata;
     final session = metadata['session'] as Map<String, Object?>? ?? const {};
+    final template = metadata['template'] as Map<String, Object?>?;
+    final course = switch (metadata['course']) {
+      final Map<String, Object?> json => (name: json['name']! as String, definition: _courseDefinition(json)),
+      _ => null,
+    };
 
-    final id = await create(
+    final id = await _insert(
       startedAt: DateTime.tryParse(metadata['recordedAt'] as String? ?? '') ?? clock.now(),
       source: ErgSourceKind.values.asNameMap()[metadata['source']] ?? ErgSourceKind.pm5,
       deviceName: metadata['device'] as String?,
+      templateName: template?['name'] as String?,
+      courseVersionId: course == null ? null : await _importCourse(course.name, course.definition),
+      plannedLaps: template?['laps'] as int?,
     );
-    final accumulator = SessionAccumulator(id);
+    final accumulator =
+        SessionAccumulator(id, course: course?.definition, plannedLaps: template?['laps'] as int?);
     recording.packets.forEach(accumulator.add);
     accumulator.finish();
     await write(accumulator.takeBatch());
@@ -170,4 +275,58 @@ class SessionRepository {
     );
     return id;
   }
+
+  /// The version of an imported course: one that rows the same, or a new
+  /// course with its zones, which are created when missing (Design D6).
+  Future<int> _importCourse(String name, CourseDefinition definition) {
+    return _db.transaction(() async {
+      final courses = CourseRepository(_db);
+      final found = await courses.findVersion(name, definition);
+      if (found != null) return found;
+      final placed = await ZoneRepository(_db).placeZones(name, definition);
+      return courses.findOrCreateVersion(name, placed);
+    });
+  }
+
+  static Map<String, Object?> _courseJson(Course course) => {
+        'name': course.name,
+        'axis': course.axis.name,
+        'length': course.definition.length,
+        'segments': [
+          for (final s in course.definition.segments)
+            {
+              'length': s.length,
+              'paceFastCs': ?s.paceFastCs,
+              'paceSlowCs': ?s.paceSlowCs,
+              'spmMin': ?s.spmMin,
+              'spmMax': ?s.spmMax,
+              if (s.zoneName case final name?)
+                'zone': {
+                  'name': name,
+                  'axis': course.axis.name,
+                  'length': s.length,
+                  'paceFastCs': ?s.paceFastCs,
+                  'paceSlowCs': ?s.paceSlowCs,
+                  'spmMin': ?s.spmMin,
+                  'spmMax': ?s.spmMax,
+                },
+            },
+        ],
+      };
+
+  static CourseDefinition _courseDefinition(Map<String, Object?> json) => CourseDefinition(
+        axis: CourseAxis.values.byName(json['axis']! as String),
+        length: json['length']! as int,
+        segments: [
+          for (final s in (json['segments']! as List).cast<Map<String, Object?>>())
+            CourseSegment(
+              length: s['length']! as int,
+              paceFastCs: s['paceFastCs'] as int?,
+              paceSlowCs: s['paceSlowCs'] as int?,
+              spmMin: s['spmMin'] as int?,
+              spmMax: s['spmMax'] as int?,
+              zoneName: (s['zone'] as Map<String, Object?>?)?['name'] as String?,
+            ),
+        ],
+      );
 }

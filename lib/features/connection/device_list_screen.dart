@@ -7,13 +7,17 @@ import '../../app/platform_providers.dart';
 import '../../data/sources/ble/ble_transport.dart';
 import '../../data/sources/ble/pm5_ble_source.dart';
 import '../../data/sources/erg_source_providers.dart';
+import '../../data/templates/session_template.dart';
 import '../live/live_screen.dart';
 
 /// Scans for PM5s in range and connects to the one the user picks.
 class DeviceListScreen extends ConsumerStatefulWidget {
-  const DeviceListScreen({super.key, this.scanTimeout = const Duration(seconds: 15)});
+  const DeviceListScreen({super.key, this.scanTimeout = const Duration(seconds: 15), this.template});
 
   final Duration scanTimeout;
+
+  /// Started in the live display once connected.
+  final SessionTemplate? template;
 
   @override
   ConsumerState<DeviceListScreen> createState() => _DeviceListScreenState();
@@ -97,7 +101,8 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
       return;
     }
     if (!mounted) return;
-    await Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => const LiveScreen()));
+    await Navigator.of(context)
+        .pushReplacement(MaterialPageRoute<void>(builder: (_) => LiveScreen(template: widget.template)));
   }
 
   @override

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/courses/course.dart';
+import '../../data/courses/course_providers.dart';
 import '../../data/db/database.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
@@ -92,6 +94,7 @@ class _Summary extends StatelessWidget {
                   style: TextStyle(color: theme.colorScheme.error),
                 ),
               ),
+            if (session.courseVersionId case final versionId?) _Laps(session: session, versionId: versionId),
             const SizedBox(height: 16),
             Wrap(
               spacing: 8,
@@ -124,6 +127,97 @@ class _Summary extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Template, course and laps of a session on a course; the best complete
+/// lap is highlighted, unfinished ones are marked.
+class _Laps extends ConsumerWidget {
+  const _Laps({required this.session, required this.versionId});
+
+  final SessionRow session;
+  final int versionId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final course = ref.watch(courseVersionProvider(versionId)).value;
+    final laps = ref.watch(sessionLapsProvider(session.id)).value ?? const <LapRow>[];
+    if (course == null) return const SizedBox.shrink();
+    final byTime = course.axis == CourseAxis.distance;
+    final complete = laps.where((l) => l.complete);
+    final best = complete.isEmpty
+        ? null
+        : complete.reduce((a, b) {
+            // Fastest lap on a distance course, the longest on a time course.
+            final aBetter = byTime
+                ? a.endWallMs - a.startWallMs <= b.endWallMs - b.startWallMs
+                : a.endDistanceDm - a.startDistanceDm >= b.endDistanceDm - b.startDistanceDm;
+            return aBetter ? a : b;
+          });
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ListTile(
+                title: Text(session.templateName ?? course.name, style: theme.textTheme.titleMedium),
+                subtitle: Text('${course.name} · ${formatCourseLength(course.axis, course.definition.length)}'),
+              ),
+              for (final lap in laps) _LapTile(lap: lap, byTime: byTime, best: identical(lap, best)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LapTile extends StatelessWidget {
+  const _LapTile({required this.lap, required this.byTime, required this.best});
+
+  final LapRow lap;
+
+  /// Whether laps compare by time (distance course) or by distance.
+  final bool byTime;
+  final bool best;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final time = formatLapTime(Duration(milliseconds: lap.endWallMs - lap.startWallMs));
+    final distance = '${(lap.endDistanceDm - lap.startDistanceDm) ~/ 10} m';
+    final share = lap.inZoneShare;
+    final value = lap.complete ? (byTime ? time : distance) : 'unvollständig · $distance · $time';
+    final style = theme.textTheme.titleMedium?.copyWith(
+      fontWeight: best ? FontWeight.bold : null,
+      color: lap.complete ? null : theme.colorScheme.onSurfaceVariant,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+    return Padding(
+      key: best ? const Key('lap-best') : Key('lap-${lap.lapNo}'),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        children: [
+          Icon(best ? Icons.star : (lap.complete ? Icons.flag_outlined : Icons.timelapse)),
+          const SizedBox(width: 16),
+          Text('Runde ${lap.lapNo}'),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              [value, if (share != null) 'Zone ${(share * 100).round()} %'].join(' · '),
+              style: style,
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
       ),
     );
   }

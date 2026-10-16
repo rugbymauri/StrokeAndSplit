@@ -9,9 +9,11 @@ import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/simulated_source.dart';
+import '../../data/templates/session_template.dart';
 import '../connection/connection_indicator.dart';
 import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
+import 'course_bar.dart';
 import 'formatters.dart';
 
 /// After this long without data the shown values are marked as outdated.
@@ -19,7 +21,10 @@ const staleAfter = Duration(seconds: 3);
 
 /// The live rowing metrics, readable from the seat.
 class LiveScreen extends ConsumerStatefulWidget {
-  const LiveScreen({super.key});
+  const LiveScreen({super.key, this.template});
+
+  /// Started as a session as soon as the source is connected.
+  final SessionTemplate? template;
 
   @override
   ConsumerState<LiveScreen> createState() => _LiveScreenState();
@@ -32,13 +37,35 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   StreamSubscription<RowingEvent>? _events;
   Wakelock? _wakelock;
   var _wakelockOn = false;
+  var _templateStarted = false;
 
   @override
   void initState() {
     super.initState();
     _wakelock = ref.read(wakelockProvider);
     ref.listenManual(rowingEventsProvider, (_, events) => _listen(events), fireImmediately: true);
-    ref.listenManual(ergConnectionStateProvider, (_, state) => _updateWakelock(state.value), fireImmediately: true);
+    ref.listenManual(ergConnectionStateProvider, (_, state) {
+      _updateWakelock(state.value);
+      if (state.value == ErgConnectionState.connected) _startTemplate();
+    }, fireImmediately: true);
+    ref.listenManual(finishedSessionProvider, (_, id) {
+      if (id != null) _showFinished(id);
+    });
+  }
+
+  void _startTemplate() {
+    final template = widget.template;
+    if (template == null || _templateStarted) return;
+    _templateStarted = true;
+    // Not within the listener that reports the connection.
+    Future.microtask(() => ref.read(sessionRecorderProvider.notifier).start(template: template));
+  }
+
+  /// The session ended by itself after its last lap.
+  Future<void> _showFinished(int id) async {
+    ref.read(finishedSessionProvider.notifier).clear();
+    if (!mounted) return;
+    await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SessionSummaryScreen(sessionId: id)));
   }
 
   void _listen(Stream<RowingEvent> events) {
@@ -118,8 +145,16 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                   content: const Text('Keine Daten seit 3 Sekunden, die Werte sind veraltet.'),
                   actions: [const SizedBox.shrink()],
                 ),
+              if ((recording?.lap, recording?.template) case (final lap?, final template?))
+                CourseBar(lap: lap, course: template.course.definition),
               Expanded(
-                child: _Metrics(tick: _tick, session: recording?.progress, outdated: _stale),
+                child: _Metrics(
+                  tick: _tick,
+                  session: recording?.progress,
+                  paceZone: ZoneHint.pace(recording?.lap?.pace),
+                  strokeRateZone: ZoneHint.strokeRate(recording?.lap?.strokeRate),
+                  outdated: _stale,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
@@ -148,13 +183,21 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 }
 
 class _Metrics extends StatelessWidget {
-  const _Metrics({required this.tick, required this.session, required this.outdated});
+  const _Metrics({
+    required this.tick,
+    required this.session,
+    required this.outdated,
+    this.paceZone,
+    this.strokeRateZone,
+  });
 
   final StatusTick? tick;
 
   /// Time and distance of the running session, shown instead of the PM5's.
   final SessionProgress? session;
   final bool outdated;
+  final ZoneHint? paceZone;
+  final ZoneHint? strokeRateZone;
 
   @override
   Widget build(BuildContext context) {
@@ -171,11 +214,21 @@ class _Metrics extends StatelessWidget {
         value: formatDistance(session?.distanceMeters ?? tick?.distanceMeters ?? 0),
       ),
       _Metric(key: const Key('metric-watts'), label: 'Watt', value: formatWhole(tick?.watts)),
-      _Metric(key: const Key('metric-spm'), label: 'Schläge/min', value: formatWhole(tick?.strokeRate)),
+      _Metric(
+        key: const Key('metric-spm'),
+        label: 'Schläge/min',
+        value: formatWhole(tick?.strokeRate),
+        zone: strokeRateZone,
+      ),
       if (tick?.heartRate != null)
         _Metric(key: const Key('metric-hr'), label: 'Puls', value: formatWhole(tick!.heartRate)),
     ];
-    final pace = _Metric(key: const Key('metric-pace'), label: 'Pace /500 m', value: formatPace(tick?.pace));
+    final pace = _Metric(
+      key: const Key('metric-pace'),
+      label: 'Pace /500 m',
+      value: formatPace(tick?.pace),
+      zone: paceZone,
+    );
 
     return Opacity(
       opacity: outdated ? 0.4 : 1,
@@ -233,26 +286,51 @@ class _Grid extends StatelessWidget {
 }
 
 class _Metric extends StatelessWidget {
-  const _Metric({super.key, required this.label, required this.value});
+  const _Metric({super.key, required this.label, required this.value, this.zone});
 
   final String label;
   final String value;
 
+  /// Whether the value is in the band of the segment; null without a band.
+  final ZoneHint? zone;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final zone = this.zone;
+    final (background, foreground) = switch (zone) {
+      null => (null, null),
+      ZoneHint(inZone: true) => (const Color(0xFF1B5E20), Colors.white),
+      ZoneHint(inZone: false) => (theme.colorScheme.errorContainer, theme.colorScheme.onErrorContainer),
+    };
+    final labelStyle = theme.textTheme.labelLarge?.copyWith(color: foreground);
     return Card(
+      key: zone == null ? null : Key('zone-${zone.inZone ? 'in' : 'out'}'),
+      color: background,
       margin: const EdgeInsets.all(4),
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(
           children: [
-            Text(label, style: theme.textTheme.labelLarge, maxLines: 1, overflow: TextOverflow.ellipsis),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(child: Text(label, style: labelStyle, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                // The direction in words and as a symbol, not only as colour.
+                if (zone != null) ...[
+                  const SizedBox(width: 8),
+                  Icon(zone.icon, size: 16, color: foreground),
+                  const SizedBox(width: 2),
+                  Flexible(child: Text(zone.text, style: labelStyle, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                ],
+              ],
+            ),
             Expanded(
               child: FittedBox(
                 child: Text(
                   value,
                   style: theme.textTheme.displayLarge?.copyWith(
+                    color: foreground,
                     fontWeight: FontWeight.bold,
                     fontFeatures: const [FontFeature.tabularFigures()],
                   ),
