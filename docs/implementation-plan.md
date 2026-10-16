@@ -18,7 +18,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
-| 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
+| 4 | `force-curve` | 1/9 | nach dem Mitschnitt | Nutzer: `make spike` mit Kraftkurve (Task 1.1) |
 | 5 | `heart-rate` | 9/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 10/13 | in Umsetzung | – |
@@ -137,6 +137,7 @@ Ziel: Kurve des letzten und vorherigen Schlags im Live-Display, Aufzeichnung und
 
 Vor dem Start:
 - [ ] Spike am echten PM5: Characteristic `0x003D` und Paketaufbau per Mitschnitt bestätigen (`make spike`). Braucht den Nutzer am Erg.
+  - 2026-10-16: Mitschnitt vom 16.10. enthält keine Kurvenpakete, weil der Spike `003d` nicht abonniert hatte. Spike erweitert (Task 1.0); `0x0035` kommt zweimal pro Schlag, Spitzenkraft 420–550 N, Durchschnitt 280–350 N als Prüfwerte für die Kurve. Neuer Mitschnitt nötig, mit unterschiedlich harten Schlägen.
 - [ ] Rohpakete tragen nach `device-types` ein Protokoll; die Kurvenpakete passen dort hinein.
 - [ ] Platz der Karte im Layout aus `ui-design`.
 
