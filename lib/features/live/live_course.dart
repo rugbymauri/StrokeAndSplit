@@ -115,7 +115,7 @@ class CourseLiveView extends StatelessWidget {
           ),
           if (curve) ...[
             const SizedBox(height: _gap),
-            SizedBox(height: curveHeight, child: ForceCurve(forces: forces)),
+            SizedBox(height: curveHeight, child: ForceCurve(last: forces, variant: ForceCurveVariant.strip)),
           ],
           const Spacer(),
           SizedBox(height: buttonHeight, child: action),
@@ -146,7 +146,7 @@ class CourseLiveView extends StatelessWidget {
             child: _dim(_strokeRate(
               math.min(72, cap),
               landscape: true,
-              footer: curve ? ForceCurve(forces: forces) : null,
+              footer: curve ? ForceCurve(last: forces, variant: ForceCurveVariant.tinted) : null,
             )),
           ),
           const SizedBox(width: AppSpacing.m),

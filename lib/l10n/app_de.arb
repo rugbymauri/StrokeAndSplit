@@ -439,6 +439,22 @@
   "@liveForceCurve": {
     "description": "Live display: title of the force curve of the last stroke"
   },
+  "liveForceCurveShort": "Kraft",
+  "@liveForceCurveShort": {
+    "description": "Live display on a template: short label of the narrow strip with the force curve"
+  },
+  "liveForceCurveLast": "Letzter",
+  "@liveForceCurveLast": {
+    "description": "Live display: legend of the force curve of the last stroke"
+  },
+  "liveForceCurvePrevious": "Vorheriger",
+  "@liveForceCurvePrevious": {
+    "description": "Live display: legend of the force curve of the stroke before the last one, drawn in grey"
+  },
+  "liveForceCurveWaiting": "Warte auf ersten Schlag",
+  "@liveForceCurveWaiting": {
+    "description": "Live display: force curve card before the first curve of the session has arrived"
+  },
   "courseLap": "Runde {lap}",
   "@courseLap": {
     "description": "Course bar: the current lap of an open number of laps",

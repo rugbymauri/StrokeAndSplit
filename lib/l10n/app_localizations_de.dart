@@ -340,6 +340,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get liveForceCurve => 'Kraftkurve';
 
   @override
+  String get liveForceCurveShort => 'Kraft';
+
+  @override
+  String get liveForceCurveLast => 'Letzter';
+
+  @override
+  String get liveForceCurvePrevious => 'Vorheriger';
+
+  @override
+  String get liveForceCurveWaiting => 'Warte auf ersten Schlag';
+
+  @override
   String courseLap(int lap) {
     return 'Runde $lap';
   }

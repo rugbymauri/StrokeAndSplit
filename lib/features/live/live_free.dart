@@ -74,7 +74,7 @@ class FreeLiveView extends StatelessWidget {
           SizedBox(height: 48, child: _dim(_SideValues(tick: tick, rrIntervalMs: rrIntervalMs, session: session, card: true))),
           if (curve) ...[
             const SizedBox(height: _gap),
-            SizedBox(height: 120, child: ForceCurve(forces: forces)),
+            SizedBox(height: 120, child: ForceCurve(last: forces)),
           ],
           const SizedBox(height: _gap),
           SizedBox(height: 56, child: action),
@@ -122,7 +122,10 @@ class FreeLiveView extends StatelessWidget {
                           Expanded(child: _dim(_pace(context, pace))),
                           if (curve) ...[
                             const SizedBox(height: AppSpacing.s),
-                            SizedBox(height: curveHeight, child: ForceCurve(forces: forces)),
+                            SizedBox(
+                              height: curveHeight,
+                              child: ForceCurve(last: forces, variant: ForceCurveVariant.inline),
+                            ),
                           ],
                         ],
                       ),

@@ -54,6 +54,19 @@ void main() {
     expect(formatStrokeRate(de, null), '–');
   });
 
+  test('formatDriveLength shows meters with two decimals and the decimal mark of the language', () {
+    expect(formatDriveLength(de, 1.06), '1,06 m');
+    expect(formatDriveLength(en, 1.06), '1.06 m');
+    expect(formatDriveLength(de, 0.6), '0,60 m');
+    // A length of 0.01 m units from the PM5, e.g. 106 for 1.06 m.
+    expect(formatDriveLength(de, 106 * 0.01), '1,06 m');
+  });
+
+  test('formatDriveLength leaves out a missing length instead of showing 0 m', () {
+    expect(formatDriveLength(de, null), isNull);
+    expect(formatDriveLength(en, 0), isNull);
+  });
+
   test('formatDateTime shows the local date and time in the format of the language', () {
     expect(formatDateTime(de, DateTime(2026, 10, 15, 18, 30)), '15.10.2026, 18:30');
     expect(formatDateTime(en, DateTime(2026, 10, 15, 18, 30)), 'Oct 15, 2026, 18:30');
