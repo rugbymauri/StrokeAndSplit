@@ -143,10 +143,13 @@ void main() {
 
     await tester.tap(find.text('Vorlage rudern'));
     await setup.settle(tester);
-    await tester.tap(find.byTooltip('Strecken'));
+    await tester.tap(find.text('Strecken'));
+    await setup.settle(tester);
+    expect(find.text('Noch keine Strecken angelegt.'), findsOneWidget);
+    await tester.tap(find.text('Zonen'));
     await setup.settle(tester);
 
-    expect(find.text('Noch keine Strecken angelegt.'), findsOneWidget);
+    expect(find.textContaining('Noch keine Zonen angelegt.'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 

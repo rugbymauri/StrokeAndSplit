@@ -9,29 +9,41 @@ import '../../data/templates/template_providers.dart';
 import '../connection/device_list_screen.dart';
 import '../courses/courses_screen.dart';
 import '../live/live_screen.dart';
+import '../zones/zones_screen.dart';
 import 'template_editor_screen.dart';
 
-/// All templates, to start, create, edit and delete them.
-class TemplatesScreen extends ConsumerWidget {
+/// Templates, courses and zones in three tabs.
+class TemplatesScreen extends StatelessWidget {
   const TemplatesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Vorlage rudern'),
+          bottom: const TabBar(tabs: [Tab(text: 'Vorlagen'), Tab(text: 'Strecken'), Tab(text: 'Zonen')]),
+        ),
+        body: const TabBarView(
+          children: [_TemplatesTab(), CoursesScreen(embedded: true), ZonesScreen(embedded: true)],
+        ),
+      ),
+    );
+  }
+}
+
+/// All templates, to start, create, edit and delete them.
+class _TemplatesTab extends ConsumerWidget {
+  const _TemplatesTab();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final templates = ref.watch(templatesProvider);
     final hasCourses = ref.watch(coursesProvider).value?.isNotEmpty ?? true;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vorlage rudern'),
-        actions: [
-          IconButton(
-            tooltip: 'Strecken',
-            icon: const Icon(Icons.route),
-            onPressed: () =>
-                Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoursesScreen())),
-          ),
-        ],
-      ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'templates',
         onPressed: () => hasCourses ? _openEditor(context) : _offerCourse(context),
         icon: const Icon(Icons.add),
         label: const Text('Vorlage anlegen'),

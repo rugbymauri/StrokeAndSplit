@@ -7,7 +7,7 @@
 ## 2. Zonen (Capability zones)
 
 - [x] 2.1 `ZoneRepository`: anlegen, auflisten mit Verwendung, bearbeiten, weich löschen. Validierung (Länge > 0, mindestens ein Band, Grenzen nicht vertauscht). Verifikation: Unit-Tests für alle Szenarien der Spec zones ausser denen, die Strecken betreffen
-- [ ] 2.2 Zonenliste und Zonen-Editor nach den Canvas-Screens „Zonenliste“ und „Zonen-Editor“, dritter Tab „Zonen“. Verifikation: Widget-Tests für Anlegen, fehlendes Band, Hinweis auf betroffene Strecken und Löschen mit Bestätigung
+- [x] 2.2 Zonenliste und Zonen-Editor nach den Canvas-Screens „Zonenliste“ und „Zonen-Editor“, dritter Tab „Zonen“. Verifikation: Widget-Tests für Anlegen, fehlendes Band, Hinweis auf betroffene Strecken und Löschen mit Bestätigung
 
 ## 3. Strecken aus Zonen (Capability courses)
 

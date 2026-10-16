@@ -5,16 +5,20 @@ import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import 'course_editor_screen.dart';
 
-/// All courses, to create, edit and delete them.
+/// All courses, to create, edit and delete them; [embedded] in a tab it
+/// has no app bar of its own.
 class CoursesScreen extends ConsumerWidget {
-  const CoursesScreen({super.key});
+  const CoursesScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final courses = ref.watch(coursesProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Strecken')),
+      appBar: embedded ? null : AppBar(title: const Text('Strecken')),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'courses',
         onPressed: () => openCourseEditor(context),
         icon: const Icon(Icons.add),
         label: const Text('Strecke anlegen'),
