@@ -22,11 +22,15 @@ Jeder Zahlenwert in den Editoren SHALL über ein Tastenpaar „mehr“ und „we
 - **THEN** steigt die Länge fortlaufend in Schritten von 100 m, bis er loslässt
 
 ### Requirement: Feste Schritte pro Feld
-Jeder Tipp auf eine Taste SHALL den Wert um einen festen Schritt ändern: Pace 5 s, Schlagzahl 1 spm, Runden 1, Streckenlänge 100 m, Zonenlänge 10 m, Startposition einer Zone 50 m.
+Jeder Tipp auf eine Taste SHALL den Wert um einen festen Schritt ändern: Pace 5 s, Schlagzahl 1 spm, Runden 1, Streckenlänge 100 m, Zonenlänge 10 m, Startposition einer Zone 50 m. Auf der Zeitachse MUST der Schritt für die Streckenlänge 30 s und für Zonenlänge und Startposition 10 s betragen.
 
 #### Scenario: Zonenlänge
 - **WHEN** im Zonen-Editor die Länge 100 m beträgt und der Nutzer einmal auf „mehr“ tippt
 - **THEN** ist die Zone 110 m lang
+
+#### Scenario: Zeitstrecke verlängern
+- **WHEN** eine Strecke mit Zeitachse 4:00 lang ist und der Nutzer einmal auf „mehr“ tippt
+- **THEN** ist die Strecke 4:30 lang
 
 ### Requirement: Richtung der Taste erkennbar
 Die Tasten SHALL die Form eines Ruderblatts haben, dessen Pfeil zugleich die Stange bildet. Bei „mehr“ MUST Blatt und Pfeil nach oben zeigen, bei „weniger“ nach unten. Jede Taste MUST für Screenreader mit Richtung und Schritt beschriftet sein, z. B. „5 Sekunden mehr“.

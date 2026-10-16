@@ -125,7 +125,7 @@ Zahlen werden in allen Editoren mit einem Tastenpaar eingestellt, nicht getippt 
 - **Form**: ein eckiges, schmales Ruderblatt mit gerader Kante an der Spitze und abgeschrägten Kanten zum Hals. Ein heller Pfeil in `text` bildet zugleich die kurze Stange, seine Spitze reicht an die Blattkante, die Schenkel bis an die Seiten, so dass er wie das Muster des Blatts wirkt. Blatt `line` mit Rand `#4A545E`. „Mehr“ zeigt nach oben, „weniger“ ist um 180° gedreht.
 - **Grössen**: gross 56 × 60 px für einzelne Werte in voller Breite (Runden, Startposition einer Zone), kompakt 44 × 47 px in Feldern nebeneinander (Länge, Pace- und Schlagzahl-Band). Der Wert steht zwischen den Tasten, die Einheit darunter bzw. daneben.
 - **Zustände**: bereit; gedrückt mit Blatt `#1D3A55`, Rand und Pfeil in `zoneIn`; gesperrt am Minimum oder Maximum mit 35 % Deckkraft.
-- **Schritte**: Pace 5 s, Schlagzahl 1 spm, Runden 1, Streckenlänge 100 m, Zonenlänge 10 m, Startposition einer Zone 50 m.
+- **Schritte**: Pace 5 s, Schlagzahl 1 spm, Runden 1, Streckenlänge 100 m, Zonenlänge 10 m, Startposition einer Zone 50 m. Auf der Zeitachse (entschieden 2026-10-16): Streckenlänge 30 s, Zonenlänge und Startposition 10 s.
 - **Gedrückt halten** wiederholt den Schritt, nach etwa einer Sekunde schneller, damit auch 10 000 m schnell erreicht sind.
 - Die Grenzen kommen aus der bestehenden Validierung der Felder. Eine Taste, deren Schritt die Grenze überschreiten würde, ist gesperrt.
 - Blau bleibt für „in der Zone“ reserviert. Darum sind beide Richtungen gleich gefärbt und unterscheiden sich nur durch die Richtung.
@@ -140,6 +140,5 @@ Zahlen werden in allen Editoren mit einem Tastenpaar eingestellt, nicht getippt 
 
 ## Open Questions
 
-- Schritte auf der Zeitachse: Bei Strecken und Zonen mit Zeitachse sind die Schritte noch offen. Vorschlag: Streckenlänge 30 s, Zonenlänge und Startposition 10 s.
 
 - Puls-Herkunft: Der Canvas zeigt im Screen „Zustände“ einen Zustand „Über PM5“. Der Change `heart-rate` schliesst die Anzeige der Puls-Herkunft im Live-Display aber ausdrücklich aus. Das ist vor der Umsetzung von `heart-rate` zu klären.

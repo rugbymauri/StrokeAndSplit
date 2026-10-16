@@ -61,11 +61,11 @@ Vor dem Start anpassen:
 - [ ] Spec-Delta `live-display` spricht von „Segmenten“ und „Segmentspur“; Begriffe mit `zones` abgleichen (Abschnitt = Zone oder frei).
 - [ ] Startbildschirm: Quellenwahl muss FTMS-Rudergeräte aus `device-types` aufnehmen.
 
-Offene Entscheide: F1. F2 ist entschieden (Mittelweg, Design D6).
+Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeitachse, Design D7) sind entschieden.
 
 - [x] F2 in Proposal, Design D6 und Task 5.1 eingetragen.
 - [x] Ruderblatt-Tasten für Zahlen (2026-10-16) als Design D7, Spec `number-steppers` und Tasks 1.4 und 4.4 aufgenommen. Betrifft auch die Editoren aus `zones`.
-- [ ] Schritte auf der Zeitachse klären (F12).
+- [x] F12 entschieden: Zeitachse Strecke 30 s, Zone und Startposition 10 s (Design D7, Spec `number-steppers`).
 
 ### 3. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 
@@ -117,7 +117,7 @@ Vor dem Start:
 | F9 | „Stroke & Split“ oder „Stroke and Split“? | rename | rename |
 | F10 | App-ID `ch.strokesplit` oder `ch.<herausgeber>.strokesplit`? | rename | rename |
 | F11 | Live-Display beim Übergang in eine Zone vorwarnen, z.B. „Sprint in 50 m“? (offen aus `zones`) | – (neuer Change) | – |
-| F12 | Schritte der Ruderblatt-Tasten auf der Zeitachse (Vorschlag: Strecke 30 s, Zone und Startposition 10 s) | ui-design | ui-design |
+| ~~F12~~ | Schritte der Ruderblatt-Tasten auf der Zeitachse: **Strecke 30 s, Zone und Startposition 10 s** (2026-10-16) | ui-design | entschieden |
 
 ## Offene Punkte
 
