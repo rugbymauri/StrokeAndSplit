@@ -9,13 +9,13 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`.
+Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`; `device-types` an diesen Stand angepasst.
 
 ## Überblick
 
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
-| 1 | `device-types` | 0/33 | ja | – |
+| 1 | `device-types` | 0/33 | ja, angepasst | – |
 | 2 | `ui-design` | 0/16 | ja, besser nach 1 | Entscheid Startbildschirm (F2) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
@@ -38,10 +38,15 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 Ziel: Nur Rudergeräte. PM5 an SkiErg/BikeErg wird abgewiesen, FTMS-Rower (`0x1826`) kommen als zweite Geräteart dazu. Ohne FTMS-Hardware verifiziert über Spec-Tests, FTMS-Modus im Simulator und einen Software-Rower (BlueZ) unter `tool/`.
 
 Vor dem Start anpassen:
-- [ ] Task 1.1 (Rebase auf `feature/courses`) ist überholt: `courses` ist auf `main`, der Branch startet einfach von `main`. Hinweis am Ende von `tasks.md` streichen.
-- [ ] Task 2.2 nennt „Schema 3“. Schema 3 hat `zones` belegt, es wird **Schema 4** (Migration `from3To4`), Migrationstest auch mit Zonen-Daten.
-- [ ] MODIFIED-Anforderungen in den Deltas gegen die aktuellen Main-Specs prüfen (`session-recording`, `rowing-telemetry`, `erg-connection`, `erg-simulation`); `courses` und `zones` haben dort Anforderungen ergänzt.
-- [ ] Task 4.2 und 7.3 rudern „eine Strecke aus `courses`“: mit eingebauten Zonen testen.
+- [x] Task 1.1: Branch startet von `main` statt Rebase auf `feature/courses`; Hinweis am Ende von `tasks.md` gestrichen.
+- [x] Task 2.2 und Design D1/D9: **Schema 4** (Migration `from3To4`), Migrationstests 3→4 und 1→4 auch mit Runden und Zonen.
+- [x] MODIFIED-Anforderungen gegen die Main-Specs geprüft: Kein Szenario geht verloren, `courses` und `zones` haben nur Anforderungen ergänzt. `openspec validate device-types --strict` ist gültig.
+- [x] Task 2.5, 4.2 und 7.3: Export, End-to-End-Test und manueller Test mit Strecke und eingebauten Zonen.
+
+Bereit zum Start (`/opsx:apply device-types`).
+
+Bei der Umsetzung mitnehmen:
+- Zeilen über 120 Zeichen in `packages/pm5_protocol/lib/src/rowing_event.dart` (`Stroke.toString`, ändert sich mit Task 2.1) und `lib/features/connection/device_list_screen.dart` (Fehlertext „Suche nach dem PM5“, ändert sich mit Task 5.5) umbrechen.
 
 Manuell (vom Nutzer): 7.x mit dem Software-Rower vom Android-Handy aus.
 
