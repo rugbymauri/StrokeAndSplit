@@ -1,8 +1,8 @@
 # AergRow
 
-Ruder-App für den Concept2-Ergometer mit PM5. Sie verbindet sich per Bluetooth mit dem PM5, zeigt die Werte live und zeichnet Sessions lokal auf. Läuft auf Android, iOS und dem Linux-Desktop. Ohne Erg funktioniert sie mit dem eingebauten Simulator.
+Ruder-App für den Concept2-RowErg mit PM5 und für Rudergeräte mit dem Bluetooth-Standard FTMS (Fitness Machine Service). Sie verbindet sich per Bluetooth mit dem Rudergerät, zeigt die Werte live und zeichnet Sessions lokal auf. Läuft auf Android, iOS und dem Linux-Desktop. Ohne Rudergerät funktioniert sie mit dem eingebauten Simulator, der wahlweise wie ein PM5 oder wie ein FTMS-Rudergerät sendet. Ein PM5 am SkiErg oder BikeErg und FTMS-Geräte, die keine Rudergeräte sind, werden abgewiesen.
 
-Die Gamification heisst hier „gegen sich selbst rudern“. Vorhanden sind Verbindung, Live-Display, Simulator, Aufzeichnung und Replay (Change `foundation`) sowie Strecken mit Zonen und Runden (Change `courses`). Geplant sind Ghost und Progression.
+Die Gamification heisst hier „gegen sich selbst rudern“. Vorhanden sind Verbindung, Live-Display, Simulator, Aufzeichnung und Replay (Change `foundation`), Strecken mit Zonen und Runden (Changes `courses` und `zones`) sowie FTMS-Rudergeräte (Change `device-types`). Geplant sind Ghost und Progression.
 
 ## Setup
 
@@ -35,8 +35,8 @@ Alle Befehle zeigt `make help`.
 
 ## Verwendung
 
-1. **PM5 suchen**: Am PM5 das Bluetooth-Menü öffnen (Verbinden), dann in der App den PM5 wählen. Der PM5 erlaubt nur eine Bluetooth-Verbindung, ErgData oder andere Apps müssen also getrennt sein.
-2. Im Live-Display **Session starten**. Zeit und Distanz zählen ab 0, auch wenn der PM5 schon etwas anzeigt, und laufen über Resets am PM5 hinweg weiter.
+1. **Rudergerät suchen**: Am PM5 das Bluetooth-Menü öffnen (Verbinden), ein FTMS-Rudergerät einschalten, dann in der App das Gerät wählen. Die Liste zeigt bei jedem Gerät, ob es ein PM5 oder ein FTMS-Gerät ist. Viele Rudergeräte erlauben nur eine Bluetooth-Verbindung, ErgData oder andere Apps müssen also getrennt sein. Ein FTMS-Rudergerät fordert die App nach dem Verbinden zum Senden auf, setzt es aber nie zurück.
+2. Im Live-Display **Session starten**. Zeit und Distanz zählen ab 0, auch wenn das Gerät schon etwas anzeigt, und laufen über Resets am Gerät hinweg weiter. Bei FTMS misst die App die Zeit selbst und hält sie an, sobald 4 s lang weder Distanz noch Schläge dazukommen. Schlagdetails wie Kraft und Zuglänge liefert nur der PM5.
 3. **Session beenden** zeigt die Zusammenfassung. Unter **Sessions** auf dem Startbildschirm lassen sich Sessions abspielen, als `.aergrow` exportieren, importieren und löschen.
 
 Wird die App während einer Session beendet, bleibt die Session bis kurz davor erhalten. Beim nächsten Start ist sie als unvollständig markiert.
@@ -48,7 +48,7 @@ Wird die App während einer Session beendet, bleibt die Session bis kurz davor e
 1. **Zonen** → **Zone anlegen**: Name, Achse (Distanz oder Zeit), feste Länge und mindestens ein Band, ein Pace-Band (z.B. 1:45–1:50) und/oder ein Schlagzahl-Band (z.B. 30–34). Die Liste zeigt die Zonen nach Achse und in wie vielen Strecken sie stecken.
 2. **Strecken** → **Strecke anlegen**: Name, Achse (Distanz in Metern oder Zeit als m:ss) und Länge. Mit **Zone einbauen** eine Zone wählen und ihre Startposition eingeben. Zonen der anderen Achse sind ausgegraut. Die Vorschau zeigt, wo die Zone liegt, und lehnt sie ab, wenn sie über das Streckenende ragt oder eine andere Zone überschneidet. Dieselbe Zone darf mehrfach vorkommen. Was zwischen den Zonen liegt, ist frei. Mit **+** bei einem freien Abschnitt beginnt die neue Zone dort, eine eingebaute Zone lässt sich antippen und verschieben oder mit **×** entfernen.
 3. **Vorlagen** → **Vorlage anlegen** mit Name, Strecke und Rundenzahl, fest oder offen.
-4. Vorlage antippen und die Quelle wählen (PM5 oder Simulator). Sobald die Quelle verbunden ist, startet die Session. Über den Werten stehen die Runde, die aktuelle Zone bzw. „frei“, der Rest bis zum Abschnittsende, die Bänder und der Anteil in der Zone. Pace und Schlagzahl werden grün, wenn sie im Band liegen, und zeigen sonst die Richtung („schneller“, „mehr Schläge“).
+4. Vorlage antippen und die Quelle wählen (Rudergerät, Simulator oder Simulator als FTMS-Gerät). Sobald die Quelle verbunden ist, startet die Session. Über den Werten stehen die Runde, die aktuelle Zone bzw. „frei“, der Rest bis zum Abschnittsende, die Bänder und der Anteil in der Zone. Pace und Schlagzahl werden grün, wenn sie im Band liegen, und zeigen sonst die Richtung („schneller“, „mehr Schläge“).
 5. Nach der letzten Runde endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit der besten hervorgehoben. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
 
 Eine geänderte Zone gilt in allen Strecken, die sie enthalten. Passt sie danach in eine davon nicht mehr, wird die Änderung abgelehnt und der Editor nennt die Strecke. Eine gelöschte Zone macht ihre Stellen frei.
@@ -85,7 +85,7 @@ Alle Quellen liefern rohe PM5-Pakete. Ein einziger Decoder in `erg_protocol` mac
 
 ## Dateiformat `.aergrow`
 
-gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format, Quelle, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren.
+gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format, Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren.
 
 Eine Session auf einer Vorlage hat im Header zusätzlich die Vorlage und die geruderte Version der Strecke:
 
@@ -130,6 +130,7 @@ Vom selben Linux-Rechner aus geht es nicht: Der Bluetooth-Adapter kann nicht gle
 |---|---|
 | Linux | Am echten PM5 verifiziert: Spike, Verbinden, Reconnect, Fehlermeldungen, Aufzeichnung, Replay, Import |
 | Android | Am echten PM5 verifiziert (Pixel 8 Pro, Android 17): Spike, Verbinden, Bluetooth-Hinweise, Aufzeichnung (Distanz und Zeit exakt wie am PM5), Replay, Export, Bildschirm bleibt an |
+| FTMS-Rudergeräte | Nach Spezifikation umgesetzt, nur mit Software-Rower getestet, ungetestet an echter Hardware |
 | iOS | Konfiguriert (`Info.plist`), ungetestet, da kein Mac verfügbar |
 | macOS | Konfiguriert (Entitlements), ungetestet |
 

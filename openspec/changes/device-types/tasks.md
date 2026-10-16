@@ -51,7 +51,7 @@
 - [ ] 7.1 Manuell am echten PM5 (Linux und Android): Suche, Verbinden, Session, Replay und Import alter Sessions funktionieren unverändert, alte Sessions sind nach dem Update vollständig
 - [ ] 7.2 Manuell mit dem Software-Rower vom Android-Handy aus: Gerät erscheint als FTMS, Verbinden, Control Point, Live-Daten, Pause, Reset (Software-Rower neu starten), Abbruch und Reconnect, Session aufzeichnen, exportieren, auf Linux importieren und abspielen
 - [ ] 7.3 Manuell eine Vorlage mit einer Strecke mit eingebauten Zonen mit dem Software-Rower rudern; Zonenanzeige, Bänder und Runden funktionieren
-- [ ] 7.4 README: Projektbeschreibung (PM5 und FTMS-Rudergeräte), Verwendung, Plattform-Status mit Zeile „FTMS-Rudergeräte: nach Spezifikation umgesetzt, nur mit Software-Rower getestet, ungetestet an echter Hardware“, Dateiformat mit `protocol`
+- [x] 7.4 README: Projektbeschreibung (PM5 und FTMS-Rudergeräte), Verwendung, Plattform-Status mit Zeile „FTMS-Rudergeräte: nach Spezifikation umgesetzt, nur mit Software-Rower getestet, ungetestet an echter Hardware“, Dateiformat mit `protocol`
 - [ ] 7.5 `make check` grün und `openspec validate device-types --strict` gültig
 
 ## Workflow follow-up
