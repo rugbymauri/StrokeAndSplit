@@ -18,7 +18,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
-| 4 | `force-curve` | 1/9 | nach dem Mitschnitt | Nutzer: `make spike` mit Kraftkurve (Task 1.1) |
+| 4 | `force-curve` | 2/10 | ja | – |
 | 5 | `heart-rate` | 19/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 12/13 | in Umsetzung | – |
@@ -136,8 +136,10 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 Ziel: Kurve des letzten und vorherigen Schlags im Live-Display, Aufzeichnung und Replay, Kurve im Simulator.
 
 Vor dem Start:
-- [ ] Spike am echten PM5: Characteristic `0x003D` und Paketaufbau per Mitschnitt bestätigen (`make spike`). Braucht den Nutzer am Erg.
+- [x] Spike am echten PM5: Characteristic `0x003D` und Paketaufbau per Mitschnitt bestätigen (`make spike`). Braucht den Nutzer am Erg.
   - 2026-10-16: Mitschnitt vom 16.10. enthält keine Kurvenpakete, weil der Spike `003d` nicht abonniert hatte. Spike erweitert (Task 1.0); `0x0035` kommt zweimal pro Schlag, Spitzenkraft 420–550 N, Durchschnitt 280–350 N als Prüfwerte für die Kurve. Neuer Mitschnitt nötig, mit unterschiedlich harten Schlägen.
+  - 2026-10-16, zweiter Mitschnitt: Format bestätigt (Byte 0 Pakete/Werte als Nibbles, Byte 1 Zähler, u16 LE in ganzen lbf; Maximum = Spitzenkraft aus `0035`). Kurve kommt direkt nach dem ersten `0035` am Ende des Durchzugs, rund 2 s vor dem `Stroke`-Ereignis; erste Kurve ab Schlag 2. Fixture `force_curve.jsonl` (17 Kurven).
+  - Nutzer (2026-10-16): Schlaglänge an der Kurve anzeigen, wenn vorhanden (Byte 6 von `0035`, 0.01 m; FTMS hat keine). Design D4, neuer Task 3.2. Vorläufig: Simulator liefert 0.8–1.3 m statt fest 1.4 m.
 - [ ] Rohpakete tragen nach `device-types` ein Protokoll; die Kurvenpakete passen dort hinein.
 - [ ] Platz der Karte im Layout aus `ui-design`.
 

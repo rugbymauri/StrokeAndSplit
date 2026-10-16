@@ -18,21 +18,45 @@ Dieser Change setzt auf `ui-design` auf, das die Flächen dafür baut.
 
 ### D1: Daten vom PM5
 
-Laut Concept2-BLE-Spezifikation sendet der PM5 die Kurve eines Schlags nach dessen Ende in mehreren Notifications. Jedes Paket enthält einen Zähler und eine Reihe von Kraftwerten in Pfund-Kraft. Der Decoder sammelt die Pakete eines Schlags und gibt die vollständige Kurve als ein Ereignis aus. Die Kraftwerte werden wie die bestehenden Kraftwerte in Newton umgerechnet.
+Der PM5 sendet die Kurve eines Schlags direkt nach dessen Durchzug in mehreren Notifications der Characteristic `0x003D`. Jedes Paket trägt die Zahl der Pakete der Kurve, einen Zähler und bis zu neun Kraftwerte in ganzen Pfund-Kraft. Der Decoder sammelt die Pakete eines Schlags, ordnet die Kurve der Schlagnummer aus dem vorangehenden `0x0035` zu und gibt die vollständige Kurve als ein Ereignis aus. Die Kraftwerte werden mit demselben Faktor wie die bestehenden Kräfte in Newton umgerechnet (1 lbf = 4.44822 N), aber ohne die Division durch 10.
 
-Erster Schritt der Umsetzung ist ein Spike-Mitschnitt am echten PM5. Er bestätigt UUID, Paketaufbau und die Zahl der Werte pro Schlag, bevor der Decoder entsteht. Weicht der Aufbau von der Spezifikation ab, gilt der Mitschnitt.
+Der Spike-Mitschnitt am echten PM5 hat Characteristic, Paketaufbau, Einheit und die Zahl der Werte pro Schlag bestätigt (siehe unten). Die Erwartung laut Spezifikation war: Characteristic `CE06003D-…` im Rowing-Service `0x0030`, Notify, bis 20 Bytes, Byte 0 im oberen Nibble die Zahl der Pakete, im unteren die Zahl der Kraftwerte im Paket, Byte 1 der Zähler, danach bis zu neun Kraftwerte als u16 Little-Endian in lbf. Das trifft zu; die offene Frage nach der Einheit beantwortet der Mitschnitt mit ganzen lbf.
 
-Erwartung laut Spezifikation, noch nicht gemessen: Characteristic `CE06003D-…` im Rowing-Service `0x0030`, Notify, bis 20 Bytes. Byte 0 trägt im oberen Nibble die Zahl der Pakete des Schlags und im unteren die Zahl der Kraftwerte in diesem Paket, Byte 1 ist der Zähler, danach folgen bis zu neun Kraftwerte als u16 Little-Endian in lbf. Ob die Werte wie bei `0x0035` in 0.1 lbf oder in ganzen lbf kommen, klärt erst der Mitschnitt.
+Zusammensetzen im Decoder (für 1.2):
+
+- Ein Paket mit Zähler 0 beginnt eine neue Kurve; eine noch offene, unvollständige Kurve wird dabei verworfen.
+- Die Kurve ist vollständig, wenn die Zähler 0 bis Paketzahl − 1 lückenlos und in Reihenfolge eingetroffen sind und alle Pakete dieselbe Paketzahl im oberen Nibble tragen. Erst dann entsteht das Ereignis.
+- Fehlt ein Zähler, passt die Paketzahl nicht, oder kommt das nächste `0x0035` mit neuer Schlagnummer, bevor die Kurve vollständig ist, wird sie verworfen.
+- Die Paketlänge ist variabel; ein Paket ist nur gültig, wenn es mindestens 2 + 2 × Werteanzahl Bytes hat.
+- Die Schlagnummer stammt aus dem letzten `0x0035` vor der Kurve. Das Schlag-Ereignis mit dieser Nummer gibt der bestehende Decoder erst am Ende der Erholung aus; die Kurve kommt also rund 1.5–2 s **vor** ihrem Schlag-Ereignis und muss die Schlagnummer selbst tragen.
 
 #### Stand des Spikes (2026-10-16)
 
-Der Mitschnitt vom 2026-10-16 (PM5 430000001, RowErg, Just Row, 13 Schläge) enthält **keine** Kraftkurve: Der Spike abonnierte nur `0031`–`0036`; dasselbe gilt für die Aufnahmen vom 2026-10-15. Bestätigt sind damit nur die Schlag-Ereignisse, an denen sich der Decoder ausrichten kann:
+Neuer Mitschnitt am 2026-10-16 um 22:32 (PM5 430000001, RowErg, Just Row, etwa 70 s, Schläge 0–23 mit Spitzenkräften von 34 bis 149 lbf, also 150–660 N). Der Spike abonnierte `0031`–`0036` und `003d`. Ergebnis: 118 Pakete `003d`, 46 × `0035`, 24 × `0036`, 22 vollständige Kurven (Schläge 2–23), kein verlorenes Paket. Ein Ausschnitt (Schläge 0–18, 17 Kurven) liegt als `packages/erg_protocol/test/fixtures/force_curve.jsonl` vor.
 
-- `0x0035` kommt zweimal pro Schlag: am Ende des Durchzugs (Schlagzustand 2 → 3/4) mit neuer Schlagnummer und Kräften, und am Ende der Erholung noch einmal mit derselben Schlagnummer und nachgeführter Erholungszeit. `0x0036` kommt einmal pro Schlag, zusammen mit dem ersten `0x0035`. Die Kurve ist um den Wechsel 2 → 4 zu erwarten.
-- Der erste Schlag nach dem Start meldet Spitzen- und Durchschnittskraft 0; für ihn ist keine Kurve zu erwarten.
-- Spitzenkraft 420–550 N, Durchschnittskraft 280–350 N, Verhältnis 0.63–0.68 bei etwa 95 W und 0.9 m Durchzug. Daran lässt sich die Kurve später prüfen: ihr Maximum muss der Spitzenkraft aus `0x0035` entsprechen, ihr Mittel ungefähr der Durchschnittskraft. Das legt auch die Einheit fest.
+**Paketaufbau** (bestätigt): Byte 0 oberes Nibble = Zahl der Pakete der Kurve, unteres Nibble = Zahl der Kraftwerte in diesem Paket; Byte 1 = Zähler 0 … Paketzahl − 1, beginnt bei jedem Schlag neu bei 0; danach die Werte als u16 Little-Endian. Alle Pakete ausser dem letzten tragen 9 Werte (20 Bytes), das letzte 1–9 Werte, die Paketlänge ist genau 2 + 2 × Werteanzahl (4–20 Bytes). Beispiel Schlag 4 (7 Pakete, 60 Werte):
 
-Der Spike abonniert `003d` jetzt zusätzlich. Ein neuer Mitschnitt von einigen Minuten ist nötig, bevor der Decoder entsteht.
+```
+79 00 06 00 06 00 06 00 13 00 13 00 13 00 2a 00 2a 00 42 00   Paket 0, 9 Werte
+79 01 42 00 42 00 58 00 58 00 6a 00 6a 00 71 00 71 00 76 00   Paket 1
+…
+76 06 13 00 04 00 04 00 03 00 00 00 00 00                     Paket 6, 6 Werte
+```
+
+Abweichend von der Erwartung „bis 20 Bytes, fest“ ist nur, dass das letzte Paket kürzer ist; ein Paket mit einem einzigen Wert (`61 05 00 00`, 4 Bytes) kam vor.
+
+**Einheit** (bestätigt: ganze lbf): Das Maximum jeder der 22 Kurven ist genau die Spitzenkraft aus `0x0035` (0.1 lbf) ganzzahlig abgeschnitten, z. B. Maximum `0x7b` = 123 bei Spitzenkraft 1237 (123.7 lbf), 148 bei 148.7, 51 bei 51.0. Das Mittel der Kurve liegt innerhalb von 3 % bei der Durchschnittskraft aus `0x0035`. Umrechnung: Wert × 4.44822 = N.
+
+**Punkte pro Kurve**: 34–68 Werte in 4–8 Paketen, etwa 62 Werte pro Sekunde Durchzugszeit (rund 16 ms Abstand). Die Zahl ändert sich also von Schlag zu Schlag; die Anzeige streckt sie nach D2 auf die Breite. Aufeinanderfolgende Werte wiederholen sich oft paarweise; sie sind unverändert zu übernehmen. Die Kurve beginnt mit einem Wert über 0 (4–28 lbf) und endet meist auf 0, manchmal auf einem kleinen Wert bis 19 lbf. Mit höchstens 15 Paketen zu 9 Werten fasst das Format 135 Werte, gut doppelt so viele wie gemessen.
+
+**Zeitliche Lage** (bestätigt, Kurve um den Wechsel 2 → 4): Am Ende des Durchzugs (`0x0031` wechselt von Schlagzustand 2 auf 3, einmal direkt auf 4) folgen ohne andere Pakete dazwischen das erste `0x0035` (neue Schlagnummer, Kräfte), `0x0036` und alle `003d`-Pakete der Kurve; danach kommt wieder `0x0031`, bald mit Schlagzustand 4. Die Kurvenpakete kommen meist innerhalb von 20 ms nach `0x0035`, zweimal um 110 bzw. 190 ms verzögert, und verteilen sich über 4–80 ms. Das zweite `0x0035` am Ende der Erholung folgt etwa 2 s später ohne Kurve.
+
+**Sonderfälle**:
+
+- Schlag 0 (beim Start, alle Werte 0) und Schlag 1 (Spitzen- und Durchschnittskraft 0) liefern keine Kurve. Die erste Kurve kommt mit Schlag 2; bis dahin bleibt die Karte im Zustand „Warte auf ersten Schlag“.
+- Abgeschnittene oder lückenhafte Kurven kamen im Mitschnitt nicht vor. Das Verwerfen nach der Spec wird deshalb mit künstlich entfernten Paketen getestet.
+- BLE-Abbrüche oder verlorene Pakete traten trotz der zusätzlichen Notifications nicht auf (siehe Risiken).
+- Der bestehende `Pm5Decoder` verwirft `003d` bisher als unbekannte Characteristic mit Warnung; das ändert 1.2.
 
 ### D2: Darstellung
 
@@ -45,7 +69,17 @@ Der Spike abonniert `003d` jetzt zusätzlich. Ein neuer Mitschnitt von einigen M
 
 Die Karte erscheint, sobald die Quelle Kraftkurven unterstützt. PM5 und Simulator tun das, FTMS-Ruderer nicht. Bis zum ersten Schlag zeigt sie eine gestrichelte Grundlinie mit „Warte auf ersten Schlag“.
 
+### D4: Schlaglänge an der Kurve
+
+Zur Kurve zeigt die Karte die Schlaglänge (Durchzugslänge) desselben Schlags, weil Kraftverlauf und Länge zusammen zeigen, ob ein Schlag lang und kräftig oder kurz und hastig war. Hinzugefügt am 2026-10-16 auf Wunsch des Nutzers.
+
+- **Quelle**: Byte 6 des ersten `0x0035` eines Schlags, 0.01 m, also genau das Paket, nach dem die Kurve kommt. Der Kurven-Decoder übernimmt den Wert in das Kurvenereignis, weil das Schlag-Ereignis mit derselben Länge erst am Ende der Erholung entsteht. Im Mitschnitt vom 2026-10-16 lagen die Werte bei 0.59–1.12 m (Schlag 4: `0x6a` = 1.06 m), im ersten Spike bei 0.85–1.03 m. Schlag 1 meldet 0.38 m, hat aber keine Kurve und damit auch keine Anzeige.
+- **Fehlende Länge**: Ein Wert 0 oder eine Quelle ohne Durchzugslänge ergibt „nicht vorhanden“ (wie `Stroke.driveLengthMeters` aus `device-types`). Dann entfällt die Angabe, die Kurve bleibt unverändert; es erscheint weder „0 m“ noch ein Strich. FTMS liefert keine Durchzugslänge und auch keine Kurve, zeigt also beides nicht.
+- **Format**: zwei Nachkommastellen mit Einheit, Dezimalzeichen nach App-Sprache wie bei der Schlagzahl: „1,02 m“ auf Deutsch, „1.02 m“ auf Englisch.
+- **Ort**: Grosse Karte (Live: freies Rudern): rechts in der Kopfzeile der Karte vor der Legende, in `textMuted`, Schriftgrösse der Legende. Schmaler Streifen „Kraft“ und die beiden Querformat-Layouts: rechts oben über der Kurve, klein in `textMuted` (im Querformat mit Vorlage in `text` wie die Kurve). Die Angabe gehört immer zur hervorgehobenen Kurve des letzten Schlags; für den vorherigen Schlag wird keine Länge gezeigt.
+- **Simulator**: liefert die Länge mit jeder Kurve, mit leichter Streuung um einen plausiblen Wert.
+
 ## Risks / Trade-offs
 
-- **Bandbreite**: Die zusätzlichen Notifications belasten die BLE-Verbindung. Bei Abbrüchen im Mitschnitt wird das Abonnement optional und lässt sich abschalten.
+- **Bandbreite**: Die zusätzlichen Notifications (4–8 pro Schlag) belasten die BLE-Verbindung. Im Mitschnitt vom 2026-10-16 (etwa 70 s) ging kein Paket verloren, das Abonnement bleibt deshalb fest. Zeigen längere Sessions Abbrüche, wird es optional und lässt sich abschalten.
 - **Speicher**: Pro Schlag kommen einige hundert Bytes Rohdaten dazu, bei einer Stunde Rudern etwa 0.5 MB.
