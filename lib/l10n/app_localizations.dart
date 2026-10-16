@@ -943,6 +943,30 @@ abstract class AppLocalizations {
   /// **'Starten'**
   String get templateStart;
 
+  /// Templates: heading above places 1–3 of the template's ranking in the opened template
+  ///
+  /// In de, this message translates to:
+  /// **'Bestleistungen'**
+  String get templatePodiumTitle;
+
+  /// Templates: hint in the opened template when it was never rowed completely on a rower
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.'**
+  String get templatePodiumEmpty;
+
+  /// Templates: hint in the opened template with an open number of laps, which has no ranking
+  ///
+  /// In de, this message translates to:
+  /// **'Bei offener Rundenzahl gibt es keine Bestzeit.'**
+  String get templatePodiumOpenLaps;
+
+  /// Templates: pace per 500 m of a place, pauses included
+  ///
+  /// In de, this message translates to:
+  /// **'{pace} /500 m'**
+  String templatePodiumPace(String pace);
+
   /// Templates: there is no template
   ///
   /// In de, this message translates to:

@@ -521,6 +521,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get templateStart => 'Start';
 
   @override
+  String get templatePodiumTitle => 'Best results';
+
+  @override
+  String get templatePodiumEmpty =>
+      'No best time yet. Sessions with all laps on a rower count.';
+
+  @override
+  String get templatePodiumOpenLaps =>
+      'An open number of laps has no best time.';
+
+  @override
+  String templatePodiumPace(String pace) {
+    return '$pace /500 m';
+  }
+
+  @override
   String get templatesEmpty => 'No templates yet.';
 
   @override
