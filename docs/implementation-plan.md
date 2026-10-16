@@ -19,7 +19,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
 | 4 | `force-curve` | 2/10 | ja | – |
-| 5 | `heart-rate` | 19/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
+| 5 | `heart-rate` | 21/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 12/13 | in Umsetzung | – |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Domain- und Markenrecherche (Nutzer) |
@@ -161,6 +161,7 @@ Entscheide F3 und F4 getroffen (Design D7, D8).
 - [x] Tasks 4.3, 3.1–3.4: Gurt in `shared_preferences` (Key `heartRateMonitor`, JSON id/name); Schema 6 mit `rr_intervals` und Ø/Max-Puls/RMSSD in `sessions`; RR-Intervalle auf der Wanduhr-Achse der Session (nicht der PM5-Uhr, die in Pausen steht); Export/Import mit Pulswerten. Vorläufig: frühe Intervalle der ersten Messung können leicht negative Zeiten haben.
 - [x] Tasks 5.1, 5.2: Bereich „Pulsgurt“ in „Geräte wählen“ mit eigener Gurt-Suche (`heart_rate_search_screen.dart`, 15 s, Tipps, „Erneut suchen“), Koppeln/Wechseln/Vergessen; Startbildschirm zeigt den Gurt unter dem Rudergerät. Vorläufig: Wahl in der Suche koppelt sofort; der Berechtigungstext der Gurt-Suche spricht noch vom Rudergerät.
 - [x] Tasks 5.3–5.5: `HeartRateIndicator` neben `ConnectionIndicator` mit `HeartRateNotice` und „Erneut versuchen“; Gurt verbindet app-weit, sobald das Rudergerät verbunden ist (`ref.listen` in `aergrow_app.dart`, D7); letztes RR-Intervall klein beim Puls, ausgeblendet ab 3 s; Zusammenfassung mit Ø/Max-Puls, RR-Kurve und HRV (RMSSD). Vorläufig: RR-Kurve und Herz in `AppColors.zoneOut` (orange) wie das bestehende `HeartIcon`; Text „Wartet auf das Rudergerät“ für einen bereiten Gurt.
+- [x] Tasks 6.1, 6.2: README-Abschnitt „Pulsgurt“, Dateiformat um `2a37` und Pulswerte ergänzt. Offen: 1.1/1.2 Mitschnitt mit Gurt und 6.3 Test am Gerät (Nutzer hat keinen Gurt); 2.6 braucht die Fixture.
 
 ### 6. `statistics`: Ranglisten pro Vorlage, Strecke und Zone
 
