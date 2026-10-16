@@ -17,7 +17,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
-| 3 | `ui-design` | 3/18 | in Arbeit | Entscheid Puls-Herkunft (F1) |
+| 3 | `ui-design` | 5/18 | in Arbeit | Entscheid Puls-Herkunft (F1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
 | 6 | `statistics` | 0/12 | Gruppe 1 jederzeit, Rest nach 3 | – |
@@ -114,6 +114,8 @@ Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeita
 - [x] Task 1.4 `OarStepper` in `lib/app/widgets/`, D1-Farben als `AppColors` in `lib/app/design_tokens.dart` (Grundlage für 1.2). Vorläufig: Tasten waagrecht wie im Canvas, keine Tooltips (beissen sich mit Gedrückthalten), Blattrand `#4A545E` und Gedrückt-Farbe `#1D3A55` als private Konstanten, Beschriftung „mehr/weniger“ statt „kürzer/länger“. Offen für 4.4: Hintergrund `bg` für kompakte Felder in Karten.
 - [x] Task 1.1 Schriften unter `assets/fonts/` mit OFL (IBM Plex Sans aus `IBM/plex`, weil google/fonts nur die variable Schrift führt); zusammen ca. 715 kB statt der geschätzten 400 kB.
 - [x] Task 2.1 `ProgressFrameModel` in `lib/features/live/progress_frame_model.dart`.
+- [x] Task 1.3 `CourseStrip` nach D4 (Höhe 8 px in Listen, 28 px mit Zonennamen im Strecken-Editor). Vorläufig: Helligkeit nach Rang der Pace-Bänder in gleichen Schritten, Zonen ohne Pace-Band in `zoneIn`, freie Lücken ohne Text; Auswahl (`selected`, `onSegmentTap`) nur vorbereitet, Anbindung mit 4.3.
+- [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Vorläufig: Primärfarbe `text` statt Blau (Blau bleibt „in der Zone“, auch Fokus und Schalter sind weiss), Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`). Offen: Barlow Condensed 500 für Einheiten bündeln?
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 

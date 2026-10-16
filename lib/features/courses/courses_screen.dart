@@ -67,7 +67,7 @@ class _CourseTile extends ConsumerWidget {
         children: [
           Text(courseSummary(l10n, course)),
           const SizedBox(height: 6),
-          CourseStrip(definition: course.definition, height: 6),
+          CourseStrip(definition: course.definition),
         ],
       ),
       onTap: () => openCourseEditor(context, course: course),

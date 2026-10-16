@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
+import '../../app/design_tokens.dart';
 import '../../app/platform_providers.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
@@ -313,7 +314,7 @@ class _Metric extends StatelessWidget {
     final zone = this.zone;
     final (background, foreground) = switch (zone) {
       null => (null, null),
-      ZoneHint(inZone: true) => (const Color(0xFF1B5E20), Colors.white),
+      ZoneHint(inZone: true) => (AppColors.zoneInSurface, AppColors.zoneInText),
       ZoneHint(inZone: false) => (theme.colorScheme.errorContainer, theme.colorScheme.onErrorContainer),
     };
     final labelStyle = theme.textTheme.labelLarge?.copyWith(color: foreground);
