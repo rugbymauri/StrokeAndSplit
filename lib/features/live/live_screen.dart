@@ -66,7 +66,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   Future<void> _showFinished(int id) async {
     ref.read(finishedSessionProvider.notifier).clear();
     if (!mounted) return;
-    await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SessionSummaryScreen(sessionId: id)));
+    if (await SessionSummaryScreen.showAfterSession(context, id)) await _leaveToStart();
   }
 
   void _listen(Stream<RowingEvent> events) {
@@ -117,7 +117,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   Future<void> _stopSession() async {
     final id = await ref.read(sessionRecorderProvider.notifier).stop();
     if (id == null || !mounted) return;
-    await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SessionSummaryScreen(sessionId: id)));
+    if (await SessionSummaryScreen.showAfterSession(context, id)) await _leaveToStart();
+  }
+
+  /// "Done" in the summary: end the connection and go back to the start screen.
+  Future<void> _leaveToStart() async {
+    await ref.read(activeErgSourceProvider.notifier).clear();
+    if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   /// Starts a session, or ends the running one; [short] for the narrow column next to the pace box.

@@ -18,6 +18,13 @@ class SessionSummaryScreen extends ConsumerWidget {
 
   final int sessionId;
 
+  /// Opens the summary right after rowing; "done" then returns true, so the
+  /// live display goes back to the start screen.
+  static Future<bool> showAfterSession(BuildContext context, int sessionId) async =>
+      await Navigator.of(context)
+          .push<bool>(MaterialPageRoute(builder: (_) => SessionSummaryScreen(sessionId: sessionId))) ??
+      false;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(sessionProvider(sessionId));
@@ -142,7 +149,7 @@ class _Summary extends ConsumerWidget {
                     Expanded(
                       child: FilledButton(
                         style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56), shape: _buttonShape),
-                        onPressed: () => Navigator.of(context).maybePop(),
+                        onPressed: () => Navigator.of(context).maybePop(true),
                         child: Text(l10n.actionDone),
                       ),
                     ),
