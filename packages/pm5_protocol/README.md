@@ -95,7 +95,7 @@ Kräfte kommen in Pound-force, 1 lbf = 4.44822 N.
 ## Plattformen
 
 - **Linux (BlueZ), Fedora 44:** Verbinden, Sample Rate setzen und alle fünf Notifications funktionieren mit `flutter_blue_plus` 2.x. Allerdings meldet der Scan nur Geräte, die BlueZ *neu* entdeckt. Ein PM5, der schon im BlueZ-Cache ist, erscheint nur über `FlutterBluePlus.systemDevices`. Ausserdem ignoriert das Linux-Backend Namensfilter beim Scan, deshalb filtert die App selbst nach `PM5`.
-- **Android:** noch nicht am PM5 getestet.
+- **Android:** am PM5 verifiziert (Pixel 8 Pro, Android 17), gleiches Verhalten wie unter Linux: Status-Pakete alle 250 ms, `0035` zweimal pro Schlag.
 
 ## Fixtures
 

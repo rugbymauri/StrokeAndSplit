@@ -74,8 +74,8 @@ gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format, Quelle
 
 | Plattform | Stand |
 |---|---|
-| Linux | Am echten PM5 verifiziert: Spike, Verbinden, Reconnect, Fehlermeldungen |
-| Android | Gebaut und konfiguriert, Verifikation am PM5 steht aus |
+| Linux | Am echten PM5 verifiziert: Spike, Verbinden, Reconnect, Fehlermeldungen, Aufzeichnung, Replay, Import |
+| Android | Am echten PM5 verifiziert (Pixel 8 Pro, Android 17): Spike, Verbinden, Bluetooth-Hinweise, Aufzeichnung (Distanz und Zeit exakt wie am PM5), Replay, Export, Bildschirm bleibt an |
 | iOS | Konfiguriert (`Info.plist`), ungetestet, da kein Mac verfügbar |
 | macOS | Konfiguriert (Entitlements), ungetestet |
 
