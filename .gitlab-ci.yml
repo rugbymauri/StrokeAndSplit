@@ -1,0 +1,53 @@
+# CI for AergRow: analysis and tests for merge requests and main.
+
+variables:
+  # Binary and file name. rename-stroke-and-split changes it here, in linux/CMakeLists.txt
+  # and in linux/packaging/.
+  APP_NAME: aergrow
+  APPLICATION_ID: ch.aergrow.aergrow
+  # Flutter version of the project (.metadata). There is no cirruslabs image for it, so the
+  # jobs take the newest image for the Android SDK and JDK and switch its Flutter checkout
+  # to this tag (see .flutter).
+  FLUTTER_VERSION: "3.47.7"
+  FLUTTER_IMAGE: ghcr.io/cirruslabs/flutter:3.44.0
+  PUB_CACHE: $CI_PROJECT_DIR/.pub-cache
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Started by hand ("Run pipeline", API) on any branch.
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
+    # A branch with an open merge request only gets the merge request pipeline.
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+stages:
+  - test
+
+.pub-cache:
+  key:
+    prefix: pub
+    files:
+      - pubspec.lock
+      - packages/erg_protocol/pubspec.yaml
+  paths:
+    - .pub-cache/
+
+.flutter:
+  image: $FLUTTER_IMAGE
+  before_script:
+    - git config --global --add safe.directory "$FLUTTER_HOME"
+    - git -C "$FLUTTER_HOME" fetch --quiet --depth 1 origin "refs/tags/$FLUTTER_VERSION:refs/tags/$FLUTTER_VERSION"
+    - git -C "$FLUTTER_HOME" checkout --quiet --force "$FLUTTER_VERSION"
+    - flutter --version
+  cache:
+    - !reference [.pub-cache]
+
+check:
+  stage: test
+  extends: .flutter
+  script:
+    - make deps
+    - make check

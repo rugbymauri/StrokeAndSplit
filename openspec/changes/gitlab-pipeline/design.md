@@ -32,6 +32,8 @@ Das Image enthält das Flutter-SDK und das Android-SDK samt Lizenzen, es basiert
 
 Alternativen: Flutter im Job klonen. Das ist langsam und muss jedes Mal das Android-SDK beschaffen. Ein eigenes Image: der beste Cache, aber ein zweites Artefakt zu pflegen. Das wäre der nächste Schritt, wenn die apt-Schritte stören.
 
+**Nachtrag bei der Umsetzung (Task 1.1):** Einen Tag `3.47.7` gibt es bei cirruslabs nicht. Die Registry `ghcr.io/cirruslabs/flutter` endet am 16.10.2026 bei `3.44.0` (= `stable`), es gibt keinen 3.47.x-Tag. `3.44.0` bringt Dart 3.12 mit, das Projekt verlangt `sdk: ^3.13.5`, das Image allein reicht also nicht. Gewählt ist darum eine Mischung aus Image und Flutter-Git-Tag: Die Jobs nutzen `ghcr.io/cirruslabs/flutter:3.44.0` (Variable `FLUTTER_IMAGE`) für Ubuntu 24.04, JDK und Android-SDK samt Lizenzen. Im `before_script` wird dessen Flutter-Checkout (`$FLUTTER_HOME`, ein flacher Git-Klon) per `git fetch --depth 1` auf den Tag `$FLUTTER_VERSION` umgestellt. Beim ersten `flutter`-Aufruf lädt Flutter dann das passende Dart-SDK und die Engine-Artefakte. Das kostet pro Job etwa eine Minute, ist aber deutlich kleiner als das Release-Archiv (1,5 GB) und braucht kein eigenes Image. Lokal im Container geprüft: `flutter --version` zeigt 3.47.7 mit Dart 3.13.5, `make check` läuft mit denselben Testzahlen wie auf dem Host. Erscheint bei cirruslabs wieder ein passender Tag, entfällt das Umstellen, und `FLUTTER_IMAGE` zeigt direkt auf ihn.
+
 ### D2: Stages und wann was läuft
 
 ```
@@ -45,7 +47,7 @@ Alternativen: Flutter im Job klonen. Das ist langsam und muss jedes Mal das Andr
   release    release           -     -        x            -
 ```
 
-`workflow:rules` lassen Pipelines nur für Merge Requests, für `main` und für Tags zu. Für einen Branch mit offener MR läuft nur die MR-Pipeline (`$CI_OPEN_MERGE_REQUESTS`), so entstehen keine doppelten Pipelines. Branches ohne MR bekommen keine Pipeline. Die Release-Jobs haben `rules: if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/`.
+`workflow:rules` lassen Pipelines nur für Merge Requests, für `main` und für Tags zu. Für einen Branch mit offener MR läuft nur die MR-Pipeline (`$CI_OPEN_MERGE_REQUESTS`), so entstehen keine doppelten Pipelines. Branches ohne MR bekommen keine Pipeline. Ausnahme (bei der Umsetzung ergänzt): Von Hand gestartete Pipelines (`web`, `api`, z. B. „Run pipeline“ oder `glab ci run`) laufen auf jedem Branch, damit sich die Pipeline ohne MR ausprobieren lässt. Tags anderer Form lassen nur `check` laufen (wie Task 4.1 es verlangt), Pakete und Release entstehen nur bei `vX.Y.Z`. Die Release-Jobs haben `rules: if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/`.
 
 `check` führt `make check` aus. Eine eigene Testlogik in YAML gibt es nicht.
 
@@ -112,7 +114,7 @@ Oben in `.gitlab-ci.yml` stehen `APP_NAME: aergrow` (Binär- und Dateiname) und 
 
 ### D10: Caches
 
-`check` und die Build-Jobs teilen einen Cache für `$PUB_CACHE` (in das Projektverzeichnis umgebogen, z. B. `.pub-cache/`), Key `pubspec.lock` plus `packages/erg_protocol/pubspec.lock`. Wo vorhanden, liegen diese Dateien im Projekt. `build-apk` cacht zusätzlich `.gradle/` (`GRADLE_USER_HOME`). `.pub-cache/` steht bereits in `.gitignore`, `.gradle/` muss dazukommen.
+`check` und die Build-Jobs teilen einen Cache für `$PUB_CACHE` (in das Projektverzeichnis umgebogen, `.pub-cache/`), Key `pubspec.lock` plus `packages/erg_protocol/pubspec.yaml`. Das Paket hat kein eingechecktes `pubspec.lock`, darum zählt dort die `pubspec.yaml`. `build-apk` cacht zusätzlich `.gradle/` (`GRADLE_USER_HOME`). `.pub-cache/` steht bereits in `.gitignore`, `.gradle/` muss dazukommen.
 
 ## Risks / Trade-offs
 

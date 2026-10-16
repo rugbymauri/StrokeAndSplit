@@ -2,10 +2,10 @@
 
 ## 1. Grundlagen
 
-- [ ] 1.1 Image-Tag `ghcr.io/cirruslabs/flutter:3.47.7` prüfen (Design D1, Risiko). Fehlt er, den Fallback wählen und in `design.md` nachtragen. Verifikation: `docker pull` des gewählten Tags gelingt, `flutter --version` im Container zeigt 3.47.x
+- [x] 1.1 Image-Tag `ghcr.io/cirruslabs/flutter:3.47.7` prüfen (Design D1, Risiko). Fehlt er, den Fallback wählen und in `design.md` nachtragen. Verifikation: `docker pull` des gewählten Tags gelingt, `flutter --version` im Container zeigt 3.47.x. Erledigt: kein 3.47.x-Tag bei cirruslabs (letzter `3.44.0`), Fallback `3.44.0` plus Flutter-Git-Tag im `before_script`, in `design.md` D1 nachgetragen. `docker pull` gelingt, `flutter --version` im Container zeigt 3.47.7 / Dart 3.13.5
 - [ ] 1.2 `docs/implementation-plan.md`: Change `gitlab-pipeline` in Überblick, Reihenfolge und Abschnitt „Changes“ aufnehmen, Hinweis bei `rename-stroke-and-split` auf die Namen in CI (D9). Verifikation: Durchsicht, im selben Commit wie 1.3
-- [ ] 1.3 `.gitlab-ci.yml` mit `workflow:rules` (MR, `main`, Tags), Variablen `APP_NAME` und `FLUTTER_VERSION`, Pub-Cache (D10) und Job `check` mit `make check` (D2). `.gradle/` in `.gitignore`. Verifikation: `glab ci lint` meldet gültig, die MR-Pipeline des Branches läuft mit grünem `check`
-- [ ] 1.4 Bei Bedarf fehlende native Bibliotheken für die Tests (z. B. `libsqlite3`) in `check` nachinstallieren (Risiko „native Bibliotheken“). Verifikation: `check` ist grün mit derselben Testanzahl wie lokal `make check`
+- [x] 1.3 `.gitlab-ci.yml` mit `workflow:rules` (MR, `main`, Tags), Variablen `APP_NAME` und `FLUTTER_VERSION`, Pub-Cache (D10) und Job `check` mit `make check` (D2). `.gradle/` in `.gitignore`. Verifikation: `glab ci lint` meldet gültig, die MR-Pipeline des Branches läuft mit grünem `check`. Erledigt: `glab ci lint` gültig, `check` grün in Pipeline 312095 des Branches (von Hand gestartet, da noch keine MR existiert)
+- [x] 1.4 Bei Bedarf fehlende native Bibliotheken für die Tests (z. B. `libsqlite3`) in `check` nachinstallieren (Risiko „native Bibliotheken“). Verifikation: `check` ist grün mit derselben Testanzahl wie lokal `make check`. Erledigt: keine Nachinstallation nötig, `check` in CI grün mit 479 + 86 Tests wie lokal
 
 ## 2. Android-Paket
 
