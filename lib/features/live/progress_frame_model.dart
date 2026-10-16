@@ -1,0 +1,84 @@
+import 'package:flutter/foundation.dart' show immutable;
+
+import '../../data/courses/course.dart';
+import '../../data/courses/lap_tracker.dart';
+
+/// One track of the progress frame: how much of it is filled and where its
+/// notches sit, both as shares from 0 to 1.
+@immutable
+class FrameTrack {
+  const FrameTrack({required this.share, required this.boundaries});
+
+  final double share;
+  final List<double> boundaries;
+}
+
+/// What the progress frame around the pace shows (ui-design, Design D3):
+/// the course over all laps, the lap and the current part of the course,
+/// with what is left of each in the unit of the course, metres or seconds.
+@immutable
+class ProgressFrameModel {
+  const ProgressFrameModel({
+    required this.course,
+    required this.lap,
+    required this.segment,
+    required this.courseDone,
+    required this.courseLength,
+    required this.lapRemaining,
+    required this.segmentRemaining,
+  });
+
+  /// From the state of the lap tracker on [definition].
+  factory ProgressFrameModel.of(LapProgress progress, CourseDefinition definition) {
+    final length = definition.length;
+    final inLap = (progress.segmentEnd - progress.remaining).clamp(0, length).toDouble();
+    final segmentLength = progress.segmentEnd - progress.segmentStart;
+    final ends = definition.segmentEnds;
+    final lap = FrameTrack(
+      share: _share(inLap, length),
+      boundaries: [for (final end in ends.take(ends.length - 1)) end / length],
+    );
+    final segment = FrameTrack(
+      share: segmentLength > 0 ? _share(inLap - progress.segmentStart, segmentLength) : 1,
+      boundaries: const [],
+    );
+    final laps = progress.plannedLaps;
+    // With an open number of laps the whole length is unknown.
+    if (laps == null) {
+      return ProgressFrameModel(
+        course: null,
+        lap: lap,
+        segment: segment,
+        courseDone: null,
+        courseLength: null,
+        lapRemaining: length - inLap,
+        segmentRemaining: progress.remaining,
+      );
+    }
+    final total = length * laps;
+    final done = ((progress.lap - 1) * length + inLap).clamp(0, total).toDouble();
+    return ProgressFrameModel(
+      course: FrameTrack(share: _share(done, total), boundaries: [for (var i = 1; i < laps; i++) i / laps]),
+      lap: lap,
+      segment: segment,
+      courseDone: done,
+      courseLength: total,
+      lapRemaining: length - inLap,
+      segmentRemaining: progress.remaining,
+    );
+  }
+
+  /// The outer track; null with an open number of laps.
+  final FrameTrack? course;
+  final FrameTrack lap;
+  final FrameTrack segment;
+
+  /// Rowed and planned over all laps; null with an open number of laps.
+  final double? courseDone;
+  final int? courseLength;
+
+  final double lapRemaining;
+  final double segmentRemaining;
+
+  static double _share(double part, int whole) => whole > 0 ? (part / whole).clamp(0, 1).toDouble() : 0;
+}
