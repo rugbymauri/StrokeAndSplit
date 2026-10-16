@@ -14,7 +14,7 @@ Gruppe 7 verbindet alles im Live-Display und braucht die Gruppen 2–5. Gruppe 8
 ## 1. Grundlagen
 
 - [x] 1.1 Typen in `lib/data/ghost/ghost.dart`: `GhostTrack` als Verlauf eines Ranglisten-Eintrags aus Punkten (Wanduhr und Distanz relativ zum Beginn des Eintrags), mit linear interpolierter Achsenposition zu einer Wanduhr (Distanz auf einer Distanzachse, Zeit auf einer Zeitachse) und umgekehrt der Wanduhr, zu der eine Distanz erreicht wurde. Vor dem Beginn steht der Ghost am Start, nach dem Ende am Ziel. Dazu `GhostGap` mit Achse, Betrag (Sekunden bzw. Meter) und ob der Ghost vorne liegt (D4). Verifikation: Unit-Tests für Interpolation zwischen zwei Punkten, vor dem ersten und nach dem letzten Punkt, Umkehrung auf einer Distanzachse und einen Verlauf mit Pause (Distanz steht, Wanduhr läuft)
-- [ ] 1.2 Widget `GhostSymbol`: dieselbe Raute wie das Ghost-Schiffchen, 10 px breit, in `AppColors.ghost` mit Rand in der Farbe der Fläche (D1), mit Screenreader-Beschriftung „Ghost“. Das Token `AppColors.ghost` (`#C9B6FF`) ist schon da. Verifikation: Widget-Test für Grösse und Semantics, Golden-Test des Symbols
+- [x] 1.2 Widget `GhostSymbol`: dieselbe Raute wie das Ghost-Schiffchen, 10 px breit, in `AppColors.ghost` mit Rand in der Farbe der Fläche (D1), mit Screenreader-Beschriftung „Ghost“. Das Token `AppColors.ghost` (`#C9B6FF`) ist schon da. Verifikation: Widget-Test für Grösse und Semantics, Golden-Test des Symbols
 
 ## 2. Verlauf des Ghosts laden
 

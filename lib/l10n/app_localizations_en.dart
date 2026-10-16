@@ -909,4 +909,7 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0 Changing the length or zones creates a new version. Earlier lap times stay comparable.';
   }
+
+  @override
+  String get ghostSymbolLabel => 'Ghost';
 }

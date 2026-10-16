@@ -1488,6 +1488,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{count}× gerudert. Änderst du Länge oder Zonen, entsteht eine neue Version. Alte Rundenzeiten bleiben vergleichbar.'**
   String courseVersionHint(int count);
+
+  /// Screen reader label of the ghost symbol (a small violet rhombus) in the pace box legend and the template choice; the ghost is the best result rowed again for comparison
+  ///
+  /// In de, this message translates to:
+  /// **'Ghost'**
+  String get ghostSymbolLabel;
 }
 
 class _AppLocalizationsDelegate

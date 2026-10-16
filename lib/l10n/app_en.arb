@@ -230,5 +230,6 @@
   "rankingEmpty": "No best time yet. Only complete laps on an erg count, not in the simulator.",
   "rankingLoadFailed": "Could not load the best results: {error}",
   "courseZoneFrom": "from {start}",
-  "courseVersionHint": "{count, plural, =1{Rowed once.} other{Rowed {count}×.}} Changing the length or zones creates a new version. Earlier lap times stay comparable."
+  "courseVersionHint": "{count, plural, =1{Rowed once.} other{Rowed {count}×.}} Changing the length or zones creates a new version. Earlier lap times stay comparable.",
+  "ghostSymbolLabel": "Ghost"
 }

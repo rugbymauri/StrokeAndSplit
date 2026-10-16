@@ -1250,5 +1250,9 @@
         "type": "int"
       }
     }
+  },
+  "ghostSymbolLabel": "Ghost",
+  "@ghostSymbolLabel": {
+    "description": "Screen reader label of the ghost symbol (a small violet rhombus) in the pace box legend and the template choice; the ghost is the best result rowed again for comparison"
   }
 }
