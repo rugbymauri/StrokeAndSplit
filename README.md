@@ -84,6 +84,22 @@ Strecke oder Zone in ihrer Liste antippen öffnet die Detailansicht mit den Plä
 
 Gewertet wird nach Wanduhr, Pausen zählen also mit, auch in der Pace: Distanzen nach der Zeit, Zeitstrecken und -zonen nach den Metern. Bei Gleichstand liegt der frühere Eintrag vorne. Es zählen nur Sessions, die auf diesem Gerät an einem PM5 oder FTMS-Rudergerät gerudert wurden, keine aus dem Simulator, aus einem Replay oder importierte. Gelöschte Sessions verschwinden aus den Listen. Wird eine Vorlage, Strecke oder Zone gelöscht, fällt ihre Liste weg, die Sessions bleiben.
 
+### Ghost
+
+Beim Rudern einer Vorlage läuft auf jeder Spur des Fortschrittsrahmens ein Ghost mit, ein violettes Schiffchen, schmaler als das eigene. Es zeigt, wo Platz 1 der passenden Bestenliste zur gleichen Zeit war:
+
+| Spur | Ghost | Läuft |
+|---|---|---|
+| aussen | Platz 1 der Vorlage mit gleicher Streckenlänge und Rundenzahl | über die ganze Session |
+| Mitte | Platz 1 der Strecke mit gleicher Länge | startet mit jeder Runde neu |
+| innen | Platz 1 der Zone des aktuellen Abschnitts mit gleicher Länge | startet mit jeder Fahrt durch die Zone neu |
+
+Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen nicht bei offener Rundenzahl, innen nicht in einem freien Abschnitt, beim freien Rudern gar keiner. Kämen sich Ghost und eigenes Schiffchen in die Quere, rückt der Ghost quer zur Spur nach aussen und kehrt auf die Mitte zurück, sobald wieder Platz ist. Auf Zeitstrecken liegen beide immer auf gleicher Höhe, der Ghost also daneben.
+
+Die Pace-Box zeigt in der Zeile **Ghost** den Abstand zum Ghost der Vorlage (aussen): auf Distanzstrecken in Sekunden, auf Zeitstrecken in Metern, z.B. „7.6 s vor dir“ (Rückstand, orange), „12 m hinter dir“ (Vorsprung, blau) oder „gleichauf“. Ohne Ghost aussen fehlt die Zeile, die Ghosts auf den anderen Spuren laufen trotzdem.
+
+Die Ghosts folgen den Bestenlisten live: Wird eine Runde oder Zonenfahrt der laufenden Session neuer Platz 1, läuft der Ghost dieser Spur ab der nächsten Runde bzw. Fahrt gegen sie. Im Simulator laufen die Ghosts ebenso mit. Da Simulator-Sessions nicht in die Bestenlisten kommen, werden sie selbst nie Ghost. In der aufgeklappten Vorlage trägt Platz 1 das Ghost-Symbol.
+
 ### Sprache
 
 Die App startet auf Deutsch. Das Sprach-Symbol oben rechts auf „Geräte wählen“ und dem Startbildschirm schaltet zwischen **Deutsch** und **English** um, also schon beim ersten Start. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Vorlagen), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten bleiben wie am PM5 (`2:05.3`).

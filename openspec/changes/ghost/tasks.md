@@ -57,7 +57,7 @@ Hängt an den Gruppen 2–5.
 
 ## 8. Abschluss
 
-- [ ] 8.1 README um den Ghost ergänzen: wer auf welcher Spur Ghost ist, dass er mit jeder Runde bzw. Zonenfahrt neu startet, was der Abstand in der Box misst, und dass Simulator-Sessions nie Ghost sind. Verifikation: `make check` grün, `openspec validate ghost --strict` gültig, Durchsicht des README
+- [x] 8.1 README um den Ghost ergänzen: wer auf welcher Spur Ghost ist, dass er mit jeder Runde bzw. Zonenfahrt neu startet, was der Abstand in der Box misst, und dass Simulator-Sessions nie Ghost sind. Verifikation: `make check` grün, `openspec validate ghost --strict` gültig, Durchsicht des README
 - [ ] 8.2 Manueller Test durch den Nutzer: am Rudergerät „Seerunde x3“ rudern, nachdem es dafür schon Einträge gibt. Auf allen drei Spuren muss ein Ghost laufen, der Runden-Ghost mit jeder Runde neu starten, der Abstand in der Box plausibel sein und der Ghost bei gleichauf nach aussen rücken. Danach eine Vorlage mit offener Rundenzahl rudern: kein Abstand in der Box, Ghost auf der Rundenspur. Verifikation: Rückmeldung des Nutzers
 
 ## Workflow follow-up
