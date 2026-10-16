@@ -12,8 +12,14 @@ SPIKE          := lib/spike/spike_main.dart
 RECORDINGS     := recordings
 ANDROID_FILES  := /sdcard/Android/data/ch.aergrow.aergrow/files
 
+# Optional version for release builds, e.g. `make apk BUILD_NAME=1.2.0 BUILD_NUMBER=42`.
+# Without them, Flutter takes the version from pubspec.yaml.
+BUILD_NAME   ?=
+BUILD_NUMBER ?=
+BUILD_FLAGS  := $(if $(BUILD_NAME),--build-name $(BUILD_NAME)) $(if $(BUILD_NUMBER),--build-number $(BUILD_NUMBER))
+
 .DEFAULT_GOAL := help
-.PHONY: help doctor deps analyze test check codegen schema run run-android spike spike-android pull-recordings build-linux clean
+.PHONY: help doctor deps analyze test check codegen schema run run-android spike spike-android pull-recordings build-linux apk appimage clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -64,7 +70,13 @@ pull-recordings: ## Copy spike recordings from the Android device to ./recording
 	$(ADB) pull $(ANDROID_FILES)/. $(RECORDINGS)/
 
 build-linux: ## Build a Linux release bundle
-	$(FLUTTER) build linux --release
+	$(FLUTTER) build linux --release $(BUILD_FLAGS)
+
+apk: ## Build a universal Android release APK (BUILD_NAME=1.2.0 BUILD_NUMBER=42 optional)
+	$(FLUTTER) build apk --release $(BUILD_FLAGS)
+
+appimage: ## Pack the Linux release bundle into an AppImage (after build-linux; BUILD_NAME optional)
+	tool/build_appimage.sh $(BUILD_NAME)
 
 clean: ## Remove build output
 	$(FLUTTER) clean

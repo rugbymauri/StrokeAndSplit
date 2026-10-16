@@ -1,0 +1,4 @@
+#!/bin/sh
+# Entry point of the AppImage: starts the Flutter binary, which finds lib/ and data/ next to itself.
+APPDIR="${APPDIR:-$(dirname "$(readlink -f "$0")")}"
+exec "$APPDIR/usr/bin/@APP_NAME@" "$@"

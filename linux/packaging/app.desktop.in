@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AergRow
+Comment=Rowing app for the Concept2 RowErg and FTMS rowers
+Exec=@APP_NAME@
+Icon=@APP_NAME@
+Categories=Utility;
+StartupWMClass=@APPLICATION_ID@
+Terminal=false

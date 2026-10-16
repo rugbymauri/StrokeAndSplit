@@ -32,6 +32,8 @@ Das Image enthält das Flutter-SDK und das Android-SDK samt Lizenzen, es basiert
 
 Alternativen: Flutter im Job klonen. Das ist langsam und muss jedes Mal das Android-SDK beschaffen. Ein eigenes Image: der beste Cache, aber ein zweites Artefakt zu pflegen. Das wäre der nächste Schritt, wenn die apt-Schritte stören.
 
+**Nachtrag bei der Umsetzung (Task 1.1):** Einen Tag `3.47.7` gibt es bei cirruslabs nicht. Die Registry `ghcr.io/cirruslabs/flutter` endet am 16.10.2026 bei `3.44.0` (= `stable`), es gibt keinen 3.47.x-Tag. `3.44.0` bringt Dart 3.12 mit, das Projekt verlangt `sdk: ^3.13.5`, das Image allein reicht also nicht. Gewählt ist darum eine Mischung aus Image und Flutter-Git-Tag: Die Jobs nutzen `ghcr.io/cirruslabs/flutter:3.44.0` (Variable `FLUTTER_IMAGE`) für Ubuntu 24.04, JDK und Android-SDK samt Lizenzen. Im `before_script` wird dessen Flutter-Checkout (`$FLUTTER_HOME`, ein flacher Git-Klon) per `git fetch --depth 1` auf den Tag `$FLUTTER_VERSION` umgestellt. Beim ersten `flutter`-Aufruf lädt Flutter dann das passende Dart-SDK und die Engine-Artefakte. Das kostet pro Job etwa eine Minute, ist aber deutlich kleiner als das Release-Archiv (1,5 GB) und braucht kein eigenes Image. Lokal im Container geprüft: `flutter --version` zeigt 3.47.7 mit Dart 3.13.5, `make check` läuft mit denselben Testzahlen wie auf dem Host. Erscheint bei cirruslabs wieder ein passender Tag, entfällt das Umstellen, und `FLUTTER_IMAGE` zeigt direkt auf ihn.
+
 ### D2: Stages und wann was läuft
 
 ```
@@ -45,7 +47,7 @@ Alternativen: Flutter im Job klonen. Das ist langsam und muss jedes Mal das Andr
   release    release           -     -        x            -
 ```
 
-`workflow:rules` lassen Pipelines nur für Merge Requests, für `main` und für Tags zu. Für einen Branch mit offener MR läuft nur die MR-Pipeline (`$CI_OPEN_MERGE_REQUESTS`), so entstehen keine doppelten Pipelines. Branches ohne MR bekommen keine Pipeline. Die Release-Jobs haben `rules: if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/`.
+`workflow:rules` lassen Pipelines nur für Merge Requests, für `main` und für Tags zu. Für einen Branch mit offener MR läuft nur die MR-Pipeline (`$CI_OPEN_MERGE_REQUESTS`), so entstehen keine doppelten Pipelines. Branches ohne MR bekommen keine Pipeline. Ausnahme (bei der Umsetzung ergänzt): Von Hand gestartete Pipelines (`web`, `api`, z. B. „Run pipeline“ oder `glab ci run`) laufen auf jedem Branch, damit sich die Pipeline ohne MR ausprobieren lässt. Tags anderer Form lassen nur `check` laufen (wie Task 4.1 es verlangt), Pakete und Release entstehen nur bei `vX.Y.Z`. Die Release-Jobs haben `rules: if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/`.
 
 `check` führt `make check` aus. Eine eigene Testlogik in YAML gibt es nicht.
 
@@ -68,6 +70,8 @@ Alternative: Versionscode aus der Version ableiten, z. B. `X*10000 + Y*100 + Z`.
 ### D5: Fester Debug-Keystore aus einer File-Variable
 
 Einmalig wird lokal ein Debug-Keystore erzeugt, und zwar wie der Android-Standard (`keytool`, Alias `androiddebugkey`, Passwörter `android`). Er wird als CI/CD-Variable vom Typ *File* `ANDROID_DEBUG_KEYSTORE` hinterlegt, *protected*. `build-apk` kopiert ihn vor dem Build nach `~/.android/debug.keystore`. Gradle nutzt dann diesen Schlüssel, weil `build.gradle.kts` den Release-Build mit der Debug-Config signiert. Am Gradle-Code ändert sich nichts.
+
+**Nachtrag bei der Umsetzung:** GitLab speichert auch File-Variablen als Text, eine Binärdatei lässt sich nicht hinterlegen. Die Variable enthält darum den Base64-kodierten Keystore (`base64 -w0`), `build-apk` dekodiert ihn und prüft mit `keytool -list`, ob Alias und Passwort stimmen.
 
 Fehlt die Variable, bricht `build-apk` ab, statt mit einem frischen Zufallsschlüssel zu bauen. Ein solcher Build liesse sich nicht über ältere Releases installieren (Spec: Update über ein älteres Release).
 
@@ -93,7 +97,7 @@ Wird später auf einen Release-Keystore gewechselt, ist das ein Schlüsselwechse
                              lib/ und data/ relativ zum Binary)
 ```
 
-- `appimagetool` wird als feste Release-Version heruntergeladen, die Prüfsumme ist im Skript hinterlegt. Docker-Runner haben kein FUSE, darum läuft es mit `APPIMAGE_EXTRACT_AND_RUN=1`.
+- `appimagetool` (1.9.1) und die AppImage-Runtime (`type2-runtime` 20251108) werden als feste Release-Versionen heruntergeladen, die Prüfsummen sind im Skript hinterlegt. Ohne `--runtime-file` holte `appimagetool` die jeweils neueste Runtime. Docker-Runner haben kein FUSE, darum läuft es mit `APPIMAGE_EXTRACT_AND_RUN=1`.
 - Die `.desktop`-Datei: `Name=AergRow`, `Exec=${APP_NAME}`, `Icon=${APP_NAME}`, `Categories=Utility;`, `StartupWMClass=ch.aergrow.aergrow`. Damit ordnet der Desktop das GTK-Fenster dem Eintrag zu. `Sports` verlangt laut Desktop-Menu-Spec die Hauptkategorie `Game` und passt nicht. `appimagetool` prüft die Datei mit `desktop-file-validate`.
 - Das Icon ist das Android-Launcher-Icon, auf 256x256 hochskaliert und als eigene Datei unter `linux/packaging/` eingecheckt, damit das Linux-Paket nicht vom Android-Ordner abhängt. Mit einem echten Logo wird nur diese Datei ersetzt.
 - GTK 3 und glibc werden nicht gebündelt (Spec: Zielsysteme mit GTK 3). Weil im Ubuntu-Image des Flutter-Images gebaut wird, ist die glibc-Untergrenze die dieses Ubuntu. Aktuelle Fedora- und Ubuntu-Versionen liegen darüber.
@@ -112,7 +116,7 @@ Oben in `.gitlab-ci.yml` stehen `APP_NAME: aergrow` (Binär- und Dateiname) und 
 
 ### D10: Caches
 
-`check` und die Build-Jobs teilen einen Cache für `$PUB_CACHE` (in das Projektverzeichnis umgebogen, z. B. `.pub-cache/`), Key `pubspec.lock` plus `packages/erg_protocol/pubspec.lock`. Wo vorhanden, liegen diese Dateien im Projekt. `build-apk` cacht zusätzlich `.gradle/` (`GRADLE_USER_HOME`). `.pub-cache/` steht bereits in `.gitignore`, `.gradle/` muss dazukommen.
+`check` und die Build-Jobs teilen einen Cache für `$PUB_CACHE` (in das Projektverzeichnis umgebogen, `.pub-cache/`), Key `pubspec.lock` plus `packages/erg_protocol/pubspec.yaml`. Das Paket hat kein eingechecktes `pubspec.lock`, darum zählt dort die `pubspec.yaml`. `build-apk` cacht zusätzlich `.gradle/` (`GRADLE_USER_HOME`). `.pub-cache/` steht bereits in `.gitignore`, `.gradle/` muss dazukommen.
 
 ## Risks / Trade-offs
 
