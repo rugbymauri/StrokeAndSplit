@@ -6,6 +6,8 @@ import 'package:drift/drift.dart';
 import 'package:pm5_protocol/pm5_protocol.dart';
 
 import '../db/database.dart';
+import '../courses/course_repository.dart';
+import '../courses/lap_tracker.dart';
 import '../sources/erg_source.dart';
 import '../templates/session_template.dart';
 import 'session_accumulator.dart';
@@ -83,9 +85,46 @@ class SessionRepository {
   Future<int> recoverInterrupted() async {
     final interrupted = await (_db.select(_db.sessions)..where((s) => s.status.equalsValue(SessionStatus.recording))).get();
     for (final session in interrupted) {
+      if (session.courseVersionId != null) await _finishLastLap(session);
       await finish(session.id, status: SessionStatus.incomplete);
     }
     return interrupted.length;
+  }
+
+  /// Finishes the lap that was running when the app ended from the stored
+  /// samples (Design D5); the finished laps are stored already.
+  Future<void> _finishLastLap(SessionRow session) async {
+    final course = await CourseRepository(_db).atVersion(session.courseVersionId!);
+    final last = await (_db.select(_db.laps)
+          ..where((l) => l.sessionId.equals(session.id) & l.complete.equals(true))
+          ..orderBy([(l) => OrderingTerm.desc(l.lapNo)])
+          ..limit(1))
+        .getSingleOrNull();
+    final lap = (last?.lapNo ?? 0) + 1;
+    if (session.plannedLaps != null && lap > session.plannedLaps!) return;
+
+    final tracker = LapTracker(
+      course.definition,
+      plannedLaps: session.plannedLaps,
+      startLap: lap,
+      startWallMs: last?.endWallMs ?? 0,
+      startDistanceDm: last?.endDistanceDm ?? 0,
+    );
+    final samples = await (_db.select(_db.samples)
+          ..where((s) => s.sessionId.equals(session.id) & s.wallMs.isBiggerOrEqualValue(last?.endWallMs ?? 0))
+          ..orderBy([(s) => OrderingTerm.asc(s.rowId)]))
+        .get();
+    for (final s in samples) {
+      tracker.add(TrackPoint(wallMs: s.wallMs!, distanceDm: s.distanceDm, paceCs: s.paceCs, strokeRate: s.strokeRate));
+    }
+    tracker.finish();
+    await write(SessionBatch(
+      samples: const [],
+      strokes: const [],
+      rawPackets: const [],
+      laps: [for (final l in tracker.takeLaps()) lapCompanion(session.id, l)],
+      lapSegments: [for (final s in tracker.takeSegments()) segmentCompanion(session.id, s)],
+    ));
   }
 
   /// All sessions, newest first.
