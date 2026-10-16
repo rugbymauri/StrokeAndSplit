@@ -3,6 +3,9 @@
 FLUTTER ?= $(or $(shell command -v flutter 2>/dev/null),$(HOME)/dev/flutter/bin/flutter)
 DART    ?= $(dir $(FLUTTER))dart
 ADB     ?= $(or $(shell command -v adb 2>/dev/null),$(HOME)/Android/Sdk/platform-tools/adb)
+# First Android device connected via adb; override with ANDROID_DEVICE=<id>.
+# Only ids made of safe characters are taken, as the id ends up in a shell command.
+ANDROID_DEVICE ?= $(shell $(ADB) devices 2>/dev/null | awk 'NR > 1 && $$2 == "device" && $$1 ~ /^[A-Za-z0-9._:-]+$$/ { print $$1; exit }')
 
 PROTOCOL       := packages/pm5_protocol
 SPIKE          := lib/spike/spike_main.dart
@@ -42,13 +45,13 @@ run: ## Start the app on the Linux desktop
 	$(FLUTTER) run -d linux
 
 run-android: ## Start the app on a connected Android device
-	$(FLUTTER) run -d android
+	$(FLUTTER) run -d $(or $(ANDROID_DEVICE),$(error No Android device found, check `$(ADB) devices`))
 
 spike: ## Start the PM5 BLE spike on the Linux desktop (recordings go to the documents folder, e.g. ~/Dokumente)
 	$(FLUTTER) run -d linux -t $(SPIKE)
 
 spike-android: ## Start the PM5 BLE spike on a connected Android device
-	$(FLUTTER) run -d android -t $(SPIKE)
+	$(FLUTTER) run -d $(or $(ANDROID_DEVICE),$(error No Android device found, check `$(ADB) devices`)) -t $(SPIKE)
 
 pull-recordings: ## Copy spike recordings from the Android device to ./recordings
 	mkdir -p $(RECORDINGS)
