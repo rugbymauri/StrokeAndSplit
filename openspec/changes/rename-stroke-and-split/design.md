@@ -44,6 +44,8 @@ Das Design der App liegt im Claude-Design-Canvas „AergRow Frontend“. Dort st
 
 ## Open Questions
 
-- Anzeigename mit „&“ („Stroke & Split“) oder ausgeschrieben („Stroke and Split“)? Dieser Change geht von „&“ aus.
-- Soll die App-ID statt `ch.strokesplit` die Domain des Herausgebers tragen (z. B. `ch.<herausgeber>.strokesplit`)?
+Keine. Entschieden (Nutzer, 2026-10-16):
+
+- Anzeigename mit „&“: **„Stroke & Split“** (F9).
+- App-ID **`ch.strokesplit`**, nicht mit der Domain des Herausgebers (F10).
 - Vor der Umsetzung Domains sichern und eine Markenrecherche bei Swissreg, EUIPO und USPTO machen.
