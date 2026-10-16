@@ -112,8 +112,8 @@ class SessionAccumulator {
 
   void _onTick(StatusTick tick) {
     lastTick = tick;
-    final offset = _offset ??= SessionOffset.start(pm5Distance: tick.distanceMeters, pm5Elapsed: tick.elapsed);
-    final progress = offset.update(pm5Distance: tick.distanceMeters, pm5Elapsed: tick.elapsed);
+    final offset = _offset ??= SessionOffset.start(deviceDistance: tick.distanceMeters, deviceElapsed: tick.elapsed);
+    final progress = offset.update(deviceDistance: tick.distanceMeters, deviceElapsed: tick.elapsed);
     _lastPm5Distance = tick.distanceMeters;
     _lastPm5Elapsed = tick.elapsed;
 

@@ -1,17 +1,18 @@
-import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'pm5_characteristics.dart';
+import '../erg_decoder.dart';
+import '../power.dart';
 import '../raw_packet.dart';
 import '../rowing_event.dart';
 import '../workout.dart';
+import 'pm5_characteristics.dart';
 
 /// Turns PM5 notifications into [RowingEvent]s.
 ///
 /// Stateful: the three status characteristics are merged into one
 /// [StatusTick], and the two stroke data notifications per stroke into one
 /// [Stroke]. Byte layouts are documented in the package README.
-class Pm5Decoder {
+class Pm5Decoder implements ErgDecoder {
   Pm5Decoder({this.onWarning});
 
   /// Receives a message for every packet that had to be dropped.
@@ -34,6 +35,7 @@ class Pm5Decoder {
   int? _lastEmittedStroke;
   (int count, int watts)? _strokePower;
 
+  @override
   List<RowingEvent> decode(RawPacket packet) {
     var id = packet.characteristicId;
     var bytes = packet.bytes;
@@ -57,7 +59,7 @@ class Pm5Decoder {
     };
   }
 
-  /// Emits what is still buffered, e.g. at the end of a replay.
+  @override
   List<RowingEvent> flush() => [..._flushStatus(), ..._flushStroke()];
 
   List<RowingEvent> _drop(RawPacket packet, String reason) {
@@ -184,12 +186,6 @@ class Pm5Decoder {
       watts: power != null && power.$1 == part.count ? power.$2 : null,
     );
   }
-}
-
-/// Power for a pace per 500 m, using the Concept2 formula P = 2.80 / (s/m)³.
-int wattsForPace(Duration pacePer500m) {
-  final secondsPerMeter = pacePer500m.inMicroseconds / Duration.microsecondsPerSecond / 500;
-  return (2.80 / math.pow(secondsPerMeter, 3)).round();
 }
 
 int _u16(Uint8List b, int offset) => b[offset] | b[offset + 1] << 8;
