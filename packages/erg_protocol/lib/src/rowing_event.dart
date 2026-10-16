@@ -100,6 +100,37 @@ final class Stroke extends RowingEvent {
       'watts: $watts)';
 }
 
+/// The force curve of one stroke's drive, complete and in order.
+///
+/// The PM5 sends it right after the drive, about 1.5 to 2 s before the
+/// [Stroke] with the same [strokeNumber], which is only emitted at the end of
+/// the recovery. Incomplete curves are never emitted.
+final class StrokeForceCurve extends RowingEvent {
+  StrokeForceCurve({
+    required super.elapsed,
+    required this.strokeNumber,
+    required List<double> forcesNewtons,
+    this.driveLengthMeters,
+  }) : forcesNewtons = List.unmodifiable(forcesNewtons);
+
+  /// Number of the stroke the curve belongs to, as in [Stroke.strokeNumber].
+  final int strokeNumber;
+
+  /// Force over the drive in newtons, evenly spaced in time (about 16 ms on
+  /// the PM5); the number of values differs from stroke to stroke.
+  final List<double> forcesNewtons;
+
+  /// Drive length of the same stroke; null when the device reports none or 0.
+  final double? driveLengthMeters;
+
+  /// The largest value of [forcesNewtons], 0 for an empty curve.
+  double get peakNewtons => forcesNewtons.fold(0, (max, f) => f > max ? f : max);
+
+  @override
+  String toString() => 'StrokeForceCurve(#$strokeNumber, elapsed: $elapsed, points: ${forcesNewtons.length}, '
+      'peak: ${peakNewtons.toStringAsFixed(1)} N, driveLength: $driveLengthMeters)';
+}
+
 /// The PM5 moved to another workout state.
 final class WorkoutStateChanged extends RowingEvent {
   const WorkoutStateChanged({

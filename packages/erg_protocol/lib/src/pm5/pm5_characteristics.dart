@@ -6,6 +6,9 @@ abstract final class Pm5Characteristics {
   static const sampleRate = '0034';
   static const strokeData = '0035';
   static const additionalStrokeData = '0036';
+
+  /// Force curve of a stroke, in several notifications after its drive.
+  static const forceCurve = '003d';
   static const multiplexed = '0080';
 
   /// Characteristics a client subscribes to for live data.
