@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/design_tokens.dart';
 import '../../data/courses/course.dart';
 import '../../data/zones/zone.dart';
 import '../../data/zones/zone_providers.dart';
 import '../../l10n/l10n.dart';
+import '../connection/option_card.dart';
+import '../courses/course_strip.dart';
 import 'zone_editor_screen.dart';
 import 'zone_format.dart';
 
@@ -21,32 +24,55 @@ class ZonesScreen extends ConsumerWidget {
     final l10n = context.l10n;
     return Scaffold(
       appBar: embedded ? null : AppBar(title: Text(l10n.zonesTitle)),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'zones',
-        onPressed: () => openZoneEditor(context),
-        icon: const Icon(Icons.add),
-        label: Text(l10n.zoneCreateShort),
-      ),
-      body: switch (zones) {
-        AsyncData(value: []) => Center(
+      body: SafeArea(
+        top: !embedded,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
             child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(l10n.zonesEmpty, textAlign: TextAlign.center),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.pagePortrait,
+                AppSpacing.l,
+                AppSpacing.pagePortrait,
+                AppSpacing.xxl,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: switch (zones) {
+                      AsyncData(value: []) => Center(
+                          child: Text(l10n.zonesEmpty, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
+                        ),
+                      AsyncData(:final value) => ListView(
+                          children: [
+                            for (final axis in CourseAxis.values)
+                              if (value.where((u) => u.zone.axis == axis).toList() case final usages
+                                  when usages.isNotEmpty) ...[
+                                SectionLabel(axis == CourseAxis.distance ? l10n.axisDistance : l10n.axisTime),
+                                _ZoneList(usages: usages),
+                                const SizedBox(height: AppSpacing.l),
+                              ],
+                          ],
+                        ),
+                      AsyncError(:final error) => Center(child: Text(l10n.zonesLoadFailed('$error'))),
+                      _ => const Center(child: CircularProgressIndicator()),
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                  OutlinedButton.icon(
+                    key: const Key('zone-create'),
+                    style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                    onPressed: () => openZoneEditor(context),
+                    icon: const Icon(Icons.add),
+                    label: Text(l10n.zoneCreateShort),
+                  ),
+                ],
+              ),
             ),
           ),
-        AsyncData(:final value) => ListView(
-            padding: const EdgeInsets.only(bottom: 88),
-            children: [
-              for (final axis in CourseAxis.values)
-                if (value.any((u) => u.zone.axis == axis)) ...[
-                  _AxisHeader(axis: axis),
-                  for (final usage in value.where((u) => u.zone.axis == axis)) _ZoneTile(usage: usage),
-                ],
-            ],
-          ),
-        AsyncError(:final error) => Center(child: Text(l10n.zonesLoadFailed('$error'))),
-        _ => const Center(child: CircularProgressIndicator()),
-      },
+        ),
+      ),
     );
   }
 }
@@ -57,36 +83,55 @@ Future<int?> openZoneEditor(BuildContext context, {Zone? zone, CourseAxis? axis}
       .push(MaterialPageRoute<int>(builder: (_) => ZoneEditorScreen(zone: zone, axis: axis)));
 }
 
-class _AxisHeader extends StatelessWidget {
-  const _AxisHeader({required this.axis});
+/// The zones of one axis on a card, divided by lines, each with a swatch in
+/// the shade it has in a course bar (design D4).
+class _ZoneList extends StatelessWidget {
+  const _ZoneList({required this.usages});
 
-  final CourseAxis axis;
+  final List<ZoneUsage> usages;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(
-        axis == CourseAxis.distance ? context.l10n.axisDistance : context.l10n.axisTime,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.primary),
+    final colors = CourseStrip.segmentColors([for (final u in usages) u.zone.segment]);
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppRadii.cardLarge),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          for (final (i, usage) in usages.indexed) ...[
+            if (i > 0) const Divider(height: 1),
+            _ZoneTile(usage: usage, color: colors[i]),
+          ],
+        ],
       ),
     );
   }
 }
 
 class _ZoneTile extends StatelessWidget {
-  const _ZoneTile({required this.usage});
+  const _ZoneTile({required this.usage, required this.color});
 
   final ZoneUsage usage;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     final zone = usage.zone;
     return ListTile(
-      leading: Icon(zone.axis == CourseAxis.distance ? Icons.straighten : Icons.timer_outlined),
-      title: Text(zone.name),
-      subtitle: Text(zoneSummary(zone)),
-      trailing: Text(context.l10n.zoneUsage(usage.courses), key: Key('zone-usage-${zone.id}')),
+      minLeadingWidth: 10,
+      leading: Container(
+        width: 10,
+        height: 30,
+        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
+      ),
+      title: Text(zone.name, style: AppTextStyles.cardTitle.copyWith(fontSize: 16)),
+      subtitle: Text(zoneSummary(zone), style: AppTextStyles.caption),
+      trailing: Text(
+        context.l10n.zoneUsage(usage.courses),
+        key: Key('zone-usage-${zone.id}'),
+        style: AppTextStyles.caption,
+      ),
       onTap: () => openZoneEditor(context, zone: zone),
     );
   }
