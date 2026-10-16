@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
+import '../../app/design_tokens.dart';
 import '../../app/platform_providers.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
@@ -154,18 +155,32 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const ConnectionIndicator(),
+          title: Row(
+            children: [
+              const ConnectionIndicator(),
+              const SizedBox(width: AppSpacing.m),
+              Flexible(
+                child: Text(
+                  recording?.template?.name ?? widget.template?.name ?? context.l10n.startRowFree,
+                  key: const Key('live-title'),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
           actions: [
-            TextButton.icon(
+            const SourceBadge(),
+            IconButton(
               onPressed: _disconnect,
+              tooltip: context.l10n.liveDisconnect,
               icon: const Icon(Icons.link_off),
-              label: Text(context.l10n.liveDisconnect),
             ),
           ],
         ),
         body: SafeArea(
           child: Column(
             children: [
+              const ConnectionNotice(),
               if (_stale && connected)
                 MaterialBanner(
                   content: Text(context.l10n.liveStale),

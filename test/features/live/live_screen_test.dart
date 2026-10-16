@@ -116,6 +116,7 @@ class _Harness {
     Size size = const Size(390, 844),
     ActiveRecording? recording,
     Locale locale = const Locale('de'),
+    ErgConnectionState state = ErgConnectionState.connected,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -123,7 +124,7 @@ class _Harness {
     await tester.pumpWidget(ProviderScope(
       overrides: [
         activeErgSourceProvider.overrideWith(() => _Fixed(FakeErgSource())),
-        ergConnectionStateProvider.overrideWithValue(const AsyncData(ErgConnectionState.connected)),
+        ergConnectionStateProvider.overrideWithValue(AsyncData(state)),
         rowingEventsProvider.overrideWithValue(events.stream),
         wakelockProvider.overrideWithValue(wakelock),
         if (recording != null) sessionRecorderProvider.overrideWith(() => _Recording(recording)),
@@ -190,10 +191,21 @@ void main() {
     'small desktop window': const Size(640, 480),
   };
   for (final MapEntry(key: name, value: size) in layouts.entries) {
-    for (final template in [false, true]) {
-      testWidgets('fits all values without overflow on a $name${template ? ' with a template' : ''}', (tester) async {
+    for (final (template, state) in const [
+      (false, ErgConnectionState.connected),
+      (true, ErgConnectionState.connected),
+      (true, ErgConnectionState.reconnecting),
+    ]) {
+      final what = '${template ? ' with a template' : ''}'
+          '${state == ErgConnectionState.connected ? '' : ' while ${state.name}'}';
+      testWidgets('fits all values without overflow on a $name$what', (tester) async {
         final harness = _Harness();
-        await harness.pump(tester, size: size, recording: template ? _onCourse(pace: BandStatus.above) : null);
+        await harness.pump(
+          tester,
+          size: size,
+          recording: template ? _onCourse(pace: BandStatus.above) : null,
+          state: state,
+        );
         await harness.emit(tester, _tick(heartRate: 151));
 
         // Overflows would be reported as exceptions and fail the test.
@@ -315,6 +327,44 @@ void main() {
       await harness.emit(tester, _tick());
 
       expect(find.text('Beenden'), findsOneWidget);
+    });
+  });
+
+  group('app bar', () {
+    testWidgets('names the template being rowed', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, recording: _onCourse());
+
+      expect(find.descendant(of: find.byType(AppBar), matching: find.text('Seerunde x3')), findsOneWidget);
+    });
+
+    testWidgets('names free rowing without a template', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+
+      expect(find.descendant(of: find.byType(AppBar), matching: find.text('Frei rudern')), findsOneWidget);
+    });
+
+    testWidgets('shows the connection as a dot and not as text', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+
+      expect(find.descendant(of: find.byType(AppBar), matching: find.byKey(const Key('connection-dot'))), findsOne);
+      expect(find.text('Verbunden'), findsNothing);
+    });
+
+    testWidgets('shows a lost connection as text', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, state: ErgConnectionState.reconnecting);
+
+      expect(find.text('Verbindung unterbrochen, verbinde neu …'), findsOneWidget);
+    });
+
+    testWidgets('keeps disconnecting within reach', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+
+      expect(find.byTooltip('Trennen'), findsOneWidget);
     });
   });
 
