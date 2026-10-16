@@ -17,7 +17,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
-| 3 | `ui-design` | 7/18 | in Arbeit | Entscheid Puls-Herkunft (F1) |
+| 3 | `ui-design` | 7/18 | in Arbeit | – |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
 | 6 | `statistics` | 6/12 | Gruppe 1 in `main`, Rest nach 3 | – |
@@ -107,7 +107,7 @@ Vorläufig, vom Nutzer zu bestätigen:
 - [x] Legende „Runde 2 / 3“ (Nutzer, 2026-10-16); dafür MODIFIED-Delta zu `course-rowing` nötig (mit 2.3). Vorläufig: Bereich „200–800 m“ entfällt.
 - [x] OFL-Lizenzen der Schriften auf der Lizenzseite der App (`registerFontLicenses` in `lib/app/font_licenses.dart`) und Barlow Condensed 500 für Einheiten (Nutzer, 2026-10-16).
 
-Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeitachse, Design D7) sind entschieden.
+Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeitachse, Design D7) sind entschieden.
 
 - [x] F2 in Proposal, Design D6 und Task 5.1 eingetragen.
 - [x] Ruderblatt-Tasten für Zahlen (2026-10-16) als Design D7, Spec `number-steppers` und Tasks 1.4 und 4.4 aufgenommen. Betrifft auch die Editoren aus `zones`.
@@ -176,7 +176,7 @@ Vor dem Start:
 
 | | Frage | Change | Entscheidet sich vor |
 |---|---|---|---|
-| F1 | Puls-Herkunft „Über PM5“ im Live-Display zeigen? Canvas zeigt sie, `heart-rate` schliesst sie aus. | ui-design, heart-rate | ui-design |
+| ~~F1~~ | Puls-Herkunft: Gurt in „Geräte wählen“ wählen; Puls vom BLE-Gurt, sonst vom PM5, sonst keine Anzeige; Herkunft wird **nicht** angezeigt (2026-10-16) | ui-design, heart-rate | entschieden |
 | ~~F2~~ | Startbildschirm: **Mittelweg** (2026-10-16): Quelle, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit der zuletzt geruderten Vorlage, Link „Sessions“ | ui-design | entschieden |
 | F3 | Welcher Puls gilt, wenn FTMS-Gerät und Gurt beide liefern? | heart-rate | heart-rate |
 | F4 | Gurt auch mit FTMS-Rudergeräten automatisch verbinden? | heart-rate | heart-rate |
