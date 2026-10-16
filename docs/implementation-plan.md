@@ -124,7 +124,7 @@ Manuelle Tests archivierter Changes (Nutzer):
 
 Nacharbeit:
 - [x] Platzhalter-Test `packages/pm5_protocol/test/pm5_protocol_test.dart` („package loads“) gelöscht.
-- [ ] `lib/data/sessions/session_repository.dart`, `recoverInterrupted`: Zeile über 120 Zeichen umbrechen.
+- [x] `lib/data/sessions/session_repository.dart`, `recoverInterrupted`: Zeile über 120 Zeichen umgebrochen.
 - [ ] Kein Git-Remote: Sobald es eines gibt, pushen und künftig per MR arbeiten.
 
 ## Erledigt

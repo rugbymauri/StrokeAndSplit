@@ -105,7 +105,8 @@ class SessionRepository {
   /// Closes sessions that were still recording when the app ended and marks
   /// them as incomplete. Returns how many there were.
   Future<int> recoverInterrupted() async {
-    final interrupted = await (_db.select(_db.sessions)..where((s) => s.status.equalsValue(SessionStatus.recording))).get();
+    final interrupted =
+        await (_db.select(_db.sessions)..where((s) => s.status.equalsValue(SessionStatus.recording))).get();
     for (final session in interrupted) {
       if (session.courseVersionId != null) await _finishLastLap(session);
       await finish(session.id, status: SessionStatus.incomplete);
