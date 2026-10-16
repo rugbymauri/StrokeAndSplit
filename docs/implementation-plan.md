@@ -21,7 +21,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | ja, 1 und 3 umgesetzt | Artefakte an FTMS und `ui-design` angleichen, dann umsetzen |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
-| 7 | `ghost` | – (keine Tasks) | ja, nach 3 und 6 | `tasks.md` erstellen |
+| 7 | `ghost` | 0/13 | ja | – |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 | 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
 
@@ -179,7 +179,10 @@ Gruppe 1 umgesetzt (2026-10-16, Tasks 1.1–1.6, `lib/data/statistics/`):
 
 Ziel: violettes Schiffchen auf den Spuren des Fortschrittsrahmens, Abstand in Metern und Sekunden, Ghost-Symbol bei Platz 1 in der Vorlagenwahl. Der Ghost jeder Spur ist Platz 1 der Rangliste dieser Ebene aus `statistics` (F5, Design D2, Spec „Platz 1 ist der Ghost“).
 
-Entscheide F6–F8 getroffen (Design D4, D5). Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
+Entscheide F6–F8 getroffen (Design D4, D5).
+
+- [x] `tasks.md` erstellt (2026-10-16): 13 Tasks in 8 Gruppen. Gruppe 1 zuerst, dann 2–6 parallel, 7 verbindet, 8 schliesst ab. `AppColors.ghost` und das Ghost-Schiffchen im Painter gibt es schon; Task 4.1 baut es nach D5 um.
+- [ ] Offen (Nutzer): Ghost auf Zeitstrecken sitzt immer neben dem eigenen Schiffchen; Runden-Ghost bei neuer Bestleistung in derselben Session; eigene Ghost-Zeit in der Vorlagenwahl; Rudern gegen den Ghost im Simulator. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
 
 ### 8. `rename-stroke-and-split`: App heisst „Stroke & Split“
 
