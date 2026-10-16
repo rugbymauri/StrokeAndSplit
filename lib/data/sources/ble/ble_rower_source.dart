@@ -43,6 +43,9 @@ class BleRowerSource implements ErgSource {
   ErgProtocol get protocol => device.protocol;
 
   @override
+  bool get providesForceCurves => protocol == ErgProtocol.pm5;
+
+  @override
   String get name => device.name;
 
   @override

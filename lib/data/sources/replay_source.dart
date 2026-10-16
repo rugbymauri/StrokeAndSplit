@@ -34,6 +34,11 @@ class ReplaySource implements ErgSource {
   @override
   ErgProtocol get protocol => ErgProtocol.parse(recording.metadata['protocol']);
 
+  /// Only when the recording holds curve packets; older PM5 recordings have none.
+  @override
+  late final bool providesForceCurves = protocol == ErgProtocol.pm5 &&
+      recording.packets.any((p) => p.characteristicId == Pm5Characteristics.forceCurve);
+
   @override
   Stream<RawPacket> get packets => _packets.stream;
 

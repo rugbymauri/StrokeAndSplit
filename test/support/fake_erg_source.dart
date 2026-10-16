@@ -5,7 +5,12 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 /// An [ErgSource] driven by the test.
 class FakeErgSource implements ErgSource {
-  FakeErgSource({this.kind = ErgSourceKind.pm5, this.name = 'PM5 Test', this.protocol = ErgProtocol.pm5});
+  FakeErgSource({
+    this.kind = ErgSourceKind.pm5,
+    this.name = 'PM5 Test',
+    this.protocol = ErgProtocol.pm5,
+    bool? providesForceCurves,
+  }) : providesForceCurves = providesForceCurves ?? protocol == ErgProtocol.pm5;
 
   @override
   final ErgSourceKind kind;
@@ -15,6 +20,9 @@ class FakeErgSource implements ErgSource {
 
   @override
   final String name;
+
+  @override
+  final bool providesForceCurves;
 
   final _packets = StreamController<RawPacket>.broadcast();
   final _states = StreamController<ErgConnectionState>.broadcast();

@@ -17,6 +17,10 @@ abstract interface class ErgSource {
   /// Protocol of the [packets]; picks the decoder.
   ErgProtocol get protocol;
 
+  /// Whether [packets] carry a force curve per stroke (force-curve, Design D3): a PM5 and the
+  /// simulator speaking PM5 do, an FTMS rower does not.
+  bool get providesForceCurves;
+
   /// Name shown to the user, e.g. `PM5 430000001 Row`.
   String get name;
 

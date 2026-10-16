@@ -92,6 +92,11 @@ void main() {
   });
 
   group('force curve', () {
+    test('is provided when speaking PM5 and not FTMS', () {
+      expect(SimulatedSource(seed: 1).providesForceCurves, isTrue);
+      expect(SimulatedSource(seed: 1, protocol: ErgProtocol.ftms).providesForceCurves, isFalse);
+    });
+
     /// The force curves of 30 s of rowing at [pace].
     List<StrokeForceCurve> curvesAt(Duration pace) {
       late List<StrokeForceCurve> curves;

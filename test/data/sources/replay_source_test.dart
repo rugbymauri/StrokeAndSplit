@@ -93,4 +93,16 @@ void main() {
     );
     expect(ReplaySource(ftms).protocol, ErgProtocol.ftms);
   });
+
+  test('provides force curves only for a PM5 recording that holds curve packets', () {
+    final withCurves = RawRecording.parseLines(
+        File('packages/erg_protocol/test/fixtures/force_curve.jsonl').readAsLinesSync());
+    expect(ReplaySource(withCurves).providesForceCurves, isTrue);
+    expect(ReplaySource(_recording).providesForceCurves, isFalse, reason: 'recorded before the curves');
+    final ftms = RawRecording(
+      metadata: {'format': RawRecording.formatName, 'version': 1, 'protocol': 'ftms'},
+      packets: const [],
+    );
+    expect(ReplaySource(ftms).providesForceCurves, isFalse);
+  });
 }
