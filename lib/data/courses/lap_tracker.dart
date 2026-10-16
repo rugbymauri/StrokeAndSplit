@@ -43,6 +43,9 @@ class LapProgress {
     required this.strokeRate,
     required this.lapInZoneShare,
     this.lapTime = Duration.zero,
+    this.courseTime = Duration.zero,
+    this.segmentTime = Duration.zero,
+    this.courseDistanceDm = 0,
   });
 
   /// Starting at 1.
@@ -65,6 +68,17 @@ class LapProgress {
 
   /// Wall-clock time since the lap started, pauses included as in the lap results.
   final Duration lapTime;
+
+  /// Wall-clock time since the first lap started, pauses included; the ghost
+  /// of the template runs on it (Change ghost, Design D2).
+  final Duration courseTime;
+
+  /// Wall-clock time since the current segment started, pauses included; the
+  /// ghost of the zone starts anew with it.
+  final Duration segmentTime;
+
+  /// Distance rowed since the first lap started, in decimetres.
+  final double courseDistanceDm;
 }
 
 /// A lap, with wall-clock times and session distances.
@@ -124,6 +138,7 @@ class LapTracker {
   })  : _lap = startLap,
         _scale = course.axis == CourseAxis.distance ? 10 : 1000,
         _previous = _Point(startWallMs.toDouble(), startDistanceDm.toDouble(), null, null) {
+    _start = _previous;
     _ends = [for (final end in course.segmentEnds) end * _scale];
     _lapStart = _position(_previous);
     _startLap(_previous);
@@ -136,6 +151,8 @@ class LapTracker {
   final int _scale;
   late final List<int> _ends;
 
+  /// Where the tracker started: the beginning of the first lap it follows.
+  late final _Point _start;
   int _lap;
   late double _lapStart;
   late _Point _lapStartPoint;
@@ -200,7 +217,10 @@ class LapTracker {
       pace: _paceStatus(segment, _previous.paceCs),
       strokeRate: _spmStatus(segment, _previous.strokeRate),
       lapInZoneShare: lapInZone > 0 ? (_lapInZoneMs + _segmentInZoneMs) / lapInZone : null,
-      lapTime: Duration(milliseconds: (_previous.wallMs - _lapStartPoint.wallMs).round()),
+      lapTime: _since(_lapStartPoint),
+      courseTime: _since(_start),
+      segmentTime: _since(_segmentStartPoint),
+      courseDistanceDm: _previous.distanceDm - _start.distanceDm,
     );
   }
 
@@ -217,6 +237,8 @@ class LapTracker {
     _segments = [];
     return segments;
   }
+
+  Duration _since(_Point start) => Duration(milliseconds: (_previous.wallMs - start.wallMs).round());
 
   double get _boundary => _lapStart + _ends[_segment];
 

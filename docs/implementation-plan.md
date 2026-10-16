@@ -21,7 +21,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 9/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
-| 7 | `ghost` | 5/13 | in Umsetzung | – |
+| 7 | `ghost` | 10/13 | in Umsetzung | – |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 | 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
 
@@ -192,6 +192,7 @@ Entscheide F6–F8 getroffen (Design D4, D5).
 - [x] Task 6.1 `GhostSymbol` bei Platz 1 in `TemplatePodium`, Platz 2 und 3 mit leerem Slot gleicher Breite.
 - [x] Task 5.1 Ghost-Zeile in der Pace-Box (`PaceBox.ghostGap`): „7.6 s vor dir“ orange, „12 m hinter dir“ blau, ab 60 s als `1:12.3`. Vorläufig: Gleichstand als „gleichauf“ gedämpft; Zehntel immer mit Punkt; `_aroundPace` 160 → 190, die Pace wird mit Ghost-Zeile etwas kleiner.
 - [x] Task 4.1 Ghost rückt bei Überlappung quer nach aussen (D5), erkannt an der Form der Rauten, höchstens 9.5 px über die Box; Ghosts von aussen nach innen gesetzt. Neue Goldens `progress_frame_ghost_*.png`. Offen für Gruppe 7: hochkant oben nur 8 px Platz, ein Ghost auf der äussersten Spur ragt 1.5 px unter die AppBar → oberes Padding in `live_course.dart` auf mindestens 10 px.
+- [x] Tasks 2.1, 2.2, 3.1–3.3: `GhostRepository.track`, `liveGhostsProvider` (folgt der Rangliste live, auch im Simulator), `LapProgress.courseTime/segmentTime/courseDistanceDm`, `ghostShares` und `ghostGap` in `lib/data/ghost/ghost_progress.dart`. Vorläufig: neue Bestleistung wird erst nach dem Schreiben der Runde Ghost, also bis etwa 2 s nach Beginn der nächsten Runde (das Schiffchen springt einmal); kein Abstand mehr, wenn man weiter ist, als der Ghost je kam.
 
 ### 8. `rename-stroke-and-split`: App heisst „Stroke & Split“
 
