@@ -215,6 +215,13 @@
   "courseZonesSummary": "{count, plural, =0{no zones} =1{zone {name}} other{{count} zones}}",
   "courseRowedCount": "{count, plural, =0{never rowed} =1{rowed once} other{rowed {count}×}}",
   "courseLegendShade": "Brighter = faster",
+  "rankingLength": "Best results {length}",
+  "rankingLengthCurrent": "Best results {length} · current",
+  "rankingPlace": "Place {place}",
+  "rankingPace": "{pace} /500 m",
+  "rankingPausesHint": "Measured by the wall clock: pauses count, also in the pace.",
+  "rankingEmpty": "No best time yet. Only complete laps on an erg count, not in the simulator.",
+  "rankingLoadFailed": "Could not load the best results: {error}",
   "courseZoneFrom": "from {start}",
   "courseVersionHint": "{count, plural, =1{Rowed once.} other{Rowed {count}×.}} Changing the length or zones creates a new version. Earlier lap times stay comparable."
 }

@@ -18,7 +18,7 @@ Sie starten deshalb erst, wenn `ui-design` umgesetzt ist (siehe `docs/implementa
 
 ## 2. Detailansicht von Strecke und Zone
 
-- [ ] 2.1 Detailansicht einer Strecke, die sich per Tipp aus der Streckenliste öffnet. Sie zeigt die Plätze 1–3 pro Länge, die aktuelle Länge zuerst, mit Wert, Pace und Datum, einen Hinweis, dass Pausen mitzählen, und den Weg zum Bearbeiten. Ohne Eintrag erscheint ein Hinweis statt der Plätze. Gestaltung im Stil von `ui-design`. Verifikation: Widget-Tests für „Mehrere Längen“, eine Strecke ohne Einträge und den Weg zum Editor
+- [x] 2.1 Detailansicht einer Strecke, die sich per Tipp aus der Streckenliste öffnet. Sie zeigt die Plätze 1–3 pro Länge, die aktuelle Länge zuerst, mit Wert, Pace und Datum, einen Hinweis, dass Pausen mitzählen, und den Weg zum Bearbeiten. Ohne Eintrag erscheint ein Hinweis statt der Plätze. Gestaltung im Stil von `ui-design`. Verifikation: Widget-Tests für „Mehrere Längen“, eine Strecke ohne Einträge und den Weg zum Editor
 - [ ] 2.2 Dasselbe für Zonen, geöffnet aus der Zonenliste. Verifikation: Widget-Tests für „Zone ansehen“ und eine Zone mit zwei Längen
 
 ## 3. Plätze in der Vorlagenwahl

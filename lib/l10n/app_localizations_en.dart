@@ -831,6 +831,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get courseLegendShade => 'Brighter = faster';
 
   @override
+  String rankingLength(String length) {
+    return 'Best results $length';
+  }
+
+  @override
+  String rankingLengthCurrent(String length) {
+    return 'Best results $length · current';
+  }
+
+  @override
+  String rankingPlace(int place) {
+    return 'Place $place';
+  }
+
+  @override
+  String rankingPace(String pace) {
+    return '$pace /500 m';
+  }
+
+  @override
+  String get rankingPausesHint =>
+      'Measured by the wall clock: pauses count, also in the pace.';
+
+  @override
+  String get rankingEmpty =>
+      'No best time yet. Only complete laps on an erg count, not in the simulator.';
+
+  @override
+  String rankingLoadFailed(String error) {
+    return 'Could not load the best results: $error';
+  }
+
+  @override
   String courseZoneFrom(String start) {
     return 'from $start';
   }
