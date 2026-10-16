@@ -90,6 +90,21 @@ class CourseDefinition {
     return [for (final s in segments) end += s.length];
   }
 
+  /// Where each segment starts, from the start of the course.
+  List<int> get segmentStarts {
+    var start = 0;
+    return [
+      for (final s in segments) (start += s.length) - s.length,
+    ];
+  }
+
+  /// Whether both row the same, whichever zones they were placed from.
+  bool sameAs(CourseDefinition other) =>
+      other.axis == axis &&
+      other.length == length &&
+      other.segments.length == segments.length &&
+      [for (final (i, s) in segments.indexed) s.sameAs(other.segments[i])].every((same) => same);
+
   @override
   bool operator ==(Object other) =>
       other is CourseDefinition && other.axis == axis && other.length == length && listEquals(other.segments, segments);
@@ -122,6 +137,12 @@ class Course {
 String formatCourseLength(CourseAxis axis, int length) => switch (axis) {
       CourseAxis.distance => '$length m',
       CourseAxis.time => '${length ~/ 60}:${(length % 60).toString().padLeft(2, '0')}',
+    };
+
+/// A range on a course: `500–600 m` or `1:00–2:00`.
+String formatCourseRange(CourseAxis axis, int start, int end) => switch (axis) {
+      CourseAxis.distance => '$start–$end m',
+      CourseAxis.time => '${formatCourseLength(axis, start)}–${formatCourseLength(axis, end)}',
     };
 
 /// What is wrong with [definition], in words for the user; empty when it can
