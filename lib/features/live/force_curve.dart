@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/design_tokens.dart';
 import '../../l10n/l10n.dart';
+import 'formatters.dart';
 
 /// Where the force curve sits in the live display (force-curve, Design D2 and the table in its context).
 enum ForceCurveVariant {
@@ -20,7 +21,8 @@ enum ForceCurveVariant {
   tinted,
 }
 
-/// The force curves of the last and the previous stroke (force-curve, Design D2 and D3).
+/// The force curves of the last and the previous stroke (force-curve, Design D2 and D3), with the
+/// drive length of the last stroke (Design D4).
 ///
 /// Before the first curve has arrived it shows a dashed baseline and "Warte auf ersten Schlag";
 /// the layout leaves it out altogether for a source without force curves.
@@ -29,6 +31,7 @@ class ForceCurve extends StatelessWidget {
     super.key,
     required this.last,
     this.previous,
+    this.driveLengthMeters,
     this.variant = ForceCurveVariant.card,
     this.foreground = AppColors.textMuted,
   });
@@ -38,6 +41,9 @@ class ForceCurve extends StatelessWidget {
 
   /// Forces over the drive of the stroke before, on the same scale; null without one.
   final List<double>? previous;
+
+  /// The drive length of the last stroke in meters; null or 0 without one, and then not shown.
+  final double? driveLengthMeters;
 
   final ForceCurveVariant variant;
 
@@ -90,7 +96,8 @@ class ForceCurve extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (_note(context) case final note?) Flexible(child: note),
+                if (_note(context) case final note?)
+                  Expanded(child: Align(alignment: Alignment.centerRight, child: note)),
               ],
             ),
             const SizedBox(height: AppSpacing.xs),
@@ -132,6 +139,10 @@ class ForceCurve extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (_length(context) case final length?) ...[
+                Text(length, key: const Key('force-curve-length'), style: AppTextStyles.caption),
+                const SizedBox(width: AppSpacing.m),
+              ],
               _LegendEntry(color: AppColors.zoneIn, text: l10n.liveForceCurveLast),
               if (hasData(previous)) ...[
                 const SizedBox(width: AppSpacing.m),
@@ -171,18 +182,30 @@ class ForceCurve extends StatelessWidget {
     );
   }
 
-  /// The note beside the curve outside the card: the waiting hint.
+  /// The note beside the curve outside the card: the waiting hint, or the drive length of the last
+  /// stroke, which in the coloured card is drawn in `text` like the curve.
   Widget? _note(BuildContext context) {
-    if (!_waiting) return null;
-    final color = variant == ForceCurveVariant.tinted ? foreground : AppColors.textMuted;
+    final tinted = variant == ForceCurveVariant.tinted;
+    if (_waiting) {
+      return Text(
+        context.l10n.liveForceCurveWaiting,
+        key: const Key('force-curve-waiting'),
+        style: _small.copyWith(color: tinted ? foreground : AppColors.textMuted),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+    final length = _length(context);
+    if (length == null) return null;
     return Text(
-      context.l10n.liveForceCurveWaiting,
-      key: const Key('force-curve-waiting'),
-      style: _small.copyWith(color: color),
+      length,
+      key: const Key('force-curve-length'),
+      style: _small.copyWith(color: tinted ? AppColors.text : AppColors.textMuted),
       maxLines: 1,
-      overflow: TextOverflow.ellipsis,
     );
   }
+
+  String? _length(BuildContext context) => formatDriveLength(context.l10n, driveLengthMeters);
 }
 
 class _LegendEntry extends StatelessWidget {

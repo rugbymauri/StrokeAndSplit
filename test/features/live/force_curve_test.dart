@@ -157,4 +157,63 @@ void main() {
     expect(find.text('Kraftkurve'), findsOneWidget);
     await expectLater(find.byKey(_golden), matchesGoldenFile('goldens/force_curve_tinted.png'));
   });
+
+  group('with the drive length', () {
+    for (final (name, variant, size, background) in [
+      ('card', ForceCurveVariant.card, _cardSize, AppColors.bg),
+      ('strip', ForceCurveVariant.strip, _stripSize, AppColors.bg),
+      ('inline', ForceCurveVariant.inline, _inlineSize, AppColors.surface),
+      ('tinted', ForceCurveVariant.tinted, _tintedSize, AppColors.zoneOutSurface),
+    ]) {
+      testWidgets('shows it beside the last stroke: $name', (tester) async {
+        await _pump(
+          tester,
+          ForceCurve(
+            last: _last,
+            previous: _previous,
+            driveLengthMeters: 1.06,
+            variant: variant,
+            foreground: variant == ForceCurveVariant.tinted ? AppColors.zoneOutText : AppColors.textMuted,
+          ),
+          size,
+          background: background,
+        );
+
+        expect(find.text('1,06 m'), findsOneWidget);
+        await expectLater(find.byKey(_golden), matchesGoldenFile('goldens/force_curve_${name}_length.png'));
+      });
+    }
+
+    testWidgets('shows it in English with a decimal point', (tester) async {
+      await tester.pumpWidget(LocalizedApp(
+        locale: const Locale('en'),
+        home: Material(child: ForceCurve(last: _last, driveLengthMeters: 1.06)),
+      ));
+
+      expect(find.text('1.06 m'), findsOneWidget);
+    });
+
+    for (final length in [null, 0.0]) {
+      testWidgets('leaves it out without a length: $length', (tester) async {
+        await _pump(tester, ForceCurve(last: _last, previous: _previous, driveLengthMeters: length), _cardSize);
+
+        expect(find.byKey(const Key('force-curve-length')), findsNothing);
+        expect(find.textContaining(' m'), findsNothing);
+        // Exactly as without the length at all.
+        await expectLater(find.byKey(_golden), matchesGoldenFile('goldens/force_curve_card.png'));
+      });
+    }
+
+    testWidgets('leaves it out without a length in the strip', (tester) async {
+      await _pump(tester, ForceCurve(last: _last, previous: _previous, variant: ForceCurveVariant.strip), _stripSize);
+
+      expect(find.byKey(const Key('force-curve-length')), findsNothing);
+    });
+
+    testWidgets('leaves it out while waiting for the first stroke', (tester) async {
+      await _pump(tester, const ForceCurve(last: null, driveLengthMeters: 1.06), _cardSize);
+
+      expect(find.text('1,06 m'), findsNothing);
+    });
+  });
 }
