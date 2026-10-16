@@ -33,13 +33,55 @@ class RankingRepository {
     );
   }
 
+  /// The segments of complete laps on which zone [zoneId] lay, one ranking
+  /// per length of the zone when rowed, the current length first (Design
+  /// D2). Start and end follow from the start of the lap and the segments
+  /// before (Design D5).
+  Future<List<Ranking>> zone(int zoneId) async {
+    final rows = await _db.customSelect('''
+        SELECT s.id AS session, s.started_at AS started_at, c.axis AS axis, cs.length AS length,
+          ls.lap_no AS lap, ls.position AS position, ls.duration_ms AS duration, ls.distance_dm AS distance,
+          l.start_wall_ms AS lap_wall, l.start_distance_dm AS lap_distance,
+          (SELECT COALESCE(SUM(b.duration_ms), 0) FROM lap_segments b
+            WHERE b.session_id = ls.session_id AND b.lap_no = ls.lap_no AND b.position < ls.position) AS before_wall,
+          (SELECT COALESCE(SUM(b.distance_dm), 0) FROM lap_segments b
+            WHERE b.session_id = ls.session_id AND b.lap_no = ls.lap_no AND b.position < ls.position) AS before_distance
+        FROM lap_segments ls
+        JOIN laps l ON l.session_id = ls.session_id AND l.lap_no = ls.lap_no
+        JOIN sessions s ON s.id = ls.session_id
+        JOIN course_segments cs ON cs.version_id = s.course_version_id AND cs.position = ls.position
+        JOIN course_versions v ON v.id = cs.version_id
+        JOIN courses c ON c.id = v.course_id
+        WHERE cs.zone_id = ? AND l.complete = 1''', variables: [Variable.withInt(zoneId)]).get();
+    final current = await _db.customSelect('SELECT axis, length FROM zones WHERE id = ?',
+        variables: [Variable.withInt(zoneId)]).getSingleOrNull();
+    return _rankings(
+      [for (final row in rows) (_axis(row), row.read<int>('length'), null, _segmentEntry(row))],
+      current: current == null ? null : (_axis(current), current.read<int>('length'), null),
+    );
+  }
+
+  static RankingEntry _segmentEntry(QueryRow row) {
+    final startWallMs = row.read<int>('lap_wall') + row.read<int>('before_wall');
+    final startDistanceDm = row.read<int>('lap_distance') + row.read<int>('before_distance');
+    return RankingEntry(
+      sessionId: row.read<int>('session'),
+      startedAt: row.read<DateTime>('started_at'),
+      lap: row.read<int>('lap'),
+      position: row.read<int>('position'),
+      startWallMs: startWallMs,
+      endWallMs: startWallMs + row.read<int>('duration'),
+      startDistanceDm: startDistanceDm,
+      endDistanceDm: startDistanceDm + row.read<int>('distance'),
+    );
+  }
+
   static CourseAxis _axis(QueryRow row) => CourseAxis.values.byName(row.read<String>('axis'));
 
-  RankingEntry _entry(QueryRow row, {int? lap, int? position, int? durationMs, int? distanceDm}) => RankingEntry(
+  RankingEntry _entry(QueryRow row, {int? lap, int? durationMs, int? distanceDm}) => RankingEntry(
         sessionId: row.read<int>('session'),
         startedAt: row.read<DateTime>('started_at'),
         lap: lap,
-        position: position,
         startWallMs: row.read<int>('start_wall'),
         endWallMs: row.read<int>('end_wall'),
         startDistanceDm: row.read<int>('start_distance'),

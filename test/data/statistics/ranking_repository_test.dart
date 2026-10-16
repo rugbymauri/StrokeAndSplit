@@ -4,6 +4,8 @@ import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/statistics/ranking.dart';
 import 'package:aergrow/data/statistics/ranking_repository.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
+import 'package:aergrow/data/zones/zone.dart';
+import 'package:aergrow/data/zones/zone_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/rowed_sessions.dart';
@@ -109,6 +111,95 @@ void main() {
 
     test('has no ranking before the course was rowed', () async {
       expect(await rankings.course(seerunde), isEmpty);
+    });
+  });
+
+  group('zone', () {
+    const sprint = Zone(name: 'Sprint', axis: CourseAxis.distance, length: 100, paceFastCs: 9000, paceSlowCs: 10000);
+    late ZoneRepository zones;
+    late int sprintId;
+
+    setUp(() async {
+      zones = ZoneRepository(db);
+      sprintId = await zones.create(sprint);
+    });
+
+    /// A course of free gaps of [gaps] metres with a sprint after each one.
+    Future<int> courseWithSprints(String name, List<int> gaps, {int after = 0}) async {
+      final placed = sprint.copyWith(id: sprintId).segment;
+      final length = gaps.fold(0, (sum, gap) => sum + gap + sprint.length) + after;
+      return courses.create(name, CourseDefinition(axis: CourseAxis.distance, length: length, segments: [
+        for (final gap in gaps) ...[if (gap > 0) CourseSegment(length: gap), placed],
+        if (after > 0) CourseSegment(length: after),
+      ]));
+    }
+
+    test('ranks the sprints of all courses together', () async {
+      final interval = await courseWithSprints('2 km Intervall', [900], after: 1000);
+      final lake = await courseWithSprints('Seerunde', [450], after: 450);
+      await storeRowedSession(db, courseVersionId: await versionOf(interval), laps: [
+        const RowedLap([(220000, 900), (18900, 100), (250000, 1000)]),
+      ]);
+      await storeRowedSession(db, courseVersionId: await versionOf(lake), laps: [
+        const RowedLap([(110000, 450), (18200, 100), (110000, 450)]),
+      ]);
+
+      final ranked = await rankings.zone(sprintId);
+
+      expect(_values(ranked), ['100: 18, 18']);
+      expect([for (final e in ranked.single.entries) (e.durationMs, e.paceCs)], [(18200, 9100), (18900, 9450)]);
+    });
+
+    test('counts every sprint of a session on its own', () async {
+      final course = await courseWithSprints('Doppelsprint', [0, 400], after: 400);
+      final lap = RowedLap([(18000 + 100, 100), (100000, 400), (18000 + 200, 100), (100000, 400)]);
+      final id = await storeRowedSession(db, courseVersionId: await versionOf(course), laps: [lap, lap, lap]);
+
+      final entries = (await rankings.zone(sprintId)).single.entries;
+
+      expect(entries, hasLength(6));
+      expect(entries.take(3).every((e) => e.sessionId == id), isTrue);
+      expect([for (final e in entries) (e.lap, e.position)], [(1, 0), (2, 0), (3, 0), (1, 2), (2, 2), (3, 2)]);
+    });
+
+    test('starts and ends the second sprint of a lap after the segments before it', () async {
+      final course = await courseWithSprints('Doppelsprint', [0, 400], after: 400);
+      final lap = RowedLap([(18000, 101), (100000, 400), (19000, 100), (100000, 400)]);
+      await storeRowedSession(db, courseVersionId: await versionOf(course), laps: [lap, lap]);
+
+      final second = (await rankings.zone(sprintId))
+          .single
+          .entries
+          .singleWhere((e) => e.lap == 2 && e.position == 2);
+
+      // Lap 1 takes 237 s over 1001 m, then 118 s over 501 m to the sprint.
+      expect(
+        (second.startWallMs, second.endWallMs, second.startDistanceDm, second.endDistanceDm),
+        (355000, 374000, 15020, 16020),
+      );
+    });
+
+    test('has a ranking per length of the zone, the current length first', () async {
+      final lake = await courseWithSprints('Seerunde', [450], after: 450);
+      await storeRowedSession(db, courseVersionId: await versionOf(lake), laps: [
+        const RowedLap([(110000, 450), (18200, 100), (110000, 450)]),
+      ]);
+      await zones.update(sprint.copyWith(id: sprintId, length: 150));
+      await storeRowedSession(db, courseVersionId: await versionOf(lake), laps: [
+        const RowedLap([(110000, 450), (28000, 150), (100000, 400)]),
+      ]);
+
+      expect(_values(await rankings.zone(sprintId)), ['150: 28', '100: 18']);
+    });
+
+    test('leaves out the sprints of a lap that was not finished', () async {
+      final lake = await courseWithSprints('Seerunde', [450], after: 450);
+      await storeRowedSession(db, courseVersionId: await versionOf(lake), laps: [
+        const RowedLap([(110000, 450), (18200, 100), (110000, 450)]),
+        const RowedLap([(110000, 450), (17000, 100), (50000, 200)], complete: false),
+      ]);
+
+      expect(_values(await rankings.zone(sprintId)), ['100: 18']);
     });
   });
 }
