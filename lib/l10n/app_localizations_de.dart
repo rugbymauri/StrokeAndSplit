@@ -524,6 +524,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get templateStart => 'Starten';
 
   @override
+  String get templatePodiumTitle => 'Bestleistungen';
+
+  @override
+  String get templatePodiumEmpty =>
+      'Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.';
+
+  @override
+  String get templatePodiumOpenLaps =>
+      'Bei offener Rundenzahl gibt es keine Bestzeit.';
+
+  @override
+  String templatePodiumPace(String pace) {
+    return '$pace /500 m';
+  }
+
+  @override
   String get templatesEmpty => 'Noch keine Vorlagen angelegt.';
 
   @override
