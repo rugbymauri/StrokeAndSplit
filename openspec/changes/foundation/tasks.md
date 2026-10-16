@@ -64,7 +64,7 @@
 
 - [x] 8.1 Ende-zu-Ende am echten PM5 auf Android: verbinden, 5 min Session rudern, beenden, in Liste prüfen, abspielen. Verifikation: Werte der Zusammenfassung stimmen mit der PM5-Anzeige überein (±1 % Distanz)
 - [x] 8.2 Ende-zu-Ende auf Linux-Desktop mit Simulator und, falls Linux-BLE funktioniert, mit dem PM5. Verifikation: Session aufgezeichnet und abspielbar
-- [ ] 8.3 iOS-Build und Test auf einem iPhone, sofern ein Mac verfügbar ist; sonst als offen im README vermerken. Verifikation: App verbindet sich auf iOS mit dem PM5 bzw. README-Vermerk
+- [x] 8.3 iOS-Build und Test auf einem iPhone, sofern ein Mac verfügbar ist; sonst als offen im README vermerken. Verifikation: App verbindet sich auf iOS mit dem PM5 bzw. README-Vermerk
 - [x] 8.4 README im Repo-Root: Setup, Befehle, Projektstruktur, Plattform-Status. Verifikation: Setup-Schritte aus dem README funktionieren auf einem frischen Checkout
 
 ## Workflow follow-up
