@@ -153,11 +153,11 @@ Zahlen werden in allen Editoren mit einem Tastenpaar eingestellt, nicht getippt 
 
 *Alternativen*: Textfelder mit Zahlentastatur wie bisher, oder ein Rad zum Drehen. Verworfen: Die Tastatur verdeckt am Handy den halben Editor, und ein Rad ist mit nassen Fingern ungenau.
 
-### D8: Sprachwahl (vorläufig)
+### D8: Sprachwahl
 
-Vorläufig entschieden am 2026-10-16, nach Vorschlag: Die Sprachwahl aus `translations` (dort Design D3) bleibt ein Symbol in der App-Leiste des Startbildschirms und öffnet wie heute den Dialog mit den Sprachen. Sie bekommt nur die Gestaltung aus D1 (Symbol in `textMuted`, Touch-Ziel ab 44 px). Der Canvas zeigt keinen Platz dafür.
+Entschieden am 2026-10-16 vom Nutzer: Die Sprachwahl aus `translations` (dort Design D3) bleibt ein Symbol in der App-Leiste des Startbildschirms und öffnet wie heute den Dialog mit den Sprachen. Sie bekommt nur die Gestaltung aus D1 (Symbol in `textMuted`, Touch-Ziel ab 44 px). Der Canvas zeigt keinen Platz dafür.
 
-*Alternativen*: ein eigener Einstellungs-Screen oder ein Eintrag unter dem Link „Sessions“. Verworfen, solange die Sprache die einzige Einstellung ist. Kommen weitere Einstellungen dazu, etwa der Brustgurt aus `heart-rate`, zieht die Sprachwahl in einen Einstellungs-Screen um.
+*Alternativen*: ein eigener Einstellungs-Screen oder ein Eintrag unter dem Link „Sessions“. Verworfen, solange die Sprache die einzige Einstellung ist. Kommen weitere Einstellungen dazu, etwa der Brustgurt aus `heart-rate`, kann die Sprachwahl in einen Einstellungs-Screen umziehen; der Pulsgurt sitzt aber in „Geräte wählen“ (D6).
 
 ### D9: Texte
 
