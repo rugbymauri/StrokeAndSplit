@@ -93,7 +93,7 @@ Wird später auf einen Release-Keystore gewechselt, ist das ein Schlüsselwechse
                              lib/ und data/ relativ zum Binary)
 ```
 
-- `appimagetool` wird als feste Release-Version heruntergeladen, die Prüfsumme ist im Skript hinterlegt. Docker-Runner haben kein FUSE, darum läuft es mit `APPIMAGE_EXTRACT_AND_RUN=1`.
+- `appimagetool` (1.9.1) und die AppImage-Runtime (`type2-runtime` 20251108) werden als feste Release-Versionen heruntergeladen, die Prüfsummen sind im Skript hinterlegt. Ohne `--runtime-file` holte `appimagetool` die jeweils neueste Runtime. Docker-Runner haben kein FUSE, darum läuft es mit `APPIMAGE_EXTRACT_AND_RUN=1`.
 - Die `.desktop`-Datei: `Name=AergRow`, `Exec=${APP_NAME}`, `Icon=${APP_NAME}`, `Categories=Utility;`, `StartupWMClass=ch.aergrow.aergrow`. Damit ordnet der Desktop das GTK-Fenster dem Eintrag zu. `Sports` verlangt laut Desktop-Menu-Spec die Hauptkategorie `Game` und passt nicht. `appimagetool` prüft die Datei mit `desktop-file-validate`.
 - Das Icon ist das Android-Launcher-Icon, auf 256x256 hochskaliert und als eigene Datei unter `linux/packaging/` eingecheckt, damit das Linux-Paket nicht vom Android-Ordner abhängt. Mit einem echten Logo wird nur diese Datei ersetzt.
 - GTK 3 und glibc werden nicht gebündelt (Spec: Zielsysteme mit GTK 3). Weil im Ubuntu-Image des Flutter-Images gebaut wird, ist die glibc-Untergrenze die dieses Ubuntu. Aktuelle Fedora- und Ubuntu-Versionen liegen darüber.

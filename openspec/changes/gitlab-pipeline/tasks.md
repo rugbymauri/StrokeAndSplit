@@ -9,13 +9,13 @@
 
 ## 2. Android-Paket
 
-- [ ] 2.1 `make apk`: `flutter build apk --release` mit optionalen `BUILD_NAME`/`BUILD_NUMBER` als `--build-name`/`--build-number` (D4, D6), bestehendes `build-linux` unverändert. `make help` listet das Ziel. Verifikation: lokal `make apk BUILD_NAME=0.0.1 BUILD_NUMBER=7` erzeugt eine APK, `aapt dump badging` bzw. `apkanalyzer` zeigt `versionName=0.0.1`, `versionCode=7`
+- [x] 2.1 `make apk`: `flutter build apk --release` mit optionalen `BUILD_NAME`/`BUILD_NUMBER` als `--build-name`/`--build-number` (D4, D6), bestehendes `build-linux` unverändert. `make help` listet das Ziel. Verifikation: lokal `make apk BUILD_NAME=0.0.1 BUILD_NUMBER=7` erzeugt eine APK, `aapt dump badging` bzw. `apkanalyzer` zeigt `versionName=0.0.1`, `versionCode=7`. Erledigt: `aapt dump badging` zeigt `versionCode='7' versionName='0.0.1'`, Universal-APK mit `arm64-v8a`, `armeabi-v7a`, `x86_64`
 - [ ] 2.2 Anleitung im README: Debug-Keystore mit `keytool` erzeugen (Alias `androiddebugkey`, Passwort `android`), als protected File-Variable `ANDROID_DEBUG_KEYSTORE` hinterlegen, `v*` als geschützten Tag einrichten (D5). Der Nutzer führt die Schritte in GitLab aus. Verifikation: die Variable und der geschützte Tag sind in den Projekteinstellungen sichtbar
 - [ ] 2.3 Job `build-apk` (nur Tags `vX.Y.Z`): Keystore nach `~/.android/debug.keystore`, Abbruch mit Meldung, wenn die Variable fehlt, `make apk` mit Version aus Tag und `CI_PIPELINE_IID`, Gradle-Cache, Artefakt `${APP_NAME}-X.Y.Z-android.apk` mit kurzer Ablaufzeit. Verifikation: in der Pipeline des Probe-Tags `v0.1.0` (Task 4.3) liegt die APK als Artefakt vor, `apksigner verify --print-certs` zeigt das Zertifikat des hinterlegten Keystores
 
 ## 3. Linux-Paket
 
-- [ ] 3.1 `linux/packaging/`: `app.desktop.in` (D7: `Name`, `Exec`, `Icon`, `Categories=Utility;`, `StartupWMClass=ch.aergrow.aergrow`), `AppRun` und `icon.png` (Android-Launcher-Icon auf 256x256). Verifikation: `desktop-file-validate` auf die ausgefüllte Vorlage ist fehlerfrei
+- [x] 3.1 `linux/packaging/`: `app.desktop.in` (D7: `Name`, `Exec`, `Icon`, `Categories=Utility;`, `StartupWMClass=ch.aergrow.aergrow`), `AppRun` und `icon.png` (Android-Launcher-Icon auf 256x256). Verifikation: `desktop-file-validate` auf die ausgefüllte Vorlage ist fehlerfrei. Erledigt: `desktop-file-validate` fehlerfrei
 - [ ] 3.2 `tool/build_appimage.sh` und `make appimage`: AppDir aus `build/linux/x64/release/bundle/`, gepinntes `appimagetool` mit Prüfsumme, `APPIMAGE_EXTRACT_AND_RUN=1`, Ausgabe `${APP_NAME}-X.Y.Z-x86_64.AppImage`, App-Name per Umgebungsvariable (D9). `make help` listet das Ziel. Verifikation: lokal auf Fedora `make build-linux appimage` erzeugt ein AppImage, das nach `chmod +x` das App-Fenster öffnet
 - [ ] 3.3 Job `build-appimage` (nur Tags `vX.Y.Z`): apt-Pakete aus D1, `flutter build linux --release` mit Version aus dem Tag, `make appimage`, Artefakt mit kurzer Ablaufzeit. Verifikation: das AppImage aus dem CI-Artefakt startet auf Fedora
 
