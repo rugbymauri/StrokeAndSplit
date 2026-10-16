@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 RawRecording loadFixture(String name) =>
     RawRecording.parseLines(File('test/fixtures/$name.jsonl').readAsLinesSync());

@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import '../courses/course.dart';
 import '../courses/lap_tracker.dart';

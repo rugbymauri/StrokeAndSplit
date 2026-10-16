@@ -7,7 +7,7 @@ ADB     ?= $(or $(shell command -v adb 2>/dev/null),$(HOME)/Android/Sdk/platform
 # Only ids made of safe characters are taken, as the id ends up in a shell command.
 ANDROID_DEVICE ?= $(shell $(ADB) devices 2>/dev/null | awk 'NR > 1 && $$2 == "device" && $$1 ~ /^[A-Za-z0-9._:-]+$$/ { print $$1; exit }')
 
-PROTOCOL       := packages/pm5_protocol
+PROTOCOL       := packages/erg_protocol
 SPIKE          := lib/spike/spike_main.dart
 RECORDINGS     := recordings
 ANDROID_FILES  := /sdcard/Android/data/ch.aergrow.aergrow/files

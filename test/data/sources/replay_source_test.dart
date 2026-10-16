@@ -4,10 +4,10 @@ import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/replay_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 final _recording = RawRecording.parseLines(
-    File('packages/pm5_protocol/test/fixtures/just_row.jsonl').readAsLinesSync());
+    File('packages/erg_protocol/test/fixtures/just_row.jsonl').readAsLinesSync());
 
 List<String> _decode(Iterable<RawPacket> packets) {
   final decoder = Pm5Decoder();

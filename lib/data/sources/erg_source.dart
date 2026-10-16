@@ -1,4 +1,4 @@
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 /// Where rowing data comes from. Shown to the user so simulated or replayed
 /// data is never mistaken for a live erg.

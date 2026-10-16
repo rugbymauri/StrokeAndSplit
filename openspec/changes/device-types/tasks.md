@@ -2,8 +2,8 @@
 
 ## 1. Basis und Package-Umbau
 
-- [ ] 1.1 Branch `feature/device-types` von `main` erstellen, auf dem `courses` und `zones` gemergt sind (Design D1); `make check` ist grün
-- [ ] 1.2 `packages/pm5_protocol` in `packages/erg_protocol` umbenennen, PM5-Dateien nach `src/pm5/` verschieben, Imports, `pubspec.yaml`, Makefile (`PROTOCOL`) und README-Verweise anpassen, rein mechanisch und ohne Verhaltensänderung (D2); `make check` ist grün
+- [x] 1.1 Branch `feature/device-types` von `main` erstellen, auf dem `courses` und `zones` gemergt sind (Design D1); `make check` ist grün
+- [x] 1.2 `packages/pm5_protocol` in `packages/erg_protocol` umbenennen, PM5-Dateien nach `src/pm5/` verschieben, Imports, `pubspec.yaml`, Makefile (`PROTOCOL`) und README-Verweise anpassen, rein mechanisch und ohne Verhaltensänderung (D2); `make check` ist grün
 - [ ] 1.3 `ErgProtocol { pm5, ftms }` und das Interface `ErgDecoder` mit `ErgDecoder.forProtocol` einführen, `Pm5Decoder` implementiert es, `wattsForPace` auf oberste Ebene ziehen, `SessionOffset`-Parameter neutral benennen (D2); bestehende Decoder-Tests laufen unverändert, ein Test prüft die Factory
 
 ## 2. Datenmodell und Schema

@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import '../db/database.dart';
 import '../courses/course.dart';

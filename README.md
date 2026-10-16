@@ -25,7 +25,7 @@ Alle Befehle zeigt `make help`.
 | Befehl | Zweck |
 |---|---|
 | `make run` / `make run-android` | App auf Linux bzw. einem per USB verbundenen Android-Gerät starten |
-| `make check` | Statische Analyse und Tests von App und `pm5_protocol` |
+| `make check` | Statische Analyse und Tests von App und `erg_protocol` |
 | `make codegen` | drift-Code neu erzeugen, nach Änderungen an `lib/data/db/database.dart` |
 | `make schema` | Schema-Snapshot und Migrationstests erzeugen, nach dem Erhöhen von `schemaVersion` |
 | `make spike` / `make spike-android` | Minimal-App, die PM5-Rohpakete mitschneidet (siehe unten) |
@@ -75,12 +75,12 @@ lib/
     sessions/          Session-Liste und Zusammenfassung
     simulator/         Bedienung des Simulators
   spike/               BLE-Spike zum Mitschneiden von Rohpaketen
-packages/pm5_protocol/ PM5-Protokoll als reines Dart-Package (Decoder, Encoder, Rohformat)
+packages/erg_protocol/ PM5-Protokoll als reines Dart-Package (Decoder, Encoder, Rohformat)
 drift_schemas/         Schema-Snapshots für Migrationstests
 openspec/              Anforderungen, Design und Tasks (OpenSpec)
 ```
 
-Alle Quellen liefern rohe PM5-Pakete. Ein einziger Decoder in `pm5_protocol` macht daraus Messwerte. So laufen Simulator und Replay durch denselben Code wie der echte PM5. Die Byte-Layouts und Beobachtungen am echten PM5 stehen in [`packages/pm5_protocol/README.md`](packages/pm5_protocol/README.md).
+Alle Quellen liefern rohe PM5-Pakete. Ein einziger Decoder in `erg_protocol` macht daraus Messwerte. So laufen Simulator und Replay durch denselben Code wie der echte PM5. Die Byte-Layouts und Beobachtungen am echten PM5 stehen in [`packages/erg_protocol/README.md`](packages/erg_protocol/README.md).
 
 ## Dateiformat `.aergrow`
 
@@ -102,7 +102,7 @@ Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwe
 
 ## Spike
 
-`make spike` startet eine Minimal-App, die sich mit dem PM5 verbindet und alle Pakete mit Zeitstempel als `pm5-<zeit>.jsonl` speichert. Unter Linux landen sie im Dokumente-Ordner des Benutzers (z.B. `~/Dokumente`), unter Android im externen App-Verzeichnis (`make pull-recordings`). Solche Mitschnitte dienen als Test-Fixtures in `packages/pm5_protocol/test/fixtures/`.
+`make spike` startet eine Minimal-App, die sich mit dem PM5 verbindet und alle Pakete mit Zeitstempel als `pm5-<zeit>.jsonl` speichert. Unter Linux landen sie im Dokumente-Ordner des Benutzers (z.B. `~/Dokumente`), unter Android im externen App-Verzeichnis (`make pull-recordings`). Solche Mitschnitte dienen als Test-Fixtures in `packages/erg_protocol/test/fixtures/`.
 
 ## Plattform-Status
 

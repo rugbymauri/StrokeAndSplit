@@ -12,7 +12,7 @@ import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../support/fixtures.dart';
 import '../../support/test_database.dart';
@@ -82,7 +82,7 @@ void main() {
 
   test('imports an uncompressed raw recording, e.g. from the spike', () async {
     final repository = SessionRepository(openTestDatabase());
-    final file = File('packages/pm5_protocol/test/fixtures/just_row.jsonl');
+    final file = File('packages/erg_protocol/test/fixtures/just_row.jsonl');
 
     final id = await repository.import(await file.readAsBytes());
     final session = (await repository.get(id))!;

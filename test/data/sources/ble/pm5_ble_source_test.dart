@@ -5,7 +5,7 @@ import 'package:aergrow/data/sources/ble/pm5_ble_source.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 const _pm5 = FoundPm5(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 

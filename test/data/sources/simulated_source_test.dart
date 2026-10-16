@@ -2,7 +2,7 @@ import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/simulated_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 /// Runs [source] in fake time and collects the decoded events.
 List<RowingEvent> _listen(SimulatedSource source) {

@@ -2,9 +2,9 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'pm5_characteristics.dart';
-import 'raw_packet.dart';
-import 'rowing_event.dart';
-import 'workout.dart';
+import '../raw_packet.dart';
+import '../rowing_event.dart';
+import '../workout.dart';
 
 /// Turns PM5 notifications into [RowingEvent]s.
 ///

@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'pm5_characteristics.dart';
-import 'raw_packet.dart';
-import 'rowing_event.dart';
+import '../raw_packet.dart';
+import '../rowing_event.dart';
 
 /// Turns [RowingEvent]s into PM5 notifications, in the byte layout and order
 /// a real PM5 sends them. Used by the simulator.
