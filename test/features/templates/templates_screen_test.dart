@@ -1,6 +1,9 @@
+import 'package:aergrow/app/platform_providers.dart';
 import 'package:aergrow/data/courses/course.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
+import 'package:aergrow/data/sources/erg_source.dart';
+import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/features/connection/start_screen.dart';
 import 'package:aergrow/features/templates/templates_screen.dart';
@@ -8,13 +11,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fake_ble_transport.dart';
 import '../../support/test_database.dart';
 
 class _Setup {
   final db = openTestDatabase();
   late final courses = CourseRepository(db);
   late final templates = TemplateRepository(db);
-  late final container = ProviderContainer(overrides: [databaseProvider.overrideWithValue(db)]);
+  late final container = ProviderContainer(overrides: [
+    databaseProvider.overrideWithValue(db),
+    wakelockProvider.overrideWithValue(FakeWakelock()),
+  ]);
 
   Future<int> addCourse(WidgetTester tester, String name) async => (await tester.runAsync(
         () => courses.create(name, CourseDefinition.single(axis: CourseAxis.distance, length: 1000)),
@@ -139,6 +146,30 @@ void main() {
     await setup.settle(tester);
 
     expect(find.text('Noch keine Strecken angelegt.'), findsOneWidget);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('starts a template with the simulator', (tester) async {
+    final setup = _Setup();
+    final id = await setup.addCourse(tester, 'Seerunde');
+    await tester.runAsync(() => setup.templates.create('Seerunde x3', courseId: id, laps: 3));
+    await setup.pump(tester);
+
+    await tester.tap(find.text('Seerunde x3'));
+    await tester.pumpAndSettle();
+    expect(find.text('„Seerunde x3“ rudern'), findsOneWidget);
+    await tester.tap(find.text('Simulator'));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    expect(setup.container.read(activeErgSourceProvider)?.kind, ErgSourceKind.simulator);
+    expect(find.text('Runde 1 von 3'), findsOneWidget);
+    expect(find.text('Session beenden'), findsOneWidget);
+    expect(setup.container.read(sessionRecorderProvider)?.template?.name, 'Seerunde x3');
+
+    await setup.container.read(sessionRecorderProvider.notifier).stop();
+    await setup.container.read(activeErgSourceProvider.notifier).clear();
     await disposeWidgetsWithDatabase(tester);
   });
 }

@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/courses/course_providers.dart';
+import '../../data/sources/erg_source_providers.dart';
+import '../../data/sources/simulated_source.dart';
 import '../../data/templates/session_template.dart';
 import '../../data/templates/template_providers.dart';
+import '../connection/device_list_screen.dart';
 import '../courses/courses_screen.dart';
+import '../live/live_screen.dart';
 import 'template_editor_screen.dart';
 
 /// All templates, to start, create, edit and delete them.
@@ -92,6 +96,8 @@ class _NoCourse extends StatelessWidget {
 
 enum _Action { edit, delete }
 
+enum _Source { pm5, simulator }
+
 class _TemplateTile extends ConsumerWidget {
   const _TemplateTile({required this.template});
 
@@ -103,6 +109,7 @@ class _TemplateTile extends ConsumerWidget {
       leading: const Icon(Icons.flag_outlined),
       title: Text(template.name),
       subtitle: Text('${template.course.name} · ${formatLaps(template.laps)}'),
+      onTap: () => _start(context, ref),
       trailing: PopupMenuButton<_Action>(
         tooltip: 'Aktionen',
         onSelected: (action) => switch (action) {
@@ -115,6 +122,35 @@ class _TemplateTile extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  /// Lets the user pick the source; the session starts once it is connected.
+  Future<void> _start(BuildContext context, WidgetRef ref) async {
+    final source = await showDialog<_Source>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text('„${template.name}“ rudern'),
+        children: [
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(context).pop(_Source.pm5),
+            child: const ListTile(leading: Icon(Icons.bluetooth_searching), title: Text('PM5 suchen')),
+          ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(context).pop(_Source.simulator),
+            child: const ListTile(leading: Icon(Icons.smart_toy_outlined), title: Text('Simulator')),
+          ),
+        ],
+      ),
+    );
+    if (source == null || !context.mounted) return;
+    final navigator = Navigator.of(context);
+    switch (source) {
+      case _Source.pm5:
+        await navigator.push(MaterialPageRoute<void>(builder: (_) => DeviceListScreen(template: template)));
+      case _Source.simulator:
+        await ref.read(activeErgSourceProvider.notifier).use(SimulatedSource());
+        await navigator.push(MaterialPageRoute<void>(builder: (_) => LiveScreen(template: template)));
+    }
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
