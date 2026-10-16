@@ -17,7 +17,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
-| 3 | `ui-design` | 0/18 | nach 2 | Entscheid Puls-Herkunft (F1) |
+| 3 | `ui-design` | 1/18 | in Arbeit | Entscheid Puls-Herkunft (F1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
 | 6 | `statistics` | 0/12 | Gruppe 1 jederzeit, Rest nach 3 | – |
@@ -105,6 +105,7 @@ Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeita
 - [x] F2 in Proposal, Design D6 und Task 5.1 eingetragen.
 - [x] Ruderblatt-Tasten für Zahlen (2026-10-16) als Design D7, Spec `number-steppers` und Tasks 1.4 und 4.4 aufgenommen. Betrifft auch die Editoren aus `zones`.
 - [x] F12 entschieden: Zeitachse Strecke 30 s, Zone und Startposition 10 s (Design D7, Spec `number-steppers`).
+- [x] Task 1.4 `OarStepper` in `lib/app/widgets/`, D1-Farben als `AppColors` in `lib/app/design_tokens.dart` (Grundlage für 1.2). Vorläufig: Tasten waagrecht wie im Canvas, keine Tooltips (beissen sich mit Gedrückthalten), Blattrand `#4A545E` und Gedrückt-Farbe `#1D3A55` als private Konstanten, Beschriftung „mehr/weniger“ statt „kürzer/länger“. Offen für 4.4: Hintergrund `bg` für kompakte Felder in Karten.
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 
