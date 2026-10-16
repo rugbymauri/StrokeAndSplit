@@ -173,7 +173,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                         ),
                 ),
               ),
-              if (source is SimulatedSource) SimulatorControls(source: source),
+              if (source is SimulatedSource)
+                SimulatorControls(
+                  source: source,
+                  onProtocolChanged: recording == null
+                      ? (protocol) => ref.read(activeErgSourceProvider.notifier).use(source.withProtocol(protocol))
+                      : null,
+                ),
             ],
           ),
         ),

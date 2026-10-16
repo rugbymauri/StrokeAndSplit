@@ -63,6 +63,14 @@ class SimulatedSource implements ErgSource {
 
   bool get isPaused => _paused;
 
+  /// A new simulator with the same targets that speaks [protocol].
+  SimulatedSource withProtocol(ErgProtocol protocol) => SimulatedSource(
+        targetPace: targetPace,
+        targetStrokeRate: targetStrokeRate,
+        tickInterval: tickInterval,
+        protocol: protocol,
+      );
+
   /// Stops rowing; the clock and the distance stand still like on a PM5.
   void pause() {
     _paused = true;

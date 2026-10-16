@@ -1,3 +1,4 @@
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -108,7 +109,7 @@ class _NoCourse extends StatelessWidget {
 
 enum _Action { edit, delete }
 
-enum _Source { pm5, simulator }
+enum _Source { pm5, simulator, simulatorFtms }
 
 class _TemplateTile extends ConsumerWidget {
   const _TemplateTile({required this.template});
@@ -151,6 +152,14 @@ class _TemplateTile extends ConsumerWidget {
             onPressed: () => Navigator.of(context).pop(_Source.simulator),
             child: const ListTile(leading: Icon(Icons.smart_toy_outlined), title: Text('Simulator')),
           ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(context).pop(_Source.simulatorFtms),
+            child: const ListTile(
+              leading: Icon(Icons.smart_toy_outlined),
+              title: Text('Simulator (FTMS)'),
+              subtitle: Text('Wie ein FTMS-Rudergerät, ohne Schlagdetails'),
+            ),
+          ),
         ],
       ),
     );
@@ -159,8 +168,9 @@ class _TemplateTile extends ConsumerWidget {
     switch (source) {
       case _Source.pm5:
         await navigator.push(MaterialPageRoute<void>(builder: (_) => DeviceListScreen(template: template)));
-      case _Source.simulator:
-        await ref.read(activeErgSourceProvider.notifier).use(SimulatedSource());
+      case _Source.simulator || _Source.simulatorFtms:
+        final protocol = source == _Source.simulatorFtms ? ErgProtocol.ftms : ErgProtocol.pm5;
+        await ref.read(activeErgSourceProvider.notifier).use(SimulatedSource(protocol: protocol));
         await navigator.push(MaterialPageRoute<void>(builder: (_) => LiveScreen(template: template)));
     }
   }

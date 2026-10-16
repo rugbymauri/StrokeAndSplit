@@ -27,7 +27,7 @@
 ## 4. Simulator und Test-Rower
 
 - [x] 4.1 `SimulatedSource` mit `protocol`: im FTMS-Modus ein Rower-Data-Paket pro Sekunde über `FtmsEncoder` (D10); Tests in `simulated_source_test.dart` prüfen, dass Pace-Annäherung, Pause und Schlagzählung im FTMS-Modus funktionieren
-- [ ] 4.2 Auswahl PM5/FTMS in der Simulator-Bedienung (D10); Widget-Test in `simulator_controls_test.dart`, und ein End-to-End-Test rudert eine Vorlage mit einer Strecke mit eingebauter Zone mit dem Simulator im FTMS-Modus bis zur gespeicherten Session mit Runden und Zonenanteil
+- [x] 4.2 Auswahl PM5/FTMS in der Simulator-Bedienung (D10); Widget-Test in `simulator_controls_test.dart`, und ein End-to-End-Test rudert eine Vorlage mit einer Strecke mit eingebauter Zone mit dem Simulator im FTMS-Modus bis zur gespeicherten Session mit Runden und Zonenanteil
 - [ ] 4.3 `dart run erg_protocol:pm5_to_ftms` wandelt eine PM5-Aufnahme in eine FTMS-Aufnahme (D11); daraus `test/fixtures/ftms_just_row.jsonl` erzeugen und in einem Test prüfen, dass Distanz und Schlaganzahl von PM5- und FTMS-Dekodierung übereinstimmen (Distanz auf ±1 m)
 - [ ] 4.4 `tool/ftms_rower/ftms_rower.py` (bless, inline-Abhängigkeiten, `uv run`) als BlueZ-Peripheral mit Service `0x1826`, Service Data „Rower“, Rower Data und Control Point, das eine FTMS-Aufnahme zeitgetreu abspielt, sowie `make ftms-rower FILE=…` (D11); läuft auf dem Linux-PC und erscheint in `bluetoothctl` bzw. nRF Connect auf dem Handy als FTMS-Gerät
 - [ ] 4.5 README-Abschnitt zum Software-Rower: Voraussetzungen, Start, Test vom Android-Handy aus, Grenze „nicht vom selben Linux-Rechner“

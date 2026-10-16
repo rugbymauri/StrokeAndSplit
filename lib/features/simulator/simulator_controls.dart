@@ -1,13 +1,18 @@
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/sources/simulated_source.dart';
 import '../live/formatters.dart';
 
-/// Target pace, stroke rate and pause for the simulated rower.
+/// Target pace, stroke rate, pause and protocol for the simulated rower.
 class SimulatorControls extends StatefulWidget {
-  const SimulatorControls({super.key, required this.source});
+  const SimulatorControls({super.key, required this.source, this.onProtocolChanged});
 
   final SimulatedSource source;
+
+  /// Switches to a simulator with another protocol; null while that is not
+  /// possible, e.g. during a session.
+  final ValueChanged<ErgProtocol>? onProtocolChanged;
 
   @override
   State<SimulatorControls> createState() => _SimulatorControlsState();
@@ -60,6 +65,19 @@ class _SimulatorControlsState extends State<SimulatorControls> {
               onIncrease: () => _changeStrokeRate(1),
               decreaseTooltip: 'Weniger Schläge',
               increaseTooltip: 'Mehr Schläge',
+            ),
+            SegmentedButton<ErgProtocol>(
+              key: const Key('sim-protocol'),
+              segments: const [
+                ButtonSegment(value: ErgProtocol.pm5, label: Text('PM5')),
+                ButtonSegment(value: ErgProtocol.ftms, label: Text('FTMS')),
+              ],
+              selected: {_source.protocol},
+              showSelectedIcon: false,
+              onSelectionChanged: switch (widget.onProtocolChanged) {
+                final onChanged? => (selected) => onChanged(selected.single),
+                null => null,
+              },
             ),
             FilledButton.tonalIcon(
               onPressed: _togglePause,
