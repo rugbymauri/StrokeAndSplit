@@ -234,7 +234,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricCalories => 'Calories';
 
   @override
-  String get metricAveragePace => '⌀ pace';
+  String get metricAveragePace => 'Ø pace';
+
+  @override
+  String get metricLapTime => 'Lap';
+
+  @override
+  String get metricInZone => 'In zone';
+
+  @override
+  String get liveStopShort => 'End';
 
   @override
   String get liveForceCurve => 'Force curve';
@@ -242,11 +251,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String courseLap(int lap) {
     return 'Lap $lap';
-  }
-
-  @override
-  String courseLapOf(int lap, int laps) {
-    return 'Lap $lap of $laps';
   }
 
   @override
@@ -274,25 +278,25 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hintInZone => 'in the zone';
+  String get hintInZone => 'In the zone';
 
   @override
-  String get hintFaster => 'faster';
+  String get hintFaster => 'Faster';
 
   @override
-  String get hintSlower => 'slower';
+  String get hintSlower => 'Slower';
 
   @override
-  String get hintNoPace => 'no pace';
+  String get hintNoPace => 'No pace';
 
   @override
-  String get hintMoreStrokes => 'more strokes';
+  String get hintMoreStrokes => 'More strokes';
 
   @override
-  String get hintFewerStrokes => 'fewer strokes';
+  String get hintFewerStrokes => 'Fewer strokes';
 
   @override
-  String get hintNoStrokes => 'no strokes';
+  String get hintNoStrokes => 'No strokes';
 
   @override
   String get simTargetPace => 'Target pace';

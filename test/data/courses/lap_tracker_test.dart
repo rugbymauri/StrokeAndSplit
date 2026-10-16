@@ -37,6 +37,8 @@ void main() {
       expect(lap.complete, isTrue);
       expect(tracker.progress.lap, 2);
       expect(tracker.progress.remaining, closeTo(997, 0.001));
+      // The lap time counts from the boundary at 239.4 s.
+      expect(tracker.progress.lapTime, const Duration(milliseconds: 600));
     });
 
     test('gives what goes beyond a lap to the next one', () {

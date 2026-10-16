@@ -193,8 +193,8 @@ void main() {
     }
 
     expect(setup.container.read(activeErgSourceProvider)?.kind, ErgSourceKind.simulator);
-    expect(find.text('Runde 1 von 3'), findsOneWidget);
-    expect(find.text('Session beenden'), findsOneWidget);
+    expect(find.text('Runde 1 / 3'), findsOneWidget);
+    expect(find.text('Beenden'), findsOneWidget);
     expect(setup.container.read(sessionRecorderProvider)?.template?.name, 'Seerunde x3');
 
     await setup.container.read(sessionRecorderProvider.notifier).stop();

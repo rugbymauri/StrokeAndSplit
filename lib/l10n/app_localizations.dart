@@ -454,8 +454,26 @@ abstract class AppLocalizations {
   /// Live display: label of the average pace per 500 metres since the start, in the line below the tiles
   ///
   /// In de, this message translates to:
-  /// **'⌀ Pace'**
+  /// **'Ø Pace'**
   String get metricAveragePace;
+
+  /// Live display on a template: label of the time rowed in the current lap
+  ///
+  /// In de, this message translates to:
+  /// **'Runde'**
+  String get metricLapTime;
+
+  /// Live display on a template: label of the share of the lap rowed within the zone, e.g. '78 %'
+  ///
+  /// In de, this message translates to:
+  /// **'In Zone'**
+  String get metricInZone;
+
+  /// Live display in landscape on a template: short button that ends the recorded session
+  ///
+  /// In de, this message translates to:
+  /// **'Beenden'**
+  String get liveStopShort;
 
   /// Live display: title of the force curve of the last stroke
   ///
@@ -468,12 +486,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Runde {lap}'**
   String courseLap(int lap);
-
-  /// Course bar: the current lap and the planned number of laps
-  ///
-  /// In de, this message translates to:
-  /// **'Runde {lap} von {laps}'**
-  String courseLapOf(int lap, int laps);
 
   /// A part of a course without a zone
   ///
@@ -514,43 +526,43 @@ abstract class AppLocalizations {
   /// Live display: the value is within the zone's band
   ///
   /// In de, this message translates to:
-  /// **'in der Zone'**
+  /// **'In der Zone'**
   String get hintInZone;
 
   /// Live display: row faster to reach the pace band
   ///
   /// In de, this message translates to:
-  /// **'schneller'**
+  /// **'Schneller'**
   String get hintFaster;
 
   /// Live display: row slower to reach the pace band
   ///
   /// In de, this message translates to:
-  /// **'langsamer'**
+  /// **'Langsamer'**
   String get hintSlower;
 
   /// Live display: there is no pace to compare with the band
   ///
   /// In de, this message translates to:
-  /// **'keine Pace'**
+  /// **'Keine Pace'**
   String get hintNoPace;
 
   /// Live display: raise the stroke rate to reach the band
   ///
   /// In de, this message translates to:
-  /// **'mehr Schläge'**
+  /// **'Mehr Schläge'**
   String get hintMoreStrokes;
 
   /// Live display: lower the stroke rate to reach the band
   ///
   /// In de, this message translates to:
-  /// **'weniger Schläge'**
+  /// **'Weniger Schläge'**
   String get hintFewerStrokes;
 
   /// Live display: there is no stroke rate to compare with the band
   ///
   /// In de, this message translates to:
-  /// **'keine Schläge'**
+  /// **'Keine Schläge'**
   String get hintNoStrokes;
 
   /// Simulator: label of the pace the simulator rows
