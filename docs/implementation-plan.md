@@ -22,7 +22,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 5 | `heart-rate` | 9/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 10/13 | in Umsetzung | – |
-| 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
+| 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Domain- und Markenrecherche (Nutzer) |
 | 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
 
 ## Warum diese Reihenfolge
@@ -199,7 +199,7 @@ Entscheide F6–F8 getroffen (Design D4, D5).
 Ziel: Anzeigename, Paket- und App-ID `strokesplit`, Dateiendung `.strokesplit`, Import liest weiter `.aergrow`.
 
 Vor dem Start:
-- [ ] Entscheide F9, F10.
+- [x] Entscheide F9, F10 (2026-10-16): „Stroke & Split“, App-ID `ch.strokesplit`.
 - [ ] Domains sichern, Markenrecherche (Swissreg, EUIPO, USPTO). Ausserhalb der App, durch den Nutzer.
 - [ ] Neue App-ID ist unter Android eine neue App: Umzug per Export/Import im README beschreiben (Task im Change).
 - [ ] Ist `gitlab-pipeline` schon umgesetzt: `APP_NAME` in `.gitlab-ci.yml`, Default in `tool/build_appimage.sh` und `linux/packaging/app.desktop.in` (`Name`, `StartupWMClass`) mit umstellen (Design D9 von `gitlab-pipeline`). Task in `tasks.md` ergänzen.
@@ -226,8 +226,8 @@ Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwech
 | ~~F6~~ | Welcher Abstand steht in der Box: **der zum Ghost der ganzen Vorlage** (2026-10-16) | ghost | entschieden |
 | ~~F7~~ | Einheit des Abstands: **Sekunden auf der Distanzachse, Meter auf der Zeitachse** (2026-10-16) | ghost | entschieden |
 | ~~F8~~ | Schiffchen bei kleinem Abstand: **Ghost rückt nach aussen** (2026-10-16) | ghost | entschieden |
-| F9 | „Stroke & Split“ oder „Stroke and Split“? | rename | rename |
-| F10 | App-ID `ch.strokesplit` oder `ch.<herausgeber>.strokesplit`? | rename | rename |
+| ~~F9~~ | Anzeigename: **„Stroke & Split“** (2026-10-16) | rename | entschieden |
+| ~~F10~~ | App-ID: **`ch.strokesplit`** (2026-10-16) | rename | entschieden |
 | F11 | Live-Display beim Übergang in eine Zone vorwarnen, z.B. „Sprint in 50 m“? (offen aus `zones`) | – (neuer Change) | – |
 | ~~F12~~ | Schritte der Ruderblatt-Tasten auf der Zeitachse: **Strecke 30 s, Zone und Startposition 10 s** (2026-10-16) | ui-design | entschieden |
 | ~~F13~~ | Rückfallsprache: **keine** (2026-10-16), die Sprache wird in der App gewählt (F14) | translations | entschieden |
