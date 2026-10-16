@@ -882,5 +882,128 @@
         "type": "String"
       }
     }
+  },
+  "zonesTitle": "Zonen",
+  "@zonesTitle": {
+    "description": "Zones: title"
+  },
+  "zoneCreateShort": "Zone anlegen",
+  "@zoneCreateShort": {
+    "description": "Zones: button that creates a zone"
+  },
+  "zonesEmpty": "Noch keine Zonen angelegt. Eine Zone ist ein Pace- oder Schlagzahl-Band über eine feste Länge, das du in Strecken einbaust.",
+  "@zonesEmpty": {
+    "description": "Zones: there is no zone, with what a zone is"
+  },
+  "zonesLoadFailed": "Zonen konnten nicht geladen werden: {error}",
+  "@zonesLoadFailed": {
+    "description": "Zones: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneUsage": "{courses, plural, =0{nicht verwendet} =1{in 1 Strecke} other{in {courses} Strecken}}",
+  "@zoneUsage": {
+    "description": "Zones: in how many courses the zone is placed",
+    "placeholders": {
+      "courses": {
+        "type": "int"
+      }
+    }
+  },
+  "zoneNew": "Neue Zone",
+  "@zoneNew": {
+    "description": "Zone editor: title for a new zone"
+  },
+  "zoneEdit": "Zone bearbeiten",
+  "@zoneEdit": {
+    "description": "Zone editor: title for an existing zone"
+  },
+  "zoneDeleteTitle": "Zone löschen?",
+  "@zoneDeleteTitle": {
+    "description": "Zone editor: title of the delete confirmation"
+  },
+  "zoneDeleteBody": "„{name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten den Namen der Zone.",
+  "@zoneDeleteBody": {
+    "description": "Zone editor: delete confirmation; name is the zone",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneDeleteCourses": "In diesen Strecken wird ihre Stelle frei: {courses}.",
+  "@zoneDeleteCourses": {
+    "description": "Zone editor: courses the zone is removed from; courses is a list of quoted names",
+    "placeholders": {
+      "courses": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneInCourses": "Steckt in {courses}",
+  "@zoneInCourses": {
+    "description": "Zone editor: the courses the zone is placed in; courses is a list of quoted names",
+    "placeholders": {
+      "courses": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneInCoursesHint": "Änderungen gelten in allen diesen Strecken. Wurde eine schon gerudert, bekommt sie eine neue Version, alte Sessions bleiben, wie sie waren.",
+  "@zoneInCoursesHint": {
+    "description": "Zone editor: what a change to a placed zone does"
+  },
+  "zoneNameHint": "z.B. Sprint",
+  "@zoneNameHint": {
+    "description": "Zone editor: example of a zone name"
+  },
+  "zonePaceBand": "Pace pro 500 m",
+  "@zonePaceBand": {
+    "description": "Zone editor: heading of the pace band"
+  },
+  "zonePaceFastest": "schnellste",
+  "@zonePaceFastest": {
+    "description": "Zone editor: the fastest pace of the band"
+  },
+  "zonePaceSlowest": "langsamste",
+  "@zonePaceSlowest": {
+    "description": "Zone editor: the slowest pace of the band"
+  },
+  "zoneSpmBand": "Schlagzahl",
+  "@zoneSpmBand": {
+    "description": "Zone editor: heading of the stroke rate band"
+  },
+  "zoneSpmFrom": "ab",
+  "@zoneSpmFrom": {
+    "description": "Zone editor: the lowest stroke rate of the band"
+  },
+  "zoneSpmTo": "bis",
+  "@zoneSpmTo": {
+    "description": "Zone editor: the highest stroke rate of the band"
+  },
+  "zoneBandHint": "Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.",
+  "@zoneBandHint": {
+    "description": "Zone editor: what a zone needs"
+  },
+  "invalidPace": "Die Pace „{text}“ ist ungültig.",
+  "@invalidPace": {
+    "description": "Zone editor: the pace typed cannot be read",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidStrokeRate": "Die Schlagzahl „{text}“ ist ungültig.",
+  "@invalidStrokeRate": {
+    "description": "Zone editor: the stroke rate typed cannot be read",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
   }
 }

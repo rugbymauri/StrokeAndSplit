@@ -1122,6 +1122,138 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Der Start „{text}“ ist ungültig.'**
   String invalidStart(String text);
+
+  /// Zones: title
+  ///
+  /// In de, this message translates to:
+  /// **'Zonen'**
+  String get zonesTitle;
+
+  /// Zones: button that creates a zone
+  ///
+  /// In de, this message translates to:
+  /// **'Zone anlegen'**
+  String get zoneCreateShort;
+
+  /// Zones: there is no zone, with what a zone is
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Zonen angelegt. Eine Zone ist ein Pace- oder Schlagzahl-Band über eine feste Länge, das du in Strecken einbaust.'**
+  String get zonesEmpty;
+
+  /// Zones: loading failed; error is the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Zonen konnten nicht geladen werden: {error}'**
+  String zonesLoadFailed(String error);
+
+  /// Zones: in how many courses the zone is placed
+  ///
+  /// In de, this message translates to:
+  /// **'{courses, plural, =0{nicht verwendet} =1{in 1 Strecke} other{in {courses} Strecken}}'**
+  String zoneUsage(int courses);
+
+  /// Zone editor: title for a new zone
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Zone'**
+  String get zoneNew;
+
+  /// Zone editor: title for an existing zone
+  ///
+  /// In de, this message translates to:
+  /// **'Zone bearbeiten'**
+  String get zoneEdit;
+
+  /// Zone editor: title of the delete confirmation
+  ///
+  /// In de, this message translates to:
+  /// **'Zone löschen?'**
+  String get zoneDeleteTitle;
+
+  /// Zone editor: delete confirmation; name is the zone
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten den Namen der Zone.'**
+  String zoneDeleteBody(String name);
+
+  /// Zone editor: courses the zone is removed from; courses is a list of quoted names
+  ///
+  /// In de, this message translates to:
+  /// **'In diesen Strecken wird ihre Stelle frei: {courses}.'**
+  String zoneDeleteCourses(String courses);
+
+  /// Zone editor: the courses the zone is placed in; courses is a list of quoted names
+  ///
+  /// In de, this message translates to:
+  /// **'Steckt in {courses}'**
+  String zoneInCourses(String courses);
+
+  /// Zone editor: what a change to a placed zone does
+  ///
+  /// In de, this message translates to:
+  /// **'Änderungen gelten in allen diesen Strecken. Wurde eine schon gerudert, bekommt sie eine neue Version, alte Sessions bleiben, wie sie waren.'**
+  String get zoneInCoursesHint;
+
+  /// Zone editor: example of a zone name
+  ///
+  /// In de, this message translates to:
+  /// **'z.B. Sprint'**
+  String get zoneNameHint;
+
+  /// Zone editor: heading of the pace band
+  ///
+  /// In de, this message translates to:
+  /// **'Pace pro 500 m'**
+  String get zonePaceBand;
+
+  /// Zone editor: the fastest pace of the band
+  ///
+  /// In de, this message translates to:
+  /// **'schnellste'**
+  String get zonePaceFastest;
+
+  /// Zone editor: the slowest pace of the band
+  ///
+  /// In de, this message translates to:
+  /// **'langsamste'**
+  String get zonePaceSlowest;
+
+  /// Zone editor: heading of the stroke rate band
+  ///
+  /// In de, this message translates to:
+  /// **'Schlagzahl'**
+  String get zoneSpmBand;
+
+  /// Zone editor: the lowest stroke rate of the band
+  ///
+  /// In de, this message translates to:
+  /// **'ab'**
+  String get zoneSpmFrom;
+
+  /// Zone editor: the highest stroke rate of the band
+  ///
+  /// In de, this message translates to:
+  /// **'bis'**
+  String get zoneSpmTo;
+
+  /// Zone editor: what a zone needs
+  ///
+  /// In de, this message translates to:
+  /// **'Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.'**
+  String get zoneBandHint;
+
+  /// Zone editor: the pace typed cannot be read
+  ///
+  /// In de, this message translates to:
+  /// **'Die Pace „{text}“ ist ungültig.'**
+  String invalidPace(String text);
+
+  /// Zone editor: the stroke rate typed cannot be read
+  ///
+  /// In de, this message translates to:
+  /// **'Die Schlagzahl „{text}“ ist ungültig.'**
+  String invalidStrokeRate(String text);
 }
 
 class _AppLocalizationsDelegate

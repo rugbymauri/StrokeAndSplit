@@ -630,4 +630,94 @@ class AppLocalizationsDe extends AppLocalizations {
   String invalidStart(String text) {
     return 'Der Start „$text“ ist ungültig.';
   }
+
+  @override
+  String get zonesTitle => 'Zonen';
+
+  @override
+  String get zoneCreateShort => 'Zone anlegen';
+
+  @override
+  String get zonesEmpty =>
+      'Noch keine Zonen angelegt. Eine Zone ist ein Pace- oder Schlagzahl-Band über eine feste Länge, das du in Strecken einbaust.';
+
+  @override
+  String zonesLoadFailed(String error) {
+    return 'Zonen konnten nicht geladen werden: $error';
+  }
+
+  @override
+  String zoneUsage(int courses) {
+    String _temp0 = intl.Intl.pluralLogic(
+      courses,
+      locale: localeName,
+      other: 'in $courses Strecken',
+      one: 'in 1 Strecke',
+      zero: 'nicht verwendet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get zoneNew => 'Neue Zone';
+
+  @override
+  String get zoneEdit => 'Zone bearbeiten';
+
+  @override
+  String get zoneDeleteTitle => 'Zone löschen?';
+
+  @override
+  String zoneDeleteBody(String name) {
+    return '„$name“ verschwindet aus der Liste. Bereits geruderte Sessions behalten den Namen der Zone.';
+  }
+
+  @override
+  String zoneDeleteCourses(String courses) {
+    return 'In diesen Strecken wird ihre Stelle frei: $courses.';
+  }
+
+  @override
+  String zoneInCourses(String courses) {
+    return 'Steckt in $courses';
+  }
+
+  @override
+  String get zoneInCoursesHint =>
+      'Änderungen gelten in allen diesen Strecken. Wurde eine schon gerudert, bekommt sie eine neue Version, alte Sessions bleiben, wie sie waren.';
+
+  @override
+  String get zoneNameHint => 'z.B. Sprint';
+
+  @override
+  String get zonePaceBand => 'Pace pro 500 m';
+
+  @override
+  String get zonePaceFastest => 'schnellste';
+
+  @override
+  String get zonePaceSlowest => 'langsamste';
+
+  @override
+  String get zoneSpmBand => 'Schlagzahl';
+
+  @override
+  String get zoneSpmFrom => 'ab';
+
+  @override
+  String get zoneSpmTo => 'bis';
+
+  @override
+  String get zoneBandHint =>
+      'Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.';
+
+  @override
+  String invalidPace(String text) {
+    return 'Die Pace „$text“ ist ungültig.';
+  }
+
+  @override
+  String invalidStrokeRate(String text) {
+    return 'Die Schlagzahl „$text“ ist ungültig.';
+  }
 }

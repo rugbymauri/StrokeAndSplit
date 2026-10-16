@@ -625,4 +625,94 @@ class AppLocalizationsEn extends AppLocalizations {
   String invalidStart(String text) {
     return 'The start “$text” is not valid.';
   }
+
+  @override
+  String get zonesTitle => 'Zones';
+
+  @override
+  String get zoneCreateShort => 'New zone';
+
+  @override
+  String get zonesEmpty =>
+      'No zones yet. A zone is a pace or stroke rate band over a fixed length that you place in courses.';
+
+  @override
+  String zonesLoadFailed(String error) {
+    return 'Zones could not be loaded: $error';
+  }
+
+  @override
+  String zoneUsage(int courses) {
+    String _temp0 = intl.Intl.pluralLogic(
+      courses,
+      locale: localeName,
+      other: 'in $courses courses',
+      one: 'in 1 course',
+      zero: 'not used',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get zoneNew => 'New zone';
+
+  @override
+  String get zoneEdit => 'Edit zone';
+
+  @override
+  String get zoneDeleteTitle => 'Delete zone?';
+
+  @override
+  String zoneDeleteBody(String name) {
+    return '“$name” disappears from the list. Sessions already rowed keep the name of the zone.';
+  }
+
+  @override
+  String zoneDeleteCourses(String courses) {
+    return 'Its place becomes free in these courses: $courses.';
+  }
+
+  @override
+  String zoneInCourses(String courses) {
+    return 'Placed in $courses';
+  }
+
+  @override
+  String get zoneInCoursesHint =>
+      'Changes apply in all these courses. A course already rowed gets a new version, old sessions stay as they were.';
+
+  @override
+  String get zoneNameHint => 'e.g. Sprint';
+
+  @override
+  String get zonePaceBand => 'Pace per 500 m';
+
+  @override
+  String get zonePaceFastest => 'fastest';
+
+  @override
+  String get zonePaceSlowest => 'slowest';
+
+  @override
+  String get zoneSpmBand => 'Stroke rate';
+
+  @override
+  String get zoneSpmFrom => 'from';
+
+  @override
+  String get zoneSpmTo => 'to';
+
+  @override
+  String get zoneBandHint =>
+      'At least one band is needed: pace, stroke rate or both.';
+
+  @override
+  String invalidPace(String text) {
+    return 'The pace “$text” is not valid.';
+  }
+
+  @override
+  String invalidStrokeRate(String text) {
+    return 'The stroke rate “$text” is not valid.';
+  }
 }

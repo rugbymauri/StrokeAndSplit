@@ -29,13 +29,13 @@ class _Setup {
   late final courses = CourseRepository(db);
   late final container = ProviderContainer(overrides: [databaseProvider.overrideWithValue(db)]);
 
-  Future<void> pump(WidgetTester tester) async {
+  Future<void> pump(WidgetTester tester, {Locale locale = const Locale('de')}) async {
     addTearDown(container.dispose);
     tester.view.physicalSize = const Size(1000, 2400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      UncontrolledProviderScope(container: container, child: const LocalizedApp(home: ZonesScreen())),
+      UncontrolledProviderScope(container: container, child: LocalizedApp(locale: locale, home: const ZonesScreen())),
     );
     await settle(tester);
   }
@@ -129,6 +129,19 @@ void main() {
     expect(find.text('The pace band is missing a bound.'), findsOneWidget);
     expect(find.text('The lowest stroke rate is above the highest.'), findsOneWidget);
     expect(await tester.runAsync(setup.zones.all), isEmpty);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('lists the zones in English', (tester) async {
+    final setup = _Setup();
+    await setup.sprintInTwoCourses(tester);
+    await tester.runAsync(() => setup.zones.create(_sprint.copyWith(name: 'Lang', length: 200)));
+    await setup.pump(tester, locale: const Locale('en'));
+
+    expect(find.text('Distance'), findsOneWidget);
+    expect(find.text('in 2 courses'), findsOneWidget);
+    expect(find.text('not used'), findsOneWidget);
+    expect(find.text('New zone'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 
