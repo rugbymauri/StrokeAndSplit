@@ -613,6 +613,12 @@ abstract class AppLocalizations {
   /// **'Beenden'**
   String get liveStopShort;
 
+  /// Live display on a template: notice while the session waits for the first stroke to start
+  ///
+  /// In de, this message translates to:
+  /// **'Bereit – startet mit dem ersten Schlag'**
+  String get liveReadyForFirstStroke;
+
   /// Live display: title of the force curve of the last stroke
   ///
   /// In de, this message translates to:

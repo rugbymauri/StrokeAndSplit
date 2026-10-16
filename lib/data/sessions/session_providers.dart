@@ -9,6 +9,7 @@ import '../db/database.dart';
 import '../sources/erg_source.dart';
 import '../sources/erg_source_providers.dart';
 import '../templates/session_template.dart';
+import 'first_stroke.dart';
 import 'session_accumulator.dart';
 import 'session_repository.dart';
 
@@ -34,11 +35,13 @@ final sessionRrIntervalsProvider = FutureProvider.family<List<RrIntervalRow>, in
   (ref, id) => ref.watch(sessionRepositoryProvider).rrIntervals(id),
 );
 
-/// A session being recorded right now.
+/// A session being recorded right now, or with a template one that is ready
+/// and starts with the first stroke.
 class ActiveRecording {
   const ActiveRecording({required this.sessionId, required this.progress, this.template, this.lap});
 
-  final int sessionId;
+  /// Null while the session is ready but not started; nothing is stored yet.
+  final int? sessionId;
 
   /// Time and distance since the session started.
   final SessionProgress progress;
@@ -48,6 +51,9 @@ class ActiveRecording {
 
   /// Where the session is on the course of [template].
   final LapProgress? lap;
+
+  /// Whether the session waits for the first stroke (start-on-first-stroke, Design D1).
+  bool get ready => sessionId == null;
 }
 
 /// A session that ended by itself after its last lap, until the live
@@ -73,8 +79,12 @@ final sessionRecorderProvider = NotifierProvider<SessionRecorder, ActiveRecordin
 class SessionRecorder extends Notifier<ActiveRecording?> {
   SessionAccumulator? _accumulator;
   StreamSubscription<RawPacket>? _packets;
+  void Function(RawPacket packet)? _onPacket;
   Timer? _flushTimer;
   var _writes = Future<void>.value();
+
+  /// The session being created after the first stroke, see [_begin].
+  Future<void>? _beginning;
 
   @override
   ActiveRecording? build() {
@@ -86,12 +96,33 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
 
   /// Starts a session with the active source; time and distance count from
   /// zero, whatever the PM5 shows at the moment. With a [template] the
-  /// session follows its course and ends by itself after the last lap.
+  /// session is only ready: it starts with the first stroke, follows its
+  /// course and ends by itself after the last lap.
   Future<void> start({SessionTemplate? template}) async {
     if (state != null) return;
     final source = ref.read(activeErgSourceProvider);
     if (source == null) throw StateError('No data source');
+    if (template == null) return _begin(source, null, const []);
 
+    state = ActiveRecording(
+      sessionId: null,
+      progress: const SessionProgress(distanceMeters: 0, elapsed: Duration.zero),
+      template: template,
+      lap: LapTracker(template.course.definition, plannedLaps: template.laps).progress,
+    );
+    final detector = FirstStrokeDetector(source.protocol);
+    List<RawPacket>? early;
+    _listen(source, (packet) {
+      // Packets that arrive while the session is created are added to the early ones.
+      if (early case final early?) return early.add(packet);
+      final first = early = detector.add(packet);
+      if (first != null) _beginning = _begin(source, template, first);
+    });
+  }
+
+  /// Creates the session and records [source] into it, starting with [early]
+  /// packets: the base of the first stroke and what followed (Design D2).
+  Future<void> _begin(ErgSource source, SessionTemplate? template, List<RawPacket> early) async {
     final id = await _repository.create(
       startedAt: clock.now(),
       source: source.kind,
@@ -111,14 +142,26 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
           template: template,
           lap: accumulator.lapProgress,
         );
-    state = current();
-    _packets = source.packets.listen((packet) {
+    void add(RawPacket packet) {
+      // Stopped after the last lap while the early packets are still added.
+      if (_accumulator != accumulator) return;
       accumulator.add(packet);
       // On a course the rest of a time segment runs on while paused.
       if (template != null || accumulator.progress != state?.progress) state = current();
       if (accumulator.lapsFinished) unawaited(_finishAfterLastLap());
-    });
+    }
+
+    state = current();
+    _listen(source, add);
     _flushTimer = Timer.periodic(ref.read(recordingFlushIntervalProvider), (_) => _flush());
+    early.forEach(add);
+  }
+
+  /// Hands the packets of [source] to [onPacket]; one subscription for the
+  /// whole session, so no packet is lost when the session starts.
+  void _listen(ErgSource source, void Function(RawPacket packet) onPacket) {
+    _onPacket = onPacket;
+    _packets ??= source.packets.listen((packet) => _onPacket?.call(packet));
   }
 
   Future<void> _finishAfterLastLap() async {
@@ -128,21 +171,32 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
 
   /// Ends the session, stores its summary and returns its id.
   Future<int?> stop() async {
+    final beginning = _beginning;
+    // After the first stroke the session is kept, even while it is being created.
+    if (beginning != null && (state?.ready ?? false)) await beginning;
+    if (state?.ready ?? false) {
+      // Nothing is stored before the first stroke.
+      _stopListening();
+      state = null;
+      return null;
+    }
     final recording = state;
     final accumulator = _accumulator;
-    if (recording == null || accumulator == null) return null;
+    final id = recording?.sessionId;
+    if (accumulator == null || id == null) return null;
     _stopListening();
-    accumulator.finish();
-    _flush();
-    await _writes;
-    await _repository.finish(recording.sessionId, endedAt: clock.now());
     _accumulator = null;
+    _beginning = null;
+    accumulator.finish();
+    _flush(accumulator);
+    await _writes;
+    await _repository.finish(id, endedAt: clock.now());
     state = null;
-    return recording.sessionId;
+    return id;
   }
 
-  void _flush() {
-    final batch = _accumulator?.takeBatch();
+  void _flush([SessionAccumulator? accumulator]) {
+    final batch = (accumulator ?? _accumulator)?.takeBatch();
     if (batch == null || batch.isEmpty) return;
     final repository = _repository;
     // Chained, so batches are written in order.
@@ -152,6 +206,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
   void _stopListening() {
     _packets?.cancel();
     _packets = null;
+    _onPacket = null;
     _flushTimer?.cancel();
     _flushTimer = null;
   }

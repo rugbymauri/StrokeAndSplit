@@ -49,11 +49,11 @@ void main() {
 
     final recorder = container.read(sessionRecorderProvider.notifier);
     await recorder.start(template: template);
-    final id = container.read(sessionRecorderProvider)!.sessionId;
-    // 100 m at 4 m/s; the session ends by itself after its only lap.
+    // 100 m at 4 m/s; the session starts with the first stroke and ends by itself after its only lap.
     ftmsRowing(seconds: 30).forEach(source.emit);
     await pumpEventQueue();
     expect(container.read(sessionRecorderProvider), isNull);
+    final id = container.read(finishedSessionProvider);
 
     final first = seen.last.single.entries.first;
     expect((first.sessionId, first.durationMs), (id, 25000));

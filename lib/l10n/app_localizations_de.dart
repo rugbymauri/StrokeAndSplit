@@ -337,6 +337,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get liveStopShort => 'Beenden';
 
   @override
+  String get liveReadyForFirstStroke =>
+      'Bereit – startet mit dem ersten Schlag';
+
+  @override
   String get liveForceCurve => 'Kraftkurve';
 
   @override
