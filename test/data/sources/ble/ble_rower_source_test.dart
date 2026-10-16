@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
 
 class _FakeLink implements RowerLink {
   final _notifications = StreamController<(String, List<int>)>.broadcast();
@@ -192,6 +193,59 @@ void main() {
 
       expect(transport.connectAttempts, attempts);
       expect(source.connectionState, ErgConnectionState.disconnected);
+    });
+  });
+
+  group('with an FTMS rower', () {
+    late BleRowerSource ftms;
+
+    setUp(() {
+      ftms = BleRowerSource(transport: transport, device: _ftms);
+      states = [];
+      ftms.connectionStates.listen(states.add);
+    });
+
+    test('is an FTMS source', () {
+      expect((ftms.kind, ftms.protocol, ftms.name), (ErgSourceKind.ftms, ErgProtocol.ftms, 'AergRow FTMS Rower'));
+    });
+
+    test('reconnects without user action after a short drop', () {
+      fakeAsync((async) {
+        final packets = <RawPacket>[];
+        ftms.packets.listen(packets.add);
+        ftms.start();
+        async.flushMicrotasks();
+
+        transport.reachable = false;
+        transport.links.single.drop();
+        async.elapse(const Duration(seconds: 10));
+        expect(ftms.connectionState, ErgConnectionState.reconnecting);
+
+        transport.reachable = true;
+        async.elapse(const Duration(seconds: 3));
+        transport.links.last.notify('2ad1', [0x2c, 0x09]);
+        async.flushMicrotasks();
+
+        expect(ftms.connectionState, ErgConnectionState.connected);
+        expect(packets.single.characteristicId, '2ad1');
+      });
+    });
+
+    test('does not reconnect after a deliberate disconnect', () {
+      fakeAsync((async) {
+        ftms.start();
+        async.flushMicrotasks();
+        final link = transport.links.single;
+
+        ftms.stop();
+        async.flushMicrotasks();
+        link.drop();
+        async.elapse(const Duration(minutes: 1));
+
+        expect(link.disconnected, isTrue);
+        expect(transport.connectAttempts, 1);
+        expect(ftms.connectionState, ErgConnectionState.disconnected);
+      });
     });
   });
 }
