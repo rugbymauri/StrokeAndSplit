@@ -13,34 +13,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'AergRow';
 
   @override
-  String get startFindRower => 'Find rower';
-
-  @override
-  String get startFindRowerHint =>
-      'Connect to your PM5 or FTMS rower over Bluetooth';
-
-  @override
-  String get startSimulator => 'Simulator';
-
-  @override
   String get startSimulatorHint =>
       'Try it without an erg, with a simulated rower';
-
-  @override
-  String get startTemplate => 'Row a template';
-
-  @override
-  String get startTemplateHint =>
-      'Row a course in laps, with zones for pace and stroke rate';
 
   @override
   String get startSessions => 'Sessions';
 
   @override
-  String get startSessionsHint => 'View, replay and share recorded sessions';
+  String get languageChoice => 'Language';
 
   @override
-  String get languageChoice => 'Language';
+  String get startTagline => 'Row against yourself';
+
+  @override
+  String get startRow => 'Row';
+
+  @override
+  String get startRowFree => 'Just row';
+
+  @override
+  String get startNoRower => 'No rower chosen';
+
+  @override
+  String get startConnectsLater => 'Connects when you start rowing';
+
+  @override
+  String get startSimulatorFtmsHint =>
+      'Like an FTMS rower, without stroke details';
+
+  @override
+  String get devicesTitle => 'Choose devices';
+
+  @override
+  String get devicesRower => 'Rower';
+
+  @override
+  String get devicesNext => 'Continue';
+
+  @override
+  String get devicesNotFound => 'not found';
+
+  @override
+  String launchSearching(String device) {
+    return 'Looking for $device …';
+  }
+
+  @override
+  String get startAgain => 'Again';
+
+  @override
+  String startAgainDaysAgo(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days ago',
+      one: 'yesterday',
+      zero: 'today',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get zoneErrorNameMissing => 'The name is missing.';
@@ -171,9 +202,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourceReplay => 'REPLAY';
-
-  @override
-  String get deviceListTitle => 'Find rower';
 
   @override
   String deviceListScanFailed(String detail) {
@@ -512,18 +540,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get courseCreate => 'New course';
-
-  @override
-  String templateRow(String name) {
-    return 'Row “$name”';
-  }
-
-  @override
-  String get templateSimulatorFtms => 'Simulator (FTMS)';
-
-  @override
-  String get templateSimulatorFtmsHint =>
-      'Like an FTMS rower, without stroke details';
 
   @override
   String get templateDeleteTitle => 'Delete template?';

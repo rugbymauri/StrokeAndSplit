@@ -4,41 +4,79 @@
   "@appTitle": {
     "description": "Name of the app, e.g. in the task switcher."
   },
-  "startFindRower": "Rudergerät suchen",
-  "@startFindRower": {
-    "description": "Start screen: option that searches for a PM5 or FTMS rower over Bluetooth."
-  },
-  "startFindRowerHint": "Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden",
-  "@startFindRowerHint": {
-    "description": "Start screen: explanation below 'Find rower'."
-  },
-  "startSimulator": "Simulator",
-  "@startSimulator": {
-    "description": "Start screen: option that rows with the built-in simulator."
-  },
   "startSimulatorHint": "Ohne Erg ausprobieren, mit simuliertem Ruderer",
   "@startSimulatorHint": {
-    "description": "Start screen: explanation below 'Simulator'."
-  },
-  "startTemplate": "Vorlage rudern",
-  "@startTemplate": {
-    "description": "Start screen: option that opens templates, courses and zones."
-  },
-  "startTemplateHint": "Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl",
-  "@startTemplateHint": {
-    "description": "Start screen: explanation below 'Row a template'."
+    "description": "Choose devices and start screen: explanation below 'Simulator'"
   },
   "startSessions": "Sessions",
   "@startSessions": {
     "description": "Start screen: option that opens the recorded sessions."
   },
-  "startSessionsHint": "Aufgezeichnete Sessions ansehen, abspielen und austauschen",
-  "@startSessionsHint": {
-    "description": "Start screen: explanation below 'Sessions'."
-  },
   "languageChoice": "Sprache",
   "@languageChoice": {
     "description": "Tooltip of the language button and title of the language dialog."
+  },
+  "startTagline": "Gegen dich selbst rudern",
+  "@startTagline": {
+    "description": "Start screen: line below the name of the app"
+  },
+  "startRow": "Rudern",
+  "@startRow": {
+    "description": "Start screen: button that opens the templates to pick one"
+  },
+  "startRowFree": "Frei rudern",
+  "@startRowFree": {
+    "description": "Start screen: button that starts rowing without a template"
+  },
+  "startNoRower": "Kein Rudergerät gewählt",
+  "@startNoRower": {
+    "description": "Start screen: device row before a rower is chosen"
+  },
+  "startConnectsLater": "Verbindet beim Start",
+  "@startConnectsLater": {
+    "description": "Start screen: device row, the chosen rower is not connected right now"
+  },
+  "startSimulatorFtmsHint": "Wie ein FTMS-Rudergerät, ohne Schlagdetails",
+  "@startSimulatorFtmsHint": {
+    "description": "Choose devices and start screen: explanation below 'Simulator (FTMS)'"
+  },
+  "devicesTitle": "Geräte wählen",
+  "@devicesTitle": {
+    "description": "Title of the first screen, where the rower is chosen; also the link to it"
+  },
+  "devicesRower": "Rudergerät",
+  "@devicesRower": {
+    "description": "Choose devices: label above the rowers and simulators"
+  },
+  "devicesNext": "Weiter",
+  "@devicesNext": {
+    "description": "Choose devices: button that connects the chosen rower and opens the start screen"
+  },
+  "devicesNotFound": "nicht gefunden",
+  "@devicesNotFound": {
+    "description": "Choose devices: the rower chosen last is not in range"
+  },
+  "launchSearching": "Suche {device} …",
+  "@launchSearching": {
+    "description": "Shown at the start while the rower chosen last is searched; device is its name",
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "startAgain": "Nochmal",
+  "@startAgain": {
+    "description": "Start screen: label above the tile with the template of the newest session"
+  },
+  "startAgainDaysAgo": "{days, plural, =0{heute} =1{gestern} other{vor {days} Tagen}}",
+  "@startAgainDaysAgo": {
+    "description": "Start screen, tile 'Again': when the session was rowed; days is the number of days since, below a week",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
   },
   "zoneErrorNameMissing": "Der Name fehlt.",
   "@zoneErrorNameMissing": {
@@ -223,10 +261,6 @@
   "sourceReplay": "REPLAY",
   "@sourceReplay": {
     "description": "Badge while a recorded session is played back"
-  },
-  "deviceListTitle": "Rudergerät suchen",
-  "@deviceListTitle": {
-    "description": "Device list: title"
   },
   "deviceListScanFailed": "Die Suche nach Rudergeräten ist fehlgeschlagen.\n\n{detail}",
   "@deviceListScanFailed": {
@@ -704,23 +738,6 @@
   "courseCreate": "Strecke anlegen",
   "@courseCreate": {
     "description": "Button that creates a course"
-  },
-  "templateRow": "„{name}“ rudern",
-  "@templateRow": {
-    "description": "Templates: title of the dialog that picks the source; name is the template",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "templateSimulatorFtms": "Simulator (FTMS)",
-  "@templateSimulatorFtms": {
-    "description": "Templates: source that simulates an FTMS rower"
-  },
-  "templateSimulatorFtmsHint": "Wie ein FTMS-Rudergerät, ohne Schlagdetails",
-  "@templateSimulatorFtmsHint": {
-    "description": "Templates: what the FTMS simulator leaves out"
   },
   "templateDeleteTitle": "Vorlage löschen?",
   "@templateDeleteTitle": {
