@@ -34,7 +34,7 @@ Alles, was die Ranglisten brauchen, wird seit `courses` und `zones` schon gespei
 
 ### D1: Berechnen statt speichern
 
-Ranglisten werden bei jeder Anzeige per Abfrage aus den gespeicherten Sessions berechnet und nicht in einer eigenen Tabelle abgelegt. So bleiben sie ohne Nachführen richtig, wenn Sessions gelöscht, importiert oder nach einem Absturz wiederhergestellt werden, und es braucht keinen Schema-Wechsel. Die Abfragen laufen als beobachtete Streams wie die übrigen Listen, damit eine neue Session sofort erscheint.
+Ranglisten werden bei jeder Anzeige per Abfrage aus den gespeicherten Sessions berechnet und nicht in einer eigenen Tabelle abgelegt. So bleiben sie ohne Nachführen richtig, wenn Sessions gelöscht, importiert oder nach einem Absturz wiederhergestellt werden, und es braucht keine eigene Tabelle. Der einzige Schema-Wechsel ist die Markierung importierter Sessions (D3, Schema 5). Die Abfragen laufen als beobachtete Streams wie die übrigen Listen, damit eine neue Session sofort erscheint.
 
 Alternative: eine Tabelle mit Bestleistungen, die beim Beenden einer Session nachgeführt wird. Verworfen, weil jeder Löschpfad (Session, Strecke, Zone, Vorlage) und der Import sie ebenfalls nachführen müssten.
 
@@ -55,7 +55,9 @@ Zeigt sich am Gerät, dass die Abfragen zu langsam sind, kommt ein Index auf `la
 
 ### D3: Was zählt
 
-- Nur Sessions mit der Quelle `pm5` oder `ftms`. `simulator` und `replay` zählen nicht. Importierte Sessions behalten ihre Quelle und zählen, wenn sie an einem Rudergerät entstanden sind.
+- Nur Sessions mit der Quelle `pm5` oder `ftms`. `simulator` und `replay` zählen nicht.
+- Importierte Sessions zählen nie, auch wenn sie an einem Rudergerät entstanden sind. Sie behalten ihre Quelle, der Import setzt die neue Spalte `sessions.imported` (bool, Default `false`, `schemaVersion` 5). Die Migration markiert bestehende Sessions als nicht importiert, denn vor Schema 5 lässt sich ein Import nicht mehr erkennen. So bleiben die Ranglisten bei den Sessions, die auf diesem Gerät gerudert wurden, und eine Kopie derselben Session über Export und Import erscheint nie doppelt.
+- Alternative: importierte Sessions an der Quelle erkennen, z. B. mit einer eigenen Quelle `import`. Verworfen, weil die Quelle für Anzeige und Rohdaten-Dekodierung gebraucht wird.
 - Gelöschte Strecken, Zonen und Vorlagen haben keine Rangliste. Ihre Sessions bleiben unverändert.
 - Jede Fahrt ist ein eigener Eintrag. Alle drei Plätze dürfen aus derselben Session stammen.
 - Bei Gleichstand liegt der frühere Eintrag vorne. Wer eine Zeit zuerst gerudert hat, behält den Platz.

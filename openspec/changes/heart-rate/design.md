@@ -117,7 +117,7 @@ Der Spike sucht zusätzlich nach `0x180D`, verbindet optional einen Gurt und sch
 - [Gurt erlaubt nur eine oder zwei BLE-Verbindungen und hängt schon an Uhr oder PM5] → klare Fehlermeldung (Spec heart-rate-monitor), der Rückfall auf den PM5-Puls greift.
 - [Zwei BLE-Verbindungen gleichzeitig belasten schwache Adapter, z.B. unter Linux/BlueZ] → Gurt erst nach stabiler PM5-Verbindung verbinden, am echten Gerät auf Linux und Android verifizieren.
 - [RR-Artefakte durch Bewegung beim Rudern verfälschen RMSSD] → als Non-Goal akzeptiert. Die Rohdaten bleiben erhalten, eine spätere Filterung kann alle Sessions neu berechnen.
-- [`device-types` erhöht `schemaVersion` ebenfalls, von 3 auf 4] → `heart-rate` kommt danach, hebt auf 5 und erzeugt Snapshot und Migrationstest auf dem Stand von `device-types`.
+- [`device-types` erhöht `schemaVersion` von 3 auf 4, `statistics` von 4 auf 5 (Markierung importierter Sessions)] → `heart-rate` kommt danach, hebt auf 6 und erzeugt Snapshot und Migrationstest auf dem Stand von `statistics`.
 - [Alte App-Version importiert eine Datei mit `2a37`] → Pakete werden mit Warnung verworfen, der PM5-Teil bleibt korrekt.
 
 ## Migration Plan
