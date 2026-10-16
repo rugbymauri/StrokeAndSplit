@@ -148,7 +148,12 @@ void main() {
     expect(strokes, isNotEmpty);
     expect(strokes.every((s) => s.driveTimeMs == null), isTrue);
 
-    await container.read(activeErgSourceProvider.notifier).clear();
+    // Done leads back to the start screen and ends the connection.
+    await tester.tap(find.text('Fertig'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SessionSummaryScreen), findsNothing);
+    expect(find.byType(StartScreen), findsOneWidget);
+    expect(container.read(activeErgSourceProvider), isNull);
     await disposeWidgetsWithDatabase(tester);
   });
 }

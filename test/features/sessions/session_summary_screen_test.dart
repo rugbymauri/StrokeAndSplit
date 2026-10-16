@@ -112,9 +112,9 @@ void main() {
     expect(find.text('Simulator'), findsOneWidget);
     expect(find.text('14:15'), findsOneWidget);
     expect(find.text('3400 m'), findsOneWidget);
-    expect(find.text('In der Zone'), findsOneWidget);
-    // Weighted by the duration of the laps: (252 × 0.9 + 248 × 0.8 + 255 × 0.6 + 100 × 0.5) / 855.
-    expect(find.text('73 %'), findsOneWidget);
+    // No share in the zone for the whole session, only per lap.
+    expect(find.text('In der Zone'), findsNothing);
+    expect(find.text('73 %'), findsNothing);
     expect(find.text('RUNDEN'), findsOneWidget);
     expect(find.text('Balken: Anteil in der Zone pro Runde'), findsOneWidget);
 
@@ -143,7 +143,7 @@ void main() {
     expect(find.text('16.10.2026, 07:00 · 3 × 4:00'), findsOneWidget);
     expect(find.text('12:00'), findsOneWidget);
     expect(find.text('3040 m'), findsOneWidget);
-    expect(find.text('75 %'), findsOneWidget);
+    expect(find.text('75 %'), findsNothing);
     expect(_lap(tester, const Key('lap-1')), '1012 m');
     expect(_lap(tester, const Key('lap-best')), '1030 m');
     expect(_lap(tester, const Key('lap-3')), '998 m');
@@ -214,7 +214,7 @@ void main() {
 
     expect(find.text('Session finished'), findsOneWidget);
     expect(find.text('Simulator'), findsOneWidget);
-    for (final label in ['Time', 'Distance', 'In the zone', 'LAPS', 'Bar: share in the zone per lap']) {
+    for (final label in ['Time', 'Distance', 'LAPS', 'Bar: share in the zone per lap']) {
       expect(find.text(label), findsOneWidget, reason: label);
     }
     expect(_caption(tester, const Key('lap-2')), 'incomplete · 1:40.0');

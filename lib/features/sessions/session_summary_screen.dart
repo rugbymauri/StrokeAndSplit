@@ -18,6 +18,13 @@ class SessionSummaryScreen extends ConsumerWidget {
 
   final int sessionId;
 
+  /// Opens the summary right after rowing; "done" then returns true, so the
+  /// live display goes back to the start screen.
+  static Future<bool> showAfterSession(BuildContext context, int sessionId) async =>
+      await Navigator.of(context)
+          .push<bool>(MaterialPageRoute(builder: (_) => SessionSummaryScreen(sessionId: sessionId))) ??
+      false;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(sessionProvider(sessionId));
@@ -60,21 +67,6 @@ String sessionSourceLabel(AppLocalizations l10n, SessionRow session) => switch (
       ErgSourceKind.replay => l10n.sourceReplayName,
     };
 
-/// Share of time within the bands over all [laps], each lap weighted by its
-/// duration; null without bands.
-double? sessionInZoneShare(List<LapRow> laps) {
-  var inZoneMs = 0.0;
-  var bandMs = 0;
-  for (final lap in laps) {
-    final share = lap.inZoneShare;
-    if (share == null) continue;
-    final duration = lap.endWallMs - lap.startWallMs;
-    inZoneMs += share * duration;
-    bandMs += duration;
-  }
-  return bandMs > 0 ? inZoneMs / bandMs : null;
-}
-
 class _Summary extends ConsumerWidget {
   const _Summary({required this.session});
 
@@ -86,7 +78,6 @@ class _Summary extends ConsumerWidget {
     final versionId = session.courseVersionId;
     final course = versionId == null ? null : ref.watch(courseVersionProvider(versionId)).value;
     final laps = versionId == null ? const <LapRow>[] : ref.watch(sessionLapsProvider(session.id)).value ?? const [];
-    final inZone = sessionInZoneShare(laps);
 
     return Center(
       child: ConstrainedBox(
@@ -110,7 +101,7 @@ class _Summary extends ConsumerWidget {
                       child: Text(l10n.sessionIncompleteNote, style: const TextStyle(color: AppColors.zoneOut)),
                     ),
                   const SizedBox(height: AppSpacing.xl),
-                  _Totals(session: session, inZone: inZone),
+                  _Totals(session: session),
                   if (course != null && laps.isNotEmpty) ...[
                     const SizedBox(height: AppSpacing.xl),
                     _Laps(laps: laps, byTime: course.axis == CourseAxis.distance),
@@ -142,7 +133,7 @@ class _Summary extends ConsumerWidget {
                     Expanded(
                       child: FilledButton(
                         style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56), shape: _buttonShape),
-                        onPressed: () => Navigator.of(context).maybePop(),
+                        onPressed: () => Navigator.of(context).maybePop(true),
                         child: Text(l10n.actionDone),
                       ),
                     ),
@@ -205,19 +196,16 @@ class _Header extends StatelessWidget {
 
 /// Time, distance and, with bands, the share in the zone.
 class _Totals extends StatelessWidget {
-  const _Totals({required this.session, required this.inZone});
+  const _Totals({required this.session});
 
   final SessionRow session;
-  final double? inZone;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final inZone = this.inZone;
     final tiles = [
       _Tile(label: l10n.sessionTime, value: formatElapsed(Duration(milliseconds: session.durationMs))),
       _Tile(label: l10n.sessionDistance, value: '${session.distanceDm ~/ 10}', unit: 'm'),
-      if (inZone != null) _Tile(label: l10n.summaryInZone, value: '${(inZone * 100).round()}', unit: '%'),
     ];
     return IntrinsicHeight(
       child: Row(

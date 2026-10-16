@@ -114,7 +114,6 @@
   "sessionStrokes": "Strokes",
   "sessionLap": "Lap {lap}",
   "summaryTitle": "Session finished",
-  "summaryInZone": "In the zone",
   "summaryLaps": "Laps",
   "summaryLapBarHint": "Bar: share in the zone per lap",
   "summaryBestLap": "Best lap",
