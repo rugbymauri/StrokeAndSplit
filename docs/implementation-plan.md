@@ -19,7 +19,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones` un
 | 2 | `ui-design` | 0/18 | nach 1 | Entscheid Puls-Herkunft (F1) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
-| 5 | `statistics` | – (keine Tasks) | ja, nach Tasks | `tasks.md` (`/opsx:continue statistics`) |
+| 5 | `statistics` | 0/12 | Gruppe 1 jederzeit, Rest nach 2 | – |
 | 6 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 2 und 5 |
 | 7 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 
@@ -105,11 +105,11 @@ Offene Entscheide: F3, F4.
 Ziel: Plätze 1–3 jeder Vorlage, Strecke und Zone. Gewertet wird die Zeit (Distanzachse) bzw. die Meter (Zeitachse) nach Wanduhr inklusive Pausen, dazu Pace und Datum. Anzeige in der Vorlagenwahl, in einer neuen Detailansicht von Strecke und Zone und als Marke in der Zusammenfassung. Proposal, Design und Spec stehen (2026-10-16), Entscheide in Design D2–D6.
 
 Vor dem Start:
-- [ ] `tasks.md` erstellen (`/opsx:continue statistics`).
-- [ ] Reihenfolge zu `ui-design` festlegen. Kommt `statistics` zuerst, übernimmt `ui-design` die Plätze in Vorlagenwahl, Detailansicht und Zusammenfassung (Design D6).
+- [x] `tasks.md` erstellt (2026-10-16), 12 Tasks in 5 Gruppen.
+- [x] Reihenfolge entschieden (2026-10-16): **nach `ui-design`**. Vorlagenwahl (`ui-design` 4.1), Strecken-/Zonenliste (4.3) und Zusammenfassung (5.2) werden dort neu gestaltet. Würden die Plätze vorher eingebaut, müsste man sie zweimal gestalten. Gruppe 1 (Ranglisten berechnen) hängt an nichts Offenem und darf vorgezogen werden.
 
 Bei der Umsetzung mitnehmen:
-- Kein Schema-Wechsel geplant (Design D1). Erst messen, dann bei Bedarf einen Index auf `laps`/`lap_segments` ergänzen.
+- Kein Schema-Wechsel geplant (Design D1). Task 1.6 misst. Braucht es einen Index, erhöht dessen Migration das Schema; die Nummer mit `heart-rate` (Schema 5) abstimmen.
 - Gezählt werden nur die Quellen `pm5` und `ftms`, nicht `simulator` und `replay` (Design D3).
 
 ### 6. `ghost`: gegen die eigene Bestzeit rudern
