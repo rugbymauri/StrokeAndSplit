@@ -201,5 +201,12 @@
   "oarStepperMore": "{step} more",
   "oarStepperLess": "{step} less",
   "stepSeconds": "{seconds, plural, =1{1 second} other{{seconds} seconds}}",
-  "stepStrokes": "{strokes, plural, =1{1 stroke} other{{strokes} strokes}}"
+  "stepStrokes": "{strokes, plural, =1{1 stroke} other{{strokes} strokes}}",
+  "fieldAxis": "Axis",
+  "fieldLengthPlain": "Length",
+  "courseZonesSummary": "{count, plural, =0{no zones} =1{zone {name}} other{{count} zones}}",
+  "courseRowedCount": "{count, plural, =0{never rowed} =1{rowed once} other{rowed {count}×}}",
+  "courseLegendShade": "Brighter = faster",
+  "courseZoneFrom": "from {start}",
+  "courseVersionHint": "{count, plural, =1{Rowed once.} other{Rowed {count}×.}} Changing the length or zones creates a new version. Earlier lap times stay comparable."
 }

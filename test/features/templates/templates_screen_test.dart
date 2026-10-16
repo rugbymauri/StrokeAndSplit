@@ -367,7 +367,7 @@ void main() {
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
 
-      expect(find.text('2000 m · Sprint, Ausdauer'), findsOneWidget);
+      expect(find.text('Distanz · 2 Zonen · noch nie gerudert'), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
 

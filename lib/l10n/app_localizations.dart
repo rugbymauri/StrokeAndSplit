@@ -1314,6 +1314,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{strokes, plural, =1{1 Schlag} other{{strokes} Schläge}}'**
   String stepStrokes(int strokes);
+
+  /// Label of the axis of a course: distance or time
+  ///
+  /// In de, this message translates to:
+  /// **'Achse'**
+  String get fieldAxis;
+
+  /// Label above the length of a course, written in capitals
+  ///
+  /// In de, this message translates to:
+  /// **'Länge'**
+  String get fieldLengthPlain;
+
+  /// Course list: the zones placed in a course; name is the zone when there is only one
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{ohne Zonen} =1{Zone {name}} other{{count} Zonen}}'**
+  String courseZonesSummary(int count, String name);
+
+  /// Course list: how often a course was rowed in sessions
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{noch nie gerudert} other{{count}× gerudert}}'**
+  String courseRowedCount(int count);
+
+  /// Course list: legend saying that brighter zones in the bar have a faster pace band
+  ///
+  /// In de, this message translates to:
+  /// **'Helligkeit = Tempo'**
+  String get courseLegendShade;
+
+  /// Course editor: where a placed zone starts, e.g. 'ab 500 m'
+  ///
+  /// In de, this message translates to:
+  /// **'ab {start}'**
+  String courseZoneFrom(String start);
+
+  /// Course editor: hint that changing a course already rowed in its newest version stores a new version
+  ///
+  /// In de, this message translates to:
+  /// **'{count}× gerudert. Änderst du Länge oder Zonen, entsteht eine neue Version. Alte Rundenzeiten bleiben vergleichbar.'**
+  String courseVersionHint(int count);
 }
 
 class _AppLocalizationsDelegate

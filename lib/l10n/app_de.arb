@@ -1060,5 +1060,58 @@
         "type": "int"
       }
     }
+  },
+  "fieldAxis": "Achse",
+  "@fieldAxis": {
+    "description": "Label of the axis of a course: distance or time"
+  },
+  "fieldLengthPlain": "Länge",
+  "@fieldLengthPlain": {
+    "description": "Label above the length of a course, written in capitals"
+  },
+  "courseZonesSummary": "{count, plural, =0{ohne Zonen} =1{Zone {name}} other{{count} Zonen}}",
+  "@courseZonesSummary": {
+    "description": "Course list: the zones placed in a course; name is the zone when there is only one",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String",
+        "example": "Tempo"
+      }
+    }
+  },
+  "courseRowedCount": "{count, plural, =0{noch nie gerudert} other{{count}× gerudert}}",
+  "@courseRowedCount": {
+    "description": "Course list: how often a course was rowed in sessions",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "courseLegendShade": "Helligkeit = Tempo",
+  "@courseLegendShade": {
+    "description": "Course list: legend saying that brighter zones in the bar have a faster pace band"
+  },
+  "courseZoneFrom": "ab {start}",
+  "@courseZoneFrom": {
+    "description": "Course editor: where a placed zone starts, e.g. 'ab 500 m'",
+    "placeholders": {
+      "start": {
+        "type": "String",
+        "example": "500 m"
+      }
+    }
+  },
+  "courseVersionHint": "{count}× gerudert. Änderst du Länge oder Zonen, entsteht eine neue Version. Alte Rundenzeiten bleiben vergleichbar.",
+  "@courseVersionHint": {
+    "description": "Course editor: hint that changing a course already rowed in its newest version stores a new version",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

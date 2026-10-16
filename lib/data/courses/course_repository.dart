@@ -5,6 +5,9 @@ import '../db/database.dart';
 import '../db/watch.dart';
 import 'course.dart';
 
+/// How often a course was rowed: in all its versions and in the newest one.
+typedef CourseRowCount = ({int total, int newest});
+
 /// Stores courses with their versions (Design D4).
 class CourseRepository {
   CourseRepository(this._db);
@@ -98,6 +101,39 @@ class CourseRepository {
       await _insertSegments(course.versionId, definition);
     });
   }
+
+  /// How often each course was rowed, by course id; a course never rowed is missing.
+  Future<Map<int, CourseRowCount>> rowCounts() async {
+    final versions = _db.courseVersions;
+    final newest = versions.version.max();
+    final newestRows = await (_db.selectOnly(versions)
+          ..addColumns([versions.courseId, newest])
+          ..groupBy([versions.courseId]))
+        .get();
+    final newestVersion = {for (final row in newestRows) row.read(versions.courseId)!: row.read(newest)!};
+
+    final sessions = _db.sessions.id.count();
+    final rows = await (_db.selectOnly(_db.sessions).join([
+      innerJoin(versions, versions.id.equalsExp(_db.sessions.courseVersionId)),
+    ])
+          ..addColumns([versions.courseId, versions.version, sessions])
+          ..groupBy([versions.id]))
+        .get();
+    final counts = <int, CourseRowCount>{};
+    for (final row in rows) {
+      final courseId = row.read(versions.courseId)!;
+      final count = row.read(sessions)!;
+      final before = counts[courseId] ?? (total: 0, newest: 0);
+      counts[courseId] = (
+        total: before.total + count,
+        newest: row.read(versions.version) == newestVersion[courseId] ? count : before.newest,
+      );
+    }
+    return counts;
+  }
+
+  Stream<Map<int, CourseRowCount>> watchRowCounts() =>
+      _db.watchTables([_db.sessions, _db.courseVersions], rowCounts);
 
   /// Names of the templates that row this course.
   Future<List<String>> templatesUsing(int id) async {
