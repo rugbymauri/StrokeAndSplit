@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
+import '../../l10n/l10n.dart';
 import 'course_editor_screen.dart';
 import 'course_strip.dart';
 
@@ -16,22 +17,23 @@ class CoursesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final courses = ref.watch(coursesProvider);
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: embedded ? null : AppBar(title: const Text('Strecken')),
+      appBar: embedded ? null : AppBar(title: Text(l10n.coursesTitle)),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'courses',
         onPressed: () => openCourseEditor(context),
         icon: const Icon(Icons.add),
-        label: const Text('Strecke anlegen'),
+        label: Text(l10n.courseCreate),
       ),
       body: switch (courses) {
-        AsyncData(value: []) => const Center(child: Text('Noch keine Strecken angelegt.')),
+        AsyncData(value: []) => Center(child: Text(l10n.coursesEmpty)),
         AsyncData(:final value) => ListView.builder(
             padding: const EdgeInsets.only(bottom: 88),
             itemCount: value.length,
             itemBuilder: (context, i) => _CourseTile(course: value[i]),
           ),
-        AsyncError(:final error) => Center(child: Text('Strecken konnten nicht geladen werden: $error')),
+        AsyncError(:final error) => Center(child: Text(l10n.coursesLoadFailed('$error'))),
         _ => const Center(child: CircularProgressIndicator()),
       },
     );
@@ -43,10 +45,10 @@ Future<void> openCourseEditor(BuildContext context, {Course? course}) {
 }
 
 /// `2000 m · Sprint, Ausdauer 2:30`, or `1000 m · frei` without zones.
-String courseSummary(Course course) {
+String courseSummary(AppLocalizations l10n, Course course) {
   final zones = {for (final s in course.definition.segments) ?s.zoneName};
   return '${formatCourseLength(course.axis, course.definition.length)} · '
-      '${zones.isEmpty ? 'frei' : zones.join(', ')}';
+      '${zones.isEmpty ? l10n.segmentFree : zones.join(', ')}';
 }
 
 class _CourseTile extends ConsumerWidget {
@@ -56,20 +58,21 @@ class _CourseTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     return ListTile(
       leading: Icon(course.axis == CourseAxis.distance ? Icons.straighten : Icons.timer_outlined),
       title: Text(course.name),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(courseSummary(course)),
+          Text(courseSummary(l10n, course)),
           const SizedBox(height: 6),
           CourseStrip(definition: course.definition, height: 6),
         ],
       ),
       onTap: () => openCourseEditor(context, course: course),
       trailing: IconButton(
-        tooltip: 'Löschen',
+        tooltip: l10n.actionDelete,
         icon: const Icon(Icons.delete_outline),
         onPressed: () => _delete(context, ref),
       ),
@@ -82,18 +85,20 @@ class _CourseTile extends ConsumerWidget {
     if (!context.mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Strecke löschen?'),
-        content: Text([
-          '„${course.name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten ihre Runden.',
-          if (templates.isNotEmpty)
-            'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: ${templates.map((t) => '„$t“').join(', ')}.',
-        ].join('\n\n')),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Abbrechen')),
-          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Löschen')),
-        ],
-      ),
+      builder: (context) {
+        final l10n = context.l10n;
+        return AlertDialog(
+          title: Text(l10n.courseDeleteTitle),
+          content: Text([
+            l10n.courseDeleteBody(course.name),
+            if (templates.isNotEmpty) l10n.courseDeleteTemplates(l10n.quotedNames(templates)),
+          ].join('\n\n')),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.actionCancel)),
+            FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.actionDelete)),
+          ],
+        );
+      },
     );
     if (confirmed == true) await repository.delete(course.id);
   }

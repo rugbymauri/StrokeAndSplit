@@ -2,6 +2,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/sources/simulated_source.dart';
+import '../../l10n/l10n.dart';
 import '../live/formatters.dart';
 
 /// Target pace, stroke rate, pause and protocol for the simulated rower.
@@ -41,6 +42,7 @@ class _SimulatorControlsState extends State<SimulatorControls> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8),
@@ -51,20 +53,20 @@ class _SimulatorControlsState extends State<SimulatorControls> {
           runSpacing: 8,
           children: [
             _Stepper(
-              label: 'Ziel-Pace',
+              label: l10n.simTargetPace,
               value: formatPace(_source.targetPace),
               onDecrease: () => _changePace(-_paceStep),
               onIncrease: () => _changePace(_paceStep),
-              decreaseTooltip: 'Schneller',
-              increaseTooltip: 'Langsamer',
+              decreaseTooltip: l10n.simFaster,
+              increaseTooltip: l10n.simSlower,
             ),
             _Stepper(
-              label: 'Ziel-SPM',
+              label: l10n.simTargetStrokeRate,
               value: '${_source.targetStrokeRate}',
               onDecrease: () => _changeStrokeRate(-1),
               onIncrease: () => _changeStrokeRate(1),
-              decreaseTooltip: 'Weniger Schläge',
-              increaseTooltip: 'Mehr Schläge',
+              decreaseTooltip: l10n.simFewerStrokes,
+              increaseTooltip: l10n.simMoreStrokes,
             ),
             SegmentedButton<ErgProtocol>(
               key: const Key('sim-protocol'),
@@ -82,7 +84,7 @@ class _SimulatorControlsState extends State<SimulatorControls> {
             FilledButton.tonalIcon(
               onPressed: _togglePause,
               icon: Icon(_source.isPaused ? Icons.play_arrow : Icons.pause),
-              label: Text(_source.isPaused ? 'Weiterrudern' : 'Pause'),
+              label: Text(_source.isPaused ? l10n.simResume : l10n.simPause),
             ),
           ],
         ),

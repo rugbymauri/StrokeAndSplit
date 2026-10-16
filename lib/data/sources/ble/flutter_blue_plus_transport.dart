@@ -110,7 +110,7 @@ class FlutterBluePlusTransport implements BleTransport {
       });
     } catch (e) {
       await device.disconnect();
-      throw RowerConnectException('$e');
+      throw RowerConnectException(RowerConnectError.failed, message: '$e');
     }
     return setUpRower(connection, found, onWarning: (message) => debugPrint('${found.protocol.name}: $message'));
   }

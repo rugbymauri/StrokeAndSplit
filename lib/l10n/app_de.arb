@@ -1,0 +1,1017 @@
+{
+  "@@locale": "de",
+  "appTitle": "AergRow",
+  "@appTitle": {
+    "description": "Name of the app, e.g. in the task switcher."
+  },
+  "startFindRower": "Rudergerät suchen",
+  "@startFindRower": {
+    "description": "Start screen: option that searches for a PM5 or FTMS rower over Bluetooth."
+  },
+  "startFindRowerHint": "Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden",
+  "@startFindRowerHint": {
+    "description": "Start screen: explanation below 'Find rower'."
+  },
+  "startSimulator": "Simulator",
+  "@startSimulator": {
+    "description": "Start screen: option that rows with the built-in simulator."
+  },
+  "startSimulatorHint": "Ohne Erg ausprobieren, mit simuliertem Ruderer",
+  "@startSimulatorHint": {
+    "description": "Start screen: explanation below 'Simulator'."
+  },
+  "startTemplate": "Vorlage rudern",
+  "@startTemplate": {
+    "description": "Start screen: option that opens templates, courses and zones."
+  },
+  "startTemplateHint": "Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl",
+  "@startTemplateHint": {
+    "description": "Start screen: explanation below 'Row a template'."
+  },
+  "startSessions": "Sessions",
+  "@startSessions": {
+    "description": "Start screen: option that opens the recorded sessions."
+  },
+  "startSessionsHint": "Aufgezeichnete Sessions ansehen, abspielen und austauschen",
+  "@startSessionsHint": {
+    "description": "Start screen: explanation below 'Sessions'."
+  },
+  "languageChoice": "Sprache",
+  "@languageChoice": {
+    "description": "Tooltip of the language button and title of the language dialog."
+  },
+  "zoneErrorNameMissing": "Der Name fehlt.",
+  "@zoneErrorNameMissing": {
+    "description": "Zone editor: the zone has no name"
+  },
+  "zoneErrorLengthMissing": "Die Länge fehlt.",
+  "@zoneErrorLengthMissing": {
+    "description": "Zone editor: the zone has no length"
+  },
+  "zoneErrorBandMissing": "Es fehlt ein Band: Pace, Schlagzahl oder beides.",
+  "@zoneErrorBandMissing": {
+    "description": "Zone editor: neither a pace nor a stroke rate band is set"
+  },
+  "zoneErrorPaceBoundMissing": "Für das Pace-Band fehlt eine Grenze.",
+  "@zoneErrorPaceBoundMissing": {
+    "description": "Zone editor: only one bound of the pace band is set"
+  },
+  "zoneErrorPaceReversed": "Die schnellste Pace ist langsamer als die langsamste.",
+  "@zoneErrorPaceReversed": {
+    "description": "Zone editor: the pace bounds are the wrong way round"
+  },
+  "zoneErrorSpmBoundMissing": "Für das Schlagzahl-Band fehlt eine Grenze.",
+  "@zoneErrorSpmBoundMissing": {
+    "description": "Zone editor: only one bound of the stroke rate band is set"
+  },
+  "zoneErrorSpmReversed": "Die niedrigste Schlagzahl liegt über der höchsten.",
+  "@zoneErrorSpmReversed": {
+    "description": "Zone editor: the stroke rate bounds are the wrong way round"
+  },
+  "quotedName": "„{name}“",
+  "@quotedName": {
+    "description": "A name the user gave, in quotes, e.g. in a list of courses",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "placementLengthMissing": "Die Länge fehlt.",
+  "@placementLengthMissing": {
+    "description": "Course editor: the course has no length"
+  },
+  "placementZoneMissing": "Eine eingebaute Zone gibt es nicht mehr.",
+  "@placementZoneMissing": {
+    "description": "Course editor: a zone placed in the course was deleted"
+  },
+  "placementAxisMismatch": "„{zone}“ misst {zoneAxis, select, distance{Distanz} other{Zeit}}, die Strecke {courseAxis, select, distance{Distanz} other{Zeit}}.",
+  "@placementAxisMismatch": {
+    "description": "Course editor: the zone and the course have different axes; the axes are 'distance' or 'time'",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "zoneAxis": {
+        "type": "String"
+      },
+      "courseAxis": {
+        "type": "String"
+      }
+    }
+  },
+  "placementBeforeStart": "„{zone}“ beginnt vor dem Start der Strecke.",
+  "@placementBeforeStart": {
+    "description": "Course editor: the zone is placed before 0",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "placementBeyondEnd": "„{zone}“ ({range}) ragt über das Streckenende bei {length}.",
+  "@placementBeyondEnd": {
+    "description": "Course editor: the zone ends after the course; range and length are formatted, e.g. '1800–2300 m' and '2000 m'",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "range": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "placementOverlap": "„{zone}“ ({range}) überschneidet „{other}“ ({otherRange}).",
+  "@placementOverlap": {
+    "description": "Course editor: two placed zones overlap; the ranges are formatted, e.g. '1000–1500 m'",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "range": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      },
+      "otherRange": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneConflict": "Die Änderung passt nicht in {courses}: Dort würde die Zone über das Streckenende ragen oder eine andere Zone überschneiden.",
+  "@zoneConflict": {
+    "description": "Zone editor: the changed zone no longer fits the courses it is placed in; courses is a list of quoted names",
+    "placeholders": {
+      "courses": {
+        "type": "String"
+      }
+    }
+  },
+  "connectFailedTitle": "Verbindung fehlgeschlagen",
+  "@connectFailedTitle": {
+    "description": "Device list: dialog title when the rower could not be connected"
+  },
+  "connectFailedBody": "{app} konnte sich nicht mit {device} verbinden.\n\nViele Rudergeräte erlauben nur eine Bluetooth-Verbindung gleichzeitig. Trenne andere Apps wie ErgData und versuche es erneut.",
+  "@connectFailedBody": {
+    "description": "Device list: why a connection may fail; app is the app name, device the name the rower announces",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "connectNotARowerTitle": "Kein Rudergerät",
+  "@connectNotARowerTitle": {
+    "description": "Device list: dialog title when the device is no rower"
+  },
+  "connectNotARowerHint": "{app} unterstützt den PM5 am RowErg und Rudergeräte mit FTMS.",
+  "@connectNotARowerHint": {
+    "description": "Device list: which devices the app supports; app is the app name",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "connectErrorSkiErg": "Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem SkiErg.",
+  "@connectErrorSkiErg": {
+    "description": "Device list: the PM5 reports a SkiErg"
+  },
+  "connectErrorBikeErg": "Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem BikeErg.",
+  "@connectErrorBikeErg": {
+    "description": "Device list: the PM5 reports a BikeErg"
+  },
+  "connectErrorNoRowerData": "Nur Rudergeräte werden unterstützt. Das Gerät liefert keine Rudern-Daten.",
+  "@connectErrorNoRowerData": {
+    "description": "Device list: an FTMS machine that is no rower"
+  },
+  "stateConnected": "Verbunden",
+  "@stateConnected": {
+    "description": "Connection indicator: the rower is connected"
+  },
+  "stateConnecting": "Verbinde …",
+  "@stateConnecting": {
+    "description": "Connection indicator and device list: a connection is being set up"
+  },
+  "stateScanning": "Suche …",
+  "@stateScanning": {
+    "description": "Connection indicator: searching for the rower"
+  },
+  "stateReconnecting": "Verbindung unterbrochen, verbinde neu …",
+  "@stateReconnecting": {
+    "description": "Connection indicator: the connection dropped and is being restored"
+  },
+  "stateDisconnected": "Getrennt",
+  "@stateDisconnected": {
+    "description": "Connection indicator: no connection"
+  },
+  "sourceSimulator": "SIMULATOR",
+  "@sourceSimulator": {
+    "description": "Badge while the simulator delivers the data"
+  },
+  "sourceSimulatorFtms": "SIMULATOR (FTMS)",
+  "@sourceSimulatorFtms": {
+    "description": "Badge while the simulator delivers the data as an FTMS rower"
+  },
+  "sourceReplay": "REPLAY",
+  "@sourceReplay": {
+    "description": "Badge while a recorded session is played back"
+  },
+  "deviceListTitle": "Rudergerät suchen",
+  "@deviceListTitle": {
+    "description": "Device list: title"
+  },
+  "deviceListScanFailed": "Die Suche nach Rudergeräten ist fehlgeschlagen.\n\n{detail}",
+  "@deviceListScanFailed": {
+    "description": "Device list: the scan failed; detail is the technical error",
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceListRetry": "Erneut suchen",
+  "@deviceListRetry": {
+    "description": "Device list: button to scan again"
+  },
+  "deviceListNothingFound": "Kein Rudergerät gefunden.\n\n• Wecke das Rudergerät auf, am PM5 mit einer Taste, bis das Hauptmenü erscheint.\n• Trenne andere Apps wie ErgData, viele Rudergeräte erlauben nur eine Verbindung.\n• Geh näher an das Rudergerät.",
+  "@deviceListNothingFound": {
+    "description": "Device list: the scan found no rower, with hints"
+  },
+  "bluetoothOff": "Bluetooth ist ausgeschaltet. Schalte Bluetooth ein, um nach deinem Rudergerät zu suchen.",
+  "@bluetoothOff": {
+    "description": "Device list: Bluetooth is switched off"
+  },
+  "bluetoothUnauthorized": "{app} darf Bluetooth nicht verwenden. Die Berechtigung ist nötig, um sich mit deinem Rudergerät zu verbinden. Erteile sie in den Systemeinstellungen unter Apps → {app} → Berechtigungen.",
+  "@bluetoothUnauthorized": {
+    "description": "Device list: the app lacks the Bluetooth permission; app is the app name",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "bluetoothUnsupported": "Dieses Gerät unterstützt kein Bluetooth LE.",
+  "@bluetoothUnsupported": {
+    "description": "Device list: the phone or computer has no Bluetooth LE"
+  },
+  "liveDisconnect": "Trennen",
+  "@liveDisconnect": {
+    "description": "Live display: button that ends the connection"
+  },
+  "liveStale": "Keine Daten seit 3 Sekunden, die Werte sind veraltet.",
+  "@liveStale": {
+    "description": "Live display: banner when the rower stopped sending data"
+  },
+  "liveStartSession": "Session starten",
+  "@liveStartSession": {
+    "description": "Live display: button that starts recording a session"
+  },
+  "liveStopSession": "Session beenden",
+  "@liveStopSession": {
+    "description": "Live display: button that ends the recorded session"
+  },
+  "metricTime": "Zeit",
+  "@metricTime": {
+    "description": "Live display: label of the elapsed time"
+  },
+  "metricDistance": "Meter",
+  "@metricDistance": {
+    "description": "Live display: label of the distance rowed"
+  },
+  "metricWatts": "Watt",
+  "@metricWatts": {
+    "description": "Live display: label of the power"
+  },
+  "metricStrokeRate": "Schläge/min",
+  "@metricStrokeRate": {
+    "description": "Live display: label of the stroke rate"
+  },
+  "metricHeartRate": "Puls",
+  "@metricHeartRate": {
+    "description": "Live display: label of the heart rate"
+  },
+  "metricPace": "Pace /500 m",
+  "@metricPace": {
+    "description": "Live display: label of the pace per 500 metres"
+  },
+  "courseLap": "Runde {lap}",
+  "@courseLap": {
+    "description": "Course bar: the current lap of an open number of laps",
+    "placeholders": {
+      "lap": {
+        "type": "int"
+      }
+    }
+  },
+  "courseLapOf": "Runde {lap} von {laps}",
+  "@courseLapOf": {
+    "description": "Course bar: the current lap and the planned number of laps",
+    "placeholders": {
+      "lap": {
+        "type": "int"
+      },
+      "laps": {
+        "type": "int"
+      }
+    }
+  },
+  "segmentFree": "frei",
+  "@segmentFree": {
+    "description": "A part of a course without a zone"
+  },
+  "segmentZone": "Zone",
+  "@segmentZone": {
+    "description": "Name shown for a zone whose name is not known"
+  },
+  "courseRest": "noch {rest}",
+  "@courseRest": {
+    "description": "Course bar: what is left of the zone or free part; rest is e.g. '280 m' or '1:20'",
+    "placeholders": {
+      "rest": {
+        "type": "String"
+      }
+    }
+  },
+  "courseInZoneShare": "Zone {percent} %",
+  "@courseInZoneShare": {
+    "description": "Course bar: share of the lap rowed within the zone",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "hintInZone": "in der Zone",
+  "@hintInZone": {
+    "description": "Live display: the value is within the zone's band"
+  },
+  "hintFaster": "schneller",
+  "@hintFaster": {
+    "description": "Live display: row faster to reach the pace band"
+  },
+  "hintSlower": "langsamer",
+  "@hintSlower": {
+    "description": "Live display: row slower to reach the pace band"
+  },
+  "hintNoPace": "keine Pace",
+  "@hintNoPace": {
+    "description": "Live display: there is no pace to compare with the band"
+  },
+  "hintMoreStrokes": "mehr Schläge",
+  "@hintMoreStrokes": {
+    "description": "Live display: raise the stroke rate to reach the band"
+  },
+  "hintFewerStrokes": "weniger Schläge",
+  "@hintFewerStrokes": {
+    "description": "Live display: lower the stroke rate to reach the band"
+  },
+  "hintNoStrokes": "keine Schläge",
+  "@hintNoStrokes": {
+    "description": "Live display: there is no stroke rate to compare with the band"
+  },
+  "simTargetPace": "Ziel-Pace",
+  "@simTargetPace": {
+    "description": "Simulator: label of the pace the simulator rows"
+  },
+  "simTargetStrokeRate": "Ziel-SPM",
+  "@simTargetStrokeRate": {
+    "description": "Simulator: label of the stroke rate the simulator rows"
+  },
+  "simFaster": "Schneller",
+  "@simFaster": {
+    "description": "Simulator: tooltip to make the pace faster"
+  },
+  "simSlower": "Langsamer",
+  "@simSlower": {
+    "description": "Simulator: tooltip to make the pace slower"
+  },
+  "simMoreStrokes": "Mehr Schläge",
+  "@simMoreStrokes": {
+    "description": "Simulator: tooltip to raise the stroke rate"
+  },
+  "simFewerStrokes": "Weniger Schläge",
+  "@simFewerStrokes": {
+    "description": "Simulator: tooltip to lower the stroke rate"
+  },
+  "simPause": "Pause",
+  "@simPause": {
+    "description": "Simulator: button that pauses rowing"
+  },
+  "simResume": "Weiterrudern",
+  "@simResume": {
+    "description": "Simulator: button that resumes rowing"
+  },
+  "actionCancel": "Abbrechen",
+  "@actionCancel": {
+    "description": "Button that closes a dialog without doing anything"
+  },
+  "actionDelete": "Löschen",
+  "@actionDelete": {
+    "description": "Button or tooltip that deletes something"
+  },
+  "actionSave": "Speichern",
+  "@actionSave": {
+    "description": "Button or tooltip that saves an editor"
+  },
+  "actionReplay": "Abspielen",
+  "@actionReplay": {
+    "description": "Plays a recorded session back in the live display"
+  },
+  "actionExport": "Exportieren",
+  "@actionExport": {
+    "description": "Exports a session as a file"
+  },
+  "actionImport": "Importieren",
+  "@actionImport": {
+    "description": "Imports a session from a file"
+  },
+  "actionMore": "Aktionen",
+  "@actionMore": {
+    "description": "Tooltip of the menu with the actions of a list entry"
+  },
+  "sessionsTitle": "Sessions",
+  "@sessionsTitle": {
+    "description": "Sessions list: title"
+  },
+  "sessionsEmpty": "Noch keine Sessions aufgezeichnet.",
+  "@sessionsEmpty": {
+    "description": "Sessions list: nothing recorded yet"
+  },
+  "sessionsLoadFailed": "Sessions konnten nicht geladen werden: {error}",
+  "@sessionsLoadFailed": {
+    "description": "Sessions list: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionIncomplete": "unvollständig",
+  "@sessionIncomplete": {
+    "description": "A session or lap that was not finished"
+  },
+  "sessionTitle": "Session",
+  "@sessionTitle": {
+    "description": "Summary: title while the session is loading"
+  },
+  "sessionGone": "Diese Session gibt es nicht mehr.",
+  "@sessionGone": {
+    "description": "Summary: the session was deleted"
+  },
+  "sessionLoadFailed": "Session konnte nicht geladen werden: {error}",
+  "@sessionLoadFailed": {
+    "description": "Summary: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionIncompleteNote": "Unvollständig: Die App wurde während der Session beendet. Gespeichert ist alles bis kurz davor.",
+  "@sessionIncompleteNote": {
+    "description": "Summary: the app ended while recording"
+  },
+  "sessionDistance": "Distanz",
+  "@sessionDistance": {
+    "description": "Summary: label of the distance rowed"
+  },
+  "sessionTime": "Zeit",
+  "@sessionTime": {
+    "description": "Summary: label of the time rowed"
+  },
+  "sessionAveragePace": "⌀ Pace /500 m",
+  "@sessionAveragePace": {
+    "description": "Summary: label of the average pace per 500 metres"
+  },
+  "sessionAverageWatts": "⌀ Watt",
+  "@sessionAverageWatts": {
+    "description": "Summary: label of the average power"
+  },
+  "sessionAverageStrokeRate": "⌀ Schläge/min",
+  "@sessionAverageStrokeRate": {
+    "description": "Summary: label of the average stroke rate"
+  },
+  "sessionStrokes": "Schläge",
+  "@sessionStrokes": {
+    "description": "Summary: label of the number of strokes"
+  },
+  "sessionLap": "Runde {lap}",
+  "@sessionLap": {
+    "description": "Summary: a lap of the course",
+    "placeholders": {
+      "lap": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceRower": "Rudergerät",
+  "@sourceRower": {
+    "description": "Source of a session from an FTMS rower without a name"
+  },
+  "sourceSimulatorName": "Simulator",
+  "@sourceSimulatorName": {
+    "description": "Source of a session from the simulator"
+  },
+  "sourceSimulatorFtmsName": "Simulator (FTMS)",
+  "@sourceSimulatorFtmsName": {
+    "description": "Source of a session from the simulator as an FTMS rower"
+  },
+  "sourceReplayName": "Replay",
+  "@sourceReplayName": {
+    "description": "Source of a session recorded during a replay"
+  },
+  "replayName": "Replay {date}",
+  "@replayName": {
+    "description": "Name of a replayed session in the live display; date is the start of the session",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "replayNoData": "Für diese Session gibt es keine Rohdaten zum Abspielen.",
+  "@replayNoData": {
+    "description": "Sessions: the session cannot be played back"
+  },
+  "sessionDeleteTitle": "Session löschen?",
+  "@sessionDeleteTitle": {
+    "description": "Sessions: title of the delete confirmation"
+  },
+  "sessionDeleteBody": "Die Session vom {date} wird mit Verlauf und Rohdaten endgültig gelöscht.",
+  "@sessionDeleteBody": {
+    "description": "Sessions: delete confirmation; date is the start of the session",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionExported": "Session exportiert.",
+  "@sessionExported": {
+    "description": "Sessions: the export was saved"
+  },
+  "sessionExportFailed": "Export fehlgeschlagen: {error}",
+  "@sessionExportFailed": {
+    "description": "Sessions: the export failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionImported": "Session importiert.",
+  "@sessionImported": {
+    "description": "Sessions: the file was imported"
+  },
+  "sessionImportFailed": "Die Datei ist keine lesbare {app}-Session: {error}",
+  "@sessionImportFailed": {
+    "description": "Sessions: the file could not be imported; app is the app name, error the technical error",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "actionEdit": "Bearbeiten",
+  "@actionEdit": {
+    "description": "Menu entry that opens the editor"
+  },
+  "fieldName": "Name",
+  "@fieldName": {
+    "description": "Label of the name field in the editors"
+  },
+  "lapsCount": "{laps, plural, =1{1 Runde} other{{laps} Runden}}",
+  "@lapsCount": {
+    "description": "Number of laps of a template",
+    "placeholders": {
+      "laps": {
+        "type": "int"
+      }
+    }
+  },
+  "lapsOpen": "offen",
+  "@lapsOpen": {
+    "description": "A template with an open number of laps"
+  },
+  "templatesTitle": "Vorlage rudern",
+  "@templatesTitle": {
+    "description": "Templates: title"
+  },
+  "tabTemplates": "Vorlagen",
+  "@tabTemplates": {
+    "description": "Templates: tab with the templates"
+  },
+  "tabCourses": "Strecken",
+  "@tabCourses": {
+    "description": "Templates: tab with the courses"
+  },
+  "tabZones": "Zonen",
+  "@tabZones": {
+    "description": "Templates: tab with the zones"
+  },
+  "templateCreate": "Vorlage anlegen",
+  "@templateCreate": {
+    "description": "Templates: button that creates a template"
+  },
+  "templatesEmpty": "Noch keine Vorlagen angelegt.",
+  "@templatesEmpty": {
+    "description": "Templates: there is no template"
+  },
+  "templatesLoadFailed": "Vorlagen konnten nicht geladen werden: {error}",
+  "@templatesLoadFailed": {
+    "description": "Templates: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "templateNeedsCourseTitle": "Zuerst eine Strecke anlegen",
+  "@templateNeedsCourseTitle": {
+    "description": "Templates: dialog title when there is no course"
+  },
+  "templateNeedsCourseBody": "Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.",
+  "@templateNeedsCourseBody": {
+    "description": "Templates: dialog text when there is no course"
+  },
+  "templateNeedsCourse": "Für eine Vorlage brauchst du zuerst eine Strecke.",
+  "@templateNeedsCourse": {
+    "description": "Templates: shown instead of the list when there is no course"
+  },
+  "courseCreate": "Strecke anlegen",
+  "@courseCreate": {
+    "description": "Button that creates a course"
+  },
+  "templateRow": "„{name}“ rudern",
+  "@templateRow": {
+    "description": "Templates: title of the dialog that picks the source; name is the template",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "templateSimulatorFtms": "Simulator (FTMS)",
+  "@templateSimulatorFtms": {
+    "description": "Templates: source that simulates an FTMS rower"
+  },
+  "templateSimulatorFtmsHint": "Wie ein FTMS-Rudergerät, ohne Schlagdetails",
+  "@templateSimulatorFtmsHint": {
+    "description": "Templates: what the FTMS simulator leaves out"
+  },
+  "templateDeleteTitle": "Vorlage löschen?",
+  "@templateDeleteTitle": {
+    "description": "Templates: title of the delete confirmation"
+  },
+  "templateDeleteBody": "„{name}“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.",
+  "@templateDeleteBody": {
+    "description": "Templates: delete confirmation; name is the template",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "templateNew": "Neue Vorlage",
+  "@templateNew": {
+    "description": "Template editor: title for a new template"
+  },
+  "templateEdit": "Vorlage bearbeiten",
+  "@templateEdit": {
+    "description": "Template editor: title for an existing template"
+  },
+  "templateNameMissing": "Der Name fehlt.",
+  "@templateNameMissing": {
+    "description": "Template editor: the template has no name"
+  },
+  "templateCourseMissing": "Wähle eine Strecke.",
+  "@templateCourseMissing": {
+    "description": "Template editor: no course chosen"
+  },
+  "templateLapsInvalid": "Die Rundenzahl muss mindestens 1 sein.",
+  "@templateLapsInvalid": {
+    "description": "Template editor: the number of laps is below 1"
+  },
+  "templateCourse": "Strecke",
+  "@templateCourse": {
+    "description": "Template editor: label of the course field"
+  },
+  "templateOpenLaps": "Offene Rundenzahl",
+  "@templateOpenLaps": {
+    "description": "Template editor: switch for an open number of laps"
+  },
+  "templateOpenLapsHint": "Runden, bis du die Session beendest",
+  "@templateOpenLapsHint": {
+    "description": "Template editor: what an open number of laps means"
+  },
+  "templateLaps": "Runden",
+  "@templateLaps": {
+    "description": "Template editor: label of the number of laps"
+  },
+  "coursesTitle": "Strecken",
+  "@coursesTitle": {
+    "description": "Courses: title"
+  },
+  "coursesEmpty": "Noch keine Strecken angelegt.",
+  "@coursesEmpty": {
+    "description": "Courses: there is no course"
+  },
+  "coursesLoadFailed": "Strecken konnten nicht geladen werden: {error}",
+  "@coursesLoadFailed": {
+    "description": "Courses: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "courseDeleteTitle": "Strecke löschen?",
+  "@courseDeleteTitle": {
+    "description": "Courses: title of the delete confirmation"
+  },
+  "courseDeleteBody": "„{name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten ihre Runden.",
+  "@courseDeleteBody": {
+    "description": "Courses: delete confirmation; name is the course",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "courseDeleteTemplates": "Diese Vorlagen verwenden die Strecke und werden mitgelöscht: {templates}.",
+  "@courseDeleteTemplates": {
+    "description": "Courses: templates deleted with the course; templates is a list of quoted names",
+    "placeholders": {
+      "templates": {
+        "type": "String"
+      }
+    }
+  },
+  "courseNew": "Neue Strecke",
+  "@courseNew": {
+    "description": "Course editor: title for a new course"
+  },
+  "courseEdit": "Strecke bearbeiten",
+  "@courseEdit": {
+    "description": "Course editor: title for an existing course"
+  },
+  "courseNameMissing": "Der Name fehlt.",
+  "@courseNameMissing": {
+    "description": "Course editor: the course has no name"
+  },
+  "courseLengthFirst": "Gib zuerst die Länge der Strecke ein.",
+  "@courseLengthFirst": {
+    "description": "Course editor: a zone is placed before the length is known"
+  },
+  "courseLengthHint": "Gib eine Länge ein, um Zonen einzubauen.",
+  "@courseLengthHint": {
+    "description": "Course editor: shown instead of the parts while there is no length"
+  },
+  "courseSequence": "Ablauf",
+  "@courseSequence": {
+    "description": "Course editor: heading above the parts of the course"
+  },
+  "coursePlaceZone": "Zone einbauen",
+  "@coursePlaceZone": {
+    "description": "Course editor: button and dialog title to place a zone"
+  },
+  "courseMoveZone": "Zone verschieben",
+  "@courseMoveZone": {
+    "description": "Course editor: dialog title to move a placed zone"
+  },
+  "coursePlaceHere": "Hier eine Zone einbauen",
+  "@coursePlaceHere": {
+    "description": "Course editor: tooltip on a free part"
+  },
+  "courseRemoveZone": "Zone entfernen",
+  "@courseRemoveZone": {
+    "description": "Course editor: tooltip on a placed zone"
+  },
+  "coursePlace": "Einbauen",
+  "@coursePlace": {
+    "description": "Place dialog: button that places the zone"
+  },
+  "courseMove": "Verschieben",
+  "@courseMove": {
+    "description": "Place dialog: button that moves the zone"
+  },
+  "courseNoZones": "Noch keine Zonen angelegt. Lege zuerst eine an.",
+  "@courseNoZones": {
+    "description": "Place dialog: there is no zone"
+  },
+  "zoneCreate": "Neue Zone anlegen",
+  "@zoneCreate": {
+    "description": "Place dialog: button that creates a zone"
+  },
+  "courseStart": "Start ({unit})",
+  "@courseStart": {
+    "description": "Place dialog: label of the start; unit is 'm' or 'm:ss'",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "courseRange": "Strecke: {range}",
+  "@courseRange": {
+    "description": "Place dialog: the range of the course, e.g. '0–2000 m'",
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "coursePlacedAt": "„{zone}“ liegt bei {range}.",
+  "@coursePlacedAt": {
+    "description": "Place dialog: where the zone would lie, e.g. '500–600 m'",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "courseOtherAxis": "andere Achse",
+  "@courseOtherAxis": {
+    "description": "Place dialog: the zone is measured in time on a distance course or the other way round"
+  },
+  "axisDistance": "Distanz",
+  "@axisDistance": {
+    "description": "Courses and zones measured in metres"
+  },
+  "axisTime": "Zeit",
+  "@axisTime": {
+    "description": "Courses and zones measured in time"
+  },
+  "fieldLength": "Länge ({unit})",
+  "@fieldLength": {
+    "description": "Label of the length; unit is 'm' or 'm:ss'",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidLength": "Die Länge „{text}“ ist ungültig.",
+  "@invalidLength": {
+    "description": "Editors: the length typed cannot be read",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidStart": "Der Start „{text}“ ist ungültig.",
+  "@invalidStart": {
+    "description": "Place dialog: the start typed cannot be read",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "zonesTitle": "Zonen",
+  "@zonesTitle": {
+    "description": "Zones: title"
+  },
+  "zoneCreateShort": "Zone anlegen",
+  "@zoneCreateShort": {
+    "description": "Zones: button that creates a zone"
+  },
+  "zonesEmpty": "Noch keine Zonen angelegt. Eine Zone ist ein Pace- oder Schlagzahl-Band über eine feste Länge, das du in Strecken einbaust.",
+  "@zonesEmpty": {
+    "description": "Zones: there is no zone, with what a zone is"
+  },
+  "zonesLoadFailed": "Zonen konnten nicht geladen werden: {error}",
+  "@zonesLoadFailed": {
+    "description": "Zones: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneUsage": "{courses, plural, =0{nicht verwendet} =1{in 1 Strecke} other{in {courses} Strecken}}",
+  "@zoneUsage": {
+    "description": "Zones: in how many courses the zone is placed",
+    "placeholders": {
+      "courses": {
+        "type": "int"
+      }
+    }
+  },
+  "zoneNew": "Neue Zone",
+  "@zoneNew": {
+    "description": "Zone editor: title for a new zone"
+  },
+  "zoneEdit": "Zone bearbeiten",
+  "@zoneEdit": {
+    "description": "Zone editor: title for an existing zone"
+  },
+  "zoneDeleteTitle": "Zone löschen?",
+  "@zoneDeleteTitle": {
+    "description": "Zone editor: title of the delete confirmation"
+  },
+  "zoneDeleteBody": "„{name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten den Namen der Zone.",
+  "@zoneDeleteBody": {
+    "description": "Zone editor: delete confirmation; name is the zone",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneDeleteCourses": "In diesen Strecken wird ihre Stelle frei: {courses}.",
+  "@zoneDeleteCourses": {
+    "description": "Zone editor: courses the zone is removed from; courses is a list of quoted names",
+    "placeholders": {
+      "courses": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneInCourses": "Steckt in {courses}",
+  "@zoneInCourses": {
+    "description": "Zone editor: the courses the zone is placed in; courses is a list of quoted names",
+    "placeholders": {
+      "courses": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneInCoursesHint": "Änderungen gelten in allen diesen Strecken. Wurde eine schon gerudert, bekommt sie eine neue Version, alte Sessions bleiben, wie sie waren.",
+  "@zoneInCoursesHint": {
+    "description": "Zone editor: what a change to a placed zone does"
+  },
+  "zoneNameHint": "z.B. Sprint",
+  "@zoneNameHint": {
+    "description": "Zone editor: example of a zone name"
+  },
+  "zonePaceBand": "Pace pro 500 m",
+  "@zonePaceBand": {
+    "description": "Zone editor: heading of the pace band"
+  },
+  "zonePaceFastest": "schnellste",
+  "@zonePaceFastest": {
+    "description": "Zone editor: the fastest pace of the band"
+  },
+  "zonePaceSlowest": "langsamste",
+  "@zonePaceSlowest": {
+    "description": "Zone editor: the slowest pace of the band"
+  },
+  "zoneSpmBand": "Schlagzahl",
+  "@zoneSpmBand": {
+    "description": "Zone editor: heading of the stroke rate band"
+  },
+  "zoneSpmFrom": "ab",
+  "@zoneSpmFrom": {
+    "description": "Zone editor: the lowest stroke rate of the band"
+  },
+  "zoneSpmTo": "bis",
+  "@zoneSpmTo": {
+    "description": "Zone editor: the highest stroke rate of the band"
+  },
+  "zoneBandHint": "Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.",
+  "@zoneBandHint": {
+    "description": "Zone editor: what a zone needs"
+  },
+  "invalidPace": "Die Pace „{text}“ ist ungültig.",
+  "@invalidPace": {
+    "description": "Zone editor: the pace typed cannot be read",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidStrokeRate": "Die Schlagzahl „{text}“ ist ungültig.",
+  "@invalidStrokeRate": {
+    "description": "Zone editor: the stroke rate typed cannot be read",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "dateTimePattern": "dd.MM.yyyy, HH:mm",
+  "@dateTimePattern": {
+    "description": "Pattern of a date with time for the intl package's DateFormat, e.g. '15.10.2026, 18:30'; keep the 24-hour clock"
+  },
+  "actionOk": "OK",
+  "@actionOk": {
+    "description": "Button that closes a message"
+  }
+}

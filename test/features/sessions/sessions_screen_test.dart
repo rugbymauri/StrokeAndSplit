@@ -16,6 +16,7 @@ import '../../support/fake_ble_transport.dart';
 import '../../support/fake_session_files.dart';
 import '../../support/fixtures.dart';
 import '../../support/test_database.dart';
+import '../../support/localized_app.dart';
 
 class _Setup {
   final db = openTestDatabase();
@@ -45,7 +46,7 @@ class _Setup {
   Future<void> pump(WidgetTester tester) async {
     addTearDown(container.dispose);
     await tester.pumpWidget(
-      UncontrolledProviderScope(container: container, child: const MaterialApp(home: SessionsScreen())),
+      UncontrolledProviderScope(container: container, child: const LocalizedApp(home: SessionsScreen())),
     );
     await tester.pump();
   }

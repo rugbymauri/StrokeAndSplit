@@ -5,6 +5,7 @@ import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import '../../data/templates/session_template.dart';
 import '../../data/templates/template_providers.dart';
+import '../../l10n/l10n.dart';
 import '../courses/courses_screen.dart';
 
 /// Creates a template, or edits [template] when given.
@@ -34,10 +35,11 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
   Future<void> _save() async {
     final name = _name.text.trim();
     final laps = _open ? null : int.tryParse(_laps.text.trim());
+    final l10n = context.l10n;
     final errors = [
-      if (name.isEmpty) 'Der Name fehlt.',
-      if (_courseId == null) 'Wähle eine Strecke.',
-      if (!_open && (laps == null || laps < 1)) 'Die Rundenzahl muss mindestens 1 sein.',
+      if (name.isEmpty) l10n.templateNameMissing,
+      if (_courseId == null) l10n.templateCourseMissing,
+      if (!_open && (laps == null || laps < 1)) l10n.templateLapsInvalid,
     ];
     if (errors.isNotEmpty) {
       setState(() => _errors = errors);
@@ -57,10 +59,11 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
   Widget build(BuildContext context) {
     final courses = ref.watch(coursesProvider).value ?? const <Course>[];
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.template == null ? 'Neue Vorlage' : 'Vorlage bearbeiten'),
-        actions: [IconButton(tooltip: 'Speichern', icon: const Icon(Icons.check), onPressed: _save)],
+        title: Text(widget.template == null ? l10n.templateNew : l10n.templateEdit),
+        actions: [IconButton(tooltip: l10n.actionSave, icon: const Icon(Icons.check), onPressed: _save)],
       ),
       body: Center(
         child: ConstrainedBox(
@@ -76,24 +79,24 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
               TextField(
                 key: const Key('template-name'),
                 controller: _name,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: l10n.fieldName),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<int>(
                 key: const Key('template-course'),
                 initialValue: courses.any((c) => c.id == _courseId) ? _courseId : null,
-                decoration: const InputDecoration(labelText: 'Strecke'),
+                decoration: InputDecoration(labelText: l10n.templateCourse),
                 items: [
                   for (final c in courses)
-                    DropdownMenuItem(value: c.id, child: Text('${c.name} · ${courseSummary(c)}')),
+                    DropdownMenuItem(value: c.id, child: Text('${c.name} · ${courseSummary(l10n, c)}')),
                 ],
                 onChanged: (id) => setState(() => _courseId = id),
               ),
               const SizedBox(height: 16),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Offene Rundenzahl'),
-                subtitle: const Text('Runden, bis du die Session beendest'),
+                title: Text(l10n.templateOpenLaps),
+                subtitle: Text(l10n.templateOpenLapsHint),
                 value: _open,
                 onChanged: (open) => setState(() => _open = open),
               ),
@@ -102,10 +105,10 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
                   key: const Key('template-laps'),
                   controller: _laps,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Runden'),
+                  decoration: InputDecoration(labelText: l10n.templateLaps),
                 ),
               const SizedBox(height: 24),
-              FilledButton(onPressed: _save, child: const Text('Speichern')),
+              FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
             ],
           ),
         ),

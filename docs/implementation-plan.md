@@ -9,29 +9,31 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones` und `device-types`; Change `statistics` geplant.
+Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `device-types` und `translations`; Change `statistics` geplant.
 
 ## Überblick
 
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
-| 2 | `ui-design` | 0/18 | nach 1 | Entscheid Puls-Herkunft (F1) |
-| 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
-| 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
-| 5 | `statistics` | 0/12 | Gruppe 1 jederzeit, Rest nach 2 | – |
-| 6 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 2 und 5 |
-| 7 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
+| 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
+| 3 | `ui-design` | 0/18 | nach 2 | Entscheid Puls-Herkunft (F1) |
+| 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
+| 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
+| 6 | `statistics` | 0/12 | Gruppe 1 jederzeit, Rest nach 3 | – |
+| 7 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 3 und 6 |
+| 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 
 ## Warum diese Reihenfolge
 
 1. **`device-types` zuerst**, weil er das Fundament der Daten umbaut: ein Decoder pro Protokoll, Rohpakete mit Protokoll, nullable Schlagdetails mit Migration. Alles, was später Rohpakete, Schläge oder Quellen anfasst (`force-curve`, `heart-rate`), baut dann auf dem neuen Stand auf, statt ihn zu kreuzen. Ausserdem kennt `ui-design` dann schon FTMS-Geräte, wenn es den Startbildschirm und die Geräteliste neu gestaltet.
-2. **`ui-design`** schafft das Layout, in das Kraftkurve, Puls und Ghost ihren reservierten Platz bekommen. Erst danach lohnt sich deren Anzeige.
-3. **`force-curve`** ist klein und hängt nur an einem Spike am PM5 und am Layout aus 2.
-4. **`heart-rate`** kommt nach `device-types`, weil beide dieselben Anforderungen ändern und der Gurt an die Quelle andockt, die `device-types` umbaut.
-5. **`statistics`** hängt an keinem offenen Change: Die Ranglisten werden aus den Runden aus `courses` und `zones` berechnet. Er kann auch vor `ui-design` kommen, dann gestaltet `ui-design` die neuen Elemente mit.
-6. **`ghost`** braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`, denn der Ghost ist Platz 1.
-7. **`rename-stroke-and-split`** zuletzt, damit nicht jeder Change auf halbem Weg die Namen wechselt.
+2. **`translations`** vor `ui-design`, weil dieser fast alle Screens neu baut: Steht die Lokalisierung schon, entstehen die neuen Screens gleich mit ARB-Keys, statt danach ein zweites Mal Texte herauszuziehen. Nach `device-types`, weil dieser selbst Texte der Geräteliste ändert (Task 5.5). Das Herausziehen aus Screens, die `ui-design` ersetzt, ist teils Wegwerfarbeit; die meisten Texte bleiben aber erhalten.
+3. **`ui-design`** schafft das Layout, in das Kraftkurve, Puls und Ghost ihren reservierten Platz bekommen. Erst danach lohnt sich deren Anzeige.
+4. **`force-curve`** ist klein und hängt nur an einem Spike am PM5 und am Layout aus 3.
+5. **`heart-rate`** kommt nach `device-types`, weil beide dieselben Anforderungen ändern und der Gurt an die Quelle andockt, die `device-types` umbaut.
+6. **`statistics`** hängt an keinem offenen Change: Die Ranglisten werden aus den Runden aus `courses` und `zones` berechnet. Er kann auch vor `ui-design` kommen, dann gestaltet `ui-design` die neuen Elemente mit.
+7. **`ghost`** braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`, denn der Ghost ist Platz 1.
+8. **`rename-stroke-and-split`** zuletzt, damit nicht jeder Change auf halbem Weg die Namen wechselt. Nach `translations` steht der Anzeigename an einer Stelle in den ARB-Dateien.
 
 ## Changes
 
@@ -63,7 +65,29 @@ Bei der Umsetzung mitnehmen:
 
 Manuell (vom Nutzer): 7.x mit dem Software-Rower vom Android-Handy aus.
 
-### 2. `ui-design`: Designsprache und neue Screens aus dem Claude-Design-Canvas
+### 2. `translations`: Deutsch und Englisch, erweiterbar
+
+Ziel: Die Oberfläche ist übersetzbar, zuerst Deutsch und Englisch, weitere Sprachen kommen als zusätzliche ARB-Datei dazu. Die Sprache wird in der App gewählt, die App startet auf Deutsch, die Systemsprache spielt keine Rolle (F13, F14). Was Nutzer selbst benennen (Zonen, Strecken, Vorlagen), wird nicht übersetzt; eigene Inhalte mit Namen liefert die App nicht mit.
+
+Stand heute: kein `flutter_localizations`, keine `l10n.yaml`, rund 250 deutsche Texte direkt in 17 Screens unter `lib/features/`.
+
+Arbeitspunkte:
+- `flutter_localizations` und `gen-l10n` einrichten, `app_de.arb` als Vorlage, `app_en.arb` als zweite Sprache.
+- Texte aus den Screens in die ARB-Dateien ziehen.
+- Deutsche Sätze aus `lib/data/` lösen: Die Schicht liefert Codes bzw. Enums, die Oberfläche übersetzt sie. Betroffen u.a. `RowerConnectException` (`rower_connector.dart`, `flutter_blue_plus_transport.dart`), `PlacementError` (`course_layout.dart`), `zoneErrors` / `ArgumentError(errors.join(' '))` (`zone_repository.dart`).
+- Formate nach Sprache (`intl`): Datum (`formatDateTime`, heute fest `15.10.2026, 18:30`) und Dezimalzeichen (`formatStrokeRate`, heute `22.5`). Die Pace `2:05.3` bleibt fest wie am PM5.
+- Sprachwahl in der App, gewählte Sprache gemerkt (F16).
+- Ab dann für alle Changes: neue Texte nur über die ARB-Dateien, in jeder Sprache.
+
+Vor dem Start:
+- [x] Change angelegt (2026-10-16): Capability `app-language`, keine geänderten Specs.
+- [x] F15 und F16 vorläufig nach Vorschlag entschieden (Schweizer Rechtschreibung, `shared_preferences`), im Design als D6 und D2. Der Nutzer kann sie noch kippen.
+- Sprachwahl vorerst als Symbol im Startbildschirm (Design D3); `ui-design` verlegt sie.
+- Texte des Startbildschirms schon mit Task 2.2 übersetzt, weil der Test der Sprachwahl sie braucht; Task 4.1 übernimmt den Rest der Verbindung.
+- Nach 6.1 bleiben als Literale nur Einheiten (`m`, `spm`, `m:ss`), Formate, Eigennamen (PM5, FTMS, Concept2) und der Dateityp „AergRow-Session“ im Dateidialog; den benennt `rename-stroke-and-split` um.
+- Offen ist nur noch der manuelle Test 6.3 auf Linux und Android (User).
+
+### 3. `ui-design`: Designsprache und neue Screens aus dem Claude-Design-Canvas
 
 Ziel: dunkles Thema, Barlow Condensed/IBM Plex Sans, Fortschrittsrahmen um die Pace, neue Editoren, Startbildschirm, Zusammenfassung. Canvas
 
@@ -73,6 +97,8 @@ Vor dem Start anpassen:
 - [ ] Task 3.3: `course_bar.dart` zeigt seit `zones` den Zonennamen bzw. „frei“; das muss in die Pace-Box übernommen werden.
 - [ ] Spec-Delta `live-display` spricht von „Segmenten“ und „Segmentspur“; Begriffe mit `zones` abgleichen (Abschnitt = Zone oder frei).
 - [ ] Startbildschirm: Quellenwahl muss FTMS-Rudergeräte aus `device-types` aufnehmen.
+- [ ] Neue Texte über die ARB-Dateien aus `translations`, nicht hart codiert.
+- [ ] Platz für die Sprachwahl aus `translations` im neuen Layout festlegen (Einstellungen bzw. Startbildschirm).
 
 Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeitachse, Design D7) sind entschieden.
 
@@ -80,7 +106,7 @@ Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeita
 - [x] Ruderblatt-Tasten für Zahlen (2026-10-16) als Design D7, Spec `number-steppers` und Tasks 1.4 und 4.4 aufgenommen. Betrifft auch die Editoren aus `zones`.
 - [x] F12 entschieden: Zeitachse Strecke 30 s, Zone und Startposition 10 s (Design D7, Spec `number-steppers`).
 
-### 3. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
+### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 
 Ziel: Kurve des letzten und vorherigen Schlags im Live-Display, Aufzeichnung und Replay, Kurve im Simulator.
 
@@ -89,7 +115,7 @@ Vor dem Start:
 - [ ] Rohpakete tragen nach `device-types` ein Protokoll; die Kurvenpakete passen dort hinein.
 - [ ] Platz der Karte im Layout aus `ui-design`.
 
-### 4. `heart-rate`: Brustgurt direkt koppeln, RR-Intervalle, HRV
+### 5. `heart-rate`: Brustgurt direkt koppeln, RR-Intervalle, HRV
 
 Ziel: Gurt koppeln und merken, automatisch verbinden, Puls-Vorrang Gurt vor PM5, RR-Intervalle, Ø/max Puls und RMSSD in der Zusammenfassung.
 
@@ -100,7 +126,7 @@ Vor dem Start anpassen:
 
 Offene Entscheide: F3, F4.
 
-### 5. `statistics`: Ranglisten pro Vorlage, Strecke und Zone
+### 6. `statistics`: Ranglisten pro Vorlage, Strecke und Zone
 
 Ziel: Plätze 1–3 jeder Vorlage, Strecke und Zone. Gewertet wird die Zeit (Distanzachse) bzw. die Meter (Zeitachse) nach Wanduhr inklusive Pausen, dazu Pace und Datum. Anzeige in der Vorlagenwahl, in einer neuen Detailansicht von Strecke und Zone und als Marke in der Zusammenfassung. Proposal, Design und Spec stehen (2026-10-16), Entscheide in Design D2–D6.
 
@@ -112,13 +138,13 @@ Bei der Umsetzung mitnehmen:
 - Kein Schema-Wechsel geplant (Design D1). Task 1.6 misst. Braucht es einen Index, erhöht dessen Migration das Schema; die Nummer mit `heart-rate` (Schema 5) abstimmen.
 - Gezählt werden nur die Quellen `pm5` und `ftms`, nicht `simulator` und `replay` (Design D3).
 
-### 6. `ghost`: gegen die eigene Bestzeit rudern
+### 7. `ghost`: gegen die eigene Bestzeit rudern
 
 Ziel: violettes Schiffchen auf den Spuren des Fortschrittsrahmens, Abstand in Metern und Sekunden, Ghost-Symbol bei Platz 1 in der Vorlagenwahl. Der Ghost jeder Spur ist Platz 1 der Rangliste dieser Ebene aus `statistics` (F5, Design D2, Spec „Platz 1 ist der Ghost“).
 
 Blockiert: `design.md` hat offene Fragen F6–F8. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
 
-### 7. `rename-stroke-and-split`: App heisst „Stroke & Split“
+### 8. `rename-stroke-and-split`: App heisst „Stroke & Split“
 
 Ziel: Anzeigename, Paket- und App-ID `strokesplit`, Dateiendung `.strokesplit`, Import liest weiter `.aergrow`.
 
@@ -143,6 +169,10 @@ Vor dem Start:
 | F10 | App-ID `ch.strokesplit` oder `ch.<herausgeber>.strokesplit`? | rename | rename |
 | F11 | Live-Display beim Übergang in eine Zone vorwarnen, z.B. „Sprint in 50 m“? (offen aus `zones`) | – (neuer Change) | – |
 | ~~F12~~ | Schritte der Ruderblatt-Tasten auf der Zeitachse: **Strecke 30 s, Zone und Startposition 10 s** (2026-10-16) | ui-design | entschieden |
+| ~~F13~~ | Rückfallsprache: **keine** (2026-10-16), die Sprache wird in der App gewählt (F14) | translations | entschieden |
+| ~~F14~~ | Sprachwahl: **in der App** (2026-10-16), Start auf Deutsch, Systemsprache wird nicht beachtet | translations | entschieden |
+| F15 | Schweizer Rechtschreibung (`ss` statt `ß`, wie heute im Code) als `de`? **Vorläufig ja** (2026-10-16, nach Vorschlag) | translations | vorläufig entschieden |
+| F16 | Wo wird die gewählte Sprache gespeichert? **Vorläufig `shared_preferences`** (2026-10-16, nach Vorschlag): keine Migration, `heart-rate` bleibt Schema 5 | translations, heart-rate | vorläufig entschieden |
 
 ## Offene Punkte
 
@@ -155,7 +185,7 @@ Manuelle Tests archivierter Changes (Nutzer):
 Nacharbeit:
 - [x] Platzhalter-Test `packages/pm5_protocol/test/pm5_protocol_test.dart` („package loads“) gelöscht.
 - [x] `lib/data/sessions/session_repository.dart`, `recoverInterrupted`: Zeile über 120 Zeichen umgebrochen.
-- [ ] Kein Git-Remote: Sobald es eines gibt, pushen und künftig per MR arbeiten.
+- [x] Git-Remote eingerichtet (2026-10-16). Ab jetzt pushen und per MR arbeiten.
 
 ## Erledigt
 

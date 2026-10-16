@@ -10,6 +10,7 @@ import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/simulated_source.dart';
 import '../../data/templates/session_template.dart';
+import '../../l10n/l10n.dart';
 import '../connection/connection_indicator.dart';
 import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
@@ -105,7 +106,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   }
 
   Future<void> _disconnect() async {
-    // A running session is kept; it ends here like with "Session beenden".
+    // A running session is kept; it ends here like with the end session button.
     await ref.read(sessionRecorderProvider.notifier).stop();
     await ref.read(activeErgSourceProvider.notifier).clear();
     if (mounted) Navigator.of(context).pop();
@@ -126,7 +127,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     final recording = ref.watch(sessionRecorderProvider);
     return PopScope(
       canPop: false,
-      // Going back ends the connection, the same as "Trennen".
+      // Going back ends the connection, the same as the disconnect button.
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _disconnect();
       },
@@ -134,7 +135,11 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
         appBar: AppBar(
           title: const ConnectionIndicator(),
           actions: [
-            TextButton.icon(onPressed: _disconnect, icon: const Icon(Icons.link_off), label: const Text('Trennen')),
+            TextButton.icon(
+              onPressed: _disconnect,
+              icon: const Icon(Icons.link_off),
+              label: Text(context.l10n.liveDisconnect),
+            ),
           ],
         ),
         body: SafeArea(
@@ -142,7 +147,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
             children: [
               if (_stale && connected)
                 MaterialBanner(
-                  content: const Text('Keine Daten seit 3 Sekunden, die Werte sind veraltet.'),
+                  content: Text(context.l10n.liveStale),
                   actions: [const SizedBox.shrink()],
                 ),
               if ((recording?.lap, recording?.template) case (final lap?, final template?))
@@ -151,8 +156,8 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                 child: _Metrics(
                   tick: _tick,
                   session: recording?.progress,
-                  paceZone: ZoneHint.pace(recording?.lap?.pace),
-                  strokeRateZone: ZoneHint.strokeRate(recording?.lap?.strokeRate),
+                  paceZone: ZoneHint.pace(context.l10n, recording?.lap?.pace),
+                  strokeRateZone: ZoneHint.strokeRate(context.l10n, recording?.lap?.strokeRate),
                   outdated: _stale,
                 ),
               ),
@@ -164,12 +169,12 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                       ? FilledButton.icon(
                           onPressed: connected ? _startSession : null,
                           icon: const Icon(Icons.fiber_manual_record),
-                          label: const Text('Session starten'),
+                          label: Text(context.l10n.liveStartSession),
                         )
                       : FilledButton.tonalIcon(
                           onPressed: _stopSession,
                           icon: const Icon(Icons.stop),
-                          label: const Text('Session beenden'),
+                          label: Text(context.l10n.liveStopSession),
                         ),
                 ),
               ),
@@ -208,30 +213,31 @@ class _Metrics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tick = this.tick;
+    final l10n = context.l10n;
     final secondary = [
       _Metric(
         key: const Key('metric-elapsed'),
-        label: 'Zeit',
+        label: l10n.metricTime,
         value: formatElapsed(session?.elapsed ?? tick?.elapsed ?? Duration.zero),
       ),
       _Metric(
         key: const Key('metric-distance'),
-        label: 'Meter',
+        label: l10n.metricDistance,
         value: formatDistance(session?.distanceMeters ?? tick?.distanceMeters ?? 0),
       ),
-      _Metric(key: const Key('metric-watts'), label: 'Watt', value: formatWhole(tick?.watts)),
+      _Metric(key: const Key('metric-watts'), label: l10n.metricWatts, value: formatWhole(tick?.watts)),
       _Metric(
         key: const Key('metric-spm'),
-        label: 'Schläge/min',
+        label: l10n.metricStrokeRate,
         value: formatWhole(tick?.strokeRate),
         zone: strokeRateZone,
       ),
       if (tick?.heartRate != null)
-        _Metric(key: const Key('metric-hr'), label: 'Puls', value: formatWhole(tick!.heartRate)),
+        _Metric(key: const Key('metric-hr'), label: l10n.metricHeartRate, value: formatWhole(tick!.heartRate)),
     ];
     final pace = _Metric(
       key: const Key('metric-pace'),
-      label: 'Pace /500 m',
+      label: l10n.metricPace,
       value: formatPace(tick?.pace),
       zone: paceZone,
     );

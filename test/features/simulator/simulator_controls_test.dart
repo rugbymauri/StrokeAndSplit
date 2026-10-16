@@ -3,6 +3,7 @@ import 'package:aergrow/features/simulator/simulator_controls.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../support/localized_app.dart';
 
 void main() {
   late SimulatedSource source;
@@ -10,7 +11,7 @@ void main() {
   setUp(() => source = SimulatedSource(targetPace: const Duration(minutes: 2, seconds: 10), targetStrokeRate: 22));
 
   Future<void> pump(WidgetTester tester, {ValueChanged<ErgProtocol>? onProtocolChanged}) => tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: SimulatorControls(source: source, onProtocolChanged: onProtocolChanged))));
+      LocalizedApp(home: Scaffold(body: SimulatorControls(source: source, onProtocolChanged: onProtocolChanged))));
 
   testWidgets('makes the simulator faster and slower', (tester) async {
     await pump(tester);

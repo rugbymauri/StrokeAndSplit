@@ -7,6 +7,7 @@ import '../../data/courses/course_providers.dart';
 import '../../data/db/database.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
+import '../../l10n/l10n.dart';
 import '../live/formatters.dart';
 import 'session_actions.dart';
 
@@ -19,23 +20,24 @@ class SessionSummaryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(sessionProvider(sessionId));
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text(session.value == null ? 'Session' : formatDateTime(session.value!.startedAt)),
+        title: Text(session.value == null ? l10n.sessionTitle : formatDateTime(l10n, session.value!.startedAt)),
         actions: [
           if (session.value case final row?) ...[
             IconButton(
-              tooltip: 'Abspielen',
+              tooltip: l10n.actionReplay,
               icon: const Icon(Icons.play_arrow),
               onPressed: () => replaySession(context, ref, row),
             ),
             IconButton(
-              tooltip: 'Exportieren',
+              tooltip: l10n.actionExport,
               icon: const Icon(Icons.ios_share),
               onPressed: () => exportSession(context, ref, row),
             ),
             IconButton(
-              tooltip: 'Löschen',
+              tooltip: l10n.actionDelete,
               icon: const Icon(Icons.delete_outline),
               onPressed: () async {
                 if (await deleteSession(context, ref, row) && context.mounted) Navigator.of(context).pop();
@@ -46,8 +48,8 @@ class SessionSummaryScreen extends ConsumerWidget {
       ),
       body: switch (session) {
         AsyncData(value: final session?) => _Summary(session: session),
-        AsyncData() => const Center(child: Text('Diese Session gibt es nicht mehr.')),
-        AsyncError(:final error) => Center(child: Text('Session konnte nicht geladen werden: $error')),
+        AsyncData() => Center(child: Text(l10n.sessionGone)),
+        AsyncError(:final error) => Center(child: Text(l10n.sessionLoadFailed('$error'))),
         _ => const Center(child: CircularProgressIndicator()),
       },
     );
@@ -55,11 +57,12 @@ class SessionSummaryScreen extends ConsumerWidget {
 }
 
 /// Name of the source a session was recorded with.
-String sessionSourceLabel(SessionRow session) => switch (session.source) {
+String sessionSourceLabel(AppLocalizations l10n, SessionRow session) => switch (session.source) {
       ErgSourceKind.pm5 => session.deviceName ?? 'PM5',
-      ErgSourceKind.ftms => '${session.deviceName ?? 'Rudergerät'} · FTMS',
-      ErgSourceKind.simulator => session.protocol == ErgProtocol.ftms ? 'Simulator (FTMS)' : 'Simulator',
-      ErgSourceKind.replay => 'Replay',
+      ErgSourceKind.ftms => '${session.deviceName ?? l10n.sourceRower} · FTMS',
+      ErgSourceKind.simulator =>
+        session.protocol == ErgProtocol.ftms ? l10n.sourceSimulatorFtmsName : l10n.sourceSimulatorName,
+      ErgSourceKind.replay => l10n.sourceReplayName,
     };
 
 class _Summary extends StatelessWidget {
@@ -71,13 +74,14 @@ class _Summary extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final pace = session.averagePaceCs;
+    final l10n = context.l10n;
     final values = [
-      ('Distanz', '${session.distanceDm ~/ 10} m'),
-      ('Zeit', formatElapsed(Duration(milliseconds: session.durationMs))),
-      ('⌀ Pace /500 m', formatPace(pace == null ? null : Duration(milliseconds: pace * 10))),
-      ('⌀ Watt', formatWhole(session.averageWatts)),
-      ('⌀ Schläge/min', formatStrokeRate(session.averageStrokeRate)),
-      ('Schläge', '${session.strokeCount}'),
+      (l10n.sessionDistance, '${session.distanceDm ~/ 10} m'),
+      (l10n.sessionTime, formatElapsed(Duration(milliseconds: session.durationMs))),
+      (l10n.sessionAveragePace, formatPace(pace == null ? null : Duration(milliseconds: pace * 10))),
+      (l10n.sessionAverageWatts, formatWhole(session.averageWatts)),
+      (l10n.sessionAverageStrokeRate, formatStrokeRate(l10n, session.averageStrokeRate)),
+      (l10n.sessionStrokes, '${session.strokeCount}'),
     ];
 
     return Center(
@@ -86,15 +90,11 @@ class _Summary extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(sessionSourceLabel(session), style: theme.textTheme.titleMedium),
+            Text(sessionSourceLabel(l10n, session), style: theme.textTheme.titleMedium),
             if (session.status == SessionStatus.incomplete)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  'Unvollständig: Die App wurde während der Session beendet. '
-                  'Gespeichert ist alles bis kurz davor.',
-                  style: TextStyle(color: theme.colorScheme.error),
-                ),
+                child: Text(l10n.sessionIncompleteNote, style: TextStyle(color: theme.colorScheme.error)),
               ),
             if (session.courseVersionId case final versionId?) _Laps(session: session, versionId: versionId),
             const SizedBox(height: 16),
@@ -197,7 +197,8 @@ class _LapTile extends StatelessWidget {
     final time = formatLapTime(Duration(milliseconds: lap.endWallMs - lap.startWallMs));
     final distance = '${(lap.endDistanceDm - lap.startDistanceDm) ~/ 10} m';
     final share = lap.inZoneShare;
-    final value = lap.complete ? (byTime ? time : distance) : 'unvollständig · $distance · $time';
+    final l10n = context.l10n;
+    final value = lap.complete ? (byTime ? time : distance) : '${l10n.sessionIncomplete} · $distance · $time';
     final style = theme.textTheme.titleMedium?.copyWith(
       fontWeight: best ? FontWeight.bold : null,
       color: lap.complete ? null : theme.colorScheme.onSurfaceVariant,
@@ -210,11 +211,11 @@ class _LapTile extends StatelessWidget {
         children: [
           Icon(best ? Icons.star : (lap.complete ? Icons.flag_outlined : Icons.timelapse)),
           const SizedBox(width: 16),
-          Text('Runde ${lap.lapNo}'),
+          Text(l10n.sessionLap(lap.lapNo)),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              [value, if (share != null) 'Zone ${(share * 100).round()} %'].join(' · '),
+              [value, if (share != null) l10n.courseInZoneShare((share * 100).round())].join(' · '),
               style: style,
               textAlign: TextAlign.end,
             ),

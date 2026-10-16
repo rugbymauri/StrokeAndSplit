@@ -4,12 +4,14 @@ import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
+import 'package:aergrow/features/zones/zone_editor_screen.dart';
 import 'package:aergrow/features/zones/zones_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
+import '../../support/localized_app.dart';
 
 const _sprint = Zone(
   name: 'Sprint',
@@ -27,13 +29,13 @@ class _Setup {
   late final courses = CourseRepository(db);
   late final container = ProviderContainer(overrides: [databaseProvider.overrideWithValue(db)]);
 
-  Future<void> pump(WidgetTester tester) async {
+  Future<void> pump(WidgetTester tester, {Locale locale = const Locale('de')}) async {
     addTearDown(container.dispose);
     tester.view.physicalSize = const Size(1000, 2400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      UncontrolledProviderScope(container: container, child: const MaterialApp(home: ZonesScreen())),
+      UncontrolledProviderScope(container: container, child: LocalizedApp(locale: locale, home: const ZonesScreen())),
     );
     await settle(tester);
   }
@@ -110,6 +112,36 @@ void main() {
 
     expect(find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'), findsOneWidget);
     expect(await tester.runAsync(setup.zones.all), isEmpty);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('says in English what keeps a zone from being saved', (tester) async {
+    final setup = _Setup();
+    addTearDown(setup.container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: setup.container,
+      child: const LocalizedApp(locale: Locale('en'), home: ZoneEditorScreen()),
+    ));
+    await _enter(tester, {'name': 'Halb', 'length': '100', 'pace-fast': '1:45', 'spm-min': '34', 'spm-max': '30'});
+    await tester.tap(find.byType(FilledButton));
+    await setup.settle(tester);
+
+    expect(find.text('The pace band is missing a bound.'), findsOneWidget);
+    expect(find.text('The lowest stroke rate is above the highest.'), findsOneWidget);
+    expect(await tester.runAsync(setup.zones.all), isEmpty);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('lists the zones in English', (tester) async {
+    final setup = _Setup();
+    await setup.sprintInTwoCourses(tester);
+    await tester.runAsync(() => setup.zones.create(_sprint.copyWith(name: 'Lang', length: 200)));
+    await setup.pump(tester, locale: const Locale('en'));
+
+    expect(find.text('Distance'), findsOneWidget);
+    expect(find.text('in 2 courses'), findsOneWidget);
+    expect(find.text('not used'), findsOneWidget);
+    expect(find.text('New zone'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 

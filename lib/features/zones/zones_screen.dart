@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/courses/course.dart';
 import '../../data/zones/zone.dart';
 import '../../data/zones/zone_providers.dart';
+import '../../l10n/l10n.dart';
 import 'zone_editor_screen.dart';
 import 'zone_format.dart';
 
@@ -17,23 +18,20 @@ class ZonesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final zones = ref.watch(zonesProvider);
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: embedded ? null : AppBar(title: const Text('Zonen')),
+      appBar: embedded ? null : AppBar(title: Text(l10n.zonesTitle)),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'zones',
         onPressed: () => openZoneEditor(context),
         icon: const Icon(Icons.add),
-        label: const Text('Zone anlegen'),
+        label: Text(l10n.zoneCreateShort),
       ),
       body: switch (zones) {
-        AsyncData(value: []) => const Center(
+        AsyncData(value: []) => Center(
             child: Padding(
-              padding: EdgeInsets.all(24),
-              child: Text(
-                'Noch keine Zonen angelegt. Eine Zone ist ein Pace- oder Schlagzahl-Band über eine feste Länge, '
-                'das du in Strecken einbaust.',
-                textAlign: TextAlign.center,
-              ),
+              padding: const EdgeInsets.all(24),
+              child: Text(l10n.zonesEmpty, textAlign: TextAlign.center),
             ),
           ),
         AsyncData(:final value) => ListView(
@@ -46,7 +44,7 @@ class ZonesScreen extends ConsumerWidget {
                 ],
             ],
           ),
-        AsyncError(:final error) => Center(child: Text('Zonen konnten nicht geladen werden: $error')),
+        AsyncError(:final error) => Center(child: Text(l10n.zonesLoadFailed('$error'))),
         _ => const Center(child: CircularProgressIndicator()),
       },
     );
@@ -69,7 +67,7 @@ class _AxisHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
       child: Text(
-        axis == CourseAxis.distance ? 'Distanz' : 'Zeit',
+        axis == CourseAxis.distance ? context.l10n.axisDistance : context.l10n.axisTime,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.primary),
       ),
     );
@@ -88,7 +86,7 @@ class _ZoneTile extends StatelessWidget {
       leading: Icon(zone.axis == CourseAxis.distance ? Icons.straighten : Icons.timer_outlined),
       title: Text(zone.name),
       subtitle: Text(zoneSummary(zone)),
-      trailing: Text(formatZoneUsage(usage.courses), key: Key('zone-usage-${zone.id}')),
+      trailing: Text(context.l10n.zoneUsage(usage.courses), key: Key('zone-usage-${zone.id}')),
       onTap: () => openZoneEditor(context, zone: zone),
     );
   }

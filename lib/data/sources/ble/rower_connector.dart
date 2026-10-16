@@ -46,16 +46,14 @@ Future<RowerLink> setUpRower(
   } catch (e) {
     await connection.disconnect();
     if (e is RowerConnectException) rethrow;
-    throw RowerConnectException('$e');
+    throw RowerConnectException(RowerConnectError.failed, message: '$e');
   }
 }
-
-const _onlyRowers = 'Nur Rudergeräte werden unterstützt.';
 
 Future<RowerLink> _setUpPm5(GattConnection connection, Duration ergTypeTimeout) async {
   final characteristics = connection.characteristics;
   if (!characteristics.contains(Pm5Characteristics.generalStatus)) {
-    throw const RowerConnectException('Das Gerät bietet keinen Rudern-Service an.');
+    throw const RowerConnectException(RowerConnectError.noRowingService);
   }
   if (characteristics.contains(Pm5Characteristics.sampleRate)) {
     await connection.write(Pm5Characteristics.sampleRate, [Pm5Characteristics.sampleRate250ms]);
@@ -68,8 +66,7 @@ Future<RowerLink> _setUpPm5(GattConnection connection, Duration ergTypeTimeout) 
   final status = await firstStatus;
   final kind = status == null ? null : Pm5ErgType.fromAdditionalStatus(Uint8List.fromList(status));
   if (kind == Pm5ErgKind.skiErg || kind == Pm5ErgKind.bikeErg) {
-    final erg = kind == Pm5ErgKind.skiErg ? 'SkiErg' : 'BikeErg';
-    throw RowerConnectException('$_onlyRowers Dieser PM5 gehört zu einem $erg.', notARower: true);
+    throw RowerConnectException(kind == Pm5ErgKind.skiErg ? RowerConnectError.skiErg : RowerConnectError.bikeErg);
   }
   return _GattRowerLink(connection, Pm5Characteristics.subscribed.toSet());
 }
@@ -81,7 +78,7 @@ Future<RowerLink> _setUpFtms(
 ) async {
   final characteristics = connection.characteristics;
   if (!characteristics.contains(FtmsIds.rowerData)) {
-    throw const RowerConnectException('$_onlyRowers Das Gerät liefert keine Rudern-Daten.', notARower: true);
+    throw const RowerConnectException(RowerConnectError.noRowerData);
   }
   await connection.subscribe(FtmsIds.rowerData);
   if (characteristics.contains(FtmsIds.controlPoint)) await _requestStart(connection, controlTimeout, onWarning);

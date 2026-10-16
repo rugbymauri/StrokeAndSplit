@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
+import '../../l10n/l10n.dart';
 
 /// Connection state and data source, always visible while rowing so that
 /// simulated or replayed data is never mistaken for a live erg.
@@ -15,13 +16,14 @@ class ConnectionIndicator extends ConsumerWidget {
     final source = ref.watch(activeErgSourceProvider);
     final state = ref.watch(ergConnectionStateProvider).value ?? ErgConnectionState.disconnected;
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     final (icon, label, color) = switch (state) {
-      ErgConnectionState.connected => (Icons.bluetooth_connected, 'Verbunden', colors.primary),
-      ErgConnectionState.connecting => (Icons.bluetooth_searching, 'Verbinde …', colors.tertiary),
-      ErgConnectionState.scanning => (Icons.bluetooth_searching, 'Suche …', colors.tertiary),
-      ErgConnectionState.reconnecting => (Icons.sync_problem, 'Verbindung unterbrochen, verbinde neu …', colors.error),
-      ErgConnectionState.disconnected => (Icons.bluetooth_disabled, 'Getrennt', colors.error),
+      ErgConnectionState.connected => (Icons.bluetooth_connected, l10n.stateConnected, colors.primary),
+      ErgConnectionState.connecting => (Icons.bluetooth_searching, l10n.stateConnecting, colors.tertiary),
+      ErgConnectionState.scanning => (Icons.bluetooth_searching, l10n.stateScanning, colors.tertiary),
+      ErgConnectionState.reconnecting => (Icons.sync_problem, l10n.stateReconnecting, colors.error),
+      ErgConnectionState.disconnected => (Icons.bluetooth_disabled, l10n.stateDisconnected, colors.error),
     };
 
     return Wrap(
@@ -51,15 +53,16 @@ class _SourceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final (label, background, foreground) = switch (source.kind) {
       ErgSourceKind.pm5 => (source.name, colors.secondaryContainer, colors.onSecondaryContainer),
       ErgSourceKind.ftms => ('${source.name} · FTMS', colors.secondaryContainer, colors.onSecondaryContainer),
       ErgSourceKind.simulator => (
-          source.protocol == ErgProtocol.ftms ? 'SIMULATOR (FTMS)' : 'SIMULATOR',
+          source.protocol == ErgProtocol.ftms ? l10n.sourceSimulatorFtms : l10n.sourceSimulator,
           colors.tertiary,
           colors.onTertiary,
         ),
-      ErgSourceKind.replay => ('REPLAY', colors.tertiary, colors.onTertiary),
+      ErgSourceKind.replay => (l10n.sourceReplay, colors.tertiary, colors.onTertiary),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

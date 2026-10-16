@@ -21,18 +21,47 @@ class ZonePlacement {
   String toString() => 'ZonePlacement($zoneId at $start)';
 }
 
-/// Why a course cannot be laid out, in words for the user.
+/// What keeps a course from being laid out (Design D4 of translations).
+enum PlacementErrorKind { lengthMissing, zoneMissing, axisMismatch, beforeStart, beyondEnd, overlap }
+
+/// Why a course cannot be laid out; the screens put it into words. Ranges and
+/// lengths come formatted, as in `500–600 m` or `4:00`.
 @immutable
 class PlacementError {
-  const PlacementError(this.message, {this.placements = const {}});
+  const PlacementError(
+    this.kind, {
+    this.placements = const {},
+    this.zone,
+    this.range,
+    this.zoneAxis,
+    this.courseAxis,
+    this.courseLength,
+    this.other,
+    this.otherRange,
+  });
 
-  final String message;
+  final PlacementErrorKind kind;
 
   /// The indices of the placements concerned; empty for the course itself.
   final Set<int> placements;
 
+  /// The name of the zone concerned and the range it covers.
+  final String? zone;
+  final String? range;
+
+  /// The axis of the zone and of the course, for [PlacementErrorKind.axisMismatch].
+  final CourseAxis? zoneAxis;
+  final CourseAxis? courseAxis;
+
+  /// The length of the course, for [PlacementErrorKind.beyondEnd].
+  final String? courseLength;
+
+  /// The zone that [zone] overlaps, for [PlacementErrorKind.overlap].
+  final String? other;
+  final String? otherRange;
+
   @override
-  String toString() => message;
+  String toString() => 'PlacementError(${kind.name}, $zone, $placements)';
 }
 
 /// A course laid out from its zones (Change zones, Design D2): either the
@@ -67,26 +96,33 @@ CourseLayout resolveCourse({
   required List<ZonePlacement> placements,
   required Map<int, Zone> zones,
 }) {
-  if (length <= 0) return const CourseLayout._(null, [PlacementError('Die Länge fehlt.')]);
+  if (length <= 0) return const CourseLayout._(null, [PlacementError(PlacementErrorKind.lengthMissing)]);
   final errors = <PlacementError>[];
   final valid = <(int, ZonePlacement, Zone)>[];
   for (final (i, p) in placements.indexed) {
     final zone = zones[p.zoneId];
     if (zone == null) {
-      errors.add(PlacementError('Eine eingebaute Zone gibt es nicht mehr.', placements: {i}));
+      errors.add(PlacementError(PlacementErrorKind.zoneMissing, placements: {i}));
       continue;
     }
-    final name = '„${zone.name}“';
     final range = formatCourseRange(axis, p.start, p.start + zone.length);
     if (zone.axis != axis) {
-      final message = '$name misst ${_axisWord(zone.axis)}, die Strecke ${_axisWord(axis)}.';
-      errors.add(PlacementError(message, placements: {i}));
+      errors.add(PlacementError(
+        PlacementErrorKind.axisMismatch,
+        placements: {i},
+        zone: zone.name,
+        zoneAxis: zone.axis,
+        courseAxis: axis,
+      ));
     } else if (p.start < 0) {
-      errors.add(PlacementError('$name beginnt vor dem Start der Strecke.', placements: {i}));
+      errors.add(PlacementError(PlacementErrorKind.beforeStart, placements: {i}, zone: zone.name));
     } else if (p.start + zone.length > length) {
       errors.add(PlacementError(
-        '$name ($range) ragt über das Streckenende bei ${formatCourseLength(axis, length)}.',
+        PlacementErrorKind.beyondEnd,
         placements: {i},
+        zone: zone.name,
+        range: range,
+        courseLength: formatCourseLength(axis, length),
       ));
     } else {
       valid.add((i, p, zone));
@@ -97,9 +133,12 @@ CourseLayout resolveCourse({
     for (final (k, q, other) in valid.take(j)) {
       if (q.start + other.length <= p.start) continue;
       errors.add(PlacementError(
-        '„${zone.name}“ (${formatCourseRange(axis, p.start, p.start + zone.length)}) überschneidet '
-        '„${other.name}“ (${formatCourseRange(axis, q.start, q.start + other.length)}).',
+        PlacementErrorKind.overlap,
         placements: {k, i},
+        zone: zone.name,
+        range: formatCourseRange(axis, p.start, p.start + zone.length),
+        other: other.name,
+        otherRange: formatCourseRange(axis, q.start, q.start + other.length),
       ));
     }
   }
@@ -115,8 +154,3 @@ CourseLayout resolveCourse({
   if (cursor < length) segments.add(CourseSegment(length: length - cursor));
   return CourseLayout._(CourseDefinition(axis: axis, length: length, segments: segments), const []);
 }
-
-String _axisWord(CourseAxis axis) => switch (axis) {
-      CourseAxis.distance => 'Distanz',
-      CourseAxis.time => 'Zeit',
-    };

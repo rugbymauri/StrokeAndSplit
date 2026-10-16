@@ -4,16 +4,17 @@ import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/features/connection/device_list_screen.dart';
 import 'package:erg_protocol/erg_protocol.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
+import '../../support/localized_app.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
 
-Future<ProviderContainer> _pump(WidgetTester tester, FakeBleTransport transport) async {
+Future<ProviderContainer> _pump(WidgetTester tester, FakeBleTransport transport, {Locale? locale}) async {
   final container = ProviderContainer(overrides: [
     bleTransportProvider.overrideWithValue(transport),
     wakelockProvider.overrideWithValue(FakeWakelock()),
@@ -21,7 +22,10 @@ Future<ProviderContainer> _pump(WidgetTester tester, FakeBleTransport transport)
   addTearDown(container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(
     container: container,
-    child: const MaterialApp(home: DeviceListScreen(scanTimeout: Duration(seconds: 15))),
+    child: LocalizedApp(
+      locale: locale ?? const Locale('de'),
+      home: const DeviceListScreen(scanTimeout: Duration(seconds: 15)),
+    ),
   ));
   await tester.pump();
   return container;
@@ -53,6 +57,17 @@ void main() {
 
     expect(find.textContaining('Kein Rudergerät gefunden'), findsOneWidget);
     expect(find.textContaining('ErgData'), findsOneWidget);
+  });
+
+  testWidgets('shows the tips in English', (tester) async {
+    await _pump(tester, FakeBleTransport(), locale: const Locale('en'));
+    await tester.pump(const Duration(seconds: 15));
+    await tester.pump();
+
+    expect(find.text('Find rower'), findsOneWidget);
+    expect(find.textContaining('No rower found.'), findsOneWidget);
+    expect(find.textContaining('Move closer to the rower.'), findsOneWidget);
+    expect(find.text('Search again'), findsOneWidget);
   });
 
   testWidgets('asks to switch Bluetooth on instead of showing an empty list', (tester) async {
@@ -89,8 +104,8 @@ void main() {
   });
 
   testWidgets('explains a failed connection with the one-connection limit', (tester) async {
-    final container = await _pump(
-        tester, FakeBleTransport(found: [_pm5], connectError: const RowerConnectException('busy')));
+    const error = RowerConnectException(RowerConnectError.failed, message: 'busy');
+    final container = await _pump(tester, FakeBleTransport(found: [_pm5], connectError: error));
 
     await tester.tap(find.text('PM5 430000001 Row'));
     await tester.pumpAndSettle();
@@ -101,8 +116,7 @@ void main() {
   });
 
   testWidgets('says that only rowers are supported when the device is no rower', (tester) async {
-    const error = RowerConnectException('Nur Rudergeräte werden unterstützt. Dieser PM5 gehört zu einem BikeErg.',
-        notARower: true);
+    const error = RowerConnectException(RowerConnectError.bikeErg);
     final container = await _pump(tester, FakeBleTransport(found: [_pm5], connectError: error));
 
     await tester.tap(find.text('PM5 430000001 Row'));
@@ -113,6 +127,18 @@ void main() {
     expect(find.textContaining('BikeErg'), findsOneWidget);
     expect(find.textContaining('nur eine Bluetooth-Verbindung'), findsNothing);
     expect(container.read(activeErgSourceProvider), isNull);
+  });
+
+  testWidgets('says in English that a PM5 on a BikeErg is no rower', (tester) async {
+    const error = RowerConnectException(RowerConnectError.bikeErg);
+    await _pump(tester, FakeBleTransport(found: [_pm5], connectError: error), locale: const Locale('en'));
+
+    await tester.tap(find.text('PM5 430000001 Row'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Not a rower'), findsOneWidget);
+    expect(find.textContaining('This PM5 belongs to a BikeErg.'), findsOneWidget);
+    expect(find.textContaining('supports the PM5 on a RowErg'), findsOneWidget);
   });
 
   testWidgets('opens the live display after connecting', (tester) async {

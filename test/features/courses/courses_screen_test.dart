@@ -5,12 +5,14 @@ import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
+import 'package:aergrow/features/courses/course_editor_screen.dart';
 import 'package:aergrow/features/courses/courses_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
+import '../../support/localized_app.dart';
 
 class _Setup {
   final db = openTestDatabase();
@@ -18,13 +20,16 @@ class _Setup {
   late final zones = ZoneRepository(db);
   late final container = ProviderContainer(overrides: [databaseProvider.overrideWithValue(db)]);
 
-  Future<void> pump(WidgetTester tester) async {
+  Future<void> pump(WidgetTester tester, {Widget home = const CoursesScreen(), Locale? locale}) async {
     addTearDown(container.dispose);
     tester.view.physicalSize = const Size(1000, 2400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      UncontrolledProviderScope(container: container, child: const MaterialApp(home: CoursesScreen())),
+      UncontrolledProviderScope(
+        container: container,
+        child: LocalizedApp(locale: locale ?? const Locale('de'), home: home),
+      ),
     );
     await settle(tester);
   }
@@ -101,7 +106,7 @@ void main() {
     late int endurance;
     late int minutes;
 
-    Future<void> pumpWithZones(WidgetTester tester) async {
+    Future<void> pumpWithZones(WidgetTester tester, {Widget home = const CoursesScreen(), Locale? locale}) async {
       setup = _Setup();
       await tester.runAsync(() async {
         sprint = await setup.zones.create(const Zone(
@@ -123,7 +128,7 @@ void main() {
         minutes = await setup.zones
             .create(const Zone(name: 'Vier Minuten', axis: CourseAxis.time, length: 240, spmMin: 20, spmMax: 22));
       });
-      await setup.pump(tester);
+      await setup.pump(tester, home: home, locale: locale);
     }
 
     Future<void> openDialog(WidgetTester tester) async {
@@ -206,6 +211,20 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
+    testWidgets('says in English that a zone extends past the end of the course', (tester) async {
+      await pumpWithZones(tester, home: const CourseEditorScreen(), locale: const Locale('en'));
+      await tester.enterText(find.byKey(const Key('course-length')), '2000');
+
+      await openDialog(tester);
+      await choose(tester, endurance, '1800');
+
+      expect(
+        find.text('“Ausdauer 2:30” (1800–2300 m) extends past the end of the course at 2000 m.'),
+        findsOneWidget,
+      );
+      await disposeWidgetsWithDatabase(tester);
+    });
+
     testWidgets('offers no zone of the other axis', (tester) async {
       await pumpWithZones(tester);
       await _openNew(tester, '2 km Intervall');
@@ -277,6 +296,23 @@ void main() {
     expect(find.text('Der Name fehlt.'), findsOneWidget);
     expect(find.text('Die Länge fehlt.'), findsOneWidget);
     expect(await setup.stored(tester), isEmpty);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('shows the editor in English', (tester) async {
+    final setup = _Setup();
+    await setup.pump(tester, home: const CourseEditorScreen(), locale: const Locale('en'));
+
+    expect(find.text('New course'), findsOneWidget);
+    expect(find.text('Distance'), findsOneWidget);
+    expect(find.text('Length (m)'), findsOneWidget);
+    expect(find.text('Enter a length to place zones.'), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('course-length')), '2x');
+    await tester.tap(find.byTooltip('Save'));
+    await setup.settle(tester);
+
+    expect(find.text('The name is missing.'), findsOneWidget);
+    expect(find.text('The length “2x” is not valid.'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 

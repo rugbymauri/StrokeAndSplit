@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
+import '../../support/localized_app.dart';
 
 /// Stores a session on [course] with laps of the given (seconds, metres).
 Future<int> _session(AppDatabase db, String name, CourseDefinition course, List<(int, int, bool)> laps) async {
@@ -40,13 +41,13 @@ Future<int> _session(AppDatabase db, String name, CourseDefinition course, List<
   return id;
 }
 
-Future<void> _pump(WidgetTester tester, AppDatabase db, int id) async {
+Future<void> _pump(WidgetTester tester, AppDatabase db, int id, {Locale locale = const Locale('de')}) async {
   tester.view.physicalSize = const Size(800, 1600);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(ProviderScope(
     overrides: [databaseProvider.overrideWithValue(db)],
-    child: MaterialApp(home: SessionSummaryScreen(sessionId: id)),
+    child: LocalizedApp(locale: locale, home: SessionSummaryScreen(sessionId: id)),
   ));
   for (var i = 0; i < 5; i++) {
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
@@ -74,6 +75,26 @@ void main() {
     expect(_lap(tester, const Key('lap-best')), '4:08.0 · Zone 75 %');
     expect(_lap(tester, const Key('lap-3')), '4:15.0 · Zone 75 %');
     expect(_lap(tester, const Key('lap-4')), 'unvollständig · 400 m · 1:40.0 · Zone 75 %');
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('shows the summary in English', (tester) async {
+    final db = openTestDatabase();
+    final id = await tester.runAsync(() => _session(
+          db,
+          'Seerunde',
+          CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+          [(252, 1000, true), (100, 400, false)],
+        ));
+    await _pump(tester, db, id!, locale: const Locale('en'));
+
+    expect(find.text('Simulator'), findsOneWidget);
+    expect(find.text('Lap 1'), findsOneWidget);
+    expect(_lap(tester, const Key('lap-2')), 'incomplete · 400 m · 1:40.0 · Zone 75 %');
+    for (final label in ['Distance', 'Time', '⌀ Pace /500 m', '⌀ Watts', '⌀ Strokes/min', 'Strokes']) {
+      expect(find.text(label), findsOneWidget, reason: label);
+    }
+    expect(find.byTooltip('Play back'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 
