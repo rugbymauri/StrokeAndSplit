@@ -19,6 +19,7 @@ import '../connection/connection_indicator.dart';
 import '../connection/heart_rate_indicator.dart';
 import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
+import 'force_curve.dart';
 import 'live_course.dart';
 import 'live_free.dart';
 import 'progress_frame.dart';
@@ -42,6 +43,9 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 
   /// The last RR intervals from the strap, shown while they are recent.
   HeartBeatIntervals? _beats;
+
+  /// The force curves of the last strokes; they belong to the source, like [_beats].
+  var _forceCurves = const ForceCurves();
   var _stale = false;
   Timer? _staleTimer;
   StreamSubscription<RowingEvent>? _events;
@@ -82,6 +86,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     _events?.cancel();
     // RR intervals of a previous source never belong to the next one.
     _beats = null;
+    _forceCurves = const ForceCurves();
     _restartStaleTimer();
     _events = events.listen((event) {
       _restartStaleTimer();
@@ -92,6 +97,8 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
         });
       } else if (event is HeartBeatIntervals) {
         setState(() => _beats = event);
+      } else if (event is StrokeForceCurve) {
+        setState(() => _forceCurves = _forceCurves.add(event));
       }
     });
   }
@@ -169,7 +176,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 
   /// The live view of [template] at [lap] with its ghosts, recomputed with
   /// every tick (Change ghost, Design D2–D4).
-  Widget _courseView(SessionTemplate template, LapProgress lap, ActiveRecording? recording, bool connected) {
+  Widget _courseView(
+    SessionTemplate template,
+    LapProgress lap,
+    ActiveRecording? recording,
+    bool connected,
+    ForceCurves? forceCurves,
+  ) {
     final ghosts = ref.watch(liveGhostsProvider(liveGhostsKey(template, lap)));
     final shares = ghostShares(lap, template.course.definition, ghosts);
     return CourseLiveView(
@@ -178,6 +191,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
       lap: lap,
       course: template.course.definition,
       outdated: _stale,
+      forceCurves: forceCurves,
       ghost: FrameGhost(course: shares.course, lap: shares.lap, segment: shares.segment),
       ghostGap: ghostGap(lap, template.course.axis, ghosts.course),
       action: _sessionButton(recording, connected),
@@ -190,6 +204,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     final source = ref.watch(activeErgSourceProvider);
     final connected = ref.watch(ergConnectionStateProvider).value == ErgConnectionState.connected;
     final recording = ref.watch(sessionRecorderProvider);
+    final forceCurves = source != null && source.providesForceCurves ? _forceCurves : null;
     return PopScope(
       canPop: false,
       // Going back ends the connection, the same as the disconnect button.
@@ -234,12 +249,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                 ),
               Expanded(
                 child: switch ((recording?.lap, recording?.template)) {
-                  (final lap?, final template?) => _courseView(template, lap, recording, connected),
+                  (final lap?, final template?) => _courseView(template, lap, recording, connected, forceCurves),
                   _ => FreeLiveView(
                       tick: _tick,
                       rrIntervalMs: _rrIntervalMs,
                       session: recording?.progress,
                       outdated: _stale,
+                      forceCurves: forceCurves,
                       action: _sessionButton(recording, connected),
                     ),
                 },

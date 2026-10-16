@@ -31,7 +31,7 @@ class CourseLiveView extends StatelessWidget {
     required this.action,
     required this.shortAction,
     this.outdated = false,
-    this.forces,
+    this.forceCurves,
     this.ghost,
     this.ghostGap,
   });
@@ -50,8 +50,8 @@ class CourseLiveView extends StatelessWidget {
   /// Whether the values are out of date; they are dimmed then.
   final bool outdated;
 
-  /// The force curve of the last stroke; left out while null.
-  final List<double>? forces;
+  /// The force curves of the last strokes; null for a source without them, which leaves the card out.
+  final ForceCurves? forceCurves;
 
   /// Where the ghosts are on the tracks; null without any.
   final FrameGhost? ghost;
@@ -87,7 +87,7 @@ class CourseLiveView extends StatelessWidget {
     const buttonHeight = 52.0;
     final inner = padding.deflateSize(size);
     // The force curve goes first when space is short (Design, Risks).
-    final curve = ForceCurve.hasData(forces) && inner.height >= 720;
+    final curve = forceCurves != null && inner.height >= 720;
     final boxHeight =
         inner.height - strokeHeight - tilesHeight - buttonHeight - 3 * _gap - (curve ? curveHeight + _gap : 0);
     final cap = PaceBox.paceFontSizeFor(Size(inner.width, boxHeight)) * valueShareOfPace;
@@ -115,7 +115,7 @@ class CourseLiveView extends StatelessWidget {
           ),
           if (curve) ...[
             const SizedBox(height: _gap),
-            SizedBox(height: curveHeight, child: ForceCurve(last: forces, variant: ForceCurveVariant.strip)),
+            SizedBox(height: curveHeight, child: forceCurves!.widget(variant: ForceCurveVariant.strip)),
           ],
           const Spacer(),
           SizedBox(height: buttonHeight, child: action),
@@ -132,7 +132,7 @@ class CourseLiveView extends StatelessWidget {
     // Nearly square as in the canvas, but leaving room for the stroke rate.
     final boxWidth = math.min(inner.height, (inner.width - sideWidth - 2 * AppSpacing.m) * 0.65);
     final cap = PaceBox.paceFontSizeFor(Size(boxWidth, inner.height)) * valueShareOfPace;
-    final curve = ForceCurve.hasData(forces) && inner.height >= 260;
+    final curve = forceCurves != null && inner.height >= 260;
     final tiles = _tiles(context, math.min(22, cap));
     return Padding(
       key: const ValueKey(LiveLayout.landscape),
@@ -146,7 +146,9 @@ class CourseLiveView extends StatelessWidget {
             child: _dim(_strokeRate(
               math.min(72, cap),
               landscape: true,
-              footer: curve ? ForceCurve(last: forces, variant: ForceCurveVariant.tinted) : null,
+              footer: curve
+                  ? (foreground) => forceCurves!.widget(variant: ForceCurveVariant.tinted, foreground: foreground)
+                  : null,
             )),
           ),
           const SizedBox(width: AppSpacing.m),
@@ -173,14 +175,15 @@ class CourseLiveView extends StatelessWidget {
   Widget _paceBox() =>
       PaceBox(progress: lap, course: course, pace: tick?.pace, ghost: ghost, ghostGap: ghostGap);
 
-  Widget _strokeRate(double fontSize, {bool landscape = false, Widget? footer}) => StrokeRateCard(
-        strokeRate: tick?.strokeRate,
-        status: lap.strokeRate,
-        segment: lap.segment,
-        fontSize: fontSize,
-        landscape: landscape,
-        footer: footer,
-      );
+  Widget _strokeRate(double fontSize, {bool landscape = false, Widget Function(Color foreground)? footer}) =>
+      StrokeRateCard(
+          strokeRate: tick?.strokeRate,
+          status: lap.strokeRate,
+          segment: lap.segment,
+          fontSize: fontSize,
+          landscape: landscape,
+          footer: footer,
+        );
 
   /// Lap time, watts, heart rate (only with a monitor) and the share in the zone.
   List<Widget> _tiles(BuildContext context, double fontSize) {

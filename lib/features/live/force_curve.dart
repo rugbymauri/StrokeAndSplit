@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/design_tokens.dart';
@@ -19,6 +20,36 @@ enum ForceCurveVariant {
 
   /// Inside the coloured stroke rate card, drawn in `text` (landscape, template).
   tinted,
+}
+
+/// The curves the live display shows: those of the last and of the previous stroke.
+///
+/// A layout gets null instead for a source without force curves and then leaves the card out.
+class ForceCurves {
+  const ForceCurves({this.last, this.previous});
+
+  /// The latest curve; null before the first one.
+  final StrokeForceCurve? last;
+
+  /// The curve that came before [last]; null without one.
+  final StrokeForceCurve? previous;
+
+  /// With [curve] as the latest one. The one before stays for comparison, unless [curve] starts
+  /// over at a lower stroke number, e.g. in a new workout.
+  ForceCurves add(StrokeForceCurve curve) {
+    final last = this.last;
+    return ForceCurves(last: curve, previous: last != null && last.strokeNumber < curve.strokeNumber ? last : null);
+  }
+
+  /// The card for these curves in [variant], drawn in [foreground] where that applies.
+  ForceCurve widget({ForceCurveVariant variant = ForceCurveVariant.card, Color foreground = AppColors.textMuted}) =>
+      ForceCurve(
+        last: last?.forcesNewtons,
+        previous: previous?.forcesNewtons,
+        driveLengthMeters: last?.driveLengthMeters,
+        variant: variant,
+        foreground: foreground,
+      );
 }
 
 /// The force curves of the last and the previous stroke (force-curve, Design D2 and D3), with the

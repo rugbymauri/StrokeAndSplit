@@ -21,7 +21,7 @@ class FreeLiveView extends StatelessWidget {
     required this.action,
     this.rrIntervalMs,
     this.outdated = false,
-    this.forces,
+    this.forceCurves,
   });
 
   final StatusTick? tick;
@@ -36,8 +36,8 @@ class FreeLiveView extends StatelessWidget {
   /// Whether the values are out of date; they are dimmed then.
   final bool outdated;
 
-  /// The force curve of the last stroke; left out while null.
-  final List<double>? forces;
+  /// The force curves of the last strokes; null for a source without them, which leaves the card out.
+  final ForceCurves? forceCurves;
 
   /// Room the label above the pace takes at most.
   static const _labelHeight = 20.0;
@@ -60,7 +60,7 @@ class FreeLiveView extends StatelessWidget {
     final paceHeight = (inner.height * 0.22).clamp(72.0, 160.0);
     final pace = paceFontSize(Size(inner.width, paceHeight - _labelHeight));
     // The force curve goes first when space is short (Design, Risks).
-    final curve = ForceCurve.hasData(forces) && inner.height >= 640;
+    final curve = forceCurves != null && inner.height >= 640;
     return Padding(
       key: const ValueKey(LiveLayout.portrait),
       padding: padding,
@@ -74,7 +74,7 @@ class FreeLiveView extends StatelessWidget {
           SizedBox(height: 48, child: _dim(_SideValues(tick: tick, rrIntervalMs: rrIntervalMs, session: session, card: true))),
           if (curve) ...[
             const SizedBox(height: _gap),
-            SizedBox(height: 120, child: ForceCurve(last: forces)),
+            SizedBox(height: 120, child: forceCurves!.widget()),
           ],
           const SizedBox(height: _gap),
           SizedBox(height: 56, child: action),
@@ -90,7 +90,7 @@ class FreeLiveView extends StatelessWidget {
     final inner = padding.deflateSize(size);
     final leftWidth = (inner.width - AppSpacing.l) * 9 / 16;
     final cardHeight = inner.height - sideHeight - _gap;
-    final curve = ForceCurve.hasData(forces) && inner.height >= 300;
+    final curve = forceCurves != null && inner.height >= 300;
     final curveHeight = math.min(88.0, cardHeight * 0.3);
     final pace = paceFontSize(Size(
       leftWidth - 2 * cardPadding,
@@ -124,7 +124,7 @@ class FreeLiveView extends StatelessWidget {
                             const SizedBox(height: AppSpacing.s),
                             SizedBox(
                               height: curveHeight,
-                              child: ForceCurve(last: forces, variant: ForceCurveVariant.inline),
+                              child: forceCurves!.widget(variant: ForceCurveVariant.inline),
                             ),
                           ],
                         ],

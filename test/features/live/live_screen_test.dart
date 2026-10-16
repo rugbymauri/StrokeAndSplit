@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:aergrow/app/design_tokens.dart';
 import 'package:aergrow/app/platform_providers.dart';
 import 'package:aergrow/data/courses/course.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
@@ -16,6 +17,7 @@ import 'package:aergrow/features/live/live_layout.dart';
 import 'package:aergrow/features/live/live_screen.dart';
 import 'package:aergrow/features/live/pace_box.dart';
 import 'package:aergrow/features/live/progress_frame.dart';
+import 'package:aergrow/features/live/stroke_rate_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,6 +25,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../support/fake_ble_transport.dart';
 import '../../support/fake_erg_source.dart';
+import '../../support/fixtures.dart';
 import '../../support/ghost_sessions.dart';
 import '../../support/localized_app.dart';
 import '../../support/rowed_sessions.dart';
@@ -38,6 +41,17 @@ class _Fixed extends ActiveErgSource {
 }
 
 const _elapsed = Duration(minutes: 12, seconds: 34);
+
+/// The curves of the PM5 recording `force_curve.jsonl`, for the strokes 2 to 18.
+List<StrokeForceCurve> _fixtureCurves() {
+  final decoder = Pm5Decoder();
+  return [
+    for (final packet in loadFixture('force_curve').packets) ...decoder.decode(packet),
+  ].whereType<StrokeForceCurve>().toList();
+}
+
+/// The drive length of [curve] as the live display shows it in German.
+String _length(StrokeForceCurve curve) => '${curve.driveLengthMeters!.toStringAsFixed(2).replaceAll('.', ',')} m';
 
 StatusTick _tick({int? heartRate, Duration elapsed = _elapsed}) => StatusTick(
       elapsed: elapsed,
@@ -129,13 +143,14 @@ class _Harness {
     Locale locale = const Locale('de'),
     ErgConnectionState state = ErgConnectionState.connected,
     AppDatabase? db,
+    ErgSource? source,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(ProviderScope(
       overrides: [
-        activeErgSourceProvider.overrideWith(() => _Fixed(FakeErgSource())),
+        activeErgSourceProvider.overrideWith(() => _Fixed(source ?? FakeErgSource())),
         ergConnectionStateProvider.overrideWithValue(AsyncData(state)),
         rowingEventsProvider.overrideWithValue(events.stream),
         wakelockProvider.overrideWithValue(wakelock),
@@ -220,12 +235,44 @@ void main() {
     });
   });
 
-  testWidgets('leaves out the force curve without data', (tester) async {
-    final harness = _Harness();
-    await harness.pump(tester);
-    await harness.emit(tester, _tick());
+  group('force curve', () {
+    testWidgets('waits for the first stroke with a PM5', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+      await harness.emit(tester, _tick());
 
-    expect(find.byKey(const Key('force-curve')), findsNothing);
+      expect(find.byKey(const Key('force-curve')), findsOneWidget);
+      expect(find.text('Warte auf ersten Schlag'), findsOneWidget);
+      expect(find.byKey(const Key('force-curve-length')), findsNothing);
+    });
+
+    testWidgets('shows the last curve with its drive length, and the previous one', (tester) async {
+      final curves = _fixtureCurves();
+      final harness = _Harness();
+      await harness.pump(tester);
+      await harness.emit(tester, _tick());
+      await harness.emit(tester, curves[2]);
+
+      expect(find.byKey(const Key('force-curve-waiting')), findsNothing);
+      expect(find.text('Vorheriger'), findsNothing);
+      // Stroke 4 of the fixture (Design D4).
+      expect(find.text('1,06 m'), findsOneWidget);
+
+      await harness.emit(tester, curves[3]);
+      expect(find.text('Letzter'), findsOneWidget);
+      expect(find.text('Vorheriger'), findsOneWidget);
+      expect(find.text('1,06 m'), findsNothing);
+      expect(find.text(_length(curves[3])), findsOneWidget);
+    });
+
+    testWidgets('leaves out the card and the drive length with an FTMS rower', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, source: FakeErgSource(kind: ErgSourceKind.ftms, protocol: ErgProtocol.ftms));
+      await harness.emit(tester, _tick());
+
+      expect(find.byKey(const Key('force-curve')), findsNothing);
+      expect(find.byKey(const Key('force-curve-length')), findsNothing);
+    });
   });
 
   for (final (size, layout) in const [
@@ -247,13 +294,16 @@ void main() {
     'small desktop window': const Size(640, 480),
   };
   for (final MapEntry(key: name, value: size) in layouts.entries) {
-    for (final (template, state) in const [
-      (false, ErgConnectionState.connected),
-      (true, ErgConnectionState.connected),
-      (true, ErgConnectionState.reconnecting),
+    for (final (template, state, curves) in const [
+      (false, ErgConnectionState.connected, true),
+      (false, ErgConnectionState.connected, false),
+      (true, ErgConnectionState.connected, true),
+      (true, ErgConnectionState.connected, false),
+      (true, ErgConnectionState.reconnecting, true),
     ]) {
       final what = '${template ? ' with a template' : ''}'
-          '${state == ErgConnectionState.connected ? '' : ' while ${state.name}'}';
+          '${state == ErgConnectionState.connected ? '' : ' while ${state.name}'}'
+          '${curves ? ' and PM5 force curves' : ' and a source without force curves'}';
       testWidgets('fits all values without overflow on a $name$what', (tester) async {
         final harness = _Harness();
         await harness.pump(
@@ -261,9 +311,15 @@ void main() {
           size: size,
           recording: template ? _onCourse(pace: BandStatus.above) : null,
           state: state,
+          source: curves ? null : FakeErgSource(kind: ErgSourceKind.ftms, protocol: ErgProtocol.ftms),
         );
         await harness.emit(tester, _tick(heartRate: 151));
         await harness.emit(tester, HeartBeatIntervals(elapsed: _elapsed, time: Duration.zero, intervalsMs: [812]));
+        if (curves) {
+          for (final curve in _fixtureCurves().take(3)) {
+            await harness.emit(tester, curve);
+          }
+        }
 
         // Overflows would be reported as exceptions and fail the test.
         final view = find.byKey(ValueKey(LiveLayout.of(size)));
@@ -289,6 +345,17 @@ void main() {
             expect(rect.bottom, lessThanOrEqualTo(size.height), reason: key);
             expect(rect.right, lessThanOrEqualTo(size.width), reason: key);
           }
+        }
+        if (!curves) {
+          expect(find.byKey(const Key('force-curve')), findsNothing);
+          expect(find.byKey(const Key('force-curve-length')), findsNothing);
+        } else if (state == ErgConnectionState.connected) {
+          // The drive length of stroke 4 at the last curve, inside the card and the screen.
+          final card = tester.getRect(find.byKey(const Key('force-curve')));
+          final length = tester.getRect(find.text('1,06 m'));
+          expect(card.contains(length.topLeft) && card.contains(length.bottomRight - const Offset(1, 1)), isTrue);
+          expect(length.bottom, lessThanOrEqualTo(size.height));
+          expect(length.right, lessThanOrEqualTo(size.width));
         }
       });
     }
@@ -389,6 +456,23 @@ void main() {
 
       expect(find.text('Beenden'), findsOneWidget);
     });
+
+    for (final (status, color) in const [
+      (BandStatus.inBand, AppColors.zoneInText),
+      (BandStatus.above, AppColors.zoneOutText),
+    ]) {
+      testWidgets('titles the force curve in landscape like the stroke rate card, ${status.name}', (tester) async {
+        final harness = _Harness();
+        await harness.pump(tester, size: const Size(844, 390), recording: _onCourse(strokeRate: status));
+        await harness.emit(tester, _tick());
+        await harness.emit(tester, _fixtureCurves()[2]);
+
+        final card = find.byType(StrokeRateCard);
+        final title = tester.widget<Text>(find.descendant(of: card, matching: find.text('Kraftkurve')));
+        expect(title.style?.color, color);
+        expect(find.descendant(of: card, matching: find.text('1,06 m')), findsOneWidget);
+      });
+    }
   });
 
   group('app bar', () {
