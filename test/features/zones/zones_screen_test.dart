@@ -68,6 +68,14 @@ class _Setup {
   }
 }
 
+/// Opens zone [name] from the list and its editor from the details.
+Future<void> _openEditor(WidgetTester tester, _Setup setup, String name) async {
+  await tester.tap(find.text(name));
+  await setup.settle(tester);
+  await tester.tap(find.byTooltip('Bearbeiten'));
+  await setup.settle(tester);
+}
+
 Future<void> _name(WidgetTester tester, String name) async {
   await tester.enterText(find.byKey(const Key('zone-name')), name);
   await tester.pump();
@@ -165,8 +173,7 @@ void main() {
     await setup.pump(tester);
     expect(find.text('in 2 Strecken'), findsOneWidget);
 
-    await tester.tap(find.text('Sprint'));
-    await setup.settle(tester);
+    await _openEditor(tester, setup, 'Sprint');
 
     expect(find.text('Steckt in „2 km Intervall“, „Kurz“'), findsOneWidget);
     final axis = tester.widget<SegmentedButton<CourseAxis>>(find.byType(SegmentedButton<CourseAxis>));
@@ -179,8 +186,7 @@ void main() {
     await setup.sprintInTwoCourses(tester);
     await setup.pump(tester);
 
-    await tester.tap(find.text('Sprint'));
-    await setup.settle(tester);
+    await _openEditor(tester, setup, 'Sprint');
     await tapStep(tester, const Key('zone-length'), more: true);
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
@@ -195,8 +201,7 @@ void main() {
       final setup = _Setup();
       await tester.runAsync(() => setup.zones.create(_sprint));
       await setup.pump(tester);
-      await tester.tap(find.text('Sprint'));
-      await setup.settle(tester);
+      await _openEditor(tester, setup, 'Sprint');
       return setup;
     }
 
@@ -252,8 +257,7 @@ void main() {
     await setup.sprintInTwoCourses(tester);
     await setup.pump(tester);
 
-    await tester.tap(find.text('Sprint'));
-    await setup.settle(tester);
+    await _openEditor(tester, setup, 'Sprint');
     await tester.tap(find.byTooltip('Löschen'));
     await tester.pumpAndSettle();
     expect(find.textContaining('In diesen Strecken wird ihre Stelle frei: „2 km Intervall“, „Kurz“.'), findsOneWidget);

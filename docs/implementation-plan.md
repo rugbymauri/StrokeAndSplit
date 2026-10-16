@@ -20,7 +20,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
-| 6 | `statistics` | 7/12 | Gruppe 1 und Anzeige teilweise in `main` | – |
+| 6 | `statistics` | 9/12 | Gruppe 1 und Anzeige teilweise in `main` | – |
 | 7 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 3 und 6 |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 | 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
@@ -168,6 +168,7 @@ Gruppe 1 umgesetzt (2026-10-16, Tasks 1.1–1.6, `lib/data/statistics/`):
 - [x] Kleine Entscheide: aktuelle Länge zuerst, ältere nach Länge aufsteigend; zusätzlich nach Achse gruppiert; bei Gleichstand gewinnt, wer früher gerudert hat; Status der Session wird nicht gefiltert (auch abgebrochene Sessions zählen mit vollständigen Runden); Vorlage mit heute offener Rundenzahl hat keine Rangliste.
 - [ ] Offen: Importierte Sessions haben kein `templateId` und zählen darum nicht für die Rangliste ihrer Vorlage (Spec-Szenario „Import“). Vorschlag: beim Import mit einer Vorlage gleichen Namens, gleicher Strecke und Rundenzahl verknüpfen. Ändert das Import-Verhalten aus `course-rowing`, Entscheid des Nutzers.
 - [x] Task 3.1 Plätze 1–3 in der aufgeklappten Vorlage (`template_podium.dart`), Lücke für das Ghost-Symbol bei Platz 1. Vorläufig: Überschrift „Bestleistungen“ und Hinweistexte selbst formuliert; Datum als `DateFormat.yMd`; ist die aktuelle Länge noch nie gerudert, erscheint der Hinweis statt einer älteren Rangliste.
+- [x] Tasks 2.1/2.2 Detailansicht von Strecke und Zone (`course_detail_screen.dart`, `zone_detail_screen.dart`, gemeinsam `lib/features/statistics/ranking_sections.dart`), Tipp in der Liste öffnet sie, Stift öffnet den Editor. Vorläufig: nach dem Speichern zurück in die Detailansicht; Löschen bleibt in Liste bzw. Editor; Zeit im Rundenformat (`0:18.2`); Datum kurz ohne Uhrzeit; hat die aktuelle Länge keine Einträge, fehlt ihre Rangliste ohne eigenen Hinweis.
 
 ### 7. `ghost`: gegen die eigene Bestzeit rudern
 

@@ -850,6 +850,39 @@ class AppLocalizationsDe extends AppLocalizations {
   String get courseLegendShade => 'Helligkeit = Tempo';
 
   @override
+  String rankingLength(String length) {
+    return 'Bestenliste $length';
+  }
+
+  @override
+  String rankingLengthCurrent(String length) {
+    return 'Bestenliste $length · aktuell';
+  }
+
+  @override
+  String rankingPlace(int place) {
+    return 'Platz $place';
+  }
+
+  @override
+  String rankingPace(String pace) {
+    return '$pace /500 m';
+  }
+
+  @override
+  String get rankingPausesHint =>
+      'Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.';
+
+  @override
+  String get rankingEmpty =>
+      'Noch keine Bestzeit. Es zählen nur vollständige Runden am Rudergerät, nicht im Simulator.';
+
+  @override
+  String rankingLoadFailed(String error) {
+    return 'Bestenliste konnte nicht geladen werden: $error';
+  }
+
+  @override
   String courseZoneFrom(String start) {
     return 'ab $start';
   }

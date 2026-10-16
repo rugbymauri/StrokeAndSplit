@@ -1417,6 +1417,48 @@ abstract class AppLocalizations {
   /// **'Helligkeit = Tempo'**
   String get courseLegendShade;
 
+  /// Course and zone details: label above places 1–3 of one length, e.g. 'Bestenliste 1000 m'
+  ///
+  /// In de, this message translates to:
+  /// **'Bestenliste {length}'**
+  String rankingLength(String length);
+
+  /// Course and zone details: label above places 1–3 of the length the course or zone has today
+  ///
+  /// In de, this message translates to:
+  /// **'Bestenliste {length} · aktuell'**
+  String rankingLengthCurrent(String length);
+
+  /// Rankings: screen reader label of a place, e.g. 'Platz 1'
+  ///
+  /// In de, this message translates to:
+  /// **'Platz {place}'**
+  String rankingPlace(int place);
+
+  /// Rankings: pace per 500 metres of an entry, pauses included
+  ///
+  /// In de, this message translates to:
+  /// **'{pace} /500 m'**
+  String rankingPace(String pace);
+
+  /// Course and zone details: hint below the rankings that times and paces include pauses
+  ///
+  /// In de, this message translates to:
+  /// **'Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.'**
+  String get rankingPausesHint;
+
+  /// Course and zone details: shown instead of places when nothing was rowed yet
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Bestzeit. Es zählen nur vollständige Runden am Rudergerät, nicht im Simulator.'**
+  String get rankingEmpty;
+
+  /// Course and zone details: the rankings could not be computed
+  ///
+  /// In de, this message translates to:
+  /// **'Bestenliste konnte nicht geladen werden: {error}'**
+  String rankingLoadFailed(String error);
+
   /// Course editor: where a placed zone starts, e.g. 'ab 500 m'
   ///
   /// In de, this message translates to:
