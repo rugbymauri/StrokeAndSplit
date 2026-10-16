@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/sources/heart_rate_monitor.dart';
 import '../features/connection/launch_screen.dart';
 import '../l10n/l10n.dart';
 import 'app_language.dart';
@@ -11,6 +12,9 @@ class AergRowApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // The strap connects as soon as a rower over Bluetooth is connected, which
+    // already happens in "Geräte wählen", not only in the live display (heart-rate, Design D7).
+    ref.listen(heartRateMonitorProvider, (_, _) {});
     return MaterialApp(
       onGenerateTitle: (context) => context.l10n.appTitle,
       debugShowCheckedModeBanner: false,
