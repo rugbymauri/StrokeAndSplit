@@ -6,6 +6,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import 'ble_transport.dart';
+import 'rower_scan_filter.dart';
 
 /// What a failed scan says about the Bluetooth prerequisites, or null when
 /// it is some other error.
@@ -29,6 +30,7 @@ BluetoothReadiness? readinessForScanError(Object error) {
 /// license (see design decision D4).
 class FlutterBluePlusTransport implements BleTransport {
   static final _rowingService = Guid(Pm5Characteristics.uuid('0030'));
+  static final _ftmsService = Guid(FtmsIds.service);
 
   @override
   Future<BluetoothReadiness> readiness() async {
@@ -51,27 +53,38 @@ class FlutterBluePlusTransport implements BleTransport {
 
     final found = <FoundRower>{};
     final updates = StreamController<List<FoundRower>>();
-    void add(Iterable<BluetoothDevice> devices) {
+    void add(Iterable<FoundRower?> rowers) {
       final before = found.length;
-      found.addAll(devices
-          .where((d) => d.platformName.startsWith('PM5'))
-          .map((d) => FoundRower(id: d.remoteId.str, name: d.platformName)));
+      found.addAll(rowers.nonNulls);
       if (found.length != before) updates.add(found.toList());
     }
 
-    final results = FlutterBluePlus.scanResults.listen((r) => add(r.map((e) => e.device)));
+    final results = FlutterBluePlus.scanResults.listen((results) => add(results.map((r) => rowerFromAdvertisement(
+          id: r.device.remoteId.str,
+          name: r.device.platformName.isNotEmpty ? r.device.platformName : r.advertisementData.advName,
+          serviceIds: [for (final uuid in r.advertisementData.serviceUuids) uuid.str.toLowerCase()],
+          serviceData: {
+            for (final MapEntry(:key, :value) in r.advertisementData.serviceData.entries) key.str.toLowerCase(): value,
+          },
+        ))));
     try {
-      // The name filter is ignored on Linux; [add] filters for all platforms.
-      await FlutterBluePlus.startScan(withKeywords: ['PM5'], timeout: timeout);
+      // No platform filter: Android cannot combine the PM5 keyword with the
+      // FTMS service, and Linux ignores filters; [rowerFromAdvertisement]
+      // filters on all platforms.
+      await FlutterBluePlus.startScan(timeout: timeout);
     } on Exception catch (e) {
       await results.cancel();
       final readiness = readinessForScanError(e);
       if (readiness != null) throw BluetoothNotReadyException(readiness);
       rethrow;
     }
-    // The Linux backend only reports devices BlueZ discovers anew; a PM5 in
-    // the BlueZ cache is only listed among the system devices.
-    if (Platform.isLinux) add(await FlutterBluePlus.systemDevices([]));
+    // The Linux backend only reports devices BlueZ discovers anew; a rower in
+    // the BlueZ cache is only listed among the system devices. These come
+    // without advertisement, so only a PM5 is recognised there, by its name.
+    if (Platform.isLinux) {
+      final cached = await FlutterBluePlus.systemDevices([_rowingService, _ftmsService]);
+      add(cached.map((d) => rowerFromAdvertisement(id: d.remoteId.str, name: d.platformName)));
+    }
 
     unawaited(FlutterBluePlus.isScanning.firstWhere((scanning) => !scanning).then((_) async {
       await results.cancel();

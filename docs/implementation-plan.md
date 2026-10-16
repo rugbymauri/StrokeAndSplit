@@ -15,7 +15,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
-| 1 | `device-types` | 20/33 | in Arbeit auf `feature/device-types` | – |
+| 1 | `device-types` | 21/33 | in Arbeit auf `feature/device-types` | – |
 | 2 | `ui-design` | 0/18 | nach 1 | Entscheid Puls-Herkunft (F1) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
@@ -52,6 +52,7 @@ Bei der Umsetzung mitnehmen:
 - Task 4.2: Zusätzlich zum Umschalter in der Simulator-Bedienung bietet „Vorlage rudern“ die Quelle „Simulator (FTMS)“ an, weil eine Vorlage die Session sofort startet und der Umschalter während einer Session gesperrt ist. Mit `ui-design` (Startbildschirm, Quellenwahl) übernehmen.
 - Reihenfolge: Abschnitt 3 (FTMS-Protokoll) vor 2.4/2.5 umgesetzt, weil deren Tests den FTMS-Decoder brauchen.
 - Task 4.4: Der Software-Rower startet unter Linux und registriert seine Advertisement bei BlueZ. Ob er vom Handy aus als FTMS-Gerät erscheint und Control Point und Notifications funktionieren, ist ungeprüft und gehört zu 7.2. bless 0.3 kann keine Service Data setzen; das Skript ergänzt sie im Advertisement-Objekt von bless. Nach einem Update von bless prüfen.
+- Task 5.2 weicht von D5 ab: Der Scan läuft ohne Plattformfilter, weil flutter_blue_plus unter Android das Keyword `PM5` nicht mit dem Service `0x1826` kombiniert. `rowerFromAdvertisement` filtert auf allen Plattformen. Unter Linux liefert `systemDevices` den BlueZ-Cache nur mit Namen; dort wird nur ein PM5 erkannt. Ein FTMS-Gerät im Cache erscheint unter Linux erst, wenn BlueZ es neu entdeckt. Das betrifft nur Linux, getestet wird FTMS vom Handy aus.
 - Design D8 angepasst: Beim FTMS-Reset beginnt die eigene Uhr wieder bei 0, sonst zählt die Session die Zeit doppelt.
 - [ ] Zeile über 120 Zeichen in `lib/features/connection/device_list_screen.dart` (Fehlertext „Suche nach dem PM5“) mit Task 5.5 umbrechen.
 
