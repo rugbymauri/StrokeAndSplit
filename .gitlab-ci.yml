@@ -1,4 +1,5 @@
-# CI for AergRow: analysis and tests for merge requests and main.
+# CI for AergRow: analysis and tests for merge requests and main, packages and a
+# GitLab release for version tags vX.Y.Z on main. See README, section "CI und Releases".
 
 variables:
   # Binary and file name. rename-stroke-and-split changes it here, in linux/CMakeLists.txt
@@ -10,7 +11,9 @@ variables:
   # to this tag (see .flutter).
   FLUTTER_VERSION: "3.47.7"
   FLUTTER_IMAGE: ghcr.io/cirruslabs/flutter:3.44.0
+  GLAB_IMAGE: registry.gitlab.com/gitlab-org/cli:v1.120.0
   PUB_CACHE: $CI_PROJECT_DIR/.pub-cache
+  PACKAGE_REGISTRY_URL: $CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/$APP_NAME
 
 workflow:
   rules:
@@ -24,7 +27,14 @@ workflow:
     - if: $CI_COMMIT_TAG
 
 stages:
+  - .pre
   - test
+  - build
+  - release
+
+.release-rules:
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
 
 .pub-cache:
   key:
@@ -45,9 +55,131 @@ stages:
   cache:
     - !reference [.pub-cache]
 
+verify-tag:
+  stage: .pre
+  image: $FLUTTER_IMAGE
+  extends: .release-rules
+  variables:
+    GIT_DEPTH: 0
+  script:
+    - git fetch --quiet origin "+refs/heads/$CI_DEFAULT_BRANCH:refs/remotes/origin/$CI_DEFAULT_BRANCH"
+    - |
+      if ! git merge-base --is-ancestor "$CI_COMMIT_SHA" "origin/$CI_DEFAULT_BRANCH"; then
+        echo "error: tag $CI_COMMIT_TAG points to $CI_COMMIT_SHORT_SHA, which is not on $CI_DEFAULT_BRANCH. Releases are only made from $CI_DEFAULT_BRANCH."
+        exit 1
+      fi
+    - |
+      status=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases/$CI_COMMIT_TAG")
+      case "$status" in
+        404) ;;
+        200) echo "error: release $CI_COMMIT_TAG already exists. Published releases are not overwritten, tag a new version instead."; exit 1 ;;
+        *) echo "error: could not check whether release $CI_COMMIT_TAG exists (HTTP $status)."; exit 1 ;;
+      esac
+    - echo "VERSION=${CI_COMMIT_TAG#v}" > release.env
+  artifacts:
+    reports:
+      dotenv: release.env
+
 check:
   stage: test
   extends: .flutter
   script:
     - make deps
     - make check
+
+build-apk:
+  stage: build
+  extends:
+    - .flutter
+    - .release-rules
+  variables:
+    GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
+  cache:
+    - !reference [.pub-cache]
+    - key: gradle
+      paths:
+        - .gradle/
+  script:
+    - |
+      if [ ! -s "${ANDROID_DEBUG_KEYSTORE:-}" ]; then
+        echo "error: CI/CD variable ANDROID_DEBUG_KEYSTORE (type File, Base64-encoded debug keystore) is missing. Without it the APK would get a random key and could not update earlier releases. See README, section \"CI und Releases\"."
+        exit 1
+      fi
+    - mkdir -p ~/.android
+    # GitLab stores variables as text, so the keystore is kept Base64-encoded.
+    - base64 --decode "$ANDROID_DEBUG_KEYSTORE" > ~/.android/debug.keystore
+    - keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey > /dev/null
+    - make deps
+    - make apk BUILD_NAME="$VERSION" BUILD_NUMBER="$CI_PIPELINE_IID"
+    - mkdir -p build/dist
+    - cp build/app/outputs/flutter-apk/app-release.apk "build/dist/$APP_NAME-$VERSION-android.apk"
+  artifacts:
+    paths:
+      - build/dist/
+    expire_in: 1 day
+
+build-appimage:
+  stage: build
+  extends:
+    - .flutter
+    - .release-rules
+  script:
+    - apt-get update -qq
+    - DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends clang cmake ninja-build pkg-config libgtk-3-dev file desktop-file-utils > /dev/null
+    - make deps
+    - make build-linux BUILD_NAME="$VERSION" BUILD_NUMBER="$CI_PIPELINE_IID"
+    - make appimage BUILD_NAME="$VERSION"
+    - mkdir -p build/dist
+    - cp "build/appimage/$APP_NAME-$VERSION-x86_64.AppImage" build/dist/
+  artifacts:
+    paths:
+      - build/dist/
+    expire_in: 1 day
+
+upload:
+  stage: release
+  image: $FLUTTER_IMAGE
+  extends: .release-rules
+  needs:
+    - verify-tag
+    - build-apk
+    - build-appimage
+  script:
+    - |
+      for file in "$APP_NAME-$VERSION-android.apk" "$APP_NAME-$VERSION-x86_64.AppImage"; do
+        echo "Uploading $file"
+        curl --fail-with-body --silent --show-error \
+          --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+          --upload-file "build/dist/$file" \
+          "$PACKAGE_REGISTRY_URL/$VERSION/$file"
+        echo
+      done
+
+release:
+  stage: release
+  image: $GLAB_IMAGE
+  extends: .release-rules
+  needs:
+    - verify-tag
+    - job: upload
+      artifacts: false
+  script:
+    - echo "Creating release $CI_COMMIT_TAG"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: $CI_COMMIT_TAG
+    description: |
+      AergRow $VERSION, built from commit $CI_COMMIT_SHA.
+
+      - Android: universal APK. Signed with the shared debug key of the pipeline, not suitable for the Play Store. Allow installing from unknown sources.
+      - Linux: AppImage for x86_64, needs GTK 3. Make it executable with `chmod +x` and start it.
+    assets:
+      links:
+        - name: $APP_NAME-$VERSION-android.apk
+          url: $PACKAGE_REGISTRY_URL/$VERSION/$APP_NAME-$VERSION-android.apk
+          link_type: package
+        - name: $APP_NAME-$VERSION-x86_64.AppImage
+          url: $PACKAGE_REGISTRY_URL/$VERSION/$APP_NAME-$VERSION-x86_64.AppImage
+          link_type: package

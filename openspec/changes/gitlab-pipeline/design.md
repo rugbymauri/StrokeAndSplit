@@ -71,6 +71,8 @@ Alternative: Versionscode aus der Version ableiten, z. B. `X*10000 + Y*100 + Z`.
 
 Einmalig wird lokal ein Debug-Keystore erzeugt, und zwar wie der Android-Standard (`keytool`, Alias `androiddebugkey`, Passwörter `android`). Er wird als CI/CD-Variable vom Typ *File* `ANDROID_DEBUG_KEYSTORE` hinterlegt, *protected*. `build-apk` kopiert ihn vor dem Build nach `~/.android/debug.keystore`. Gradle nutzt dann diesen Schlüssel, weil `build.gradle.kts` den Release-Build mit der Debug-Config signiert. Am Gradle-Code ändert sich nichts.
 
+**Nachtrag bei der Umsetzung:** GitLab speichert auch File-Variablen als Text, eine Binärdatei lässt sich nicht hinterlegen. Die Variable enthält darum den Base64-kodierten Keystore (`base64 -w0`), `build-apk` dekodiert ihn und prüft mit `keytool -list`, ob Alias und Passwort stimmen.
+
 Fehlt die Variable, bricht `build-apk` ab, statt mit einem frischen Zufallsschlüssel zu bauen. Ein solcher Build liesse sich nicht über ältere Releases installieren (Spec: Update über ein älteres Release).
 
 Weil die Variable *protected* ist, muss `v*` als geschützter Tag eingerichtet werden. Sonst sieht der Tag-Job die Variable nicht. Der Keystore ist kein Geheimnis von Wert (Debug, Standardpasswort). *Protected* verhindert nur, dass MR-Pipelines ihn sehen und mit ihm signieren.
