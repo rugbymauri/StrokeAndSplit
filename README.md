@@ -36,21 +36,37 @@ Alle Befehle zeigt `make help`.
 
 ## Verwendung
 
-1. **Rudergerät suchen**: Am PM5 das Bluetooth-Menü öffnen (Verbinden), ein FTMS-Rudergerät einschalten, dann in der App das Gerät wählen. Die Liste zeigt bei jedem Gerät, ob es ein PM5 oder ein FTMS-Gerät ist. Viele Rudergeräte erlauben nur eine Bluetooth-Verbindung, ErgData oder andere Apps müssen also getrennt sein. Ein FTMS-Rudergerät fordert die App nach dem Verbinden zum Senden auf, setzt es aber nie zurück.
-2. Im Live-Display **Session starten**. Zeit und Distanz zählen ab 0, auch wenn das Gerät schon etwas anzeigt, und laufen über Resets am Gerät hinweg weiter. Bei FTMS misst die App die Zeit selbst und hält sie an, sobald 4 s lang weder Distanz noch Schläge dazukommen. Schlagdetails wie Kraft und Zuglänge liefert nur der PM5.
-3. **Session beenden** zeigt die Zusammenfassung. Unter **Sessions** auf dem Startbildschirm lassen sich Sessions abspielen, als `.aergrow` exportieren, importieren und löschen.
+1. **Geräte wählen**: Am PM5 das Bluetooth-Menü öffnen (Verbinden) bzw. ein FTMS-Rudergerät einschalten. Die App sucht beim Start und listet die gefundenen Rudergeräte, jeweils mit dem Hinweis, ob es ein PM5 oder ein FTMS-Gerät ist, darunter **Simulator** und **Simulator (FTMS)**. Gerät wählen und **Weiter**. Viele Rudergeräte erlauben nur eine Bluetooth-Verbindung, ErgData oder andere Apps müssen also getrennt sein. Ein FTMS-Rudergerät fordert die App nach dem Verbinden zum Senden auf, setzt es aber nie zurück.
+2. Die App merkt sich das Rudergerät. Beim nächsten Start sucht sie es bis zu 10 s, verbindet und überspringt „Geräte wählen“. Wird es nicht gefunden, erscheint „Geräte wählen“ mit diesem Gerät vorausgewählt. War es ein Simulator, geht es ohne Suche weiter.
+3. **Startbildschirm**: Oben steht das gewählte Rudergerät, Antippen führt zurück zu „Geräte wählen“. **Rudern** öffnet die Vorlagen (siehe unten), **Frei rudern** das Live-Display ohne Vorlage. **Nochmal** zeigt die zuletzt geruderte Vorlage und öffnet sie aufgeklappt in den Vorlagen. Unter **Sessions** lassen sich Sessions abspielen, als `.aergrow` exportieren, importieren und löschen.
+4. Beim freien Rudern im Live-Display **Session starten**. Zeit und Distanz zählen ab 0, auch wenn das Gerät schon etwas anzeigt, und laufen über Resets am Gerät hinweg weiter. Bei FTMS misst die App die Zeit selbst und hält sie an, sobald 4 s lang weder Distanz noch Schläge dazukommen. Schlagdetails wie Kraft und Zuglänge liefert nur der PM5.
+5. **Session beenden** zeigt die Zusammenfassung mit Durchschnittswerten und, bei einer Vorlage, den Runden. **Fertig** trennt das Rudergerät und führt zum Startbildschirm, die nächste Session verbindet wieder.
+
+Das Live-Display passt sich dem Platz an: Ist er breiter als hoch, gilt das Querformat, auch im breiten Laptop-Fenster. Die Kopfzeile zeigt den Namen der Vorlage bzw. „Frei rudern“ und davor die Verbindung als Punkt: grün verbunden, orange beim Verbinden oder Wiederverbinden (mit Text darunter), leerer Ring getrennt. Simulator und Replay sind rechts markiert, daneben trennt das Symbol die Verbindung, ebenso wie Zurück.
 
 Wird die App während einer Session beendet, bleibt die Session bis kurz davor erhalten. Beim nächsten Start ist sie als unvollständig markiert.
 
 ### Zonen, Strecken und Vorlagen
 
-**Vorlage rudern** auf dem Startbildschirm hat drei Tabs: **Vorlagen**, **Strecken** und **Zonen**.
+**Rudern** führt zu „Vorlage rudern“ mit drei Tabs: **Vorlagen**, **Strecken** und **Zonen**. Zahlen wie Länge, Bänder, Startposition und Runden werden in allen Editoren mit zwei Ruderblatt-Tasten eingestellt, nicht getippt: Die Taste mit dem Pfeil nach oben gibt mehr, die mit dem Pfeil nach unten weniger. Gedrückt halten wiederholt den Schritt, nach etwa einer Sekunde schneller. Am Minimum oder Maximum ist die Taste gesperrt.
 
 1. **Zonen** → **Zone anlegen**: Name, Achse (Distanz oder Zeit), feste Länge und mindestens ein Band, ein Pace-Band (z.B. 1:45–1:50) und/oder ein Schlagzahl-Band (z.B. 30–34). Die Liste zeigt die Zonen nach Achse und in wie vielen Strecken sie stecken.
-2. **Strecken** → **Strecke anlegen**: Name, Achse (Distanz in Metern oder Zeit als m:ss) und Länge. Mit **Zone einbauen** eine Zone wählen und ihre Startposition eingeben. Zonen der anderen Achse sind ausgegraut. Die Vorschau zeigt, wo die Zone liegt, und lehnt sie ab, wenn sie über das Streckenende ragt oder eine andere Zone überschneidet. Dieselbe Zone darf mehrfach vorkommen. Was zwischen den Zonen liegt, ist frei. Mit **+** bei einem freien Abschnitt beginnt die neue Zone dort, eine eingebaute Zone lässt sich antippen und verschieben oder mit **×** entfernen.
-3. **Vorlagen** → **Vorlage anlegen** mit Name, Strecke und Rundenzahl, fest oder offen.
-4. Vorlage antippen und die Quelle wählen (Rudergerät, Simulator oder Simulator als FTMS-Gerät). Sobald die Quelle verbunden ist, startet die Session. Über den Werten stehen die Runde, die aktuelle Zone bzw. „frei“, der Rest bis zum Abschnittsende, die Bänder und der Anteil in der Zone. Pace und Schlagzahl werden grün, wenn sie im Band liegen, und zeigen sonst die Richtung („schneller“, „mehr Schläge“).
-5. Nach der letzten Runde endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit der besten hervorgehoben. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
+2. **Strecken** → **Strecke anlegen**: Name, Achse (Distanz in Metern oder Zeit als m:ss) und Länge. Mit **Zone einbauen** eine Zone wählen und ihre Startposition einstellen. Zonen der anderen Achse sind ausgegraut. Die Vorschau zeigt, wo die Zone liegt, und lehnt sie ab, wenn sie über das Streckenende ragt oder eine andere Zone überschneidet. Dieselbe Zone darf mehrfach vorkommen. Was zwischen den Zonen liegt, ist frei. Mit **+** bei einem freien Abschnitt beginnt die neue Zone dort, eine eingebaute Zone lässt sich antippen und verschieben oder mit **×** entfernen. Im Balken über der Liste heisst grau frei und blau Zone, schnellere Pace-Bänder sind heller.
+3. **Vorlagen** → **Vorlage anlegen** mit Name, Strecke und Runden, **Feste Anzahl** oder **Offen bis Stopp**.
+4. Vorlage antippen klappt sie mit ihren Zonen und Bändern auf. **Starten** verbindet das gewählte Rudergerät und startet die Session sofort. Der Stift öffnet den Editor, dort lässt sich die Vorlage auch löschen.
+5. Nach der letzten Runde endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit dem Anteil in der Zone, die beste mit Stern. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
+
+Im Live-Display mit Vorlage ist die Pace der grösste Wert. Darunter steht der Zonenstatus mit dem Band („In der Zone · 2:05–2:10“, sonst „Schneller“ bzw. „Langsamer“), die Schlagzahl-Karte zeigt ihr Band ebenso („Mehr Schläge“, „Weniger Schläge“). Blau heisst in der Zone, orange ausserhalb. Dazu kommen Kacheln für Rundenzeit, Watt, Puls (wenn das Rudergerät ihn liefert) und den Anteil in der Zone.
+
+Um die Pace läuft ein Fortschrittsrahmen aus drei Spuren, jede beginnt oben in der Mitte und läuft im Uhrzeigersinn, an der Spitze sitzt ein Schiffchen:
+
+| Spur | Zeigt | Legende, z.B. |
+|---|---|---|
+| aussen, weiss | die ganze Strecke über alle Runden, Kerben an den Rundengrenzen | „Gesamt 1 460 / 3 000 m“ |
+| Mitte, grau | die aktuelle Runde, Kerben an den Abschnittsgrenzen | „Runde 2 / 3 · noch 540 m“ |
+| innen, farbig | den aktuellen Abschnitt, blau bzw. orange nach dem Zonenstatus der Pace, grau, wenn er frei ist | „Tempo · noch 340 m“ bzw. „frei · noch 340 m“ |
+
+Bei offener Rundenzahl fehlt die äussere Spur, die Legende zeigt dann „Runde 2“. Bei Zeitstrecken stehen statt Metern Zeiten.
 
 Eine geänderte Zone gilt in allen Strecken, die sie enthalten. Passt sie danach in eine davon nicht mehr, wird die Änderung abgelehnt und der Editor nennt die Strecke. Eine gelöschte Zone macht ihre Stellen frei.
 
@@ -58,7 +74,7 @@ Runden laufen nach Wanduhr: Eine Pause kostet bei Distanzstrecken Zeit und bei Z
 
 ### Sprache
 
-Die App startet auf Deutsch. Das Sprach-Symbol oben rechts im Startbildschirm schaltet zwischen **Deutsch** und **English** um. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Vorlagen), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten bleiben wie am PM5 (`2:05.3`).
+Die App startet auf Deutsch. Das Sprach-Symbol oben rechts auf „Geräte wählen“ und dem Startbildschirm schaltet zwischen **Deutsch** und **English** um, also schon beim ersten Start. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Vorlagen), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten bleiben wie am PM5 (`2:05.3`).
 
 ## Projektstruktur
 
@@ -74,11 +90,11 @@ lib/
     sessions/          Aufzeichnung, Zusammenfassung, Export/Import
   l10n/                Übersetzungen: app_de.arb (Vorlage), app_en.arb und der erzeugte Code
   features/
-    connection/        Startbildschirm, PM5-Suche, Verbindungsanzeige
+    connection/        Geräte wählen, Startbildschirm, Verbindungsanzeige
     courses/           Strecken-Liste und -Editor mit „Zone einbauen“
     zones/             Zonen-Liste und -Editor
     templates/         Vorlagen-Liste und -Editor
-    live/              Live-Display mit Streckenleiste
+    live/              Live-Display mit Pace-Box und Fortschrittsrahmen
     sessions/          Session-Liste und Zusammenfassung
     simulator/         Bedienung des Simulators
   spike/               BLE-Spike zum Mitschneiden von Rohpaketen
