@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../db/database.dart';
+import '../db/watch.dart';
 import '../sources/erg_source.dart';
 import 'ranking.dart';
 
@@ -108,6 +109,20 @@ class RankingRepository {
       current: (_axis(current), current.read<int>('length'), laps),
     );
   }
+
+  /// [load] now and again after every change to sessions, laps, courses,
+  /// zones or templates, e.g. a new, imported or deleted session.
+  Stream<List<Ranking>> watch(Future<List<Ranking>> Function() load) => _db.watchTables([
+        _db.sessions,
+        _db.laps,
+        _db.lapSegments,
+        _db.courses,
+        _db.courseVersions,
+        _db.courseSegments,
+        _db.zones,
+        _db.templates,
+        _db.templateBlocks,
+      ], load);
 
   static RankingEntry _segmentEntry(QueryRow row) {
     final startWallMs = row.read<int>('lap_wall') + row.read<int>('before_wall');
