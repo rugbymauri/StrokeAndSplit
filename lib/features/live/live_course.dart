@@ -6,17 +6,21 @@ import 'package:flutter/material.dart';
 import '../../app/design_tokens.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/lap_tracker.dart';
+import '../../data/ghost/ghost.dart';
 import '../../l10n/l10n.dart';
 import 'force_curve.dart';
 import 'formatters.dart';
 import 'live_layout.dart';
 import 'metric_tile.dart';
 import 'pace_box.dart';
+import 'progress_frame.dart';
 import 'stroke_rate_card.dart';
 
 /// The live display while rowing a template (ui-design, Design D2): the pace
 /// box with the progress frame, the stroke rate card, four small tiles, the
-/// force curve and the button that ends the session.
+/// force curve and the button that ends the session. The ghosts run in the
+/// progress frame and the gap to the ghost of the template is in the pace
+/// box (Change ghost, Design D1, D4).
 class CourseLiveView extends StatelessWidget {
   const CourseLiveView({
     super.key,
@@ -27,6 +31,8 @@ class CourseLiveView extends StatelessWidget {
     required this.shortAction,
     this.outdated = false,
     this.forces,
+    this.ghost,
+    this.ghostGap,
   });
 
   final StatusTick? tick;
@@ -43,6 +49,12 @@ class CourseLiveView extends StatelessWidget {
   /// The force curve of the last stroke; left out while null.
   final List<double>? forces;
 
+  /// Where the ghosts are on the tracks; null without any.
+  final FrameGhost? ghost;
+
+  /// The gap to the ghost of the whole template; null without one.
+  final GhostGap? ghostGap;
+
   static const _gap = 10.0;
 
   @override
@@ -57,7 +69,14 @@ class CourseLiveView extends StatelessWidget {
   }
 
   Widget _portrait(BuildContext context, Size size) {
-    const padding = EdgeInsets.symmetric(horizontal: AppSpacing.pagePortrait, vertical: AppSpacing.s);
+    // A ghost moved out of the outer track sticks out of the box by up to
+    // [ProgressFramePainter.overhang]; the top padding keeps it clear of the app bar.
+    final padding = EdgeInsets.fromLTRB(
+      AppSpacing.pagePortrait,
+      math.max(AppSpacing.s, ProgressFramePainter.overhang.ceilToDouble()),
+      AppSpacing.pagePortrait,
+      AppSpacing.s,
+    );
     const strokeHeight = 76.0;
     const tilesHeight = 60.0;
     const curveHeight = 72.0;
@@ -147,7 +166,8 @@ class CourseLiveView extends StatelessWidget {
 
   Widget _dim(Widget child) => Opacity(opacity: outdated ? 0.4 : 1, child: child);
 
-  Widget _paceBox() => PaceBox(progress: lap, course: course, pace: tick?.pace);
+  Widget _paceBox() =>
+      PaceBox(progress: lap, course: course, pace: tick?.pace, ghost: ghost, ghostGap: ghostGap);
 
   Widget _strokeRate(double fontSize, {bool landscape = false, Widget? footer}) => StrokeRateCard(
         strokeRate: tick?.strokeRate,

@@ -2,14 +2,20 @@ import 'dart:async';
 
 import 'package:aergrow/app/platform_providers.dart';
 import 'package:aergrow/data/courses/course.dart';
+import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/courses/lap_tracker.dart';
+import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/data/templates/session_template.dart';
+import 'package:aergrow/data/templates/template_repository.dart';
+import 'package:aergrow/data/zones/zone.dart';
+import 'package:aergrow/data/zones/zone_repository.dart';
 import 'package:aergrow/features/live/live_layout.dart';
 import 'package:aergrow/features/live/live_screen.dart';
 import 'package:aergrow/features/live/pace_box.dart';
+import 'package:aergrow/features/live/progress_frame.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,7 +23,10 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../support/fake_ble_transport.dart';
 import '../../support/fake_erg_source.dart';
+import '../../support/ghost_sessions.dart';
 import '../../support/localized_app.dart';
+import '../../support/rowed_sessions.dart';
+import '../../support/test_database.dart';
 
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
@@ -117,6 +126,7 @@ class _Harness {
     ActiveRecording? recording,
     Locale locale = const Locale('de'),
     ErgConnectionState state = ErgConnectionState.connected,
+    AppDatabase? db,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -128,6 +138,7 @@ class _Harness {
         rowingEventsProvider.overrideWithValue(events.stream),
         wakelockProvider.overrideWithValue(wakelock),
         if (recording != null) sessionRecorderProvider.overrideWith(() => _Recording(recording)),
+        if (db != null) databaseProvider.overrideWithValue(db),
       ],
       child: LocalizedApp(locale: locale, home: const LiveScreen()),
     ));
@@ -212,6 +223,9 @@ void main() {
         final view = find.byKey(ValueKey(LiveLayout.of(size)));
         _expectLargestPace(tester, view, Key(template ? 'pace-box-pace' : 'metric-pace'));
         if (template) {
+          // Room for a ghost moved out of the outer track (Change ghost, Design D5).
+          final box = tester.getRect(find.byType(PaceBox));
+          expect(box.top - tester.getRect(view).top, greaterThanOrEqualTo(ProgressFramePainter.overhang));
           for (final key in const [
             'pace-box-course',
             'pace-box-lap',
@@ -398,5 +412,169 @@ void main() {
 
     await tester.pumpWidget(const SizedBox());
     expect(harness.wakelock.enabled, isFalse);
+  });
+
+  group('with ghosts', () {
+    late AppDatabase db;
+
+    setUp(() => db = openTestDatabase());
+
+    /// Stores [definition] as "Seerunde" and a template with [laps] on it.
+    Future<SessionTemplate> templateOn(WidgetTester tester, CourseDefinition definition, {required int? laps}) async {
+      return (await tester.runAsync(() async {
+        final course = await CourseRepository(db).create('Seerunde', definition);
+        final templates = TemplateRepository(db);
+        return (await templates.get(await templates.create('Seerunde x$laps', courseId: course, laps: laps)))!;
+      }))!;
+    }
+
+    /// Rowing [template] at [inLap] metres of lap [lap], with the given wall-clock
+    /// times in seconds and [courseMetres] since the start.
+    ActiveRecording rowing(
+      SessionTemplate template, {
+      int lap = 1,
+      required int inLap,
+      required int lapSeconds,
+      required int courseSeconds,
+      required int segmentSeconds,
+      required int courseMetres,
+    }) {
+      final definition = template.course.definition;
+      final index = definition.segmentEnds.indexWhere((end) => end > inLap);
+      return ActiveRecording(
+        sessionId: 99,
+        progress: SessionProgress(distanceMeters: courseMetres.toDouble(), elapsed: Duration(seconds: courseSeconds)),
+        template: template,
+        lap: LapProgress(
+          lap: lap,
+          plannedLaps: template.laps,
+          segmentIndex: index,
+          segment: definition.segments[index],
+          segmentStart: definition.segmentStarts[index],
+          segmentEnd: definition.segmentEnds[index],
+          remaining: (definition.segmentEnds[index] - inLap).toDouble(),
+          pace: BandStatus.none,
+          strokeRate: BandStatus.none,
+          lapInZoneShare: null,
+          lapTime: Duration(seconds: lapSeconds),
+          courseTime: Duration(seconds: courseSeconds),
+          segmentTime: Duration(seconds: segmentSeconds),
+          courseDistanceDm: courseMetres * 10.0,
+        ),
+      );
+    }
+
+    /// Shows [recording] and lets the ghosts load from the database.
+    Future<void> show(WidgetTester tester, ActiveRecording recording, {Size size = const Size(390, 844)}) async {
+      final harness = _Harness();
+      await harness.pump(tester, size: size, recording: recording, db: db);
+      await harness.emit(tester, _tick());
+      for (var i = 0; i < 10; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 5)));
+        await tester.pump();
+      }
+    }
+
+    PaceBox paceBox(WidgetTester tester) => tester.widget<PaceBox>(find.byType(PaceBox));
+
+    for (final MapEntry(key: name, value: size) in const {
+      'portrait': Size(390, 844),
+      'landscape': Size(844, 390),
+    }.entries) {
+      testWidgets('Runde 2: the lap ghost in the frame and the gap in the box, $name', (tester) async {
+        final template =
+            await templateOn(tester, CourseDefinition.single(axis: CourseAxis.distance, length: 1000), laps: 3);
+        // The best so far: three laps of 3:50 each.
+        await tester.runAsync(() => storeRowedSessionWithSamples(db, template: template, laps: [
+              for (var i = 0; i < 3; i++) RowedLap.single(230000, 1000),
+            ]));
+
+        // 1 460 m after 6:05, 115 s into lap 2.
+        await show(
+          tester,
+          rowing(template,
+              lap: 2, inLap: 460, lapSeconds: 115, courseSeconds: 365, segmentSeconds: 115, courseMetres: 1460),
+          size: size,
+        );
+
+        final box = paceBox(tester);
+        // Halfway through its lap and at 365 s of its 690 s session.
+        expect(box.ghost!.lap, closeTo(0.5, 0.005));
+        expect(box.ghost!.course, closeTo(365 / 690, 0.005));
+        // The ghost passed 1 460 m after 335.8 s.
+        expect(box.ghostGap!.ghostAhead, isTrue);
+        expect(box.ghostGap!.amount, closeTo(29.2, 0.1));
+        final line = find.byKey(const Key('pace-box-ghost-behind'));
+        expect(find.descendant(of: line, matching: find.text('29.2 s vor dir')), findsOneWidget);
+        await disposeWidgetsWithDatabase(tester);
+      });
+    }
+
+    testWidgets('Offene Rundenzahl: no gap in the box, the lap ghost in the frame', (tester) async {
+      final template =
+          await templateOn(tester, CourseDefinition.single(axis: CourseAxis.distance, length: 1000), laps: null);
+      await tester.runAsync(() => storeRowedSessionWithSamples(db, template: template, laps: [
+            RowedLap.single(250000, 1000),
+            RowedLap.single(248000, 1000),
+          ]));
+
+      await show(
+        tester,
+        rowing(template,
+            lap: 3, inLap: 500, lapSeconds: 124, courseSeconds: 624, segmentSeconds: 124, courseMetres: 2500),
+      );
+
+      final box = paceBox(tester);
+      expect(box.ghost!.course, isNull);
+      expect(box.ghost!.lap, closeTo(0.5, 0.005));
+      expect(box.ghostGap, isNull);
+      expect(find.textContaining('Ghost'), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('Freier Abschnitt: no ghost on the segment track', (tester) async {
+      const sprint = Zone(name: 'Sprint', axis: CourseAxis.distance, length: 100, paceFastCs: 9000, paceSlowCs: 10000);
+      final sprintId = (await tester.runAsync(() => ZoneRepository(db).create(sprint)))!;
+      final definition = CourseDefinition(axis: CourseAxis.distance, length: 1000, segments: [
+        sprint.copyWith(id: sprintId).segment,
+        const CourseSegment(length: 900),
+      ]);
+      final template = await templateOn(tester, definition, laps: 1);
+      await tester.runAsync(() => storeRowedSessionWithSamples(db, template: template, laps: [
+            const RowedLap([(20000, 100), (210000, 900)]),
+          ]));
+
+      await show(
+        tester,
+        rowing(template, inLap: 300, lapSeconds: 60, courseSeconds: 60, segmentSeconds: 40, courseMetres: 300),
+      );
+
+      final box = paceBox(tester);
+      expect(box.ghost!.segment, isNull);
+      expect(box.ghost!.lap, isNotNull);
+      expect(box.ghost!.course, isNotNull);
+      expect(box.ghostGap, isNotNull);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('rowing free shows no ghost', (tester) async {
+      final template =
+          await templateOn(tester, CourseDefinition.single(axis: CourseAxis.distance, length: 1000), laps: 1);
+      await tester.runAsync(
+          () => storeRowedSessionWithSamples(db, template: template, laps: [RowedLap.single(230000, 1000)]));
+
+      await show(
+        tester,
+        const ActiveRecording(
+          sessionId: 99,
+          progress: SessionProgress(distanceMeters: 460, elapsed: Duration(seconds: 115)),
+        ),
+      );
+
+      expect(find.byType(PaceBox), findsNothing);
+      expect(find.byType(ProgressFrame), findsNothing);
+      expect(find.textContaining('Ghost'), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
   });
 }

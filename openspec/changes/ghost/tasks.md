@@ -53,7 +53,7 @@ Hängt nur an Gruppe 1.
 
 Hängt an den Gruppen 2–5.
 
-- [ ] 7.1 `LiveScreen`/`CourseLiveView` lesen die Ghosts aus 2.2 für die laufende Vorlage, berechnen mit 3.2 und 3.3 bei jedem Tick `FrameGhost` und `GhostGap` und geben sie an `PaceBox` weiter, hochkant und quer. Frei rudern zeigt keinen Ghost. Verifikation: Widget-Tests mit Test-Datenbank und simuliertem Verlauf für „Runde 2“ (Rundenspur mit Ghost, Abstand in der Box), „Offene Rundenzahl“ (kein Abstand, Rundenspur mit Ghost), „Freier Abschnitt“ (Abschnittsspur ohne Ghost) und frei rudern
+- [x] 7.1 `LiveScreen`/`CourseLiveView` lesen die Ghosts aus 2.2 für die laufende Vorlage, berechnen mit 3.2 und 3.3 bei jedem Tick `FrameGhost` und `GhostGap` und geben sie an `PaceBox` weiter, hochkant und quer. Frei rudern zeigt keinen Ghost. Verifikation: Widget-Tests mit Test-Datenbank und simuliertem Verlauf für „Runde 2“ (Rundenspur mit Ghost, Abstand in der Box), „Offene Rundenzahl“ (kein Abstand, Rundenspur mit Ghost), „Freier Abschnitt“ (Abschnittsspur ohne Ghost) und frei rudern
 
 ## 8. Abschluss
 
