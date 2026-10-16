@@ -6,6 +6,9 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../app/design_tokens.dart';
 import '../../app/platform_providers.dart';
+import '../../data/courses/lap_tracker.dart';
+import '../../data/ghost/ghost_progress.dart';
+import '../../data/ghost/ghost_providers.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
@@ -17,6 +20,7 @@ import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
 import 'live_course.dart';
 import 'live_free.dart';
+import 'progress_frame.dart';
 
 /// After this long without data the shown values are marked as outdated.
 const staleAfter = Duration(seconds: 3);
@@ -142,6 +146,23 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
               label: Text(context.l10n.liveStopSession),
             );
 
+  /// The live view of [template] at [lap] with its ghosts, recomputed with
+  /// every tick (Change ghost, Design D2–D4).
+  Widget _courseView(SessionTemplate template, LapProgress lap, ActiveRecording? recording, bool connected) {
+    final ghosts = ref.watch(liveGhostsProvider(liveGhostsKey(template, lap)));
+    final shares = ghostShares(lap, template.course.definition, ghosts);
+    return CourseLiveView(
+      tick: _tick,
+      lap: lap,
+      course: template.course.definition,
+      outdated: _stale,
+      ghost: FrameGhost(course: shares.course, lap: shares.lap, segment: shares.segment),
+      ghostGap: ghostGap(lap, template.course.axis, ghosts.course),
+      action: _sessionButton(recording, connected),
+      shortAction: _sessionButton(recording, connected, short: true),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final source = ref.watch(activeErgSourceProvider);
@@ -188,14 +209,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                 ),
               Expanded(
                 child: switch ((recording?.lap, recording?.template)) {
-                  (final lap?, final template?) => CourseLiveView(
-                      tick: _tick,
-                      lap: lap,
-                      course: template.course.definition,
-                      outdated: _stale,
-                      action: _sessionButton(recording, connected),
-                      shortAction: _sessionButton(recording, connected, short: true),
-                    ),
+                  (final lap?, final template?) => _courseView(template, lap, recording, connected),
                   _ => FreeLiveView(
                       tick: _tick,
                       session: recording?.progress,
