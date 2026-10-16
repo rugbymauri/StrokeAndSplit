@@ -1,4 +1,5 @@
 import 'erg_protocol.dart';
+import 'ftms/ftms_decoder.dart';
 import 'pm5/pm5_decoder.dart';
 import 'raw_packet.dart';
 import 'rowing_event.dart';
@@ -13,7 +14,7 @@ abstract interface class ErgDecoder {
   factory ErgDecoder.forProtocol(ErgProtocol protocol, {void Function(String message)? onWarning}) =>
       switch (protocol) {
         ErgProtocol.pm5 => Pm5Decoder(onWarning: onWarning),
-        ErgProtocol.ftms => throw UnimplementedError('FTMS decoder'),
+        ErgProtocol.ftms => FtmsDecoder(onWarning: onWarning),
       };
 
   List<RowingEvent> decode(RawPacket packet);
