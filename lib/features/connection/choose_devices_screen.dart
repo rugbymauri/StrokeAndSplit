@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/design_tokens.dart';
 import '../../app/platform_providers.dart';
+import '../../app/widgets/language_button.dart';
 import '../../data/sources/ble/ble_transport.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/rower_choice.dart';
@@ -145,6 +146,7 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.devicesTitle),
+        actions: const [LanguageButton()],
         bottom: busy ? const PreferredSize(preferredSize: Size.fromHeight(4), child: LinearProgressIndicator()) : null,
       ),
       body: SafeArea(

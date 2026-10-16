@@ -155,7 +155,7 @@ Zahlen werden in allen Editoren mit einem Tastenpaar eingestellt, nicht getippt 
 
 ### D8: Sprachwahl
 
-Entschieden am 2026-10-16 vom Nutzer: Die Sprachwahl aus `translations` (dort Design D3) bleibt ein Symbol in der App-Leiste des Startbildschirms und öffnet wie heute den Dialog mit den Sprachen. Sie bekommt nur die Gestaltung aus D1 (Symbol in `textMuted`, Touch-Ziel ab 44 px). Der Canvas zeigt keinen Platz dafür.
+Entschieden am 2026-10-16 vom Nutzer: Die Sprachwahl aus `translations` (dort Design D3) bleibt ein Symbol in der App-Leiste und öffnet wie heute den Dialog mit den Sprachen. Das Symbol steht auf dem Startbildschirm und auf „Geräte wählen“, damit sich die Sprache schon beim ersten Start wählen lässt, bevor ein Rudergerät gewählt ist. Beide Screens nutzen dasselbe Widget. Das Symbol bekommt nur die Gestaltung aus D1 (Symbol in `textMuted`, Touch-Ziel ab 44 px). Der Canvas zeigt keinen Platz dafür.
 
 *Alternativen*: ein eigener Einstellungs-Screen oder ein Eintrag unter dem Link „Sessions“. Verworfen, solange die Sprache die einzige Einstellung ist. Kommen weitere Einstellungen dazu, etwa der Brustgurt aus `heart-rate`, kann die Sprachwahl in einen Einstellungs-Screen umziehen; der Pulsgurt sitzt aber in „Geräte wählen“ (D6).
 
