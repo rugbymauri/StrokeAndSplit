@@ -28,9 +28,9 @@ Keine.
 
 ## Impact
 
-- `packages/pm5_protocol`: Characteristic, Decoder für die Kraftkurve mit Zusammensetzen der Teilpakete, neues Ereignis pro Schlag.
+- `packages/erg_protocol`: Characteristic, Decoder für die Kraftkurve mit Zusammensetzen der Teilpakete, neues Ereignis pro Schlag.
 - `lib/data/sources`: Abonnement der zusätzlichen Characteristic, Kurve im Simulator.
 - `lib/features/live`: Karte mit der Kurve. Ihr Platz ist im Change `ui-design` vorgesehen.
-- `lib/spike`: Mitschnitt der Kurvenpakete als Test-Fixture.
+- `lib/spike`: abonniert die Kurvenpakete; ein Ausschnitt des Mitschnitts wird Test-Fixture.
 - Keine Schema-Änderung: Die Kurvenpakete laufen als Rohpakete in die bestehende Tabelle `raw_packets`.
 - Design: Canvas „AergRow Frontend“, Screens „Live: freies Rudern“, „Live: Vorlage mit Zonen“, die beiden Querformat-Screens und „Zustände: Kraftkurve & Puls“ (Abschnitt Kraftkurve).
