@@ -13,35 +13,50 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appTitle => 'AergRow';
 
   @override
-  String get startFindRower => 'Rudergerät suchen';
-
-  @override
-  String get startFindRowerHint =>
-      'Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden';
-
-  @override
-  String get startSimulator => 'Simulator';
-
-  @override
   String get startSimulatorHint =>
       'Ohne Erg ausprobieren, mit simuliertem Ruderer';
-
-  @override
-  String get startTemplate => 'Vorlage rudern';
-
-  @override
-  String get startTemplateHint =>
-      'Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl';
 
   @override
   String get startSessions => 'Sessions';
 
   @override
-  String get startSessionsHint =>
-      'Aufgezeichnete Sessions ansehen, abspielen und austauschen';
+  String get languageChoice => 'Sprache';
 
   @override
-  String get languageChoice => 'Sprache';
+  String get startTagline => 'Gegen dich selbst rudern';
+
+  @override
+  String get startRow => 'Rudern';
+
+  @override
+  String get startRowFree => 'Frei rudern';
+
+  @override
+  String get startNoRower => 'Kein Rudergerät gewählt';
+
+  @override
+  String get startConnectsLater => 'Verbindet beim Start';
+
+  @override
+  String get startSimulatorFtmsHint =>
+      'Wie ein FTMS-Rudergerät, ohne Schlagdetails';
+
+  @override
+  String get devicesTitle => 'Geräte wählen';
+
+  @override
+  String get devicesRower => 'Rudergerät';
+
+  @override
+  String get devicesNext => 'Weiter';
+
+  @override
+  String get devicesNotFound => 'nicht gefunden';
+
+  @override
+  String launchSearching(String device) {
+    return 'Suche $device …';
+  }
 
   @override
   String get zoneErrorNameMissing => 'Der Name fehlt.';
@@ -173,9 +188,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get sourceReplay => 'REPLAY';
-
-  @override
-  String get deviceListTitle => 'Rudergerät suchen';
 
   @override
   String deviceListScanFailed(String detail) {
@@ -504,18 +516,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get courseCreate => 'Strecke anlegen';
-
-  @override
-  String templateRow(String name) {
-    return '„$name“ rudern';
-  }
-
-  @override
-  String get templateSimulatorFtms => 'Simulator (FTMS)';
-
-  @override
-  String get templateSimulatorFtmsHint =>
-      'Wie ein FTMS-Rudergerät, ohne Schlagdetails';
 
   @override
   String get templateDeleteTitle => 'Vorlage löschen?';

@@ -104,41 +104,11 @@ abstract class AppLocalizations {
   /// **'AergRow'**
   String get appTitle;
 
-  /// Start screen: option that searches for a PM5 or FTMS rower over Bluetooth.
-  ///
-  /// In de, this message translates to:
-  /// **'Rudergerät suchen'**
-  String get startFindRower;
-
-  /// Start screen: explanation below 'Find rower'.
-  ///
-  /// In de, this message translates to:
-  /// **'Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden'**
-  String get startFindRowerHint;
-
-  /// Start screen: option that rows with the built-in simulator.
-  ///
-  /// In de, this message translates to:
-  /// **'Simulator'**
-  String get startSimulator;
-
-  /// Start screen: explanation below 'Simulator'.
+  /// Choose devices and start screen: explanation below 'Simulator'
   ///
   /// In de, this message translates to:
   /// **'Ohne Erg ausprobieren, mit simuliertem Ruderer'**
   String get startSimulatorHint;
-
-  /// Start screen: option that opens templates, courses and zones.
-  ///
-  /// In de, this message translates to:
-  /// **'Vorlage rudern'**
-  String get startTemplate;
-
-  /// Start screen: explanation below 'Row a template'.
-  ///
-  /// In de, this message translates to:
-  /// **'Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl'**
-  String get startTemplateHint;
 
   /// Start screen: option that opens the recorded sessions.
   ///
@@ -146,17 +116,77 @@ abstract class AppLocalizations {
   /// **'Sessions'**
   String get startSessions;
 
-  /// Start screen: explanation below 'Sessions'.
-  ///
-  /// In de, this message translates to:
-  /// **'Aufgezeichnete Sessions ansehen, abspielen und austauschen'**
-  String get startSessionsHint;
-
   /// Tooltip of the language button and title of the language dialog.
   ///
   /// In de, this message translates to:
   /// **'Sprache'**
   String get languageChoice;
+
+  /// Start screen: line below the name of the app
+  ///
+  /// In de, this message translates to:
+  /// **'Gegen dich selbst rudern'**
+  String get startTagline;
+
+  /// Start screen: button that opens the templates to pick one
+  ///
+  /// In de, this message translates to:
+  /// **'Rudern'**
+  String get startRow;
+
+  /// Start screen: button that starts rowing without a template
+  ///
+  /// In de, this message translates to:
+  /// **'Frei rudern'**
+  String get startRowFree;
+
+  /// Start screen: device row before a rower is chosen
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Rudergerät gewählt'**
+  String get startNoRower;
+
+  /// Start screen: device row, the chosen rower is not connected right now
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindet beim Start'**
+  String get startConnectsLater;
+
+  /// Choose devices and start screen: explanation below 'Simulator (FTMS)'
+  ///
+  /// In de, this message translates to:
+  /// **'Wie ein FTMS-Rudergerät, ohne Schlagdetails'**
+  String get startSimulatorFtmsHint;
+
+  /// Title of the first screen, where the rower is chosen; also the link to it
+  ///
+  /// In de, this message translates to:
+  /// **'Geräte wählen'**
+  String get devicesTitle;
+
+  /// Choose devices: label above the rowers and simulators
+  ///
+  /// In de, this message translates to:
+  /// **'Rudergerät'**
+  String get devicesRower;
+
+  /// Choose devices: button that connects the chosen rower and opens the start screen
+  ///
+  /// In de, this message translates to:
+  /// **'Weiter'**
+  String get devicesNext;
+
+  /// Choose devices: the rower chosen last is not in range
+  ///
+  /// In de, this message translates to:
+  /// **'nicht gefunden'**
+  String get devicesNotFound;
+
+  /// Shown at the start while the rower chosen last is searched; device is its name
+  ///
+  /// In de, this message translates to:
+  /// **'Suche {device} …'**
+  String launchSearching(String device);
 
   /// Zone editor: the zone has no name
   ///
@@ -342,12 +372,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'REPLAY'**
   String get sourceReplay;
-
-  /// Device list: title
-  ///
-  /// In de, this message translates to:
-  /// **'Rudergerät suchen'**
-  String get deviceListTitle;
 
   /// Device list: the scan failed; detail is the technical error
   ///
@@ -912,24 +936,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Strecke anlegen'**
   String get courseCreate;
-
-  /// Templates: title of the dialog that picks the source; name is the template
-  ///
-  /// In de, this message translates to:
-  /// **'„{name}“ rudern'**
-  String templateRow(String name);
-
-  /// Templates: source that simulates an FTMS rower
-  ///
-  /// In de, this message translates to:
-  /// **'Simulator (FTMS)'**
-  String get templateSimulatorFtms;
-
-  /// Templates: what the FTMS simulator leaves out
-  ///
-  /// In de, this message translates to:
-  /// **'Wie ein FTMS-Rudergerät, ohne Schlagdetails'**
-  String get templateSimulatorFtmsHint;
 
   /// Templates: title of the delete confirmation
   ///

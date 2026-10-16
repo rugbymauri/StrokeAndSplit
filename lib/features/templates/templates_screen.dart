@@ -1,16 +1,12 @@
-import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/courses/course_providers.dart';
-import '../../data/sources/erg_source_providers.dart';
-import '../../data/sources/simulated_source.dart';
 import '../../data/templates/session_template.dart';
 import '../../data/templates/template_providers.dart';
 import '../../l10n/l10n.dart';
-import '../connection/device_list_screen.dart';
+import '../connection/rower_connection.dart';
 import '../courses/courses_screen.dart';
-import '../live/live_screen.dart';
 import '../zones/zones_screen.dart';
 import 'template_editor_screen.dart';
 import 'template_format.dart';
@@ -117,8 +113,6 @@ class _NoCourse extends StatelessWidget {
 
 enum _Action { edit, delete }
 
-enum _Source { pm5, simulator, simulatorFtms }
-
 class _TemplateTile extends ConsumerWidget {
   const _TemplateTile({required this.template});
 
@@ -146,44 +140,8 @@ class _TemplateTile extends ConsumerWidget {
     );
   }
 
-  /// Lets the user pick the source; the session starts once it is connected.
-  Future<void> _start(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final source = await showDialog<_Source>(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: Text(l10n.templateRow(template.name)),
-        children: [
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(context).pop(_Source.pm5),
-            child: ListTile(leading: const Icon(Icons.bluetooth_searching), title: Text(l10n.startFindRower)),
-          ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(context).pop(_Source.simulator),
-            child: ListTile(leading: const Icon(Icons.smart_toy_outlined), title: Text(l10n.startSimulator)),
-          ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(context).pop(_Source.simulatorFtms),
-            child: ListTile(
-              leading: const Icon(Icons.smart_toy_outlined),
-              title: Text(l10n.templateSimulatorFtms),
-              subtitle: Text(l10n.templateSimulatorFtmsHint),
-            ),
-          ),
-        ],
-      ),
-    );
-    if (source == null || !context.mounted) return;
-    final navigator = Navigator.of(context);
-    switch (source) {
-      case _Source.pm5:
-        await navigator.push(MaterialPageRoute<void>(builder: (_) => DeviceListScreen(template: template)));
-      case _Source.simulator || _Source.simulatorFtms:
-        final protocol = source == _Source.simulatorFtms ? ErgProtocol.ftms : ErgProtocol.pm5;
-        await ref.read(activeErgSourceProvider.notifier).use(SimulatedSource(protocol: protocol));
-        await navigator.push(MaterialPageRoute<void>(builder: (_) => LiveScreen(template: template)));
-    }
-  }
+  /// Starts the template with the rower chosen in "Geräte wählen" (Design D6).
+  Future<void> _start(BuildContext context, WidgetRef ref) => startRowing(context, ref, template: template);
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(

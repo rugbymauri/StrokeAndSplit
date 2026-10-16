@@ -6,6 +6,7 @@ import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sessions/session_repository.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
+import 'package:aergrow/data/sources/rower_choice.dart';
 import 'package:aergrow/data/sources/simulated_source.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/data/zones/zone.dart';
@@ -34,6 +35,7 @@ void main() {
     final container = ProviderContainer(overrides: [
       databaseProvider.overrideWithValue(db),
       wakelockProvider.overrideWithValue(FakeWakelock()),
+      rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(const RowerChoice.simulator())),
     ]);
     addTearDown(container.dispose);
     await tester.runAsync(() async {
@@ -52,14 +54,12 @@ void main() {
       child: const LocalizedApp(home: StartScreen()),
     ));
 
-    await tester.tap(find.text('Vorlage rudern'));
+    await tester.tap(find.text('Rudern'));
     for (var i = 0; i < 5; i++) {
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
       await tester.pumpAndSettle();
     }
     await tester.tap(find.text('Dreiteiler x2'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Simulator'));
     Future<void> row(Duration duration) async {
       for (var i = 0; i < duration.inMilliseconds ~/ 250; i++) {
         await tester.pump(const Duration(milliseconds: 250));
@@ -107,6 +107,7 @@ void main() {
     final container = ProviderContainer(overrides: [
       databaseProvider.overrideWithValue(db),
       wakelockProvider.overrideWithValue(FakeWakelock()),
+      rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(const RowerChoice.simulator(ErgProtocol.ftms))),
     ]);
     addTearDown(container.dispose);
     await tester.runAsync(() async {
@@ -126,14 +127,12 @@ void main() {
       child: const LocalizedApp(home: StartScreen()),
     ));
 
-    await tester.tap(find.text('Vorlage rudern'));
+    await tester.tap(find.text('Rudern'));
     for (var i = 0; i < 5; i++) {
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
       await tester.pumpAndSettle();
     }
     await tester.tap(find.text('Seerunde x2'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Simulator (FTMS)'));
     for (var i = 0; i < 100 * 4; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }

@@ -4,6 +4,7 @@ import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
+import 'package:aergrow/data/sources/rower_choice.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/features/connection/start_screen.dart';
 import 'package:aergrow/features/sessions/session_summary_screen.dart';
@@ -24,6 +25,7 @@ class _Setup {
   late final container = ProviderContainer(overrides: [
     databaseProvider.overrideWithValue(db),
     wakelockProvider.overrideWithValue(FakeWakelock()),
+    rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(const RowerChoice.simulator())),
   ]);
 
   Future<int> addCourse(WidgetTester tester, String name, {int length = 1000}) async => (await tester.runAsync(
@@ -166,7 +168,7 @@ void main() {
     final setup = _Setup();
     await setup.pump(tester, home: const StartScreen());
 
-    await tester.tap(find.text('Vorlage rudern'));
+    await tester.tap(find.text('Rudern'));
     await setup.settle(tester);
     await tester.tap(find.text('Strecken'));
     await setup.settle(tester);
@@ -178,20 +180,18 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('starts a template with the simulator', (tester) async {
+  testWidgets('starts a template with the chosen simulator without asking for the source', (tester) async {
     final setup = _Setup();
     final id = await setup.addCourse(tester, 'Seerunde');
     await tester.runAsync(() => setup.templates.create('Seerunde x3', courseId: id, laps: 3));
     await setup.pump(tester);
 
     await tester.tap(find.text('Seerunde x3'));
-    await tester.pumpAndSettle();
-    expect(find.text('„Seerunde x3“ rudern'), findsOneWidget);
-    await tester.tap(find.text('Simulator'));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }
 
+    expect(find.byType(SimpleDialog), findsNothing);
     expect(setup.container.read(activeErgSourceProvider)?.kind, ErgSourceKind.simulator);
     expect(find.text('Runde 1 von 3'), findsOneWidget);
     expect(find.text('Session beenden'), findsOneWidget);
@@ -209,8 +209,6 @@ void main() {
     await setup.pump(tester);
 
     await tester.tap(find.text('Sprint x3'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Simulator'));
     // 3 × 100 m at 2:10 /500 m take 78 s.
     for (var i = 0; i < 90 * 4; i++) {
       await tester.pump(const Duration(milliseconds: 250));
