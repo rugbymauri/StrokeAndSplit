@@ -30,7 +30,7 @@ class CourseRepository {
 
   Stream<List<Course>> watchAll() {
     return _db
-        .customSelect('SELECT 1', readsFrom: {_db.courses, _db.courseVersions, _db.courseSegments})
+        .customSelect('SELECT 1', readsFrom: {_db.courses, _db.courseVersions, _db.courseSegments, _db.zones})
         .watch()
         .asyncMap((_) => all());
   }
@@ -138,6 +138,8 @@ class CourseRepository {
               paceSlowCs: Value(s.paceSlowCs),
               spmMin: Value(s.spmMin),
               spmMax: Value(s.spmMax),
+              zoneId: Value(s.zoneId),
+              zoneName: Value(s.zoneName),
             ),
         ]));
   }
@@ -169,6 +171,8 @@ class CourseRepository {
             paceSlowCs: s.paceSlowCs,
             spmMin: s.spmMin,
             spmMax: s.spmMax,
+            zoneId: s.zoneId,
+            zoneName: s.zoneName,
           ),
       ]),
     );

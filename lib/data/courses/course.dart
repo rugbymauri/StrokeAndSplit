@@ -4,10 +4,18 @@ import '../db/database.dart';
 
 export '../db/database.dart' show CourseAxis;
 
-/// A part of a course, with optional bands to row in.
+/// A part of a course: a placed zone with a copy of its bands, or a free gap.
 @immutable
 class CourseSegment {
-  const CourseSegment({required this.length, this.paceFastCs, this.paceSlowCs, this.spmMin, this.spmMax});
+  const CourseSegment({
+    required this.length,
+    this.paceFastCs,
+    this.paceSlowCs,
+    this.spmMin,
+    this.spmMax,
+    this.zoneId,
+    this.zoneName,
+  });
 
   /// In the unit of the course: metres or seconds.
   final int length;
@@ -18,29 +26,47 @@ class CourseSegment {
   final int? spmMin;
   final int? spmMax;
 
+  /// The placed zone; null for a free gap and in rowed versions from before
+  /// zones, which only keep [zoneName].
+  final int? zoneId;
+
+  /// The name of the zone when the version was stored.
+  final String? zoneName;
+
   bool get hasPaceBand => paceFastCs != null && paceSlowCs != null;
   bool get hasSpmBand => spmMin != null && spmMax != null;
 
   /// A segment without any band is rowed freely.
   bool get isFree => !hasPaceBand && !hasSpmBand;
 
-  CourseSegment withLength(int length) =>
-      CourseSegment(length: length, paceFastCs: paceFastCs, paceSlowCs: paceSlowCs, spmMin: spmMin, spmMax: spmMax);
+  CourseSegment withLength(int length) => CourseSegment(
+        length: length,
+        paceFastCs: paceFastCs,
+        paceSlowCs: paceSlowCs,
+        spmMin: spmMin,
+        spmMax: spmMax,
+        zoneId: zoneId,
+        zoneName: zoneName,
+      );
 
-  @override
-  bool operator ==(Object other) =>
-      other is CourseSegment &&
+  /// Whether both row the same, whichever zone they were placed from.
+  bool sameAs(CourseSegment other) =>
       other.length == length &&
       other.paceFastCs == paceFastCs &&
       other.paceSlowCs == paceSlowCs &&
       other.spmMin == spmMin &&
-      other.spmMax == spmMax;
+      other.spmMax == spmMax &&
+      other.zoneName == zoneName;
 
   @override
-  int get hashCode => Object.hash(length, paceFastCs, paceSlowCs, spmMin, spmMax);
+  bool operator ==(Object other) => other is CourseSegment && other.zoneId == zoneId && sameAs(other);
 
   @override
-  String toString() => 'CourseSegment($length, pace $paceFastCs–$paceSlowCs, spm $spmMin–$spmMax)';
+  int get hashCode => Object.hash(length, paceFastCs, paceSlowCs, spmMin, spmMax, zoneId, zoneName);
+
+  @override
+  String toString() =>
+      'CourseSegment($length, pace $paceFastCs–$paceSlowCs, spm $spmMin–$spmMax, zone $zoneId $zoneName)';
 }
 
 /// What a course asks for: its axis, its length and its segments.
