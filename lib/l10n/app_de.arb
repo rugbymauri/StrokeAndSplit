@@ -515,7 +515,7 @@
   "@sessionTime": {
     "description": "Summary: label of the time rowed"
   },
-  "sessionAveragePace": "⌀ Pace /500 m",
+  "sessionAveragePace": "⌀ Pace",
   "@sessionAveragePace": {
     "description": "Summary: label of the average pace per 500 metres"
   },
@@ -523,7 +523,7 @@
   "@sessionAverageWatts": {
     "description": "Summary: label of the average power"
   },
-  "sessionAverageStrokeRate": "⌀ Schläge/min",
+  "sessionAverageStrokeRate": "⌀ spm",
   "@sessionAverageStrokeRate": {
     "description": "Summary: label of the average stroke rate"
   },
@@ -539,6 +539,30 @@
         "type": "int"
       }
     }
+  },
+  "summaryTitle": "Session beendet",
+  "@summaryTitle": {
+    "description": "Summary: title above the totals of a session"
+  },
+  "summaryInZone": "In der Zone",
+  "@summaryInZone": {
+    "description": "Summary: label of the share of time within the bands over all laps"
+  },
+  "summaryLaps": "Runden",
+  "@summaryLaps": {
+    "description": "Summary: heading above the laps, written in capitals"
+  },
+  "summaryLapBarHint": "Balken: Anteil in der Zone pro Runde",
+  "@summaryLapBarHint": {
+    "description": "Summary: explains the bar in each lap row"
+  },
+  "summaryBestLap": "Beste Runde",
+  "@summaryBestLap": {
+    "description": "Summary: marks the fastest lap of a distance course or the longest of a time course"
+  },
+  "actionDone": "Fertig",
+  "@actionDone": {
+    "description": "Closes the summary of a session"
   },
   "sourceRower": "Rudergerät",
   "@sourceRower": {
@@ -727,25 +751,38 @@
   "@templateCourseMissing": {
     "description": "Template editor: no course chosen"
   },
-  "templateLapsInvalid": "Die Rundenzahl muss mindestens 1 sein.",
-  "@templateLapsInvalid": {
-    "description": "Template editor: the number of laps is below 1"
-  },
   "templateCourse": "Strecke",
   "@templateCourse": {
     "description": "Template editor: label of the course field"
   },
-  "templateOpenLaps": "Offene Rundenzahl",
-  "@templateOpenLaps": {
-    "description": "Template editor: switch for an open number of laps"
+  "templateFixedLaps": "Feste Anzahl",
+  "@templateFixedLaps": {
+    "description": "Template editor: choice for a fixed number of laps"
   },
-  "templateOpenLapsHint": "Runden, bis du die Session beendest",
-  "@templateOpenLapsHint": {
-    "description": "Template editor: what an open number of laps means"
+  "templateOpenLaps": "Offen bis Stopp",
+  "@templateOpenLaps": {
+    "description": "Template editor: choice for an open number of laps, rowed until the session ends"
   },
   "templateLaps": "Runden",
   "@templateLaps": {
     "description": "Template editor: label of the number of laps"
+  },
+  "templateLapsUnit": "{laps, plural, =1{Runde} other{Runden}}",
+  "@templateLapsUnit": {
+    "description": "Template editor: unit after the number of laps, without the number",
+    "placeholders": {
+      "laps": {
+        "type": "int"
+      }
+    }
+  },
+  "templateResult": "Ergibt",
+  "@templateResult": {
+    "description": "Template editor: label of the line with the total length of all laps"
+  },
+  "templateResultOpen": "pro Runde, bis du die Session beendest",
+  "@templateResultOpen": {
+    "description": "Template editor: after the length of one lap when the number of laps is open"
   },
   "coursesTitle": "Strecken",
   "@coursesTitle": {
@@ -797,14 +834,6 @@
   "courseNameMissing": "Der Name fehlt.",
   "@courseNameMissing": {
     "description": "Course editor: the course has no name"
-  },
-  "courseLengthFirst": "Gib zuerst die Länge der Strecke ein.",
-  "@courseLengthFirst": {
-    "description": "Course editor: a zone is placed before the length is known"
-  },
-  "courseLengthHint": "Gib eine Länge ein, um Zonen einzubauen.",
-  "@courseLengthHint": {
-    "description": "Course editor: shown instead of the parts while there is no length"
   },
   "courseSequence": "Ablauf",
   "@courseSequence": {
@@ -893,24 +922,6 @@
       }
     }
   },
-  "invalidLength": "Die Länge „{text}“ ist ungültig.",
-  "@invalidLength": {
-    "description": "Editors: the length typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
-  "invalidStart": "Der Start „{text}“ ist ungültig.",
-  "@invalidStart": {
-    "description": "Place dialog: the start typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
   "zonesTitle": "Zonen",
   "@zonesTitle": {
     "description": "Zones: title"
@@ -988,51 +999,33 @@
   "@zoneNameHint": {
     "description": "Zone editor: example of a zone name"
   },
-  "zonePaceBand": "Pace pro 500 m",
+  "zonePaceBand": "Pace-Band",
   "@zonePaceBand": {
-    "description": "Zone editor: heading of the pace band"
+    "description": "Zone editor: title and switch of the pace band per 500 m"
   },
-  "zonePaceFastest": "schnellste",
+  "zonePaceFastest": "Schnellste",
   "@zonePaceFastest": {
-    "description": "Zone editor: the fastest pace of the band"
+    "description": "Zone editor: label of the fastest pace of the band"
   },
-  "zonePaceSlowest": "langsamste",
+  "zonePaceSlowest": "Langsamste",
   "@zonePaceSlowest": {
-    "description": "Zone editor: the slowest pace of the band"
+    "description": "Zone editor: label of the slowest pace of the band"
   },
-  "zoneSpmBand": "Schlagzahl",
+  "zoneSpmBand": "Schlagzahl-Band",
   "@zoneSpmBand": {
-    "description": "Zone editor: heading of the stroke rate band"
+    "description": "Zone editor: title and switch of the stroke rate band"
   },
-  "zoneSpmFrom": "ab",
+  "zoneSpmFrom": "Mindestens",
   "@zoneSpmFrom": {
-    "description": "Zone editor: the lowest stroke rate of the band"
+    "description": "Zone editor: label of the lowest stroke rate of the band"
   },
-  "zoneSpmTo": "bis",
+  "zoneSpmTo": "Höchstens",
   "@zoneSpmTo": {
-    "description": "Zone editor: the highest stroke rate of the band"
+    "description": "Zone editor: label of the highest stroke rate of the band"
   },
   "zoneBandHint": "Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.",
   "@zoneBandHint": {
     "description": "Zone editor: what a zone needs"
-  },
-  "invalidPace": "Die Pace „{text}“ ist ungültig.",
-  "@invalidPace": {
-    "description": "Zone editor: the pace typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
-  "invalidStrokeRate": "Die Schlagzahl „{text}“ ist ungültig.",
-  "@invalidStrokeRate": {
-    "description": "Zone editor: the stroke rate typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
   },
   "dateTimePattern": "dd.MM.yyyy, HH:mm",
   "@dateTimePattern": {

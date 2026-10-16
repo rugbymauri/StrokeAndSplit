@@ -718,7 +718,7 @@ abstract class AppLocalizations {
   /// Summary: label of the average pace per 500 metres
   ///
   /// In de, this message translates to:
-  /// **'⌀ Pace /500 m'**
+  /// **'⌀ Pace'**
   String get sessionAveragePace;
 
   /// Summary: label of the average power
@@ -730,7 +730,7 @@ abstract class AppLocalizations {
   /// Summary: label of the average stroke rate
   ///
   /// In de, this message translates to:
-  /// **'⌀ Schläge/min'**
+  /// **'⌀ spm'**
   String get sessionAverageStrokeRate;
 
   /// Summary: label of the number of strokes
@@ -744,6 +744,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Runde {lap}'**
   String sessionLap(int lap);
+
+  /// Summary: title above the totals of a session
+  ///
+  /// In de, this message translates to:
+  /// **'Session beendet'**
+  String get summaryTitle;
+
+  /// Summary: label of the share of time within the bands over all laps
+  ///
+  /// In de, this message translates to:
+  /// **'In der Zone'**
+  String get summaryInZone;
+
+  /// Summary: heading above the laps, written in capitals
+  ///
+  /// In de, this message translates to:
+  /// **'Runden'**
+  String get summaryLaps;
+
+  /// Summary: explains the bar in each lap row
+  ///
+  /// In de, this message translates to:
+  /// **'Balken: Anteil in der Zone pro Runde'**
+  String get summaryLapBarHint;
+
+  /// Summary: marks the fastest lap of a distance course or the longest of a time course
+  ///
+  /// In de, this message translates to:
+  /// **'Beste Runde'**
+  String get summaryBestLap;
+
+  /// Closes the summary of a session
+  ///
+  /// In de, this message translates to:
+  /// **'Fertig'**
+  String get actionDone;
 
   /// Source of a session from an FTMS rower without a name
   ///
@@ -961,35 +997,47 @@ abstract class AppLocalizations {
   /// **'Wähle eine Strecke.'**
   String get templateCourseMissing;
 
-  /// Template editor: the number of laps is below 1
-  ///
-  /// In de, this message translates to:
-  /// **'Die Rundenzahl muss mindestens 1 sein.'**
-  String get templateLapsInvalid;
-
   /// Template editor: label of the course field
   ///
   /// In de, this message translates to:
   /// **'Strecke'**
   String get templateCourse;
 
-  /// Template editor: switch for an open number of laps
+  /// Template editor: choice for a fixed number of laps
   ///
   /// In de, this message translates to:
-  /// **'Offene Rundenzahl'**
-  String get templateOpenLaps;
+  /// **'Feste Anzahl'**
+  String get templateFixedLaps;
 
-  /// Template editor: what an open number of laps means
+  /// Template editor: choice for an open number of laps, rowed until the session ends
   ///
   /// In de, this message translates to:
-  /// **'Runden, bis du die Session beendest'**
-  String get templateOpenLapsHint;
+  /// **'Offen bis Stopp'**
+  String get templateOpenLaps;
 
   /// Template editor: label of the number of laps
   ///
   /// In de, this message translates to:
   /// **'Runden'**
   String get templateLaps;
+
+  /// Template editor: unit after the number of laps, without the number
+  ///
+  /// In de, this message translates to:
+  /// **'{laps, plural, =1{Runde} other{Runden}}'**
+  String templateLapsUnit(int laps);
+
+  /// Template editor: label of the line with the total length of all laps
+  ///
+  /// In de, this message translates to:
+  /// **'Ergibt'**
+  String get templateResult;
+
+  /// Template editor: after the length of one lap when the number of laps is open
+  ///
+  /// In de, this message translates to:
+  /// **'pro Runde, bis du die Session beendest'**
+  String get templateResultOpen;
 
   /// Courses: title
   ///
@@ -1044,18 +1092,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Der Name fehlt.'**
   String get courseNameMissing;
-
-  /// Course editor: a zone is placed before the length is known
-  ///
-  /// In de, this message translates to:
-  /// **'Gib zuerst die Länge der Strecke ein.'**
-  String get courseLengthFirst;
-
-  /// Course editor: shown instead of the parts while there is no length
-  ///
-  /// In de, this message translates to:
-  /// **'Gib eine Länge ein, um Zonen einzubauen.'**
-  String get courseLengthHint;
 
   /// Course editor: heading above the parts of the course
   ///
@@ -1153,18 +1189,6 @@ abstract class AppLocalizations {
   /// **'Länge ({unit})'**
   String fieldLength(String unit);
 
-  /// Editors: the length typed cannot be read
-  ///
-  /// In de, this message translates to:
-  /// **'Die Länge „{text}“ ist ungültig.'**
-  String invalidLength(String text);
-
-  /// Place dialog: the start typed cannot be read
-  ///
-  /// In de, this message translates to:
-  /// **'Der Start „{text}“ ist ungültig.'**
-  String invalidStart(String text);
-
   /// Zones: title
   ///
   /// In de, this message translates to:
@@ -1243,40 +1267,40 @@ abstract class AppLocalizations {
   /// **'z.B. Sprint'**
   String get zoneNameHint;
 
-  /// Zone editor: heading of the pace band
+  /// Zone editor: title and switch of the pace band per 500 m
   ///
   /// In de, this message translates to:
-  /// **'Pace pro 500 m'**
+  /// **'Pace-Band'**
   String get zonePaceBand;
 
-  /// Zone editor: the fastest pace of the band
+  /// Zone editor: label of the fastest pace of the band
   ///
   /// In de, this message translates to:
-  /// **'schnellste'**
+  /// **'Schnellste'**
   String get zonePaceFastest;
 
-  /// Zone editor: the slowest pace of the band
+  /// Zone editor: label of the slowest pace of the band
   ///
   /// In de, this message translates to:
-  /// **'langsamste'**
+  /// **'Langsamste'**
   String get zonePaceSlowest;
 
-  /// Zone editor: heading of the stroke rate band
+  /// Zone editor: title and switch of the stroke rate band
   ///
   /// In de, this message translates to:
-  /// **'Schlagzahl'**
+  /// **'Schlagzahl-Band'**
   String get zoneSpmBand;
 
-  /// Zone editor: the lowest stroke rate of the band
+  /// Zone editor: label of the lowest stroke rate of the band
   ///
   /// In de, this message translates to:
-  /// **'ab'**
+  /// **'Mindestens'**
   String get zoneSpmFrom;
 
-  /// Zone editor: the highest stroke rate of the band
+  /// Zone editor: label of the highest stroke rate of the band
   ///
   /// In de, this message translates to:
-  /// **'bis'**
+  /// **'Höchstens'**
   String get zoneSpmTo;
 
   /// Zone editor: what a zone needs
@@ -1284,18 +1308,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.'**
   String get zoneBandHint;
-
-  /// Zone editor: the pace typed cannot be read
-  ///
-  /// In de, this message translates to:
-  /// **'Die Pace „{text}“ ist ungültig.'**
-  String invalidPace(String text);
-
-  /// Zone editor: the stroke rate typed cannot be read
-  ///
-  /// In de, this message translates to:
-  /// **'Die Schlagzahl „{text}“ ist ungültig.'**
-  String invalidStrokeRate(String text);
 
   /// Pattern of a date with time for the intl package's DateFormat, e.g. '15.10.2026, 18:30'; keep the 24-hour clock
   ///

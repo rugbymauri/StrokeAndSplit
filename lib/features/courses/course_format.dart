@@ -1,4 +1,4 @@
-/// Input and display formats of courses.
+/// Display formats of courses.
 library;
 
 import '../../data/courses/course.dart';
@@ -18,20 +18,4 @@ String formatSegmentBands(CourseSegment segment) {
     if (segment.hasPaceBand) '${formatPaceBound(segment.paceFastCs!)}–${formatPaceBound(segment.paceSlowCs!)}',
     if (segment.hasSpmBand) '${segment.spmMin}–${segment.spmMax} spm',
   ].join(' · ');
-}
-
-/// A length as typed: metres, or `m:ss` (or whole minutes) on a time course.
-int? parseCourseLength(CourseAxis axis, String text) {
-  final value = text.trim();
-  if (axis == CourseAxis.distance) return int.tryParse(value);
-  final match = RegExp(r'^(\d+)(?::([0-5]\d))?$').firstMatch(value);
-  if (match == null) return null;
-  return int.parse(match[1]!) * 60 + int.parse(match[2] ?? '0');
-}
-
-/// A pace per 500 m as typed, e.g. `2:05` or `2:05.5`, in centiseconds.
-int? parsePace(String text) {
-  final match = RegExp(r'^(\d+):([0-5]\d)(?:[.,](\d))?$').firstMatch(text.trim());
-  if (match == null) return null;
-  return ((int.parse(match[1]!) * 60 + int.parse(match[2]!)) * 10 + int.parse(match[3] ?? '0')) * 10;
 }

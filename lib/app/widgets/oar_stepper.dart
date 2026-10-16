@@ -38,6 +38,7 @@ class OarStepper extends StatelessWidget {
     this.unit,
     this.label,
     this.size = OarStepperSize.large,
+    this.background = AppColors.surface,
   }) : assert(step > 0);
 
   final int value;
@@ -59,6 +60,9 @@ class OarStepper extends StatelessWidget {
   final String? label;
 
   final OarStepperSize size;
+
+  /// Fill behind buttons and value; [AppColors.bg] stands out on a card.
+  final Color background;
 
   bool get canIncrease => max == null || value + step <= max!;
   bool get canDecrease => min == null || value - step >= min!;
@@ -83,7 +87,7 @@ class OarStepper extends StatelessWidget {
       onDecrease: decrease,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: background,
           borderRadius: BorderRadius.circular(12),
           border: large ? null : Border.all(color: AppColors.line),
         ),

@@ -25,15 +25,15 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 ## 4. Vorlagen und Strecken
 
 - [ ] 4.1 Die bestehenden drei Tabs „Vorlagen“, „Strecken“ und „Zonen“ aus `zones` nach „Vorlage wählen“ und „Streckenliste“ gestalten, Aufbau und Navigation bleiben; aufklappbare Vorlage mit „Starten“. Verifikation: bestehende Tests zum Tabwechsel grün, Widget-Tests für Aufklappen, Auswahl und Start mit der gewählten Quelle
-- [ ] 4.2 Vorlagen-Editor nach „Vorlagen-Editor“ (Umschalter feste Anzahl/offen, Zähler, Ergebnis-Zeile). Verifikation: Widget-Tests für feste und offene Rundenzahl
+- [x] 4.2 Vorlagen-Editor nach „Vorlagen-Editor“ (Umschalter feste Anzahl/offen, Zähler, Ergebnis-Zeile). Verifikation: Widget-Tests für feste und offene Rundenzahl
 - [ ] 4.3 Gestaltung der Streckenliste und des Strecken-Kopfs (Name, Achse, Länge, Ablaufbalken) nach „Streckenliste“ und „Strecken-Editor“. Einbauen von Zonen und Zonen-Editor setzt der Change `zones` um. Verifikation: Widget-Tests für Streckenliste und Versionierungshinweis
 
-- [ ] 4.4 Zahlenfelder durch `OarStepper` ersetzen: Rundenzahl im Vorlagen-Editor, Länge im Strecken-Editor, Länge, Pace- und Schlagzahl-Band im Zonen-Editor, Startposition in „Zone einbauen“, mit den Schritten aus D7. Verifikation: bestehende Editor-Tests auf Tippen umgestellt und grün, Widget-Tests für die Spec-Szenarien „Pace-Band anpassen“ und „Zone verschieben“
+- [x] 4.4 Zahlenfelder durch `OarStepper` ersetzen: Rundenzahl im Vorlagen-Editor, Länge im Strecken-Editor, Länge, Pace- und Schlagzahl-Band im Zonen-Editor, Startposition in „Zone einbauen“, mit den Schritten aus D7. Verifikation: bestehende Editor-Tests auf Tippen umgestellt und grün, Widget-Tests für die Spec-Szenarien „Pace-Band anpassen“ und „Zone verschieben“
 
 ## 5. Start und Zusammenfassung
 
 - [ ] 5.1 „Geräte wählen“ als erster Screen nach Design D6 (Rudergerät aus der Geräteliste für PM5 und FTMS, „Simulator“ und „Simulator (FTMS)“, Platz für den Pulsgurt, „Weiter“ erst mit Rudergerät; übersprungen, wenn das zuletzt gewählte Rudergerät gefunden wird) und danach der Startbildschirm (Gerätezeile, „Rudern“, „Frei rudern“, Kachel „Nochmal“, Link „Sessions“) und Sprachwahl in der App-Leiste nach D8, Gestaltung nach „Start“ im Canvas. Der Quellen-Dialog beim Start einer Vorlage entfällt. Verifikation: Widget-Tests für Simulator und Simulator (FTMS) wählen, Rudergerät aus der Liste wählen, „Weiter“ gesperrt ohne Rudergerät, Gerätezeile führt zurück zu „Geräte wählen“, beim Start mit gefundenem letztem Rudergerät direkt der Startbildschirm, ohne gefundenes Gerät „Geräte wählen“ mit Vorauswahl, Sprachwahl, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit vorausgewählter Vorlage, keine Kachel ohne Session und keine Kachel, wenn die Vorlage der jüngsten Session gelöscht ist
-- [ ] 5.2 Zusammenfassung nach „Zusammenfassung“ mit Rundenbalken für den Anteil in der Zone. Verifikation: Widget-Tests für Distanz- und Zeitstrecke sowie eine freie Session
+- [x] 5.2 Zusammenfassung nach „Zusammenfassung“ mit Rundenbalken für den Anteil in der Zone. Verifikation: Widget-Tests für Distanz- und Zeitstrecke sowie eine freie Session
 
 ## 6. Abschluss
 
