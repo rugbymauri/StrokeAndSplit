@@ -9,7 +9,7 @@
 
 - [x] 2.1 `CourseRepository`: anlegen, auflisten (nur nicht gelöschte, neueste Version), umbenennen, Definition ändern mit Versionierungsregel (neue Version nur, wenn die aktuelle schon gerudert wurde), weich löschen inkl. Löschen abhängiger Vorlagen. Verifikation: Unit-Tests gegen In-Memory-DB für alle Szenarien der Spec courses
 - [x] 2.2 Validierung einer Streckendefinition (Länge > 0, Segmentsumme gleich Länge, Bänder mit Untergrenze ≤ Obergrenze) als reine Funktion mit verständlichen Fehlermeldungen. Verifikation: Unit-Tests für Länge 0, Abweichung 100 m und vertauschtes Pace-Band
-- [ ] 2.3 Strecken-Liste und Strecken-Editor (Name, Achse, Länge, Segmente teilen und zusammenlegen, optionale Bänder, Eingabe m:ss bei Zeit), Löschen mit Bestätigung und Hinweis auf betroffene Vorlagen. Verifikation: Widget-Tests für Anlegen einer Distanz- und einer Zeitstrecke, Unterteilen, Fehleranzeige und Löschen
+- [x] 2.3 Strecken-Liste und Strecken-Editor (Name, Achse, Länge, Segmente teilen und zusammenlegen, optionale Bänder, Eingabe m:ss bei Zeit), Löschen mit Bestätigung und Hinweis auf betroffene Vorlagen. Verifikation: Widget-Tests für Anlegen einer Distanz- und einer Zeitstrecke, Unterteilen, Fehleranzeige und Löschen
 
 ## 3. Vorlagen (Capability session-templates)
 

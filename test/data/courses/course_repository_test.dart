@@ -31,7 +31,9 @@ Future<int> _rowSession(AppDatabase db, int versionId) async {
 
 Future<int> _template(AppDatabase db, String name, int courseId) async {
   final id = await db.into(db.templates).insert(TemplatesCompanion.insert(name: name, createdAt: DateTime(2026)));
-  await db.into(db.templateBlocks).insert(TemplateBlocksCompanion.insert(templateId: id, position: 0, courseId: courseId));
+  await db
+      .into(db.templateBlocks)
+      .insert(TemplateBlocksCompanion.insert(templateId: id, position: 0, courseId: courseId));
   return id;
 }
 
