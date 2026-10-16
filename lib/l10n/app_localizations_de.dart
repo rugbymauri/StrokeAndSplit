@@ -54,6 +54,44 @@ class AppLocalizationsDe extends AppLocalizations {
   String get devicesNotFound => 'nicht gefunden';
 
   @override
+  String get devicesHeartRateMonitor => 'Pulsgurt';
+
+  @override
+  String get devicesNoStrap => 'Kein Gurt';
+
+  @override
+  String get devicesNoStrapHint =>
+      'Optional, für Puls und RR-Intervalle direkt vom Gurt';
+
+  @override
+  String get devicesStrapPaired => 'Gekoppelt';
+
+  @override
+  String get devicesStrapPair => 'Gurt koppeln';
+
+  @override
+  String get devicesStrapChange => 'Gurt wechseln';
+
+  @override
+  String get devicesStrapForget => 'Vergessen';
+
+  @override
+  String get strapSearchTitle => 'Pulsgurt suchen';
+
+  @override
+  String get strapSearchNothingFound =>
+      'Kein Gurt gefunden.\n\n• Feuchte die Elektroden an und lege den Gurt an, erst dann sendet er.\n• Trenne den Gurt von anderen Apps oder Uhren, viele Gurte erlauben nur wenige Verbindungen gleichzeitig.\n• Geh näher an den Gurt.';
+
+  @override
+  String strapSearchFailed(String detail) {
+    return 'Die Suche nach Pulsgurten ist fehlgeschlagen.\n\n$detail';
+  }
+
+  @override
+  String get strapBluetoothOff =>
+      'Bluetooth ist ausgeschaltet. Schalte Bluetooth ein, um nach deinem Pulsgurt zu suchen.';
+
+  @override
   String launchSearching(String device) {
     return 'Suche $device …';
   }

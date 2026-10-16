@@ -56,6 +56,55 @@
   "@devicesNotFound": {
     "description": "Choose devices: the rower chosen last is not in range"
   },
+  "devicesHeartRateMonitor": "Pulsgurt",
+  "@devicesHeartRateMonitor": {
+    "description": "Choose devices: label above the heart rate strap"
+  },
+  "devicesNoStrap": "Kein Gurt",
+  "@devicesNoStrap": {
+    "description": "Choose devices: no heart rate strap is paired"
+  },
+  "devicesNoStrapHint": "Optional, für Puls und RR-Intervalle direkt vom Gurt",
+  "@devicesNoStrapHint": {
+    "description": "Choose devices: explanation below 'Kein Gurt', the strap is optional"
+  },
+  "devicesStrapPaired": "Gekoppelt",
+  "@devicesStrapPaired": {
+    "description": "Choose devices: line below the name of the paired heart rate strap"
+  },
+  "devicesStrapPair": "Gurt koppeln",
+  "@devicesStrapPair": {
+    "description": "Choose devices: button that opens the strap search when no strap is paired"
+  },
+  "devicesStrapChange": "Gurt wechseln",
+  "@devicesStrapChange": {
+    "description": "Choose devices: button that opens the strap search to pair another strap"
+  },
+  "devicesStrapForget": "Vergessen",
+  "@devicesStrapForget": {
+    "description": "Choose devices: button that forgets the paired heart rate strap"
+  },
+  "strapSearchTitle": "Pulsgurt suchen",
+  "@strapSearchTitle": {
+    "description": "Strap search: title of the screen listing the heart rate straps in range"
+  },
+  "strapSearchNothingFound": "Kein Gurt gefunden.\n\n• Feuchte die Elektroden an und lege den Gurt an, erst dann sendet er.\n• Trenne den Gurt von anderen Apps oder Uhren, viele Gurte erlauben nur wenige Verbindungen gleichzeitig.\n• Geh näher an den Gurt.",
+  "@strapSearchNothingFound": {
+    "description": "Strap search: the scan found no strap within 15 seconds, with hints"
+  },
+  "strapSearchFailed": "Die Suche nach Pulsgurten ist fehlgeschlagen.\n\n{detail}",
+  "@strapSearchFailed": {
+    "description": "Strap search: the scan failed; detail is the technical error",
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "strapBluetoothOff": "Bluetooth ist ausgeschaltet. Schalte Bluetooth ein, um nach deinem Pulsgurt zu suchen.",
+  "@strapBluetoothOff": {
+    "description": "Strap search: Bluetooth is switched off"
+  },
   "launchSearching": "Suche {device} …",
   "@launchSearching": {
     "description": "Shown at the start while the rower chosen last is searched; device is its name",

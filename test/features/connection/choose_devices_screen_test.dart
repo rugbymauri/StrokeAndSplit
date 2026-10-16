@@ -2,9 +2,12 @@ import 'package:aergrow/app/platform_providers.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sources/ble/ble_transport.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
+import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
+import 'package:aergrow/data/sources/heart_rate_choice.dart';
 import 'package:aergrow/data/sources/rower_choice.dart';
 import 'package:aergrow/features/connection/choose_devices_screen.dart';
+import 'package:aergrow/features/connection/heart_rate_search_screen.dart';
 import 'package:aergrow/features/connection/start_screen.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
@@ -12,23 +15,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
+import '../../support/fake_heart_rate_transport.dart';
 import '../../support/localized_app.dart';
 import '../../support/test_database.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
+const _h10 = FoundHeartRateMonitor(id: 'A0:9E:1A:00:00:01', name: 'Polar H10 1A2B3C4D');
+const _tickr = FoundHeartRateMonitor(id: 'D4:22:CD:00:00:02', name: 'TICKR 1234');
 
 Future<ProviderContainer> _pump(
   WidgetTester tester,
   FakeBleTransport transport, {
   Locale? locale,
   RowerChoiceStore? store,
+  FakeHeartRateTransport? strapTransport,
+  HeartRateMonitorStore? strapStore,
 }) async {
   final container = ProviderContainer(overrides: [
     bleTransportProvider.overrideWithValue(transport),
     wakelockProvider.overrideWithValue(FakeWakelock()),
     databaseProvider.overrideWithValue(openTestDatabase()),
     rowerChoiceStoreProvider.overrideWithValue(store ?? MemoryRowerChoiceStore()),
+    heartRateTransportProvider.overrideWithValue(strapTransport ?? FakeHeartRateTransport()),
+    heartRateMonitorStoreProvider.overrideWithValue(strapStore ?? MemoryHeartRateMonitorStore()),
   ]);
   addTearDown(container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(
@@ -48,6 +58,29 @@ bool _isSelected(WidgetTester tester, String key) => tester.any(
     );
 
 FilledButton _next(WidgetTester tester) => tester.widget(find.widgetWithText(FilledButton, 'Weiter'));
+
+/// A screen tall enough to show the strap section below the rowers.
+void _tallScreen(WidgetTester tester) {
+  tester.view.physicalSize = const Size(800, 1600);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+}
+
+/// Lets the rower scan run out, so that later transitions can settle.
+Future<void> _finishRowerScan(WidgetTester tester) async {
+  await tester.pump(const Duration(seconds: 15));
+  await tester.pump();
+}
+
+/// Opens the strap search and waits for the straps found at once.
+Future<void> _openStrapSearch(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('strap-search')));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
+}
+
+/// The texts in the card of the strap section.
+Finder _inStrapCard(String text) => find.descendant(of: find.byKey(const Key('strap')), matching: find.text(text));
 
 Future<void> _continue(WidgetTester tester, {String label = 'Weiter'}) async {
   await tester.pump();
@@ -253,5 +286,159 @@ void main() {
     expect(find.text('Not a rower'), findsOneWidget);
     expect(find.textContaining('This PM5 belongs to a BikeErg.'), findsOneWidget);
     expect(find.textContaining('supports the PM5 on a RowErg'), findsOneWidget);
+  });
+
+  group('heart rate strap', () {
+    testWidgets('shows "Kein Gurt" and offers to pair one', (tester) async {
+      _tallScreen(tester);
+      await _pump(tester, FakeBleTransport());
+
+      expect(find.text('PULSGURT'), findsOneWidget);
+      expect(_inStrapCard('Kein Gurt'), findsOneWidget);
+      expect(find.text('Gurt koppeln'), findsOneWidget);
+      expect(find.text('Vergessen'), findsNothing);
+      await _finishRowerScan(tester);
+    });
+
+    testWidgets('pairs a strap from the strap search and remembers it', (tester) async {
+      _tallScreen(tester);
+      final strapStore = MemoryHeartRateMonitorStore();
+      final strapTransport = FakeHeartRateTransport(found: [_h10]);
+      final container = await _pump(
+        tester,
+        FakeBleTransport(found: [_pm5]),
+        strapTransport: strapTransport,
+        strapStore: strapStore,
+      );
+      await _finishRowerScan(tester);
+
+      await _openStrapSearch(tester);
+      expect(find.byType(HeartRateSearchScreen), findsOneWidget);
+      expect(find.text('Pulsgurt suchen'), findsOneWidget);
+      // The strap search lists straps only, apart from the rowers.
+      expect(find.text('PM5 430000001 Row'), findsNothing);
+      await tester.tap(find.text('Polar H10 1A2B3C4D'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HeartRateSearchScreen), findsNothing);
+      expect(_inStrapCard('Polar H10 1A2B3C4D'), findsOneWidget);
+      expect(_inStrapCard('Gekoppelt · A0:9E:1A:00:00:01'), findsOneWidget);
+      expect(find.text('Gurt wechseln'), findsOneWidget);
+      expect(container.read(chosenHeartRateMonitorProvider), _h10);
+      expect(decodeHeartRateMonitor(strapStore.read()), _h10);
+      // Pairing connects nothing yet, that happens with the rower.
+      expect(strapTransport.attempts, isEmpty);
+    });
+
+    testWidgets('changes the paired strap', (tester) async {
+      _tallScreen(tester);
+      final strapStore = MemoryHeartRateMonitorStore(_h10);
+      final container = await _pump(
+        tester,
+        FakeBleTransport(),
+        strapTransport: FakeHeartRateTransport(found: [_h10, _tickr]),
+        strapStore: strapStore,
+      );
+      await _finishRowerScan(tester);
+      expect(_inStrapCard('Polar H10 1A2B3C4D'), findsOneWidget);
+
+      await _openStrapSearch(tester);
+      expect(
+        find.descendant(of: find.byKey(Key('strap-${_h10.id}')), matching: find.byIcon(Icons.radio_button_checked)),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('TICKR 1234'));
+      await tester.pumpAndSettle();
+
+      expect(_inStrapCard('TICKR 1234'), findsOneWidget);
+      expect(_inStrapCard('Polar H10 1A2B3C4D'), findsNothing);
+      expect(container.read(chosenHeartRateMonitorProvider), _tickr);
+      expect(decodeHeartRateMonitor(strapStore.read()), _tickr);
+    });
+
+    testWidgets('forgets the paired strap', (tester) async {
+      _tallScreen(tester);
+      final strapStore = MemoryHeartRateMonitorStore(_h10);
+      final container = await _pump(tester, FakeBleTransport(), strapStore: strapStore);
+
+      await tester.tap(find.text('Vergessen'));
+      await tester.pump();
+
+      expect(_inStrapCard('Kein Gurt'), findsOneWidget);
+      expect(find.text('Vergessen'), findsNothing);
+      expect(container.read(chosenHeartRateMonitorProvider), isNull);
+      expect(strapStore.read(), isNull);
+      await _finishRowerScan(tester);
+    });
+
+    testWidgets('shows tips when no strap was found within 15 seconds', (tester) async {
+      _tallScreen(tester);
+      await _pump(tester, FakeBleTransport());
+      await _finishRowerScan(tester);
+
+      await _openStrapSearch(tester);
+      expect(find.textContaining('Kein Gurt gefunden'), findsNothing);
+      await tester.pump(const Duration(seconds: 15));
+      await tester.pump();
+
+      expect(find.textContaining('Kein Gurt gefunden'), findsOneWidget);
+      expect(find.textContaining('Feuchte die Elektroden an'), findsOneWidget);
+      expect(find.textContaining('von anderen Apps oder Uhren'), findsOneWidget);
+      expect(find.text('Erneut suchen'), findsOneWidget);
+    });
+
+    testWidgets('shows the strap tips in English', (tester) async {
+      _tallScreen(tester);
+      await _pump(tester, FakeBleTransport(), locale: const Locale('en'));
+      await _finishRowerScan(tester);
+
+      expect(find.text('HEART RATE STRAP'), findsOneWidget);
+      expect(_inStrapCard('No strap'), findsOneWidget);
+      await _openStrapSearch(tester);
+      await tester.pump(const Duration(seconds: 15));
+      await tester.pump();
+
+      expect(find.text('Find heart rate strap'), findsOneWidget);
+      expect(find.textContaining('No strap found.'), findsOneWidget);
+    });
+
+    testWidgets('asks to switch Bluetooth on for the strap search', (tester) async {
+      _tallScreen(tester);
+      await _pump(
+        tester,
+        FakeBleTransport(),
+        strapTransport: FakeHeartRateTransport(readinessValue: BluetoothReadiness.off),
+      );
+      await _finishRowerScan(tester);
+
+      await _openStrapSearch(tester);
+
+      expect(find.textContaining('nach deinem Pulsgurt zu suchen'), findsOneWidget);
+    });
+
+    testWidgets('continues without a strap once a rower is chosen', (tester) async {
+      _tallScreen(tester);
+      final container = await _pump(tester, FakeBleTransport());
+      await _finishRowerScan(tester);
+
+      expect(_inStrapCard('Kein Gurt'), findsOneWidget);
+      await tester.tap(find.text('Simulator'));
+      await tester.pump();
+      expect(_next(tester).onPressed, isNotNull);
+      await _continue(tester);
+
+      expect(find.byType(StartScreen), findsOneWidget);
+      expect(container.read(chosenHeartRateMonitorProvider), isNull);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('keeps "Weiter" locked with a paired strap but no rower', (tester) async {
+      _tallScreen(tester);
+      await _pump(tester, FakeBleTransport(), strapStore: MemoryHeartRateMonitorStore(_h10));
+      await _finishRowerScan(tester);
+
+      expect(_inStrapCard('Polar H10 1A2B3C4D'), findsOneWidget);
+      expect(_next(tester).onPressed, isNull);
+    });
   });
 }

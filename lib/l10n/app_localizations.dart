@@ -182,6 +182,72 @@ abstract class AppLocalizations {
   /// **'nicht gefunden'**
   String get devicesNotFound;
 
+  /// Choose devices: label above the heart rate strap
+  ///
+  /// In de, this message translates to:
+  /// **'Pulsgurt'**
+  String get devicesHeartRateMonitor;
+
+  /// Choose devices: no heart rate strap is paired
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Gurt'**
+  String get devicesNoStrap;
+
+  /// Choose devices: explanation below 'Kein Gurt', the strap is optional
+  ///
+  /// In de, this message translates to:
+  /// **'Optional, für Puls und RR-Intervalle direkt vom Gurt'**
+  String get devicesNoStrapHint;
+
+  /// Choose devices: line below the name of the paired heart rate strap
+  ///
+  /// In de, this message translates to:
+  /// **'Gekoppelt'**
+  String get devicesStrapPaired;
+
+  /// Choose devices: button that opens the strap search when no strap is paired
+  ///
+  /// In de, this message translates to:
+  /// **'Gurt koppeln'**
+  String get devicesStrapPair;
+
+  /// Choose devices: button that opens the strap search to pair another strap
+  ///
+  /// In de, this message translates to:
+  /// **'Gurt wechseln'**
+  String get devicesStrapChange;
+
+  /// Choose devices: button that forgets the paired heart rate strap
+  ///
+  /// In de, this message translates to:
+  /// **'Vergessen'**
+  String get devicesStrapForget;
+
+  /// Strap search: title of the screen listing the heart rate straps in range
+  ///
+  /// In de, this message translates to:
+  /// **'Pulsgurt suchen'**
+  String get strapSearchTitle;
+
+  /// Strap search: the scan found no strap within 15 seconds, with hints
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Gurt gefunden.\n\n• Feuchte die Elektroden an und lege den Gurt an, erst dann sendet er.\n• Trenne den Gurt von anderen Apps oder Uhren, viele Gurte erlauben nur wenige Verbindungen gleichzeitig.\n• Geh näher an den Gurt.'**
+  String get strapSearchNothingFound;
+
+  /// Strap search: the scan failed; detail is the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Die Suche nach Pulsgurten ist fehlgeschlagen.\n\n{detail}'**
+  String strapSearchFailed(String detail);
+
+  /// Strap search: Bluetooth is switched off
+  ///
+  /// In de, this message translates to:
+  /// **'Bluetooth ist ausgeschaltet. Schalte Bluetooth ein, um nach deinem Pulsgurt zu suchen.'**
+  String get strapBluetoothOff;
+
   /// Shown at the start while the rower chosen last is searched; device is its name
   ///
   /// In de, this message translates to:
