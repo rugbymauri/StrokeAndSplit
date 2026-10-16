@@ -70,7 +70,7 @@ void main() {
       await tester.enterText(find.byKey(const Key('template-name')), name);
       await tester.tap(find.byKey(const Key('template-course')));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Seerunde · 1000 m · 1 Segment').last);
+      await tester.tap(find.text('Seerunde · 1000 m · frei').last);
       await tester.pumpAndSettle();
       if (open) await tester.tap(find.text('Offene Rundenzahl'));
       if (laps != null) await tester.enterText(find.byKey(const Key('template-laps')), laps);

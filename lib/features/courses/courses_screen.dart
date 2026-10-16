@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import 'course_editor_screen.dart';
+import 'course_strip.dart';
 
 /// All courses, to create, edit and delete them; [embedded] in a tab it
 /// has no app bar of its own.
@@ -41,11 +42,11 @@ Future<void> openCourseEditor(BuildContext context, {Course? course}) {
   return Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CourseEditorScreen(course: course)));
 }
 
-/// `1000 m · 3 Segmente`
+/// `2000 m · Sprint, Ausdauer 2:30`, or `1000 m · frei` without zones.
 String courseSummary(Course course) {
-  final segments = course.definition.segments.length;
+  final zones = {for (final s in course.definition.segments) ?s.zoneName};
   return '${formatCourseLength(course.axis, course.definition.length)} · '
-      '${segments == 1 ? '1 Segment' : '$segments Segmente'}';
+      '${zones.isEmpty ? 'frei' : zones.join(', ')}';
 }
 
 class _CourseTile extends ConsumerWidget {
@@ -58,7 +59,14 @@ class _CourseTile extends ConsumerWidget {
     return ListTile(
       leading: Icon(course.axis == CourseAxis.distance ? Icons.straighten : Icons.timer_outlined),
       title: Text(course.name),
-      subtitle: Text(courseSummary(course)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(courseSummary(course)),
+          const SizedBox(height: 6),
+          CourseStrip(definition: course.definition, height: 6),
+        ],
+      ),
       onTap: () => openCourseEditor(context, course: course),
       trailing: IconButton(
         tooltip: 'Löschen',

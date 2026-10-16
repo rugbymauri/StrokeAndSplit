@@ -144,35 +144,3 @@ String formatCourseRange(CourseAxis axis, int start, int end) => switch (axis) {
       CourseAxis.distance => '$start–$end m',
       CourseAxis.time => '${formatCourseLength(axis, start)}–${formatCourseLength(axis, end)}',
     };
-
-/// What is wrong with [definition], in words for the user; empty when it can
-/// be saved.
-List<String> courseErrors(CourseDefinition definition) {
-  final errors = <String>[];
-  final axis = definition.axis;
-  if (definition.length <= 0) {
-    errors.add('Die Länge fehlt.');
-    return errors;
-  }
-  for (final (i, segment) in definition.segments.indexed) {
-    final name = 'Segment ${i + 1}';
-    if (segment.length <= 0) errors.add('$name hat keine Länge.');
-    if ((segment.paceFastCs == null) != (segment.paceSlowCs == null)) {
-      errors.add('$name: Für das Pace-Band fehlt eine Grenze.');
-    } else if (segment.hasPaceBand && segment.paceFastCs! > segment.paceSlowCs!) {
-      errors.add('$name: Die schnellste Pace ist langsamer als die langsamste.');
-    }
-    if ((segment.spmMin == null) != (segment.spmMax == null)) {
-      errors.add('$name: Für das Schlagzahl-Band fehlt eine Grenze.');
-    } else if (segment.hasSpmBand && segment.spmMin! > segment.spmMax!) {
-      errors.add('$name: Die niedrigste Schlagzahl liegt über der höchsten.');
-    }
-  }
-  final sum = definition.segments.fold(0, (sum, s) => sum + s.length);
-  final difference = sum - definition.length;
-  if (difference != 0) {
-    errors.add('Die Segmente ergeben ${formatCourseLength(axis, sum)}, '
-        'das sind ${formatCourseLength(axis, difference.abs())} ${difference < 0 ? 'zu wenig' : 'zu viel'}.');
-  }
-  return errors;
-}

@@ -13,7 +13,7 @@
 
 - [x] 3.1 Reine Funktion `resolve` nach Design D2. Verifikation: Unit-Tests für das Spec-Beispiel „2 km Intervall“, Überschneidung, Ende überschritten, falsche Achse und Zone doppelt eingebaut
 - [x] 3.2 `CourseRepository` speichert Einbauten als aufgelöste Abschnitte, Zonenänderung und -löschung lösen alle betroffenen Strecken in einer Transaktion neu auf und versionieren (Design D3, D4). Verifikation: Unit-Tests „Sprint verlängern“, „Änderung passt nicht“, „Zone einer geruderten Strecke ändern“ und „Verwendete Zone löschen“
-- [ ] 3.3 Strecken-Editor mit Ablauf und „Zone einbauen“ nach den Canvas-Screens „Strecken-Editor“ und „Zone einbauen“, Segment-Editor entfällt. Verifikation: Widget-Tests für Einbauen, Überschneidung, ausgegraute Zeit-Zone und zu kurze Strecke
+- [x] 3.3 Strecken-Editor mit Ablauf und „Zone einbauen“ nach den Canvas-Screens „Strecken-Editor“ und „Zone einbauen“, Segment-Editor entfällt. Verifikation: Widget-Tests für Einbauen, Überschneidung, ausgegraute Zeit-Zone und zu kurze Strecke
 
 ## 4. Rudern und Austausch
 
