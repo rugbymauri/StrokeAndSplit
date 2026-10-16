@@ -43,6 +43,9 @@ abstract final class AppColors {
 
   /// The ghost.
   static const ghost = Color(0xFFC9B6FF);
+
+  /// The dot of a connected erg in the live display's app bar.
+  static const connected = Color(0xFF4CD07D);
 }
 
 /// The two bundled font families (design D1).

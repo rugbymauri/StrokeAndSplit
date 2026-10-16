@@ -58,6 +58,7 @@ Farben:
 | `zoneOut` | `#FF9A3D` | ausserhalb der Zone, Fehler, Löschen |
 | `zoneOutSurface` / `zoneOutText` | `#33200F` / `#FFC58F` | Karte bzw. Text ausserhalb |
 | `ghost` | `#C9B6FF` | Ghost |
+| `connected` | `#4CD07D` | Punkt „verbunden“ in der Kopfzeile des Live-Displays (vorläufig) |
 
 Blau und Orange unterscheiden sich auch in der Helligkeit, damit der Zonenstatus bei Rot-Grün-Schwäche lesbar bleibt. Dazu kommen immer Pfeil oder Text (bestehende Spec „Zonenstatus ohne Farbe erkennbar“).
 
@@ -77,6 +78,14 @@ Das Live-Display wählt das Layout nach dem Seitenverhältnis des verfügbaren P
 - **Quer, Vorlage**: links die Pace-Box fast über die volle Höhe, in der Mitte die Schlagzahl-Karte mit Kraftkurve, rechts eine schmale Spalte mit den vier Kacheln und „Beenden“.
 
 Die Grössen skalieren mit dem Platz. Massgebend ist das Verhältnis aus dem Canvas, nicht der absolute Pixelwert.
+
+Kopfzeile (entschieden 2026-10-16 vom Nutzer): Die App-Leiste des Live-Displays zeigt nur noch den Namen der gerudeten Vorlage, beim freien Rudern vorläufig „Frei rudern“. Die Verbindung steht als kleiner Punkt (12 px) vor dem Namen statt als Text, verbunden ist er grün ausgefüllt (`connected`). Vorläufig gilt für die übrigen Zustände:
+
+- Suchen, Verbinden und Wiederverbinden: Punkt in `zoneOut`, ohne Animation.
+- Getrennt: leerer Ring in `textMuted`.
+- In allen Zuständen ausser „verbunden“ steht der Zustand zusätzlich als Text unter der App-Leiste (z. B. „Verbindung unterbrochen, verbinde neu …“), damit er wie in der Spec `erg-connection` verlangt auch ohne Farben erkennbar ist. Screenreader lesen den Zustand am Punkt vor, ein langer Druck zeigt ihn als Tooltip.
+- Der Name des echten Rudergeräts entfällt. Simulator und Replay bleiben als Badge rechts in der App-Leiste markiert (Spec `erg-simulation`, „Datenquelle erkennbar machen“).
+- „Trennen“ bleibt als Symbol-Button rechts in der App-Leiste erreichbar.
 
 ### D3: Fortschrittsrahmen
 
