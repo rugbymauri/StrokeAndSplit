@@ -146,6 +146,10 @@ class Sessions extends Table {
 
   /// Null for an open number of laps.
   IntColumn get plannedLaps => integer().nullable()();
+
+  /// Set by the import; imported sessions count in no ranking (Change
+  /// statistics, Design D3). Sessions before schema 5 count as recorded here.
+  BoolColumn get imported => boolean().withDefault(const Constant(false))();
 }
 
 /// Session-relative values per status tick (Design D6/D7).
@@ -252,7 +256,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase.local() => AppDatabase(driftDatabase(name: 'aergrow'));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -289,6 +293,11 @@ class AppDatabase extends _$AppDatabase {
           from3To4: (m, schema) async {
             await m.alterTable(TableMigration(schema.strokes));
             await m.addColumn(schema.sessions, schema.sessions.protocol);
+          },
+          // Imported sessions leave the rankings (Change statistics, Design D3);
+          // existing sessions count as recorded on this device.
+          from4To5: (m, schema) async {
+            await m.addColumn(schema.sessions, schema.sessions.imported);
           },
         ),
         beforeOpen: (details) async {

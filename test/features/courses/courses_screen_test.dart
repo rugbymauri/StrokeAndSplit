@@ -56,6 +56,14 @@ Future<void> _openNew(WidgetTester tester, String name) async {
   await tester.enterText(find.byKey(const Key('course-name')), name);
 }
 
+/// Opens course [name] from the list and its editor from the details.
+Future<void> _openEditor(WidgetTester tester, _Setup setup, String name) async {
+  await tester.tap(find.text(name));
+  await setup.settle(tester);
+  await tester.tap(find.byTooltip('Bearbeiten'));
+  await setup.settle(tester);
+}
+
 Future<void> _save(WidgetTester tester, _Setup setup) async {
   await tester.tap(find.byTooltip('Speichern'));
   await setup.settle(tester);
@@ -404,8 +412,7 @@ void main() {
       await place(tester, endurance, 1000);
       await _save(tester, setup);
 
-      await tester.tap(find.text('2 km Intervall'));
-      await setup.settle(tester);
+      await _openEditor(tester, setup, '2 km Intervall');
       await stepTo(tester, _length, 1200);
       await _save(tester, setup);
 
@@ -449,8 +456,7 @@ void main() {
     );
     await setup.pump(tester);
 
-    await tester.tap(find.text('Seerunde'));
-    await tester.pumpAndSettle();
+    await _openEditor(tester, setup, 'Seerunde');
     await tester.enterText(find.byKey(const Key('course-name')), 'Seerunde lang');
     await _save(tester, setup);
 
@@ -501,8 +507,7 @@ void main() {
         await _row(setup, id, rowed);
       });
       await setup.pump(tester, locale: locale);
-      await tester.tap(find.text('Seerunde'));
-      await setup.settle(tester);
+      await _openEditor(tester, setup, 'Seerunde');
       return setup;
     }
 
@@ -528,10 +533,11 @@ void main() {
       final setup = await pumpRowed(tester, rowed: 2);
       await stepTo(tester, _length, 1200);
       await _save(tester, setup);
+      await tester.tap(find.byTooltip('Zurück'));
+      await setup.settle(tester);
       expect(find.text('Distanz · ohne Zonen · 2× gerudert'), findsOneWidget);
 
-      await tester.tap(find.text('Seerunde'));
-      await setup.settle(tester);
+      await _openEditor(tester, setup, 'Seerunde');
 
       expect(stepperValue(tester, _length), 1200);
       expect(find.byKey(hint), findsNothing);
@@ -550,6 +556,8 @@ void main() {
       expect(find.text('Distance · no zones · rowed once'), findsOneWidget);
       expect(find.text('Brighter = faster'), findsOneWidget);
       await tester.tap(find.text('Seerunde'));
+      await setup.settle(tester);
+      await tester.tap(find.byTooltip('Edit'));
       await setup.settle(tester);
 
       expect(

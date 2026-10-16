@@ -12,8 +12,9 @@ class RankingRepository {
 
   final AppDatabase _db;
 
-  /// Only sessions rowed on an erg count, also when imported (Design D3).
-  static final _counted = "s.source IN ('${ErgSourceKind.pm5.name}', '${ErgSourceKind.ftms.name}')";
+  /// Only sessions rowed on an erg on this device count, none imported (Design D3).
+  static final _counted =
+      "s.source IN ('${ErgSourceKind.pm5.name}', '${ErgSourceKind.ftms.name}') AND s.imported = 0";
 
   /// The complete laps on course [courseId], one ranking per length of the
   /// rowed versions, the current length first (Design D2).

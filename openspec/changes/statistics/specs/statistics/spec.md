@@ -75,7 +75,7 @@ Die App SHALL pro Zone eine Rangliste führen, deren Einträge die Abschnitte vo
 - **THEN** hat „Sprint“ eine Rangliste für 100 m und eine für 150 m
 
 ### Requirement: Nur echte Sessions zählen
-Die Ranglisten SHALL nur Sessions enthalten, die an einem Rudergerät aufgezeichnet wurden. Simulierte Sessions MUST NOT zählen. Importierte Sessions SHALL zählen, wenn sie an einem Rudergerät entstanden sind.
+Die Ranglisten SHALL nur Sessions enthalten, die an einem Rudergerät aufgezeichnet wurden. Simulierte und importierte Sessions MUST NOT zählen, auch wenn eine importierte Session an einem Rudergerät entstanden ist.
 
 #### Scenario: Simulator
 - **WHEN** der Nutzer „Seerunde x3“ mit dem Simulator rudert
@@ -83,7 +83,7 @@ Die Ranglisten SHALL nur Sessions enthalten, die an einem Rudergerät aufgezeich
 
 #### Scenario: Import
 - **WHEN** der Nutzer eine am PM5 geruderte Session auf dem Laptop importiert
-- **THEN** zählt sie dort in den Ranglisten ihrer Vorlage, Strecke und Zonen
+- **THEN** erscheint die Session dort in keiner Rangliste ihrer Vorlage, Strecke und Zonen und bekommt keine Platzmarken
 
 ### Requirement: Gelöschtes verlässt die Ranglisten
 Wird eine Strecke, Zone oder Vorlage gelöscht, SHALL ihre Rangliste nicht mehr angezeigt werden. Wird eine Session gelöscht, MUST sie aus allen Ranglisten verschwinden. Die Sessions selbst MUST beim Löschen einer Strecke, Zone oder Vorlage erhalten bleiben.

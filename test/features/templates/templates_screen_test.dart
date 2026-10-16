@@ -18,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
 import '../../support/oar_steppers.dart';
+import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 import '../../support/localized_app.dart';
 
@@ -532,6 +533,121 @@ void main() {
       await setup.settle(tester);
 
       expect(find.text('Sprintstrecke · 2000 m · frei'), findsWidgets);
+      await disposeWidgetsWithDatabase(tester);
+    });
+  });
+
+  group('places of a template', () {
+    Finder inCard(int id, Finder finder) => find.descendant(of: find.byKey(Key('template-$id')), matching: finder);
+    Finder inPlace(int place, String text) =>
+        find.descendant(of: find.byKey(Key('template-place-$place')), matching: find.text(text));
+
+    testWidgets('shows places 1 and 2 with time, pace and date after two sessions', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourse(tester, 'Seerunde');
+      final id = await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+      await tester.runAsync(() async {
+        final x3 = (await setup.templates.get(id))!;
+        await storeRowedSession(setup.db, template: x3, startedAt: DateTime(2026, 10, 1, 7), laps: [
+          for (var i = 0; i < 3; i++) RowedLap.single(250000, 1000),
+        ]);
+        await storeRowedSession(setup.db, template: x3, startedAt: DateTime(2026, 10, 3, 7), laps: [
+          for (var i = 0; i < 3; i++) RowedLap.single(248000, 1000),
+        ]);
+      });
+      await setup.pump(tester);
+
+      expect(find.byKey(const Key('template-podium')), findsNothing);
+      await tester.tap(find.text('Seerunde x3'));
+      await setup.settle(tester);
+
+      expect(inCard(id, find.text('BESTLEISTUNGEN')), findsOneWidget);
+      expect(inPlace(1, '12:24.0'), findsOneWidget);
+      expect(inPlace(1, '2:04.0 /500 m'), findsOneWidget);
+      expect(inPlace(1, '3.10.2026'), findsOneWidget);
+      expect(inPlace(2, '12:30.0'), findsOneWidget);
+      expect(inPlace(2, '2:05.0 /500 m'), findsOneWidget);
+      expect(inPlace(2, '1.10.2026'), findsOneWidget);
+      expect(find.byKey(const Key('template-place-3')), findsNothing);
+      expect(find.byKey(const Key('template-podium-hint')), findsNothing);
+      // Place 1 keeps room for the ghost symbol.
+      final ghostSlot = find.byKey(const Key('template-ghost-slot'));
+      expect(find.descendant(of: find.byKey(const Key('template-place-1')), matching: ghostSlot), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('says that a template never rowed has no best time yet', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourse(tester, 'Seerunde');
+      final id = await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Seerunde x3'));
+      await setup.settle(tester);
+
+      expect(
+        inCard(id, find.text('Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('template-podium')), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows no places for an open number of laps', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourse(tester, 'Seerunde');
+      final id = await setup.addTemplate(tester, 'Seerunde offen', courseId: course, laps: null);
+      await tester.runAsync(() async {
+        final open = (await setup.templates.get(id))!;
+        await storeRowedSession(setup.db, template: open, laps: [RowedLap.single(250000, 1000)]);
+      });
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Seerunde offen'));
+      await setup.settle(tester);
+
+      expect(inCard(id, find.text('Bei offener Rundenzahl gibt es keine Bestzeit.')), findsOneWidget);
+      expect(find.byKey(const Key('template-podium')), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows the hint when only a simulated session was rowed', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourse(tester, 'Seerunde');
+      final id = await setup.addTemplate(tester, 'Seerunde x1', courseId: course, laps: 1);
+      await tester.runAsync(() async {
+        final x1 = (await setup.templates.get(id))!;
+        await storeRowedSession(setup.db, template: x1, source: ErgSourceKind.simulator, laps: [
+          RowedLap.single(250000, 1000),
+        ]);
+      });
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Seerunde x1'));
+      await setup.settle(tester);
+
+      expect(find.byKey(const Key('template-podium-hint')), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows the places in English', (tester) async {
+      final setup = _Setup();
+      final course = await setup.addCourse(tester, 'Seerunde');
+      final id = await setup.addTemplate(tester, 'Seerunde x1', courseId: course, laps: 1);
+      await tester.runAsync(() async {
+        final x1 = (await setup.templates.get(id))!;
+        await storeRowedSession(setup.db, template: x1, startedAt: DateTime(2026, 10, 3, 7), laps: [
+          RowedLap.single(250000, 1000),
+        ]);
+      });
+      await setup.pump(tester, locale: const Locale('en'));
+
+      await tester.tap(find.text('Seerunde x1'));
+      await setup.settle(tester);
+
+      expect(find.text('BEST RESULTS'), findsOneWidget);
+      expect(inPlace(1, '4:10.0'), findsOneWidget);
+      expect(inPlace(1, '10/3/2026'), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
   });

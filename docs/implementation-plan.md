@@ -20,7 +20,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
-| 6 | `statistics` | 6/12 | Gruppe 1 in `main`, Rest nach 3 | – |
+| 6 | `statistics` | 10/13 | Gruppe 1 und Anzeige teilweise in `main` | – |
 | 7 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 3 und 6 |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 | 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
@@ -126,7 +126,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Task 5.2 Zusammenfassung nach Canvas (`session_summary_screen.dart`), Platz für die Marken aus `statistics` rechts der Runden und neben dem Titel. Entschieden (Nutzer, 2026-10-16): kein Anteil in der Zone für die ganze Session, nur pro Runde; „Fertig“ nach einer Session trennt und führt zum Startbildschirm. Vorläufig: Kopf mit Vorlage und Quelle; Schläge als vierter Durchschnittswert; beste Runde mit Stern.
 - [x] Task 6.2 README-Bedienung nachgeführt (Geräte wählen, Startbildschirm, Vorlagen, Ruderblatt-Tasten, Fortschrittsrahmen, Live-Kopfzeile, Sprache).
 - [ ] Offen: Task 6.1 Abgleich mit dem Canvas auf Android hoch/quer und Linux (Nutzer), danach archivieren.
-- [x] Task 4.1 Vorlagen-Tab: Tabs als Segment-Umschalter, Vorlagen als aufklappbare Karten mit Bändern und „Starten“ (gewählte Quelle), Vorauswahl aus „Nochmal“ aufgeklappt und ins Bild gescrollt; Zonen-Tab angeglichen; „⌀“ durch „Ø“ ersetzt (Glyphe fehlt in IBM Plex Sans). Vorläufig: Löschen einer Vorlage im Editor statt in der Liste; Titel „Vorlage rudern“ ohne Geräteanzeige; kein „Frei rudern“ im Vorlagen-Tab; Platz für Ghost und Ranglisten-Marken frei.
+- [x] Task 4.1 Vorlagen-Tab: Tabs als Segment-Umschalter, Vorlagen als aufklappbare Karten mit Bändern und „Starten“ (gewählte Quelle), Vorauswahl aus „Nochmal“ aufgeklappt und ins Bild gescrollt; Zonen-Tab angeglichen; „⌀“ durch „Ø“ ersetzt (Glyphe fehlt in IBM Plex Sans). Entschieden (Nutzer, 2026-10-16): Vorlagen werden im Editor gelöscht, nicht in der Liste. Vorläufig: Titel „Vorlage rudern“ ohne Geräteanzeige; kein „Frei rudern“ im Vorlagen-Tab; Platz für Ghost und Ranglisten-Marken frei.
 - [x] Task 4.2 Vorlagen-Editor (Umschalter „Feste Anzahl“/„Offen bis Stopp“, Runden mit `OarStepper`, Ergebnis-Zeile „3 × 1000 m“ ohne Zeitschätzung, vom Nutzer bestätigt) und 4.4 Zahlenfelder als `OarStepper` in Strecken-, Zonen-Editor und „Zone einbauen“; `OarStepper.background` für Karten. Entschieden (Nutzer, 2026-10-16): Pace-Band einer neuen Zone startet bei 2:45–2:50; Grenzen Pace 1:00–5:00, Schlagzahl 10–60, Runden bis 99. Vorläufig: Startwerte neue Strecke 2000 m bzw. 4:00, neue Zone 100 m bzw. 1:00 (Schlagzahl-Band aus, sonst 24–26); Texte aus dem Canvas („Pace-Band“, „Schnellste“ …).
 - [x] Task 4.3 Streckenliste (Karte mit Balken, „12× gerudert“, Legende) und Strecken-Kopf (Achse/Länge nebeneinander, Positionen am grossen Balken, Abschnitte als Karte, Versionierungshinweis); `courseRowCountsProvider` zählt Sessions pro Strecke. Vorläufig: Antippen im Balken öffnet „Zone verschieben“ bzw. „Zone einbauen“ an der Lücke; Liste zählt alle Versionen, Hinweis nur die neueste (Simulator zählt mit); Hinweistext wörtlich aus dem Canvas; Button „Strecke anlegen“.
 - [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Primärfarbe Blau `zoneIn`, auch für den gefüllten Button (Nutzer, 2026-10-16). Vorläufig: Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`).
@@ -145,7 +145,7 @@ Vor dem Start:
 Ziel: Gurt koppeln und merken, automatisch verbinden, Puls-Vorrang Gurt vor PM5, RR-Intervalle, Ø/max Puls und RMSSD in der Zusammenfassung.
 
 Vor dem Start anpassen:
-- [x] Task 3.1 erhöht das Schema: nach `device-types` ist das **Schema 5**. In Proposal und Design vermerkt, `tasks.md` spricht ohnehin von „erhöhen“.
+- [x] Task 3.1 erhöht das Schema: nach `device-types` und `statistics` ist das **Schema 6** (`statistics` 1.7 nimmt 5, 2026-10-16). In Proposal und Design vermerkt, `tasks.md` spricht ohnehin von „erhöhen“.
 - [ ] Design bindet den Gurt an `Pm5BleSource`; nach `device-types` gibt es auch FTMS-Quellen. Festlegen, ob der Gurt auch mit FTMS verbunden wird.
 - [ ] Gleiche MODIFIED-Anforderungen wie `device-types` (`rowing-telemetry` „Laufende Messwerte bereitstellen“, `session-recording` „Session vollständig speichern“, „Rohdaten für Replay speichern“): Deltas auf den Text nach dem Archivieren von `device-types` umschreiben, sonst überschreibt das Archiv dessen Änderungen.
 
@@ -156,17 +156,19 @@ Offene Entscheide: F3, F4.
 Ziel: Plätze 1–3 jeder Vorlage, Strecke und Zone. Gewertet wird die Zeit (Distanzachse) bzw. die Meter (Zeitachse) nach Wanduhr inklusive Pausen, dazu Pace und Datum. Anzeige in der Vorlagenwahl, in einer neuen Detailansicht von Strecke und Zone und als Marke in der Zusammenfassung. Proposal, Design und Spec stehen (2026-10-16), Entscheide in Design D2–D6.
 
 Vor dem Start:
-- [x] `tasks.md` erstellt (2026-10-16), 12 Tasks in 5 Gruppen.
+- [x] `tasks.md` erstellt (2026-10-16), 12 Tasks in 5 Gruppen; Task 1.7 (Import) am 2026-10-16 ergänzt.
 - [x] Reihenfolge entschieden (2026-10-16): **nach `ui-design`**. Vorlagenwahl (`ui-design` 4.1), Strecken-/Zonenliste (4.3) und Zusammenfassung (5.2) werden dort neu gestaltet. Würden die Plätze vorher eingebaut, müsste man sie zweimal gestalten. Gruppe 1 (Ranglisten berechnen) hängt an nichts Offenem und darf vorgezogen werden.
 
 Bei der Umsetzung mitnehmen:
-- Kein Schema-Wechsel geplant (Design D1). Task 1.6 misst. Braucht es einen Index, erhöht dessen Migration das Schema; die Nummer mit `heart-rate` (Schema 5) abstimmen.
+- Keine eigene Tabelle (Design D1). Einziger Schema-Wechsel ist die Import-Markierung aus Task 1.7 (Schema 5); `heart-rate` nimmt danach 6.
 - Gezählt werden nur die Quellen `pm5` und `ftms`, nicht `simulator` und `replay` (Design D3).
 
 Gruppe 1 umgesetzt (2026-10-16, Tasks 1.1–1.6, `lib/data/statistics/`):
 - [x] Messung 1.6: 200 Sessions mit je 3 Runden und 2 Zonen, alle vier Abfragen zusammen 22–69 ms. Kein Index, kein Schema-Wechsel, Schema bleibt 4.
 - [x] Kleine Entscheide: aktuelle Länge zuerst, ältere nach Länge aufsteigend; zusätzlich nach Achse gruppiert; bei Gleichstand gewinnt, wer früher gerudert hat; Status der Session wird nicht gefiltert (auch abgebrochene Sessions zählen mit vollständigen Runden); Vorlage mit heute offener Rundenzahl hat keine Rangliste.
-- [ ] Offen: Importierte Sessions haben kein `templateId` und zählen darum nicht für die Rangliste ihrer Vorlage (Spec-Szenario „Import“). Vorschlag: beim Import mit einer Vorlage gleichen Namens, gleicher Strecke und Rundenzahl verknüpfen. Ändert das Import-Verhalten aus `course-rowing`, Entscheid des Nutzers.
+- [x] Entschieden (Nutzer, 2026-10-16): importierte Sessions werden nicht mit der Statistik verbunden. Task 1.7: Spalte `sessions.imported`, Schema 5 mit `from4To5`, der Import setzt sie, alle Ranglisten lassen importierte Sessions weg; Spec-Szenario „Import“ und Design D1/D3 angepasst, `heart-rate` auf Schema 6 nachgeführt.
+- [x] Task 3.1 Plätze 1–3 in der aufgeklappten Vorlage (`template_podium.dart`), Lücke für das Ghost-Symbol bei Platz 1. Vorläufig: Überschrift „Bestleistungen“ und Hinweistexte selbst formuliert; Datum als `DateFormat.yMd`; ist die aktuelle Länge noch nie gerudert, erscheint der Hinweis statt einer älteren Rangliste.
+- [x] Tasks 2.1/2.2 Detailansicht von Strecke und Zone (`course_detail_screen.dart`, `zone_detail_screen.dart`, gemeinsam `lib/features/statistics/ranking_sections.dart`), Tipp in der Liste öffnet sie, Stift öffnet den Editor. Vorläufig: nach dem Speichern zurück in die Detailansicht; Löschen bleibt in Liste bzw. Editor; Zeit im Rundenformat (`0:18.2`); Datum kurz ohne Uhrzeit; hat die aktuelle Länge keine Einträge, fehlt ihre Rangliste ohne eigenen Hinweis.
 
 ### 7. `ghost`: gegen die eigene Bestzeit rudern
 
@@ -213,7 +215,7 @@ Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwech
 | ~~F13~~ | Rückfallsprache: **keine** (2026-10-16), die Sprache wird in der App gewählt (F14) | translations | entschieden |
 | ~~F14~~ | Sprachwahl: **in der App** (2026-10-16), Start auf Deutsch, Systemsprache wird nicht beachtet | translations | entschieden |
 | F15 | Schweizer Rechtschreibung (`ss` statt `ß`, wie heute im Code) als `de`? **Vorläufig ja** (2026-10-16, nach Vorschlag) | translations | vorläufig entschieden |
-| F16 | Wo wird die gewählte Sprache gespeichert? **Vorläufig `shared_preferences`** (2026-10-16, nach Vorschlag): keine Migration, `heart-rate` bleibt Schema 5 | translations, heart-rate | vorläufig entschieden |
+| F16 | Wo wird die gewählte Sprache gespeichert? **Vorläufig `shared_preferences`** (2026-10-16, nach Vorschlag): keine Migration, `heart-rate` bekommt Schema 6, weil `statistics` 5 nimmt | translations, heart-rate | vorläufig entschieden |
 | F17 | Release nur für Tags auf `main`? **Vorläufig ja** (2026-10-16, nach Vorschlag): Tags ausserhalb von `main` lassen `verify-tag` fehlschlagen | gitlab-pipeline | gitlab-pipeline |
 
 ## Offene Punkte

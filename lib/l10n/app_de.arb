@@ -740,6 +740,28 @@
   "@templateStart": {
     "description": "Templates: button in the opened template that starts rowing it"
   },
+  "templatePodiumTitle": "Bestleistungen",
+  "@templatePodiumTitle": {
+    "description": "Templates: heading above places 1–3 of the template's ranking in the opened template"
+  },
+  "templatePodiumEmpty": "Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.",
+  "@templatePodiumEmpty": {
+    "description": "Templates: hint in the opened template when it was never rowed completely on a rower"
+  },
+  "templatePodiumOpenLaps": "Bei offener Rundenzahl gibt es keine Bestzeit.",
+  "@templatePodiumOpenLaps": {
+    "description": "Templates: hint in the opened template with an open number of laps, which has no ranking"
+  },
+  "templatePodiumPace": "{pace} /500 m",
+  "@templatePodiumPace": {
+    "description": "Templates: pace per 500 m of a place, pauses included",
+    "placeholders": {
+      "pace": {
+        "type": "String",
+        "example": "2:05.3"
+      }
+    }
+  },
   "templatesEmpty": "Noch keine Vorlagen angelegt.",
   "@templatesEmpty": {
     "description": "Templates: there is no template"
@@ -1153,6 +1175,62 @@
   "courseLegendShade": "Helligkeit = Tempo",
   "@courseLegendShade": {
     "description": "Course list: legend saying that brighter zones in the bar have a faster pace band"
+  },
+  "rankingLength": "Bestenliste {length}",
+  "@rankingLength": {
+    "description": "Course and zone details: label above places 1–3 of one length, e.g. 'Bestenliste 1000 m'",
+    "placeholders": {
+      "length": {
+        "type": "String",
+        "example": "1000 m"
+      }
+    }
+  },
+  "rankingLengthCurrent": "Bestenliste {length} · aktuell",
+  "@rankingLengthCurrent": {
+    "description": "Course and zone details: label above places 1–3 of the length the course or zone has today",
+    "placeholders": {
+      "length": {
+        "type": "String",
+        "example": "1200 m"
+      }
+    }
+  },
+  "rankingPlace": "Platz {place}",
+  "@rankingPlace": {
+    "description": "Rankings: screen reader label of a place, e.g. 'Platz 1'",
+    "placeholders": {
+      "place": {
+        "type": "int"
+      }
+    }
+  },
+  "rankingPace": "{pace} /500 m",
+  "@rankingPace": {
+    "description": "Rankings: pace per 500 metres of an entry, pauses included",
+    "placeholders": {
+      "pace": {
+        "type": "String",
+        "example": "2:04.0"
+      }
+    }
+  },
+  "rankingPausesHint": "Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.",
+  "@rankingPausesHint": {
+    "description": "Course and zone details: hint below the rankings that times and paces include pauses"
+  },
+  "rankingEmpty": "Noch keine Bestzeit. Es zählen nur vollständige Runden am Rudergerät, nicht im Simulator.",
+  "@rankingEmpty": {
+    "description": "Course and zone details: shown instead of places when nothing was rowed yet"
+  },
+  "rankingLoadFailed": "Bestenliste konnte nicht geladen werden: {error}",
+  "@rankingLoadFailed": {
+    "description": "Course and zone details: the rankings could not be computed",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "courseZoneFrom": "ab {start}",
   "@courseZoneFrom": {

@@ -536,6 +536,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get templateStart => 'Start';
 
   @override
+  String get templatePodiumTitle => 'Best results';
+
+  @override
+  String get templatePodiumEmpty =>
+      'No best time yet. Sessions with all laps on a rower count.';
+
+  @override
+  String get templatePodiumOpenLaps =>
+      'An open number of laps has no best time.';
+
+  @override
+  String templatePodiumPace(String pace) {
+    return '$pace /500 m';
+  }
+
+  @override
   String get templatesEmpty => 'No templates yet.';
 
   @override
@@ -844,6 +860,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get courseLegendShade => 'Brighter = faster';
+
+  @override
+  String rankingLength(String length) {
+    return 'Best results $length';
+  }
+
+  @override
+  String rankingLengthCurrent(String length) {
+    return 'Best results $length · current';
+  }
+
+  @override
+  String rankingPlace(int place) {
+    return 'Place $place';
+  }
+
+  @override
+  String rankingPace(String pace) {
+    return '$pace /500 m';
+  }
+
+  @override
+  String get rankingPausesHint =>
+      'Measured by the wall clock: pauses count, also in the pace.';
+
+  @override
+  String get rankingEmpty =>
+      'No best time yet. Only complete laps on an erg count, not in the simulator.';
+
+  @override
+  String rankingLoadFailed(String error) {
+    return 'Could not load the best results: $error';
+  }
 
   @override
   String courseZoneFrom(String start) {

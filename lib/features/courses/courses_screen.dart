@@ -6,10 +6,11 @@ import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import '../../data/courses/course_repository.dart';
 import '../../l10n/l10n.dart';
+import 'course_detail_screen.dart';
 import 'course_editor_screen.dart';
 import 'course_strip.dart';
 
-/// All courses, to create, edit and delete them; [embedded] in a tab it
+/// All courses, to look at their places, create, edit and delete them; [embedded] in a tab it
 /// has no app bar of its own.
 class CoursesScreen extends ConsumerWidget {
   const CoursesScreen({super.key, this.embedded = false});
@@ -131,7 +132,7 @@ class _CourseTile extends ConsumerWidget {
     final l10n = context.l10n;
     return InkWell(
       key: Key('course-${course.id}'),
-      onTap: () => openCourseEditor(context, course: course),
+      onTap: () => openCourseDetail(context, course),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(AppSpacing.l, AppSpacing.xs, AppSpacing.xs, AppSpacing.l),
         child: Column(

@@ -14,6 +14,7 @@ import '../courses/courses_screen.dart';
 import '../zones/zones_screen.dart';
 import 'template_editor_screen.dart';
 import 'template_format.dart';
+import 'template_podium.dart';
 
 /// Templates, courses and zones in three tabs (canvas „Vorlage wählen“).
 class TemplatesScreen extends StatelessWidget {
@@ -212,8 +213,8 @@ List<String> templateZoneLines(AppLocalizations l10n, Course course) {
   return lines.isEmpty ? [l10n.courseZonesSummary(0, '')] : lines.toList();
 }
 
-/// A template as a card; opened it shows the bands of its zones and
-/// "Starten", and the pencil leads to the editor (Design D6).
+/// A template as a card; opened it shows the bands of its zones, places 1–3
+/// of its ranking and "Starten", and the pencil leads to the editor (Design D6).
 class _TemplateCard extends ConsumerStatefulWidget {
   const _TemplateCard({
     required this.template,
@@ -308,9 +309,11 @@ class _TemplateCardState extends ConsumerState<_TemplateCard> {
                           ],
                         ),
                       ),
-                      // The ghost's best time and the ranking marks of `statistics` go here.
+                      // The ghost's best time of `ghost` goes here.
                     ],
                   ),
+                  const SizedBox(height: AppSpacing.m),
+                  TemplatePodium(template: template),
                   const SizedBox(height: AppSpacing.m),
                   SizedBox(
                     height: 56,
