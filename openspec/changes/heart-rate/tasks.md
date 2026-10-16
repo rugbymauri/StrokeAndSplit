@@ -29,7 +29,7 @@
 
 ## 5. Oberfläche (Capabilities heart-rate-monitor, live-display, session-recording)
 
-- [ ] 5.1 Startbildschirm: Bereich „Pulsgurt“ mit gekoppeltem Gurt bzw. „Kein Gurt“, Gurt-Suche mit Liste und Hinweis nach 15 s, Aktionen Koppeln/Wechseln/Vergessen. Verifikation: Widget-Tests für Koppeln, Vergessen und „kein Gurt gefunden“
+- [ ] 5.1 „Geräte wählen“ (aus `ui-design` 5.1): Bereich „Pulsgurt“ mit gekoppeltem Gurt bzw. „Kein Gurt“, Gurt-Suche mit Liste und Hinweis nach 15 s, Aktionen Koppeln/Wechseln/Vergessen. Verifikation: Widget-Tests für Koppeln, Vergessen und „kein Gurt gefunden“
 - [ ] 5.2 Live-Display: Gurt-Indikator neben dem PM5-Indikator, nur bei gekoppeltem Gurt und PM5-Quelle. Verifikation: Widget-Tests für verbunden, wiederverbindend und Simulator ohne Indikator
 - [ ] 5.3 Live-Display: letztes RR-Intervall klein unter dem Puls, ausgeblendet ab 3 s Abstand zum jüngsten Tick. Verifikation: Widget-Tests für „812 ms“, Puls nur vom PM5 und veraltetes RR. Die bestehenden Layout-Tests für Hoch- und Querformat bleiben grün
 - [ ] 5.4 Zusammenfassung: Ø/Max-Puls, RR-Kurve per `CustomPainter` und „HRV (RMSSD) xx ms“, alles nur bei vorhandenen Daten. Verifikation: Widget-Tests für Session mit RR, nur PM5-Puls und ohne Puls
