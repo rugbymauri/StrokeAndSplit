@@ -780,4 +780,53 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get fieldAxis => 'Axis';
+
+  @override
+  String get fieldLengthPlain => 'Length';
+
+  @override
+  String courseZonesSummary(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count zones',
+      one: 'zone $name',
+      zero: 'no zones',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String courseRowedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'rowed $count×',
+      one: 'rowed once',
+      zero: 'never rowed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get courseLegendShade => 'Brighter = faster';
+
+  @override
+  String courseZoneFrom(String start) {
+    return 'from $start';
+  }
+
+  @override
+  String courseVersionHint(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Rowed $count×.',
+      one: 'Rowed once.',
+    );
+    return '$_temp0 Changing the length or zones creates a new version. Earlier lap times stay comparable.';
+  }
 }

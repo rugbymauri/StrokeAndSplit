@@ -785,4 +785,46 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get fieldAxis => 'Achse';
+
+  @override
+  String get fieldLengthPlain => 'Länge';
+
+  @override
+  String courseZonesSummary(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Zonen',
+      one: 'Zone $name',
+      zero: 'ohne Zonen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String courseRowedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count× gerudert',
+      zero: 'noch nie gerudert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get courseLegendShade => 'Helligkeit = Tempo';
+
+  @override
+  String courseZoneFrom(String start) {
+    return 'ab $start';
+  }
+
+  @override
+  String courseVersionHint(int count) {
+    return '$count× gerudert. Änderst du Länge oder Zonen, entsteht eine neue Version. Alte Rundenzeiten bleiben vergleichbar.';
+  }
 }

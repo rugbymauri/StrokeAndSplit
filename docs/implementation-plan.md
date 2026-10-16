@@ -17,7 +17,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
-| 3 | `ui-design` | 13/18 | in Arbeit | – |
+| 3 | `ui-design` | 14/18 | in Arbeit | – |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
 | 6 | `statistics` | 6/12 | Gruppe 1 in `main`, Rest nach 3 | – |
@@ -122,6 +122,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Task 2.3 `PaceBox` in `lib/features/live/pace_box.dart`, Legende „Runde 2 / 3“ mit MODIFIED-Delta zu `course-rowing`. Bis 3.3 zeigt `course_bar.dart` noch „Runde 2 von 3“ (`courseLapOf` entfällt mit 3.3). Vorläufig: unter 260 px Höhe wird der Inhalt verkleinert (auf dem Gerät prüfen, 6.1); Zonenstatus „in der Zone“ klein wie bisher.
 - [x] Task 5.2 Zusammenfassung nach Canvas (`session_summary_screen.dart`), Platz für die Marken aus `statistics` rechts der Runden und neben dem Titel. Vorläufig: Anteil in der Zone der Session aus den Runden nach Dauer gewichtet (Näherung); Kopf mit Vorlage und Quelle; Schläge als vierter Durchschnittswert; beste Runde mit Stern; „Fertig“ schliesst nur die Zusammenfassung. Offen: „Fertig“ zum Startbildschirm? Anteil exakt über die Abschnitte?
 - [x] Task 4.2 Vorlagen-Editor (Umschalter „Feste Anzahl“/„Offen bis Stopp“, Runden mit `OarStepper`, Ergebnis-Zeile ohne Zeitschätzung) und 4.4 Zahlenfelder als `OarStepper` in Strecken-, Zonen-Editor und „Zone einbauen“; `OarStepper.background` für Karten. Vorläufig: Startwerte neue Strecke 2000 m bzw. 4:00, neue Zone 100 m bzw. 1:00 mit Pace-Band 2:00–2:05 (Schlagzahl-Band aus, sonst 24–26); Grenzen Pace 1:00–5:00, Schlagzahl 10–60, Runden bis 99; Texte aus dem Canvas („Pace-Band“, „Schnellste“ …).
+- [x] Task 4.3 Streckenliste (Karte mit Balken, „12× gerudert“, Legende) und Strecken-Kopf (Achse/Länge nebeneinander, Positionen am grossen Balken, Abschnitte als Karte, Versionierungshinweis); `courseRowCountsProvider` zählt Sessions pro Strecke. Vorläufig: Antippen im Balken öffnet „Zone verschieben“ bzw. „Zone einbauen“ an der Lücke; Liste zählt alle Versionen, Hinweis nur die neueste (Simulator zählt mit); Hinweistext wörtlich aus dem Canvas; Button „Strecke anlegen“.
 - [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Primärfarbe Blau `zoneIn` (Nutzer, 2026-10-16), gefüllter Button bleibt `text` wie im Canvas. Vorläufig: Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`).
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen

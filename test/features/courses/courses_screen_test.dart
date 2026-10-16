@@ -4,10 +4,13 @@ import 'package:aergrow/data/courses/course_layout.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
+import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
 import 'package:aergrow/features/courses/course_editor_screen.dart';
+import 'package:aergrow/features/courses/course_strip.dart';
 import 'package:aergrow/features/courses/courses_screen.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,7 +61,7 @@ Future<void> _save(WidgetTester tester, _Setup setup) async {
   await setup.settle(tester);
 }
 
-/// `frei · 0–500 m` or `Sprint · 500–600 m · 1:45–1:50` for each part of the course.
+/// `0–500 m · frei` or `ab 500 m · Sprint · 100 m · 1:45–1:50` for each part of the course.
 List<String> _sections(WidgetTester tester) => [
       for (var i = 0; find.byKey(Key('section-$i')).evaluate().isNotEmpty; i++)
         [
@@ -68,6 +71,19 @@ List<String> _sections(WidgetTester tester) => [
             text.data!,
         ].join(' · '),
     ];
+
+/// Stores [count] sessions rowed on the newest version of course [id].
+Future<void> _row(_Setup setup, int id, int count) async {
+  final versionId = (await setup.courses.get(id))!.versionId;
+  for (var i = 0; i < count; i++) {
+    await setup.db.into(setup.db.sessions).insert(SessionsCompanion.insert(
+          startedAt: DateTime(2026, 10, 16),
+          status: SessionStatus.complete,
+          source: ErgSourceKind.pm5,
+          courseVersionId: Value(versionId),
+        ));
+  }
+}
 
 const _length = Key('course-length');
 const _start = Key('place-start');
@@ -81,11 +97,12 @@ void main() {
     await _openNew(tester, 'Seerunde');
     expect(stepperValue(tester, _length), 2000);
     await stepTo(tester, _length, 1000);
-    expect(_sections(tester), ['frei · 0–1000 m']);
+    expect(_sections(tester), ['0–1000 m · frei']);
     await _save(tester, setup);
 
     expect(find.text('Seerunde'), findsOneWidget);
-    expect(find.text('1000 m · frei'), findsOneWidget);
+    expect(find.text('1000 m'), findsOneWidget);
+    expect(find.text('Distanz · ohne Zonen · noch nie gerudert'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 
@@ -102,7 +119,8 @@ void main() {
     expect(find.text('4:30'), findsOneWidget);
     await _save(tester, setup);
 
-    expect(find.text('4:30 · frei'), findsOneWidget);
+    expect(find.text('4:30'), findsOneWidget);
+    expect(find.text('Zeit · ohne Zonen · noch nie gerudert'), findsOneWidget);
     final course = (await setup.stored(tester)).single;
     expect((course.axis, course.definition.length), (CourseAxis.time, 270));
     await disposeWidgetsWithDatabase(tester);
@@ -172,15 +190,15 @@ void main() {
       await place(tester, endurance, 1000);
 
       expect(_sections(tester), [
-        'frei · 0–500 m',
-        'Sprint · 500–600 m · 1:45–1:50 · 30–34 spm',
-        'frei · 600–1000 m',
-        'Ausdauer 2:30 · 1000–1500 m · 2:28–2:32',
-        'frei · 1500–2000 m',
+        '0–500 m · frei',
+        'ab 500 m · Sprint · 100 m · 1:45–1:50 · 30–34 spm',
+        '600–1000 m · frei',
+        'ab 1000 m · Ausdauer 2:30 · 500 m · 2:28–2:32',
+        '1500–2000 m · frei',
       ]);
       await _save(tester, setup);
 
-      expect(find.text('2000 m · Sprint, Ausdauer 2:30'), findsOneWidget);
+      expect(find.text('Distanz · 2 Zonen · noch nie gerudert'), findsOneWidget);
       final course = (await setup.stored(tester)).single;
       expect(course.definition.placements, [
         ZonePlacement(zoneId: sprint, start: 500),
@@ -257,19 +275,19 @@ void main() {
       await tester.tap(find.text('Einbauen'));
       await tester.pumpAndSettle();
       expect(_sections(tester).map((s) => s.split(' · ').take(2).join(' · ')), [
-        'frei · 0–200 m',
-        'Ausdauer 2:30 · 200–700 m',
-        'Sprint · 700–800 m',
-        'frei · 800–1000 m',
+        '0–200 m · frei',
+        'ab 200 m · Ausdauer 2:30',
+        'ab 700 m · Sprint',
+        '800–1000 m · frei',
       ]);
 
       await tester.tap(find.byTooltip('Zone entfernen').first);
       await tester.pump();
 
       expect(_sections(tester).map((s) => s.split(' · ').take(2).join(' · ')), [
-        'frei · 0–700 m',
-        'Sprint · 700–800 m',
-        'frei · 800–1000 m',
+        '0–700 m · frei',
+        'ab 700 m · Sprint',
+        '800–1000 m · frei',
       ]);
       await disposeWidgetsWithDatabase(tester);
     });
@@ -291,9 +309,9 @@ void main() {
       await tester.tap(find.text('Verschieben'));
       await tester.pumpAndSettle();
       expect(_sections(tester).map((s) => s.split(' · ').take(2).join(' · ')), [
-        'frei · 0–1550 m',
-        'Sprint · 1550–1650 m',
-        'frei · 1650–2000 m',
+        '0–1550 m · frei',
+        'ab 1550 m · Sprint',
+        '1650–2000 m · frei',
       ]);
       await disposeWidgetsWithDatabase(tester);
     });
@@ -311,6 +329,72 @@ void main() {
 
       expect(tester.widget<OarStepper>(find.byKey(_start)).canIncrease, isFalse);
       expect(find.text('„Ausdauer 2:30“ liegt bei 1500–2000 m.'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('lists courses with their zones and how often they were rowed', (tester) async {
+      await pumpWithZones(tester);
+      await tester.runAsync(() async {
+        final interval = await setup.courses.create(
+          '2 km Intervall',
+          resolveCourse(axis: CourseAxis.distance, length: 2000, placements: [
+            ZonePlacement(zoneId: sprint, start: 500),
+            ZonePlacement(zoneId: endurance, start: 1000),
+          ], zones: {
+            for (final z in await setup.zones.all()) z.id: z,
+          }).definition!,
+        );
+        await _row(setup, interval, 3);
+        final lake = await setup.courses.create(
+          'Seerunde',
+          resolveCourse(axis: CourseAxis.distance, length: 1000, placements: [
+            ZonePlacement(zoneId: endurance, start: 200),
+          ], zones: {
+            for (final z in await setup.zones.all()) z.id: z,
+          }).definition!,
+        );
+        await _row(setup, lake, 1);
+        await setup.courses.create('Vier Minuten', CourseDefinition.single(axis: CourseAxis.time, length: 240));
+      });
+      await setup.settle(tester);
+
+      expect(find.text('2000 m'), findsOneWidget);
+      expect(find.text('Distanz · 2 Zonen · 3× gerudert'), findsOneWidget);
+      expect(find.text('Distanz · Zone Ausdauer 2:30 · 1× gerudert'), findsOneWidget);
+      expect(find.text('Zeit · ohne Zonen · noch nie gerudert'), findsOneWidget);
+      expect(find.text('Helligkeit = Tempo'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('opens a zone from the strip and outlines it meanwhile', (tester) async {
+      await pumpWithZones(tester);
+      await _openNew(tester, '2 km Intervall');
+      await place(tester, sprint, 500);
+
+      await tester.tap(find.byKey(const Key('course-strip-segment-1')));
+      await setup.settle(tester);
+
+      expect(find.text('Zone verschieben'), findsOneWidget);
+      expect(stepperValue(tester, _start), 500);
+      expect(tester.widget<CourseStrip>(find.byKey(const Key('course-strip'))).selected, 1);
+      await tester.tap(find.text('Abbrechen'));
+      await tester.pumpAndSettle();
+      expect(tester.widget<CourseStrip>(find.byKey(const Key('course-strip'))).selected, isNull);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('fits the list and the editor on a small phone', (tester) async {
+      await pumpWithZones(tester);
+      await _openNew(tester, 'Intervall mit einem recht langen Namen');
+      await place(tester, sprint, 500);
+      await place(tester, endurance, 1000);
+      tester.view.physicalSize = const Size(360, 640);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      await _save(tester, setup);
+      expect(find.text('Distanz · 2 Zonen · noch nie gerudert'), findsOneWidget);
+      expect(tester.takeException(), isNull);
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -349,7 +433,7 @@ void main() {
 
     expect(find.text('New course'), findsOneWidget);
     expect(find.text('Distance'), findsOneWidget);
-    expect(find.text('Length (m)'), findsOneWidget);
+    expect(find.text('LENGTH'), findsOneWidget);
     expect(find.bySemanticsLabel('100 m more'), findsOneWidget);
     await tester.tap(find.byTooltip('Save'));
     await setup.settle(tester);
@@ -404,5 +488,76 @@ void main() {
     expect(find.text('Noch keine Strecken angelegt.'), findsOneWidget);
     expect(await tester.runAsync(() => setup.db.select(setup.db.templates).get()), isEmpty);
     await disposeWidgetsWithDatabase(tester);
+  });
+
+  group('version hint', () {
+    const hint = Key('course-version-hint');
+
+    Future<_Setup> pumpRowed(WidgetTester tester, {required int rowed, Locale? locale}) async {
+      final setup = _Setup();
+      await tester.runAsync(() async {
+        final id = await setup.courses
+            .create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 1000));
+        await _row(setup, id, rowed);
+      });
+      await setup.pump(tester, locale: locale);
+      await tester.tap(find.text('Seerunde'));
+      await setup.settle(tester);
+      return setup;
+    }
+
+    testWidgets('says that a rowed course gets a new version', (tester) async {
+      await pumpRowed(tester, rowed: 3);
+
+      expect(
+        find.text('3× gerudert. Änderst du Länge oder Zonen, entsteht eine neue Version. '
+            'Alte Rundenzeiten bleiben vergleichbar.'),
+        findsOneWidget,
+      );
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('says nothing about versions for a course never rowed', (tester) async {
+      await pumpRowed(tester, rowed: 0);
+
+      expect(find.byKey(hint), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('says nothing once the rowed version was changed', (tester) async {
+      final setup = await pumpRowed(tester, rowed: 2);
+      await stepTo(tester, _length, 1200);
+      await _save(tester, setup);
+      expect(find.text('Distanz · ohne Zonen · 2× gerudert'), findsOneWidget);
+
+      await tester.tap(find.text('Seerunde'));
+      await setup.settle(tester);
+
+      expect(stepperValue(tester, _length), 1200);
+      expect(find.byKey(hint), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows the list and the hint in English', (tester) async {
+      final setup = _Setup();
+      await tester.runAsync(() async {
+        final id = await setup.courses
+            .create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 1000));
+        await _row(setup, id, 1);
+      });
+      await setup.pump(tester, locale: const Locale('en'));
+
+      expect(find.text('Distance · no zones · rowed once'), findsOneWidget);
+      expect(find.text('Brighter = faster'), findsOneWidget);
+      await tester.tap(find.text('Seerunde'));
+      await setup.settle(tester);
+
+      expect(
+        find.text('Rowed once. Changing the length or zones creates a new version. Earlier lap times stay comparable.'),
+        findsOneWidget,
+      );
+      expect(find.text('AXIS'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
   });
 }

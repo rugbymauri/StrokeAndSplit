@@ -13,3 +13,8 @@ final coursesProvider = StreamProvider<List<Course>>((ref) => ref.watch(courseRe
 final courseVersionProvider = FutureProvider.family<Course, int>(
   (ref, versionId) => ref.watch(courseRepositoryProvider).atVersion(versionId),
 );
+
+/// How often each course was rowed, by course id; a course never rowed is missing.
+final courseRowCountsProvider = StreamProvider<Map<int, CourseRowCount>>(
+  (ref) => ref.watch(courseRepositoryProvider).watchRowCounts(),
+);
