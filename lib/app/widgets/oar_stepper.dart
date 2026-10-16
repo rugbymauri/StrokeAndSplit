@@ -110,6 +110,7 @@ class OarStepper extends StatelessWidget {
     final value = Text(
       _show(this.value),
       style: TextStyle(
+        fontFamily: AppFonts.display,
         fontSize: size.valueFontSize,
         fontWeight: FontWeight.w700,
         height: 1,
