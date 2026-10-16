@@ -71,7 +71,7 @@ void main() {
     expect(_text(tester, const Key('pace-box-pace')), '2:07.0');
     expect(find.text('PACE /500 M'), findsOneWidget);
     expect(find.byKey(const Key('pace-box-zone-in')), findsOneWidget);
-    expect(_text(tester, const Key('pace-box-status')), 'in der Zone · 2:05–2:10');
+    expect(_text(tester, const Key('pace-box-status')), 'In der Zone · 2:05–2:10');
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     _expectLine(const Key('pace-box-course'), 'Gesamt', '1 460 / 3 000 m');
     _expectLine(const Key('pace-box-lap'), 'Runde 2 / 3', 'noch 540 m');
@@ -83,7 +83,7 @@ void main() {
 
     expect(_text(tester, const Key('pace-box-pace')), '2:13.0');
     expect(find.byKey(const Key('pace-box-zone-out')), findsOneWidget);
-    expect(_text(tester, const Key('pace-box-status')), 'schneller · 2:05–2:10');
+    expect(_text(tester, const Key('pace-box-status')), 'Schneller · 2:05–2:10');
     expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
   });
 
@@ -124,7 +124,7 @@ void main() {
   testWidgets('speaks English', (tester) async {
     await _pump(tester, _at(460), locale: const Locale('en'));
 
-    expect(_text(tester, const Key('pace-box-status')), 'in the zone · 2:05–2:10');
+    expect(_text(tester, const Key('pace-box-status')), 'In the zone · 2:05–2:10');
     _expectLine(const Key('pace-box-course'), 'Total', '1 460 / 3 000 m');
     _expectLine(const Key('pace-box-lap'), 'Lap 2 / 3', '540 m to go');
     _expectLine(const Key('pace-box-segment'), 'Tempo', '340 m to go');
@@ -134,7 +134,7 @@ void main() {
     await _pump(tester, _at(460, pace: BandStatus.missing), pace: null);
 
     expect(_text(tester, const Key('pace-box-pace')), '–:––.–');
-    expect(_text(tester, const Key('pace-box-status')), 'keine Pace · 2:05–2:10');
+    expect(_text(tester, const Key('pace-box-status')), 'Keine Pace · 2:05–2:10');
   });
 
   // Portrait box, landscape box on a phone on its side and a small phone.

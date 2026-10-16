@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
-import '../../app/design_tokens.dart';
 import '../../app/platform_providers.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
@@ -15,9 +14,8 @@ import '../../l10n/l10n.dart';
 import '../connection/connection_indicator.dart';
 import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
-import 'course_bar.dart';
-import 'formatters.dart';
-import 'live_layout.dart';
+import 'live_course.dart';
+import 'live_free.dart';
 
 /// After this long without data the shown values are marked as outdated.
 const staleAfter = Duration(seconds: 3);
@@ -122,6 +120,21 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SessionSummaryScreen(sessionId: id)));
   }
 
+  /// Starts a session, or ends the running one; [short] for the narrow column next to the pace box.
+  Widget _sessionButton(ActiveRecording? recording, bool connected, {bool short = false}) => recording == null
+      ? FilledButton.icon(
+          onPressed: connected ? _startSession : null,
+          icon: const Icon(Icons.fiber_manual_record),
+          label: Text(context.l10n.liveStartSession),
+        )
+      : short
+          ? FilledButton.tonal(onPressed: _stopSession, child: Text(context.l10n.liveStopShort, maxLines: 1))
+          : FilledButton.tonalIcon(
+              onPressed: _stopSession,
+              icon: const Icon(Icons.stop),
+              label: Text(context.l10n.liveStopSession),
+            );
+
   @override
   Widget build(BuildContext context) {
     final source = ref.watch(activeErgSourceProvider);
@@ -152,33 +165,23 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                   content: Text(context.l10n.liveStale),
                   actions: [const SizedBox.shrink()],
                 ),
-              if ((recording?.lap, recording?.template) case (final lap?, final template?))
-                CourseBar(lap: lap, course: template.course.definition),
               Expanded(
-                child: _Metrics(
-                  tick: _tick,
-                  session: recording?.progress,
-                  paceZone: ZoneHint.pace(context.l10n, recording?.lap?.pace),
-                  strokeRateZone: ZoneHint.strokeRate(context.l10n, recording?.lap?.strokeRate),
-                  outdated: _stale,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: recording == null
-                      ? FilledButton.icon(
-                          onPressed: connected ? _startSession : null,
-                          icon: const Icon(Icons.fiber_manual_record),
-                          label: Text(context.l10n.liveStartSession),
-                        )
-                      : FilledButton.tonalIcon(
-                          onPressed: _stopSession,
-                          icon: const Icon(Icons.stop),
-                          label: Text(context.l10n.liveStopSession),
-                        ),
-                ),
+                child: switch ((recording?.lap, recording?.template)) {
+                  (final lap?, final template?) => CourseLiveView(
+                      tick: _tick,
+                      lap: lap,
+                      course: template.course.definition,
+                      outdated: _stale,
+                      action: _sessionButton(recording, connected),
+                      shortAction: _sessionButton(recording, connected, short: true),
+                    ),
+                  _ => FreeLiveView(
+                      tick: _tick,
+                      session: recording?.progress,
+                      outdated: _stale,
+                      action: _sessionButton(recording, connected),
+                    ),
+                },
               ),
               if (source is SimulatedSource)
                 SimulatorControls(
@@ -189,169 +192,6 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                 ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Metrics extends StatelessWidget {
-  const _Metrics({
-    required this.tick,
-    required this.session,
-    required this.outdated,
-    this.paceZone,
-    this.strokeRateZone,
-  });
-
-  final StatusTick? tick;
-
-  /// Time and distance of the running session, shown instead of the PM5's.
-  final SessionProgress? session;
-  final bool outdated;
-  final ZoneHint? paceZone;
-  final ZoneHint? strokeRateZone;
-
-  @override
-  Widget build(BuildContext context) {
-    final tick = this.tick;
-    final l10n = context.l10n;
-    final secondary = [
-      _Metric(
-        key: const Key('metric-elapsed'),
-        label: l10n.metricTime,
-        value: formatElapsed(session?.elapsed ?? tick?.elapsed ?? Duration.zero),
-      ),
-      _Metric(
-        key: const Key('metric-distance'),
-        label: l10n.metricDistance,
-        value: formatDistance(session?.distanceMeters ?? tick?.distanceMeters ?? 0),
-      ),
-      _Metric(key: const Key('metric-watts'), label: l10n.metricWatts, value: formatWhole(tick?.watts)),
-      _Metric(
-        key: const Key('metric-spm'),
-        label: l10n.metricStrokeRate,
-        value: formatWhole(tick?.strokeRate),
-        zone: strokeRateZone,
-      ),
-      if (tick?.heartRate != null)
-        _Metric(key: const Key('metric-hr'), label: l10n.metricHeartRate, value: formatWhole(tick!.heartRate)),
-    ];
-    final pace = _Metric(
-      key: const Key('metric-pace'),
-      label: l10n.metricPace,
-      value: formatPace(tick?.pace),
-      zone: paceZone,
-    );
-
-    return Opacity(
-      opacity: outdated ? 0.4 : 1,
-      child: LiveLayoutBuilder(
-        builder: (context, layout) {
-          final grid = _Grid(columns: 2, children: secondary);
-          return Padding(
-            key: ValueKey(layout),
-            padding: const EdgeInsets.all(8),
-            child: layout == LiveLayout.landscape
-                ? Row(
-                    children: [
-                      Expanded(flex: 3, child: pace),
-                      Expanded(flex: 2, child: grid),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      Expanded(flex: 2, child: pace),
-                      Expanded(flex: 3, child: grid),
-                    ],
-                  ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _Grid extends StatelessWidget {
-  const _Grid({required this.columns, required this.children});
-
-  final int columns;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final rows = <List<Widget>>[
-      for (var i = 0; i < children.length; i += columns) children.sublist(i, (i + columns).clamp(0, children.length)),
-    ];
-    return Column(
-      children: [
-        for (final row in rows)
-          Expanded(
-            child: Row(
-              children: [
-                for (final cell in row) Expanded(child: cell),
-                for (var i = row.length; i < columns; i++) const Spacer(),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _Metric extends StatelessWidget {
-  const _Metric({super.key, required this.label, required this.value, this.zone});
-
-  final String label;
-  final String value;
-
-  /// Whether the value is in the band of the segment; null without a band.
-  final ZoneHint? zone;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final zone = this.zone;
-    final (background, foreground) = switch (zone) {
-      null => (null, null),
-      ZoneHint(inZone: true) => (AppColors.zoneInSurface, AppColors.zoneInText),
-      ZoneHint(inZone: false) => (theme.colorScheme.errorContainer, theme.colorScheme.onErrorContainer),
-    };
-    final labelStyle = theme.textTheme.labelLarge?.copyWith(color: foreground);
-    return Card(
-      key: zone == null ? null : Key('zone-${zone.inZone ? 'in' : 'out'}'),
-      color: background,
-      margin: const EdgeInsets.all(4),
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(child: Text(label, style: labelStyle, maxLines: 1, overflow: TextOverflow.ellipsis)),
-                // The direction in words and as a symbol, not only as colour.
-                if (zone != null) ...[
-                  const SizedBox(width: 8),
-                  Icon(zone.icon, size: 16, color: foreground),
-                  const SizedBox(width: 2),
-                  Flexible(child: Text(zone.text, style: labelStyle, maxLines: 1, overflow: TextOverflow.ellipsis)),
-                ],
-              ],
-            ),
-            Expanded(
-              child: FittedBox(
-                child: Text(
-                  value,
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    color: foreground,
-                    fontWeight: FontWeight.bold,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );

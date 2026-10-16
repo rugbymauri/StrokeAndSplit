@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../app/design_tokens.dart';
@@ -5,8 +7,9 @@ import '../../data/courses/course.dart';
 import '../../data/courses/lap_tracker.dart';
 import '../../l10n/l10n.dart';
 import '../courses/course_format.dart';
-import 'course_bar.dart' show ZoneHint;
+import 'zone_hint.dart';
 import 'formatters.dart';
+import 'metric_tile.dart';
 import 'progress_frame.dart';
 import 'progress_frame_model.dart';
 
@@ -29,6 +32,20 @@ class PaceBox extends StatelessWidget {
   /// The height inside the frame below which the content shrinks as a whole.
   static const minContentHeight = 260.0;
 
+  /// What the content takes besides the pace, generously: label, zone status, divider and legend.
+  static const _aroundPace = 160.0;
+
+  /// At least the font size of the pace in a box of [size], so values next to the
+  /// box can be kept smaller.
+  static double paceFontSizeFor(Size size) {
+    // The frame with all three tracks and the padding of [ProgressFrame].
+    final inset = 2 * (ProgressFramePainter.frameWidth(3) + 12);
+    final width = math.max(0.0, size.width - inset);
+    final height = math.max(0.0, size.height - inset);
+    final scale = height < minContentHeight ? height / minContentHeight : 1.0;
+    return paceFontSize(Size(width, math.max(height, minContentHeight) - _aroundPace)) * scale;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -50,7 +67,13 @@ class PaceBox extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(l10n.metricPace.toUpperCase(), style: AppTextStyles.label, textAlign: TextAlign.center),
+                Text(
+                  l10n.metricPace.toUpperCase(),
+                  style: AppTextStyles.label,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 Expanded(
                   child: Center(
                     child: FittedBox(
@@ -109,17 +132,13 @@ class PaceBox extends StatelessWidget {
 
   /// What is left, rounded up: metres with grouped thousands, e.g. `1 460 m`, or a time on a time course.
   String _amount(double left) => course.axis == CourseAxis.distance
-      ? '${_grouped(left.ceil())} m'
+      ? '${formatGrouped(left.ceil())} m'
       : formatElapsed(Duration(seconds: left.ceil()));
 
   /// Rowed of [total], rounded down, e.g. `1 460 / 3 000 m` or `24:20 / 50:00`.
   String _done(double done, int total) => course.axis == CourseAxis.distance
-      ? '${_grouped(done.floor())} / ${_grouped(total)} m'
+      ? '${formatGrouped(done.floor())} / ${formatGrouped(total)} m'
       : '${formatElapsed(Duration(seconds: done.floor()))} / ${formatElapsed(Duration(seconds: total))}';
-
-  /// Thousands separated by a no-break space, as in the canvas.
-  static String _grouped(int value) =>
-      value.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+$)'), (_) => ' ');
 }
 
 /// The zone status of the pace as symbol and word, not only as colour, with the band.

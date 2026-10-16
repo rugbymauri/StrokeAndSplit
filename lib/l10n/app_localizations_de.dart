@@ -219,13 +219,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get metricTime => 'Zeit';
 
   @override
-  String get metricDistance => 'Meter';
+  String get metricDistance => 'Distanz';
 
   @override
   String get metricWatts => 'Watt';
 
   @override
-  String get metricStrokeRate => 'Schläge/min';
+  String get metricStrokeRate => 'Schlagzahl';
 
   @override
   String get metricHeartRate => 'Puls';
@@ -234,13 +234,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get metricPace => 'Pace /500 m';
 
   @override
-  String courseLap(int lap) {
-    return 'Runde $lap';
-  }
+  String get metricCalories => 'Kalorien';
 
   @override
-  String courseLapOf(int lap, int laps) {
-    return 'Runde $lap von $laps';
+  String get metricAveragePace => 'Ø Pace';
+
+  @override
+  String get metricLapTime => 'Runde';
+
+  @override
+  String get metricInZone => 'In Zone';
+
+  @override
+  String get liveStopShort => 'Beenden';
+
+  @override
+  String get liveForceCurve => 'Kraftkurve';
+
+  @override
+  String courseLap(int lap) {
+    return 'Runde $lap';
   }
 
   @override
@@ -268,25 +281,25 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get hintInZone => 'in der Zone';
+  String get hintInZone => 'In der Zone';
 
   @override
-  String get hintFaster => 'schneller';
+  String get hintFaster => 'Schneller';
 
   @override
-  String get hintSlower => 'langsamer';
+  String get hintSlower => 'Langsamer';
 
   @override
-  String get hintNoPace => 'keine Pace';
+  String get hintNoPace => 'Keine Pace';
 
   @override
-  String get hintMoreStrokes => 'mehr Schläge';
+  String get hintMoreStrokes => 'Mehr Schläge';
 
   @override
-  String get hintFewerStrokes => 'weniger Schläge';
+  String get hintFewerStrokes => 'Weniger Schläge';
 
   @override
-  String get hintNoStrokes => 'keine Schläge';
+  String get hintNoStrokes => 'Keine Schläge';
 
   @override
   String get simTargetPace => 'Ziel-Pace';

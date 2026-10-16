@@ -41,18 +41,15 @@ void main() {
     for (var i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 500));
     }
-    final pm5Distance = tester.widget<Text>(find.descendant(
-      of: find.byKey(const Key('metric-distance')),
-      matching: find.byType(Text),
-    ).last);
-    expect(int.parse(pm5Distance.data!), greaterThan(0));
+    final pm5Distance = tester.widget<Text>(find.byKey(const Key('metric-distance'))).textSpan!.toPlainText();
+    expect(int.parse(pm5Distance.replaceAll(RegExp(r'\D'), '')), greaterThan(0));
 
     await tester.tap(find.text('Session starten'));
     await tester.pump();
     expect(find.text('Session beenden'), findsOneWidget);
     // The session counts from zero, not from what the simulator shows.
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.descendant(of: find.byKey(const Key('metric-elapsed')), matching: find.text('0:00')), findsOneWidget);
+    expect(tester.widget<Text>(find.byKey(const Key('metric-elapsed'))).textSpan!.toPlainText(), '0:00');
 
     for (var i = 0; i < 60; i++) {
       await tester.pump(const Duration(milliseconds: 500));

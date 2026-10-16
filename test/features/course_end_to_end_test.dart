@@ -67,7 +67,7 @@ void main() {
     }
 
     await row(const Duration(seconds: 2));
-    expect(find.text('Runde 1 von 2'), findsOneWidget);
+    expect(find.text('Runde 1 / 2'), findsOneWidget);
     final simulator = container.read(activeErgSourceProvider)! as SimulatedSource;
     await row(const Duration(seconds: 15));
     // Too slow for the band of segment 2, then a pause in it.
