@@ -53,6 +53,9 @@ spike: ## Start the PM5 BLE spike on the Linux desktop (recordings go to the doc
 spike-android: ## Start the PM5 BLE spike on a connected Android device
 	$(FLUTTER) run -d $(or $(ANDROID_DEVICE),$(error No Android device found, check `$(ADB) devices`)) -t $(SPIKE)
 
+ftms-rower: ## Play an FTMS recording as a software FTMS rower over Bluetooth (FILE=recording.jsonl, test from a phone)
+	uv run tool/ftms_rower/ftms_rower.py $(or $(FILE),$(error Set FILE to an FTMS recording, e.g. packages/erg_protocol/test/fixtures/ftms_just_row.jsonl)) $(ARGS)
+
 pull-recordings: ## Copy spike recordings from the Android device to ./recordings
 	mkdir -p $(RECORDINGS)
 	$(ADB) pull $(ANDROID_FILES)/. $(RECORDINGS)/

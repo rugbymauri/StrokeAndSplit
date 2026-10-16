@@ -29,6 +29,7 @@ Alle Befehle zeigt `make help`.
 | `make codegen` | drift-Code neu erzeugen, nach Änderungen an `lib/data/db/database.dart` |
 | `make schema` | Schema-Snapshot und Migrationstests erzeugen, nach dem Erhöhen von `schemaVersion` |
 | `make spike` / `make spike-android` | Minimal-App, die PM5-Rohpakete mitschneidet (siehe unten) |
+| `make ftms-rower FILE=…` | Software-FTMS-Rudergerät, das eine Aufnahme über Bluetooth abspielt (siehe unten) |
 | `make pull-recordings` | Mitschnitte vom Android-Gerät nach `./recordings` kopieren |
 | `make build-linux` | Linux-Release-Bundle bauen |
 
@@ -103,6 +104,23 @@ Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwe
 ## Spike
 
 `make spike` startet eine Minimal-App, die sich mit dem PM5 verbindet und alle Pakete mit Zeitstempel als `pm5-<zeit>.jsonl` speichert. Unter Linux landen sie im Dokumente-Ordner des Benutzers (z.B. `~/Dokumente`), unter Android im externen App-Verzeichnis (`make pull-recordings`). Solche Mitschnitte dienen als Test-Fixtures in `packages/erg_protocol/test/fixtures/`.
+
+## Software-Rower
+
+Ohne echtes FTMS-Rudergerät lässt sich die FTMS-Anbindung mit einem Software-Rower testen. Er läuft auf dem Linux-PC, meldet sich als `AergRow FTMS Rower` mit dem Fitness Machine Service `0x1826` und spielt eine FTMS-Aufnahme zeitgetreu als Rower-Data-Notifications ab.
+
+Voraussetzungen: BlueZ mit eingeschaltetem Adapter und [`uv`](https://docs.astral.sh/uv/). Die Python-Abhängigkeit (`bless`) holt `uv` beim ersten Start selbst.
+
+```sh
+# PM5-Aufnahme in eine FTMS-Aufnahme umrechnen (.jsonl oder .aergrow)
+cd packages/erg_protocol && dart run erg_protocol:pm5_to_ftms test/fixtures/just_row.jsonl /tmp/ftms.jsonl
+# Software-Rower starten, ARGS=--loop spielt die Aufnahme endlos
+make ftms-rower FILE=packages/erg_protocol/test/fixtures/ftms_just_row.jsonl
+```
+
+Getestet wird vom **Android-Handy** aus: `make run-android`, in der Geräteliste erscheint der Software-Rower als FTMS-Rudergerät. Zur Kontrolle zeigt ihn auch nRF Connect mit dem Service `0x1826`. Nach dem Verbinden bestätigt er Request Control und Start/Resume am Control Point und beginnt abzuspielen; ohne Start-Befehl beginnt er 2 s nach dem Verbinden. Einen Reset simuliert man, indem man den Software-Rower neu startet.
+
+Vom selben Linux-Rechner aus geht es nicht: Der Bluetooth-Adapter kann nicht gleichzeitig Peripheral für den Software-Rower und Central für die App sein. Wer ein zweites Linux-Gerät hat, kann die App dort starten.
 
 ## Plattform-Status
 
