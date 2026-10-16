@@ -46,9 +46,17 @@ class _Recording extends SessionRecorder {
   ActiveRecording? build() => recording;
 }
 
-const _band = CourseSegment(length: 600, paceFastCs: 12500, paceSlowCs: 13000, spmMin: 20, spmMax: 22);
+const _band = CourseSegment(
+  length: 600,
+  paceFastCs: 12500,
+  paceSlowCs: 13000,
+  spmMin: 20,
+  spmMax: 22,
+  zoneId: 1,
+  zoneName: 'Tempo',
+);
 
-/// In lap 2 of "Seerunde x3" at 520 m of the lap, in the segment with bands.
+/// In lap 2 of "Seerunde x3" at 520 m of the lap, in the zone "Tempo" from 200 to 800 m.
 ActiveRecording _onCourse({
   CourseSegment segment = _band,
   BandStatus pace = BandStatus.inBand,
@@ -152,7 +160,14 @@ void main() {
           expect(pace.width * pace.height, greaterThan(other.width * other.height), reason: key);
         }
         if (template) {
-          for (final key in ['course-lap', 'course-segment', 'course-rest', 'course-bands', 'course-zone']) {
+          for (final key in const [
+            'course-lap',
+            'course-segment',
+            'course-range',
+            'course-rest',
+            'course-bands',
+            'course-zone',
+          ]) {
             final rect = tester.getRect(find.byKey(Key(key)));
             expect(rect.bottom, lessThanOrEqualTo(size.height), reason: key);
             expect(rect.right, lessThanOrEqualTo(size.width), reason: key);
@@ -163,13 +178,14 @@ void main() {
   }
 
   group('on a template', () {
-    testWidgets('shows lap, segment, rest, bands and the share in the zone', (tester) async {
+    testWidgets('shows lap, zone, rest, bands and the share in the zone', (tester) async {
       final harness = _Harness();
       await harness.pump(tester, recording: _onCourse());
       await harness.emit(tester, _tick());
 
       expect(find.text('Runde 2 von 3'), findsOneWidget);
-      expect(find.text('Segment 2/3 · 200–800 m'), findsOneWidget);
+      expect(find.text('Tempo'), findsOneWidget);
+      expect(find.text('200–800 m'), findsOneWidget);
       expect(find.text('noch 280 m'), findsOneWidget);
       expect(find.text('2:05–2:10 · 20–22 spm'), findsOneWidget);
       expect(find.text('Zone 75 %'), findsOneWidget);
@@ -195,7 +211,7 @@ void main() {
       expect(find.text('mehr Schläge'), findsOneWidget);
     });
 
-    testWidgets('shows no zone in a free segment', (tester) async {
+    testWidgets('shows a free gap without bands', (tester) async {
       final harness = _Harness();
       await harness.pump(
         tester,
@@ -208,6 +224,8 @@ void main() {
       await harness.emit(tester, _tick());
 
       expect(find.text('frei'), findsOneWidget);
+      expect(find.text('noch 280 m'), findsOneWidget);
+      expect(find.byKey(const Key('course-bands')), findsNothing);
       expect(find.byKey(const Key('zone-in')), findsNothing);
       expect(find.byKey(const Key('zone-out')), findsNothing);
       expect(find.textContaining('Zone'), findsNothing);

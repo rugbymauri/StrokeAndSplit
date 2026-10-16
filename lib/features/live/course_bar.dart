@@ -5,7 +5,7 @@ import '../../data/courses/lap_tracker.dart';
 import '../courses/course_format.dart';
 import 'formatters.dart';
 
-/// Lap, segment, what is left of it, its bands and the share in the zone,
+/// Lap, zone or free gap, what is left of it, its bands and the share in the zone,
 /// above the core values while rowing a template.
 class CourseBar extends StatelessWidget {
   const CourseBar({super.key, required this.lap, required this.course});
@@ -32,12 +32,15 @@ class CourseBar extends StatelessWidget {
               key: const Key('course-lap'),
               style: strong,
             ),
+            // The zone the rower is in, or a free gap (Change zones, Design D7).
             Text(
-              'Segment ${lap.segmentIndex + 1}/${course.segments.length} · ${_range()}',
+              lap.segment.isFree ? 'frei' : lap.segment.zoneName ?? 'Zone',
               key: const Key('course-segment'),
+              style: strong,
             ),
+            Text(_range(), key: const Key('course-range')),
             Text('noch ${_remaining()}', key: const Key('course-rest'), style: strong),
-            Text(formatSegmentBands(lap.segment), key: const Key('course-bands')),
+            if (!lap.segment.isFree) Text(formatSegmentBands(lap.segment), key: const Key('course-bands')),
             if (share != null) Text('Zone ${(share * 100).round()} %', key: const Key('course-zone')),
           ],
         ),
@@ -45,9 +48,7 @@ class CourseBar extends StatelessWidget {
     );
   }
 
-  String _range() => course.axis == CourseAxis.distance
-      ? '${lap.segmentStart}–${lap.segmentEnd} m'
-      : '${formatCourseLength(course.axis, lap.segmentStart)}–${formatCourseLength(course.axis, lap.segmentEnd)}';
+  String _range() => formatCourseRange(course.axis, lap.segmentStart, lap.segmentEnd);
 
   String _remaining() => course.axis == CourseAxis.distance
       ? '${lap.remaining.ceil()} m'
