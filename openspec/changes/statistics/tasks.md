@@ -32,7 +32,7 @@ Sie starten deshalb erst, wenn `ui-design` umgesetzt ist (siehe `docs/implementa
 
 ## 5. Abschluss
 
-- [ ] 5.1 README um die Ranglisten ergänzen, inklusive des Hinweises, dass Simulator-Sessions nicht zählen. Verifikation: `make check` grün, `openspec validate statistics --strict` gültig, Durchsicht des README
+- [x] 5.1 README um die Ranglisten ergänzen, inklusive des Hinweises, dass Simulator-Sessions nicht zählen. Verifikation: `make check` grün, `openspec validate statistics --strict` gültig, Durchsicht des README
 - [ ] 5.2 Manueller Test durch den Nutzer: am Rudergerät „Seerunde x3“ zweimal rudern. Danach müssen in der Vorlagenwahl, in den Detailansichten von Strecke und Zone und in der Zusammenfassung die erwarteten Plätze stehen. Verifikation: Rückmeldung des Nutzers
 
 ## Workflow follow-up
