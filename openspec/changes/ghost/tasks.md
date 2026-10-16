@@ -35,7 +35,7 @@ Hängt nur an Gruppe 1.
 
 Hängt nur an Gruppe 1 (oder an nichts, `FrameGhost` gibt es schon).
 
-- [ ] 4.1 `ProgressFramePainter` nach D1 und D5: Das Ghost-Schiffchen (18 × 7 px, Rand 1.5 px, liegt schon) liegt nicht mehr über dem eigenen, sondern rückt quer zur Laufrichtung nach aussen, aus der Box bzw. auf der äussersten Spur in den Rand des Rahmens, sobald sich beide überlappen würden. Entlang der Spur bleibt es an seiner Position und kehrt auf die Mitte zurück, sobald der Abstand reicht. Den Rand dafür im Padding von `ProgressFrame` und in `PaceBox.paceFontSizeFor` berücksichtigen, falls er nicht schon reicht. Verifikation: bestehender Golden `progress_frame_ghost.png` neu, dazu Golden-Tests für Überlappung auf der Rundenspur, auf der äussersten Spur, in einer Ecke und knapp ohne Überlappung (Ghost auf der Mitte)
+- [x] 4.1 `ProgressFramePainter` nach D1 und D5: Das Ghost-Schiffchen (18 × 7 px, Rand 1.5 px, liegt schon) liegt nicht mehr über dem eigenen, sondern rückt quer zur Laufrichtung nach aussen, aus der Box bzw. auf der äussersten Spur in den Rand des Rahmens, sobald sich beide überlappen würden. Entlang der Spur bleibt es an seiner Position und kehrt auf die Mitte zurück, sobald der Abstand reicht. Den Rand dafür im Padding von `ProgressFrame` und in `PaceBox.paceFontSizeFor` berücksichtigen, falls er nicht schon reicht. Verifikation: bestehender Golden `progress_frame_ghost.png` neu, dazu Golden-Tests für Überlappung auf der Rundenspur, auf der äussersten Spur, in einer Ecke und knapp ohne Überlappung (Ghost auf der Mitte)
 
 ## 5. Abstand in der Pace-Box
 
