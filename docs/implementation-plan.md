@@ -16,7 +16,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
 | 1 | `device-types` | 0/33 | ja, angepasst | – |
-| 2 | `ui-design` | 0/16 | nach 1 | Entscheid Puls-Herkunft (F1) |
+| 2 | `ui-design` | 0/18 | nach 1 | Entscheid Puls-Herkunft (F1) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
 | 5 | `ghost` | – (keine Tasks) | nein | Entscheide F5–F8, dann Specs und Tasks; braucht 2 |
@@ -64,6 +64,8 @@ Vor dem Start anpassen:
 Offene Entscheide: F1. F2 ist entschieden (Mittelweg, Design D6).
 
 - [x] F2 in Proposal, Design D6 und Task 5.1 eingetragen.
+- [x] Ruderblatt-Tasten für Zahlen (2026-10-16) als Design D7, Spec `number-steppers` und Tasks 1.4 und 4.4 aufgenommen. Betrifft auch die Editoren aus `zones`.
+- [ ] Schritte auf der Zeitachse klären (F12).
 
 ### 3. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 
@@ -115,6 +117,7 @@ Vor dem Start:
 | F9 | „Stroke & Split“ oder „Stroke and Split“? | rename | rename |
 | F10 | App-ID `ch.strokesplit` oder `ch.<herausgeber>.strokesplit`? | rename | rename |
 | F11 | Live-Display beim Übergang in eine Zone vorwarnen, z.B. „Sprint in 50 m“? (offen aus `zones`) | – (neuer Change) | – |
+| F12 | Schritte der Ruderblatt-Tasten auf der Zeitachse (Vorschlag: Strecke 30 s, Zone und Startposition 10 s) | ui-design | ui-design |
 
 ## Offene Punkte
 
