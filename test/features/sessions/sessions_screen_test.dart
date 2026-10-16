@@ -1,9 +1,12 @@
 import 'package:aergrow/app/platform_providers.dart';
+import 'package:aergrow/data/courses/course.dart';
+import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/sessions/session_accumulator.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sessions/session_repository.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
+import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/features/sessions/sessions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -166,6 +169,33 @@ void main() {
       await tester.pump();
     }
     expect(find.textContaining('keine lesbare AergRow-Session'), findsOneWidget);
+    await setup.tearDown(tester);
+  });
+
+  testWidgets('names the template of a session, also after it was deleted', (tester) async {
+    final setup = _Setup();
+    await tester.runAsync(() async {
+      final courses = CourseRepository(setup.db);
+      final templates = TemplateRepository(setup.db);
+      final course = await courses.create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 1000));
+      final kept = await templates.create('Seerunde x3', courseId: course, laps: 3);
+      final deleted = await templates.create('Seerunde offen', courseId: course, laps: null);
+      for (final id in [kept, deleted]) {
+        final session = await setup.repository.create(
+          startedAt: DateTime(2026, 10, 16, 7),
+          source: ErgSourceKind.simulator,
+          template: await templates.get(id),
+        );
+        await setup.repository.finish(session);
+      }
+      await templates.delete(deleted);
+    });
+    await setup.addSession(tester, DateTime(2026, 10, 15, 18, 30));
+    await setup.pump(tester);
+
+    expect(find.textContaining('Seerunde x3 · '), findsOneWidget);
+    expect(find.textContaining('Seerunde offen · '), findsOneWidget);
+    expect(find.textContaining('Seerunde'), findsNWidgets(2));
     await setup.tearDown(tester);
   });
 }

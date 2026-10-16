@@ -49,6 +49,7 @@ class _SessionTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pace = session.averagePaceCs;
     final details = [
+      ?session.templateName,
       '${session.distanceDm ~/ 10} m',
       formatElapsed(Duration(milliseconds: session.durationMs)),
       '${formatPace(pace == null ? null : Duration(milliseconds: pace * 10))} /500 m',
