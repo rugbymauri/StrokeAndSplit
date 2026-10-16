@@ -14,7 +14,7 @@
 ## 3. Vorlagen (Capability session-templates)
 
 - [x] 3.1 `TemplateRepository`: anlegen, auflisten mit Strecke und Rundenzahl, bearbeiten, löschen (setzt `sessions.templateId` auf null, `templateName` bleibt). Verifikation: Unit-Tests für feste und offene Rundenzahl, Ändern der Rundenzahl und Löschen mit bestehender Session
-- [ ] 3.2 Vorlagen-Liste und -Editor, Hinweis zum Anlegen einer Strecke, wenn keine existiert, und Eintrag „Vorlage rudern“ auf dem Startbildschirm. Verifikation: Widget-Tests für Liste, Editor, leeren Zustand ohne Strecke und Navigation vom Startbildschirm
+- [x] 3.2 Vorlagen-Liste und -Editor, Hinweis zum Anlegen einer Strecke, wenn keine existiert, und Eintrag „Vorlage rudern“ auf dem Startbildschirm. Verifikation: Widget-Tests für Liste, Editor, leeren Zustand ohne Strecke und Navigation vom Startbildschirm
 
 ## 4. Runden-Logik (Capability course-rowing, Kern)
 

@@ -1,0 +1,134 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../data/courses/course_providers.dart';
+import '../../data/templates/session_template.dart';
+import '../../data/templates/template_providers.dart';
+import '../courses/courses_screen.dart';
+import 'template_editor_screen.dart';
+
+/// All templates, to start, create, edit and delete them.
+class TemplatesScreen extends ConsumerWidget {
+  const TemplatesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final templates = ref.watch(templatesProvider);
+    final hasCourses = ref.watch(coursesProvider).value?.isNotEmpty ?? true;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Vorlage rudern'),
+        actions: [
+          IconButton(
+            tooltip: 'Strecken',
+            icon: const Icon(Icons.route),
+            onPressed: () =>
+                Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoursesScreen())),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => hasCourses ? _openEditor(context) : _offerCourse(context),
+        icon: const Icon(Icons.add),
+        label: const Text('Vorlage anlegen'),
+      ),
+      body: switch (templates) {
+        AsyncData(value: []) when !hasCourses => _NoCourse(onCreate: () => openCourseEditor(context)),
+        AsyncData(value: []) => const Center(child: Text('Noch keine Vorlagen angelegt.')),
+        AsyncData(:final value) => ListView.builder(
+            padding: const EdgeInsets.only(bottom: 88),
+            itemCount: value.length,
+            itemBuilder: (context, i) => _TemplateTile(template: value[i]),
+          ),
+        AsyncError(:final error) => Center(child: Text('Vorlagen konnten nicht geladen werden: $error')),
+        _ => const Center(child: CircularProgressIndicator()),
+      },
+    );
+  }
+
+  Future<void> _offerCourse(BuildContext context) async {
+    final create = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Zuerst eine Strecke anlegen'),
+        content: const Text('Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Abbrechen')),
+          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Strecke anlegen')),
+        ],
+      ),
+    );
+    if (create == true && context.mounted) await openCourseEditor(context);
+  }
+}
+
+Future<void> _openEditor(BuildContext context, {SessionTemplate? template}) {
+  return Navigator.of(context)
+      .push(MaterialPageRoute<void>(builder: (_) => TemplateEditorScreen(template: template)));
+}
+
+class _NoCourse extends StatelessWidget {
+  const _NoCourse({required this.onCreate});
+
+  final VoidCallback onCreate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Für eine Vorlage brauchst du zuerst eine Strecke.', textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            FilledButton.icon(onPressed: onCreate, icon: const Icon(Icons.route), label: const Text('Strecke anlegen')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _Action { edit, delete }
+
+class _TemplateTile extends ConsumerWidget {
+  const _TemplateTile({required this.template});
+
+  final SessionTemplate template;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      leading: const Icon(Icons.flag_outlined),
+      title: Text(template.name),
+      subtitle: Text('${template.course.name} · ${formatLaps(template.laps)}'),
+      trailing: PopupMenuButton<_Action>(
+        tooltip: 'Aktionen',
+        onSelected: (action) => switch (action) {
+          _Action.edit => _openEditor(context, template: template),
+          _Action.delete => _delete(context, ref),
+        },
+        itemBuilder: (context) => const [
+          PopupMenuItem(value: _Action.edit, child: Text('Bearbeiten')),
+          PopupMenuItem(value: _Action.delete, child: Text('Löschen')),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Vorlage löschen?'),
+        content: Text('„${template.name}“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Abbrechen')),
+          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Löschen')),
+        ],
+      ),
+    );
+    if (confirmed == true) await ref.read(templateRepositoryProvider).delete(template.id);
+  }
+}

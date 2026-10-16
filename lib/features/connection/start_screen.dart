@@ -5,6 +5,7 @@ import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/simulated_source.dart';
 import '../live/live_screen.dart';
 import '../sessions/sessions_screen.dart';
+import '../templates/templates_screen.dart';
 import 'device_list_screen.dart';
 
 /// Lets the user pick where the rowing data comes from.
@@ -38,6 +39,13 @@ class StartScreen extends ConsumerWidget {
                   if (!context.mounted) return;
                   await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LiveScreen()));
                 },
+              ),
+              _SourceOption(
+                icon: Icons.flag_outlined,
+                title: 'Vorlage rudern',
+                subtitle: 'Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl',
+                onTap: () => Navigator.of(context)
+                    .push(MaterialPageRoute<void>(builder: (_) => const TemplatesScreen())),
               ),
               _SourceOption(
                 icon: Icons.replay,
