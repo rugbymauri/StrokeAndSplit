@@ -524,6 +524,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get templateCreate => 'Vorlage anlegen';
 
   @override
+  String get templateStart => 'Starten';
+
+  @override
   String get templatesEmpty => 'Noch keine Vorlagen angelegt.';
 
   @override

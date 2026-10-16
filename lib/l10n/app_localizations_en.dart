@@ -521,6 +521,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get templateCreate => 'New template';
 
   @override
+  String get templateStart => 'Start';
+
+  @override
   String get templatesEmpty => 'No templates yet.';
 
   @override

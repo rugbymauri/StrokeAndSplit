@@ -943,6 +943,12 @@ abstract class AppLocalizations {
   /// **'Vorlage anlegen'**
   String get templateCreate;
 
+  /// Templates: button in the opened template that starts rowing it
+  ///
+  /// In de, this message translates to:
+  /// **'Starten'**
+  String get templateStart;
+
   /// Templates: there is no template
   ///
   /// In de, this message translates to:

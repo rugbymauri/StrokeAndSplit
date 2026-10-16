@@ -219,9 +219,10 @@ void main() {
       await _settle(tester);
 
       expect(find.byType(TemplatesScreen), findsOneWidget);
-      ListTile template(String name) => tester.widget(find.byKey(Key('template-${ids[name]}')));
-      expect(template('Seerunde x3').selected, isTrue);
-      expect(template('Seerunde offen').selected, isFalse);
+      Finder start(String name) =>
+          find.descendant(of: find.byKey(Key('template-${ids[name]}')), matching: find.text('Starten'));
+      expect(start('Seerunde x3'), findsOneWidget);
+      expect(start('Seerunde offen'), findsNothing);
       await disposeWidgetsWithDatabase(tester);
     });
 

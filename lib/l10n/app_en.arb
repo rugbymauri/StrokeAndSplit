@@ -140,6 +140,7 @@
   "tabCourses": "Courses",
   "tabZones": "Zones",
   "templateCreate": "New template",
+  "templateStart": "Start",
   "templatesEmpty": "No templates yet.",
   "templatesLoadFailed": "Templates could not be loaded: {error}",
   "templateNeedsCourseTitle": "Create a course first",

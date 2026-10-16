@@ -60,6 +60,8 @@ void main() {
       await tester.pumpAndSettle();
     }
     await tester.tap(find.text('Dreiteiler x2'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Starten'));
     Future<void> row(Duration duration) async {
       for (var i = 0; i < duration.inMilliseconds ~/ 250; i++) {
         await tester.pump(const Duration(milliseconds: 250));
@@ -133,6 +135,8 @@ void main() {
       await tester.pumpAndSettle();
     }
     await tester.tap(find.text('Seerunde x2'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Starten'));
     for (var i = 0; i < 100 * 4; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }

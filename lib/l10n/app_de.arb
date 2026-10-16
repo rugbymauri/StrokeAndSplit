@@ -710,6 +710,10 @@
   "@templateCreate": {
     "description": "Templates: button that creates a template"
   },
+  "templateStart": "Starten",
+  "@templateStart": {
+    "description": "Templates: button in the opened template that starts rowing it"
+  },
   "templatesEmpty": "Noch keine Vorlagen angelegt.",
   "@templatesEmpty": {
     "description": "Templates: there is no template"
