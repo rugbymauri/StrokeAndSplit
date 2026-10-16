@@ -2,7 +2,7 @@
 
 ## Why
 
-AergRow funktioniert heute nur mit einem Concept2 PM5. Viele Rudergeräte anderer Hersteller sprechen den Bluetooth-Standard FTMS (Fitness Machine Service). Wer ein solches Gerät hat, soll Strecken, Zonen und später den Ghost genauso nutzen können. Ausserdem steckt der PM5 nicht nur im RowErg, sondern auch im SkiErg und BikeErg. Heute würde die App deren Daten ungeprüft als Rudern aufzeichnen. Jetzt ist der richtige Zeitpunkt, weil `courses` und Ghost auf den Messwerten aufbauen: Je früher die Datenschicht mehrere Protokolle trägt, desto weniger muss später umgebaut werden.
+AergRow funktioniert heute nur mit einem Concept2 PM5. Viele Rudergeräte anderer Hersteller sprechen den Bluetooth-Standard FTMS (Fitness Machine Service). Wer ein solches Gerät hat, soll Strecken, Zonen und später den Ghost genauso nutzen können. Ausserdem steckt der PM5 nicht nur im RowErg, sondern auch im SkiErg und BikeErg. Heute würde die App deren Daten ungeprüft als Rudern aufzeichnen. Jetzt ist der richtige Zeitpunkt, weil Strecken und Zonen schon und der Ghost bald auf den Messwerten aufbauen: Je früher die Datenschicht mehrere Protokolle trägt, desto weniger muss später umgebaut werden.
 
 ## What Changes
 
@@ -44,5 +44,5 @@ _Keine._ Die Änderungen erweitern die bestehenden Capabilities um eine zweite G
 - **Datenbank**: Schema-Migration (`schemaVersion` erhöhen, `make schema`) für nullable Schlagdetails und das Protokoll der Rohdaten.
 - **Dateiformat**: Der `.aergrow`-Header bekommt ein Protokollfeld. Das Format bleibt abwärtskompatibel.
 - **Werkzeuge**: neuer Software-Rower unter `tool/` (Linux, BlueZ als GATT-Peripheral). Der Spike schneidet zusätzlich FTMS mit.
-- **Parallele Changes**: `courses` braucht nur Pace, Schlagzahl, Zeit und Distanz, und die liefert FTMS. Mit `heart-rate` überschneidet sich die Herzfrequenz aus FTMS. Die Rohformat- und Schemaänderungen müssen mit dem Stand von `courses` zusammengeführt werden.
+- **Andere Changes**: Strecken und Zonen (`courses`, `zones`, bereits auf `main`) brauchen nur Pace, Schlagzahl, Zeit und Distanz, und die liefert FTMS. Die Migration baut auf deren Schema 3 auf. Mit `heart-rate` überschneidet sich die Herzfrequenz aus FTMS, und beide ändern dieselben Requirements in `rowing-telemetry` und `session-recording`: `heart-rate` wird nach dem Archivieren dieses Changes auf dessen Text angepasst.
 - **Risiken**: Manche Geräte senden erst nach einem Start über den FTMS Control Point (`0x2AD9`). Hersteller weichen vom Standard ab, etwa mit falschen Flags, 0 statt „kein Wert“ oder anderen Einheiten. Beides lässt sich ohne echte Hardware nur nach Spezifikation und defensiv abfangen.

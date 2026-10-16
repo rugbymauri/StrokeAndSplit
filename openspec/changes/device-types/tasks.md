@@ -2,17 +2,17 @@
 
 ## 1. Basis und Package-Umbau
 
-- [ ] 1.1 Branch `feature/device-types` auf `feature/courses` (bzw. `main`, falls `courses` gemergt ist) rebasen (Design D1); `make check` ist danach grün
+- [ ] 1.1 Branch `feature/device-types` von `main` erstellen, auf dem `courses` und `zones` gemergt sind (Design D1); `make check` ist grün
 - [ ] 1.2 `packages/pm5_protocol` in `packages/erg_protocol` umbenennen, PM5-Dateien nach `src/pm5/` verschieben, Imports, `pubspec.yaml`, Makefile (`PROTOCOL`) und README-Verweise anpassen, rein mechanisch und ohne Verhaltensänderung (D2); `make check` ist grün
 - [ ] 1.3 `ErgProtocol { pm5, ftms }` und das Interface `ErgDecoder` mit `ErgDecoder.forProtocol` einführen, `Pm5Decoder` implementiert es, `wattsForPace` auf oberste Ebene ziehen, `SessionOffset`-Parameter neutral benennen (D2); bestehende Decoder-Tests laufen unverändert, ein Test prüft die Factory
 
 ## 2. Datenmodell und Schema
 
 - [ ] 2.1 Schlagdetails in `Stroke` nullable machen (`driveLengthMeters`, `driveTime`, `recoveryTime`, `peakForceNewtons`, `averageForceNewtons`) und alle Verwender anpassen (D9); `make check` ist grün
-- [ ] 2.2 Schema 3: Spalten in `Strokes` nullable per `TableMigration`, `Sessions.protocol` (Text-Enum, Default `pm5`), `schemaVersion` erhöhen, `make codegen` und `make schema` ausführen (D9); Migrationstests 2→3 und 1→3 prüfen, dass bestehende Sessions mit allen Schlagdetails erhalten bleiben und als `pm5` gelten
+- [ ] 2.2 Schema 4: Spalten in `Strokes` nullable per `TableMigration`, `Sessions.protocol` (Text-Enum, Default `pm5`), `schemaVersion` auf 4, Schritt `from3To4`, `make codegen` und `make schema` ausführen (D9); Migrationstests 3→4 und 1→4 in `test/data/db/migration_test.dart` prüfen, dass bestehende Sessions mit allen Schlagdetails, Runden und Strecken samt Zonen erhalten bleiben und als `pm5` gelten
 - [ ] 2.3 `ErgSourceKind.ftms` ergänzen und `ErgSource.protocol` einführen, alle Quellen und Fakes (`test/support/fake_erg_source.dart`) liefern ihr Protokoll (D3, D4); Analyse ist grün
 - [ ] 2.4 `rowingEventsProvider` und `SessionAccumulator` erzeugen den Decoder über `ErgDecoder.forProtocol`, die Session speichert `protocol` und `deviceName` auch für `ftms` (D3); Tests in `erg_source_providers_test.dart` und den Session-Tests decken eine Quelle mit Protokoll `ftms` ab
-- [ ] 2.5 Rohformat und `.aergrow`: `"protocol"` im Header schreiben und lesen, fehlend gilt `pm5`, `ReplaySource` übernimmt das Protokoll aus dem Header (D3); Tests in `session_export_test.dart` und `replay_source_test.dart` prüfen Export/Import mit Protokoll und den Import einer Datei ohne Protokoll
+- [ ] 2.5 Rohformat und `.aergrow`: `"protocol"` im Header schreiben und lesen, fehlend gilt `pm5`, `ReplaySource` übernimmt das Protokoll aus dem Header (D3); Tests in `session_export_test.dart` und `replay_source_test.dart` prüfen Export/Import mit Protokoll, Strecke und Zonen sowie den Import einer Datei ohne Protokoll
 - [ ] 2.6 Quellenanzeige und Zusammenfassung zeigen FTMS-Geräte mit Namen und Kennzeichnung „FTMS“, den Simulator im FTMS-Modus als „SIMULATOR (FTMS)“ (D4); Widget-Tests in `connection_indicator_test.dart` und `session_summary`-Tests
 
 ## 3. FTMS-Protokoll
@@ -27,7 +27,7 @@
 ## 4. Simulator und Test-Rower
 
 - [ ] 4.1 `SimulatedSource` mit `protocol`: im FTMS-Modus ein Rower-Data-Paket pro Sekunde über `FtmsEncoder` (D10); Tests in `simulated_source_test.dart` prüfen, dass Pace-Annäherung, Pause und Schlagzählung im FTMS-Modus funktionieren
-- [ ] 4.2 Auswahl PM5/FTMS in der Simulator-Bedienung (D10); Widget-Test in `simulator_controls_test.dart`, und ein End-to-End-Test rudert eine Strecke aus `courses` mit dem Simulator im FTMS-Modus bis zur gespeicherten Session
+- [ ] 4.2 Auswahl PM5/FTMS in der Simulator-Bedienung (D10); Widget-Test in `simulator_controls_test.dart`, und ein End-to-End-Test rudert eine Vorlage mit einer Strecke mit eingebauter Zone mit dem Simulator im FTMS-Modus bis zur gespeicherten Session mit Runden und Zonenanteil
 - [ ] 4.3 `dart run erg_protocol:pm5_to_ftms` wandelt eine PM5-Aufnahme in eine FTMS-Aufnahme (D11); daraus `test/fixtures/ftms_just_row.jsonl` erzeugen und in einem Test prüfen, dass Distanz und Schlaganzahl von PM5- und FTMS-Dekodierung übereinstimmen (Distanz auf ±1 m)
 - [ ] 4.4 `tool/ftms_rower/ftms_rower.py` (bless, inline-Abhängigkeiten, `uv run`) als BlueZ-Peripheral mit Service `0x1826`, Service Data „Rower“, Rower Data und Control Point, das eine FTMS-Aufnahme zeitgetreu abspielt, sowie `make ftms-rower FILE=…` (D11); läuft auf dem Linux-PC und erscheint in `bluetoothctl` bzw. nRF Connect auf dem Handy als FTMS-Gerät
 - [ ] 4.5 README-Abschnitt zum Software-Rower: Voraussetzungen, Start, Test vom Android-Handy aus, Grenze „nicht vom selben Linux-Rechner“
@@ -50,11 +50,10 @@
 
 - [ ] 7.1 Manuell am echten PM5 (Linux und Android): Suche, Verbinden, Session, Replay und Import alter Sessions funktionieren unverändert, alte Sessions sind nach dem Update vollständig
 - [ ] 7.2 Manuell mit dem Software-Rower vom Android-Handy aus: Gerät erscheint als FTMS, Verbinden, Control Point, Live-Daten, Pause, Reset (Software-Rower neu starten), Abbruch und Reconnect, Session aufzeichnen, exportieren, auf Linux importieren und abspielen
-- [ ] 7.3 Manuell eine Strecke aus `courses` mit dem Software-Rower rudern; Zonenanzeige und Runden funktionieren
+- [ ] 7.3 Manuell eine Vorlage mit einer Strecke mit eingebauten Zonen mit dem Software-Rower rudern; Zonenanzeige, Bänder und Runden funktionieren
 - [ ] 7.4 README: Projektbeschreibung (PM5 und FTMS-Rudergeräte), Verwendung, Plattform-Status mit Zeile „FTMS-Rudergeräte: nach Spezifikation umgesetzt, nur mit Software-Rower getestet, ungetestet an echter Hardware“, Dateiformat mit `protocol`
 - [ ] 7.5 `make check` grün und `openspec validate device-types --strict` gültig
 
 ## Workflow follow-up
 
-- Nach dem Merge von `courses` erneut rebasen, falls 1.1 auf `feature/courses` lief.
 - Change archivieren, sobald die manuellen Tests abgeschlossen sind.

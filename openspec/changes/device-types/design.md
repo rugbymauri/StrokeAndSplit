@@ -13,7 +13,7 @@ Heutiger Stand (Foundation, archiviert):
 - Keine Anzeige liest Schlagdetails, Workout-Typ oder -Zustand. Die Schlagdetails sind also nur in der Datenschicht relevant.
 - `ErgSourceKind` (`pm5`, `simulator`, `replay`) wird als Text gespeichert und steuert die Quellenanzeige (`connection_indicator.dart`, `session_summary_screen.dart`).
 
-Der Change `courses` (Branch `feature/courses`, noch nicht gemergt) hebt das Schema auf Version 2: Er führt `wallMs` an den Samples, Strecken, Vorlagen und Runden ein und baut den `SessionAccumulator` aus. Er ändert nur ADDED-Requirements, es gibt also keinen Spec-Konflikt, wohl aber Code- und Schema-Überschneidungen.
+Die Changes `courses` und `zones` sind archiviert und auf `main`. `courses` hat das Schema auf Version 2 gehoben (`wallMs` an den Samples, Strecken, Vorlagen, Runden, ausgebauter `SessionAccumulator`), `zones` auf Version 3 (Tabelle `zones`, `course_segments.zoneId/zoneName`). Der Export schreibt Strecke und Zonen in den Header des Rohformats, die Format-Version ist weiterhin 1. Beide Changes haben nur Requirements ergänzt, die MODIFIED-Requirements dieses Changes verlieren also keine Szenarien.
 
 FTMS-Rudergeräte (Bluetooth SIG, *Fitness Machine Service 1.0*):
 
@@ -59,11 +59,11 @@ Bit 0 ist invertiert („More Data“): Ist es gesetzt, fehlen Stroke Rate und C
 
 ## Decisions
 
-### D1: Auf `feature/courses` aufbauen
+### D1: Auf `main` mit `courses` und `zones` aufbauen
 
-`device-types` wird vor der Umsetzung auf `feature/courses` rebased (oder auf `main`, sobald `courses` gemergt ist). Die Migration geht damit von Schema 2 auf 3.
+`device-types` startet von `main`, auf dem `courses` und `zones` gemergt sind. Die Migration geht damit von Schema 3 auf 4.
 
-*Alternative:* parallel auf dem Foundation-Stand bauen und später zusammenführen. Verworfen, weil beide Changes den `SessionAccumulator`, das Schema und das Rohformat ändern. Zwei unabhängige Migrationen auf Version 2 liessen sich nicht sauber zusammenführen.
+*Alternative:* parallel auf dem Foundation-Stand bauen und später zusammenführen. Verworfen, weil beide Changes den `SessionAccumulator`, das Schema und das Rohformat ändern. Zwei unabhängige Migrationen auf dieselbe Version liessen sich nicht sauber zusammenführen.
 
 ### D2: Package `pm5_protocol` wird zu `erg_protocol`
 
@@ -133,14 +133,14 @@ Nur wenn `0x2AD9` existiert: Indicate aktivieren, `Request Control (0x00)` schre
 - **Reset:** Fällt die Distanz oder der Schlagzähler zurück, wird `WorkoutStateChanged(isReset: true)` mit Zuständen `unknown` gemeldet. Die eigene Uhr läuft weiter. Für die Session reicht das, weil `SessionOffset` den Rückfall der Distanz ohnehin erkennt.
 - **Workout:** `workoutType` und `workoutState` sind immer `unknown`. Das ist der einzige `WorkoutStateChanged`, den der FTMS-Decoder erzeugt.
 
-### D9: Schlagdetails nullable, Schema 3
+### D9: Schlagdetails nullable, Schema 4
 
-`Stroke.driveLengthMeters`, `driveTime`, `recoveryTime`, `peakForceNewtons` und `averageForceNewtons` werden nullable, ebenso die gleichnamigen Spalten in `Strokes`. Die Migration von 2 auf 3:
+`Stroke.driveLengthMeters`, `driveTime`, `recoveryTime`, `peakForceNewtons` und `averageForceNewtons` werden nullable, ebenso die gleichnamigen Spalten in `Strokes`. Die Migration von 3 auf 4 (`from3To4`):
 
 - `Strokes` über `TableMigration` neu aufbauen, weil SQLite `NOT NULL` nicht per `ALTER` lockern kann. Bestehende Zeilen bleiben erhalten.
 - `Sessions.protocol` mit Default `pm5` hinzufügen.
 
-Danach `make schema` ausführen, die Migrationstests aus `courses` um 2→3 und 1→3 erweitern.
+Danach `make schema` ausführen und die Migrationstests in `test/data/db/migration_test.dart` um 3→4 und 1→4 erweitern, mit Daten aus allen bisherigen Versionen (Sessions mit Schlagdetails, Runden, Strecken mit Zonen).
 
 ### D10: Simulator mit FTMS-Modus
 
@@ -167,13 +167,13 @@ Der Spike sucht auch nach FTMS-Rowern und schreibt deren Notifications von `0x2A
 - [Ein Gerät sendet nur nach einem Control-Point-Befehl, der hier nicht vorgesehen ist, oder es interpretiert „Start“ als Reset.] → Nur Request Control und Start/Resume. Ein Reset wird vom Accumulator abgefangen. Falls nötig, folgt eine Verbesserung, sobald ein echter Mitschnitt vorliegt.
 - [Die Zeit einer FTMS-Session weicht von der Geräteanzeige ab, weil die App selbst misst.] → So gewollt, weil die Zeit dadurch zwischen Geräten vergleichbar ist und im Replay reproduzierbar bleibt. Die Abweichung liegt im Bereich der 4-s-Pausenerkennung.
 - [Die Erg-Typ-Werte stammen aus dem Gedächtnis und der Spezifikation, nicht aus einer Messung an Ski- oder BikeErg.] → Nur bekannte Ski- und Bike-Werte werden abgewiesen. Der Name-Suffix filtert zusätzlich in der Liste.
-- [Die Umbenennung des Packages berührt viele Imports und kollidiert mit `courses`.] → Die Umbenennung kommt als eigener, rein mechanischer Commit direkt nach dem Rebase (D1).
+- [Die Umbenennung des Packages berührt viele Imports und trifft den Code aus `courses` und `zones`.] → Die Umbenennung kommt als eigener, rein mechanischer Commit gleich zu Beginn (D1), bevor sich andere Arbeit darauf stapelt.
 - [Ein PM5 mit FTMS-Unterstützung wird als PM5 behandelt, auch wenn FTMS bei einem Bike Daten liefern würde.] → Gewollt, denn das PM5-Protokoll ist reicher, und Nicht-RowErgs werden über D6 abgewiesen.
 
 ## Migration Plan
 
-1. Rebase auf `feature/courses` (Schema 2).
-2. Schema 3: `Strokes` neu aufbauen, `Sessions.protocol` mit Default `pm5`. Bestehende Sessions bleiben vollständig und gelten als PM5.
+1. Start von `main` (Schema 3).
+2. Schema 4: `Strokes` neu aufbauen, `Sessions.protocol` mit Default `pm5`. Bestehende Sessions bleiben vollständig und gelten als PM5.
 3. Alte `.aergrow`-Dateien ohne `protocol` werden als PM5 importiert.
 
-Einen Rollback gibt es nicht: Eine ältere App-Version kann eine Datenbank mit Schema 3 nicht öffnen. Bei einer lokalen Single-User-App ohne Verteilung ist das vertretbar.
+Einen Rollback gibt es nicht: Eine ältere App-Version kann eine Datenbank mit Schema 4 nicht öffnen. Bei einer lokalen Single-User-App ohne Verteilung ist das vertretbar.

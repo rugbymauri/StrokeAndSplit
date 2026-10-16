@@ -30,7 +30,7 @@ Nicht Teil dieses Changes: ein simulierter Gurt (der Simulator liefert weiterhin
 
 - `packages/pm5_protocol`: Decoder für die Heart Rate Measurement (0x2A37), Vorrangregel im Decoder, neues Ereignis für RR-Intervalle.
 - `lib/data/sources/ble`: Suche und Verbindung für Brustgurte neben dem PM5, Einspeisung der Gurt-Pakete in den Paketstrom der PM5-Quelle.
-- `lib/data/db`: Schema-Erweiterung für Puls-Zusammenfassung und RR-Intervalle, mit Migration. Der Branch `feature/courses` erhöht `schemaVersion` ebenfalls, der zweite Merge muss die Migration also nachziehen.
+- `lib/data/db`: Schema-Erweiterung für Puls-Zusammenfassung und RR-Intervalle, mit Migration. Auf `main` steht das Schema auf 3, `device-types` hebt es auf 4. Kommt `heart-rate` danach, wird es Version 5.
 - `lib/features`: Startbildschirm (Gurt koppeln), Live-Display (Gurt-Indikator, RR), Zusammenfassung (Puls, RR-Kurve, RMSSD).
 - `lib/spike`: zusätzlicher Mitschnitt eines Brustgurts.
 - Gespeicherte Einstellung für den gemerkten Gurt. Bisher speichert die App keine Einstellungen.
