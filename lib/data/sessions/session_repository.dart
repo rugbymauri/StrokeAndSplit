@@ -31,6 +31,9 @@ class SessionRepository {
       b.insertAll(_db.samples, batch.samples);
       b.insertAll(_db.strokes, batch.strokes);
       b.insertAll(_db.rawPackets, batch.rawPackets);
+      // Replaced, as the recovery finishes a lap that may be partly stored.
+      b.insertAll(_db.laps, batch.laps, mode: InsertMode.insertOrReplace);
+      b.insertAll(_db.lapSegments, batch.lapSegments, mode: InsertMode.insertOrReplace);
     });
   }
 

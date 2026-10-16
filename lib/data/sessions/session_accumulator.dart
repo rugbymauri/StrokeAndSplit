@@ -2,30 +2,45 @@ import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:pm5_protocol/pm5_protocol.dart';
 
+import '../courses/course.dart';
+import '../courses/lap_tracker.dart';
 import '../db/database.dart';
 
 /// Rows collected since the last write.
 class SessionBatch {
-  const SessionBatch({required this.samples, required this.strokes, required this.rawPackets});
+  const SessionBatch({
+    required this.samples,
+    required this.strokes,
+    required this.rawPackets,
+    this.laps = const [],
+    this.lapSegments = const [],
+  });
 
   final List<SamplesCompanion> samples;
   final List<StrokesCompanion> strokes;
   final List<RawPacketsCompanion> rawPackets;
+  final List<LapsCompanion> laps;
+  final List<LapSegmentsCompanion> lapSegments;
 
-  bool get isEmpty => samples.isEmpty && strokes.isEmpty && rawPackets.isEmpty;
+  bool get isEmpty =>
+      samples.isEmpty && strokes.isEmpty && rawPackets.isEmpty && laps.isEmpty && lapSegments.isEmpty;
 }
 
 /// Turns the notifications of one session into session-relative rows.
 ///
 /// Recording and importing both feed the raw notifications through this,
 /// so an imported session ends up with the same rows as the recorded one.
+/// On a [course] it also follows the laps (Design D2).
 class SessionAccumulator {
-  SessionAccumulator(this.sessionId);
+  SessionAccumulator(this.sessionId, {CourseDefinition? course, int? plannedLaps})
+      : _tracker = course == null ? null : LapTracker(course, plannedLaps: plannedLaps);
 
   final int sessionId;
+  final LapTracker? _tracker;
 
   final _decoder = Pm5Decoder(onWarning: (message) => debugPrint('PM5: $message'));
   Duration? _firstPacketTime;
+  var _wallMs = 0;
   SessionOffset? _offset;
   var _lastPm5Distance = 0.0;
   var _lastPm5Elapsed = Duration.zero;
@@ -41,22 +56,43 @@ class SessionAccumulator {
   /// The latest status, with the PM5's own time and distance.
   StatusTick? lastTick;
 
+  /// Where the session is on its course; null without a course.
+  LapProgress? get lapProgress => _tracker?.progress;
+
+  /// Whether the last of a fixed number of laps is done.
+  bool get lapsFinished => _tracker?.finished ?? false;
+
   void add(RawPacket packet) {
     final first = _firstPacketTime ??= packet.time;
+    // The arrival times keep running while the PM5 pauses its clock (Design D1).
+    _wallMs = (packet.time - first).inMilliseconds;
     _rawPackets.add(RawPacketsCompanion.insert(
       sessionId: sessionId,
-      tMs: (packet.time - first).inMilliseconds,
+      tMs: _wallMs,
       characteristicId: packet.characteristicId,
       bytes: packet.bytes,
     ));
     _decoder.decode(packet).forEach(_onEvent);
   }
 
-  /// Handles what the decoder still holds back; call once at the end.
-  void finish() => _decoder.flush().forEach(_onEvent);
+  /// Handles what the decoder still holds back and closes an unfinished lap;
+  /// call once at the end.
+  void finish() {
+    _decoder.flush().forEach(_onEvent);
+    _tracker?.finish();
+  }
 
   SessionBatch takeBatch() {
-    final batch = SessionBatch(samples: _samples, strokes: _strokes, rawPackets: _rawPackets);
+    final tracker = _tracker;
+    final batch = SessionBatch(
+      samples: _samples,
+      strokes: _strokes,
+      rawPackets: _rawPackets,
+      laps: [for (final lap in tracker?.takeLaps() ?? const <LapResult>[]) lapCompanion(sessionId, lap)],
+      lapSegments: [
+        for (final segment in tracker?.takeSegments() ?? const <SegmentResult>[]) segmentCompanion(sessionId, segment),
+      ],
+    );
     _samples = [];
     _strokes = [];
     _rawPackets = [];
@@ -83,18 +119,23 @@ class SessionAccumulator {
 
     final tMs = progress.elapsed.inMilliseconds;
     final distanceDm = (progress.distanceMeters * 10).round();
-    // While paused the PM5 repeats the same values; they add nothing.
-    if (_lastSample == (tMs, distanceDm)) return;
+    final paceCs = tick.pace == null ? null : tick.pace!.inMilliseconds ~/ 10;
+    final tracker = _tracker;
+    tracker?.add(TrackPoint(wallMs: _wallMs, distanceDm: distanceDm, paceCs: paceCs, strokeRate: tick.strokeRate));
+    // While paused the PM5 repeats the same values; they add nothing to a
+    // free session, but on a course the zone counts the pause.
+    if (tracker == null && _lastSample == (tMs, distanceDm)) return;
     _lastSample = (tMs, distanceDm);
     _samples.add(SamplesCompanion.insert(
       sessionId: sessionId,
       tMs: tMs,
       distanceDm: distanceDm,
-      paceCs: Value(tick.pace == null ? null : tick.pace!.inMilliseconds ~/ 10),
+      paceCs: Value(paceCs),
       watts: Value(tick.watts),
       strokeRate: Value(tick.strokeRate),
       heartRate: Value(tick.heartRate),
       calories: Value(tick.calories),
+      wallMs: Value(_wallMs),
     ));
   }
 
@@ -118,3 +159,23 @@ class SessionAccumulator {
     ));
   }
 }
+
+LapsCompanion lapCompanion(int sessionId, LapResult lap) => LapsCompanion.insert(
+      sessionId: sessionId,
+      lapNo: lap.lap,
+      startWallMs: lap.startWallMs,
+      endWallMs: lap.endWallMs,
+      startDistanceDm: lap.startDistanceDm,
+      endDistanceDm: lap.endDistanceDm,
+      complete: lap.complete,
+      inZoneShare: Value(lap.inZoneShare),
+    );
+
+LapSegmentsCompanion segmentCompanion(int sessionId, SegmentResult segment) => LapSegmentsCompanion.insert(
+      sessionId: sessionId,
+      lapNo: segment.lap,
+      position: segment.position,
+      durationMs: segment.durationMs,
+      distanceDm: segment.distanceDm,
+      inZoneShare: Value(segment.inZoneShare),
+    );
