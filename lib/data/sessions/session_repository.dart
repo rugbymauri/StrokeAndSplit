@@ -9,6 +9,7 @@ import '../db/database.dart';
 import '../courses/course.dart';
 import '../courses/course_repository.dart';
 import '../courses/lap_tracker.dart';
+import '../zones/zone_repository.dart';
 import '../sources/erg_source.dart';
 import '../templates/session_template.dart';
 import 'session_accumulator.dart';
@@ -259,8 +260,7 @@ class SessionRepository {
       source: ErgSourceKind.values.asNameMap()[metadata['source']] ?? ErgSourceKind.pm5,
       deviceName: metadata['device'] as String?,
       templateName: template?['name'] as String?,
-      courseVersionId:
-          course == null ? null : await CourseRepository(_db).findOrCreateVersion(course.name, course.definition),
+      courseVersionId: course == null ? null : await _importCourse(course.name, course.definition),
       plannedLaps: template?['laps'] as int?,
     );
     final accumulator =
@@ -276,6 +276,18 @@ class SessionRepository {
     return id;
   }
 
+  /// The version of an imported course: one that rows the same, or a new
+  /// course with its zones, which are created when missing (Design D6).
+  Future<int> _importCourse(String name, CourseDefinition definition) {
+    return _db.transaction(() async {
+      final courses = CourseRepository(_db);
+      final found = await courses.findVersion(name, definition);
+      if (found != null) return found;
+      final placed = await ZoneRepository(_db).placeZones(name, definition);
+      return courses.findOrCreateVersion(name, placed);
+    });
+  }
+
   static Map<String, Object?> _courseJson(Course course) => {
         'name': course.name,
         'axis': course.axis.name,
@@ -288,6 +300,16 @@ class SessionRepository {
               'paceSlowCs': ?s.paceSlowCs,
               'spmMin': ?s.spmMin,
               'spmMax': ?s.spmMax,
+              if (s.zoneName case final name?)
+                'zone': {
+                  'name': name,
+                  'axis': course.axis.name,
+                  'length': s.length,
+                  'paceFastCs': ?s.paceFastCs,
+                  'paceSlowCs': ?s.paceSlowCs,
+                  'spmMin': ?s.spmMin,
+                  'spmMax': ?s.spmMax,
+                },
             },
         ],
       };
@@ -303,6 +325,7 @@ class SessionRepository {
               paceSlowCs: s['paceSlowCs'] as int?,
               spmMin: s['spmMin'] as int?,
               spmMax: s['spmMax'] as int?,
+              zoneName: (s['zone'] as Map<String, Object?>?)?['name'] as String?,
             ),
         ],
       );

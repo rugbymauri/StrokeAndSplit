@@ -48,19 +48,27 @@ class CourseRepository {
     return _course(row, version);
   }
 
-  /// A version of a course named [name] with exactly [definition]; a new
-  /// course is created when there is none, e.g. for an imported session.
+  /// A version of a course named [name] that rows like [definition],
+  /// whichever zones it was placed from; null when there is none.
+  Future<int?> findVersion(String name, CourseDefinition definition) async {
+    final rows = await (_db.select(_db.courses)
+          ..where((c) => c.name.equals(name) & c.axis.equalsValue(definition.axis) & c.deletedAt.isNull()))
+        .get();
+    for (final row in rows) {
+      final versions = await (_db.select(_db.courseVersions)..where((v) => v.courseId.equals(row.id))).get();
+      for (final version in versions) {
+        if ((await _course(row, version)).definition.sameAs(definition)) return version.id;
+      }
+    }
+    return null;
+  }
+
+  /// A version of a course named [name] with [definition]; a new course is
+  /// created when there is none, e.g. for an imported session.
   Future<int> findOrCreateVersion(String name, CourseDefinition definition) {
     return _db.transaction(() async {
-      final rows = await (_db.select(_db.courses)
-            ..where((c) => c.name.equals(name) & c.axis.equalsValue(definition.axis) & c.deletedAt.isNull()))
-          .get();
-      for (final row in rows) {
-        final versions = await (_db.select(_db.courseVersions)..where((v) => v.courseId.equals(row.id))).get();
-        for (final version in versions) {
-          if ((await _course(row, version)).definition == definition) return version.id;
-        }
-      }
+      final found = await findVersion(name, definition);
+      if (found != null) return found;
       final id = await create(name, definition);
       return (await get(id))!.versionId;
     });

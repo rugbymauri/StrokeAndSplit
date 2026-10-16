@@ -18,7 +18,7 @@
 ## 4. Rudern und Austausch
 
 - [x] 4.1 Live-Display und Zusammenfassung nennen den Zonennamen bzw. „frei“ (Design D7). Verifikation: Widget-Tests für die beiden Szenarien der Delta-Spec course-rowing
-- [ ] 4.2 Export mit Zonen im Header, Import legt fehlende Zonen an (Design D6). Verifikation: Roundtrip-Test, Import einer Datei aus `courses` ohne Zonen
+- [x] 4.2 Export mit Zonen im Header, Import legt fehlende Zonen an (Design D6). Verifikation: Roundtrip-Test, Import einer Datei aus `courses` ohne Zonen
 
 ## 5. Abschluss
 

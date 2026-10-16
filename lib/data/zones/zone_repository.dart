@@ -40,6 +40,41 @@ class ZoneRepository {
         ));
   }
 
+  /// The id of a zone that is not deleted and equals [zone] apart from the
+  /// id; a new zone is created when there is none, e.g. on import.
+  Future<int> findOrCreate(Zone zone) async {
+    for (final existing in await all()) {
+      if (existing.sameAs(zone)) return existing.id;
+    }
+    return create(zone);
+  }
+
+  /// [definition] with every segment that has a band placed from a stored
+  /// zone of the same name and bands (Design D6); segments without a zone
+  /// name are named after [course] and their position (Design D5).
+  Future<CourseDefinition> placeZones(String course, CourseDefinition definition) async {
+    return CourseDefinition(axis: definition.axis, length: definition.length, segments: [
+      for (final (i, s) in definition.segments.indexed)
+        if (s.isFree)
+          s
+        else
+          await _placed(s, s.zoneName ?? '$course ${i + 1}', definition.axis),
+    ]);
+  }
+
+  Future<CourseSegment> _placed(CourseSegment segment, String name, CourseAxis axis) async {
+    final zone = Zone(
+      name: name,
+      axis: axis,
+      length: segment.length,
+      paceFastCs: segment.paceFastCs,
+      paceSlowCs: segment.paceSlowCs,
+      spmMin: segment.spmMin,
+      spmMax: segment.spmMax,
+    );
+    return zone.copyWith(id: await findOrCreate(zone)).segment;
+  }
+
   /// All zones that are not deleted, by axis and name.
   Future<List<Zone>> all() async {
     final rows = await (_db.select(_db.zones)
