@@ -22,13 +22,13 @@
 - [x] 3.3 `FtmsDecoder` für `StatusTick`: Felder über More-Data-Teile zusammensetzen, Tick am Ende eines Datensatzes, eigene Uhr aus `RawPacket.time` nur während des Ruderns, Rudern-Erkennung über 4 s, Pace und Watt aus der Pace, Plausibilitätsgrenzen, `workoutType`/`workoutState` `unknown` (D8); Tests für Gerät ohne Zeitfeld, Pause, Pace 0, HR 0, Schlagzahl 120, Kalorien `0xFFFF`, gleiche Watt wie PM5 bei 2:00
 - [x] 3.4 `FtmsDecoder` für Schläge und Reset: ein `Stroke` je Zählerschritt ohne Details, kein Ereignis bei mehr als 10 Schlägen Sprung, Reset bei zurückfallender Distanz oder zurückfallendem Zähler (D8); Tests für 40→42, ersten Datensatz mitten im Rudern, Reset von 1500 m auf 0 m
 - [ ] 3.5 `Pm5ErgType` mit den Ski- und Bike-Werten aus der Concept2-Spezifikation (Werte gegen das aktuelle Dokument prüfen) und Auswertung von `0x0032` Byte 16 (D6); Unit-Tests für RowErg, SkiErg, BikeErg und unbekannte Werte
-- [ ] 3.6 Package-README: Abschnitt FTMS mit Byte-Layout von Rower Data, Control Point, eigener Uhr, Plausibilitätsgrenzen und der Erg-Typ-Tabelle; Fixtures-Tabelle ergänzt
+- [x] 3.6 Package-README: Abschnitt FTMS mit Byte-Layout von Rower Data, Control Point, eigener Uhr, Plausibilitätsgrenzen und der Erg-Typ-Tabelle; Fixtures-Tabelle ergänzt
 
 ## 4. Simulator und Test-Rower
 
 - [x] 4.1 `SimulatedSource` mit `protocol`: im FTMS-Modus ein Rower-Data-Paket pro Sekunde über `FtmsEncoder` (D10); Tests in `simulated_source_test.dart` prüfen, dass Pace-Annäherung, Pause und Schlagzählung im FTMS-Modus funktionieren
 - [x] 4.2 Auswahl PM5/FTMS in der Simulator-Bedienung (D10); Widget-Test in `simulator_controls_test.dart`, und ein End-to-End-Test rudert eine Vorlage mit einer Strecke mit eingebauter Zone mit dem Simulator im FTMS-Modus bis zur gespeicherten Session mit Runden und Zonenanteil
-- [ ] 4.3 `dart run erg_protocol:pm5_to_ftms` wandelt eine PM5-Aufnahme in eine FTMS-Aufnahme (D11); daraus `test/fixtures/ftms_just_row.jsonl` erzeugen und in einem Test prüfen, dass Distanz und Schlaganzahl von PM5- und FTMS-Dekodierung übereinstimmen (Distanz auf ±1 m)
+- [x] 4.3 `dart run erg_protocol:pm5_to_ftms` wandelt eine PM5-Aufnahme in eine FTMS-Aufnahme (D11); daraus `test/fixtures/ftms_just_row.jsonl` erzeugen und in einem Test prüfen, dass Distanz und Schlaganzahl von PM5- und FTMS-Dekodierung übereinstimmen (Distanz auf ±1 m)
 - [ ] 4.4 `tool/ftms_rower/ftms_rower.py` (bless, inline-Abhängigkeiten, `uv run`) als BlueZ-Peripheral mit Service `0x1826`, Service Data „Rower“, Rower Data und Control Point, das eine FTMS-Aufnahme zeitgetreu abspielt, sowie `make ftms-rower FILE=…` (D11); läuft auf dem Linux-PC und erscheint in `bluetoothctl` bzw. nRF Connect auf dem Handy als FTMS-Gerät
 - [ ] 4.5 README-Abschnitt zum Software-Rower: Voraussetzungen, Start, Test vom Android-Handy aus, Grenze „nicht vom selben Linux-Rechner“
 

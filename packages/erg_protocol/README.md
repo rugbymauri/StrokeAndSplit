@@ -178,3 +178,6 @@ Nach dem Verbinden: Indicate aktivieren, `0x00` (Request Control) schreiben und 
 | `just_row.jsonl` | ca. 2 min Just Row, ca. 44 Schläge |
 | `pause.jsonl` | Rudern, ca. 80 s Pause, weiterrudern |
 | `reset.jsonl` | mehrere neue Workouts am PM5 während des Ruderns |
+| `ftms_just_row.jsonl` | `just_row.jsonl` als FTMS-Rower: ein Rower-Data-Datensatz pro Sekunde, erzeugt mit `dart run erg_protocol:pm5_to_ftms test/fixtures/just_row.jsonl test/fixtures/ftms_just_row.jsonl` |
+
+`pm5_to_ftms` liest `.jsonl` und `.aergrow` und übernimmt Schlagzähler, Distanz, Pace, Leistung, Energie und Zeit des PM5. Die Fixture ist keine Aufnahme eines echten FTMS-Geräts; die bleibt für den Spike offen.

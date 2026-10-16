@@ -6,6 +6,7 @@ export 'src/erg_protocol.dart';
 export 'src/ftms/ftms_decoder.dart';
 export 'src/ftms/ftms_encoder.dart';
 export 'src/ftms/ftms_ids.dart';
+export 'src/ftms/pm5_to_ftms.dart';
 export 'src/ftms/rower_data.dart';
 export 'src/pm5/pm5_characteristics.dart';
 export 'src/pm5/pm5_decoder.dart';
