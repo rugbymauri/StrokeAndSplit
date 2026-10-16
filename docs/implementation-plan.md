@@ -18,7 +18,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
-| 4 | `force-curve` | 2/10 | ja | – |
+| 4 | `force-curve` | 6/10 | in Umsetzung | – |
 | 5 | `heart-rate` | 21/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 12/13 | in Umsetzung | – |
@@ -142,6 +142,7 @@ Vor dem Start:
   - Nutzer (2026-10-16): Schlaglänge an der Kurve anzeigen, wenn vorhanden (Byte 6 von `0035`, 0.01 m; FTMS hat keine). Design D4, neuer Task 3.2. Vorläufig: Simulator liefert 0.8–1.3 m statt fest 1.4 m.
 - [ ] Rohpakete tragen nach `device-types` ein Protokoll; die Kurvenpakete passen dort hinein.
 - [ ] Platz der Karte im Layout aus `ui-design`.
+- [x] Tasks 1.2, 2.1–2.3: Ereignis `StrokeForceCurve` (Schlagnummer, Kräfte in N, Schlaglänge), `Pm5Decoder` setzt `003d` zusammen und verwirft unvollständige Kurven, PM5 abonniert `003d`, Simulator sendet Kurven (Länge 1.05 ± 0.1 m), Replay getestet. Die Kurve kommt 1.5–2 s vor dem `Stroke` desselben Schlags.
 
 ### 5. `heart-rate`: Brustgurt direkt koppeln, RR-Intervalle, HRV
 
