@@ -358,4 +358,103 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
   });
+
+  group('heart rate', () {
+    /// Stores a PM5 session with the given heart rate summary and RR intervals.
+    Future<int> heartRateSession(
+      AppDatabase db, {
+      int? average,
+      int? max,
+      int? rmssd,
+      List<(int, int)> intervals = const [],
+    }) async {
+      final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
+            startedAt: _startedAt,
+            status: SessionStatus.complete,
+            source: ErgSourceKind.pm5,
+            durationMs: const Value(630000),
+            distanceDm: const Value(25120),
+            averageHeartRate: Value(average),
+            maxHeartRate: Value(max),
+            rmssdMs: Value(rmssd),
+          ));
+      for (final (tMs, rrMs) in intervals) {
+        await db.into(db.rrIntervals).insert(RrIntervalsCompanion.insert(sessionId: id, tMs: tMs, rrMs: rrMs));
+      }
+      return id;
+    }
+
+    testWidgets('shows average and maximum, the RR curve and the RMSSD with RR intervals', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final db = openTestDatabase();
+      final id = await tester.runAsync(() => heartRateSession(
+            db,
+            average: 142,
+            max: 171,
+            rmssd: 16,
+            intervals: [(800, 800), (1610, 810), (2400, 790)],
+          ));
+      await _pump(tester, db, id!);
+
+      expect(find.text('Ø Puls 142'), findsOneWidget);
+      expect(find.text('Max. Puls 171'), findsOneWidget);
+      expect(find.text('RR-INTERVALLE'), findsOneWidget);
+      expect(find.byKey(const Key('summary-rr-curve')), findsOneWidget);
+      expect(find.text('HRV (RMSSD) 16 ms'), findsOneWidget);
+      expect(find.text('810 ms'), findsOneWidget);
+      expect(find.text('790 ms'), findsOneWidget);
+      expect(find.bySemanticsLabel('Verlauf der RR-Intervalle zwischen 790 und 810 ms'), findsOneWidget);
+      final painter = tester
+          .widget<CustomPaint>(find.descendant(
+            of: find.byKey(const Key('summary-rr-curve')),
+            matching: find.byType(CustomPaint),
+          ))
+          .painter! as RrCurvePainter;
+      expect(painter.points, [(800, 800), (1610, 810), (2400, 790)]);
+      semantics.dispose();
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows only average and maximum with the heart rate from the rower', (tester) async {
+      final db = openTestDatabase();
+      final id = await tester.runAsync(() => heartRateSession(db, average: 138, max: 165));
+      await _pump(tester, db, id!);
+
+      expect(find.text('Ø Puls 138'), findsOneWidget);
+      expect(find.text('Max. Puls 165'), findsOneWidget);
+      expect(find.text('RR-INTERVALLE'), findsNothing);
+      expect(find.byKey(const Key('summary-rr-curve')), findsNothing);
+      expect(find.textContaining('RMSSD'), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows no heart rate values without a heart rate', (tester) async {
+      final db = openTestDatabase();
+      final id = await tester.runAsync(() => heartRateSession(db));
+      await _pump(tester, db, id!);
+
+      expect(find.textContaining('Puls'), findsNothing);
+      expect(find.text('RR-INTERVALLE'), findsNothing);
+      expect(find.textContaining('RMSSD'), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows the heart rate values in English', (tester) async {
+      final db = openTestDatabase();
+      final id = await tester.runAsync(() => heartRateSession(
+            db,
+            average: 142,
+            max: 171,
+            rmssd: 16,
+            intervals: [(800, 800), (1610, 810), (2400, 790)],
+          ));
+      await _pump(tester, db, id!, locale: const Locale('en'));
+
+      expect(find.text('Ø Heart rate 142'), findsOneWidget);
+      expect(find.text('Max heart rate 171'), findsOneWidget);
+      expect(find.text('RR INTERVALS'), findsOneWidget);
+      expect(find.text('HRV (RMSSD) 16 ms'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+  });
 }

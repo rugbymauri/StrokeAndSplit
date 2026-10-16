@@ -433,6 +433,42 @@ abstract class AppLocalizations {
   /// **'Getrennt'**
   String get stateDisconnected;
 
+  /// Live display: screen reader text and tooltip of the dot that shows the heart rate strap's connection state
+  ///
+  /// In de, this message translates to:
+  /// **'Pulsgurt: {state}'**
+  String heartRateStateLabel(String state);
+
+  /// Live display: the heart rate strap is paired, but waits for the rower to be connected before it connects
+  ///
+  /// In de, this message translates to:
+  /// **'Wartet auf das Rudergerät'**
+  String get heartRateStateWaiting;
+
+  /// Live display: the heart rate strap could not be connected, e.g. because it is already connected to a watch or the rower
+  ///
+  /// In de, this message translates to:
+  /// **'Pulsgurt nicht erreichbar. Viele Gurte erlauben nur eine oder zwei Bluetooth-Verbindungen gleichzeitig. Trenne ihn von Uhr oder Rudergerät und versuche es erneut.'**
+  String get heartRateFailedUnreachable;
+
+  /// Live display: the paired device offers no Heart Rate service; „Geräte wählen“ is the screen to choose rower and strap
+  ///
+  /// In de, this message translates to:
+  /// **'Das gekoppelte Gerät liefert keinen Puls. Koppele in „Geräte wählen“ einen Pulsgurt.'**
+  String get heartRateFailedNoService;
+
+  /// Live display: the heart rate strap dropped and could not be reconnected within 30 seconds
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung zum Pulsgurt verloren. Sitzt er richtig und ist er in Reichweite?'**
+  String get heartRateFailedLost;
+
+  /// Live display: button that tries again to connect the heart rate strap
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut versuchen'**
+  String get heartRateRetry;
+
   /// Badge while the simulator delivers the data
   ///
   /// In de, this message translates to:
@@ -876,6 +912,36 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Session beendet'**
   String get summaryTitle;
+
+  /// Summary: label of the average heart rate in beats per minute
+  ///
+  /// In de, this message translates to:
+  /// **'Ø Puls'**
+  String get sessionAverageHeartRate;
+
+  /// Summary: label of the highest heart rate in beats per minute
+  ///
+  /// In de, this message translates to:
+  /// **'Max. Puls'**
+  String get sessionMaxHeartRate;
+
+  /// Summary: title above the curve of the intervals from one heart beat to the next, as sent by the heart rate strap
+  ///
+  /// In de, this message translates to:
+  /// **'RR-Intervalle'**
+  String get summaryRrIntervals;
+
+  /// Summary: screen reader text of the curve of the RR intervals over the session
+  ///
+  /// In de, this message translates to:
+  /// **'Verlauf der RR-Intervalle zwischen {min} und {max} ms'**
+  String summaryRrCurve(int min, int max);
+
+  /// Summary: heart rate variability of the session as RMSSD in whole milliseconds
+  ///
+  /// In de, this message translates to:
+  /// **'HRV (RMSSD) {ms} ms'**
+  String summaryRmssd(int ms);
 
   /// Summary: heading above the laps, written in capitals
   ///

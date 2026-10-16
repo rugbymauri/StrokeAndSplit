@@ -16,6 +16,7 @@ import '../../data/sources/simulated_source.dart';
 import '../../data/templates/session_template.dart';
 import '../../l10n/l10n.dart';
 import '../connection/connection_indicator.dart';
+import '../connection/heart_rate_indicator.dart';
 import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
 import 'live_course.dart';
@@ -38,6 +39,9 @@ class LiveScreen extends ConsumerStatefulWidget {
 
 class _LiveScreenState extends ConsumerState<LiveScreen> {
   StatusTick? _tick;
+
+  /// The last RR intervals from the strap, shown while they are recent.
+  HeartBeatIntervals? _beats;
   var _stale = false;
   Timer? _staleTimer;
   StreamSubscription<RowingEvent>? _events;
@@ -76,6 +80,8 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 
   void _listen(Stream<RowingEvent> events) {
     _events?.cancel();
+    // RR intervals of a previous source never belong to the next one.
+    _beats = null;
     _restartStaleTimer();
     _events = events.listen((event) {
       _restartStaleTimer();
@@ -84,8 +90,23 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
           _tick = event;
           _stale = false;
         });
+      } else if (event is HeartBeatIntervals) {
+        setState(() => _beats = event);
       }
     });
+  }
+
+  /// The last RR interval in ms; null without one or once the latest tick is
+  /// more than [staleAfter] past it (heart-rate, Design D8). A tick carries no
+  /// packet time, so both compare by the rower's elapsed time; this works the
+  /// same in a replay.
+  int? get _rrIntervalMs {
+    final beats = _beats;
+    final tick = _tick;
+    if (beats == null || tick == null || beats.intervalsMs.isEmpty) return null;
+    final age = tick.elapsed - beats.elapsed;
+    if (age.isNegative || age > staleAfter) return null;
+    return beats.intervalsMs.last;
   }
 
   void _restartStaleTimer() {
@@ -153,6 +174,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     final shares = ghostShares(lap, template.course.definition, ghosts);
     return CourseLiveView(
       tick: _tick,
+      rrIntervalMs: _rrIntervalMs,
       lap: lap,
       course: template.course.definition,
       outdated: _stale,
@@ -179,6 +201,8 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
           title: Row(
             children: [
               const ConnectionIndicator(),
+              // The strap, if any; it also keeps the strap connected while rowing (Design D7).
+              const HeartRateIndicator(),
               const SizedBox(width: AppSpacing.m),
               Flexible(
                 child: Text(
@@ -202,6 +226,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
           child: Column(
             children: [
               const ConnectionNotice(),
+              const HeartRateNotice(),
               if (_stale && connected)
                 MaterialBanner(
                   content: Text(context.l10n.liveStale),
@@ -212,6 +237,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                   (final lap?, final template?) => _courseView(template, lap, recording, connected),
                   _ => FreeLiveView(
                       tick: _tick,
+                      rrIntervalMs: _rrIntervalMs,
                       session: recording?.progress,
                       outdated: _stale,
                       action: _sessionButton(recording, connected),

@@ -233,6 +233,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stateDisconnected => 'Disconnected';
 
   @override
+  String heartRateStateLabel(String state) {
+    return 'Heart rate strap: $state';
+  }
+
+  @override
+  String get heartRateStateWaiting => 'Waiting for the rower';
+
+  @override
+  String get heartRateFailedUnreachable =>
+      'Heart rate strap not reachable. Many straps allow only one or two Bluetooth connections at a time. Disconnect it from your watch or rower and try again.';
+
+  @override
+  String get heartRateFailedNoService =>
+      'The paired device sends no heart rate. Pair a heart rate strap in “Choose devices”.';
+
+  @override
+  String get heartRateFailedLost =>
+      'Lost the connection to the heart rate strap. Does it sit well and is it in range?';
+
+  @override
+  String get heartRateRetry => 'Try again';
+
+  @override
   String get sourceSimulator => 'SIMULATOR';
 
   @override
@@ -479,6 +502,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get summaryTitle => 'Session finished';
+
+  @override
+  String get sessionAverageHeartRate => 'Ø Heart rate';
+
+  @override
+  String get sessionMaxHeartRate => 'Max heart rate';
+
+  @override
+  String get summaryRrIntervals => 'RR intervals';
+
+  @override
+  String summaryRrCurve(int min, int max) {
+    return 'RR intervals over the session, between $min and $max ms';
+  }
+
+  @override
+  String summaryRmssd(int ms) {
+    return 'HRV (RMSSD) $ms ms';
+  }
 
   @override
   String get summaryLaps => 'Laps';

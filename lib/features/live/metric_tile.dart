@@ -58,6 +58,8 @@ class MetricTile extends StatelessWidget {
     required this.fontSize,
     this.unit,
     this.icon,
+    this.footnote,
+    this.footnoteKey,
     this.compact = false,
   });
 
@@ -74,6 +76,10 @@ class MetricTile extends StatelessWidget {
   /// Before the label, e.g. the heart for the heart rate.
   final Widget? icon;
 
+  /// Small text below the value, e.g. the last RR interval below the heart rate.
+  final String? footnote;
+  final Key? footnoteKey;
+
   /// Small tiles in a row, as next to the pace box.
   final bool compact;
 
@@ -81,6 +87,7 @@ class MetricTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final unit = this.unit;
     final icon = this.icon;
+    final footnote = this.footnote;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -129,6 +136,18 @@ class MetricTile extends StatelessWidget {
                 ),
               ),
             ),
+            if (footnote != null)
+              Text(
+                footnote,
+                key: footnoteKey,
+                style: AppTextStyles.caption.copyWith(
+                  fontSize: compact ? 11 : 12,
+                  height: 1.1,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
           ],
         ),
       ),
