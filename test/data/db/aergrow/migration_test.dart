@@ -99,4 +99,105 @@ void main() {
       await db.close();
     },
   );
+
+  test(
+    'turns the band segments of version 2 into zones and keeps rowed laps',
+    () async {
+      final schema = await verifier.schemaAt(2);
+      final old = v2.DatabaseAtV2(schema.newConnection());
+      await old.batch((b) {
+        b.insert(
+          old.courses,
+          v2.CoursesCompanion.insert(name: 'Seerunde', axis: 'distance'),
+        );
+        // Version 1 was rowed, version 2 is the current one.
+        for (final version in [1, 2]) {
+          b.insert(
+            old.courseVersions,
+            v2.CourseVersionsCompanion.insert(
+              courseId: 1,
+              version: version,
+              length: 1000,
+              createdAt: 0,
+            ),
+          );
+          b.insertAll(old.courseSegments, [
+            v2.CourseSegmentsCompanion.insert(
+              versionId: version,
+              position: 0,
+              length: 200,
+            ),
+            v2.CourseSegmentsCompanion.insert(
+              versionId: version,
+              position: 1,
+              length: 600,
+              paceFastCs: const Value(12500),
+              paceSlowCs: const Value(13000),
+              spmMin: const Value(20),
+              spmMax: const Value(22),
+            ),
+            v2.CourseSegmentsCompanion.insert(
+              versionId: version,
+              position: 2,
+              length: 200,
+            ),
+          ]);
+        }
+        b.insert(
+          old.sessions,
+          v2.SessionsCompanion.insert(
+            startedAt: 0,
+            status: 'complete',
+            source: 'pm5',
+            courseVersionId: const Value(1),
+          ),
+        );
+        b.insert(
+          old.laps,
+          v2.LapsCompanion.insert(
+            sessionId: 1,
+            lapNo: 1,
+            startWallMs: 0,
+            endWallMs: 252000,
+            startDistanceDm: 0,
+            endDistanceDm: 10000,
+            complete: 1,
+            inZoneShare: const Value(0.75),
+          ),
+        );
+      });
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 3);
+
+      final zone = (await db.select(db.zones).get()).single;
+      expect(
+        (zone.name, zone.axis, zone.length, zone.paceFastCs, zone.paceSlowCs),
+        ('Seerunde 2', CourseAxis.distance, 600, 12500, 13000),
+      );
+      expect((zone.spmMin, zone.spmMax), (20, 22));
+      Future<List<(int, int?, String?)>> segments(int version) async => [
+        for (final s in await (db.select(db.courseSegments)
+              ..where((s) => s.versionId.equals(version))
+              ..orderBy([(s) => OrderingTerm.asc(s.position)]))
+            .get())
+          (s.length, s.zoneId, s.zoneName),
+      ];
+      // The zone starts at 200 m in the current version.
+      expect(await segments(2), [
+        (200, null, null),
+        (600, zone.id, 'Seerunde 2'),
+        (200, null, null),
+      ]);
+      expect(await segments(1), [
+        (200, null, null),
+        (600, null, 'Seerunde 2'),
+        (200, null, null),
+      ]);
+      final lap = (await db.select(db.laps).get()).single;
+      expect((lap.endWallMs, lap.complete, lap.inZoneShare), (252000, true, 0.75));
+      await db.close();
+    },
+  );
 }

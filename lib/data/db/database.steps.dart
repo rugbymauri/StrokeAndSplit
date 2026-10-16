@@ -888,8 +888,315 @@ i1.GeneratedColumn<int> _column_55(String aliasedName) =>
       type: i1.DriftSqlType.int,
       $customConstraints: 'NOT NULL',
     );
+
+final class Schema3 extends i0.VersionedSchema {
+  Schema3({required super.database}) : super(version: 3);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    templates,
+    courses,
+    courseVersions,
+    sessions,
+    samples,
+    strokes,
+    rawPackets,
+    zones,
+    courseSegments,
+    templateBlocks,
+    laps,
+    lapSegments,
+    samplesSessionTime,
+    strokesSessionTime,
+    rawPacketsSessionTime,
+    courseVersionsCourse,
+  ];
+  late final Shape0 templates = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'templates',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_0, _column_1, _column_2],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 courses = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'courses',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_0, _column_1, _column_3, _column_4],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 courseVersions = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'course_versions',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_0, _column_5, _column_6, _column_7, _column_2],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 sessions = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'sessions',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_0,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_20,
+        _column_21,
+        _column_22,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 samples = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'samples',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_23,
+        _column_24,
+        _column_25,
+        _column_26,
+        _column_27,
+        _column_28,
+        _column_29,
+        _column_30,
+        _column_31,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 strokes = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'strokes',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_23,
+        _column_24,
+        _column_25,
+        _column_32,
+        _column_33,
+        _column_34,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_27,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 rawPackets = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'raw_packets',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_23, _column_24, _column_38, _column_39],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape11 zones = Shape11(
+    source: i0.VersionedTable(
+      entityName: 'zones',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_3,
+        _column_7,
+        _column_42,
+        _column_43,
+        _column_44,
+        _column_45,
+        _column_4,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape12 courseSegments = Shape12(
+    source: i0.VersionedTable(
+      entityName: 'course_segments',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(version_id, position)'],
+      columns: [
+        _column_40,
+        _column_41,
+        _column_7,
+        _column_42,
+        _column_43,
+        _column_44,
+        _column_45,
+        _column_56,
+        _column_57,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape8 templateBlocks = Shape8(
+    source: i0.VersionedTable(
+      entityName: 'template_blocks',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(template_id, position)'],
+      columns: [_column_46, _column_41, _column_5, _column_47],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 laps = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'laps',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(session_id, lap_no)'],
+      columns: [
+        _column_23,
+        _column_48,
+        _column_49,
+        _column_50,
+        _column_51,
+        _column_52,
+        _column_53,
+        _column_54,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape10 lapSegments = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'lap_segments',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(session_id, lap_no, position)'],
+      columns: [
+        _column_23,
+        _column_48,
+        _column_41,
+        _column_55,
+        _column_25,
+        _column_54,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index samplesSessionTime = i1.Index(
+    'samples_session_time',
+    'CREATE INDEX samples_session_time ON samples (session_id, t_ms)',
+  );
+  final i1.Index strokesSessionTime = i1.Index(
+    'strokes_session_time',
+    'CREATE INDEX strokes_session_time ON strokes (session_id, t_ms)',
+  );
+  final i1.Index rawPacketsSessionTime = i1.Index(
+    'raw_packets_session_time',
+    'CREATE INDEX raw_packets_session_time ON raw_packets (session_id, t_ms)',
+  );
+  final i1.Index courseVersionsCourse = i1.Index(
+    'course_versions_course',
+    'CREATE INDEX course_versions_course ON course_versions (course_id, version)',
+  );
+}
+
+class Shape11 extends i0.VersionedTable {
+  Shape11({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<int> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get axis =>
+      columnsByName['axis']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get length =>
+      columnsByName['length']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get paceFastCs =>
+      columnsByName['pace_fast_cs']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get paceSlowCs =>
+      columnsByName['pace_slow_cs']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get spmMin =>
+      columnsByName['spm_min']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get spmMax =>
+      columnsByName['spm_max']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get deletedAt =>
+      columnsByName['deleted_at']! as i1.GeneratedColumn<int>;
+}
+
+class Shape12 extends i0.VersionedTable {
+  Shape12({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<int> get versionId =>
+      columnsByName['version_id']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get position =>
+      columnsByName['position']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get length =>
+      columnsByName['length']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get paceFastCs =>
+      columnsByName['pace_fast_cs']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get paceSlowCs =>
+      columnsByName['pace_slow_cs']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get spmMin =>
+      columnsByName['spm_min']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get spmMax =>
+      columnsByName['spm_max']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get zoneId =>
+      columnsByName['zone_id']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get zoneName =>
+      columnsByName['zone_name']! as i1.GeneratedColumn<String>;
+}
+
+i1.GeneratedColumn<int> _column_56(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'zone_id',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NULL REFERENCES zones(id)',
+    );
+i1.GeneratedColumn<String> _column_57(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'zone_name',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
+  required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -898,6 +1205,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from1To2(migrator, schema);
         return 2;
+      case 2:
+        final schema = Schema3(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from2To3(migrator, schema);
+        return 3;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -906,6 +1218,7 @@ i0.MigrationStepWithVersion migrationSteps({
 
 i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
+  required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
 }) => i0.VersionedSchema.stepByStepHelper(
-  step: migrationSteps(from1To2: from1To2),
+  step: migrationSteps(from1To2: from1To2, from2To3: from2To3),
 );

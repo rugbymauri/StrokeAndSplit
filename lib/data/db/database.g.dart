@@ -3422,6 +3422,569 @@ class RawPacketsCompanion extends UpdateCompanion<RawPacketRow> {
   }
 }
 
+class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ZonesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<CourseAxis, String> axis =
+      GeneratedColumn<String>(
+        'axis',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<CourseAxis>($ZonesTable.$converteraxis);
+  static const VerificationMeta _lengthMeta = const VerificationMeta('length');
+  @override
+  late final GeneratedColumn<int> length = GeneratedColumn<int>(
+    'length',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _paceFastCsMeta = const VerificationMeta(
+    'paceFastCs',
+  );
+  @override
+  late final GeneratedColumn<int> paceFastCs = GeneratedColumn<int>(
+    'pace_fast_cs',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paceSlowCsMeta = const VerificationMeta(
+    'paceSlowCs',
+  );
+  @override
+  late final GeneratedColumn<int> paceSlowCs = GeneratedColumn<int>(
+    'pace_slow_cs',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _spmMinMeta = const VerificationMeta('spmMin');
+  @override
+  late final GeneratedColumn<int> spmMin = GeneratedColumn<int>(
+    'spm_min',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _spmMaxMeta = const VerificationMeta('spmMax');
+  @override
+  late final GeneratedColumn<int> spmMax = GeneratedColumn<int>(
+    'spm_max',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    axis,
+    length,
+    paceFastCs,
+    paceSlowCs,
+    spmMin,
+    spmMax,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'zones';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ZoneRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('length')) {
+      context.handle(
+        _lengthMeta,
+        length.isAcceptableOrUnknown(data['length']!, _lengthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lengthMeta);
+    }
+    if (data.containsKey('pace_fast_cs')) {
+      context.handle(
+        _paceFastCsMeta,
+        paceFastCs.isAcceptableOrUnknown(
+          data['pace_fast_cs']!,
+          _paceFastCsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('pace_slow_cs')) {
+      context.handle(
+        _paceSlowCsMeta,
+        paceSlowCs.isAcceptableOrUnknown(
+          data['pace_slow_cs']!,
+          _paceSlowCsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('spm_min')) {
+      context.handle(
+        _spmMinMeta,
+        spmMin.isAcceptableOrUnknown(data['spm_min']!, _spmMinMeta),
+      );
+    }
+    if (data.containsKey('spm_max')) {
+      context.handle(
+        _spmMaxMeta,
+        spmMax.isAcceptableOrUnknown(data['spm_max']!, _spmMaxMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ZoneRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ZoneRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      axis: $ZonesTable.$converteraxis.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}axis'],
+        )!,
+      ),
+      length: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}length'],
+      )!,
+      paceFastCs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pace_fast_cs'],
+      ),
+      paceSlowCs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pace_slow_cs'],
+      ),
+      spmMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}spm_min'],
+      ),
+      spmMax: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}spm_max'],
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $ZonesTable createAlias(String alias) {
+    return $ZonesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<CourseAxis, String, String> $converteraxis =
+      const EnumNameConverter<CourseAxis>(CourseAxis.values);
+}
+
+class ZoneRow extends DataClass implements Insertable<ZoneRow> {
+  final int id;
+  final String name;
+  final CourseAxis axis;
+
+  /// In metres or seconds, depending on [axis].
+  final int length;
+  final int? paceFastCs;
+  final int? paceSlowCs;
+  final int? spmMin;
+  final int? spmMax;
+
+  /// Zones are only marked as deleted, as course versions keep their name.
+  final DateTime? deletedAt;
+  const ZoneRow({
+    required this.id,
+    required this.name,
+    required this.axis,
+    required this.length,
+    this.paceFastCs,
+    this.paceSlowCs,
+    this.spmMin,
+    this.spmMax,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    {
+      map['axis'] = Variable<String>($ZonesTable.$converteraxis.toSql(axis));
+    }
+    map['length'] = Variable<int>(length);
+    if (!nullToAbsent || paceFastCs != null) {
+      map['pace_fast_cs'] = Variable<int>(paceFastCs);
+    }
+    if (!nullToAbsent || paceSlowCs != null) {
+      map['pace_slow_cs'] = Variable<int>(paceSlowCs);
+    }
+    if (!nullToAbsent || spmMin != null) {
+      map['spm_min'] = Variable<int>(spmMin);
+    }
+    if (!nullToAbsent || spmMax != null) {
+      map['spm_max'] = Variable<int>(spmMax);
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  ZonesCompanion toCompanion(bool nullToAbsent) {
+    return ZonesCompanion(
+      id: Value(id),
+      name: Value(name),
+      axis: Value(axis),
+      length: Value(length),
+      paceFastCs: paceFastCs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paceFastCs),
+      paceSlowCs: paceSlowCs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paceSlowCs),
+      spmMin: spmMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(spmMin),
+      spmMax: spmMax == null && nullToAbsent
+          ? const Value.absent()
+          : Value(spmMax),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory ZoneRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ZoneRow(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      axis: $ZonesTable.$converteraxis.fromJson(
+        serializer.fromJson<String>(json['axis']),
+      ),
+      length: serializer.fromJson<int>(json['length']),
+      paceFastCs: serializer.fromJson<int?>(json['paceFastCs']),
+      paceSlowCs: serializer.fromJson<int?>(json['paceSlowCs']),
+      spmMin: serializer.fromJson<int?>(json['spmMin']),
+      spmMax: serializer.fromJson<int?>(json['spmMax']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'axis': serializer.toJson<String>(
+        $ZonesTable.$converteraxis.toJson(axis),
+      ),
+      'length': serializer.toJson<int>(length),
+      'paceFastCs': serializer.toJson<int?>(paceFastCs),
+      'paceSlowCs': serializer.toJson<int?>(paceSlowCs),
+      'spmMin': serializer.toJson<int?>(spmMin),
+      'spmMax': serializer.toJson<int?>(spmMax),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  ZoneRow copyWith({
+    int? id,
+    String? name,
+    CourseAxis? axis,
+    int? length,
+    Value<int?> paceFastCs = const Value.absent(),
+    Value<int?> paceSlowCs = const Value.absent(),
+    Value<int?> spmMin = const Value.absent(),
+    Value<int?> spmMax = const Value.absent(),
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => ZoneRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    axis: axis ?? this.axis,
+    length: length ?? this.length,
+    paceFastCs: paceFastCs.present ? paceFastCs.value : this.paceFastCs,
+    paceSlowCs: paceSlowCs.present ? paceSlowCs.value : this.paceSlowCs,
+    spmMin: spmMin.present ? spmMin.value : this.spmMin,
+    spmMax: spmMax.present ? spmMax.value : this.spmMax,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  ZoneRow copyWithCompanion(ZonesCompanion data) {
+    return ZoneRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      axis: data.axis.present ? data.axis.value : this.axis,
+      length: data.length.present ? data.length.value : this.length,
+      paceFastCs: data.paceFastCs.present
+          ? data.paceFastCs.value
+          : this.paceFastCs,
+      paceSlowCs: data.paceSlowCs.present
+          ? data.paceSlowCs.value
+          : this.paceSlowCs,
+      spmMin: data.spmMin.present ? data.spmMin.value : this.spmMin,
+      spmMax: data.spmMax.present ? data.spmMax.value : this.spmMax,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZoneRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('axis: $axis, ')
+          ..write('length: $length, ')
+          ..write('paceFastCs: $paceFastCs, ')
+          ..write('paceSlowCs: $paceSlowCs, ')
+          ..write('spmMin: $spmMin, ')
+          ..write('spmMax: $spmMax, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    axis,
+    length,
+    paceFastCs,
+    paceSlowCs,
+    spmMin,
+    spmMax,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ZoneRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.axis == this.axis &&
+          other.length == this.length &&
+          other.paceFastCs == this.paceFastCs &&
+          other.paceSlowCs == this.paceSlowCs &&
+          other.spmMin == this.spmMin &&
+          other.spmMax == this.spmMax &&
+          other.deletedAt == this.deletedAt);
+}
+
+class ZonesCompanion extends UpdateCompanion<ZoneRow> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<CourseAxis> axis;
+  final Value<int> length;
+  final Value<int?> paceFastCs;
+  final Value<int?> paceSlowCs;
+  final Value<int?> spmMin;
+  final Value<int?> spmMax;
+  final Value<DateTime?> deletedAt;
+  const ZonesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.axis = const Value.absent(),
+    this.length = const Value.absent(),
+    this.paceFastCs = const Value.absent(),
+    this.paceSlowCs = const Value.absent(),
+    this.spmMin = const Value.absent(),
+    this.spmMax = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  });
+  ZonesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required CourseAxis axis,
+    required int length,
+    this.paceFastCs = const Value.absent(),
+    this.paceSlowCs = const Value.absent(),
+    this.spmMin = const Value.absent(),
+    this.spmMax = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  }) : name = Value(name),
+       axis = Value(axis),
+       length = Value(length);
+  static Insertable<ZoneRow> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? axis,
+    Expression<int>? length,
+    Expression<int>? paceFastCs,
+    Expression<int>? paceSlowCs,
+    Expression<int>? spmMin,
+    Expression<int>? spmMax,
+    Expression<DateTime>? deletedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (axis != null) 'axis': axis,
+      if (length != null) 'length': length,
+      if (paceFastCs != null) 'pace_fast_cs': paceFastCs,
+      if (paceSlowCs != null) 'pace_slow_cs': paceSlowCs,
+      if (spmMin != null) 'spm_min': spmMin,
+      if (spmMax != null) 'spm_max': spmMax,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+    });
+  }
+
+  ZonesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<CourseAxis>? axis,
+    Value<int>? length,
+    Value<int?>? paceFastCs,
+    Value<int?>? paceSlowCs,
+    Value<int?>? spmMin,
+    Value<int?>? spmMax,
+    Value<DateTime?>? deletedAt,
+  }) {
+    return ZonesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      axis: axis ?? this.axis,
+      length: length ?? this.length,
+      paceFastCs: paceFastCs ?? this.paceFastCs,
+      paceSlowCs: paceSlowCs ?? this.paceSlowCs,
+      spmMin: spmMin ?? this.spmMin,
+      spmMax: spmMax ?? this.spmMax,
+      deletedAt: deletedAt ?? this.deletedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (axis.present) {
+      map['axis'] = Variable<String>(
+        $ZonesTable.$converteraxis.toSql(axis.value),
+      );
+    }
+    if (length.present) {
+      map['length'] = Variable<int>(length.value);
+    }
+    if (paceFastCs.present) {
+      map['pace_fast_cs'] = Variable<int>(paceFastCs.value);
+    }
+    if (paceSlowCs.present) {
+      map['pace_slow_cs'] = Variable<int>(paceSlowCs.value);
+    }
+    if (spmMin.present) {
+      map['spm_min'] = Variable<int>(spmMin.value);
+    }
+    if (spmMax.present) {
+      map['spm_max'] = Variable<int>(spmMax.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZonesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('axis: $axis, ')
+          ..write('length: $length, ')
+          ..write('paceFastCs: $paceFastCs, ')
+          ..write('paceSlowCs: $paceSlowCs, ')
+          ..write('spmMin: $spmMin, ')
+          ..write('spmMax: $spmMax, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $CourseSegmentsTable extends CourseSegments
     with TableInfo<$CourseSegmentsTable, CourseSegmentRow> {
   @override
@@ -3502,6 +4065,29 @@ class $CourseSegmentsTable extends CourseSegments
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _zoneIdMeta = const VerificationMeta('zoneId');
+  @override
+  late final GeneratedColumn<int> zoneId = GeneratedColumn<int>(
+    'zone_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES zones (id)',
+    ),
+  );
+  static const VerificationMeta _zoneNameMeta = const VerificationMeta(
+    'zoneName',
+  );
+  @override
+  late final GeneratedColumn<String> zoneName = GeneratedColumn<String>(
+    'zone_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     versionId,
@@ -3511,6 +4097,8 @@ class $CourseSegmentsTable extends CourseSegments
     paceSlowCs,
     spmMin,
     spmMax,
+    zoneId,
+    zoneName,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3578,6 +4166,18 @@ class $CourseSegmentsTable extends CourseSegments
         spmMax.isAcceptableOrUnknown(data['spm_max']!, _spmMaxMeta),
       );
     }
+    if (data.containsKey('zone_id')) {
+      context.handle(
+        _zoneIdMeta,
+        zoneId.isAcceptableOrUnknown(data['zone_id']!, _zoneIdMeta),
+      );
+    }
+    if (data.containsKey('zone_name')) {
+      context.handle(
+        _zoneNameMeta,
+        zoneName.isAcceptableOrUnknown(data['zone_name']!, _zoneNameMeta),
+      );
+    }
     return context;
   }
 
@@ -3615,6 +4215,14 @@ class $CourseSegmentsTable extends CourseSegments
         DriftSqlType.int,
         data['${effectivePrefix}spm_max'],
       ),
+      zoneId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}zone_id'],
+      ),
+      zoneName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}zone_name'],
+      ),
     );
   }
 
@@ -3635,6 +4243,13 @@ class CourseSegmentRow extends DataClass
   final int? paceSlowCs;
   final int? spmMin;
   final int? spmMax;
+
+  /// The placed zone; null for a free gap and in versions from before zones
+  /// that were already rowed.
+  final int? zoneId;
+
+  /// The name of the zone when the version was stored.
+  final String? zoneName;
   const CourseSegmentRow({
     required this.versionId,
     required this.position,
@@ -3643,6 +4258,8 @@ class CourseSegmentRow extends DataClass
     this.paceSlowCs,
     this.spmMin,
     this.spmMax,
+    this.zoneId,
+    this.zoneName,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3661,6 +4278,12 @@ class CourseSegmentRow extends DataClass
     }
     if (!nullToAbsent || spmMax != null) {
       map['spm_max'] = Variable<int>(spmMax);
+    }
+    if (!nullToAbsent || zoneId != null) {
+      map['zone_id'] = Variable<int>(zoneId);
+    }
+    if (!nullToAbsent || zoneName != null) {
+      map['zone_name'] = Variable<String>(zoneName);
     }
     return map;
   }
@@ -3682,6 +4305,12 @@ class CourseSegmentRow extends DataClass
       spmMax: spmMax == null && nullToAbsent
           ? const Value.absent()
           : Value(spmMax),
+      zoneId: zoneId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(zoneId),
+      zoneName: zoneName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(zoneName),
     );
   }
 
@@ -3698,6 +4327,8 @@ class CourseSegmentRow extends DataClass
       paceSlowCs: serializer.fromJson<int?>(json['paceSlowCs']),
       spmMin: serializer.fromJson<int?>(json['spmMin']),
       spmMax: serializer.fromJson<int?>(json['spmMax']),
+      zoneId: serializer.fromJson<int?>(json['zoneId']),
+      zoneName: serializer.fromJson<String?>(json['zoneName']),
     );
   }
   @override
@@ -3711,6 +4342,8 @@ class CourseSegmentRow extends DataClass
       'paceSlowCs': serializer.toJson<int?>(paceSlowCs),
       'spmMin': serializer.toJson<int?>(spmMin),
       'spmMax': serializer.toJson<int?>(spmMax),
+      'zoneId': serializer.toJson<int?>(zoneId),
+      'zoneName': serializer.toJson<String?>(zoneName),
     };
   }
 
@@ -3722,6 +4355,8 @@ class CourseSegmentRow extends DataClass
     Value<int?> paceSlowCs = const Value.absent(),
     Value<int?> spmMin = const Value.absent(),
     Value<int?> spmMax = const Value.absent(),
+    Value<int?> zoneId = const Value.absent(),
+    Value<String?> zoneName = const Value.absent(),
   }) => CourseSegmentRow(
     versionId: versionId ?? this.versionId,
     position: position ?? this.position,
@@ -3730,6 +4365,8 @@ class CourseSegmentRow extends DataClass
     paceSlowCs: paceSlowCs.present ? paceSlowCs.value : this.paceSlowCs,
     spmMin: spmMin.present ? spmMin.value : this.spmMin,
     spmMax: spmMax.present ? spmMax.value : this.spmMax,
+    zoneId: zoneId.present ? zoneId.value : this.zoneId,
+    zoneName: zoneName.present ? zoneName.value : this.zoneName,
   );
   CourseSegmentRow copyWithCompanion(CourseSegmentsCompanion data) {
     return CourseSegmentRow(
@@ -3744,6 +4381,8 @@ class CourseSegmentRow extends DataClass
           : this.paceSlowCs,
       spmMin: data.spmMin.present ? data.spmMin.value : this.spmMin,
       spmMax: data.spmMax.present ? data.spmMax.value : this.spmMax,
+      zoneId: data.zoneId.present ? data.zoneId.value : this.zoneId,
+      zoneName: data.zoneName.present ? data.zoneName.value : this.zoneName,
     );
   }
 
@@ -3756,7 +4395,9 @@ class CourseSegmentRow extends DataClass
           ..write('paceFastCs: $paceFastCs, ')
           ..write('paceSlowCs: $paceSlowCs, ')
           ..write('spmMin: $spmMin, ')
-          ..write('spmMax: $spmMax')
+          ..write('spmMax: $spmMax, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('zoneName: $zoneName')
           ..write(')'))
         .toString();
   }
@@ -3770,6 +4411,8 @@ class CourseSegmentRow extends DataClass
     paceSlowCs,
     spmMin,
     spmMax,
+    zoneId,
+    zoneName,
   );
   @override
   bool operator ==(Object other) =>
@@ -3781,7 +4424,9 @@ class CourseSegmentRow extends DataClass
           other.paceFastCs == this.paceFastCs &&
           other.paceSlowCs == this.paceSlowCs &&
           other.spmMin == this.spmMin &&
-          other.spmMax == this.spmMax);
+          other.spmMax == this.spmMax &&
+          other.zoneId == this.zoneId &&
+          other.zoneName == this.zoneName);
 }
 
 class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
@@ -3792,6 +4437,8 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
   final Value<int?> paceSlowCs;
   final Value<int?> spmMin;
   final Value<int?> spmMax;
+  final Value<int?> zoneId;
+  final Value<String?> zoneName;
   final Value<int> rowid;
   const CourseSegmentsCompanion({
     this.versionId = const Value.absent(),
@@ -3801,6 +4448,8 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     this.paceSlowCs = const Value.absent(),
     this.spmMin = const Value.absent(),
     this.spmMax = const Value.absent(),
+    this.zoneId = const Value.absent(),
+    this.zoneName = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CourseSegmentsCompanion.insert({
@@ -3811,6 +4460,8 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     this.paceSlowCs = const Value.absent(),
     this.spmMin = const Value.absent(),
     this.spmMax = const Value.absent(),
+    this.zoneId = const Value.absent(),
+    this.zoneName = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : versionId = Value(versionId),
        position = Value(position),
@@ -3823,6 +4474,8 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     Expression<int>? paceSlowCs,
     Expression<int>? spmMin,
     Expression<int>? spmMax,
+    Expression<int>? zoneId,
+    Expression<String>? zoneName,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3833,6 +4486,8 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
       if (paceSlowCs != null) 'pace_slow_cs': paceSlowCs,
       if (spmMin != null) 'spm_min': spmMin,
       if (spmMax != null) 'spm_max': spmMax,
+      if (zoneId != null) 'zone_id': zoneId,
+      if (zoneName != null) 'zone_name': zoneName,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3845,6 +4500,8 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     Value<int?>? paceSlowCs,
     Value<int?>? spmMin,
     Value<int?>? spmMax,
+    Value<int?>? zoneId,
+    Value<String?>? zoneName,
     Value<int>? rowid,
   }) {
     return CourseSegmentsCompanion(
@@ -3855,6 +4512,8 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
       paceSlowCs: paceSlowCs ?? this.paceSlowCs,
       spmMin: spmMin ?? this.spmMin,
       spmMax: spmMax ?? this.spmMax,
+      zoneId: zoneId ?? this.zoneId,
+      zoneName: zoneName ?? this.zoneName,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3883,6 +4542,12 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     if (spmMax.present) {
       map['spm_max'] = Variable<int>(spmMax.value);
     }
+    if (zoneId.present) {
+      map['zone_id'] = Variable<int>(zoneId.value);
+    }
+    if (zoneName.present) {
+      map['zone_name'] = Variable<String>(zoneName.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3899,6 +4564,8 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
           ..write('paceSlowCs: $paceSlowCs, ')
           ..write('spmMin: $spmMin, ')
           ..write('spmMax: $spmMax, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('zoneName: $zoneName, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -5217,6 +5884,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SamplesTable samples = $SamplesTable(this);
   late final $StrokesTable strokes = $StrokesTable(this);
   late final $RawPacketsTable rawPackets = $RawPacketsTable(this);
+  late final $ZonesTable zones = $ZonesTable(this);
   late final $CourseSegmentsTable courseSegments = $CourseSegmentsTable(this);
   late final $TemplateBlocksTable templateBlocks = $TemplateBlocksTable(this);
   late final $LapsTable laps = $LapsTable(this);
@@ -5249,6 +5917,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     samples,
     strokes,
     rawPackets,
+    zones,
     courseSegments,
     templateBlocks,
     laps,
@@ -8756,6 +9425,380 @@ typedef $$RawPacketsTableProcessedTableManager =
       RawPacketRow,
       PrefetchHooks Function({bool sessionId})
     >;
+typedef $$ZonesTableCreateCompanionBuilder = ZonesCompanion Function({
+  Value<int> id,
+  required String name,
+  required CourseAxis axis,
+  required int length,
+  Value<int?> paceFastCs,
+  Value<int?> paceSlowCs,
+  Value<int?> spmMin,
+  Value<int?> spmMax,
+  Value<DateTime?> deletedAt,
+});
+typedef $$ZonesTableUpdateCompanionBuilder = ZonesCompanion Function({
+  Value<int> id,
+  Value<String> name,
+  Value<CourseAxis> axis,
+  Value<int> length,
+  Value<int?> paceFastCs,
+  Value<int?> paceSlowCs,
+  Value<int?> spmMin,
+  Value<int?> spmMax,
+  Value<DateTime?> deletedAt,
+});
+
+final class $$ZonesTableReferences
+    extends BaseReferences<_$AppDatabase, $ZonesTable, ZoneRow> {
+  $$ZonesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$CourseSegmentsTable, List<CourseSegmentRow>>
+  _courseSegmentsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.courseSegments,
+    aliasName: 'zones__id__course_segments__zone_id',
+  );
+
+  $$CourseSegmentsTableProcessedTableManager get courseSegmentsRefs {
+    final manager = $$CourseSegmentsTableTableManager(
+      $_db,
+      $_db.courseSegments,
+    ).filter((f) => f.zoneId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_courseSegmentsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ZonesTableFilterComposer extends Composer<_$AppDatabase, $ZonesTable> {
+  $$ZonesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<CourseAxis, CourseAxis, String> get axis =>
+      $composableBuilder(
+        column: $table.axis,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<int> get length => $composableBuilder(
+    column: $table.length,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get paceFastCs => $composableBuilder(
+    column: $table.paceFastCs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get paceSlowCs => $composableBuilder(
+    column: $table.paceSlowCs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get spmMin => $composableBuilder(
+    column: $table.spmMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get spmMax => $composableBuilder(
+    column: $table.spmMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> courseSegmentsRefs(
+    Expression<bool> Function($$CourseSegmentsTableFilterComposer f) f,
+  ) {
+    final $$CourseSegmentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.courseSegments,
+      getReferencedColumn: (t) => t.zoneId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseSegmentsTableFilterComposer(
+            $db: $db,
+            $table: $db.courseSegments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ZonesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ZonesTable> {
+  $$ZonesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get axis => $composableBuilder(
+    column: $table.axis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get length => $composableBuilder(
+    column: $table.length,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get paceFastCs => $composableBuilder(
+    column: $table.paceFastCs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get paceSlowCs => $composableBuilder(
+    column: $table.paceSlowCs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get spmMin => $composableBuilder(
+    column: $table.spmMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get spmMax => $composableBuilder(
+    column: $table.spmMax,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ZonesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ZonesTable> {
+  $$ZonesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<CourseAxis, String> get axis =>
+      $composableBuilder(column: $table.axis, builder: (column) => column);
+
+  GeneratedColumn<int> get length =>
+      $composableBuilder(column: $table.length, builder: (column) => column);
+
+  GeneratedColumn<int> get paceFastCs => $composableBuilder(
+    column: $table.paceFastCs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get paceSlowCs => $composableBuilder(
+    column: $table.paceSlowCs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get spmMin =>
+      $composableBuilder(column: $table.spmMin, builder: (column) => column);
+
+  GeneratedColumn<int> get spmMax =>
+      $composableBuilder(column: $table.spmMax, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  Expression<T> courseSegmentsRefs<T extends Object>(
+    Expression<T> Function($$CourseSegmentsTableAnnotationComposer a) f,
+  ) {
+    final $$CourseSegmentsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.courseSegments,
+      getReferencedColumn: (t) => t.zoneId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CourseSegmentsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.courseSegments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ZonesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ZonesTable,
+          ZoneRow,
+          $$ZonesTableFilterComposer,
+          $$ZonesTableOrderingComposer,
+          $$ZonesTableAnnotationComposer,
+          $$ZonesTableCreateCompanionBuilder,
+          $$ZonesTableUpdateCompanionBuilder,
+          (ZoneRow, $$ZonesTableReferences),
+          ZoneRow,
+          PrefetchHooks Function({bool courseSegmentsRefs})
+        > {
+  $$ZonesTableTableManager(_$AppDatabase db, $ZonesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ZonesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ZonesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ZonesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<CourseAxis> axis = const Value.absent(),
+                Value<int> length = const Value.absent(),
+                Value<int?> paceFastCs = const Value.absent(),
+                Value<int?> paceSlowCs = const Value.absent(),
+                Value<int?> spmMin = const Value.absent(),
+                Value<int?> spmMax = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => ZonesCompanion(
+                id: id,
+                name: name,
+                axis: axis,
+                length: length,
+                paceFastCs: paceFastCs,
+                paceSlowCs: paceSlowCs,
+                spmMin: spmMin,
+                spmMax: spmMax,
+                deletedAt: deletedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required CourseAxis axis,
+                required int length,
+                Value<int?> paceFastCs = const Value.absent(),
+                Value<int?> paceSlowCs = const Value.absent(),
+                Value<int?> spmMin = const Value.absent(),
+                Value<int?> spmMax = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => ZonesCompanion.insert(
+                id: id,
+                name: name,
+                axis: axis,
+                length: length,
+                paceFastCs: paceFastCs,
+                paceSlowCs: paceSlowCs,
+                spmMin: spmMin,
+                spmMax: spmMax,
+                deletedAt: deletedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ZonesTable, ZoneRow>(table),
+                  $$ZonesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({courseSegmentsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (courseSegmentsRefs) db.courseSegments,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (courseSegmentsRefs)
+                    await $_getPrefetchedData<
+                      ZoneRow,
+                      $ZonesTable,
+                      CourseSegmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ZonesTableReferences
+                          ._courseSegmentsRefsTable(db),
+                      managerFromTypedResult: (p0) => $$ZonesTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).courseSegmentsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.zoneId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ZonesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ZonesTable,
+      ZoneRow,
+      $$ZonesTableFilterComposer,
+      $$ZonesTableOrderingComposer,
+      $$ZonesTableAnnotationComposer,
+      $$ZonesTableCreateCompanionBuilder,
+      $$ZonesTableUpdateCompanionBuilder,
+      (ZoneRow, $$ZonesTableReferences),
+      ZoneRow,
+      PrefetchHooks Function({bool courseSegmentsRefs})
+    >;
 typedef $$CourseSegmentsTableCreateCompanionBuilder =
     CourseSegmentsCompanion Function({
       required int versionId,
@@ -8765,6 +9808,8 @@ typedef $$CourseSegmentsTableCreateCompanionBuilder =
       Value<int?> paceSlowCs,
       Value<int?> spmMin,
       Value<int?> spmMax,
+      Value<int?> zoneId,
+      Value<String?> zoneName,
       Value<int> rowid,
     });
 typedef $$CourseSegmentsTableUpdateCompanionBuilder =
@@ -8776,6 +9821,8 @@ typedef $$CourseSegmentsTableUpdateCompanionBuilder =
       Value<int?> paceSlowCs,
       Value<int?> spmMin,
       Value<int?> spmMax,
+      Value<int?> zoneId,
+      Value<String?> zoneName,
       Value<int> rowid,
     });
 
@@ -8800,6 +9847,23 @@ final class $$CourseSegmentsTableReferences
       $_db.courseVersions,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_versionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ZonesTable _zoneIdTable(_$AppDatabase db) =>
+      db.zones.createAlias('course_segments__zone_id__zones__id');
+
+  $$ZonesTableProcessedTableManager? get zoneId {
+    final $_column = $_itemColumn<int>('zone_id');
+    if ($_column == null) return null;
+    final manager = $$ZonesTableTableManager(
+      $_db,
+      $_db.zones,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_zoneIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -8846,6 +9910,11 @@ class $$CourseSegmentsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get zoneName => $composableBuilder(
+    column: $table.zoneName,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$CourseVersionsTableFilterComposer get versionId {
     final $$CourseVersionsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -8860,6 +9929,29 @@ class $$CourseSegmentsTableFilterComposer
           }) => $$CourseVersionsTableFilterComposer(
             $db: $db,
             $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableFilterComposer get zoneId {
+    final $$ZonesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableFilterComposer(
+            $db: $db,
+            $table: $db.zones,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8909,6 +10001,11 @@ class $$CourseSegmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get zoneName => $composableBuilder(
+    column: $table.zoneName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$CourseVersionsTableOrderingComposer get versionId {
     final $$CourseVersionsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -8923,6 +10020,29 @@ class $$CourseSegmentsTableOrderingComposer
           }) => $$CourseVersionsTableOrderingComposer(
             $db: $db,
             $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableOrderingComposer get zoneId {
+    final $$ZonesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableOrderingComposer(
+            $db: $db,
+            $table: $db.zones,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8964,6 +10084,9 @@ class $$CourseSegmentsTableAnnotationComposer
   GeneratedColumn<int> get spmMax =>
       $composableBuilder(column: $table.spmMax, builder: (column) => column);
 
+  GeneratedColumn<String> get zoneName =>
+      $composableBuilder(column: $table.zoneName, builder: (column) => column);
+
   $$CourseVersionsTableAnnotationComposer get versionId {
     final $$CourseVersionsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -8978,6 +10101,29 @@ class $$CourseSegmentsTableAnnotationComposer
           }) => $$CourseVersionsTableAnnotationComposer(
             $db: $db,
             $table: $db.courseVersions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ZonesTableAnnotationComposer get zoneId {
+    final $$ZonesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.zoneId,
+      referencedTable: $db.zones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZonesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zones,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9001,7 +10147,7 @@ class $$CourseSegmentsTableTableManager
           $$CourseSegmentsTableUpdateCompanionBuilder,
           (CourseSegmentRow, $$CourseSegmentsTableReferences),
           CourseSegmentRow,
-          PrefetchHooks Function({bool versionId})
+          PrefetchHooks Function({bool versionId, bool zoneId})
         > {
   $$CourseSegmentsTableTableManager(
     _$AppDatabase db,
@@ -9025,6 +10171,8 @@ class $$CourseSegmentsTableTableManager
                 Value<int?> paceSlowCs = const Value.absent(),
                 Value<int?> spmMin = const Value.absent(),
                 Value<int?> spmMax = const Value.absent(),
+                Value<int?> zoneId = const Value.absent(),
+                Value<String?> zoneName = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CourseSegmentsCompanion(
                 versionId: versionId,
@@ -9034,6 +10182,8 @@ class $$CourseSegmentsTableTableManager
                 paceSlowCs: paceSlowCs,
                 spmMin: spmMin,
                 spmMax: spmMax,
+                zoneId: zoneId,
+                zoneName: zoneName,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -9045,6 +10195,8 @@ class $$CourseSegmentsTableTableManager
                 Value<int?> paceSlowCs = const Value.absent(),
                 Value<int?> spmMin = const Value.absent(),
                 Value<int?> spmMax = const Value.absent(),
+                Value<int?> zoneId = const Value.absent(),
+                Value<String?> zoneName = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CourseSegmentsCompanion.insert(
                 versionId: versionId,
@@ -9054,6 +10206,8 @@ class $$CourseSegmentsTableTableManager
                 paceSlowCs: paceSlowCs,
                 spmMin: spmMin,
                 spmMax: spmMax,
+                zoneId: zoneId,
+                zoneName: zoneName,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -9064,7 +10218,7 @@ class $$CourseSegmentsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({versionId = false}) {
+          prefetchHooksCallback: ({versionId = false, zoneId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -9095,6 +10249,17 @@ class $$CourseSegmentsTableTableManager
                             .id,
                       ) as T;
                     }
+                    if (zoneId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.zoneId,
+                        referencedTable: $$CourseSegmentsTableReferences
+                            ._zoneIdTable(db),
+                        referencedColumn: $$CourseSegmentsTableReferences
+                            ._zoneIdTable(db)
+                            .id,
+                      ) as T;
+                    }
 
                     return state;
                   },
@@ -9119,7 +10284,7 @@ typedef $$CourseSegmentsTableProcessedTableManager =
       $$CourseSegmentsTableUpdateCompanionBuilder,
       (CourseSegmentRow, $$CourseSegmentsTableReferences),
       CourseSegmentRow,
-      PrefetchHooks Function({bool versionId})
+      PrefetchHooks Function({bool versionId, bool zoneId})
     >;
 typedef $$TemplateBlocksTableCreateCompanionBuilder =
     TemplateBlocksCompanion Function({
@@ -10243,6 +11408,8 @@ class $AppDatabaseManager {
       $$StrokesTableTableManager(_db, _db.strokes);
   $$RawPacketsTableTableManager get rawPackets =>
       $$RawPacketsTableTableManager(_db, _db.rawPackets);
+  $$ZonesTableTableManager get zones =>
+      $$ZonesTableTableManager(_db, _db.zones);
   $$CourseSegmentsTableTableManager get courseSegments =>
       $$CourseSegmentsTableTableManager(_db, _db.courseSegments);
   $$TemplateBlocksTableTableManager get templateBlocks =>

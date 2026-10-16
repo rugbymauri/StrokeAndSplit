@@ -2,7 +2,7 @@
 
 ## 1. Schema und Migration
 
-- [ ] 1.1 Tabelle `zones` und Spalten `course_segments.zoneId/zoneName` (Design D1), `schemaVersion` 3 mit Migration nach Design D5. Verifikation: `make codegen`, `make schema` und Migrationstests grün, dazu ein Test, der die Strecke „Seerunde“ (200/600/200 m, Band in der Mitte) migriert und eine Zone „Seerunde 2“ ab 200 m sowie unveränderte Runden alter Sessions findet
+- [x] 1.1 Tabelle `zones` und Spalten `course_segments.zoneId/zoneName` (Design D1), `schemaVersion` 3 mit Migration nach Design D5. Verifikation: `make codegen`, `make schema` und Migrationstests grün, dazu ein Test, der die Strecke „Seerunde“ (200/600/200 m, Band in der Mitte) migriert und eine Zone „Seerunde 2“ ab 200 m sowie unveränderte Runden alter Sessions findet
 
 ## 2. Zonen (Capability zones)
 

@@ -47,6 +47,29 @@ class CourseVersions extends Table {
   DateTimeColumn get createdAt => dateTime()();
 }
 
+/// A reusable band over a fixed length, placed in courses of the same axis
+/// (Change zones, Design D1).
+@DataClassName('ZoneRow')
+class Zones extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  TextColumn get axis => textEnum<CourseAxis>()();
+
+  /// In metres or seconds, depending on [axis].
+  IntColumn get length => integer()();
+
+  // Pace per 500 m in centiseconds; at least one band is set.
+  IntColumn get paceFastCs => integer().nullable()();
+  IntColumn get paceSlowCs => integer().nullable()();
+  IntColumn get spmMin => integer().nullable()();
+  IntColumn get spmMax => integer().nullable()();
+
+  /// Zones are only marked as deleted, as course versions keep their name.
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+}
+
+/// The resolved parts of a course version: placed zones with a copy of their
+/// bands, and the free gaps between them.
 @DataClassName('CourseSegmentRow')
 class CourseSegments extends Table {
   IntColumn get versionId => integer().references(CourseVersions, #id, onDelete: KeyAction.cascade)();
@@ -60,6 +83,13 @@ class CourseSegments extends Table {
   IntColumn get paceSlowCs => integer().nullable()();
   IntColumn get spmMin => integer().nullable()();
   IntColumn get spmMax => integer().nullable()();
+
+  /// The placed zone; null for a free gap and in versions from before zones
+  /// that were already rowed.
+  IntColumn get zoneId => integer().nullable().references(Zones, #id)();
+
+  /// The name of the zone when the version was stored.
+  TextColumn get zoneName => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {versionId, position};
@@ -202,6 +232,7 @@ class LapSegments extends Table {
     Courses,
     CourseVersions,
     CourseSegments,
+    Zones,
     Templates,
     TemplateBlocks,
     Laps,
@@ -215,7 +246,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase.local() => AppDatabase(driftDatabase(name: 'aergrow'));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -240,9 +271,68 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(schema.sessions, schema.sessions.plannedLaps);
             await m.addColumn(schema.samples, schema.samples.wallMs);
           },
+          // Reusable zones; segments with bands become zones (Change zones, Design D5).
+          from2To3: (m, schema) async {
+            await m.createTable(schema.zones);
+            await m.addColumn(schema.courseSegments, schema.courseSegments.zoneId);
+            await m.addColumn(schema.courseSegments, schema.courseSegments.zoneName);
+            await migrateSegmentsToZones(m.database);
+          },
         ),
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },
       );
+}
+
+/// Turns every segment with a band into a zone named after its course and
+/// position. Segments of the newest version of a course are placed zones;
+/// older versions only keep the name, as they no longer change.
+Future<void> migrateSegmentsToZones(GeneratedDatabase db) async {
+  final courses = await db.customSelect('SELECT id, name, axis FROM courses').get();
+  for (final course in courses) {
+    final courseId = course.read<int>('id');
+    final versions = await db
+        .customSelect('SELECT id FROM course_versions WHERE course_id = ? ORDER BY version DESC',
+            variables: [Variable.withInt(courseId)])
+        .get();
+    for (final (i, version) in versions.indexed) {
+      final versionId = version.read<int>('id');
+      final segments = await db
+          .customSelect(
+              'SELECT position, length, pace_fast_cs, pace_slow_cs, spm_min, spm_max FROM course_segments '
+              'WHERE version_id = ? AND (pace_fast_cs IS NOT NULL OR spm_min IS NOT NULL) ORDER BY position',
+              variables: [Variable.withInt(versionId)])
+          .get();
+      for (final segment in segments) {
+        final position = segment.read<int>('position');
+        final name = '${course.read<String>('name')} ${position + 1}';
+        int? zoneId;
+        if (i == 0) {
+          zoneId = await db.customInsert(
+            'INSERT INTO zones (name, axis, length, pace_fast_cs, pace_slow_cs, spm_min, spm_max) '
+            'VALUES (?, ?, ?, ?, ?, ?, ?)',
+            variables: [
+              Variable.withString(name),
+              Variable.withString(course.read<String>('axis')),
+              Variable.withInt(segment.read<int>('length')),
+              Variable(segment.read<int?>('pace_fast_cs')),
+              Variable(segment.read<int?>('pace_slow_cs')),
+              Variable(segment.read<int?>('spm_min')),
+              Variable(segment.read<int?>('spm_max')),
+            ],
+          );
+        }
+        await db.customUpdate(
+          'UPDATE course_segments SET zone_id = ?, zone_name = ? WHERE version_id = ? AND position = ?',
+          variables: [
+            Variable(zoneId),
+            Variable.withString(name),
+            Variable.withInt(versionId),
+            Variable.withInt(position),
+          ],
+        );
+      }
+    }
+  }
 }
