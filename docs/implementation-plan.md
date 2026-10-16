@@ -171,7 +171,9 @@ Gruppe 1 umgesetzt (2026-10-16, Tasks 1.1–1.6, `lib/data/statistics/`):
 - [x] Tasks 2.1/2.2 Detailansicht von Strecke und Zone (`course_detail_screen.dart`, `zone_detail_screen.dart`, gemeinsam `lib/features/statistics/ranking_sections.dart`), Tipp in der Liste öffnet sie, Stift öffnet den Editor. Vorläufig: nach dem Speichern zurück in die Detailansicht; Löschen bleibt in Liste bzw. Editor; Zeit im Rundenformat (`0:18.2`); Datum kurz ohne Uhrzeit; hat die aktuelle Länge keine Einträge, fehlt ihre Rangliste ohne eigenen Hinweis.
 - [x] Task 4.1 Platzmarken in der Zusammenfassung (`session_places.dart`, `sessionPlacesProvider`): Session neben dem Titel, Runden und Zonenfahrten („Sprint · Platz 1“) in der Rundenzeile; Marken folgen der Rangliste live; Simulator, Replay und Import ohne Marken. Vorläufig: neutrale Pille für alle Plätze (kein Ghost-Violett); Session ohne Vorlage ohne eigene Marke.
 - [x] Task 5.1 README-Abschnitt „Bestenlisten“ (Ebenen, Orte der Anzeige, Wanduhr inkl. Pausen, Simulator/Replay/Import zählen nicht).
-- [ ] Offen: Task 5.2 Test am Gerät (Nutzer), danach archivieren. Gefunden bei 5.1: Strecken-Detailansicht bleibt nach dem Löschen im Editor leer offen; Design D6 sagt bei offener Rundenzahl „nichts“, Code zeigt einen Hinweis; Rangliste der Vorlage trennt nicht nach Strecke (Frage an Nutzer).
+- [x] Nach 5.1 bereinigt: Strecken-Detailansicht schliesst sich, wenn die Strecke gelöscht wird (wie bei Zonen); Design D6 nennt den Hinweis bei offener Rundenzahl.
+- [x] Entschieden (Nutzer, 2026-10-16): Die Bestenliste gehört zur Vorlage und wird nicht nach Strecke getrennt; Sessions mit einer früheren Strecke gleicher Achse und Länge bleiben in derselben Liste.
+- [ ] Offen: Task 5.2 Test am Gerät (Nutzer), danach archivieren.
 
 ### 7. `ghost`: gegen die eigene Bestzeit rudern
 

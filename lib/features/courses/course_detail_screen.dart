@@ -16,7 +16,7 @@ Future<void> openCourseDetail(BuildContext context, Course course) {
 }
 
 /// A course with places 1–3 per length and the way to edit it (Change
-/// statistics, Design D6).
+/// statistics, Design D6). Deleting the course while it is open closes it too.
 class CourseDetailScreen extends ConsumerWidget {
   const CourseDetailScreen({super.key, required this.courseId});
 
@@ -25,6 +25,12 @@ class CourseDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    ref.listen(coursesProvider, (_, next) {
+      if (next case AsyncData(:final value) when !value.any((c) => c.id == courseId)) {
+        final route = ModalRoute.of(context);
+        if (route != null && route.isActive) Navigator.of(context).removeRoute(route);
+      }
+    });
     final course = ref.watch(coursesProvider).value?.where((c) => c.id == courseId).firstOrNull;
     final rankings = ref.watch(courseRankingsProvider(courseId));
     return Scaffold(

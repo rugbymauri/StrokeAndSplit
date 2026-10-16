@@ -78,7 +78,7 @@ Für Runden steht das direkt in `laps`. Für Abschnitte ergibt es sich aus dem R
 
 ### D6: Anzeige
 
-- **Vorlagenwahl**: Die aufgeklappte Vorlage zeigt Platz 1–3 mit Wert, Pace und Datum. Platz 1 trägt das Ghost-Symbol, sobald `ghost` umgesetzt ist. Bei offener Rundenzahl steht dort nichts.
+- **Vorlagenwahl**: Die aufgeklappte Vorlage zeigt Platz 1–3 mit Wert, Pace und Datum. Platz 1 trägt das Ghost-Symbol, sobald `ghost` umgesetzt ist. Bei offener Rundenzahl steht dort statt der Plätze ein Hinweis, dass es keine Bestzeit gibt.
 - **Detailansicht Strecke und Zone**: Sie ist neu und öffnet sich per Tipp aus der Strecken- bzw. Zonenliste. Dort stehen die Plätze 1–3 pro Länge, die aktuelle Länge zuerst. Bearbeiten erreicht man von dort aus.
 - **Zusammenfassung**: Jede Runde und jede Zonenfahrt dieser Session, die in ihrer Rangliste auf Platz 1–3 steht, bekommt ihren Platz als Marke. Ebenso die Session selbst, wenn sie in der Rangliste ihrer Vorlage auf Platz 1–3 steht. Gezeigt wird der aktuelle Platz. Öffnet man die Zusammenfassung später, kann die Marke weggefallen sein.
 
