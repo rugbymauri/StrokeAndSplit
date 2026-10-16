@@ -1,41 +1,53 @@
 # Tasks
 
-## 1. Spike und Fixture
+Voraussetzungen: `device-types`, `ui-design` und `statistics` (Schema 5) sind in `main`. `device-types` wird vor `heart-rate` archiviert, weil die MODIFIED-Anforderungen auf seinem Text aufbauen. Die Frage F17 (gemerkter Gurt in `settings` oder `shared_preferences`, Design D6) ist vor den Tasks 3.1 und 4.3 entschieden.
 
-- [ ] 1.1 Spike um Gurt erweitern (Design D9): zusätzlich nach Service `0x180D` suchen, optional einen Gurt verbinden, `0x2A37` abonnieren und die Pakete als `"c": "2a37"` in dieselbe `.jsonl` schreiben. Verifikation: auf Android oder Linux entsteht ein Mitschnitt mit PM5- und `2a37`-Zeilen
-- [ ] 1.2 Mitschnitt von ca. 2 min Rudern mit Gurt direkt und gleichzeitig am PM5 als `packages/pm5_protocol/test/fixtures/heart_rate.jsonl` ablegen und die Beobachtungen (Flags, RR vorhanden, Taktung) in `packages/pm5_protocol/README.md` festhalten. Verifikation: Fixture committed, README-Abschnitt „Heart Rate Measurement“ vorhanden
+Parallel arbeiten: Die Gruppen 1, 2 und 4 hängen an keinem anderen Task dieses Changes und können gleichzeitig starten. Innerhalb der Gruppen und für die übrigen Gruppen gilt:
+- Gruppe 2: 2.1 zuerst (Ereignis und `copyWith` als Vertrag für die Gruppen 3 und 5), danach 2.2 und 2.3 parallel, 2.4 nach 2.2 und 2.3, 2.5 nach 2.4, 2.6 nach 2.4 und 1.2.
+- Gruppe 3 startet nach 2.1. 3.1 zuerst, danach 3.2 und 3.3 parallel, 3.4 nach 2.4, 3.2 und 3.3.
+- Gruppe 4: 4.1 zuerst, danach 4.2, 4.3 und 4.4 parallel, 4.5 nach 4.3 und 4.4.
+- Gruppe 5: 5.1 und 5.2 nach 4.1 und 4.3, 5.3 nach 4.5, 5.4 nach 2.1, 5.5 nach 3.3. Jeder UI-Task ergänzt seine Texte selbst in `app_de.arb` und `app_en.arb` und führt `make l10n` aus; Konflikte in den ARB-Dateien beim Zusammenführen sind zu erwarten und einfach.
+- Gruppe 6 zum Schluss.
 
-## 2. Protokoll (Capability rowing-telemetry)
+## 1. Spike und Fixture (Hardware)
 
-- [ ] 2.1 Parser für Heart Rate Measurement (Design D3): uint8/uint16, Energy Expended überspringen, RR-Intervalle in ms, zu kurze Pakete ergeben `null` mit Warnung. Verifikation: Unit-Tests mit selbst gebauten Paketen für alle Flag-Kombinationen und abgeschnittene Pakete
-- [ ] 2.2 `Pm5Decoder` verarbeitet `2a37`: Vorrangregel Gurt (≤ 3 s Paketzeit) vor PM5 vor `null` beim Ausgeben von `StatusTick`. Verifikation: Unit-Tests für die drei Szenarien der Spec „Herzfrequenz nach Vorrang wählen“ sowie für die Grenze bei genau 3 s
-- [ ] 2.3 Neues `RowingEvent` `HeartBeatIntervals(time, intervalsMs)` pro Messung mit RR-Intervallen. Ohne RR entsteht kein Ereignis. Verifikation: Unit-Tests, dazu ein Test gegen `heart_rate.jsonl` mit konkreten Puls- und RR-Werten
-- [ ] 2.4 `Pm5Encoder` kann Gurt-Messungen erzeugen, damit Tests Gurt-Pakete bauen können. Der Simulator bleibt ohne Puls. Verifikation: Roundtrip-Test encode→decode für Puls und RR
+- [ ] 1.1 Spike um Gurt erweitern (Design D9): zusätzlich nach Service `0x180D` suchen, optional einen Gurt neben dem PM5 oder FTMS-Rudergerät verbinden, `0x2A37` abonnieren und die Pakete als `"c": "2a37"` in dieselbe `.jsonl` schreiben. Verifikation: auf Android oder Linux entsteht ein Mitschnitt mit Zeilen des Rudergeräts und `2a37`-Zeilen, `flutter analyze` sauber
+- [ ] 1.2 Mitschnitt von ca. 2 min Rudern am PM5 mit Gurt direkt und gleichzeitig am PM5 als `packages/erg_protocol/test/fixtures/heart_rate.jsonl` ablegen und die Beobachtungen (Flags, RR vorhanden, Taktung) in `packages/erg_protocol/README.md` im Abschnitt „Heart Rate Measurement“ festhalten. Verifikation: Fixture committed, README-Abschnitt vorhanden
+
+## 2. Protokoll in `packages/erg_protocol` (Capability rowing-telemetry)
+
+- [ ] 2.1 Neues `RowingEvent` `HeartBeatIntervals(time, intervalsMs)` und `StatusTick.copyWith(heartRate:)` (Design D3). Verifikation: Unit-Tests für `copyWith` (übrige Felder unverändert, `heartRate` auf Wert und auf `null`), `dart analyze --fatal-infos` sauber
+- [ ] 2.2 Parser `src/heart_rate/heart_rate_measurement.dart` (Design D3): uint8/uint16, Energy Expended überspringen, RR-Intervalle in ms (`raw * 1000 / 1024`, gerundet), zu kurze Pakete ergeben `null`. Verifikation: Unit-Tests mit selbst gebauten Paketen für alle Flag-Kombinationen und abgeschnittene Pakete
+- [ ] 2.3 `HeartRateEncoder` in `src/heart_rate/` erzeugt Gurt-Messungen mit Puls (uint8 und uint16) und RR-Intervallen, damit Tests Gurt-Pakete bauen können. Die Simulatoren bleiben ohne Puls. Verifikation: Roundtrip-Test encode→parse für Puls und RR
+- [ ] 2.4 `HeartRateDecoder` umhüllt den Decoder des Rudergeräts (Design D3): fängt `2a37` ab, Vorrangregel Gurt (≤ 3 s Paketzeit) vor Rudergerät vor `null` in jedem `StatusTick`, ein `HeartBeatIntervals` pro Messung mit RR-Intervallen (ohne RR kein Ereignis), abgeschnittene Messungen mit Warnung verwerfen. `ErgDecoder.forProtocol` liefert für PM5 und FTMS den umhüllten Decoder. Verifikation: Unit-Tests mit `Pm5Encoder` bzw. `FtmsEncoder` und `HeartRateEncoder` für die vier Szenarien der Spec „Herzfrequenz nach Vorrang wählen“, die Grenze bei genau 3 s und „Abgeschnittene Messung“; die bestehenden Decoder-Tests bleiben grün
+- [ ] 2.5 FTMS-Rückfall absichern (Design D3, F3): Test, dass ein FTMS-Puls ohne Gurt durchkommt, mit frischem Gurt überstimmt wird und nach 3 s ohne Gurt wieder gilt; ein FTMS-Puls 0 bleibt „nicht vorhanden“. `FtmsDecoder` selbst bleibt unverändert. Verifikation: die genannten Unit-Tests sind grün
+- [ ] 2.6 Test gegen `heart_rate.jsonl` mit konkreten Puls- und RR-Werten an festen Zeitpunkten. Verifikation: Test grün, Werte stimmen mit den Beobachtungen im README überein
 
 ## 3. Datenbank (Capability session-recording)
 
-- [ ] 3.1 Schema erweitern (Design D5/D6): Spalten `averageHeartRate`, `maxHeartRate`, `rmssdMs` in `sessions`, Tabellen `rr_intervals` und `settings`, `schemaVersion` erhöhen, Migration schreiben, `make codegen` und `make schema` ausführen. Verifikation: Migrationstest von der vorherigen Version ist grün, bestehende Sessions bleiben erhalten
-- [ ] 3.2 `SessionAccumulator` schreibt `HeartBeatIntervals` mit Endzeit nach Design D4 in `rr_intervals`. Verifikation: Unit-Test mit einer Messung aus zwei Intervallen prüft beide Zeilen und ihre Zeiten
-- [ ] 3.3 `SessionRepository.finish` berechnet Ø-Puls, Max-Puls und RMSSD. Ohne Puls bzw. mit weniger als zwei RR-Intervallen bleibt der jeweilige Wert `null`. Verifikation: Unit-Tests inklusive des Spec-Beispiels 800/810/790 ms ergibt 16 ms
-- [ ] 3.4 Export/Import: Die Zusammenfassung im Header enthält die neuen Werte, und ein Import baut `rr_intervals` aus den Rohpaketen neu auf. Verifikation: Test exportiert und importiert eine Session mit Gurt-Paketen und vergleicht Puls, RR und Zusammenfassung
+- [ ] 3.1 Schema auf `schemaVersion` 6 (Design D5, D6 nach F17): Spalten `averageHeartRate`, `maxHeartRate`, `rmssdMs` in `sessions`, Tabelle `rr_intervals` mit Index, Tabelle `settings` nur, wenn F17 bei D6 bleibt. Migrationsschritt `from5To6`, `make codegen` und `make schema` ausführen. Verifikation: Migrationstests 5→6 und 1→6 sind grün, bestehende Sessions bleiben erhalten und haben `null` in den neuen Spalten
+- [ ] 3.2 `SessionAccumulator` schreibt `HeartBeatIntervals` mit Endzeit nach Design D4 in `rr_intervals`, auf der Session-Zeitachse wie die übrigen Zeilen. Verifikation: Unit-Test mit einer Messung aus zwei Intervallen prüft beide Zeilen und ihre Zeiten
+- [ ] 3.3 `SessionRepository.finish` berechnet Ø-Puls, Max-Puls und RMSSD. Ohne Puls bzw. mit weniger als zwei RR-Intervallen bleibt der jeweilige Wert `null`. Verifikation: Unit-Tests inklusive des Spec-Beispiels 800/810/790 ms ergibt 16 ms und einer Session nur mit PM5-Puls
+- [ ] 3.4 Export/Import: Der `session`-Block im Header enthält die neuen Werte, und ein Import baut `rr_intervals` aus den Rohpaketen neu auf. Verifikation: Test exportiert und importiert je eine PM5- und eine FTMS-Session mit Gurt-Paketen und vergleicht Puls, RR und Zusammenfassung
 
 ## 4. Gurt-Verbindung (Capability heart-rate-monitor)
 
-- [ ] 4.1 `HeartRateTransport` mit `FoundHeartRateMonitor`, `HeartRateLink` und einem Fake für Tests definieren und in `FlutterBluePlusTransport` implementieren (Design D2): Suche nur mit Service `0x180D`, 15-s-Timeout, `connect` abonniert `0x2A37`. Verifikation: `flutter analyze` sauber, manuell erscheint ein Gurt in der Suche, ein PM5 nicht
-- [ ] 4.2 Gemerkten Gurt in `settings` speichern, lesen und löschen. Verifikation: Unit-Test mit In-Memory-Datenbank übersteht ein erneutes Öffnen
-- [ ] 4.3 `Pm5BleSource` kann einen Gurt-Strom anhängen und lösen und stempelt dessen Pakete mit der eigenen Uhr (Design D1). Verifikation: Unit-Test mit Fake-Transport zeigt `2a37`-Pakete in `source.packets` auf derselben Zeitachse
-- [ ] 4.4 `heartRateMonitorProvider` mit Zustandsautomat nach Design D7: Verbinden nur bei verbundener `Pm5BleSource`, Trennen bei bewusstem Stopp oder Quellenwechsel, 30-s-Wiederverbinden. Den Reconnect-Teil mit `Pm5BleSource` teilen, wenn das sauber geht. Verifikation: Unit-Tests mit Fake-Transports für alle Übergänge, inklusive „Simulator verbindet keinen Gurt“ und „Gurt-Ausfall lässt PM5 unberührt“
-- [ ] 4.5 Fehlermeldung bei gescheiterter Gurt-Verbindung mit Hinweis auf begrenzte Verbindungen. Verifikation: Widget-Test mit Fake-Transport, der beim Verbinden wirft, plus manueller Test mit einem an Uhr oder PM5 gebundenen Gurt
+- [ ] 4.1 `HeartRateTransport` mit `FoundHeartRateMonitor`, `HeartRateLink`, `HeartRateConnectException` und einem Fake für Tests in `lib/data/sources/ble/` definieren (Design D2), dazu `heartRateTransportProvider` in `platform_providers.dart`. Verifikation: `flutter analyze` sauber, der Fake wird von einem ersten Unit-Test genutzt
+- [ ] 4.2 Gurt-Einrichtung neben `setUpRower` auf `GattConnection` (ohne Heart Rate Service `HeartRateConnectException`, sonst `0x2A37` abonnieren) und Implementierung in `FlutterBluePlusTransport`: Suche nur mit Service `0x180D`, 15-s-Timeout, geteilte Readiness-Prüfung. Verifikation: Unit-Tests der Einrichtung mit Fake-`GattConnection`; manuell erscheint ein Gurt in der Suche, ein PM5 oder FTMS-Rudergerät nicht
+- [ ] 4.3 Gemerkten Gurt speichern, lesen und löschen nach D6 bzw. F17, mit `chosenHeartRateMonitorProvider` (koppeln, wechseln, vergessen) neben `chosenRowerProvider`. Verifikation: Unit-Test übersteht ein erneutes Öffnen des Speichers (In-Memory-Datenbank bei `settings`, Speicher-Store bei `shared_preferences`) und vergisst den Gurt
+- [ ] 4.4 `BleRowerSource.attachHeartRate` und `detachHeartRate` stempeln Gurt-Pakete mit der eigenen Uhr (Design D1); ein Wiederverbinden des Rudergeräts lässt das Gurt-Abonnement bestehen. Verifikation: Unit-Tests mit Fake-Transport zeigen `2a37`-Pakete in `source.packets` auf derselben Zeitachse, für PM5 und FTMS, und auch nach einem Wiederverbinden des Rudergeräts
+- [ ] 4.5 `heartRateMonitorProvider` mit Zustandsautomat nach Design D7: Verbinden nur bei verbundener `BleRowerSource` (PM5 oder FTMS), Trennen bei bewusstem Stopp, Quellenwechsel oder Vergessen, 30-s-Wiederverbinden, Grund des Fehlschlags im Zustand „getrennt“, erneuter Versuch auf Anfrage. Den Reconnect-Teil mit `BleRowerSource` teilen, wenn das sauber geht. Verifikation: Unit-Tests mit Fake-Transports für alle Übergänge, inklusive „FTMS verbindet den Gurt“, „Simulator und Replay verbinden keinen Gurt“ und „Gurt-Ausfall lässt das Rudergerät unberührt“
 
 ## 5. Oberfläche (Capabilities heart-rate-monitor, live-display, session-recording)
 
-- [ ] 5.1 „Geräte wählen“ (aus `ui-design` 5.1): Bereich „Pulsgurt“ mit gekoppeltem Gurt bzw. „Kein Gurt“, Gurt-Suche mit Liste und Hinweis nach 15 s, Aktionen Koppeln/Wechseln/Vergessen. Verifikation: Widget-Tests für Koppeln, Vergessen und „kein Gurt gefunden“
-- [ ] 5.2 Live-Display: Gurt-Indikator neben dem PM5-Indikator, nur bei gekoppeltem Gurt und PM5-Quelle. Verifikation: Widget-Tests für verbunden, wiederverbindend und Simulator ohne Indikator
-- [ ] 5.3 Live-Display: letztes RR-Intervall klein unter dem Puls, ausgeblendet ab 3 s Abstand zum jüngsten Tick. Verifikation: Widget-Tests für „812 ms“, Puls nur vom PM5 und veraltetes RR. Die bestehenden Layout-Tests für Hoch- und Querformat bleiben grün
-- [ ] 5.4 Zusammenfassung: Ø/Max-Puls, RR-Kurve per `CustomPainter` und „HRV (RMSSD) xx ms“, alles nur bei vorhandenen Daten. Verifikation: Widget-Tests für Session mit RR, nur PM5-Puls und ohne Puls
-- [ ] 5.5 README ergänzen: Gurt koppeln, Vorrangregel, RR/RMSSD, Fixture. Verifikation: README-Abschnitt vorhanden und mit dem Verhalten der App abgeglichen
+- [ ] 5.1 „Geräte wählen“: Bereich „Pulsgurt“ anstelle des Platzhalters in `choose_devices_screen.dart` mit gekoppeltem Gurt bzw. „Kein Gurt“, Gurt-Suche mit Liste und Tipps nach 15 s, Aktionen Koppeln/Wechseln/Vergessen; „Weiter“ hängt weiter nur vom Rudergerät ab (Design D8). Verifikation: Widget-Tests für Koppeln, Wechseln, Vergessen, „kein Gurt gefunden“ und „Weiter ohne Gurt“; die bestehenden Tests von „Geräte wählen“ bleiben grün
+- [ ] 5.2 Startbildschirm: `_DeviceRow` zeigt den gekoppelten Gurt neben dem Rudergerät (Design D8). Verifikation: Widget-Tests für Gerätezeile mit und ohne Gurt, Antippen führt weiter zu „Geräte wählen“
+- [ ] 5.3 Live-Display: Gurt-Indikator neben `ConnectionIndicator` in der Kopfzeile, nur bei gekoppeltem Gurt und `BleRowerSource`; bei gescheiterter Verbindung die Meldung mit Hinweis auf begrenzte Verbindungen und „Erneut versuchen“. Verifikation: Widget-Tests für verbunden, wiederverbindend, Fehlschlag mit Meldung (Fake-Transport, der beim Verbinden wirft) und Simulator ohne Indikator
+- [ ] 5.4 Live-Display: letztes RR-Intervall klein beim Puls in `live_free.dart` und `live_course.dart`, ausgeblendet ab 3 s Abstand zum jüngsten Tick, ohne Hinweis auf die Puls-Herkunft. Verifikation: Widget-Tests für „812 ms“, Puls nur vom Rudergerät und veraltetes RR; die bestehenden Layout-Tests für Hoch- und Querformat bleiben grün
+- [ ] 5.5 Zusammenfassung: Ø/Max-Puls, RR-Kurve per `CustomPainter` und „HRV (RMSSD) xx ms“, alles nur bei vorhandenen Daten. Verifikation: Widget-Tests für Session mit RR, nur mit Puls vom Rudergerät und ohne Puls
 
-## 6. Integration am echten Gerät
+## 6. Abschluss und Integration am echten Gerät
 
-- [ ] 6.1 `make check` grün. Verifikation: Analyse und alle Tests von App und `pm5_protocol` ohne Fehler
-- [ ] 6.2 Manuell auf Android und Linux mit PM5 und Gurt: Koppeln, automatisch verbinden, Gurt kurz ausser Reichweite (Wiederverbinden), Gurt ablegen (Rückfall auf PM5-Puls), Session aufzeichnen, Zusammenfassung prüfen, Replay und Export/Import. Verifikation: Ergebnis im Plattform-Status des README festgehalten
+- [ ] 6.1 README ergänzen: Gurt in „Geräte wählen“ koppeln, Vorrangregel für PM5 und FTMS, RR/RMSSD, Fixture. Verifikation: README-Abschnitt vorhanden und mit dem Verhalten der App abgeglichen
+- [ ] 6.2 `make check` grün. Verifikation: Analyse und alle Tests von App und `erg_protocol` ohne Fehler
+- [ ] 6.3 Manuell auf Android und Linux mit Gurt, je einmal mit PM5 und mit FTMS-Rudergerät (oder `make ftms-rower`): Koppeln, automatisch verbinden, Gurt kurz ausser Reichweite (Wiederverbinden), Gurt ablegen (Rückfall auf den Puls des Rudergeräts), Session aufzeichnen, Zusammenfassung prüfen, Replay und Export/Import. Verifikation: Ergebnis im Plattform-Status des README festgehalten
