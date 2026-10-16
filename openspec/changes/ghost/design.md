@@ -49,6 +49,13 @@ Würden sich eigenes Schiffchen und Ghost auf einer Spur überlappen, rückt der
 
 Verworfen: Überlappen mit dem Ghost oben, weil das eigene Schiffchen dann verdeckt wird.
 
+### D6: Weitere Entscheide (2026-10-16)
+
+- **Zeitstrecken:** Auf einer Zeitachse steht der Ghost an derselben Achsenposition wie das eigene Schiffchen, also nach D5 immer aussen daneben. Vorsprung oder Rückstand zeigt dort nur die Pace-Box in Metern (D4). So gewollt.
+- **Neue Bestleistung in derselben Session:** Wird eine Runde oder eine Zonenfahrt der laufenden Session neuer Platz 1, läuft der Ghost dieser Spur ab der nächsten Runde bzw. Fahrt gegen sie. Die Ghosts folgen also der Rangliste live und werden nicht beim Start festgelegt.
+- **Vorlagenwahl:** nur das Ghost-Symbol bei Platz 1, keine eigene Ghost-Zeit, weil Platz 1 die Zeit schon zeigt.
+- **Simulator:** Auch im Simulator läuft der Ghost mit. Simulierte Sessions werden selbst nie Ghost (`statistics` D3), also ändert der Simulator die Ghosts nicht.
+
 ## Open Questions
 
 Keine. Als Nächstes kommt `tasks.md` dazu. Die Auswahl des Ghosts steht seit D2 in den Specs.

@@ -185,7 +185,7 @@ Ziel: violettes Schiffchen auf den Spuren des Fortschrittsrahmens, Abstand in Me
 Entscheide F6–F8 getroffen (Design D4, D5).
 
 - [x] `tasks.md` erstellt (2026-10-16): 13 Tasks in 8 Gruppen. Gruppe 1 zuerst, dann 2–6 parallel, 7 verbindet, 8 schliesst ab. `AppColors.ghost` und das Ghost-Schiffchen im Painter gibt es schon; Task 4.1 baut es nach D5 um.
-- [ ] Offen (Nutzer): Ghost auf Zeitstrecken sitzt immer neben dem eigenen Schiffchen; Runden-Ghost bei neuer Bestleistung in derselben Session; eigene Ghost-Zeit in der Vorlagenwahl; Rudern gegen den Ghost im Simulator. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
+- [x] Entschieden (Nutzer, 2026-10-16, Design D6): auf Zeitstrecken sitzt der Ghost neben dem eigenen Schiffchen, so gewollt; eine neue Bestleistung in derselben Session wird ab der nächsten Runde bzw. Fahrt zum Ghost; in der Vorlagenwahl nur das Symbol; im Simulator läuft der Ghost mit. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
 
 ### 8. `rename-stroke-and-split`: App heisst „Stroke & Split“
 
