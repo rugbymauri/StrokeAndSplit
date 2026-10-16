@@ -21,7 +21,7 @@ Der Canvas ist privat. Wer ihn öffnen soll, braucht eine Freigabe über das Sha
 | Vorlagen-Editor | Vorlagen und Strecken | 390 × 844 | Vorlagen-Editor |
 | Streckenliste | Vorlagen und Strecken | 390 × 844 | Tab „Strecken“ |
 | Strecken-Editor | Vorlagen und Strecken | 390 × 844 | Strecken-Editor |
-| Segment bearbeiten | Vorlagen und Strecken | 390 × 844 | Segment-Editor |
+| Zone einbauen, Zonenliste, Zonen-Editor | Vorlagen, Strecken und Zonen | 390 × 844 | gehören zum Change `zones` |
 
 Die Kraftkurve, das Herz-Symbol beim Puls und die Ghost-Schiffchen sind in den Live-Screens schon eingezeichnet. Dieser Change baut die Flächen dafür, befüllt sie aber erst, wenn die jeweiligen Changes die Daten liefern. Ohne Daten bleiben sie ausgeblendet.
 
@@ -93,7 +93,7 @@ Der Rahmen der Pace-Box besteht aus drei ineinanderliegenden Spuren in der Form 
 - Bei offener Rundenzahl entfällt die Streckenspur, weil die Gesamtlänge unbekannt ist. Die Rundenspur rückt nach aussen.
 - Die Position wird als Bogenlänge auf dem Pfad berechnet (`PathMetrics`), damit gleiche Anteile überall gleich lang sind, auch in den Ecken.
 
-Inhalt der Box von oben nach unten: Beschriftung „Pace /500 m“, die Pace, Zonenstatus mit Band (z. B. „In der Zone · 2:05–2:10“), eine Trennlinie und die Legende. Die Legende hat eine Zeile pro Spur mit Farbpunkt, Bezeichnung und Restangabe, z. B. „Gesamt 1 460 / 3 000 m“, „Runde 2 / 3 noch 540 m“, „Segment 2 / 3 noch 206 m“. Bei Zeitstrecken stehen statt Metern Zeiten.
+Inhalt der Box von oben nach unten: Beschriftung „Pace /500 m“, die Pace, Zonenstatus mit Band (z. B. „In der Zone · 2:05–2:10“), eine Trennlinie und die Legende. Die Legende hat eine Zeile pro Spur mit Farbpunkt, Bezeichnung und Restangabe, z. B. „Gesamt 1 460 / 3 000 m“, „Runde 2 / 3 noch 540 m“, „Zone Tempo noch 206 m“ bzw. „frei noch 206 m“ (Zonenname aus `zones`). Bei Zeitstrecken stehen statt Metern Zeiten.
 
 Platz für den Ghost: Der Change `ghost` setzt auf jede Spur ein zweites, kleineres Schiffchen in `ghost` (etwa 18 × 7 px) und eine vierte Zeile in der Legende. Liegen beide Schiffchen übereinander, liegt das des Ghosts oben. Das Widget nimmt dafür optionale Ghost-Positionen pro Spur entgegen.
 
@@ -101,21 +101,17 @@ Platz für den Ghost: Der Change `ghost` setzt auf jede Spur ein zweites, kleine
 
 ### D4: Segmentbalken
 
-Ein wiederverwendbares Widget zeigt die Segmente einer Strecke als Balken. Breite heisst Länge, Grau heisst frei, Blau heisst mit Band. Haben mehrere Segmente ein Pace-Band, werden schnellere Bänder heller dargestellt. Die Abstufung reicht von `#2F5577` (langsamstes Band) bis `#A9D3FF` (schnellstes). Haben die Segmente nur ein Schlagzahl-Band, sind sie einheitlich `zoneIn`. Höhe: 8–10 px in Listen, 28 px mit Nummern im Strecken-Editor. Das gewählte Segment hat einen Umriss in `text`.
+Ein wiederverwendbares Widget zeigt die Segmente einer Strecke als Balken. Breite heisst Länge, Grau heisst frei, Blau heisst mit Band. Haben mehrere Segmente ein Pace-Band, werden schnellere Bänder heller dargestellt. Die Abstufung reicht von `#2F5577` (langsamstes Band) bis `#A9D3FF` (schnellstes). Haben die Segmente nur ein Schlagzahl-Band, sind sie einheitlich `zoneIn`. Höhe: 8–10 px in Listen, 28 px mit Zonennamen im Strecken-Editor. Die gewählte Zone hat einen Umriss in `text`. Mit `zones` sind die Abschnitte mit Band die eingebauten Zonen, die grauen die freien Lücken.
 
-### D5: Segmentlänge ändern
+### D5: Segmentlänge ändern (entfällt)
 
-Die Länge eines Segments ändert sich über einen Zähler in Schritten von 50 m bzw. 10 s oder über direkte Eingabe. Die Differenz trägt das folgende Segment, beim letzten Segment das vorherige. Ein Segment ist mindestens 50 m bzw. 10 s lang. Lässt das Nachbarsegment die Änderung nicht zu, wird der Wert begrenzt und der Editor zeigt, warum.
-
-Ändert der Nutzer die Streckenlänge, trägt das letzte Segment die Differenz. „Segment teilen“ halbiert das gewählte Segment. „Segment entfernen“ gibt die Länge an das vorherige Segment, beim ersten an das folgende. Die Regel „Summe = Streckenlänge“ aus `courses` bleibt damit immer erfüllt. Die bestehende Validierung bleibt als Sicherung im Repository.
-
-*Alternative*: Abweichung anzeigen und Speichern sperren, wie in `courses` umgesetzt. Verworfen, weil der Nutzer dann mehrere Felder abgleichen muss, um eine Länge zu ändern.
+Die manuelle Segmentlänge ersetzt der Change `zones`: Strecken bestehen dort aus eingebauten Zonen mit fester Länge und freien Lücken. Die Nummer D5 bleibt frei, damit Verweise stabil bleiben.
 
 ### D6: Navigation
 
 - Startbildschirm: „Rudern“ bzw. eine Vorlagenkachel öffnet „Vorlage wählen“ mit vorausgewählter Vorlage. „Frei rudern“ startet direkt.
 - „Vorlage wählen“ klappt die gewählte Vorlage auf, mit Bändern, Ghost-Bestzeit (sobald `ghost` da ist) und „Starten“. Der Stift öffnet den Vorlagen-Editor.
-- Der Tab „Strecken“ zeigt die Streckenliste. Eine Strecke öffnet den Strecken-Editor, ein Segment darin den Segment-Editor.
+- Der Tab „Strecken“ zeigt die Streckenliste. Eine Strecke öffnet den Strecken-Editor. Der dritte Tab „Zonen“ und „Zone einbauen“ kommen mit `zones`.
 
 ## Risks / Trade-offs
 

@@ -22,8 +22,7 @@
 
 - [ ] 4.1 Gemeinsamer Screen mit Tabs „Vorlagen“ und „Strecken“ nach „Vorlage wählen“ und „Streckenliste“, aufklappbare Vorlage mit „Starten“. Verifikation: Widget-Tests für Tabwechsel, Auswahl und Start mit dem Simulator
 - [ ] 4.2 Vorlagen-Editor nach „Vorlagen-Editor“ (Umschalter feste Anzahl/offen, Zähler, Ergebnis-Zeile). Verifikation: Widget-Tests für feste und offene Rundenzahl
-- [ ] 4.3 Längenregeln aus Design D5 als reine Funktionen (Segment ändern, Strecke ändern, teilen, entfernen, Mindestlänge). Verifikation: Unit-Tests für alle Szenarien der Delta-Spec `courses`
-- [ ] 4.4 Strecken-Editor und Segment-Editor nach „Strecken-Editor“ und „Segment bearbeiten“, mit Versionierungshinweis und Fehleranzeige vertauschter Bänder. Verifikation: Widget-Tests für Verlängern eines Segments, Begrenzung durch den Nachbarn und vertauschtes Schlagzahl-Band
+- [ ] 4.3 Gestaltung der Streckenliste und des Strecken-Kopfs (Name, Achse, Länge, Segmentbalken) nach „Streckenliste“ und „Strecken-Editor“. Einbauen von Zonen und Zonen-Editor setzt der Change `zones` um. Verifikation: Widget-Tests für Streckenliste und Versionierungshinweis
 
 ## 5. Start und Zusammenfassung
 
