@@ -19,7 +19,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
-| 5 | `heart-rate` | 0/22 | ja, 1 und 3 umgesetzt | Artefakte an FTMS und `ui-design` angleichen, dann umsetzen |
+| 5 | `heart-rate` | 0/25 | ja | Entscheid F17; Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 0/13 | ja | – |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
@@ -151,6 +151,9 @@ Vor dem Start anpassen:
 
 Entscheide F3 und F4 getroffen (Design D7, D8).
 
+- [x] Artefakte an `device-types`, `ui-design` und `statistics` angeglichen (2026-10-16): BLE-Rudergerät statt PM5 (`BleRowerSource`, `erg_protocol`), Vorrangregel in einem `HeartRateDecoder`, der den Decoder des Rudergeräts umhüllt; FTMS-Puls dekodiert schon und dient als Rückfall; Schema 6 mit `from5To6`. `tasks.md` neu: 25 Tasks in 6 Gruppen; 2, 4 und der Spike (1) parallel, 3 nach 2.1.
+- [ ] Archivieren: `device-types` vor `heart-rate`, weil dessen MODIFIED-Anforderungen auf `device-types` aufbauen.
+
 ### 6. `statistics`: Ranglisten pro Vorlage, Strecke und Zone
 
 Ziel: Plätze 1–3 jeder Vorlage, Strecke und Zone. Gewertet wird die Zeit (Distanzachse) bzw. die Meter (Zeitachse) nach Wanduhr inklusive Pausen, dazu Pace und Datum. Anzeige in der Vorlagenwahl, in einer neuen Detailansicht von Strecke und Zone und als Marke in der Zusammenfassung. Proposal, Design und Spec stehen (2026-10-16), Entscheide in Design D2–D6.
@@ -182,7 +185,7 @@ Ziel: violettes Schiffchen auf den Spuren des Fortschrittsrahmens, Abstand in Me
 Entscheide F6–F8 getroffen (Design D4, D5).
 
 - [x] `tasks.md` erstellt (2026-10-16): 13 Tasks in 8 Gruppen. Gruppe 1 zuerst, dann 2–6 parallel, 7 verbindet, 8 schliesst ab. `AppColors.ghost` und das Ghost-Schiffchen im Painter gibt es schon; Task 4.1 baut es nach D5 um.
-- [ ] Offen (Nutzer): Ghost auf Zeitstrecken sitzt immer neben dem eigenen Schiffchen; Runden-Ghost bei neuer Bestleistung in derselben Session; eigene Ghost-Zeit in der Vorlagenwahl; Rudern gegen den Ghost im Simulator. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
+- [x] Entschieden (Nutzer, 2026-10-16, Design D6): auf Zeitstrecken sitzt der Ghost neben dem eigenen Schiffchen, so gewollt; eine neue Bestleistung in derselben Session wird ab der nächsten Runde bzw. Fahrt zum Ghost; in der Vorlagenwahl nur das Symbol; im Simulator läuft der Ghost mit. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
 
 ### 8. `rename-stroke-and-split`: App heisst „Stroke & Split“
 
@@ -223,6 +226,7 @@ Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwech
 | ~~F13~~ | Rückfallsprache: **keine** (2026-10-16), die Sprache wird in der App gewählt (F14) | translations | entschieden |
 | ~~F14~~ | Sprachwahl: **in der App** (2026-10-16), Start auf Deutsch, Systemsprache wird nicht beachtet | translations | entschieden |
 | F15 | Schweizer Rechtschreibung (`ss` statt `ß`, wie heute im Code) als `de`? **Vorläufig ja** (2026-10-16, nach Vorschlag) | translations | vorläufig entschieden |
+| F17 | Gemerkter Gurt: Tabelle `settings` (Design D6) oder `shared_preferences` wie Rudergerät und Sprache? Empfehlung: `shared_preferences`, dann entfällt die Tabelle `settings` | heart-rate | heart-rate |
 | F16 | Wo wird die gewählte Sprache gespeichert? **Vorläufig `shared_preferences`** (2026-10-16, nach Vorschlag): keine Migration, `heart-rate` bekommt Schema 6, weil `statistics` 5 nimmt | translations, heart-rate | vorläufig entschieden |
 | F17 | Release nur für Tags auf `main`? **Vorläufig ja** (2026-10-16, nach Vorschlag): Tags ausserhalb von `main` lassen `verify-tag` fehlschlagen | gitlab-pipeline | gitlab-pipeline |
 
