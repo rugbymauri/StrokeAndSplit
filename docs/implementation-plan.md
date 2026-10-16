@@ -103,7 +103,7 @@ Vor dem Start angepasst (2026-10-16, in Proposal, Design, Specs und Tasks eingea
 Vorläufig, vom Nutzer zu bestätigen:
 - [ ] D6 Quelle: „Rudergerät“ (PM5 und FTMS), „Simulator“, „Simulator (FTMS)“ auf dem Startbildschirm gilt für „Rudern“, „Frei rudern“ und „Nochmal“; der Quellen-Dialog beim Start einer Vorlage fällt weg.
 - [ ] D8 Sprachwahl bleibt Symbol in der App-Leiste des Startbildschirms, zieht in Einstellungen um, sobald es weitere gibt.
-- [ ] Legende „Runde 2 von 3“ statt „Runde 2 / 3“ (passt zur Spec `course-rowing`); Bereich „200–800 m“ entfällt.
+- [x] Legende „Runde 2 / 3“ (Nutzer, 2026-10-16); dafür MODIFIED-Delta zu `course-rowing` nötig (mit 2.3). Vorläufig: Bereich „200–800 m“ entfällt.
 - [ ] OFL-Lizenzen der Schriften in der Lizenzseite der App (`LicenseRegistry`) zeigen? Keinem Task zugeordnet.
 
 Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeitachse, Design D7) sind entschieden.
@@ -117,7 +117,7 @@ Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeita
 - [x] Task 1.3 `CourseStrip` nach D4 (Höhe 8 px in Listen, 28 px mit Zonennamen im Strecken-Editor). Vorläufig: Helligkeit nach Rang der Pace-Bänder in gleichen Schritten, Zonen ohne Pace-Band in `zoneIn`, freie Lücken ohne Text; Auswahl (`selected`, `onSegmentTap`) nur vorbereitet, Anbindung mit 4.3.
 - [x] Task 2.2 `ProgressFrame` in `lib/features/live/progress_frame.dart` mit Goldens. Entschieden (2026-10-16): Startkerbe oben in der Mitte auf Strecken- und Rundenspur, leere innere Spur als Token `AppColors.trackInner`. Vorläufig: ohne Pace färbt die Abschnittsspur `zoneOut`; Masse feste Pixel aus dem Canvas.
 - [x] Task 3.1 `LiveLayout.of(Size)` in `lib/features/live/live_layout.dart`: Querformat nur, wenn breiter als hoch; gilt vorerst für die Fläche der Messwerte.
-- [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Vorläufig: Primärfarbe `text` statt Blau (Blau bleibt „in der Zone“, auch Fokus und Schalter sind weiss), Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`). Offen: Barlow Condensed 500 für Einheiten bündeln?
+- [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Primärfarbe Blau `zoneIn` (Nutzer, 2026-10-16), gefüllter Button bleibt `text` wie im Canvas. Vorläufig: Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`). Offen: Barlow Condensed 500 für Einheiten bündeln?
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 
