@@ -53,7 +53,7 @@ Farben:
 | `trackInner` | `#1B3550` | leere innere Spur (Abschnitt), leicht blau getönt |
 | `text` | `#E8ECEF` | Text, Zahlen, primärer Button |
 | `textMuted` | `#9AA4AD` | Beschriftungen |
-| `zoneIn` | `#5AB0FF` | in der Zone, Zone mit Band |
+| `zoneIn` | `#5AB0FF` | in der Zone, Zone mit Band, Primärfarbe (Fokus, Schalter, Auswahl) |
 | `zoneInSurface` / `zoneInText` | `#0F2438` / `#A9D3FF` | Karte bzw. Text in der Zone |
 | `zoneOut` | `#FF9A3D` | ausserhalb der Zone, Fehler, Löschen |
 | `zoneOutSurface` / `zoneOutText` | `#33200F` / `#FFC58F` | Karte bzw. Text ausserhalb |

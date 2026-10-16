@@ -4,15 +4,15 @@ import 'design_tokens.dart';
 
 /// The dark theme of the app, built from the tokens of design D1.
 ///
-/// The primary colour is [AppColors.text], not blue: blue stays reserved for
-/// "in the zone" (design D7).
+/// The primary colour is blue ([AppColors.zoneIn]); the filled button stays in
+/// [AppColors.text] as in the canvas (design D1).
 ThemeData appTheme() {
   const colors = ColorScheme(
     brightness: Brightness.dark,
-    primary: AppColors.text,
+    primary: AppColors.zoneIn,
     onPrimary: AppColors.bg,
-    primaryContainer: AppColors.line,
-    onPrimaryContainer: AppColors.text,
+    primaryContainer: AppColors.zoneInSurface,
+    onPrimaryContainer: AppColors.zoneInText,
     secondary: AppColors.textMuted,
     onSecondary: AppColors.bg,
     secondaryContainer: AppColors.line,
@@ -37,7 +37,7 @@ ThemeData appTheme() {
     outlineVariant: AppColors.line,
     inverseSurface: AppColors.text,
     onInverseSurface: AppColors.bg,
-    inversePrimary: AppColors.bg,
+    inversePrimary: AppColors.zoneInSurface,
     surfaceTint: Colors.transparent,
     shadow: Colors.black,
     scrim: Colors.black,

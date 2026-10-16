@@ -14,6 +14,7 @@ void main() {
     expect(theme.brightness, Brightness.dark);
     expect(theme.useMaterial3, isTrue);
     expect(theme.scaffoldBackgroundColor, AppColors.bg);
+    expect(theme.colorScheme.primary, AppColors.zoneIn);
     expect(theme.colorScheme.onSurface, AppColors.text);
     expect(theme.colorScheme.onSurfaceVariant, AppColors.textMuted);
     expect(theme.colorScheme.error, AppColors.zoneOut);
