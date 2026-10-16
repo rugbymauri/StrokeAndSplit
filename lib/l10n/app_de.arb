@@ -349,6 +349,22 @@
       }
     }
   },
+  "paceBoxTotal": "Gesamt",
+  "@paceBoxTotal": {
+    "description": "Pace box: legend line of the whole course over all laps, followed by e.g. '1 460 / 3 000 m'"
+  },
+  "paceBoxLapOf": "Runde {lap} / {laps}",
+  "@paceBoxLapOf": {
+    "description": "Pace box: legend line of the lap track with the current lap and the planned number of laps, e.g. 'Runde 2 / 3'",
+    "placeholders": {
+      "lap": {
+        "type": "int"
+      },
+      "laps": {
+        "type": "int"
+      }
+    }
+  },
   "hintInZone": "in der Zone",
   "@hintInZone": {
     "description": "Live display: the value is within the zone's band"

@@ -63,6 +63,8 @@
   "segmentZone": "Zone",
   "courseRest": "{rest} to go",
   "courseInZoneShare": "Zone {percent} %",
+  "paceBoxTotal": "Total",
+  "paceBoxLapOf": "Lap {lap} / {laps}",
   "hintInZone": "in the zone",
   "hintFaster": "faster",
   "hintSlower": "slower",

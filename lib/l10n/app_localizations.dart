@@ -481,6 +481,18 @@ abstract class AppLocalizations {
   /// **'Zone {percent} %'**
   String courseInZoneShare(int percent);
 
+  /// Pace box: legend line of the whole course over all laps, followed by e.g. '1 460 / 3 000 m'
+  ///
+  /// In de, this message translates to:
+  /// **'Gesamt'**
+  String get paceBoxTotal;
+
+  /// Pace box: legend line of the lap track with the current lap and the planned number of laps, e.g. 'Runde 2 / 3'
+  ///
+  /// In de, this message translates to:
+  /// **'Runde {lap} / {laps}'**
+  String paceBoxLapOf(int lap, int laps);
+
   /// Live display: the value is within the zone's band
   ///
   /// In de, this message translates to:
