@@ -77,7 +77,7 @@ Vor dem Start:
 Ziel: Gurt koppeln und merken, automatisch verbinden, Puls-Vorrang Gurt vor PM5, RR-Intervalle, Ø/max Puls und RMSSD in der Zusammenfassung.
 
 Vor dem Start anpassen:
-- [ ] Task 3.1 erhöht das Schema: nach `device-types` ist das **Schema 5**.
+- [x] Task 3.1 erhöht das Schema: nach `device-types` ist das **Schema 5**. In Proposal und Design vermerkt, `tasks.md` spricht ohnehin von „erhöhen“.
 - [ ] Design bindet den Gurt an `Pm5BleSource`; nach `device-types` gibt es auch FTMS-Quellen. Festlegen, ob der Gurt auch mit FTMS verbunden wird.
 - [ ] Gleiche MODIFIED-Anforderungen wie `device-types` (`rowing-telemetry` „Laufende Messwerte bereitstellen“, `session-recording` „Session vollständig speichern“, „Rohdaten für Replay speichern“): Deltas auf den Text nach dem Archivieren von `device-types` umschreiben, sonst überschreibt das Archiv dessen Änderungen.
 
