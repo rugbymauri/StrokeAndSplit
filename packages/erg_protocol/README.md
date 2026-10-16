@@ -8,7 +8,7 @@ dart test
 
 ## Byte-Layouts PM5
 
-Grundlage ist die *Concept2 PM5 Bluetooth Smart Interface Definition*, gegengeprüft mit den Aufnahmen in `test/fixtures/` (PM5 430000001, RowErg, Just Row, Sample Rate 250 ms). Alle Werte sind Little-Endian und vorzeichenlos. Die Paketlängen waren in allen Aufnahmen konstant.
+Grundlage ist die *Concept2 PM5 Bluetooth Smart Interface Definition*, gegengeprüft mit den Aufnahmen in `test/fixtures/` (PM5 430000001, RowErg, Just Row, Sample Rate 250 ms). Alle Werte sind Little-Endian und vorzeichenlos. Die Paketlängen waren in allen Aufnahmen konstant, ausser bei der Kraftkurve `0x003D`.
 
 UUID-Schema: `CE06xxxx-43E5-11E4-916C-0800200C9A66`, Rowing-Service `0x0030`.
 
@@ -83,6 +83,24 @@ Kräfte kommen in Pound-force, 1 lbf = 4.44822 N.
 | 7–8 | Schlagnummer | – |
 | 9–11 | Projected Work Time | 0.01 s |
 | 12–14 | Projected Work Distance | m |
+
+### `0x003D` Force Curve (4–20 Bytes)
+
+Gemessen am 2026-10-16 (Fixture `force_curve.jsonl`). Die Kurve eines Schlags kommt direkt nach dem Durchzug in mehreren Paketen, unmittelbar nach dem ersten `0x0035` und `0x0036` dieses Schlags; sie gehört zur Schlagnummer dieses `0x0035`.
+
+| Bytes | Feld | Einheit |
+|---|---|---|
+| 0, Bits 4–7 | Zahl der Pakete der Kurve | – |
+| 0, Bits 0–3 | Zahl der Kraftwerte in diesem Paket (1–9) | – |
+| 1 | Zähler, 0 bis Paketzahl − 1, pro Schlag neu ab 0 | – |
+| 2 … | Kraftwerte, je 2 Bytes | lbf (ganze) |
+
+- Alle Pakete ausser dem letzten tragen 9 Werte, die Länge ist 2 + 2 × Werteanzahl.
+- 4–8 Pakete, 34–68 Werte pro Schlag, etwa 62 Werte pro Sekunde Durchzug.
+- Das Maximum der Kurve ist die Spitzenkraft aus `0x0035` ganzzahlig abgeschnitten (`0x0035` liefert 0.1 lbf, die Kurve ganze lbf).
+- Die Schläge 0 und 1 nach dem Start liefern keine Kurve.
+
+Beispiel, erstes und letztes Paket eines Schlags mit 7 Paketen: `79 00 06 00 06 00 06 00 13 00 …` (7 Pakete, 9 Werte, Zähler 0, 6 lbf, 6 lbf, …) und `76 06 13 00 04 00 04 00 03 00 00 00 00 00` (6 Werte, Zähler 6).
 
 ## Erg-Typ des PM5
 
@@ -178,6 +196,7 @@ Nach dem Verbinden: Indicate aktivieren, `0x00` (Request Control) schreiben und 
 | `just_row.jsonl` | ca. 2 min Just Row, ca. 44 Schläge |
 | `pause.jsonl` | Rudern, ca. 80 s Pause, weiterrudern |
 | `reset.jsonl` | mehrere neue Workouts am PM5 während des Ruderns |
+| `force_curve.jsonl` | ca. 55 s Just Row mit Kraftkurve `003d`, Schläge 0–18, 17 Kurven mit Spitzenkräften von 34 bis 149 lbf, Ausschnitt aus dem Mitschnitt vom 2026-10-16 |
 | `ftms_just_row.jsonl` | `just_row.jsonl` als FTMS-Rower: ein Rower-Data-Datensatz pro Sekunde, erzeugt mit `dart run erg_protocol:pm5_to_ftms test/fixtures/just_row.jsonl test/fixtures/ftms_just_row.jsonl` |
 
 `pm5_to_ftms` liest `.jsonl` und `.aergrow` und übernimmt Schlagzähler, Distanz, Pace, Leistung, Energie und Zeit des PM5. Die Fixture ist keine Aufnahme eines echten FTMS-Geräts; die bleibt für den Spike offen.
