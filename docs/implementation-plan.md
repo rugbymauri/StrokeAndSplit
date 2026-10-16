@@ -229,6 +229,13 @@ Vor dem Start:
 
 Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwechsel am besten zusammen mit der neuen App-ID aus `rename-stroke-and-split`), eigenes Logo statt des Platzhalter-Icons.
 
+### 10. `start-on-first-stroke`: Vorlage startet mit dem ersten Ruderschlag
+
+Wunsch des Nutzers nach dem Gerätetest (2026-10-16). Stand 10/11.
+
+- [x] Umgesetzt: Nach der Vorlagenwahl ist die Session „bereit“ (Hinweis, keine Zeit, kein Datenbankeintrag), der erste Schlag (Schlagmeldung oder Distanzanstieg) startet sie; Nullpunkt ist der letzte Messwert davor. Freies Rudern unverändert. Simulator rudert ab Verbindung, Bereit-Zustand dort kaum sichtbar.
+- [ ] Task 4.2 (Nutzer): Gerätetest am PM5.
+
 ## Offene Entscheide
 
 | | Frage | Change | Entscheidet sich vor |
