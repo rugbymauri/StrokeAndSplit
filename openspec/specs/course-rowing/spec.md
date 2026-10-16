@@ -43,11 +43,15 @@ Beendet der Nutzer die Session mitten in einer Runde, SHALL die angefangene Rund
 - **THEN** zeigt die Zusammenfassung Runde 1 mit ihrer Zeit und Runde 2 als unvollständig mit 400 m
 
 ### Requirement: Runde und Segment live anzeigen
-Beim Rudern einer Vorlage SHALL das Live-Display die aktuelle Runde (bei fester Zahl als „Runde 2 von 3“), das aktuelle Segment, die Restdistanz bzw. Restzeit bis zum Segmentende und die Zielbänder des Segments anzeigen.
+Beim Rudern einer Vorlage SHALL das Live-Display die aktuelle Runde (bei fester Zahl als „Runde 2 von 3“), den aktuellen Abschnitt mit dem Namen seiner Zone bzw. „frei“, die Restdistanz bzw. Restzeit bis zum Abschnittsende und die Zielbänder der Zone anzeigen.
 
-#### Scenario: Mitten im Tempo-Segment
-- **WHEN** der Nutzer in Runde 2 von 3 bei 520 m im Segment 200–800 m mit Band 2:05–2:10 rudert
-- **THEN** zeigt das Display „Runde 2 von 3“, das Segment, „280 m“ bis zum Segmentende und „2:05–2:10“
+#### Scenario: Mitten in der Zone Tempo
+- **WHEN** der Nutzer in Runde 2 von 3 bei 520 m in der Zone „Tempo“ von 200 bis 800 m mit Band 2:05–2:10 rudert
+- **THEN** zeigt das Display „Runde 2 von 3“, „Tempo“, „280 m“ bis zum Abschnittsende und „2:05–2:10“
+
+#### Scenario: Freier Abschnitt
+- **WHEN** der Nutzer bei 300 m einer Strecke rudert, in der die erste Zone bei 500 m beginnt
+- **THEN** zeigt das Display „frei“ und „200 m“ bis zum Abschnittsende
 
 ### Requirement: Zonenstatus anzeigen
 Hat das aktuelle Segment ein Band, SHALL das Live-Display für Pace bzw. Schlagzahl sichtbar anzeigen, ob der aktuelle Wert im Band liegt. Liegt er ausserhalb, MUST die Anzeige die Richtung zeigen: schneller oder langsamer bzw. mehr oder weniger Schläge.
