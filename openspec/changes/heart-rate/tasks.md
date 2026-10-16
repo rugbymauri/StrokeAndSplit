@@ -26,7 +26,7 @@ Parallel arbeiten: Die Gruppen 1, 2 und 4 hängen an keinem anderen Task dieses 
 ## 3. Datenbank (Capability session-recording)
 
 - [x] 3.1 Schema auf `schemaVersion` 6 (Design D5): Spalten `averageHeartRate`, `maxHeartRate`, `rmssdMs` in `sessions`, Tabelle `rr_intervals` mit Index. Migrationsschritt `from5To6`, `make codegen` und `make schema` ausführen. Verifikation: Migrationstests 5→6 und 1→6 sind grün, bestehende Sessions bleiben erhalten und haben `null` in den neuen Spalten
-- [ ] 3.2 `SessionAccumulator` schreibt `HeartBeatIntervals` mit Endzeit nach Design D4 in `rr_intervals`, auf der Session-Zeitachse wie die übrigen Zeilen. Verifikation: Unit-Test mit einer Messung aus zwei Intervallen prüft beide Zeilen und ihre Zeiten
+- [x] 3.2 `SessionAccumulator` schreibt `HeartBeatIntervals` mit Endzeit nach Design D4 in `rr_intervals`, auf der Session-Zeitachse wie die übrigen Zeilen. Verifikation: Unit-Test mit einer Messung aus zwei Intervallen prüft beide Zeilen und ihre Zeiten
 - [ ] 3.3 `SessionRepository.finish` berechnet Ø-Puls, Max-Puls und RMSSD. Ohne Puls bzw. mit weniger als zwei RR-Intervallen bleibt der jeweilige Wert `null`. Verifikation: Unit-Tests inklusive des Spec-Beispiels 800/810/790 ms ergibt 16 ms und einer Session nur mit PM5-Puls
 - [ ] 3.4 Export/Import: Der `session`-Block im Header enthält die neuen Werte, und ein Import baut `rr_intervals` aus den Rohpaketen neu auf. Verifikation: Test exportiert und importiert je eine PM5- und eine FTMS-Session mit Gurt-Paketen und vergleicht Puls, RR und Zusammenfassung
 
