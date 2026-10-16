@@ -30,3 +30,11 @@ schema: spec-driven
 #     archive:
 #       guidance:
 #         - Summarize the archive outcome before finishing
+
+operations:
+  apply:
+    guidance:
+      - Keep docs/implementation-plan.md up to date in the same commit as the work - mark the change as started, record decided questions, add anything new that must not be forgotten
+  archive:
+    guidance:
+      - Move the archived change to "Erledigt" in docs/implementation-plan.md, carry over its open manual tests, and check the following changes for consequences (schema version, modified requirements)
