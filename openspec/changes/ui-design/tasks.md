@@ -26,7 +26,7 @@
 
 ## 5. Start und Zusammenfassung
 
-- [ ] 5.1 Startbildschirm nach „Start“ mit Navigation aus Design D6. Verifikation: Widget-Tests für Simulator wählen, Vorlagenkachel und „Frei rudern“
+- [ ] 5.1 Startbildschirm nach Design D6 (Quelle, „Rudern“, „Frei rudern“, Kachel „Nochmal“, Link „Sessions“), Gestaltung nach „Start“ im Canvas. Verifikation: Widget-Tests für Simulator wählen, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit vorausgewählter Vorlage, keine Kachel ohne Session und keine Kachel, wenn die Vorlage der jüngsten Session gelöscht ist
 - [ ] 5.2 Zusammenfassung nach „Zusammenfassung“ mit Rundenbalken für den Anteil in der Zone. Verifikation: Widget-Tests für Distanz- und Zeitstrecke sowie eine freie Session
 
 ## 6. Abschluss

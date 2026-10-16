@@ -7,7 +7,7 @@ Die Screens aus `foundation` und `courses` sind funktional, folgen aber keiner g
 ## What Changes
 
 - **Designsprache**: dunkles Thema, Barlow Condensed für Zahlen, IBM Plex Sans für Text, feste Farbbedeutungen (Blau: in der Zone, Orange: ausserhalb, Violett: Ghost), Touch-Ziele ab 44 px. Die Werte stehen als Tokens in `design.md`.
-- **Startbildschirm**: Quelle wählen (PM5 oder Simulator), Kurzwahl der Vorlagen, „Frei rudern“ und die letzten Sessions.
+- **Startbildschirm**: Quelle wählen (PM5 oder Simulator), „Rudern“, „Frei rudern“, eine Kachel „Nochmal“ mit der zuletzt geruderten Vorlage und ein Link zu den Sessions. Schlanker als im Canvas, der Kacheln aller Vorlagen und eine Liste der letzten Sessions zeigt.
 - **Live-Display frei**: grosse Pace, Kacheln für Schlagzahl, Watt, Zeit und Distanz, eine Zeile für Puls, Kalorien und Ø Pace. Eigene Layouts für Hoch- und Querformat.
 - **Live-Display mit Vorlage**: Die Pace steht in einer Box mit abgerundeten Ecken. Der Rahmen der Box zeigt den Fortschritt als drei Spuren wie bei einer Uhr: aussen die Gesamtstrecke, in der Mitte die Runde, innen der aktuelle Abschnitt (Zone oder frei). Die Spitze jeder Spur ist ein Schiffchen. In der Box stehen Pace, Zonenstatus mit Band und die Restangaben zu Strecke, Runde und Segment. Die Schlagzahl hat eine eigene, kleinere Karte mit Zonenstatus.
 - **Vorlagen und Strecken**: ein gemeinsamer Screen mit Tabs „Vorlagen“ und „Strecken“. Jede Vorlage und jede Strecke zeigt einen Segmentbalken (Breite: Länge, Blau: mit Band, Grau: frei, Helligkeit: Tempo). Neu gestaltete Editoren für Vorlage und Strecke. Zonen als wiederverwendbare Bausteine, ein dritter Tab „Zonen“ und das Einbauen in Strecken regelt der Change `zones`.

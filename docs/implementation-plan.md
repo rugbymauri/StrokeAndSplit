@@ -16,7 +16,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
 | 1 | `device-types` | 0/33 | ja, angepasst | – |
-| 2 | `ui-design` | 0/16 | ja, besser nach 1 | Entscheid Startbildschirm (F2) |
+| 2 | `ui-design` | 0/16 | nach 1 | Entscheid Puls-Herkunft (F1) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
 | 5 | `ghost` | – (keine Tasks) | nein | Entscheide F5–F8, dann Specs und Tasks; braucht 2 |
@@ -61,7 +61,9 @@ Vor dem Start anpassen:
 - [ ] Spec-Delta `live-display` spricht von „Segmenten“ und „Segmentspur“; Begriffe mit `zones` abgleichen (Abschnitt = Zone oder frei).
 - [ ] Startbildschirm: Quellenwahl muss FTMS-Rudergeräte aus `device-types` aufnehmen.
 
-Offene Entscheide: F1, F2.
+Offene Entscheide: F1. F2 ist entschieden (Mittelweg, Design D6).
+
+- [x] F2 in Proposal, Design D6 und Task 5.1 eingetragen.
 
 ### 3. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 
@@ -103,7 +105,7 @@ Vor dem Start:
 | | Frage | Change | Entscheidet sich vor |
 |---|---|---|---|
 | F1 | Puls-Herkunft „Über PM5“ im Live-Display zeigen? Canvas zeigt sie, `heart-rate` schliesst sie aus. | ui-design, heart-rate | ui-design |
-| F2 | Startbildschirm schlank (nur Quelle und „Rudern“) oder mit Vorlagenkacheln und letzten Sessions? | ui-design | ui-design |
+| ~~F2~~ | Startbildschirm: **Mittelweg** (2026-10-16): Quelle, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit der zuletzt geruderten Vorlage, Link „Sessions“ | ui-design | entschieden |
 | F3 | Welcher Puls gilt, wenn FTMS-Gerät und Gurt beide liefern? | heart-rate | heart-rate |
 | F4 | Gurt auch mit FTMS-Rudergeräten automatisch verbinden? | heart-rate | heart-rate |
 | F5 | Wer ist der Ghost: (a) beste Runde dieser Streckenversion, (b) letzte Session derselben Vorlage, (c) wählbar? | ghost | ghost |

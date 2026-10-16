@@ -109,7 +109,11 @@ Die manuelle Segmentlänge ersetzt der Change `zones`: Strecken bestehen dort au
 
 ### D6: Navigation
 
-- Startbildschirm: „Rudern“ bzw. eine Vorlagenkachel öffnet „Vorlage wählen“ mit vorausgewählter Vorlage. „Frei rudern“ startet direkt.
+- Startbildschirm (entschieden 2026-10-16, Mittelweg statt Canvas): oben die Quelle, darunter „Rudern“ und „Frei rudern“, dann die Kachel „Nochmal“ und der Link „Sessions“.
+  - „Rudern“ öffnet „Vorlage wählen“. „Frei rudern“ startet direkt.
+  - „Nochmal“ zeigt die Vorlage der jüngsten Session, deren Vorlage noch existiert, mit Name und Datum der Session („gestern“). Antippen öffnet „Vorlage wählen“ mit dieser Vorlage vorausgewählt. Gibt es keine solche Session, fehlt die Kachel.
+  - Keine Kacheln für alle Vorlagen und keine Liste der letzten Sessions: Der Bildschirm bleibt ruhig, und der häufigste Fall, dieselbe Vorlage noch einmal zu rudern, braucht trotzdem nur zwei Tipps.
+  - *Alternativen:* wie im Canvas (alle Vorlagen als Kacheln, letzte Sessions) oder ganz schlank (nur Quelle, „Rudern“, „Frei rudern“). Verworfen, weil der Canvas am Erg zu voll ist und die schlanke Variante für die Lieblingsvorlage einen Schritt mehr braucht.
 - „Vorlage wählen“ klappt die gewählte Vorlage auf, mit Bändern, Ghost-Bestzeit (sobald `ghost` da ist) und „Starten“. Der Stift öffnet den Vorlagen-Editor.
 - Der Tab „Strecken“ zeigt die Streckenliste. Eine Strecke öffnet den Strecken-Editor. Der dritte Tab „Zonen“ und „Zone einbauen“ kommen mit `zones`.
 
@@ -122,4 +126,3 @@ Die manuelle Segmentlänge ersetzt der Change `zones`: Strecken bestehen dort au
 ## Open Questions
 
 - Puls-Herkunft: Der Canvas zeigt im Screen „Zustände“ einen Zustand „Über PM5“. Der Change `heart-rate` schliesst die Anzeige der Puls-Herkunft im Live-Display aber ausdrücklich aus. Das ist vor der Umsetzung von `heart-rate` zu klären.
-- Soll der Startbildschirm schlanker werden und nur noch Quelle und „Rudern“ zeigen, statt Vorlagenkacheln und letzte Sessions?
