@@ -619,6 +619,30 @@ abstract class AppLocalizations {
   /// **'Kraftkurve'**
   String get liveForceCurve;
 
+  /// Live display on a template: short label of the narrow strip with the force curve
+  ///
+  /// In de, this message translates to:
+  /// **'Kraft'**
+  String get liveForceCurveShort;
+
+  /// Live display: legend of the force curve of the last stroke
+  ///
+  /// In de, this message translates to:
+  /// **'Letzter'**
+  String get liveForceCurveLast;
+
+  /// Live display: legend of the force curve of the stroke before the last one, drawn in grey
+  ///
+  /// In de, this message translates to:
+  /// **'Vorheriger'**
+  String get liveForceCurvePrevious;
+
+  /// Live display: force curve card before the first curve of the session has arrived
+  ///
+  /// In de, this message translates to:
+  /// **'Warte auf ersten Schlag'**
+  String get liveForceCurveWaiting;
+
   /// Course bar: the current lap of an open number of laps
   ///
   /// In de, this message translates to:
