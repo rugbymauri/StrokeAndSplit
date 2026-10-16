@@ -8,7 +8,8 @@ import 'erg_source.dart';
 
 /// A simulated rower that produces notifications like a real erg in Just
 /// Row: the pace moves towards [targetPace] over a few strokes with a slight
-/// variation per stroke, and the clock stops while paused.
+/// variation per stroke, and the clock stops while paused. As a PM5 it sends
+/// a force curve after every drive, as high as the power asks for (Design D4).
 ///
 /// With [protocol] FTMS it sends one Rower Data record per second like a
 /// typical FTMS rower instead of the PM5 notifications (Design D10).
@@ -34,7 +35,13 @@ class SimulatedSource implements ErgSource {
   static const _encoder = Pm5Encoder();
   static const _ftmsEncoder = FtmsEncoder();
   static const _driveShare = 0.35;
-  static const _driveLengthMeters = 1.4;
+
+  /// Typical drive length and its variation from stroke to stroke.
+  static const _driveLengthMeters = 1.05;
+  static const _driveLengthSpread = 0.1;
+
+  /// Force values per second of drive, as the PM5 sends them.
+  static const _curvePointsPerSecond = 62;
 
   final math.Random _random;
   final _packets = StreamController<RawPacket>.broadcast();
@@ -162,7 +169,10 @@ class SimulatedSource implements ErgSource {
     final stroke = _stroke ??= _nextStroke();
     if (!stroke.driveEndSent && _elapsed >= stroke.start + stroke.drive) {
       stroke.driveEndSent = true;
-      if (protocol == ErgProtocol.pm5) _encoder.encodeDriveEnd(stroke.data, at: at).forEach(_packets.add);
+      if (protocol == ErgProtocol.pm5) {
+        _encoder.encodeDriveEnd(stroke.data, at: at).forEach(_packets.add);
+        _encoder.encodeForceCurve(stroke.forceCurve, at: at).forEach(_packets.add);
+      }
     }
     if (_elapsed >= stroke.start + stroke.drive + stroke.recovery) {
       if (protocol == ErgProtocol.pm5) _packets.add(_encoder.encodeRecoveryEnd(stroke.data, at: at));
@@ -180,7 +190,10 @@ class SimulatedSource implements ErgSource {
     final interval = 60 / targetStrokeRate;
     final watts = wattsForPace(_currentPace);
     final driveSeconds = interval * _driveShare;
-    final averageForce = watts * interval / _driveLengthMeters;
+    final driveLength = _driveLengthMeters + (_random.nextDouble() * 2 - 1) * _driveLengthSpread;
+    // The work of one stroke is the average force over the drive length.
+    final averageForce = watts * interval / driveLength;
+    final peakForce = averageForce * 1.6;
     final drive = _duration(driveSeconds);
     final recovery = _duration(interval - driveSeconds);
     _strokeNumber++;
@@ -192,14 +205,25 @@ class SimulatedSource implements ErgSource {
         elapsed: _elapsed + drive,
         strokeNumber: _strokeNumber,
         distanceMeters: _distanceMeters,
-        driveLengthMeters: _driveLengthMeters,
+        driveLengthMeters: driveLength,
         driveTime: drive,
         recoveryTime: recovery,
-        peakForceNewtons: averageForce * 1.6,
+        peakForceNewtons: peakForce,
         averageForceNewtons: averageForce,
         watts: watts,
       ),
+      _forceCurve(peakForce, driveSeconds),
     );
+  }
+
+  /// A hump that rises quickly, peaks before the middle of the drive and
+  /// falls to 0, with the peak a little earlier or later from stroke to stroke.
+  List<double> _forceCurve(double peakForce, double driveSeconds) {
+    final points = (driveSeconds * _curvePointsPerSecond).round().clamp(10, 135);
+    final skew = 0.75 + _random.nextDouble() * 0.2;
+    final shape = [for (var i = 1; i <= points; i++) math.pow(math.sin(math.pi * math.pow(i / points, skew)), 1.5)];
+    final highest = shape.reduce(math.max);
+    return [for (final s in shape) peakForce * s / highest];
   }
 
   void _setState(ErgConnectionState state) {
@@ -214,11 +238,12 @@ class SimulatedSource implements ErgSource {
 }
 
 class _SimulatedStroke {
-  _SimulatedStroke(this.start, this.drive, this.recovery, this.data);
+  _SimulatedStroke(this.start, this.drive, this.recovery, this.data, this.forceCurve);
 
   final Duration start;
   final Duration drive;
   final Duration recovery;
   final Stroke data;
+  final List<double> forceCurve;
   var driveEndSent = false;
 }

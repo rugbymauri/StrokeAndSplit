@@ -91,6 +91,59 @@ void main() {
     expect(run(), orderedEquals(run()));
   });
 
+  group('force curve', () {
+    /// The force curves of 30 s of rowing at [pace].
+    List<StrokeForceCurve> curvesAt(Duration pace) {
+      late List<StrokeForceCurve> curves;
+      fakeAsync((async) {
+        final source = SimulatedSource(targetPace: pace, seed: 5);
+        final events = _listen(source);
+        source.start();
+        async.elapse(const Duration(seconds: 30));
+        curves = events.whereType<StrokeForceCurve>().toList();
+      });
+      return curves;
+    }
+
+    double meanPeak(List<StrokeForceCurve> curves) =>
+        curves.map((c) => c.peakNewtons).reduce((a, b) => a + b) / curves.length;
+
+    test('comes once per stroke with the peak force and drive length of the stroke', () {
+      fakeAsync((async) {
+        final source = SimulatedSource(seed: 2);
+        final events = _listen(source);
+        source.start();
+        async.elapse(const Duration(seconds: 20));
+
+        final curves = {for (final c in events.whereType<StrokeForceCurve>()) c.strokeNumber: c};
+        final strokes = events.whereType<Stroke>().toList();
+        expect(strokes, isNotEmpty);
+        for (final stroke in strokes) {
+          final curve = curves[stroke.strokeNumber]!;
+          // Curve values travel in whole pound-force, the peak force in tenths.
+          expect(curve.peakNewtons, closeTo(stroke.peakForceNewtons!, newtonsPerPoundForce));
+          expect(curve.driveLengthMeters, stroke.driveLengthMeters);
+          expect(curve.forcesNewtons.length, inInclusiveRange(30, 70));
+        }
+      });
+    });
+
+    test('carries a drive length between 0.8 and 1.3 m that varies from stroke to stroke', () {
+      final lengths = curvesAt(const Duration(minutes: 2, seconds: 10)).map((c) => c.driveLengthMeters).toList();
+
+      expect(lengths, hasLength(greaterThan(5)));
+      expect(lengths, everyElement(allOf(isNotNull, inInclusiveRange(0.8, 1.3))));
+      expect(lengths.toSet().length, greaterThan(1));
+    });
+
+    test('is higher at a higher power', () {
+      final easy = curvesAt(const Duration(minutes: 2, seconds: 20));
+      final hard = curvesAt(const Duration(minutes: 1, seconds: 45));
+
+      expect(meanPeak(hard), greaterThan(meanPeak(easy) * 1.5));
+    });
+  });
+
   test('stops producing data when stopped', () {
     fakeAsync((async) {
       final source = SimulatedSource(seed: 1);
