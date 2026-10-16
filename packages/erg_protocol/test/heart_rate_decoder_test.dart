@@ -170,6 +170,29 @@ void main() {
     });
   }
 
+  group('FTMS heart rate as fallback', () {
+    test('comes through without a strap', () {
+      final session = _Session(ErgProtocol.ftms);
+      expect(session.rower(_s(1), heartRate: 138).heartRate, 138);
+    });
+
+    test('is overridden by a fresh strap and applies again 3 s after its last value', () {
+      final session = _Session(ErgProtocol.ftms)..rower(_s(1), heartRate: 138);
+      session.strap(_s(2), 142);
+      expect(session.rower(_s(2), heartRate: 138).heartRate, 142);
+      expect(session.rower(_s(5), heartRate: 139).heartRate, 142);
+      expect(session.rower(_s(6), heartRate: 139).heartRate, 139);
+    });
+
+    test('stays missing when the rower reports 0', () {
+      final session = _Session(ErgProtocol.ftms)
+        ..strap(_s(1), 142)
+        ..rower(_s(1), heartRate: 0);
+      expect(session.rower(_s(5), heartRate: 0).heartRate, isNull);
+      expect(_Session(ErgProtocol.ftms).rower(_s(1), heartRate: 0).heartRate, isNull);
+    });
+  });
+
   test('a strap packet never reaches the rower decoder', () {
     final session = _Session(ErgProtocol.pm5)..strap(_s(1), 142, intervalsMs: [800]);
     expect(_Session.warnings, isEmpty);
