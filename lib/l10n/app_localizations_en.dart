@@ -257,6 +257,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get paceBoxTotal => 'Total';
+
+  @override
+  String paceBoxLapOf(int lap, int laps) {
+    return 'Lap $lap / $laps';
+  }
+
+  @override
   String get hintInZone => 'in the zone';
 
   @override
