@@ -36,8 +36,8 @@
 
 - [x] 5.1 `FoundPm5`/`Pm5Link`/`Pm5ConnectException` in `FoundRower` (mit `protocol`)/`RowerLink`/`RowerConnectException` umbenennen, `Pm5BleSource` in `BleRowerSource` (D5); bestehende Tests in `pm5_ble_source_test.dart` und `fake_ble_transport.dart` laufen angepasst
 - [x] 5.2 Scan nach PM5 und FTMS: Keyword `PM5` und Service `0x1826`, eigene Filterung inklusive Ski-/Bike-Suffix und Rower-Bit in der Service Data, ein PM5 mit FTMS erscheint nur als PM5, Linux-`systemDevices` für beide Services (D5); Unit-Tests der Filterfunktion für alle Fälle
-- [ ] 5.3 PM5-Connect prüft den Erg-Typ aus dem ersten `0x0032` innerhalb von 3 s und trennt bei SkiErg/BikeErg mit Hinweis (D6); Test mit Fake-Transport für SkiErg, BikeErg, RowErg und ausbleibendes Paket
-- [ ] 5.4 FTMS-Connect: `0x2AD1` abonnieren, ohne `0x2AD1` trennen mit Hinweis „kein Rudergerät“, Control Point mit Request Control und Start/Resume, 2 s Timeout, Fehler ignorieren, nie Reset/Stop (D5, D7); Tests mit Fake-Transport für Gerät mit, ohne und mit ablehnendem Control Point und für bewusstes Trennen ohne Stop-Befehl
+- [x] 5.3 PM5-Connect prüft den Erg-Typ aus dem ersten `0x0032` innerhalb von 3 s und trennt bei SkiErg/BikeErg mit Hinweis (D6); Test mit Fake-Transport für SkiErg, BikeErg, RowErg und ausbleibendes Paket
+- [x] 5.4 FTMS-Connect: `0x2AD1` abonnieren, ohne `0x2AD1` trennen mit Hinweis „kein Rudergerät“, Control Point mit Request Control und Start/Resume, 2 s Timeout, Fehler ignorieren, nie Reset/Stop (D5, D7); Tests mit Fake-Transport für Gerät mit, ohne und mit ablehnendem Control Point und für bewusstes Trennen ohne Stop-Befehl
 - [ ] 5.5 Geräteliste und Texte: Geräteart je Eintrag, Hinweise und Fehlermeldungen sprechen von Rudergeräten statt nur vom PM5, Hinweis „nur Rudergeräte“ beim Abweisen (Spec `erg-connection`); Tests in `device_list_screen_test.dart`
 - [ ] 5.6 Reconnect und bewusstes Trennen für FTMS-Quellen (Spec `erg-connection`); Tests in `pm5_ble_source_test.dart` bzw. dessen Nachfolger mit Protokoll `ftms`
 

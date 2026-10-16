@@ -35,9 +35,12 @@ class BluetoothNotReadyException implements Exception {
 
 /// The connection could not be established.
 class RowerConnectException implements Exception {
-  const RowerConnectException(this.message);
+  const RowerConnectException(this.message, {this.notARower = false});
 
   final String message;
+
+  /// The device was reached but is no rower, e.g. a PM5 on a SkiErg.
+  final bool notARower;
 
   @override
   String toString() => 'RowerConnectException: $message';
