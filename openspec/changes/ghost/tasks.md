@@ -27,7 +27,7 @@ Hängt nur an Gruppe 1.
 
 Hängt nur an Gruppe 1.
 
-- [ ] 3.1 `LapProgress` um die Wanduhr seit Beginn der ersten Runde und seit Beginn des aktuellen Abschnitts ergänzen (seit Rundenbeginn gibt es schon `lapTime`), damit Runden- und Zonen-Ghost mit jeder Runde bzw. Fahrt neu starten (D2). Verifikation: Unit-Tests im Lap-Tracker für Rundenwechsel, Abschnittswechsel und eine Pause
+- [x] 3.1 `LapProgress` um die Wanduhr seit Beginn der ersten Runde und seit Beginn des aktuellen Abschnitts ergänzen (seit Rundenbeginn gibt es schon `lapTime`), damit Runden- und Zonen-Ghost mit jeder Runde bzw. Fahrt neu starten (D2). Verifikation: Unit-Tests im Lap-Tracker für Rundenwechsel, Abschnittswechsel und eine Pause
 - [ ] 3.2 Reine Funktion, die aus `LapProgress`, Vorlage und den drei `GhostTrack` die Anteile für `FrameGhost` (Strecke, Runde, Abschnitt) berechnet, wie `ProgressFrameModel` den eigenen Fortschritt (D3). Eine Spur ohne Ghost bleibt null. Verifikation: Unit-Tests für die Spec-Szenarien „Ghost liegt vorne“ (460 m in Runde 2, Ghost bei 490 m), „Nur Rundendaten“, „Runde 2“ (Ghost erreicht das Rundenende nach 4:08) und eine Zeitstrecke
 - [ ] 3.3 Reine Funktion für den `GhostGap` zum Ghost der Vorlage (D4): auf einer Distanzachse die Differenz der Wanduhren bei der aktuellen Distanz in Sekunden, auf einer Zeitachse die Differenz der Distanzen bei der aktuellen Wanduhr in Metern; null ohne Ghost aussen. Verifikation: Unit-Tests für „Rückstand auf einer Distanzachse“ (7.6 s, Ghost vorne), „Vorsprung auf einer Zeitachse“ (12 m, Ghost hinten), Gleichstand und „Kein Ghost der Vorlage“
 

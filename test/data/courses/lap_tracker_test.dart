@@ -230,6 +230,63 @@ void main() {
     });
   });
 
+  group('wall-clock times for the ghost', () {
+    test('the course time runs on over a lap change, the lap time starts anew', () {
+      final tracker = LapTracker(_thousand, plannedLaps: 3)
+        ..add(_at(0, 0))
+        ..add(_at(239, 998))
+        ..add(_at(240, 1003));
+
+      final progress = tracker.progress;
+      expect(progress.courseTime, const Duration(seconds: 240));
+      expect(progress.lapTime, const Duration(milliseconds: 600));
+      expect(progress.courseDistanceDm, 10030);
+    });
+
+    test('the segment time starts anew at a segment boundary', () {
+      // The band of the Seerunde starts at 200 m, reached after 50 s.
+      final tracker = LapTracker(_seerunde, plannedLaps: 3);
+      _row(0, 60).forEach(tracker.add);
+
+      final progress = tracker.progress;
+      expect(progress.segmentIndex, 1);
+      expect(progress.segmentTime, const Duration(seconds: 10));
+      expect(progress.lapTime, const Duration(seconds: 60));
+      expect(progress.courseTime, const Duration(seconds: 60));
+    });
+
+    test('the segment time starts anew with the first segment of the next lap', () {
+      final tracker = LapTracker(_seerunde, plannedLaps: 3);
+      _row(0, 260).forEach(tracker.add);
+
+      final progress = tracker.progress;
+      expect((progress.lap, progress.segmentIndex), (2, 0));
+      expect(progress.segmentTime, const Duration(seconds: 10));
+      expect(progress.courseTime, const Duration(seconds: 260));
+    });
+
+    test('all times run on during a pause while the distance stands', () {
+      final tracker = LapTracker(_seerunde, plannedLaps: 3)
+        ..add(_at(0, 0))
+        ..add(_at(100, 400))
+        ..add(_at(130, 400, pace: null, spm: 0));
+
+      final progress = tracker.progress;
+      expect(progress.courseTime, const Duration(seconds: 130));
+      expect(progress.lapTime, const Duration(seconds: 130));
+      expect(progress.segmentTime, const Duration(seconds: 80));
+      expect(progress.courseDistanceDm, 4000);
+    });
+
+    test('count from where a tracker for a later lap starts', () {
+      final tracker = LapTracker(_thousand, plannedLaps: 3, startLap: 3, startWallMs: 500000, startDistanceDm: 20000)
+        ..add(_at(560, 2240));
+
+      expect(tracker.progress.courseTime, const Duration(seconds: 60));
+      expect(tracker.progress.courseDistanceDm, 2400);
+    });
+  });
+
   group('an unfinished lap', () {
     test('is stored as incomplete with what was rowed', () {
       final tracker = LapTracker(_thousand, plannedLaps: 3);
