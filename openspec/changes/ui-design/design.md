@@ -172,4 +172,4 @@ Neue und geänderte Texte stehen nur in `lib/l10n/app_de.arb` und `lib/l10n/app_
 ## Open Questions
 
 
-- Puls-Herkunft: Der Canvas zeigt im Screen „Zustände“ einen Zustand „Über PM5“. Der Change `heart-rate` schliesst die Anzeige der Puls-Herkunft im Live-Display aber ausdrücklich aus. Das ist vor der Umsetzung von `heart-rate` zu klären.
+- ~~Puls-Herkunft~~ (F1, entschieden 2026-10-16 vom Nutzer): Der Pulsgurt wird in „Geräte wählen“ gewählt (D6). Der Puls kommt vom gewählten BLE-Gurt, wenn er gefunden ist und Werte liefert, sonst vom Rudergerät (PM5), wenn es Puls liefert, sonst wird kein Puls angezeigt (Vorrangregel aus `heart-rate`). Das Live-Display zeigt die Herkunft nicht an; der Zustand „Über PM5“ aus dem Canvas entfällt.
