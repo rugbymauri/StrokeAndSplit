@@ -8,7 +8,7 @@
 
 ## 2. Quellen und Aufzeichnung
 
-- [ ] 2.1 PM5-Quelle abonniert die Characteristic, die Pakete laufen in `raw_packets`. Verifikation: Unit-Test, dass der Accumulator die Pakete speichert und der Import dieselben Kurven ergibt
+- [x] 2.1 PM5-Quelle abonniert die Characteristic, die Pakete laufen in `raw_packets`. Verifikation: Unit-Test, dass der Accumulator die Pakete speichert und der Import dieselben Kurven ergibt
 - [ ] 2.2 Simulator liefert eine Kurve pro Schlag, skaliert nach Leistung, mit Durchzugslänge (Design D4). Verifikation: Unit-Test für höhere Leistung ergibt höhere Kurve; jede simulierte Kurve trägt eine Länge zwischen 0.8 und 1.3 m
 - [ ] 2.3 Replay liefert die Kurvenereignisse. Verifikation: Unit-Test mit der Fixture
 
