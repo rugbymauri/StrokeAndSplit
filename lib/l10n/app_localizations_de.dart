@@ -308,6 +308,22 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get paceBoxGhost => 'Ghost';
+
+  @override
+  String paceBoxGhostAhead(String amount) {
+    return '$amount vor dir';
+  }
+
+  @override
+  String paceBoxGhostBehind(String amount) {
+    return '$amount hinter dir';
+  }
+
+  @override
+  String get paceBoxGhostLevel => 'gleichauf';
+
+  @override
   String get hintInZone => 'In der Zone';
 
   @override

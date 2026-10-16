@@ -1,5 +1,8 @@
 import 'package:aergrow/data/courses/course.dart';
+import 'package:aergrow/app/design_tokens.dart';
+import 'package:aergrow/app/widgets/ghost_symbol.dart';
 import 'package:aergrow/data/courses/lap_tracker.dart';
+import 'package:aergrow/data/ghost/ghost.dart';
 import 'package:aergrow/features/live/pace_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,12 +47,16 @@ Future<void> _pump(
   Locale locale = const Locale('de'),
   Size size = const Size(350, 380),
   CourseDefinition course = _seerunde,
+  GhostGap? ghostGap,
 }) async {
   await tester.pumpWidget(LocalizedApp(
     locale: locale,
     home: Scaffold(
       body: Center(
-        child: SizedBox.fromSize(size: size, child: PaceBox(progress: progress, course: course, pace: pace)),
+        child: SizedBox.fromSize(
+          size: size,
+          child: PaceBox(progress: progress, course: course, pace: pace, ghostGap: ghostGap),
+        ),
       ),
     ),
   ));
@@ -63,6 +70,14 @@ void _expectLine(Key key, String label, String value) {
   expect(find.descendant(of: line, matching: find.text(label)), findsOneWidget);
   expect(find.descendant(of: line, matching: find.text(value)), findsOneWidget);
 }
+
+/// The colour of the value in the legend line with [key].
+Color? _valueColor(WidgetTester tester, Key key, String value) => tester
+    .widget<Text>(find.descendant(of: find.byKey(key), matching: find.text(value)))
+    .style
+    ?.color;
+
+const _course = CourseDefinition(axis: CourseAxis.time, length: 1000, segments: [_free, _tempo, _free]);
 
 void main() {
   testWidgets('shows the pace in the zone with its band, the lap and the zone', (tester) async {
@@ -137,11 +152,71 @@ void main() {
     expect(_text(tester, const Key('pace-box-status')), 'Keine Pace · 2:05–2:10');
   });
 
-  // Portrait box, landscape box on a phone on its side and a small phone.
-  for (final size in const [Size(350, 380), Size(330, 320), Size(300, 280)]) {
-    testWidgets('fits ${size.width.toInt()} × ${size.height.toInt()} with the pace as the largest text',
-        (tester) async {
-      await _pump(tester, _at(460, pace: BandStatus.above), size: size);
+  testWidgets('shows a gap behind the ghost on a distance course in seconds, in orange', (tester) async {
+    await _pump(tester, _at(460),
+        ghostGap: const GhostGap(axis: CourseAxis.distance, amount: 7.62, ghostAhead: true));
+
+    const key = Key('pace-box-ghost-behind');
+    _expectLine(key, 'Ghost', '7.6 s vor dir');
+    expect(_valueColor(tester, key, '7.6 s vor dir'), AppColors.zoneOut);
+    expect(find.descendant(of: find.byKey(key), matching: find.byType(GhostSymbol)), findsOneWidget);
+  });
+
+  testWidgets('shows a lead over the ghost on a time course in metres, in blue', (tester) async {
+    await _pump(tester, _at(460),
+        course: _course, ghostGap: const GhostGap(axis: CourseAxis.time, amount: 12.3, ghostAhead: false));
+
+    const key = Key('pace-box-ghost-ahead');
+    _expectLine(key, 'Ghost', '12 m hinter dir');
+    expect(_valueColor(tester, key, '12 m hinter dir'), AppColors.zoneIn);
+  });
+
+  testWidgets('shows a gap of a minute and more like a lap time', (tester) async {
+    await _pump(tester, _at(460),
+        ghostGap: const GhostGap(axis: CourseAxis.distance, amount: 72.34, ghostAhead: true));
+
+    _expectLine(const Key('pace-box-ghost-behind'), 'Ghost', '1:12.3 vor dir');
+  });
+
+  testWidgets('says level instead of a gap that rounds to nothing', (tester) async {
+    await _pump(tester, _at(460),
+        ghostGap: const GhostGap(axis: CourseAxis.distance, amount: 0.04, ghostAhead: true));
+
+    const key = Key('pace-box-ghost-level');
+    _expectLine(key, 'Ghost', 'gleichauf');
+    expect(_valueColor(tester, key, 'gleichauf'), AppColors.textMuted);
+  });
+
+  testWidgets('speaks English about the ghost', (tester) async {
+    await _pump(tester, _at(460),
+        locale: const Locale('en'),
+        ghostGap: const GhostGap(axis: CourseAxis.distance, amount: 2.9, ghostAhead: false));
+
+    _expectLine(const Key('pace-box-ghost-ahead'), 'Ghost', '2.9 s behind you');
+  });
+
+  testWidgets('has no ghost line without a ghost of the template', (tester) async {
+    await _pump(tester, _at(460, laps: null));
+
+    expect(find.text('Ghost'), findsNothing);
+    expect(find.byType(GhostSymbol), findsNothing);
+    _expectLine(const Key('pace-box-lap'), 'Runde 2', 'noch 540 m');
+  });
+
+  // Portrait box, landscape box on a phone on its side and a small phone, with and without a ghost.
+  for (final (size, gap) in const [
+    (Size(350, 380), null),
+    (Size(330, 320), null),
+    (Size(300, 280), null),
+    (Size(350, 380), GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true)),
+    (Size(330, 320), GhostGap(axis: CourseAxis.distance, amount: 72.3, ghostAhead: true)),
+    (Size(300, 280), GhostGap(axis: CourseAxis.time, amount: 1234, ghostAhead: false)),
+    (Size(240, 220), GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true)),
+  ]) {
+    testWidgets(
+        'fits ${size.width.toInt()} × ${size.height.toInt()} ${gap == null ? 'without' : 'with'} a ghost '
+        'with the pace as the largest text', (tester) async {
+      await _pump(tester, _at(460, pace: BandStatus.above), size: size, ghostGap: gap);
 
       expect(tester.takeException(), isNull);
       final pace = tester.getRect(find.byKey(const Key('pace-box-pace'))).height;

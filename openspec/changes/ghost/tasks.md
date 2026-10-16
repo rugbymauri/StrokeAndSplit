@@ -41,7 +41,7 @@ Hängt nur an Gruppe 1 (oder an nichts, `FrameGhost` gibt es schon).
 
 Hängt nur an Gruppe 1.
 
-- [ ] 5.1 `PaceBox` nimmt einen optionalen `GhostGap` und zeigt ihn als vierte Legendenzeile (D1, D4): `GhostSymbol` statt Punkt, „Ghost“ links, rechts z. B. „7.6 s vor dir“ bzw. „12 m hinter dir“, orange (`zoneOut`) bei Rückstand, blau (`zoneIn`) bei Vorsprung. Vorne oder hinten steht im Text, nicht nur in der Farbe. Ohne `GhostGap` entfällt die Zeile. Prüfen, ob `_aroundPace` und `minContentHeight` die zusätzliche Zeile tragen. Verifikation: Widget-Tests für Rückstand auf einer Distanzachse, Vorsprung auf einer Zeitachse, keine Zeile ohne Ghost und eine schmale Box, in der die Pace weiterhin der grösste Text bleibt
+- [x] 5.1 `PaceBox` nimmt einen optionalen `GhostGap` und zeigt ihn als vierte Legendenzeile (D1, D4): `GhostSymbol` statt Punkt, „Ghost“ links, rechts z. B. „7.6 s vor dir“ bzw. „12 m hinter dir“, orange (`zoneOut`) bei Rückstand, blau (`zoneIn`) bei Vorsprung. Vorne oder hinten steht im Text, nicht nur in der Farbe. Ohne `GhostGap` entfällt die Zeile. Prüfen, ob `_aroundPace` und `minContentHeight` die zusätzliche Zeile tragen. Verifikation: Widget-Tests für Rückstand auf einer Distanzachse, Vorsprung auf einer Zeitachse, keine Zeile ohne Ghost und eine schmale Box, in der die Pace weiterhin der grösste Text bleibt
 
 ## 6. Ghost-Symbol in der Vorlagenwahl
 

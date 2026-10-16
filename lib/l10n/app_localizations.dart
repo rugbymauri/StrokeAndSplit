@@ -559,6 +559,30 @@ abstract class AppLocalizations {
   /// **'Runde {lap} / {laps}'**
   String paceBoxLapOf(int lap, int laps);
 
+  /// Pace box: legend line with the gap to the ghost of the template, i.e. its best session rowed again for comparison; followed by e.g. '7.6 s vor dir'
+  ///
+  /// In de, this message translates to:
+  /// **'Ghost'**
+  String get paceBoxGhost;
+
+  /// Pace box: the ghost is ahead of the rower, who is behind, by a time or a distance
+  ///
+  /// In de, this message translates to:
+  /// **'{amount} vor dir'**
+  String paceBoxGhostAhead(String amount);
+
+  /// Pace box: the ghost is behind the rower, who is ahead, by a time or a distance
+  ///
+  /// In de, this message translates to:
+  /// **'{amount} hinter dir'**
+  String paceBoxGhostBehind(String amount);
+
+  /// Pace box: the rower and the ghost are level
+  ///
+  /// In de, this message translates to:
+  /// **'gleichauf'**
+  String get paceBoxGhostLevel;
+
   /// Live display: the value is within the zone's band
   ///
   /// In de, this message translates to:
