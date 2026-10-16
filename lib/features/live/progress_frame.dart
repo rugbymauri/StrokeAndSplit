@@ -1,4 +1,5 @@
-import 'dart:ui' show PathMetric;
+import 'dart:math' as math;
+import 'dart:ui' show PathMetric, Tangent;
 
 import 'package:flutter/material.dart';
 
@@ -44,6 +45,8 @@ class ProgressFrame extends StatelessWidget {
 
 /// Paints the box and its tracks. Each track starts at the top centre and
 /// runs clockwise; positions are arc lengths, so equal shares are equally long.
+/// A ghost moved out of the outer track sticks out of the box by up to [overhang];
+/// the layout around the box keeps that free.
 class ProgressFramePainter extends CustomPainter {
   ProgressFramePainter({required this.model, this.pace, this.ghost});
 
@@ -54,6 +57,20 @@ class ProgressFramePainter extends CustomPainter {
   static const radius = 28.0;
   static const trackWidth = 10.0;
   static const trackGap = 4.0;
+
+  static const _boatLength = 22.0;
+  static const _boatWidth = 14.0;
+  static const _boatRim = 2.0;
+  static const _ghostLength = 18.0;
+  static const _ghostWidth = 7.0;
+  static const _ghostRim = 1.5;
+
+  /// How far the ghost moves out across its track to clear a boat beside it:
+  /// its rim lies on the boat's rim, so both stay whole (ghost, Design D5).
+  static const ghostShift = _boatWidth / 2 - _boatRim / 2 + _ghostWidth / 2 + _ghostRim / 2;
+
+  /// How far a ghost moved out of the outer track sticks out of the box, rim included.
+  static const overhang = ghostShift + (_ghostWidth + _ghostRim) / 2 - trackWidth / 2;
 
   /// From the outer edge to the inner edge of the innermost track.
   static double frameWidth(int tracks) => tracks * trackWidth + (tracks - 1) * trackGap;
@@ -96,16 +113,80 @@ class ProgressFramePainter extends CustomPainter {
         _notch(canvas, metrics[i], boundary);
       }
     }
+    final boats = <List<Offset>>[];
     for (var i = 0; i < tracks.length; i++) {
       final (track, _, filled, _) = tracks[i];
-      _boat(canvas, metrics[i], track.share, filled, length: 22, width: 14, rim: 2);
-    }
-    // The ghost lies above the rower's own boat.
-    for (var i = 0; i < tracks.length; i++) {
-      if (tracks[i].$4 case final share?) {
-        _boat(canvas, metrics[i], share, AppColors.ghost, length: 18, width: 7, rim: 1.5);
+      if (_tangent(metrics[i], track.share) case final tangent?) {
+        _boat(canvas, tangent.position, tangent, filled, length: _boatLength, width: _boatWidth, rim: _boatRim);
+        // What shows of the boat; the rim of a ghost may lie on its rim.
+        boats.add(_rhombus(tangent.position, tangent, _boatLength - _boatRim, _boatWidth - _boatRim));
       }
     }
+    // A ghost moves out of the way instead of covering a boat (ghost, Design D5).
+    for (var i = 0; i < tracks.length; i++) {
+      if (tracks[i].$4 case final share?) {
+        if (_tangent(metrics[i], share) case final tangent?) {
+          // Out to [overhang] beyond the box at most.
+          final inset = trackWidth / 2 + i * (trackWidth + trackGap);
+          final position = _ghostPosition(tangent, boats, maxShift: inset + overhang - (_ghostWidth + _ghostRim) / 2);
+          // Ghosts further in keep clear of this one as well.
+          boats.add(_rhombus(position, tangent, _ghostLength - _ghostRim, _ghostWidth - _ghostRim));
+          _boat(canvas, position, tangent, AppColors.ghost, length: _ghostLength, width: _ghostWidth, rim: _ghostRim);
+        }
+      }
+    }
+  }
+
+  /// Where the ghost at [tangent] clears all [boats], including ghosts already placed:
+  /// on the centre line of its track, or moved out across it by at least [ghostShift],
+  /// but at most [maxShift].
+  static Offset _ghostPosition(Tangent tangent, List<List<Offset>> boats, {required double maxShift}) {
+    final out = Offset(tangent.vector.dy, -tangent.vector.dx);
+    bool clear(double shift) {
+      final ghost = _rhombus(
+        tangent.position + out * shift,
+        tangent,
+        _ghostLength + _ghostRim,
+        _ghostWidth + _ghostRim,
+      );
+      return boats.every((boat) => !_overlap(ghost, boat));
+    }
+
+    if (clear(0)) return tangent.position;
+    var shift = math.min(ghostShift, maxShift);
+    while (shift < maxShift && !clear(shift)) {
+      shift = math.min(shift + 1, maxShift);
+    }
+    return tangent.position + out * shift;
+  }
+
+  static Tangent? _tangent(PathMetric metric, double share) =>
+      metric.getTangentForOffset(share.clamp(0, 1) * metric.length);
+
+  /// The corners of a rhombus around [centre], pointing along [tangent].
+  static List<Offset> _rhombus(Offset centre, Tangent tangent, double length, double width) {
+    final along = tangent.vector * (length / 2);
+    final across = Offset(-tangent.vector.dy, tangent.vector.dx) * (width / 2);
+    return [centre - along, centre - across, centre + along, centre + across];
+  }
+
+  /// Whether two convex polygons overlap by more than touching (separating axis test).
+  static bool _overlap(List<Offset> a, List<Offset> b) {
+    for (final polygon in [a, b]) {
+      for (var i = 0; i < polygon.length; i++) {
+        final edge = polygon[(i + 1) % polygon.length] - polygon[i];
+        final axis = Offset(-edge.dy, edge.dx);
+        double project(Offset p) => p.dx * axis.dx + p.dy * axis.dy;
+        final pa = a.map(project);
+        final pb = b.map(project);
+        const touching = 1e-6;
+        if (pa.reduce(math.max) <= pb.reduce(math.min) + touching ||
+            pb.reduce(math.max) <= pa.reduce(math.min) + touching) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   /// The centre line of a track [inset] from the edge of [box], from the top centre clockwise.
@@ -141,18 +222,16 @@ class ProgressFramePainter extends CustomPainter {
     );
   }
 
-  /// A rhombus at [share] of the track, pointing along it, with a dark rim.
+  /// A rhombus at [position], pointing along [tangent], with a rim in the colour of the box.
   static void _boat(
     Canvas canvas,
-    PathMetric metric,
-    double share,
+    Offset position,
+    Tangent tangent,
     Color color, {
     required double length,
     required double width,
     required double rim,
   }) {
-    final tangent = metric.getTangentForOffset(share.clamp(0, 1) * metric.length);
-    if (tangent == null) return;
     final boat = Path()
       ..moveTo(-length / 2, 0)
       ..lineTo(0, -width / 2)
@@ -161,7 +240,7 @@ class ProgressFramePainter extends CustomPainter {
       ..close();
     canvas
       ..save()
-      ..translate(tangent.position.dx, tangent.position.dy)
+      ..translate(position.dx, position.dy)
       ..rotate(-tangent.angle)
       ..drawPath(boat, Paint()..color = color)
       ..drawPath(
