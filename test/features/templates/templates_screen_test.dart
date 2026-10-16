@@ -6,6 +6,7 @@ import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/features/connection/start_screen.dart';
+import 'package:aergrow/features/sessions/session_summary_screen.dart';
 import 'package:aergrow/features/templates/templates_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +24,8 @@ class _Setup {
     wakelockProvider.overrideWithValue(FakeWakelock()),
   ]);
 
-  Future<int> addCourse(WidgetTester tester, String name) async => (await tester.runAsync(
-        () => courses.create(name, CourseDefinition.single(axis: CourseAxis.distance, length: 1000)),
+  Future<int> addCourse(WidgetTester tester, String name, {int length = 1000}) async => (await tester.runAsync(
+        () => courses.create(name, CourseDefinition.single(axis: CourseAxis.distance, length: length)),
       ))!;
 
   Future<void> pump(WidgetTester tester, {Widget home = const TemplatesScreen()}) async {
@@ -169,6 +170,30 @@ void main() {
     expect(setup.container.read(sessionRecorderProvider)?.template?.name, 'Seerunde x3');
 
     await setup.container.read(sessionRecorderProvider.notifier).stop();
+    await setup.container.read(activeErgSourceProvider.notifier).clear();
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('shows the summary when the last lap is done', (tester) async {
+    final setup = _Setup();
+    final id = await setup.addCourse(tester, 'Sprint', length: 100);
+    await tester.runAsync(() => setup.templates.create('Sprint x3', courseId: id, laps: 3));
+    await setup.pump(tester);
+
+    await tester.tap(find.text('Sprint x3'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Simulator'));
+    // 3 × 100 m at 2:10 /500 m take 78 s.
+    for (var i = 0; i < 90 * 4; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    expect(setup.container.read(sessionRecorderProvider), isNull);
+    expect(find.byType(SessionSummaryScreen), findsOneWidget);
+    expect(find.text('Sprint · 100 m'), findsOneWidget);
+    expect(find.byKey(const Key('lap-best')), findsOneWidget);
+    expect(find.text('Runde 3'), findsOneWidget);
+
     await setup.container.read(activeErgSourceProvider.notifier).clear();
     await disposeWidgetsWithDatabase(tester);
   });

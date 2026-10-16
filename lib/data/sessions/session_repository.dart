@@ -169,11 +169,14 @@ class SessionRepository {
   }
 
   /// The laps of a session on a course, in order.
-  Future<List<LapRow>> laps(int id) {
-    return (_db.select(_db.laps)
-          ..where((l) => l.sessionId.equals(id))
-          ..orderBy([(l) => OrderingTerm.asc(l.lapNo)]))
-        .get();
+  Future<List<LapRow>> laps(int id) => _laps(id).get();
+
+  Stream<List<LapRow>> watchLaps(int id) => _laps(id).watch();
+
+  SimpleSelectStatement<$LapsTable, LapRow> _laps(int id) {
+    return _db.select(_db.laps)
+      ..where((l) => l.sessionId.equals(id))
+      ..orderBy([(l) => OrderingTerm.asc(l.lapNo)]);
   }
 
   Future<bool> hasRawPackets(int id) async {

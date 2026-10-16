@@ -34,7 +34,7 @@
 
 - [x] 6.1 Vorlage starten: Quelle wählen (PM5 suchen oder Simulator), nach dem Verbinden startet die Session mit der Vorlage. Verifikation: Widget-Test startet eine Vorlage mit dem Simulator und das Live-Display zeigt „Runde 1 von 3“
 - [x] 6.2 Streckenleiste im Live-Display (Runde, Segment, Rest, Zielbänder, Zonenanteil) und Zonenstatus an Pace- und Schlagzahl-Kachel mit Farbe und Pfeil bzw. Text. Verifikation: Widget-Tests für in der Zone, zu langsam und freies Segment sowie die bestehenden Layout-Tests in allen vier Grössen mit Vorlage ohne Überlauf
-- [ ] 6.3 Nach automatischem Ende die Zusammenfassung öffnen. Die Zusammenfassung zeigt Vorlage, Strecke, Runden mit Zeit bzw. Distanz, Anteil in der Zone, die hervorgehobene beste Runde und unvollständige Runden. Verifikation: Widget-Test für Distanz- und Zeitstrecke
+- [x] 6.3 Nach automatischem Ende die Zusammenfassung öffnen. Die Zusammenfassung zeigt Vorlage, Strecke, Runden mit Zeit bzw. Distanz, Anteil in der Zone, die hervorgehobene beste Runde und unvollständige Runden. Verifikation: Widget-Test für Distanz- und Zeitstrecke
 - [ ] 6.4 Session-Liste zeigt den Vorlagennamen. Verifikation: Widget-Test mit einer Vorlagen-Session und einer gelöschten Vorlage
 
 ## 7. Integration

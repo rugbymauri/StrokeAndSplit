@@ -24,6 +24,11 @@ final sessionProvider = StreamProvider.family<SessionRow?, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).watch(id),
 );
 
+/// The laps of a session on a course, in order.
+final sessionLapsProvider = StreamProvider.family<List<LapRow>, int>(
+  (ref, id) => ref.watch(sessionRepositoryProvider).watchLaps(id),
+);
+
 /// A session being recorded right now.
 class ActiveRecording {
   const ActiveRecording({required this.sessionId, required this.progress, this.template, this.lap});

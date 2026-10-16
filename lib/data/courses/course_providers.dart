@@ -8,3 +8,8 @@ final courseRepositoryProvider = Provider<CourseRepository>((ref) => CourseRepos
 
 /// All courses that are not deleted, by name.
 final coursesProvider = StreamProvider<List<Course>>((ref) => ref.watch(courseRepositoryProvider).watchAll());
+
+/// A course in the version a session rowed.
+final courseVersionProvider = FutureProvider.family<Course, int>(
+  (ref, versionId) => ref.watch(courseRepositoryProvider).atVersion(versionId),
+);

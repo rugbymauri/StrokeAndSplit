@@ -21,6 +21,12 @@ String formatElapsed(Duration elapsed) {
   return hours > 0 ? '$hours:${_two(minutes)}:${_two(seconds)}' : '$minutes:${_two(seconds)}';
 }
 
+/// A lap time with tenths, e.g. `3:59.4` or `1:02:03.4`.
+String formatLapTime(Duration time) {
+  final tenths = (time.inMilliseconds / 100).round();
+  return '${formatElapsed(Duration(seconds: tenths ~/ 10))}.${tenths % 10}';
+}
+
 /// Distance in whole meters, e.g. `1234`.
 String formatDistance(double meters) => meters.floor().toString();
 
