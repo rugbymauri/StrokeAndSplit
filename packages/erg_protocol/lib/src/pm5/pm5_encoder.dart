@@ -64,11 +64,11 @@ class Pm5Encoder {
   Uint8List _strokeData(Stroke stroke) => (_Bytes(20)
         ..u24(0, _centi(stroke.elapsed))
         ..u24(3, (stroke.distanceMeters * 10).round())
-        ..u8(6, (stroke.driveLengthMeters * 100).round())
-        ..u8(7, _centi(stroke.driveTime))
-        ..u16(8, _centi(stroke.recoveryTime))
-        ..u16(12, (stroke.peakForceNewtons / newtonsPerPoundForce * 10).round())
-        ..u16(14, (stroke.averageForceNewtons / newtonsPerPoundForce * 10).round())
+        ..u8(6, ((stroke.driveLengthMeters ?? 0) * 100).round())
+        ..u8(7, _centi(stroke.driveTime ?? Duration.zero))
+        ..u16(8, _centi(stroke.recoveryTime ?? Duration.zero))
+        ..u16(12, ((stroke.peakForceNewtons ?? 0) / newtonsPerPoundForce * 10).round())
+        ..u16(14, ((stroke.averageForceNewtons ?? 0) / newtonsPerPoundForce * 10).round())
         ..u16(18, stroke.strokeNumber))
       .bytes;
 

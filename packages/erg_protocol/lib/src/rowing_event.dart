@@ -51,32 +51,36 @@ final class StatusTick extends RowingEvent {
 }
 
 /// Data of one completed stroke.
+///
+/// The details are null when the device does not report them, as FTMS
+/// rowers only count strokes; they are never estimated.
 final class Stroke extends RowingEvent {
   const Stroke({
     required super.elapsed,
     required this.strokeNumber,
     required this.distanceMeters,
-    required this.driveLengthMeters,
-    required this.driveTime,
-    required this.recoveryTime,
-    required this.peakForceNewtons,
-    required this.averageForceNewtons,
+    this.driveLengthMeters,
+    this.driveTime,
+    this.recoveryTime,
+    this.peakForceNewtons,
+    this.averageForceNewtons,
     this.watts,
   });
 
   final int strokeNumber;
   final double distanceMeters;
-  final double driveLengthMeters;
-  final Duration driveTime;
-  final Duration recoveryTime;
-  final double peakForceNewtons;
-  final double averageForceNewtons;
+  final double? driveLengthMeters;
+  final Duration? driveTime;
+  final Duration? recoveryTime;
+  final double? peakForceNewtons;
+  final double? averageForceNewtons;
   final int? watts;
 
   @override
   String toString() => 'Stroke(#$strokeNumber, elapsed: $elapsed, distance: $distanceMeters, '
       'driveLength: $driveLengthMeters, drive: $driveTime, recovery: $recoveryTime, '
-      'peak: ${peakForceNewtons.toStringAsFixed(1)} N, avg: ${averageForceNewtons.toStringAsFixed(1)} N, watts: $watts)';
+      'peak: ${peakForceNewtons?.toStringAsFixed(1)} N, avg: ${averageForceNewtons?.toStringAsFixed(1)} N, '
+      'watts: $watts)';
 }
 
 /// The PM5 moved to another workout state.

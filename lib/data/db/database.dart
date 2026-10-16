@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import '../sources/erg_source.dart';
 import 'database.steps.dart';
@@ -125,6 +126,9 @@ class Sessions extends Table {
   TextColumn get source => textEnum<ErgSourceKind>()();
   TextColumn get deviceName => text().nullable()();
 
+  /// Protocol of the raw packets; sessions before schema 4 are PM5 sessions.
+  TextColumn get protocol => textEnum<ErgProtocol>().withDefault(const Constant('pm5'))();
+
   // Summary, derived from samples and strokes when the session ends.
   IntColumn get durationMs => integer().withDefault(const Constant(0))();
   IntColumn get distanceDm => integer().withDefault(const Constant(0))();
@@ -169,11 +173,13 @@ class Strokes extends Table {
   IntColumn get tMs => integer()();
   IntColumn get distanceDm => integer()();
   IntColumn get strokeNumber => integer()();
-  RealColumn get driveLengthMeters => real()();
-  IntColumn get driveTimeMs => integer()();
-  IntColumn get recoveryTimeMs => integer()();
-  RealColumn get peakForceNewtons => real()();
-  RealColumn get averageForceNewtons => real()();
+
+  // Stroke details; null when the device does not report them (FTMS).
+  RealColumn get driveLengthMeters => real().nullable()();
+  IntColumn get driveTimeMs => integer().nullable()();
+  IntColumn get recoveryTimeMs => integer().nullable()();
+  RealColumn get peakForceNewtons => real().nullable()();
+  RealColumn get averageForceNewtons => real().nullable()();
   IntColumn get watts => integer().nullable()();
 }
 
@@ -246,7 +252,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase.local() => AppDatabase(driftDatabase(name: 'aergrow'));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -277,6 +283,12 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(schema.courseSegments, schema.courseSegments.zoneId);
             await m.addColumn(schema.courseSegments, schema.courseSegments.zoneName);
             await migrateSegmentsToZones(m.database);
+          },
+          // FTMS rowers (Change device-types, Design D9): SQLite cannot drop NOT NULL in place,
+          // so the strokes table is rebuilt with its rows; old sessions are PM5 sessions.
+          from3To4: (m, schema) async {
+            await m.alterTable(TableMigration(schema.strokes));
+            await m.addColumn(schema.sessions, schema.sessions.protocol);
           },
         ),
         beforeOpen: (details) async {

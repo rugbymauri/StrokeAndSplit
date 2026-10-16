@@ -117,11 +117,11 @@ class SimulatedSource implements ErgSource {
     _calories += (4 * wattsForPace(_currentPace) + 300) * _seconds(step) / 3600;
 
     final stroke = _stroke ??= _nextStroke();
-    if (!stroke.driveEndSent && _elapsed >= stroke.start + stroke.data.driveTime) {
+    if (!stroke.driveEndSent && _elapsed >= stroke.start + stroke.drive) {
       stroke.driveEndSent = true;
       _encoder.encodeDriveEnd(stroke.data, at: at).forEach(_packets.add);
     }
-    if (_elapsed >= stroke.start + stroke.data.driveTime + stroke.data.recoveryTime) {
+    if (_elapsed >= stroke.start + stroke.drive + stroke.recovery) {
       _packets.add(_encoder.encodeRecoveryEnd(stroke.data, at: at));
       _stroke = null;
     }
@@ -137,16 +137,20 @@ class SimulatedSource implements ErgSource {
     final watts = wattsForPace(_currentPace);
     final driveSeconds = interval * _driveShare;
     final averageForce = watts * interval / _driveLengthMeters;
+    final drive = _duration(driveSeconds);
+    final recovery = _duration(interval - driveSeconds);
     _strokeNumber++;
     return _SimulatedStroke(
       _elapsed,
+      drive,
+      recovery,
       Stroke(
-        elapsed: _elapsed + _duration(driveSeconds),
+        elapsed: _elapsed + drive,
         strokeNumber: _strokeNumber,
         distanceMeters: _distanceMeters,
         driveLengthMeters: _driveLengthMeters,
-        driveTime: _duration(driveSeconds),
-        recoveryTime: _duration(interval - driveSeconds),
+        driveTime: drive,
+        recoveryTime: recovery,
         peakForceNewtons: averageForce * 1.6,
         averageForceNewtons: averageForce,
         watts: watts,
@@ -166,9 +170,11 @@ class SimulatedSource implements ErgSource {
 }
 
 class _SimulatedStroke {
-  _SimulatedStroke(this.start, this.data);
+  _SimulatedStroke(this.start, this.drive, this.recovery, this.data);
 
   final Duration start;
+  final Duration drive;
+  final Duration recovery;
   final Stroke data;
   var driveEndSent = false;
 }

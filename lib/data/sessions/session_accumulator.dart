@@ -150,11 +150,11 @@ class SessionAccumulator {
       tMs: (progress.elapsed + (dt.isNegative ? Duration.zero : dt)).inMilliseconds,
       distanceDm: ((progress.distanceMeters + (dd < 0 ? 0 : dd)) * 10).round(),
       strokeNumber: stroke.strokeNumber,
-      driveLengthMeters: stroke.driveLengthMeters,
-      driveTimeMs: stroke.driveTime.inMilliseconds,
-      recoveryTimeMs: stroke.recoveryTime.inMilliseconds,
-      peakForceNewtons: stroke.peakForceNewtons,
-      averageForceNewtons: stroke.averageForceNewtons,
+      driveLengthMeters: Value(stroke.driveLengthMeters),
+      driveTimeMs: Value(stroke.driveTime?.inMilliseconds),
+      recoveryTimeMs: Value(stroke.recoveryTime?.inMilliseconds),
+      peakForceNewtons: Value(stroke.peakForceNewtons),
+      averageForceNewtons: Value(stroke.averageForceNewtons),
       watts: Value(stroke.watts),
     ));
   }

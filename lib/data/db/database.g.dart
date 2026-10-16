@@ -981,6 +981,16 @@ class $SessionsTable extends Sessions
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  @override
+  late final GeneratedColumnWithTypeConverter<ErgProtocol, String> protocol =
+      GeneratedColumn<String>(
+        'protocol',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('pm5'),
+      ).withConverter<ErgProtocol>($SessionsTable.$converterprotocol);
   static const VerificationMeta _durationMsMeta = const VerificationMeta(
     'durationMs',
   );
@@ -1109,6 +1119,7 @@ class $SessionsTable extends Sessions
     status,
     source,
     deviceName,
+    protocol,
     durationMs,
     distanceDm,
     averagePaceCs,
@@ -1273,6 +1284,12 @@ class $SessionsTable extends Sessions
         DriftSqlType.string,
         data['${effectivePrefix}device_name'],
       ),
+      protocol: $SessionsTable.$converterprotocol.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}protocol'],
+        )!,
+      ),
       durationMs: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}duration_ms'],
@@ -1325,6 +1342,8 @@ class $SessionsTable extends Sessions
       const EnumNameConverter<SessionStatus>(SessionStatus.values);
   static JsonTypeConverter2<ErgSourceKind, String, String> $convertersource =
       const EnumNameConverter<ErgSourceKind>(ErgSourceKind.values);
+  static JsonTypeConverter2<ErgProtocol, String, String> $converterprotocol =
+      const EnumNameConverter<ErgProtocol>(ErgProtocol.values);
 }
 
 class SessionRow extends DataClass implements Insertable<SessionRow> {
@@ -1334,6 +1353,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
   final SessionStatus status;
   final ErgSourceKind source;
   final String? deviceName;
+
+  /// Protocol of the raw packets; sessions before schema 4 are PM5 sessions.
+  final ErgProtocol protocol;
   final int durationMs;
   final int distanceDm;
   final int? averagePaceCs;
@@ -1355,6 +1377,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     required this.status,
     required this.source,
     this.deviceName,
+    required this.protocol,
     required this.durationMs,
     required this.distanceDm,
     this.averagePaceCs,
@@ -1386,6 +1409,11 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     }
     if (!nullToAbsent || deviceName != null) {
       map['device_name'] = Variable<String>(deviceName);
+    }
+    {
+      map['protocol'] = Variable<String>(
+        $SessionsTable.$converterprotocol.toSql(protocol),
+      );
     }
     map['duration_ms'] = Variable<int>(durationMs);
     map['distance_dm'] = Variable<int>(distanceDm);
@@ -1426,6 +1454,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       deviceName: deviceName == null && nullToAbsent
           ? const Value.absent()
           : Value(deviceName),
+      protocol: Value(protocol),
       durationMs: Value(durationMs),
       distanceDm: Value(distanceDm),
       averagePaceCs: averagePaceCs == null && nullToAbsent
@@ -1469,6 +1498,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         serializer.fromJson<String>(json['source']),
       ),
       deviceName: serializer.fromJson<String?>(json['deviceName']),
+      protocol: $SessionsTable.$converterprotocol.fromJson(
+        serializer.fromJson<String>(json['protocol']),
+      ),
       durationMs: serializer.fromJson<int>(json['durationMs']),
       distanceDm: serializer.fromJson<int>(json['distanceDm']),
       averagePaceCs: serializer.fromJson<int?>(json['averagePaceCs']),
@@ -1497,6 +1529,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         $SessionsTable.$convertersource.toJson(source),
       ),
       'deviceName': serializer.toJson<String?>(deviceName),
+      'protocol': serializer.toJson<String>(
+        $SessionsTable.$converterprotocol.toJson(protocol),
+      ),
       'durationMs': serializer.toJson<int>(durationMs),
       'distanceDm': serializer.toJson<int>(distanceDm),
       'averagePaceCs': serializer.toJson<int?>(averagePaceCs),
@@ -1517,6 +1552,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     SessionStatus? status,
     ErgSourceKind? source,
     Value<String?> deviceName = const Value.absent(),
+    ErgProtocol? protocol,
     int? durationMs,
     int? distanceDm,
     Value<int?> averagePaceCs = const Value.absent(),
@@ -1534,6 +1570,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     status: status ?? this.status,
     source: source ?? this.source,
     deviceName: deviceName.present ? deviceName.value : this.deviceName,
+    protocol: protocol ?? this.protocol,
     durationMs: durationMs ?? this.durationMs,
     distanceDm: distanceDm ?? this.distanceDm,
     averagePaceCs: averagePaceCs.present
@@ -1561,6 +1598,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       deviceName: data.deviceName.present
           ? data.deviceName.value
           : this.deviceName,
+      protocol: data.protocol.present ? data.protocol.value : this.protocol,
       durationMs: data.durationMs.present
           ? data.durationMs.value
           : this.durationMs,
@@ -1603,6 +1641,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ..write('status: $status, ')
           ..write('source: $source, ')
           ..write('deviceName: $deviceName, ')
+          ..write('protocol: $protocol, ')
           ..write('durationMs: $durationMs, ')
           ..write('distanceDm: $distanceDm, ')
           ..write('averagePaceCs: $averagePaceCs, ')
@@ -1625,6 +1664,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     status,
     source,
     deviceName,
+    protocol,
     durationMs,
     distanceDm,
     averagePaceCs,
@@ -1646,6 +1686,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           other.status == this.status &&
           other.source == this.source &&
           other.deviceName == this.deviceName &&
+          other.protocol == this.protocol &&
           other.durationMs == this.durationMs &&
           other.distanceDm == this.distanceDm &&
           other.averagePaceCs == this.averagePaceCs &&
@@ -1665,6 +1706,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
   final Value<SessionStatus> status;
   final Value<ErgSourceKind> source;
   final Value<String?> deviceName;
+  final Value<ErgProtocol> protocol;
   final Value<int> durationMs;
   final Value<int> distanceDm;
   final Value<int?> averagePaceCs;
@@ -1682,6 +1724,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.status = const Value.absent(),
     this.source = const Value.absent(),
     this.deviceName = const Value.absent(),
+    this.protocol = const Value.absent(),
     this.durationMs = const Value.absent(),
     this.distanceDm = const Value.absent(),
     this.averagePaceCs = const Value.absent(),
@@ -1700,6 +1743,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     required SessionStatus status,
     required ErgSourceKind source,
     this.deviceName = const Value.absent(),
+    this.protocol = const Value.absent(),
     this.durationMs = const Value.absent(),
     this.distanceDm = const Value.absent(),
     this.averagePaceCs = const Value.absent(),
@@ -1720,6 +1764,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Expression<String>? status,
     Expression<String>? source,
     Expression<String>? deviceName,
+    Expression<String>? protocol,
     Expression<int>? durationMs,
     Expression<int>? distanceDm,
     Expression<int>? averagePaceCs,
@@ -1738,6 +1783,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       if (status != null) 'status': status,
       if (source != null) 'source': source,
       if (deviceName != null) 'device_name': deviceName,
+      if (protocol != null) 'protocol': protocol,
       if (durationMs != null) 'duration_ms': durationMs,
       if (distanceDm != null) 'distance_dm': distanceDm,
       if (averagePaceCs != null) 'average_pace_cs': averagePaceCs,
@@ -1758,6 +1804,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Value<SessionStatus>? status,
     Value<ErgSourceKind>? source,
     Value<String?>? deviceName,
+    Value<ErgProtocol>? protocol,
     Value<int>? durationMs,
     Value<int>? distanceDm,
     Value<int?>? averagePaceCs,
@@ -1776,6 +1823,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       status: status ?? this.status,
       source: source ?? this.source,
       deviceName: deviceName ?? this.deviceName,
+      protocol: protocol ?? this.protocol,
       durationMs: durationMs ?? this.durationMs,
       distanceDm: distanceDm ?? this.distanceDm,
       averagePaceCs: averagePaceCs ?? this.averagePaceCs,
@@ -1813,6 +1861,11 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     }
     if (deviceName.present) {
       map['device_name'] = Variable<String>(deviceName.value);
+    }
+    if (protocol.present) {
+      map['protocol'] = Variable<String>(
+        $SessionsTable.$converterprotocol.toSql(protocol.value),
+      );
     }
     if (durationMs.present) {
       map['duration_ms'] = Variable<int>(durationMs.value);
@@ -1856,6 +1909,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
           ..write('status: $status, ')
           ..write('source: $source, ')
           ..write('deviceName: $deviceName, ')
+          ..write('protocol: $protocol, ')
           ..write('durationMs: $durationMs, ')
           ..write('distanceDm: $distanceDm, ')
           ..write('averagePaceCs: $averagePaceCs, ')
@@ -2501,9 +2555,9 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
       GeneratedColumn<double>(
         'drive_length_meters',
         aliasedName,
-        false,
+        true,
         type: DriftSqlType.double,
-        requiredDuringInsert: true,
+        requiredDuringInsert: false,
       );
   static const VerificationMeta _driveTimeMsMeta = const VerificationMeta(
     'driveTimeMs',
@@ -2512,9 +2566,9 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
   late final GeneratedColumn<int> driveTimeMs = GeneratedColumn<int>(
     'drive_time_ms',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _recoveryTimeMsMeta = const VerificationMeta(
     'recoveryTimeMs',
@@ -2523,9 +2577,9 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
   late final GeneratedColumn<int> recoveryTimeMs = GeneratedColumn<int>(
     'recovery_time_ms',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _peakForceNewtonsMeta = const VerificationMeta(
     'peakForceNewtons',
@@ -2534,9 +2588,9 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
   late final GeneratedColumn<double> peakForceNewtons = GeneratedColumn<double>(
     'peak_force_newtons',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.double,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _averageForceNewtonsMeta =
       const VerificationMeta('averageForceNewtons');
@@ -2545,9 +2599,9 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
       GeneratedColumn<double>(
         'average_force_newtons',
         aliasedName,
-        false,
+        true,
         type: DriftSqlType.double,
-        requiredDuringInsert: true,
+        requiredDuringInsert: false,
       );
   static const VerificationMeta _wattsMeta = const VerificationMeta('watts');
   @override
@@ -2626,8 +2680,6 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
           _driveLengthMetersMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_driveLengthMetersMeta);
     }
     if (data.containsKey('drive_time_ms')) {
       context.handle(
@@ -2637,8 +2689,6 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
           _driveTimeMsMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_driveTimeMsMeta);
     }
     if (data.containsKey('recovery_time_ms')) {
       context.handle(
@@ -2648,8 +2698,6 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
           _recoveryTimeMsMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_recoveryTimeMsMeta);
     }
     if (data.containsKey('peak_force_newtons')) {
       context.handle(
@@ -2659,8 +2707,6 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
           _peakForceNewtonsMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_peakForceNewtonsMeta);
     }
     if (data.containsKey('average_force_newtons')) {
       context.handle(
@@ -2670,8 +2716,6 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
           _averageForceNewtonsMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_averageForceNewtonsMeta);
     }
     if (data.containsKey('watts')) {
       context.handle(
@@ -2707,23 +2751,23 @@ class $StrokesTable extends Strokes with TableInfo<$StrokesTable, StrokeRow> {
       driveLengthMeters: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}drive_length_meters'],
-      )!,
+      ),
       driveTimeMs: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}drive_time_ms'],
-      )!,
+      ),
       recoveryTimeMs: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}recovery_time_ms'],
-      )!,
+      ),
       peakForceNewtons: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}peak_force_newtons'],
-      )!,
+      ),
       averageForceNewtons: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}average_force_newtons'],
-      )!,
+      ),
       watts: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}watts'],
@@ -2742,22 +2786,22 @@ class StrokeRow extends DataClass implements Insertable<StrokeRow> {
   final int tMs;
   final int distanceDm;
   final int strokeNumber;
-  final double driveLengthMeters;
-  final int driveTimeMs;
-  final int recoveryTimeMs;
-  final double peakForceNewtons;
-  final double averageForceNewtons;
+  final double? driveLengthMeters;
+  final int? driveTimeMs;
+  final int? recoveryTimeMs;
+  final double? peakForceNewtons;
+  final double? averageForceNewtons;
   final int? watts;
   const StrokeRow({
     required this.sessionId,
     required this.tMs,
     required this.distanceDm,
     required this.strokeNumber,
-    required this.driveLengthMeters,
-    required this.driveTimeMs,
-    required this.recoveryTimeMs,
-    required this.peakForceNewtons,
-    required this.averageForceNewtons,
+    this.driveLengthMeters,
+    this.driveTimeMs,
+    this.recoveryTimeMs,
+    this.peakForceNewtons,
+    this.averageForceNewtons,
     this.watts,
   });
   @override
@@ -2767,11 +2811,21 @@ class StrokeRow extends DataClass implements Insertable<StrokeRow> {
     map['t_ms'] = Variable<int>(tMs);
     map['distance_dm'] = Variable<int>(distanceDm);
     map['stroke_number'] = Variable<int>(strokeNumber);
-    map['drive_length_meters'] = Variable<double>(driveLengthMeters);
-    map['drive_time_ms'] = Variable<int>(driveTimeMs);
-    map['recovery_time_ms'] = Variable<int>(recoveryTimeMs);
-    map['peak_force_newtons'] = Variable<double>(peakForceNewtons);
-    map['average_force_newtons'] = Variable<double>(averageForceNewtons);
+    if (!nullToAbsent || driveLengthMeters != null) {
+      map['drive_length_meters'] = Variable<double>(driveLengthMeters);
+    }
+    if (!nullToAbsent || driveTimeMs != null) {
+      map['drive_time_ms'] = Variable<int>(driveTimeMs);
+    }
+    if (!nullToAbsent || recoveryTimeMs != null) {
+      map['recovery_time_ms'] = Variable<int>(recoveryTimeMs);
+    }
+    if (!nullToAbsent || peakForceNewtons != null) {
+      map['peak_force_newtons'] = Variable<double>(peakForceNewtons);
+    }
+    if (!nullToAbsent || averageForceNewtons != null) {
+      map['average_force_newtons'] = Variable<double>(averageForceNewtons);
+    }
     if (!nullToAbsent || watts != null) {
       map['watts'] = Variable<int>(watts);
     }
@@ -2784,11 +2838,21 @@ class StrokeRow extends DataClass implements Insertable<StrokeRow> {
       tMs: Value(tMs),
       distanceDm: Value(distanceDm),
       strokeNumber: Value(strokeNumber),
-      driveLengthMeters: Value(driveLengthMeters),
-      driveTimeMs: Value(driveTimeMs),
-      recoveryTimeMs: Value(recoveryTimeMs),
-      peakForceNewtons: Value(peakForceNewtons),
-      averageForceNewtons: Value(averageForceNewtons),
+      driveLengthMeters: driveLengthMeters == null && nullToAbsent
+          ? const Value.absent()
+          : Value(driveLengthMeters),
+      driveTimeMs: driveTimeMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(driveTimeMs),
+      recoveryTimeMs: recoveryTimeMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recoveryTimeMs),
+      peakForceNewtons: peakForceNewtons == null && nullToAbsent
+          ? const Value.absent()
+          : Value(peakForceNewtons),
+      averageForceNewtons: averageForceNewtons == null && nullToAbsent
+          ? const Value.absent()
+          : Value(averageForceNewtons),
       watts: watts == null && nullToAbsent
           ? const Value.absent()
           : Value(watts),
@@ -2805,11 +2869,13 @@ class StrokeRow extends DataClass implements Insertable<StrokeRow> {
       tMs: serializer.fromJson<int>(json['tMs']),
       distanceDm: serializer.fromJson<int>(json['distanceDm']),
       strokeNumber: serializer.fromJson<int>(json['strokeNumber']),
-      driveLengthMeters: serializer.fromJson<double>(json['driveLengthMeters']),
-      driveTimeMs: serializer.fromJson<int>(json['driveTimeMs']),
-      recoveryTimeMs: serializer.fromJson<int>(json['recoveryTimeMs']),
-      peakForceNewtons: serializer.fromJson<double>(json['peakForceNewtons']),
-      averageForceNewtons: serializer.fromJson<double>(
+      driveLengthMeters: serializer.fromJson<double?>(
+        json['driveLengthMeters'],
+      ),
+      driveTimeMs: serializer.fromJson<int?>(json['driveTimeMs']),
+      recoveryTimeMs: serializer.fromJson<int?>(json['recoveryTimeMs']),
+      peakForceNewtons: serializer.fromJson<double?>(json['peakForceNewtons']),
+      averageForceNewtons: serializer.fromJson<double?>(
         json['averageForceNewtons'],
       ),
       watts: serializer.fromJson<int?>(json['watts']),
@@ -2823,11 +2889,11 @@ class StrokeRow extends DataClass implements Insertable<StrokeRow> {
       'tMs': serializer.toJson<int>(tMs),
       'distanceDm': serializer.toJson<int>(distanceDm),
       'strokeNumber': serializer.toJson<int>(strokeNumber),
-      'driveLengthMeters': serializer.toJson<double>(driveLengthMeters),
-      'driveTimeMs': serializer.toJson<int>(driveTimeMs),
-      'recoveryTimeMs': serializer.toJson<int>(recoveryTimeMs),
-      'peakForceNewtons': serializer.toJson<double>(peakForceNewtons),
-      'averageForceNewtons': serializer.toJson<double>(averageForceNewtons),
+      'driveLengthMeters': serializer.toJson<double?>(driveLengthMeters),
+      'driveTimeMs': serializer.toJson<int?>(driveTimeMs),
+      'recoveryTimeMs': serializer.toJson<int?>(recoveryTimeMs),
+      'peakForceNewtons': serializer.toJson<double?>(peakForceNewtons),
+      'averageForceNewtons': serializer.toJson<double?>(averageForceNewtons),
       'watts': serializer.toJson<int?>(watts),
     };
   }
@@ -2837,22 +2903,30 @@ class StrokeRow extends DataClass implements Insertable<StrokeRow> {
     int? tMs,
     int? distanceDm,
     int? strokeNumber,
-    double? driveLengthMeters,
-    int? driveTimeMs,
-    int? recoveryTimeMs,
-    double? peakForceNewtons,
-    double? averageForceNewtons,
+    Value<double?> driveLengthMeters = const Value.absent(),
+    Value<int?> driveTimeMs = const Value.absent(),
+    Value<int?> recoveryTimeMs = const Value.absent(),
+    Value<double?> peakForceNewtons = const Value.absent(),
+    Value<double?> averageForceNewtons = const Value.absent(),
     Value<int?> watts = const Value.absent(),
   }) => StrokeRow(
     sessionId: sessionId ?? this.sessionId,
     tMs: tMs ?? this.tMs,
     distanceDm: distanceDm ?? this.distanceDm,
     strokeNumber: strokeNumber ?? this.strokeNumber,
-    driveLengthMeters: driveLengthMeters ?? this.driveLengthMeters,
-    driveTimeMs: driveTimeMs ?? this.driveTimeMs,
-    recoveryTimeMs: recoveryTimeMs ?? this.recoveryTimeMs,
-    peakForceNewtons: peakForceNewtons ?? this.peakForceNewtons,
-    averageForceNewtons: averageForceNewtons ?? this.averageForceNewtons,
+    driveLengthMeters: driveLengthMeters.present
+        ? driveLengthMeters.value
+        : this.driveLengthMeters,
+    driveTimeMs: driveTimeMs.present ? driveTimeMs.value : this.driveTimeMs,
+    recoveryTimeMs: recoveryTimeMs.present
+        ? recoveryTimeMs.value
+        : this.recoveryTimeMs,
+    peakForceNewtons: peakForceNewtons.present
+        ? peakForceNewtons.value
+        : this.peakForceNewtons,
+    averageForceNewtons: averageForceNewtons.present
+        ? averageForceNewtons.value
+        : this.averageForceNewtons,
     watts: watts.present ? watts.value : this.watts,
   );
   StrokeRow copyWithCompanion(StrokesCompanion data) {
@@ -2935,11 +3009,11 @@ class StrokesCompanion extends UpdateCompanion<StrokeRow> {
   final Value<int> tMs;
   final Value<int> distanceDm;
   final Value<int> strokeNumber;
-  final Value<double> driveLengthMeters;
-  final Value<int> driveTimeMs;
-  final Value<int> recoveryTimeMs;
-  final Value<double> peakForceNewtons;
-  final Value<double> averageForceNewtons;
+  final Value<double?> driveLengthMeters;
+  final Value<int?> driveTimeMs;
+  final Value<int?> recoveryTimeMs;
+  final Value<double?> peakForceNewtons;
+  final Value<double?> averageForceNewtons;
   final Value<int?> watts;
   final Value<int> rowid;
   const StrokesCompanion({
@@ -2960,22 +3034,17 @@ class StrokesCompanion extends UpdateCompanion<StrokeRow> {
     required int tMs,
     required int distanceDm,
     required int strokeNumber,
-    required double driveLengthMeters,
-    required int driveTimeMs,
-    required int recoveryTimeMs,
-    required double peakForceNewtons,
-    required double averageForceNewtons,
+    this.driveLengthMeters = const Value.absent(),
+    this.driveTimeMs = const Value.absent(),
+    this.recoveryTimeMs = const Value.absent(),
+    this.peakForceNewtons = const Value.absent(),
+    this.averageForceNewtons = const Value.absent(),
     this.watts = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : sessionId = Value(sessionId),
        tMs = Value(tMs),
        distanceDm = Value(distanceDm),
-       strokeNumber = Value(strokeNumber),
-       driveLengthMeters = Value(driveLengthMeters),
-       driveTimeMs = Value(driveTimeMs),
-       recoveryTimeMs = Value(recoveryTimeMs),
-       peakForceNewtons = Value(peakForceNewtons),
-       averageForceNewtons = Value(averageForceNewtons);
+       strokeNumber = Value(strokeNumber);
   static Insertable<StrokeRow> custom({
     Expression<int>? sessionId,
     Expression<int>? tMs,
@@ -3010,11 +3079,11 @@ class StrokesCompanion extends UpdateCompanion<StrokeRow> {
     Value<int>? tMs,
     Value<int>? distanceDm,
     Value<int>? strokeNumber,
-    Value<double>? driveLengthMeters,
-    Value<int>? driveTimeMs,
-    Value<int>? recoveryTimeMs,
-    Value<double>? peakForceNewtons,
-    Value<double>? averageForceNewtons,
+    Value<double?>? driveLengthMeters,
+    Value<int?>? driveTimeMs,
+    Value<int?>? recoveryTimeMs,
+    Value<double?>? peakForceNewtons,
+    Value<double?>? averageForceNewtons,
     Value<int?>? watts,
     Value<int>? rowid,
   }) {
@@ -7224,6 +7293,7 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   required SessionStatus status,
   required ErgSourceKind source,
   Value<String?> deviceName,
+  Value<ErgProtocol> protocol,
   Value<int> durationMs,
   Value<int> distanceDm,
   Value<int?> averagePaceCs,
@@ -7242,6 +7312,7 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<SessionStatus> status,
   Value<ErgSourceKind> source,
   Value<String?> deviceName,
+  Value<ErgProtocol> protocol,
   Value<int> durationMs,
   Value<int> distanceDm,
   Value<int?> averagePaceCs,
@@ -7426,6 +7497,12 @@ class $$SessionsTableFilterComposer
   ColumnFilters<String> get deviceName => $composableBuilder(
     column: $table.deviceName,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<ErgProtocol, ErgProtocol, String>
+  get protocol => $composableBuilder(
+    column: $table.protocol,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<int> get durationMs => $composableBuilder(
@@ -7679,6 +7756,11 @@ class $$SessionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get protocol => $composableBuilder(
+    column: $table.protocol,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get durationMs => $composableBuilder(
     column: $table.durationMs,
     builder: (column) => ColumnOrderings(column),
@@ -7794,6 +7876,9 @@ class $$SessionsTableAnnotationComposer
     column: $table.deviceName,
     builder: (column) => column,
   );
+
+  GeneratedColumnWithTypeConverter<ErgProtocol, String> get protocol =>
+      $composableBuilder(column: $table.protocol, builder: (column) => column);
 
   GeneratedColumn<int> get durationMs => $composableBuilder(
     column: $table.durationMs,
@@ -8049,6 +8134,7 @@ class $$SessionsTableTableManager
                 Value<SessionStatus> status = const Value.absent(),
                 Value<ErgSourceKind> source = const Value.absent(),
                 Value<String?> deviceName = const Value.absent(),
+                Value<ErgProtocol> protocol = const Value.absent(),
                 Value<int> durationMs = const Value.absent(),
                 Value<int> distanceDm = const Value.absent(),
                 Value<int?> averagePaceCs = const Value.absent(),
@@ -8066,6 +8152,7 @@ class $$SessionsTableTableManager
                 status: status,
                 source: source,
                 deviceName: deviceName,
+                protocol: protocol,
                 durationMs: durationMs,
                 distanceDm: distanceDm,
                 averagePaceCs: averagePaceCs,
@@ -8085,6 +8172,7 @@ class $$SessionsTableTableManager
                 required SessionStatus status,
                 required ErgSourceKind source,
                 Value<String?> deviceName = const Value.absent(),
+                Value<ErgProtocol> protocol = const Value.absent(),
                 Value<int> durationMs = const Value.absent(),
                 Value<int> distanceDm = const Value.absent(),
                 Value<int?> averagePaceCs = const Value.absent(),
@@ -8102,6 +8190,7 @@ class $$SessionsTableTableManager
                 status: status,
                 source: source,
                 deviceName: deviceName,
+                protocol: protocol,
                 durationMs: durationMs,
                 distanceDm: distanceDm,
                 averagePaceCs: averagePaceCs,
@@ -8712,11 +8801,11 @@ typedef $$StrokesTableCreateCompanionBuilder = StrokesCompanion Function({
   required int tMs,
   required int distanceDm,
   required int strokeNumber,
-  required double driveLengthMeters,
-  required int driveTimeMs,
-  required int recoveryTimeMs,
-  required double peakForceNewtons,
-  required double averageForceNewtons,
+  Value<double?> driveLengthMeters,
+  Value<int?> driveTimeMs,
+  Value<int?> recoveryTimeMs,
+  Value<double?> peakForceNewtons,
+  Value<double?> averageForceNewtons,
   Value<int?> watts,
   Value<int> rowid,
 });
@@ -8725,11 +8814,11 @@ typedef $$StrokesTableUpdateCompanionBuilder = StrokesCompanion Function({
   Value<int> tMs,
   Value<int> distanceDm,
   Value<int> strokeNumber,
-  Value<double> driveLengthMeters,
-  Value<int> driveTimeMs,
-  Value<int> recoveryTimeMs,
-  Value<double> peakForceNewtons,
-  Value<double> averageForceNewtons,
+  Value<double?> driveLengthMeters,
+  Value<int?> driveTimeMs,
+  Value<int?> recoveryTimeMs,
+  Value<double?> peakForceNewtons,
+  Value<double?> averageForceNewtons,
   Value<int?> watts,
   Value<int> rowid,
 });
@@ -9018,11 +9107,11 @@ class $$StrokesTableTableManager
                 Value<int> tMs = const Value.absent(),
                 Value<int> distanceDm = const Value.absent(),
                 Value<int> strokeNumber = const Value.absent(),
-                Value<double> driveLengthMeters = const Value.absent(),
-                Value<int> driveTimeMs = const Value.absent(),
-                Value<int> recoveryTimeMs = const Value.absent(),
-                Value<double> peakForceNewtons = const Value.absent(),
-                Value<double> averageForceNewtons = const Value.absent(),
+                Value<double?> driveLengthMeters = const Value.absent(),
+                Value<int?> driveTimeMs = const Value.absent(),
+                Value<int?> recoveryTimeMs = const Value.absent(),
+                Value<double?> peakForceNewtons = const Value.absent(),
+                Value<double?> averageForceNewtons = const Value.absent(),
                 Value<int?> watts = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => StrokesCompanion(
@@ -9044,11 +9133,11 @@ class $$StrokesTableTableManager
                 required int tMs,
                 required int distanceDm,
                 required int strokeNumber,
-                required double driveLengthMeters,
-                required int driveTimeMs,
-                required int recoveryTimeMs,
-                required double peakForceNewtons,
-                required double averageForceNewtons,
+                Value<double?> driveLengthMeters = const Value.absent(),
+                Value<int?> driveTimeMs = const Value.absent(),
+                Value<int?> recoveryTimeMs = const Value.absent(),
+                Value<double?> peakForceNewtons = const Value.absent(),
+                Value<double?> averageForceNewtons = const Value.absent(),
                 Value<int?> watts = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => StrokesCompanion.insert(

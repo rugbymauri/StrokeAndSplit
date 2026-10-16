@@ -8,8 +8,8 @@
 
 ## 2. Datenmodell und Schema
 
-- [ ] 2.1 Schlagdetails in `Stroke` nullable machen (`driveLengthMeters`, `driveTime`, `recoveryTime`, `peakForceNewtons`, `averageForceNewtons`) und alle Verwender anpassen (D9); `make check` ist grün
-- [ ] 2.2 Schema 4: Spalten in `Strokes` nullable per `TableMigration`, `Sessions.protocol` (Text-Enum, Default `pm5`), `schemaVersion` auf 4, Schritt `from3To4`, `make codegen` und `make schema` ausführen (D9); Migrationstests 3→4 und 1→4 in `test/data/db/migration_test.dart` prüfen, dass bestehende Sessions mit allen Schlagdetails, Runden und Strecken samt Zonen erhalten bleiben und als `pm5` gelten
+- [x] 2.1 Schlagdetails in `Stroke` nullable machen (`driveLengthMeters`, `driveTime`, `recoveryTime`, `peakForceNewtons`, `averageForceNewtons`) und alle Verwender anpassen (D9); `make check` ist grün
+- [x] 2.2 Schema 4: Spalten in `Strokes` nullable per `TableMigration`, `Sessions.protocol` (Text-Enum, Default `pm5`), `schemaVersion` auf 4, Schritt `from3To4`, `make codegen` und `make schema` ausführen (D9); Migrationstests 3→4 und 1→4 in `test/data/db/migration_test.dart` prüfen, dass bestehende Sessions mit allen Schlagdetails, Runden und Strecken samt Zonen erhalten bleiben und als `pm5` gelten
 - [ ] 2.3 `ErgSourceKind.ftms` ergänzen und `ErgSource.protocol` einführen, alle Quellen und Fakes (`test/support/fake_erg_source.dart`) liefern ihr Protokoll (D3, D4); Analyse ist grün
 - [ ] 2.4 `rowingEventsProvider` und `SessionAccumulator` erzeugen den Decoder über `ErgDecoder.forProtocol`, die Session speichert `protocol` und `deviceName` auch für `ftms` (D3); Tests in `erg_source_providers_test.dart` und den Session-Tests decken eine Quelle mit Protokoll `ftms` ab
 - [ ] 2.5 Rohformat und `.aergrow`: `"protocol"` im Header schreiben und lesen, fehlend gilt `pm5`, `ReplaySource` übernimmt das Protokoll aus dem Header (D3); Tests in `session_export_test.dart` und `replay_source_test.dart` prüfen Export/Import mit Protokoll, Strecke und Zonen sowie den Import einer Datei ohne Protokoll

@@ -15,7 +15,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
-| 1 | `device-types` | 3/33 | in Arbeit auf `feature/device-types` | – |
+| 1 | `device-types` | 5/33 | in Arbeit auf `feature/device-types` | – |
 | 2 | `ui-design` | 0/18 | nach 1 | Entscheid Puls-Herkunft (F1) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
@@ -46,7 +46,8 @@ Vor dem Start anpassen:
 In Arbeit seit 2026-10-16 auf `feature/device-types`. Die manuellen Tests 7.1–7.3 macht der Nutzer in einer späteren Session; bis dahin bleibt der Change offen.
 
 Bei der Umsetzung mitnehmen:
-- Zeilen über 120 Zeichen in `packages/pm5_protocol/lib/src/rowing_event.dart` (`Stroke.toString`, ändert sich mit Task 2.1) und `lib/features/connection/device_list_screen.dart` (Fehlertext „Suche nach dem PM5“, ändert sich mit Task 5.5) umbrechen.
+- [x] Zeile über 120 Zeichen in `Stroke.toString` (Task 2.1) umgebrochen.
+- [ ] Zeile über 120 Zeichen in `lib/features/connection/device_list_screen.dart` (Fehlertext „Suche nach dem PM5“) mit Task 5.5 umbrechen.
 
 Manuell (vom Nutzer): 7.x mit dem Software-Rower vom Android-Handy aus.
 

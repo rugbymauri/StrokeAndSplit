@@ -78,8 +78,8 @@ void main() {
     expect(decoded.driveTime, stroke.driveTime);
     expect(decoded.recoveryTime, stroke.recoveryTime);
     // Forces travel in 0.1 lbf steps.
-    expect(decoded.peakForceNewtons, closeTo(stroke.peakForceNewtons, 0.45));
-    expect(decoded.averageForceNewtons, closeTo(stroke.averageForceNewtons, 0.45));
+    expect(decoded.peakForceNewtons, closeTo(stroke.peakForceNewtons!, 0.45));
+    expect(decoded.averageForceNewtons, closeTo(stroke.averageForceNewtons!, 0.45));
     expect(decoded.watts, 211);
   });
 
