@@ -101,7 +101,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
             content: Text(notARower == null
                 ? l10n.connectFailedBody(l10n.appTitle, device.name)
                 : '$notARower\n\n${l10n.connectNotARowerHint(l10n.appTitle)}'),
-            actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
+            actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.actionOk))],
           );
         },
       );

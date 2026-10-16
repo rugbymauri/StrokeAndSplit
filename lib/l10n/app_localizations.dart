@@ -1260,6 +1260,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'dd.MM.yyyy, HH:mm'**
   String get dateTimePattern;
+
+  /// Button that closes a message
+  ///
+  /// In de, this message translates to:
+  /// **'OK'**
+  String get actionOk;
 }
 
 class _AppLocalizationsDelegate

@@ -106,7 +106,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   }
 
   Future<void> _disconnect() async {
-    // A running session is kept; it ends here like with "Session beenden".
+    // A running session is kept; it ends here like with the end session button.
     await ref.read(sessionRecorderProvider.notifier).stop();
     await ref.read(activeErgSourceProvider.notifier).clear();
     if (mounted) Navigator.of(context).pop();
@@ -127,7 +127,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     final recording = ref.watch(sessionRecorderProvider);
     return PopScope(
       canPop: false,
-      // Going back ends the connection, the same as "Trennen".
+      // Going back ends the connection, the same as the disconnect button.
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _disconnect();
       },

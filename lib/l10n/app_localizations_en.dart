@@ -718,4 +718,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateTimePattern => 'MMM d, y, HH:mm';
+
+  @override
+  String get actionOk => 'OK';
 }

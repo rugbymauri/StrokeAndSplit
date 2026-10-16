@@ -1009,5 +1009,9 @@
   "dateTimePattern": "dd.MM.yyyy, HH:mm",
   "@dateTimePattern": {
     "description": "Pattern of a date with time for the intl package's DateFormat, e.g. '15.10.2026, 18:30'; keep the 24-hour clock"
+  },
+  "actionOk": "OK",
+  "@actionOk": {
+    "description": "Button that closes a message"
   }
 }
