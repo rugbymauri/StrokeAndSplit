@@ -7,6 +7,7 @@ import 'package:pm5_protocol/pm5_protocol.dart';
 
 import '../db/database.dart';
 import '../sources/erg_source.dart';
+import '../templates/session_template.dart';
 import 'session_accumulator.dart';
 
 /// Stores sessions with their samples, strokes and raw notifications.
@@ -15,12 +16,23 @@ class SessionRepository {
 
   final AppDatabase _db;
 
-  Future<int> create({required DateTime startedAt, required ErgSourceKind source, String? deviceName}) {
+  /// Starts a session; with a [template] it rows the course in the version
+  /// the template uses now.
+  Future<int> create({
+    required DateTime startedAt,
+    required ErgSourceKind source,
+    String? deviceName,
+    SessionTemplate? template,
+  }) {
     return _db.into(_db.sessions).insert(SessionsCompanion.insert(
           startedAt: startedAt,
           status: SessionStatus.recording,
           source: source,
           deviceName: Value(deviceName),
+          templateId: Value(template?.id),
+          templateName: Value(template?.name),
+          courseVersionId: Value(template?.course.versionId),
+          plannedLaps: Value(template?.laps),
         ));
   }
 
