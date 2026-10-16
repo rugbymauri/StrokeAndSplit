@@ -22,4 +22,4 @@
 
 ## 5. Abschluss
 
-- [ ] 5.1 README um Zonen ergänzen. Verifikation: Die beschriebenen Schritte funktionieren im Simulator
+- [x] 5.1 README um Zonen ergänzen. Verifikation: Die beschriebenen Schritte funktionieren im Simulator
