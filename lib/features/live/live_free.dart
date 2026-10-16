@@ -8,11 +8,12 @@ import '../../l10n/l10n.dart';
 import 'force_curve.dart';
 import 'formatters.dart';
 import 'live_layout.dart';
+import 'live_status.dart';
 import 'metric_tile.dart';
 
 /// The live display without a template (ui-design, Design D2): the pace on
 /// top or on the left, four tiles, a line with further values, the force
-/// curve and [action], the button that starts or ends the session.
+/// curve and [action], the button that starts or ends the session, with [status] beside it.
 class FreeLiveView extends StatelessWidget {
   const FreeLiveView({
     super.key,
@@ -22,6 +23,7 @@ class FreeLiveView extends StatelessWidget {
     this.rrIntervalMs,
     this.outdated = false,
     this.forceCurves,
+    this.status,
   });
 
   final StatusTick? tick;
@@ -38,6 +40,9 @@ class FreeLiveView extends StatelessWidget {
 
   /// The force curves of the last strokes; null for a source without them, which leaves the card out.
   final ForceCurves? forceCurves;
+
+  /// Connection and disconnect button beside [action]; null leaves the button alone.
+  final Widget? status;
 
   /// Room the label above the pace takes at most.
   static const _labelHeight = 20.0;
@@ -77,7 +82,7 @@ class FreeLiveView extends StatelessWidget {
             SizedBox(height: 120, child: forceCurves!.widget()),
           ],
           const SizedBox(height: _gap),
-          SizedBox(height: 56, child: action),
+          SizedBox(height: 56, child: LiveActionRow(action: action, status: status)),
         ],
       ),
     );
@@ -144,7 +149,7 @@ class FreeLiveView extends StatelessWidget {
               children: [
                 Expanded(child: _dim(_tiles(context, math.min(52, pace * valueShareOfPace)))),
                 const SizedBox(height: _gap),
-                SizedBox(height: 52, child: action),
+                SizedBox(height: 52, child: LiveActionRow(action: action, status: status)),
               ],
             ),
           ),

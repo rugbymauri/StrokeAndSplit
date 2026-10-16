@@ -70,7 +70,7 @@ void main() {
       final straps = await _pump(tester, await _rower(device));
 
       expect(straps.attempts, [_h10]);
-      expect(find.descendant(of: find.byType(AppBar), matching: _dot), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const Key('live-status')), matching: _dot), findsOneWidget);
       expect(find.byKey(const Key('connection-dot')), findsOneWidget);
       expect(_dotColor(tester), AppColors.connected);
       expect(find.bySemanticsLabel('Pulsgurt: Verbunden'), findsOneWidget);

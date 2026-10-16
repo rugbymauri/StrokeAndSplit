@@ -11,6 +11,7 @@ import '../../l10n/l10n.dart';
 import 'force_curve.dart';
 import 'formatters.dart';
 import 'live_layout.dart';
+import 'live_status.dart';
 import 'metric_tile.dart';
 import 'pace_box.dart';
 import 'progress_frame.dart';
@@ -18,7 +19,7 @@ import 'stroke_rate_card.dart';
 
 /// The live display while rowing a template (ui-design, Design D2): the pace
 /// box with the progress frame, the stroke rate card, four small tiles, the
-/// force curve and the button that ends the session. The ghosts run in the
+/// force curve and the button that ends the session, with [status] beside it. The ghosts run in the
 /// progress frame and the gap to the ghost of the template is in the pace
 /// box (Change ghost, Design D1, D4).
 class CourseLiveView extends StatelessWidget {
@@ -34,6 +35,7 @@ class CourseLiveView extends StatelessWidget {
     this.forceCurves,
     this.ghost,
     this.ghostGap,
+    this.status,
   });
 
   final StatusTick? tick;
@@ -59,6 +61,9 @@ class CourseLiveView extends StatelessWidget {
   /// The gap to the ghost of the whole template; null without one.
   final GhostGap? ghostGap;
 
+  /// Connection and disconnect button beside the button; null leaves the button alone.
+  final Widget? status;
+
   static const _gap = 10.0;
 
   @override
@@ -74,7 +79,7 @@ class CourseLiveView extends StatelessWidget {
 
   Widget _portrait(BuildContext context, Size size) {
     // A ghost moved out of the outer track sticks out of the box by up to
-    // [ProgressFramePainter.overhang]; the top padding keeps it clear of the app bar.
+    // [ProgressFramePainter.overhang]; the top padding keeps it on the screen.
     final padding = EdgeInsets.fromLTRB(
       AppSpacing.pagePortrait,
       math.max(AppSpacing.s, ProgressFramePainter.overhang.ceilToDouble()),
@@ -118,7 +123,7 @@ class CourseLiveView extends StatelessWidget {
             SizedBox(height: curveHeight, child: forceCurves!.widget(variant: ForceCurveVariant.strip)),
           ],
           const Spacer(),
-          SizedBox(height: buttonHeight, child: action),
+          SizedBox(height: buttonHeight, child: LiveActionRow(action: action, status: status)),
         ],
       ),
     );
@@ -143,13 +148,31 @@ class CourseLiveView extends StatelessWidget {
           SizedBox(width: boxWidth, child: _dim(_paceBox())),
           const SizedBox(width: AppSpacing.m),
           Expanded(
-            child: _dim(_strokeRate(
-              math.min(72, cap),
-              landscape: true,
-              footer: curve
-                  ? (foreground) => forceCurves!.widget(variant: ForceCurveVariant.tinted, foreground: foreground)
-                  : null,
-            )),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: _dim(_strokeRate(
+                    math.min(72, cap),
+                    landscape: true,
+                    footer: curve
+                        ? (foreground) => forceCurves!.widget(variant: ForceCurveVariant.tinted, foreground: foreground)
+                        : null,
+                  )),
+                ),
+                // The side column is too narrow for it, so it sits left of the button, in the same row.
+                if (status case final status?) ...[
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    height: buttonHeight,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FittedBox(fit: BoxFit.scaleDown, child: status),
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
           const SizedBox(width: AppSpacing.m),
           SizedBox(
