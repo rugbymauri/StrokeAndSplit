@@ -34,6 +34,7 @@ Alle Befehle zeigt `make help`.
 | `make pull-recordings` | Mitschnitte vom Android-Gerät nach `./recordings` kopieren |
 | `make build-linux` | Linux-Release-Bundle bauen |
 | `make apk` | Universal-APK für Android bauen, Version optional mit `BUILD_NAME=1.2.0 BUILD_NUMBER=42` |
+| `make install-apk` | Universal-APK bauen und auf dem per USB verbundenen Android-Gerät installieren; `APK=datei.apk` installiert stattdessen eine geladene APK |
 | `make appimage` | Linux-Bundle nach `make build-linux` als AppImage nach `build/appimage/` packen |
 
 ## Verwendung
