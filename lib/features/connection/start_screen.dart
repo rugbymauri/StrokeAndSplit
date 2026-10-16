@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../app/app_language.dart';
 import '../../app/design_tokens.dart';
+import '../../app/widgets/language_button.dart';
 import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sessions/session_providers.dart';
@@ -30,14 +30,7 @@ class StartScreen extends ConsumerWidget {
     final navigator = Navigator.of(context);
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
-            tooltip: l10n.languageChoice,
-            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-            onPressed: () => _chooseLanguage(context, ref),
-          ),
-        ],
+        actions: const [LanguageButton()],
       ),
       body: SafeArea(
         child: Center(
@@ -172,27 +165,4 @@ class _DeviceRow extends ConsumerWidget {
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ChooseDevicesScreen())),
     );
   }
-}
-
-/// Lets the user pick the language of the app; it applies at once (Design D3).
-Future<void> _chooseLanguage(BuildContext context, WidgetRef ref) async {
-  final current = ref.read(appLanguageProvider);
-  final chosen = await showDialog<AppLanguage>(
-    context: context,
-    builder: (context) => SimpleDialog(
-      title: Text(context.l10n.languageChoice),
-      children: [
-        for (final language in AppLanguage.values)
-          SimpleDialogOption(
-            key: Key('language-${language.name}'),
-            onPressed: () => Navigator.of(context).pop(language),
-            child: ListTile(
-              title: Text(language.nativeName),
-              trailing: language == current ? const Icon(Icons.check) : null,
-            ),
-          ),
-      ],
-    ),
-  );
-  if (chosen != null) await ref.read(appLanguageProvider.notifier).choose(chosen);
 }

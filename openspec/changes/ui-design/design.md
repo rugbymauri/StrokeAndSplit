@@ -51,9 +51,9 @@ Farben:
 | `line` | `#2A3138` | Rahmen, Trennlinien, freie Abschnitte |
 | `track` | `#242B32` | leere Fortschrittsspur |
 | `trackInner` | `#1B3550` | leere innere Spur (Abschnitt), leicht blau getönt |
-| `text` | `#E8ECEF` | Text, Zahlen, primärer Button |
+| `text` | `#E8ECEF` | Text, Zahlen |
 | `textMuted` | `#9AA4AD` | Beschriftungen |
-| `zoneIn` | `#5AB0FF` | in der Zone, Zone mit Band, Primärfarbe (Fokus, Schalter, Auswahl) |
+| `zoneIn` | `#5AB0FF` | in der Zone, Zone mit Band, Primärfarbe (Fokus, Schalter, Auswahl, gefüllter Button; entschieden 2026-10-16) |
 | `zoneInSurface` / `zoneInText` | `#0F2438` / `#A9D3FF` | Karte bzw. Text in der Zone |
 | `zoneOut` | `#FF9A3D` | ausserhalb der Zone, Fehler, Löschen |
 | `zoneOutSurface` / `zoneOutText` | `#33200F` / `#FFC58F` | Karte bzw. Text ausserhalb |
@@ -164,7 +164,7 @@ Zahlen werden in allen Editoren mit einem Tastenpaar eingestellt, nicht getippt 
 
 ### D8: Sprachwahl
 
-Entschieden am 2026-10-16 vom Nutzer: Die Sprachwahl aus `translations` (dort Design D3) bleibt ein Symbol in der App-Leiste des Startbildschirms und öffnet wie heute den Dialog mit den Sprachen. Sie bekommt nur die Gestaltung aus D1 (Symbol in `textMuted`, Touch-Ziel ab 44 px). Der Canvas zeigt keinen Platz dafür.
+Entschieden am 2026-10-16 vom Nutzer: Die Sprachwahl aus `translations` (dort Design D3) bleibt ein Symbol in der App-Leiste und öffnet wie heute den Dialog mit den Sprachen. Das Symbol steht auf dem Startbildschirm und auf „Geräte wählen“, damit sich die Sprache schon beim ersten Start wählen lässt, bevor ein Rudergerät gewählt ist. Beide Screens nutzen dasselbe Widget. Das Symbol bekommt nur die Gestaltung aus D1 (Symbol in `textMuted`, Touch-Ziel ab 44 px). Der Canvas zeigt keinen Platz dafür.
 
 *Alternativen*: ein eigener Einstellungs-Screen oder ein Eintrag unter dem Link „Sessions“. Verworfen, solange die Sprache die einzige Einstellung ist. Kommen weitere Einstellungen dazu, etwa der Brustgurt aus `heart-rate`, kann die Sprachwahl in einen Einstellungs-Screen umziehen; der Pulsgurt sitzt aber in „Geräte wählen“ (D6).
 

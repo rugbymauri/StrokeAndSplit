@@ -101,7 +101,7 @@ void main() {
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
-    expect(find.text('Distanz'), findsOneWidget);
+    expect(find.text('DISTANZ'), findsOneWidget);
     expect(find.text('Sprint'), findsOneWidget);
     expect(find.text('100 m · 1:45–1:50 · 30–34 spm'), findsOneWidget);
     expect(find.text('nicht verwendet'), findsOneWidget);
@@ -152,7 +152,7 @@ void main() {
     await tester.runAsync(() => setup.zones.create(_sprint.copyWith(name: 'Lang', length: 200)));
     await setup.pump(tester, locale: const Locale('en'));
 
-    expect(find.text('Distance'), findsOneWidget);
+    expect(find.text('DISTANCE'), findsOneWidget);
     expect(find.text('in 2 courses'), findsOneWidget);
     expect(find.text('not used'), findsOneWidget);
     expect(find.text('New zone'), findsOneWidget);

@@ -17,7 +17,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
-| 3 | `ui-design` | 15/18 | in Arbeit | – |
+| 3 | `ui-design` | 16/18 | in Arbeit | – |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
 | 6 | `statistics` | 6/12 | Gruppe 1 in `main`, Rest nach 3 | – |
@@ -105,7 +105,7 @@ Vor dem Start angepasst (2026-10-16, in Proposal, Design, Specs und Tasks eingea
 Vorläufig, vom Nutzer zu bestätigen:
 - [x] D6 Geräte zuerst (Nutzer, 2026-10-16): Die App beginnt mit „Geräte wählen“ (Rudergerät inkl. Simulatoren, optional Pulsgurt aus `heart-rate`), dann Startbildschirm mit Gerätezeile. Der Quellen-Dialog beim Start einer Vorlage fällt weg. `heart-rate` 5.1 koppelt den Gurt dort statt auf dem Startbildschirm.
 - [x] „Geräte wählen“ wird übersprungen, wenn das zuletzt gewählte Rudergerät gefunden wird (Nutzer, 2026-10-16). Vorläufig: Suche bis 10 s, Simulator als letzte Wahl geht direkt zum Startbildschirm.
-- [x] D8 Sprachwahl bleibt Symbol in der App-Leiste des Startbildschirms (Nutzer, 2026-10-16).
+- [x] D8 Sprachwahl als Symbol in der App-Leiste des Startbildschirms und von „Geräte wählen“, also schon beim ersten Start (Nutzer, 2026-10-16; `LanguageButton` in `lib/app/widgets/`).
 - [x] Legende „Runde 2 / 3“ (Nutzer, 2026-10-16); dafür MODIFIED-Delta zu `course-rowing` nötig (mit 2.3). Vorläufig: Bereich „200–800 m“ entfällt.
 - [x] OFL-Lizenzen der Schriften auf der Lizenzseite der App (`registerFontLicenses` in `lib/app/font_licenses.dart`) und Barlow Condensed 500 für Einheiten (Nutzer, 2026-10-16).
 
@@ -124,9 +124,10 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Task 2.3 `PaceBox` in `lib/features/live/pace_box.dart`, Legende „Runde 2 / 3“ mit MODIFIED-Delta zu `course-rowing`. Bis 3.3 zeigt `course_bar.dart` noch „Runde 2 von 3“ (`courseLapOf` entfällt mit 3.3). Vorläufig: unter 260 px Höhe wird der Inhalt verkleinert (auf dem Gerät prüfen, 6.1); Zonenstatus „in der Zone“ klein wie bisher.
 - [x] Task 5.1 „Geräte wählen“ (`choose_devices_screen.dart`, gemerktes Rudergerät in `rower_choice.dart`, `LaunchScreen` sucht es bis 10 s) und Startbildschirm mit Gerätezeile, „Rudern“, „Frei rudern“, „Nochmal“, „Sessions“; Quellen-Dialog beim Vorlagenstart entfernt. Vorläufig: „Nochmal“ fällt auf eine ältere Session zurück, wenn die Vorlage der jüngsten gelöscht ist; Pulsgurt-Bereich fehlt bis `heart-rate`. Nur am Gerät prüfbar: Wiederverbinden per ID ohne Scan (BlueZ), 10-s-Suche mit PM5/FTMS, Bluetooth aus beim Start.
 - [x] Task 5.2 Zusammenfassung nach Canvas (`session_summary_screen.dart`), Platz für die Marken aus `statistics` rechts der Runden und neben dem Titel. Entschieden (Nutzer, 2026-10-16): kein Anteil in der Zone für die ganze Session, nur pro Runde; „Fertig“ nach einer Session trennt und führt zum Startbildschirm. Vorläufig: Kopf mit Vorlage und Quelle; Schläge als vierter Durchschnittswert; beste Runde mit Stern.
-- [x] Task 4.2 Vorlagen-Editor (Umschalter „Feste Anzahl“/„Offen bis Stopp“, Runden mit `OarStepper`, Ergebnis-Zeile ohne Zeitschätzung) und 4.4 Zahlenfelder als `OarStepper` in Strecken-, Zonen-Editor und „Zone einbauen“; `OarStepper.background` für Karten. Entschieden (Nutzer, 2026-10-16): Pace-Band einer neuen Zone startet bei 2:45–2:50; Grenzen Pace 1:00–5:00, Schlagzahl 10–60, Runden bis 99. Vorläufig: Startwerte neue Strecke 2000 m bzw. 4:00, neue Zone 100 m bzw. 1:00 (Schlagzahl-Band aus, sonst 24–26); Texte aus dem Canvas („Pace-Band“, „Schnellste“ …).
+- [x] Task 4.1 Vorlagen-Tab: Tabs als Segment-Umschalter, Vorlagen als aufklappbare Karten mit Bändern und „Starten“ (gewählte Quelle), Vorauswahl aus „Nochmal“ aufgeklappt und ins Bild gescrollt; Zonen-Tab angeglichen; „⌀“ durch „Ø“ ersetzt (Glyphe fehlt in IBM Plex Sans). Vorläufig: Löschen einer Vorlage im Editor statt in der Liste; Titel „Vorlage rudern“ ohne Geräteanzeige; kein „Frei rudern“ im Vorlagen-Tab; Platz für Ghost und Ranglisten-Marken frei.
+- [x] Task 4.2 Vorlagen-Editor (Umschalter „Feste Anzahl“/„Offen bis Stopp“, Runden mit `OarStepper`, Ergebnis-Zeile „3 × 1000 m“ ohne Zeitschätzung, vom Nutzer bestätigt) und 4.4 Zahlenfelder als `OarStepper` in Strecken-, Zonen-Editor und „Zone einbauen“; `OarStepper.background` für Karten. Entschieden (Nutzer, 2026-10-16): Pace-Band einer neuen Zone startet bei 2:45–2:50; Grenzen Pace 1:00–5:00, Schlagzahl 10–60, Runden bis 99. Vorläufig: Startwerte neue Strecke 2000 m bzw. 4:00, neue Zone 100 m bzw. 1:00 (Schlagzahl-Band aus, sonst 24–26); Texte aus dem Canvas („Pace-Band“, „Schnellste“ …).
 - [x] Task 4.3 Streckenliste (Karte mit Balken, „12× gerudert“, Legende) und Strecken-Kopf (Achse/Länge nebeneinander, Positionen am grossen Balken, Abschnitte als Karte, Versionierungshinweis); `courseRowCountsProvider` zählt Sessions pro Strecke. Vorläufig: Antippen im Balken öffnet „Zone verschieben“ bzw. „Zone einbauen“ an der Lücke; Liste zählt alle Versionen, Hinweis nur die neueste (Simulator zählt mit); Hinweistext wörtlich aus dem Canvas; Button „Strecke anlegen“.
-- [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Primärfarbe Blau `zoneIn` (Nutzer, 2026-10-16), gefüllter Button bleibt `text` wie im Canvas. Vorläufig: Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`).
+- [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Primärfarbe Blau `zoneIn`, auch für den gefüllten Button (Nutzer, 2026-10-16). Vorläufig: Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`).
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 

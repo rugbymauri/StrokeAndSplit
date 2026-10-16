@@ -4,8 +4,7 @@ import 'design_tokens.dart';
 
 /// The dark theme of the app, built from the tokens of design D1.
 ///
-/// The primary colour is blue ([AppColors.zoneIn]); the filled button stays in
-/// [AppColors.text] as in the canvas (design D1).
+/// The primary colour is blue ([AppColors.zoneIn]), also for the filled button.
 ThemeData appTheme() {
   const colors = ColorScheme(
     brightness: Brightness.dark,
@@ -72,7 +71,7 @@ ThemeData appTheme() {
     listTileTheme: const ListTileThemeData(iconColor: AppColors.textMuted),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.text,
+        backgroundColor: AppColors.zoneIn,
         foregroundColor: AppColors.bg,
         shape: cardShape,
         textStyle: AppTextStyles.button.copyWith(fontWeight: FontWeight.w600),
@@ -109,11 +108,17 @@ ThemeData appTheme() {
         borderSide: BorderSide(color: AppColors.text, width: 2),
       ),
     ),
-    tabBarTheme: const TabBarThemeData(
+    // Segmented tabs as in the canvas: the chosen tab on a lighter pill.
+    tabBarTheme: TabBarThemeData(
       labelColor: AppColors.text,
       unselectedLabelColor: AppColors.textMuted,
-      indicatorColor: AppColors.text,
-      dividerColor: AppColors.line,
+      labelStyle: AppTextStyles.button.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
+      unselectedLabelStyle: AppTextStyles.button.copyWith(fontSize: 15),
+      indicator: BoxDecoration(color: AppColors.line, borderRadius: BorderRadius.circular(AppRadii.small - 3)),
+      indicatorSize: TabBarIndicatorSize.tab,
+      dividerHeight: 0,
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      splashBorderRadius: BorderRadius.circular(AppRadii.small - 3),
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.text, linearTrackColor: AppColors.track),
   );

@@ -409,13 +409,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sessionTime => 'Zeit';
 
   @override
-  String get sessionAveragePace => '⌀ Pace';
+  String get sessionAveragePace => 'Ø Pace';
 
   @override
-  String get sessionAverageWatts => '⌀ Watt';
+  String get sessionAverageWatts => 'Ø Watt';
 
   @override
-  String get sessionAverageStrokeRate => '⌀ spm';
+  String get sessionAverageStrokeRate => 'Ø spm';
 
   @override
   String get sessionStrokes => 'Schläge';
@@ -519,6 +519,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get templateCreate => 'Vorlage anlegen';
+
+  @override
+  String get templateStart => 'Starten';
 
   @override
   String get templatesEmpty => 'Noch keine Vorlagen angelegt.';
