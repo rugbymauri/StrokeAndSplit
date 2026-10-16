@@ -18,7 +18,9 @@ Guid _pm5Uuid(String shortId) => Guid('ce06$shortId-43e5-11e4-916c-0800200c9a66'
 
 final _rowingService = _pm5Uuid('0030');
 final _sampleRate = _pm5Uuid('0034');
-const _subscribedIds = ['0031', '0032', '0033', '0035', '0036'];
+/// `003d` is the force curve (change `force-curve`); a PM5 without it is
+/// reported as missing and the recording continues.
+const _subscribedIds = ['0031', '0032', '0033', '0035', '0036', '003d'];
 
 final _ftmsService = Guid(FtmsIds.service);
 
