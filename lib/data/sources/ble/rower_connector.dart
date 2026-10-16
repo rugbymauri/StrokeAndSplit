@@ -4,12 +4,14 @@ import 'dart:typed_data';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import 'ble_transport.dart';
+import 'heart_rate_transport.dart';
 
 /// A connected device with its services discovered: the thin part that
 /// depends on the BLE plugin.
 abstract interface class GattConnection {
-  /// Short ids of the characteristics of the PM5 rowing service and of the
-  /// Fitness Machine Service, e.g. `0031` or `2ad1`.
+  /// Short ids of the characteristics of the services looked for: the PM5
+  /// rowing service and the Fitness Machine Service for a rower, the Heart
+  /// Rate service for a strap, e.g. `0031`, `2ad1` or `2a37`.
   Set<String> get characteristics;
 
   /// Values of subscribed characteristics as (short id, bytes).
@@ -68,7 +70,7 @@ Future<RowerLink> _setUpPm5(GattConnection connection, Duration ergTypeTimeout) 
   if (kind == Pm5ErgKind.skiErg || kind == Pm5ErgKind.bikeErg) {
     throw RowerConnectException(kind == Pm5ErgKind.skiErg ? RowerConnectError.skiErg : RowerConnectError.bikeErg);
   }
-  return _GattRowerLink(connection, Pm5Characteristics.subscribed.toSet());
+  return _GattLink(connection, Pm5Characteristics.subscribed.toSet());
 }
 
 Future<RowerLink> _setUpFtms(
@@ -82,7 +84,26 @@ Future<RowerLink> _setUpFtms(
   }
   await connection.subscribe(FtmsIds.rowerData);
   if (characteristics.contains(FtmsIds.controlPoint)) await _requestStart(connection, controlTimeout, onWarning);
-  return _GattRowerLink(connection, {FtmsIds.rowerData});
+  return _GattLink(connection, {FtmsIds.rowerData});
+}
+
+/// Sets up a freshly connected heart rate strap: subscribes to the Heart Rate
+/// Measurement and returns the link (Design D2).
+///
+/// Disconnects and throws [HeartRateConnectException] when the device offers
+/// no Heart Rate service or the subscription fails.
+Future<HeartRateLink> setUpHeartRateMonitor(GattConnection connection) async {
+  try {
+    if (!connection.characteristics.contains(HeartRateIds.measurement)) {
+      throw const HeartRateConnectException(HeartRateConnectError.noHeartRateService);
+    }
+    await connection.subscribe(HeartRateIds.measurement);
+    return _GattLink(connection, {HeartRateIds.measurement});
+  } catch (e) {
+    await connection.disconnect();
+    if (e is HeartRateConnectException) rethrow;
+    throw HeartRateConnectException(HeartRateConnectError.failed, message: '$e');
+  }
 }
 
 /// Asks an FTMS rower to send: Request Control, then Start or Resume (D7).
@@ -137,9 +158,9 @@ Future<List<int>?> _first(
   return result.future;
 }
 
-/// Forwards the rowing data of a set-up connection.
-class _GattRowerLink implements RowerLink {
-  _GattRowerLink(this._connection, this._ids);
+/// Forwards the data of a set-up connection: rowing data or heart rate.
+class _GattLink implements RowerLink, HeartRateLink {
+  _GattLink(this._connection, this._ids);
 
   final GattConnection _connection;
   final Set<String> _ids;

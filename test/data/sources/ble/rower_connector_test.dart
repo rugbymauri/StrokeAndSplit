@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:aergrow/data/sources/ble/ble_transport.dart';
+import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
 import 'package:aergrow/data/sources/ble/rower_connector.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:fake_async/fake_async.dart';
@@ -250,6 +251,63 @@ void main() {
         ..notify(FtmsIds.rowerData, [1]);
 
       expect(received, [FtmsIds.rowerData]);
+    });
+  });
+
+  group('heart rate strap', () {
+    (HeartRateLink?, Object?) setUpStrap(_FakeConnection connection) {
+      HeartRateLink? link;
+      Object? error;
+      fakeAsync((async) {
+        setUpHeartRateMonitor(connection).then<void>((l) => link = l, onError: (Object e) => error = e);
+        async.flushMicrotasks();
+      });
+      return (link, error);
+    }
+
+    test('subscribes to the heart rate measurement', () {
+      final connection = _FakeConnection({HeartRateIds.measurement, '2a38'});
+      final (link, error) = setUpStrap(connection);
+
+      expect(error, isNull);
+      expect(link, isNotNull);
+      expect(connection.subscribed, [HeartRateIds.measurement]);
+      expect(connection.writes, isEmpty);
+      expect(connection.disconnected, isFalse);
+    });
+
+    test('forwards only the heart rate measurement', () {
+      final connection = _FakeConnection({HeartRateIds.measurement, '2a38'});
+      final (link, _) = setUpStrap(connection);
+      final received = <String>[];
+      link!.notifications.listen((n) => received.add('${n.$1}:${n.$2}'));
+
+      connection
+        ..notify('2a38', [1])
+        ..notify(HeartRateIds.measurement, [0x10, 72, 0x00, 0x04]);
+
+      expect(received, ['2a37:[16, 72, 0, 4]']);
+    });
+
+    test('rejects a device without heart rate service and disconnects', () {
+      final connection = _FakeConnection(_pm5Characteristics);
+      final (link, error) = setUpStrap(connection);
+
+      expect(link, isNull);
+      expect(
+        error,
+        isA<HeartRateConnectException>().having((e) => e.error, 'error', HeartRateConnectError.noHeartRateService),
+      );
+      expect(connection.disconnected, isTrue);
+    });
+
+    test('reports a failed subscription as a failed connection', () {
+      final connection = _FakeConnection({HeartRateIds.measurement})
+        ..onSubscribe = (_) => throw StateError('gatt error');
+      final (_, error) = setUpStrap(connection);
+
+      expect(error, isA<HeartRateConnectException>().having((e) => e.error, 'error', HeartRateConnectError.failed));
+      expect(connection.disconnected, isTrue);
     });
   });
 }
