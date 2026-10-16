@@ -97,13 +97,13 @@ Der Rahmen der Pace-Box besteht aus drei ineinanderliegenden Spuren in der Form 
 - Bei offener Rundenzahl entfällt die Streckenspur, weil die Gesamtlänge unbekannt ist. Die Rundenspur rückt nach aussen.
 - Die Position wird als Bogenlänge auf dem Pfad berechnet (`PathMetrics`), damit gleiche Anteile überall gleich lang sind, auch in den Ecken.
 
-Inhalt der Box von oben nach unten: Beschriftung „Pace /500 m“, die Pace, Zonenstatus mit Band (z. B. „In der Zone · 2:05–2:10“), eine Trennlinie und die Legende. Die Legende hat eine Zeile pro Spur mit Farbpunkt, Bezeichnung und Restangabe, z. B. „Gesamt 1 460 / 3 000 m“, „Runde 2 von 3 · noch 540 m“, „Tempo · noch 340 m“ bzw. „frei · noch 340 m“. Bei Zeitstrecken stehen statt Metern Zeiten. Die Runde heisst wie bisher „Runde 2 von 3“ bzw. bei offener Rundenzahl „Runde 2“, damit die Spec `course-rowing` gilt.
+Inhalt der Box von oben nach unten: Beschriftung „Pace /500 m“, die Pace, Zonenstatus mit Band (z. B. „In der Zone · 2:05–2:10“), eine Trennlinie und die Legende. Die Legende hat eine Zeile pro Spur mit Farbpunkt, Bezeichnung und Restangabe, z. B. „Gesamt 1 460 / 3 000 m“, „Runde 2 / 3 · noch 540 m“, „Tempo · noch 340 m“ bzw. „frei · noch 340 m“. Bei Zeitstrecken stehen statt Metern Zeiten. Die Runde heisst knapp „Runde 2 / 3“ statt wie bisher „Runde 2 von 3“, bei offener Rundenzahl weiterhin „Runde 2“ (entschieden 2026-10-16). Die Spec `course-rowing` ändert sich entsprechend.
 
 Was die bisherige Streckenleiste `course_bar.dart` zeigt, wandert in die Pace-Box und die Kacheln (Task 3.3):
 
 | `course_bar.dart` | neu |
 |---|---|
-| Runde („Runde 2 von 3“) | Legende, Zeile der Rundenspur |
+| Runde („Runde 2 / 3“) | Legende, Zeile der Rundenspur |
 | Zonenname bzw. „frei“ (`segment.zoneName`, ohne Namen „Zone“) | Legende, Zeile der Abschnittsspur |
 | Rest bis Abschnittsende | Legende, Zeile der Abschnittsspur |
 | Pace-Band | Zonenstatus unter der Pace |
