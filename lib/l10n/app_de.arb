@@ -549,15 +549,15 @@
   "@sessionTime": {
     "description": "Summary: label of the time rowed"
   },
-  "sessionAveragePace": "⌀ Pace",
+  "sessionAveragePace": "Ø Pace",
   "@sessionAveragePace": {
     "description": "Summary: label of the average pace per 500 metres"
   },
-  "sessionAverageWatts": "⌀ Watt",
+  "sessionAverageWatts": "Ø Watt",
   "@sessionAverageWatts": {
     "description": "Summary: label of the average power"
   },
-  "sessionAverageStrokeRate": "⌀ spm",
+  "sessionAverageStrokeRate": "Ø spm",
   "@sessionAverageStrokeRate": {
     "description": "Summary: label of the average stroke rate"
   },

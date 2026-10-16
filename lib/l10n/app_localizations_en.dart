@@ -407,13 +407,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionTime => 'Time';
 
   @override
-  String get sessionAveragePace => '⌀ Pace';
+  String get sessionAveragePace => 'Ø Pace';
 
   @override
-  String get sessionAverageWatts => '⌀ Watts';
+  String get sessionAverageWatts => 'Ø Watts';
 
   @override
-  String get sessionAverageStrokeRate => '⌀ spm';
+  String get sessionAverageStrokeRate => 'Ø spm';
 
   @override
   String get sessionStrokes => 'Strokes';

@@ -190,7 +190,7 @@ void main() {
     expect(find.text('2512 m'), findsOneWidget);
     expect(find.text('In der Zone'), findsNothing);
     expect(find.text('RUNDEN'), findsNothing);
-    for (final value in ['⌀ Pace 2:05.4', '⌀ spm 22,5', '⌀ Watt 178', 'Schläge 236']) {
+    for (final value in ['Ø Pace 2:05.4', 'Ø spm 22,5', 'Ø Watt 178', 'Schläge 236']) {
       expect(find.text(value), findsOneWidget, reason: value);
     }
     expect(find.widgetWithText(OutlinedButton, 'Abspielen'), findsOneWidget);
@@ -218,7 +218,7 @@ void main() {
       expect(find.text(label), findsOneWidget, reason: label);
     }
     expect(_caption(tester, const Key('lap-2')), 'incomplete · 1:40.0');
-    expect(find.textContaining('⌀ spm'), findsOneWidget);
+    expect(find.textContaining('Ø spm'), findsOneWidget);
     expect(find.byWidgetPredicate((w) => w is Icon && w.semanticLabel == 'Best lap'), findsOneWidget);
     expect(find.widgetWithText(OutlinedButton, 'Play back'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Done'), findsOneWidget);
