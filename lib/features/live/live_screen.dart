@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../app/platform_providers.dart';
 import '../../data/sessions/session_providers.dart';
@@ -173,7 +173,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                         ),
                 ),
               ),
-              if (source is SimulatedSource) SimulatorControls(source: source),
+              if (source is SimulatedSource)
+                SimulatorControls(
+                  source: source,
+                  onProtocolChanged: recording == null
+                      ? (protocol) => ref.read(activeErgSourceProvider.notifier).use(source.withProtocol(protocol))
+                      : null,
+                ),
             ],
           ),
         ),

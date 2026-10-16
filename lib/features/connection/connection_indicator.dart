@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/sources/erg_source.dart';
@@ -52,7 +53,12 @@ class _SourceBadge extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final (label, background, foreground) = switch (source.kind) {
       ErgSourceKind.pm5 => (source.name, colors.secondaryContainer, colors.onSecondaryContainer),
-      ErgSourceKind.simulator => ('SIMULATOR', colors.tertiary, colors.onTertiary),
+      ErgSourceKind.ftms => ('${source.name} · FTMS', colors.secondaryContainer, colors.onSecondaryContainer),
+      ErgSourceKind.simulator => (
+          source.protocol == ErgProtocol.ftms ? 'SIMULATOR (FTMS)' : 'SIMULATOR',
+          colors.tertiary,
+          colors.onTertiary,
+        ),
       ErgSourceKind.replay => ('REPLAY', colors.tertiary, colors.onTertiary),
     };
     return Container(

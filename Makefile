@@ -7,7 +7,7 @@ ADB     ?= $(or $(shell command -v adb 2>/dev/null),$(HOME)/Android/Sdk/platform
 # Only ids made of safe characters are taken, as the id ends up in a shell command.
 ANDROID_DEVICE ?= $(shell $(ADB) devices 2>/dev/null | awk 'NR > 1 && $$2 == "device" && $$1 ~ /^[A-Za-z0-9._:-]+$$/ { print $$1; exit }')
 
-PROTOCOL       := packages/pm5_protocol
+PROTOCOL       := packages/erg_protocol
 SPIKE          := lib/spike/spike_main.dart
 RECORDINGS     := recordings
 ANDROID_FILES  := /sdcard/Android/data/ch.aergrow.aergrow/files
@@ -47,11 +47,14 @@ run: ## Start the app on the Linux desktop
 run-android: ## Start the app on a connected Android device
 	$(FLUTTER) run -d $(or $(ANDROID_DEVICE),$(error No Android device found, check `$(ADB) devices`))
 
-spike: ## Start the PM5 BLE spike on the Linux desktop (recordings go to the documents folder, e.g. ~/Dokumente)
+spike: ## Start the BLE spike for PM5 and FTMS rowers on the Linux desktop (recordings go to the documents folder, e.g. ~/Dokumente)
 	$(FLUTTER) run -d linux -t $(SPIKE)
 
-spike-android: ## Start the PM5 BLE spike on a connected Android device
+spike-android: ## Start the BLE spike for PM5 and FTMS rowers on a connected Android device
 	$(FLUTTER) run -d $(or $(ANDROID_DEVICE),$(error No Android device found, check `$(ADB) devices`)) -t $(SPIKE)
+
+ftms-rower: ## Play an FTMS recording as a software FTMS rower over Bluetooth (FILE=recording.jsonl, test from a phone)
+	uv run tool/ftms_rower/ftms_rower.py $(or $(FILE),$(error Set FILE to an FTMS recording, e.g. packages/erg_protocol/test/fixtures/ftms_just_row.jsonl)) $(ARGS)
 
 pull-recordings: ## Copy spike recordings from the Android device to ./recordings
 	mkdir -p $(RECORDINGS)

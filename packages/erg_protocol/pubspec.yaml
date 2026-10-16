@@ -1,0 +1,11 @@
+name: erg_protocol
+description: Decoders and encoders for the Bluetooth data of rowing machines (Concept2 PM5 and FTMS).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.5
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

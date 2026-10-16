@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:clock/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import '../courses/lap_tracker.dart';
 import '../db/database.dart';
@@ -90,11 +90,13 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
     final id = await _repository.create(
       startedAt: clock.now(),
       source: source.kind,
-      deviceName: source.kind == ErgSourceKind.pm5 ? source.name : null,
+      protocol: source.protocol,
+      deviceName: source.kind == ErgSourceKind.pm5 || source.kind == ErgSourceKind.ftms ? source.name : null,
       template: template,
     );
     final accumulator = _accumulator = SessionAccumulator(
       id,
+      protocol: source.protocol,
       course: template?.course.definition,
       plannedLaps: template?.laps,
     );

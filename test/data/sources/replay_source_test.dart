@@ -4,10 +4,10 @@ import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/replay_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 final _recording = RawRecording.parseLines(
-    File('packages/pm5_protocol/test/fixtures/just_row.jsonl').readAsLinesSync());
+    File('packages/erg_protocol/test/fixtures/just_row.jsonl').readAsLinesSync());
 
 List<String> _decode(Iterable<RawPacket> packets) {
   final decoder = Pm5Decoder();
@@ -59,5 +59,14 @@ void main() {
       expect(done, isTrue);
       expect(_decode(replayed), orderedEquals(_decode(_recording.packets)));
     });
+  });
+
+  test('takes the protocol from the header of the recording', () {
+    expect(ReplaySource(_recording).protocol, ErgProtocol.pm5, reason: 'the fixture names no protocol');
+    final ftms = RawRecording(
+      metadata: {'format': RawRecording.formatName, 'version': 1, 'protocol': 'ftms'},
+      packets: const [],
+    );
+    expect(ReplaySource(ftms).protocol, ErgProtocol.ftms);
   });
 }

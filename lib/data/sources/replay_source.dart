@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:clock/clock.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import 'erg_source.dart';
 
-/// Plays a recorded session back as if the PM5 sent it again, at original
-/// speed or faster.
+/// Plays a recorded session back as if the rowing machine sent it again, at
+/// original speed or faster.
 class ReplaySource implements ErgSource {
   ReplaySource(this.recording, {this.speed = 1, String? name})
       : assert(speed > 0),
@@ -29,6 +29,10 @@ class ReplaySource implements ErgSource {
 
   @override
   ErgSourceKind get kind => ErgSourceKind.replay;
+
+  /// From the header of the recording; recordings without one are PM5 ones.
+  @override
+  ErgProtocol get protocol => ErgProtocol.parse(recording.metadata['protocol']);
 
   @override
   Stream<RawPacket> get packets => _packets.stream;

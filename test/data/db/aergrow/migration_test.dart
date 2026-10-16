@@ -3,13 +3,17 @@
 import 'package:drift/drift.dart' hide isNull;
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:aergrow/data/db/database.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:aergrow/data/sessions/session_repository.dart';
+import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../support/test_database.dart';
 import 'generated/schema.dart';
 
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
+import 'generated/schema_v3.dart' as v3;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -80,7 +84,8 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 2);
+      // The repository reads the current schema.
+      await verifier.migrateAndValidate(db, 4);
       final repository = SessionRepository(db);
 
       final session = (await repository.get(1))!;
@@ -200,4 +205,198 @@ void main() {
       await db.close();
     },
   );
+
+  group('to version 4', () {
+    v1.StrokesCompanion stroke1(int number) => v1.StrokesCompanion.insert(
+          sessionId: 1,
+          tMs: number * 2500,
+          distanceDm: number * 100,
+          strokeNumber: number,
+          driveLengthMeters: 1.38,
+          driveTimeMs: 820,
+          recoveryTimeMs: 1640,
+          peakForceNewtons: 712.5,
+          averageForceNewtons: 431,
+          watts: const Value(203),
+        );
+
+    Future<void> expectFullStrokes(AppDatabase db) async {
+      final strokes = await (db.select(db.strokes)
+            ..orderBy([(s) => OrderingTerm.asc(s.strokeNumber)]))
+          .get();
+      expect(
+        strokes.map(
+          (s) => (
+            s.strokeNumber,
+            s.driveLengthMeters,
+            s.driveTimeMs,
+            s.recoveryTimeMs,
+            s.peakForceNewtons,
+            s.averageForceNewtons,
+            s.watts,
+          ),
+        ),
+        [
+          (1, 1.38, 820, 1640, 712.5, 431.0, 203),
+          (2, 1.38, 820, 1640, 712.5, 431.0, 203),
+        ],
+      );
+    }
+
+    test('keeps the strokes of version 1 with all details as PM5 sessions',
+        () async {
+      final schema = await verifier.schemaAt(1);
+      final old = v1.DatabaseAtV1(schema.newConnection());
+      await old.batch((b) {
+        b.insert(
+          old.sessions,
+          v1.SessionsCompanion.insert(
+            startedAt: 0,
+            status: 'complete',
+            source: 'pm5',
+            deviceName: const Value('PM5 Test'),
+            strokeCount: const Value(2),
+          ),
+        );
+        b.insertAll(old.strokes, [stroke1(1), stroke1(2)]);
+      });
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 4);
+
+      final session = (await db.select(db.sessions).get()).single;
+      expect((session.protocol, session.deviceName, session.strokeCount),
+          (ErgProtocol.pm5, 'PM5 Test', 2));
+      await expectFullStrokes(db);
+      await db.close();
+    });
+
+    test('keeps strokes, laps and courses with zones of version 3', () async {
+      final schema = await verifier.schemaAt(3);
+      final old = v3.DatabaseAtV3(schema.newConnection());
+      await old.batch((b) {
+        b.insert(
+          old.zones,
+          v3.ZonesCompanion.insert(
+            name: 'Tempo',
+            axis: 'distance',
+            length: 600,
+            paceFastCs: const Value(12500),
+            paceSlowCs: const Value(13000),
+          ),
+        );
+        b.insert(
+          old.courses,
+          v3.CoursesCompanion.insert(name: 'Seerunde', axis: 'distance'),
+        );
+        b.insert(
+          old.courseVersions,
+          v3.CourseVersionsCompanion.insert(
+            courseId: 1,
+            version: 1,
+            length: 1000,
+            createdAt: 0,
+          ),
+        );
+        b.insertAll(old.courseSegments, [
+          v3.CourseSegmentsCompanion.insert(
+            versionId: 1,
+            position: 0,
+            length: 200,
+          ),
+          v3.CourseSegmentsCompanion.insert(
+            versionId: 1,
+            position: 1,
+            length: 600,
+            paceFastCs: const Value(12500),
+            paceSlowCs: const Value(13000),
+            zoneId: const Value(1),
+            zoneName: const Value('Tempo'),
+          ),
+          v3.CourseSegmentsCompanion.insert(
+            versionId: 1,
+            position: 2,
+            length: 200,
+          ),
+        ]);
+        b.insert(
+          old.sessions,
+          v3.SessionsCompanion.insert(
+            startedAt: 0,
+            status: 'complete',
+            source: 'pm5',
+            courseVersionId: const Value(1),
+            plannedLaps: const Value(1),
+          ),
+        );
+        b.insertAll(old.strokes, [
+          for (final n in [1, 2])
+            v3.StrokesCompanion.insert(
+              sessionId: 1,
+              tMs: n * 2500,
+              distanceDm: n * 100,
+              strokeNumber: n,
+              driveLengthMeters: 1.38,
+              driveTimeMs: 820,
+              recoveryTimeMs: 1640,
+              peakForceNewtons: 712.5,
+              averageForceNewtons: 431,
+              watts: const Value(203),
+            ),
+        ]);
+        b.insert(
+          old.laps,
+          v3.LapsCompanion.insert(
+            sessionId: 1,
+            lapNo: 1,
+            startWallMs: 0,
+            endWallMs: 252000,
+            startDistanceDm: 0,
+            endDistanceDm: 10000,
+            complete: 1,
+            inZoneShare: const Value(0.75),
+          ),
+        );
+      });
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 4);
+
+      final session = (await db.select(db.sessions).get()).single;
+      expect((session.protocol, session.courseVersionId), (ErgProtocol.pm5, 1));
+      await expectFullStrokes(db);
+      final lap = (await db.select(db.laps).get()).single;
+      expect((lap.endWallMs, lap.inZoneShare), (252000, 0.75));
+      final segment = (await (db.select(db.courseSegments)
+                ..where((s) => s.position.equals(1)))
+              .get())
+          .single;
+      expect((segment.zoneId, segment.zoneName), (1, 'Tempo'));
+      expect((await db.select(db.zones).get()).single.name, 'Tempo');
+      await db.close();
+    });
+
+    test('stores strokes without details', () async {
+      final db = openTestDatabase();
+      final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
+            startedAt: DateTime(2026, 10, 16),
+            status: SessionStatus.complete,
+            source: ErgSourceKind.pm5,
+            protocol: const Value(ErgProtocol.ftms),
+          ));
+      await db.into(db.strokes).insert(StrokesCompanion.insert(
+            sessionId: id,
+            tMs: 2500,
+            distanceDm: 100,
+            strokeNumber: 1,
+          ));
+      final stroke = (await db.select(db.strokes).get()).single;
+      expect(stroke.driveLengthMeters, isNull);
+      expect(stroke.peakForceNewtons, isNull);
+      expect((await db.select(db.sessions).get()).single.protocol, ErgProtocol.ftms);
+      await db.close();
+    });
+  });
 }

@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import '../courses/course.dart';
 import '../courses/lap_tracker.dart';
@@ -32,13 +32,20 @@ class SessionBatch {
 /// so an imported session ends up with the same rows as the recorded one.
 /// On a [course] it also follows the laps (Design D2).
 class SessionAccumulator {
-  SessionAccumulator(this.sessionId, {CourseDefinition? course, int? plannedLaps})
-      : _tracker = course == null ? null : LapTracker(course, plannedLaps: plannedLaps);
+  SessionAccumulator(
+    this.sessionId, {
+    this.protocol = ErgProtocol.pm5,
+    CourseDefinition? course,
+    int? plannedLaps,
+  })  : _tracker = course == null ? null : LapTracker(course, plannedLaps: plannedLaps),
+        _decoder = ErgDecoder.forProtocol(protocol, onWarning: (message) => debugPrint('${protocol.name}: $message'));
 
   final int sessionId;
-  final LapTracker? _tracker;
 
-  final _decoder = Pm5Decoder(onWarning: (message) => debugPrint('PM5: $message'));
+  /// Protocol of the raw notifications; picks the decoder.
+  final ErgProtocol protocol;
+  final LapTracker? _tracker;
+  final ErgDecoder _decoder;
   Duration? _firstPacketTime;
   var _wallMs = 0;
   SessionOffset? _offset;
@@ -112,8 +119,8 @@ class SessionAccumulator {
 
   void _onTick(StatusTick tick) {
     lastTick = tick;
-    final offset = _offset ??= SessionOffset.start(pm5Distance: tick.distanceMeters, pm5Elapsed: tick.elapsed);
-    final progress = offset.update(pm5Distance: tick.distanceMeters, pm5Elapsed: tick.elapsed);
+    final offset = _offset ??= SessionOffset.start(deviceDistance: tick.distanceMeters, deviceElapsed: tick.elapsed);
+    final progress = offset.update(deviceDistance: tick.distanceMeters, deviceElapsed: tick.elapsed);
     _lastPm5Distance = tick.distanceMeters;
     _lastPm5Elapsed = tick.elapsed;
 
@@ -150,11 +157,11 @@ class SessionAccumulator {
       tMs: (progress.elapsed + (dt.isNegative ? Duration.zero : dt)).inMilliseconds,
       distanceDm: ((progress.distanceMeters + (dd < 0 ? 0 : dd)) * 10).round(),
       strokeNumber: stroke.strokeNumber,
-      driveLengthMeters: stroke.driveLengthMeters,
-      driveTimeMs: stroke.driveTime.inMilliseconds,
-      recoveryTimeMs: stroke.recoveryTime.inMilliseconds,
-      peakForceNewtons: stroke.peakForceNewtons,
-      averageForceNewtons: stroke.averageForceNewtons,
+      driveLengthMeters: Value(stroke.driveLengthMeters),
+      driveTimeMs: Value(stroke.driveTime?.inMilliseconds),
+      recoveryTimeMs: Value(stroke.recoveryTime?.inMilliseconds),
+      peakForceNewtons: Value(stroke.peakForceNewtons),
+      averageForceNewtons: Value(stroke.averageForceNewtons),
       watts: Value(stroke.watts),
     ));
   }

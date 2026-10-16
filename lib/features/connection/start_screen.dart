@@ -25,8 +25,8 @@ class StartScreen extends ConsumerWidget {
             children: [
               _SourceOption(
                 icon: Icons.bluetooth_searching,
-                title: 'PM5 suchen',
-                subtitle: 'Mit deinem Concept2-Erg über Bluetooth verbinden',
+                title: 'Rudergerät suchen',
+                subtitle: 'Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden',
                 onTap: () => Navigator.of(context)
                     .push(MaterialPageRoute<void>(builder: (_) => const DeviceListScreen())),
               ),

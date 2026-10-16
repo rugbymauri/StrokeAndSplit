@@ -2,11 +2,11 @@ import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/simulated_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 /// Runs [source] in fake time and collects the decoded events.
 List<RowingEvent> _listen(SimulatedSource source) {
-  final decoder = Pm5Decoder(onWarning: (w) => fail(w));
+  final decoder = ErgDecoder.forProtocol(source.protocol, onWarning: (w) => fail(w));
   final events = <RowingEvent>[];
   source.packets.listen((p) => events.addAll(decoder.decode(p)));
   return events;
@@ -103,6 +103,67 @@ void main() {
 
       expect(events, hasLength(count));
       expect(source.connectionState, ErgConnectionState.disconnected);
+    });
+  });
+
+  group('in FTMS mode', () {
+    test('sends one Rower Data record per second', () {
+      fakeAsync((async) {
+        final source = SimulatedSource(seed: 1, protocol: ErgProtocol.ftms);
+        final packets = <RawPacket>[];
+        source.packets.listen(packets.add);
+        source.start();
+        async.elapse(const Duration(seconds: 10));
+
+        expect(source.protocol, ErgProtocol.ftms);
+        expect(packets.map((p) => p.characteristicId).toSet(), {FtmsIds.rowerData});
+        expect(packets, hasLength(inInclusiveRange(9, 10)));
+      });
+    });
+
+    test('approaches a new target pace and counts the strokes', () {
+      fakeAsync((async) {
+        final source = SimulatedSource(seed: 7, protocol: ErgProtocol.ftms);
+        final events = _listen(source);
+        source.start();
+        async.elapse(const Duration(seconds: 20));
+        source.targetPace = const Duration(minutes: 1, seconds: 50);
+        async.elapse(const Duration(seconds: 30));
+
+        final last = events.whereType<StatusTick>().last;
+        expect(_paceSeconds(last.pace!), closeTo(110, 110 * 0.04));
+        // 22 strokes per minute over 50 s; strokes end on a 250 ms tick, so
+        // the simulator rows a little slower, like in PM5 mode.
+        expect(events.whereType<Stroke>().length, inInclusiveRange(15, 19));
+        expect(events.whereType<Stroke>().every((s) => s.driveTime == null), isTrue);
+        expect(last.distanceMeters, greaterThan(150));
+      });
+    });
+
+    test('stands still while paused and continues afterwards', () {
+      fakeAsync((async) {
+        final source = SimulatedSource(seed: 3, protocol: ErgProtocol.ftms);
+        final events = _listen(source);
+        source.start();
+        async.elapse(const Duration(seconds: 10));
+
+        source.pause();
+        async.elapse(const Duration(seconds: 30));
+        final duringPause = events.whereType<StatusTick>().last;
+        final strokesAtPause = events.whereType<Stroke>().length;
+        async.elapse(const Duration(seconds: 5));
+
+        expect(duringPause.isRowing, isFalse);
+        expect(duringPause.pace, isNull);
+        expect(events.whereType<StatusTick>().last.elapsed, duringPause.elapsed);
+        expect(events.whereType<Stroke>().length, strokesAtPause);
+
+        source.resume();
+        async.elapse(const Duration(seconds: 10));
+        final resumed = events.whereType<StatusTick>().last;
+        expect(resumed.distanceMeters, greaterThan(duringPause.distanceMeters));
+        expect(resumed.elapsed, greaterThan(duringPause.elapsed));
+      });
     });
   });
 }

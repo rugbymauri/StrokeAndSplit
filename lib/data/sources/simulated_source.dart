@@ -2,26 +2,37 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:clock/clock.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import 'erg_source.dart';
 
-/// A simulated rower that produces PM5 notifications like a real erg in
-/// Just Row: the pace moves towards [targetPace] over a few strokes with a
-/// slight variation per stroke, and the clock stops while paused.
+/// A simulated rower that produces notifications like a real erg in Just
+/// Row: the pace moves towards [targetPace] over a few strokes with a slight
+/// variation per stroke, and the clock stops while paused.
+///
+/// With [protocol] FTMS it sends one Rower Data record per second like a
+/// typical FTMS rower instead of the PM5 notifications (Design D10).
 class SimulatedSource implements ErgSource {
   SimulatedSource({
     this.targetPace = const Duration(minutes: 2, seconds: 10),
     this.targetStrokeRate = 22,
     int? seed,
     this.tickInterval = const Duration(milliseconds: 250),
+    this.protocol = ErgProtocol.pm5,
   })  : _currentPace = targetPace,
         _random = math.Random(seed);
 
   /// Time between two status notifications, like the PM5 sample rate.
   final Duration tickInterval;
 
+  @override
+  final ErgProtocol protocol;
+
+  /// Time between two Rower Data records in FTMS mode.
+  static const ftmsInterval = Duration(seconds: 1);
+
   static const _encoder = Pm5Encoder();
+  static const _ftmsEncoder = FtmsEncoder();
   static const _driveShare = 0.35;
   static const _driveLengthMeters = 1.4;
 
@@ -46,9 +57,19 @@ class SimulatedSource implements ErgSource {
   var _distanceMeters = 0.0;
   var _calories = 0.0;
   var _strokeNumber = 0;
+  var _completedStrokes = 0;
   _SimulatedStroke? _stroke;
+  Duration? _lastFtmsRecord;
 
   bool get isPaused => _paused;
+
+  /// A new simulator with the same targets that speaks [protocol].
+  SimulatedSource withProtocol(ErgProtocol protocol) => SimulatedSource(
+        targetPace: targetPace,
+        targetStrokeRate: targetStrokeRate,
+        tickInterval: tickInterval,
+        protocol: protocol,
+      );
 
   /// Stops rowing; the clock and the distance stand still like on a PM5.
   void pause() {
@@ -107,7 +128,29 @@ class SimulatedSource implements ErgSource {
       strokeRate: _paused ? 0 : targetStrokeRate,
       calories: _calories.floor(),
     );
-    _encoder.encodeStatus(tick, at: at).forEach(_packets.add);
+    switch (protocol) {
+      case ErgProtocol.pm5:
+        _encoder.encodeStatus(tick, at: at).forEach(_packets.add);
+      case ErgProtocol.ftms:
+        final last = _lastFtmsRecord;
+        if (last != null && at - last < ftmsInterval) return;
+        _lastFtmsRecord = at;
+        _packets.add(_ftmsEncoder.encodeStatus(
+          StatusTick(
+            elapsed: tick.elapsed,
+            distanceMeters: tick.distanceMeters,
+            workoutType: tick.workoutType,
+            workoutState: tick.workoutState,
+            isRowing: tick.isRowing,
+            pace: tick.pace,
+            watts: tick.pace == null ? null : wattsForPace(tick.pace!),
+            strokeRate: tick.strokeRate,
+            calories: tick.calories,
+          ),
+          strokeCount: _completedStrokes,
+          at: at,
+        ));
+    }
   }
 
   void _row(Duration step, Duration at) {
@@ -117,12 +160,13 @@ class SimulatedSource implements ErgSource {
     _calories += (4 * wattsForPace(_currentPace) + 300) * _seconds(step) / 3600;
 
     final stroke = _stroke ??= _nextStroke();
-    if (!stroke.driveEndSent && _elapsed >= stroke.start + stroke.data.driveTime) {
+    if (!stroke.driveEndSent && _elapsed >= stroke.start + stroke.drive) {
       stroke.driveEndSent = true;
-      _encoder.encodeDriveEnd(stroke.data, at: at).forEach(_packets.add);
+      if (protocol == ErgProtocol.pm5) _encoder.encodeDriveEnd(stroke.data, at: at).forEach(_packets.add);
     }
-    if (_elapsed >= stroke.start + stroke.data.driveTime + stroke.data.recoveryTime) {
-      _packets.add(_encoder.encodeRecoveryEnd(stroke.data, at: at));
+    if (_elapsed >= stroke.start + stroke.drive + stroke.recovery) {
+      if (protocol == ErgProtocol.pm5) _packets.add(_encoder.encodeRecoveryEnd(stroke.data, at: at));
+      _completedStrokes++;
       _stroke = null;
     }
   }
@@ -137,16 +181,20 @@ class SimulatedSource implements ErgSource {
     final watts = wattsForPace(_currentPace);
     final driveSeconds = interval * _driveShare;
     final averageForce = watts * interval / _driveLengthMeters;
+    final drive = _duration(driveSeconds);
+    final recovery = _duration(interval - driveSeconds);
     _strokeNumber++;
     return _SimulatedStroke(
       _elapsed,
+      drive,
+      recovery,
       Stroke(
-        elapsed: _elapsed + _duration(driveSeconds),
+        elapsed: _elapsed + drive,
         strokeNumber: _strokeNumber,
         distanceMeters: _distanceMeters,
         driveLengthMeters: _driveLengthMeters,
-        driveTime: _duration(driveSeconds),
-        recoveryTime: _duration(interval - driveSeconds),
+        driveTime: drive,
+        recoveryTime: recovery,
         peakForceNewtons: averageForce * 1.6,
         averageForceNewtons: averageForce,
         watts: watts,
@@ -166,9 +214,11 @@ class SimulatedSource implements ErgSource {
 }
 
 class _SimulatedStroke {
-  _SimulatedStroke(this.start, this.data);
+  _SimulatedStroke(this.start, this.drive, this.recovery, this.data);
 
   final Duration start;
+  final Duration drive;
+  final Duration recovery;
   final Stroke data;
   var driveEndSent = false;
 }

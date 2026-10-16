@@ -15,7 +15,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
-| 1 | `device-types` | 0/33 | ja, angepasst | – |
+| 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `ui-design` | 0/18 | nach 1 | Entscheid Puls-Herkunft (F1) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
@@ -43,10 +43,21 @@ Vor dem Start anpassen:
 - [x] MODIFIED-Anforderungen gegen die Main-Specs geprüft: Kein Szenario geht verloren, `courses` und `zones` haben nur Anforderungen ergänzt. `openspec validate device-types --strict` ist gültig.
 - [x] Task 2.5, 4.2 und 7.3: Export, End-to-End-Test und manueller Test mit Strecke und eingebauten Zonen.
 
-Bereit zum Start (`/opsx:apply device-types`).
+Umgesetzt am 2026-10-16 auf `feature/device-types`: `make check` grün (261 App-, 86 Package-Tests), `openspec validate device-types --strict` gültig. Offen sind nur Task 3.5 (Erg-Typ-Werte prüfen) und die manuellen Tests 7.1–7.3, die der Nutzer in einer späteren Session macht. Am 2026-10-16 auf `main` rebased und gemergt. Archiviert wird nach den manuellen Tests.
 
 Bei der Umsetzung mitnehmen:
-- Zeilen über 120 Zeichen in `packages/pm5_protocol/lib/src/rowing_event.dart` (`Stroke.toString`, ändert sich mit Task 2.1) und `lib/features/connection/device_list_screen.dart` (Fehlertext „Suche nach dem PM5“, ändert sich mit Task 5.5) umbrechen.
+- [x] Zeile über 120 Zeichen in `Stroke.toString` (Task 2.1) umgebrochen.
+- [ ] Task 3.5: `Pm5ErgType` ist umgesetzt, aber die Ski- und Bike-Werte sind nicht gegen das aktuelle Concept2-Dokument geprüft. Online war die Liste nicht zu finden, nur der Wert 0 (RowErg) ist an den Aufnahmen bestätigt. Der Nutzer prüft sie gegen die *PM5 Bluetooth Smart Interface Definition* oder an einem SkiErg/BikeErg, dann Task abhaken.
+- [x] Task 3.6: README-Abschnitt FTMS und Erg-Typ steht, die Fixtures-Tabelle kam mit Task 4.3 (`ftms_just_row.jsonl` ist aus `just_row.jsonl` umgerechnet, keine Aufnahme eines echten FTMS-Geräts).
+- Task 4.2: Zusätzlich zum Umschalter in der Simulator-Bedienung bietet „Vorlage rudern“ die Quelle „Simulator (FTMS)“ an, weil eine Vorlage die Session sofort startet und der Umschalter während einer Session gesperrt ist. Mit `ui-design` (Startbildschirm, Quellenwahl) übernehmen.
+- Reihenfolge: Abschnitt 3 (FTMS-Protokoll) vor 2.4/2.5 umgesetzt, weil deren Tests den FTMS-Decoder brauchen.
+- Task 4.4: Der Software-Rower startet unter Linux und registriert seine Advertisement bei BlueZ. Ob er vom Handy aus als FTMS-Gerät erscheint und Control Point und Notifications funktionieren, ist ungeprüft und gehört zu 7.2. bless 0.3 kann keine Service Data setzen; das Skript ergänzt sie im Advertisement-Objekt von bless. Nach einem Update von bless prüfen.
+- Task 5.2 weicht von D5 ab: Der Scan läuft ohne Plattformfilter, weil flutter_blue_plus unter Android das Keyword `PM5` nicht mit dem Service `0x1826` kombiniert. `rowerFromAdvertisement` filtert auf allen Plattformen. Unter Linux liefert `systemDevices` den BlueZ-Cache nur mit Namen; dort wird nur ein PM5 erkannt. Ein FTMS-Gerät im Cache erscheint unter Linux erst, wenn BlueZ es neu entdeckt. Das betrifft nur Linux, getestet wird FTMS vom Handy aus.
+- Task 5.3/5.4: Die Protokolllogik beim Verbinden (Abtastrate, Abos, Erg-Typ, Control Point) liegt in `setUpRower` über einer dünnen `GattConnection`, damit sie ohne Bluetooth testbar ist. `FlutterBluePlusTransport` verbindet nur noch und sucht die Characteristics der Services `0x0030` und `0x1826`.
+- Task 7.4: Die README-Zeile „nur mit Software-Rower getestet“ stimmt erst nach dem manuellen Test 7.2; bis dahin ist FTMS nur automatisch getestet.
+- Design D8 angepasst: Beim FTMS-Reset beginnt die eigene Uhr wieder bei 0, sonst zählt die Session die Zeit doppelt.
+- [x] Zeile über 120 Zeichen in `lib/features/connection/device_list_screen.dart` (Fehlertext „Suche nach dem PM5“) mit Task 5.5 umgebrochen.
+- Task 5.5: „PM5 suchen“ heisst jetzt überall „Rudergerät suchen“, auch auf dem Startbildschirm und in „Vorlage rudern“. Mit `ui-design` übernehmen.
 
 Manuell (vom Nutzer): 7.x mit dem Software-Rower vom Android-Handy aus.
 

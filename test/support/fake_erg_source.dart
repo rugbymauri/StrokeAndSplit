@@ -1,14 +1,17 @@
 import 'dart:async';
 
 import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 /// An [ErgSource] driven by the test.
 class FakeErgSource implements ErgSource {
-  FakeErgSource({this.kind = ErgSourceKind.pm5, this.name = 'PM5 Test'});
+  FakeErgSource({this.kind = ErgSourceKind.pm5, this.name = 'PM5 Test', this.protocol = ErgProtocol.pm5});
 
   @override
   final ErgSourceKind kind;
+
+  @override
+  final ErgProtocol protocol;
 
   @override
   final String name;

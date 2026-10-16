@@ -1,0 +1,250 @@
+import 'dart:async';
+
+import 'package:aergrow/data/sources/ble/ble_transport.dart';
+import 'package:aergrow/data/sources/ble/rower_connector.dart';
+import 'package:erg_protocol/erg_protocol.dart';
+import 'package:fake_async/fake_async.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
+
+class _FakeConnection implements GattConnection {
+  _FakeConnection(this.characteristics);
+
+  @override
+  final Set<String> characteristics;
+
+  final _notifications = StreamController<(String, List<int>)>.broadcast(sync: true);
+  final subscribed = <String>[];
+  /// Writes as `id:bytes`, e.g. `2ad9:[0]`.
+  final writes = <String>[];
+  var disconnected = false;
+
+  /// Called on every write, e.g. to answer on the control point.
+  void Function(String id, List<int> bytes)? onWrite;
+
+  /// Called on every subscription, e.g. to send the first status.
+  void Function(String id)? onSubscribe;
+
+  void notify(String id, List<int> bytes) => _notifications.add((id, bytes));
+
+  @override
+  Stream<(String, List<int>)> get notifications => _notifications.stream;
+
+  @override
+  Future<void> subscribe(String id) async {
+    subscribed.add(id);
+    onSubscribe?.call(id);
+  }
+
+  @override
+  Future<void> write(String id, List<int> bytes) async {
+    if (disconnected) throw StateError('disconnected');
+    writes.add('$id:$bytes');
+    onWrite?.call(id, bytes);
+  }
+
+  @override
+  Future<void> get lost => Completer<void>().future;
+
+  @override
+  Future<void> disconnect() async => disconnected = true;
+}
+
+const _pm5Characteristics = {'0031', '0032', '0033', '0034', '0035', '0036'};
+
+/// A PM5 that sends its first Additional Status with [ergType], or none.
+_FakeConnection _pm5Connection(int? ergType) {
+  final connection = _FakeConnection(_pm5Characteristics);
+  connection.onSubscribe = (id) {
+    if (id == Pm5Characteristics.additionalStatus && ergType != null) {
+      scheduleMicrotask(() => connection.notify(id, [...List.filled(16, 0), ergType]));
+    }
+  };
+  return connection;
+}
+
+/// An FTMS rower; [controlResult] is its answer to Request Control, null for
+/// no answer, and without [controlPoint] it has none.
+_FakeConnection _ftmsConnection({bool controlPoint = true, int? controlResult = 0x01, bool rowerData = true}) {
+  final connection = _FakeConnection({
+    FtmsIds.feature,
+    if (rowerData) FtmsIds.rowerData,
+    if (controlPoint) FtmsIds.controlPoint,
+    FtmsIds.machineStatus,
+  });
+  connection.onWrite = (id, bytes) {
+    if (id == FtmsIds.controlPoint && controlResult != null) {
+      scheduleMicrotask(() => connection.notify(id, [0x80, bytes.first, bytes.first == 0x00 ? controlResult : 0x01]));
+    }
+  };
+  return connection;
+}
+
+/// Sets up [connection] and returns the link or the error.
+(RowerLink?, Object?, List<String>) _setUp(_FakeConnection connection, FoundRower rower) {
+  RowerLink? link;
+  Object? error;
+  final warnings = <String>[];
+  fakeAsync((async) {
+    setUpRower(connection, rower, onWarning: warnings.add)
+        .then<void>((l) => link = l, onError: (Object e) => error = e);
+    async.elapse(const Duration(seconds: 5));
+  });
+  return (link, error, warnings);
+}
+
+void main() {
+  group('PM5', () {
+    test('sets the sample rate and subscribes to the rowing data of a RowErg', () {
+      final connection = _pm5Connection(0);
+      final (link, error, _) = _setUp(connection, _pm5);
+
+      expect(error, isNull);
+      expect(link, isNotNull);
+      expect(connection.writes, ['${Pm5Characteristics.sampleRate}:[${Pm5Characteristics.sampleRate250ms}]']);
+      expect(connection.subscribed, Pm5Characteristics.subscribed);
+      expect(connection.disconnected, isFalse);
+    });
+
+    for (final (erg, code) in [('SkiErg', 143), ('BikeErg', 192)]) {
+      test('disconnects from a PM5 on a $erg', () {
+        final connection = _pm5Connection(code);
+        final (link, error, _) = _setUp(connection, _pm5);
+
+        expect(link, isNull);
+        expect(error, isA<RowerConnectException>().having((e) => e.notARower, 'notARower', isTrue));
+        expect((error! as RowerConnectException).message, contains(erg));
+        expect(connection.disconnected, isTrue);
+      });
+    }
+
+    test('lets a PM5 with an unknown erg type through', () {
+      final (link, error, _) = _setUp(_pm5Connection(99), _pm5);
+
+      expect(error, isNull);
+      expect(link, isNotNull);
+    });
+
+    test('lets a PM5 through that sends no status within 3 seconds', () {
+      final connection = _pm5Connection(null);
+      RowerLink? link;
+      fakeAsync((async) {
+        setUpRower(connection, _pm5).then((l) => link = l);
+        async.elapse(const Duration(milliseconds: 2900));
+        expect(link, isNull);
+        async.elapse(const Duration(milliseconds: 200));
+        expect(link, isNotNull);
+      });
+    });
+
+    test('rejects a device without rowing service', () {
+      final connection = _FakeConnection({});
+      final (_, error, _) = _setUp(connection, _pm5);
+
+      expect(error, isA<RowerConnectException>().having((e) => e.notARower, 'notARower', isFalse));
+      expect(connection.disconnected, isTrue);
+    });
+
+    test('forwards only the rowing data', () {
+      final connection = _pm5Connection(0);
+      final (link, _, _) = _setUp(connection, _pm5);
+      final received = <String>[];
+      link!.notifications.listen((n) => received.add(n.$1));
+
+      connection
+        ..notify('0031', [1])
+        ..notify('2ad1', [1])
+        ..notify('0035', [1]);
+
+      expect(received, ['0031', '0035']);
+    });
+  });
+
+  group('FTMS', () {
+    test('requests control and starts the rower', () {
+      final connection = _ftmsConnection();
+      final (link, error, warnings) = _setUp(connection, _ftms);
+
+      expect(error, isNull);
+      expect(link, isNotNull);
+      expect(connection.subscribed, [FtmsIds.rowerData, FtmsIds.controlPoint]);
+      expect(connection.writes, ['2ad9:[0]', '2ad9:[7]']);
+      expect(warnings, isEmpty);
+    });
+
+    test('connects to a rower without control point without writing', () {
+      final connection = _ftmsConnection(controlPoint: false);
+      final (link, _, _) = _setUp(connection, _ftms);
+
+      expect(link, isNotNull);
+      expect(connection.subscribed, [FtmsIds.rowerData]);
+      expect(connection.writes, isEmpty);
+    });
+
+    test('stays connected when the rower refuses control', () {
+      final connection = _ftmsConnection(controlResult: 0x05);
+      final (link, _, warnings) = _setUp(connection, _ftms);
+
+      expect(link, isNotNull);
+      expect(connection.writes, ['2ad9:[0]']);
+      expect(connection.disconnected, isFalse);
+      expect(warnings.single, contains('refused'));
+    });
+
+    test('stays connected when the rower does not answer within 2 seconds', () {
+      final connection = _ftmsConnection(controlResult: null);
+      RowerLink? link;
+      fakeAsync((async) {
+        setUpRower(connection, _ftms).then((l) => link = l);
+        async.elapse(const Duration(milliseconds: 1900));
+        expect(link, isNull);
+        async.elapse(const Duration(milliseconds: 200));
+        expect(link, isNotNull);
+      });
+      expect(connection.writes, ['2ad9:[0]']);
+    });
+
+    test('stays connected when writing to the control point fails', () {
+      final connection = _ftmsConnection()..onWrite = (_, _) => throw StateError('write failed');
+      final (link, _, warnings) = _setUp(connection, _ftms);
+
+      expect(link, isNotNull);
+      expect(warnings.single, contains('write failed'));
+    });
+
+    test('rejects an FTMS machine without rower data', () {
+      final connection = _ftmsConnection(rowerData: false);
+      final (_, error, _) = _setUp(connection, _ftms);
+
+      expect(error, isA<RowerConnectException>().having((e) => e.notARower, 'notARower', isTrue));
+      expect(connection.disconnected, isTrue);
+    });
+
+    test('sends neither reset nor stop when disconnecting', () {
+      final connection = _ftmsConnection();
+      final (link, _, _) = _setUp(connection, _ftms);
+      fakeAsync((async) {
+        link!.disconnect();
+        async.flushMicrotasks();
+      });
+
+      expect(connection.disconnected, isTrue);
+      expect(connection.writes, isNot(anyOf(contains('2ad9:[1]'), contains('2ad9:[8]'))));
+    });
+
+    test('forwards only the rower data', () {
+      final connection = _ftmsConnection();
+      final (link, _, _) = _setUp(connection, _ftms);
+      final received = <String>[];
+      link!.notifications.listen((n) => received.add(n.$1));
+
+      connection
+        ..notify(FtmsIds.controlPoint, [0x80, 0x07, 0x01])
+        ..notify(FtmsIds.rowerData, [1]);
+
+      expect(received, [FtmsIds.rowerData]);
+    });
+  });
+}

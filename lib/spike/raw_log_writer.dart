@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-/// Writes raw PM5 notifications as JSON lines: one header line, then one
-/// line per packet (`t`, `c`, `b`) or marker (`t`, `m`).
+/// Writes raw notifications of a PM5 or FTMS rower as JSON lines: one header
+/// line, then one line per packet (`t`, `c`, `b`) or marker (`t`, `m`).
 ///
 /// This is the uncompressed form of the `.aergrow` export format, so spike
 /// recordings can be used directly as test fixtures.
@@ -14,15 +14,17 @@ class RawLogWriter {
   final Stopwatch _clock;
   int packetCount = 0;
 
-  static Future<RawLogWriter> create(Directory dir, {required String deviceName}) async {
+  /// [protocol] is `pm5` or `ftms` and names the file, e.g. `ftms-<time>.jsonl`.
+  static Future<RawLogWriter> create(Directory dir, {required String deviceName, String protocol = 'pm5'}) async {
     final startedAt = DateTime.now();
     final stamp = startedAt.toIso8601String().replaceAll(':', '-').split('.').first;
-    final file = File('${dir.path}/pm5-$stamp.jsonl');
+    final file = File('${dir.path}/$protocol-$stamp.jsonl');
     final sink = file.openWrite();
     sink.writeln(jsonEncode({
       'format': 'aergrow-raw',
       'version': 1,
-      'source': 'pm5',
+      'source': protocol,
+      'protocol': protocol,
       'device': deviceName,
       'recordedAt': startedAt.toUtc().toIso8601String(),
     }));

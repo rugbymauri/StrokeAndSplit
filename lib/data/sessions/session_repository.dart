@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
-import 'package:pm5_protocol/pm5_protocol.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 
 import '../db/database.dart';
 import '../courses/course.dart';
@@ -25,12 +25,14 @@ class SessionRepository {
   Future<int> create({
     required DateTime startedAt,
     required ErgSourceKind source,
+    ErgProtocol protocol = ErgProtocol.pm5,
     String? deviceName,
     SessionTemplate? template,
   }) {
     return _insert(
       startedAt: startedAt,
       source: source,
+      protocol: protocol,
       deviceName: deviceName,
       templateId: template?.id,
       templateName: template?.name,
@@ -42,6 +44,7 @@ class SessionRepository {
   Future<int> _insert({
     required DateTime startedAt,
     required ErgSourceKind source,
+    required ErgProtocol protocol,
     String? deviceName,
     int? templateId,
     String? templateName,
@@ -52,6 +55,7 @@ class SessionRepository {
           startedAt: startedAt,
           status: SessionStatus.recording,
           source: source,
+          protocol: Value(protocol),
           deviceName: Value(deviceName),
           templateId: Value(templateId),
           templateName: Value(templateName),
@@ -202,6 +206,7 @@ class SessionRepository {
         'format': RawRecording.formatName,
         'version': 1,
         'source': session.source.name,
+        'protocol': session.protocol.name,
         'device': ?session.deviceName,
         'recordedAt': session.startedAt.toUtc().toIso8601String(),
       },
@@ -256,16 +261,23 @@ class SessionRepository {
       _ => null,
     };
 
+    // Files from before FTMS support name no protocol and are PM5 recordings.
+    final protocol = ErgProtocol.parse(metadata['protocol']);
     final id = await _insert(
       startedAt: DateTime.tryParse(metadata['recordedAt'] as String? ?? '') ?? clock.now(),
       source: ErgSourceKind.values.asNameMap()[metadata['source']] ?? ErgSourceKind.pm5,
+      protocol: protocol,
       deviceName: metadata['device'] as String?,
       templateName: template?['name'] as String?,
       courseVersionId: course == null ? null : await _importCourse(course.name, course.definition),
       plannedLaps: template?['laps'] as int?,
     );
-    final accumulator =
-        SessionAccumulator(id, course: course?.definition, plannedLaps: template?['laps'] as int?);
+    final accumulator = SessionAccumulator(
+      id,
+      protocol: protocol,
+      course: course?.definition,
+      plannedLaps: template?['laps'] as int?,
+    );
     recording.packets.forEach(accumulator.add);
     accumulator.finish();
     await write(accumulator.takeBatch());

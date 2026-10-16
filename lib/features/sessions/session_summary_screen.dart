@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/courses/course.dart';
@@ -56,7 +57,8 @@ class SessionSummaryScreen extends ConsumerWidget {
 /// Name of the source a session was recorded with.
 String sessionSourceLabel(SessionRow session) => switch (session.source) {
       ErgSourceKind.pm5 => session.deviceName ?? 'PM5',
-      ErgSourceKind.simulator => 'Simulator',
+      ErgSourceKind.ftms => '${session.deviceName ?? 'Rudergerät'} · FTMS',
+      ErgSourceKind.simulator => session.protocol == ErgProtocol.ftms ? 'Simulator (FTMS)' : 'Simulator',
       ErgSourceKind.replay => 'Replay',
     };
 
