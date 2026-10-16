@@ -31,5 +31,20 @@
   "connectNotARowerHint": "{app} supports the PM5 on a RowErg and rowers with FTMS.",
   "connectErrorSkiErg": "Only rowers are supported. This PM5 belongs to a SkiErg.",
   "connectErrorBikeErg": "Only rowers are supported. This PM5 belongs to a BikeErg.",
-  "connectErrorNoRowerData": "Only rowers are supported. The device sends no rowing data."
+  "connectErrorNoRowerData": "Only rowers are supported. The device sends no rowing data.",
+  "stateConnected": "Connected",
+  "stateConnecting": "Connecting …",
+  "stateScanning": "Searching …",
+  "stateReconnecting": "Connection lost, reconnecting …",
+  "stateDisconnected": "Disconnected",
+  "sourceSimulator": "SIMULATOR",
+  "sourceSimulatorFtms": "SIMULATOR (FTMS)",
+  "sourceReplay": "REPLAY",
+  "deviceListTitle": "Find rower",
+  "deviceListScanFailed": "Searching for rowers failed.\n\n{detail}",
+  "deviceListRetry": "Search again",
+  "deviceListNothingFound": "No rower found.\n\n• Wake the rower up, on the PM5 with any button until the main menu appears.\n• Disconnect other apps such as ErgData, many rowers allow only one connection.\n• Move closer to the rower.",
+  "bluetoothOff": "Bluetooth is off. Turn Bluetooth on to search for your rower.",
+  "bluetoothUnauthorized": "{app} may not use Bluetooth. The permission is needed to connect to your rower. Grant it in the system settings under Apps → {app} → Permissions.",
+  "bluetoothUnsupported": "This device does not support Bluetooth LE."
 }

@@ -149,4 +149,56 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get connectErrorNoRowerData =>
       'Nur Rudergeräte werden unterstützt. Das Gerät liefert keine Rudern-Daten.';
+
+  @override
+  String get stateConnected => 'Verbunden';
+
+  @override
+  String get stateConnecting => 'Verbinde …';
+
+  @override
+  String get stateScanning => 'Suche …';
+
+  @override
+  String get stateReconnecting => 'Verbindung unterbrochen, verbinde neu …';
+
+  @override
+  String get stateDisconnected => 'Getrennt';
+
+  @override
+  String get sourceSimulator => 'SIMULATOR';
+
+  @override
+  String get sourceSimulatorFtms => 'SIMULATOR (FTMS)';
+
+  @override
+  String get sourceReplay => 'REPLAY';
+
+  @override
+  String get deviceListTitle => 'Rudergerät suchen';
+
+  @override
+  String deviceListScanFailed(String detail) {
+    return 'Die Suche nach Rudergeräten ist fehlgeschlagen.\n\n$detail';
+  }
+
+  @override
+  String get deviceListRetry => 'Erneut suchen';
+
+  @override
+  String get deviceListNothingFound =>
+      'Kein Rudergerät gefunden.\n\n• Wecke das Rudergerät auf, am PM5 mit einer Taste, bis das Hauptmenü erscheint.\n• Trenne andere Apps wie ErgData, viele Rudergeräte erlauben nur eine Verbindung.\n• Geh näher an das Rudergerät.';
+
+  @override
+  String get bluetoothOff =>
+      'Bluetooth ist ausgeschaltet. Schalte Bluetooth ein, um nach deinem Rudergerät zu suchen.';
+
+  @override
+  String bluetoothUnauthorized(String app) {
+    return '$app darf Bluetooth nicht verwenden. Die Berechtigung ist nötig, um sich mit deinem Rudergerät zu verbinden. Erteile sie in den Systemeinstellungen unter Apps → $app → Berechtigungen.';
+  }
+
+  @override
+  String get bluetoothUnsupported =>
+      'Dieses Gerät unterstützt kein Bluetooth LE.';
 }

@@ -191,5 +191,75 @@
   "connectErrorNoRowerData": "Nur Rudergeräte werden unterstützt. Das Gerät liefert keine Rudern-Daten.",
   "@connectErrorNoRowerData": {
     "description": "Device list: an FTMS machine that is no rower"
+  },
+  "stateConnected": "Verbunden",
+  "@stateConnected": {
+    "description": "Connection indicator: the rower is connected"
+  },
+  "stateConnecting": "Verbinde …",
+  "@stateConnecting": {
+    "description": "Connection indicator and device list: a connection is being set up"
+  },
+  "stateScanning": "Suche …",
+  "@stateScanning": {
+    "description": "Connection indicator: searching for the rower"
+  },
+  "stateReconnecting": "Verbindung unterbrochen, verbinde neu …",
+  "@stateReconnecting": {
+    "description": "Connection indicator: the connection dropped and is being restored"
+  },
+  "stateDisconnected": "Getrennt",
+  "@stateDisconnected": {
+    "description": "Connection indicator: no connection"
+  },
+  "sourceSimulator": "SIMULATOR",
+  "@sourceSimulator": {
+    "description": "Badge while the simulator delivers the data"
+  },
+  "sourceSimulatorFtms": "SIMULATOR (FTMS)",
+  "@sourceSimulatorFtms": {
+    "description": "Badge while the simulator delivers the data as an FTMS rower"
+  },
+  "sourceReplay": "REPLAY",
+  "@sourceReplay": {
+    "description": "Badge while a recorded session is played back"
+  },
+  "deviceListTitle": "Rudergerät suchen",
+  "@deviceListTitle": {
+    "description": "Device list: title"
+  },
+  "deviceListScanFailed": "Die Suche nach Rudergeräten ist fehlgeschlagen.\n\n{detail}",
+  "@deviceListScanFailed": {
+    "description": "Device list: the scan failed; detail is the technical error",
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceListRetry": "Erneut suchen",
+  "@deviceListRetry": {
+    "description": "Device list: button to scan again"
+  },
+  "deviceListNothingFound": "Kein Rudergerät gefunden.\n\n• Wecke das Rudergerät auf, am PM5 mit einer Taste, bis das Hauptmenü erscheint.\n• Trenne andere Apps wie ErgData, viele Rudergeräte erlauben nur eine Verbindung.\n• Geh näher an das Rudergerät.",
+  "@deviceListNothingFound": {
+    "description": "Device list: the scan found no rower, with hints"
+  },
+  "bluetoothOff": "Bluetooth ist ausgeschaltet. Schalte Bluetooth ein, um nach deinem Rudergerät zu suchen.",
+  "@bluetoothOff": {
+    "description": "Device list: Bluetooth is switched off"
+  },
+  "bluetoothUnauthorized": "{app} darf Bluetooth nicht verwenden. Die Berechtigung ist nötig, um sich mit deinem Rudergerät zu verbinden. Erteile sie in den Systemeinstellungen unter Apps → {app} → Berechtigungen.",
+  "@bluetoothUnauthorized": {
+    "description": "Device list: the app lacks the Bluetooth permission; app is the app name",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "bluetoothUnsupported": "Dieses Gerät unterstützt kein Bluetooth LE.",
+  "@bluetoothUnsupported": {
+    "description": "Device list: the phone or computer has no Bluetooth LE"
   }
 }

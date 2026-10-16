@@ -294,6 +294,96 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Nur Rudergeräte werden unterstützt. Das Gerät liefert keine Rudern-Daten.'**
   String get connectErrorNoRowerData;
+
+  /// Connection indicator: the rower is connected
+  ///
+  /// In de, this message translates to:
+  /// **'Verbunden'**
+  String get stateConnected;
+
+  /// Connection indicator and device list: a connection is being set up
+  ///
+  /// In de, this message translates to:
+  /// **'Verbinde …'**
+  String get stateConnecting;
+
+  /// Connection indicator: searching for the rower
+  ///
+  /// In de, this message translates to:
+  /// **'Suche …'**
+  String get stateScanning;
+
+  /// Connection indicator: the connection dropped and is being restored
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung unterbrochen, verbinde neu …'**
+  String get stateReconnecting;
+
+  /// Connection indicator: no connection
+  ///
+  /// In de, this message translates to:
+  /// **'Getrennt'**
+  String get stateDisconnected;
+
+  /// Badge while the simulator delivers the data
+  ///
+  /// In de, this message translates to:
+  /// **'SIMULATOR'**
+  String get sourceSimulator;
+
+  /// Badge while the simulator delivers the data as an FTMS rower
+  ///
+  /// In de, this message translates to:
+  /// **'SIMULATOR (FTMS)'**
+  String get sourceSimulatorFtms;
+
+  /// Badge while a recorded session is played back
+  ///
+  /// In de, this message translates to:
+  /// **'REPLAY'**
+  String get sourceReplay;
+
+  /// Device list: title
+  ///
+  /// In de, this message translates to:
+  /// **'Rudergerät suchen'**
+  String get deviceListTitle;
+
+  /// Device list: the scan failed; detail is the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Die Suche nach Rudergeräten ist fehlgeschlagen.\n\n{detail}'**
+  String deviceListScanFailed(String detail);
+
+  /// Device list: button to scan again
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut suchen'**
+  String get deviceListRetry;
+
+  /// Device list: the scan found no rower, with hints
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Rudergerät gefunden.\n\n• Wecke das Rudergerät auf, am PM5 mit einer Taste, bis das Hauptmenü erscheint.\n• Trenne andere Apps wie ErgData, viele Rudergeräte erlauben nur eine Verbindung.\n• Geh näher an das Rudergerät.'**
+  String get deviceListNothingFound;
+
+  /// Device list: Bluetooth is switched off
+  ///
+  /// In de, this message translates to:
+  /// **'Bluetooth ist ausgeschaltet. Schalte Bluetooth ein, um nach deinem Rudergerät zu suchen.'**
+  String get bluetoothOff;
+
+  /// Device list: the app lacks the Bluetooth permission; app is the app name
+  ///
+  /// In de, this message translates to:
+  /// **'{app} darf Bluetooth nicht verwenden. Die Berechtigung ist nötig, um sich mit deinem Rudergerät zu verbinden. Erteile sie in den Systemeinstellungen unter Apps → {app} → Berechtigungen.'**
+  String bluetoothUnauthorized(String app);
+
+  /// Device list: the phone or computer has no Bluetooth LE
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Gerät unterstützt kein Bluetooth LE.'**
+  String get bluetoothUnsupported;
 }
 
 class _AppLocalizationsDelegate

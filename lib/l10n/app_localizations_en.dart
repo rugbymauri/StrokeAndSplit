@@ -147,4 +147,56 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get connectErrorNoRowerData =>
       'Only rowers are supported. The device sends no rowing data.';
+
+  @override
+  String get stateConnected => 'Connected';
+
+  @override
+  String get stateConnecting => 'Connecting …';
+
+  @override
+  String get stateScanning => 'Searching …';
+
+  @override
+  String get stateReconnecting => 'Connection lost, reconnecting …';
+
+  @override
+  String get stateDisconnected => 'Disconnected';
+
+  @override
+  String get sourceSimulator => 'SIMULATOR';
+
+  @override
+  String get sourceSimulatorFtms => 'SIMULATOR (FTMS)';
+
+  @override
+  String get sourceReplay => 'REPLAY';
+
+  @override
+  String get deviceListTitle => 'Find rower';
+
+  @override
+  String deviceListScanFailed(String detail) {
+    return 'Searching for rowers failed.\n\n$detail';
+  }
+
+  @override
+  String get deviceListRetry => 'Search again';
+
+  @override
+  String get deviceListNothingFound =>
+      'No rower found.\n\n• Wake the rower up, on the PM5 with any button until the main menu appears.\n• Disconnect other apps such as ErgData, many rowers allow only one connection.\n• Move closer to the rower.';
+
+  @override
+  String get bluetoothOff =>
+      'Bluetooth is off. Turn Bluetooth on to search for your rower.';
+
+  @override
+  String bluetoothUnauthorized(String app) {
+    return '$app may not use Bluetooth. The permission is needed to connect to your rower. Grant it in the system settings under Apps → $app → Permissions.';
+  }
+
+  @override
+  String get bluetoothUnsupported =>
+      'This device does not support Bluetooth LE.';
 }

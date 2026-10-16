@@ -114,19 +114,19 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rudergerät suchen'),
+        title: Text(l10n.deviceListTitle),
         bottom: _phase == _Phase.scanning || _phase == _Phase.connecting || _phase == _Phase.checking
             ? const PreferredSize(preferredSize: Size.fromHeight(4), child: LinearProgressIndicator())
             : null,
       ),
       body: switch (_phase) {
-        _Phase.notReady => _Message(text: _notReadyText(_readiness), onRetry: _startScan),
-        _Phase.failed =>
-          _Message(text: 'Die Suche nach Rudergeräten ist fehlgeschlagen.\n\n$_scanError', onRetry: _startScan),
-        _Phase.done when _found.isEmpty => _Message(text: _nothingFoundText, onRetry: _startScan),
-        _Phase.connecting => const Center(child: Text('Verbinde …')),
+        _Phase.notReady => _Message(text: _notReadyText(l10n, _readiness), onRetry: _startScan),
+        _Phase.failed => _Message(text: l10n.deviceListScanFailed('$_scanError'), onRetry: _startScan),
+        _Phase.done when _found.isEmpty => _Message(text: l10n.deviceListNothingFound, onRetry: _startScan),
+        _Phase.connecting => Center(child: Text(l10n.stateConnecting)),
         _ => ListView(
             children: [
               for (final device in _found)
@@ -139,7 +139,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
               if (_phase == _Phase.done)
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: OutlinedButton(onPressed: _startScan, child: const Text('Erneut suchen')),
+                  child: OutlinedButton(onPressed: _startScan, child: Text(l10n.deviceListRetry)),
                 ),
             ],
           ),
@@ -147,13 +147,10 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
     );
   }
 
-  static String _notReadyText(BluetoothReadiness readiness) => switch (readiness) {
-        BluetoothReadiness.off =>
-          'Bluetooth ist ausgeschaltet. Schalte Bluetooth ein, um nach deinem Rudergerät zu suchen.',
-        BluetoothReadiness.unauthorized => 'AergRow darf Bluetooth nicht verwenden. Die Berechtigung ist nötig, '
-            'um sich mit deinem Rudergerät zu verbinden. Erteile sie in den Systemeinstellungen unter '
-            'Apps → AergRow → Berechtigungen.',
-        BluetoothReadiness.unsupported => 'Dieses Gerät unterstützt kein Bluetooth LE.',
+  static String _notReadyText(AppLocalizations l10n, BluetoothReadiness readiness) => switch (readiness) {
+        BluetoothReadiness.off => l10n.bluetoothOff,
+        BluetoothReadiness.unauthorized => l10n.bluetoothUnauthorized(l10n.appTitle),
+        BluetoothReadiness.unsupported => l10n.bluetoothUnsupported,
         BluetoothReadiness.ready => '',
       };
 
@@ -162,10 +159,6 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
         ErgProtocol.ftms => 'FTMS',
       };
 
-  static const _nothingFoundText = 'Kein Rudergerät gefunden.\n\n'
-      '• Wecke das Rudergerät auf, am PM5 mit einer Taste, bis das Hauptmenü erscheint.\n'
-      '• Trenne andere Apps wie ErgData, viele Rudergeräte erlauben nur eine Verbindung.\n'
-      '• Geh näher an das Rudergerät.';
 }
 
 class _Message extends StatelessWidget {
@@ -184,7 +177,7 @@ class _Message extends StatelessWidget {
           children: [
             Text(text, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 24),
-            FilledButton(onPressed: onRetry, child: const Text('Erneut suchen')),
+            FilledButton(onPressed: onRetry, child: Text(context.l10n.deviceListRetry)),
           ],
         ),
       ),

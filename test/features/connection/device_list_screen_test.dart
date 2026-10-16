@@ -59,6 +59,17 @@ void main() {
     expect(find.textContaining('ErgData'), findsOneWidget);
   });
 
+  testWidgets('shows the tips in English', (tester) async {
+    await _pump(tester, FakeBleTransport(), locale: const Locale('en'));
+    await tester.pump(const Duration(seconds: 15));
+    await tester.pump();
+
+    expect(find.text('Find rower'), findsOneWidget);
+    expect(find.textContaining('No rower found.'), findsOneWidget);
+    expect(find.textContaining('Move closer to the rower.'), findsOneWidget);
+    expect(find.text('Search again'), findsOneWidget);
+  });
+
   testWidgets('asks to switch Bluetooth on instead of showing an empty list', (tester) async {
     await _pump(tester, FakeBleTransport(readinessValue: BluetoothReadiness.off));
 
