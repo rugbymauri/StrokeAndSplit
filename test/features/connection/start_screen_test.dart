@@ -7,8 +7,10 @@ import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sessions/session_repository.dart';
 import 'package:aergrow/data/sources/ble/ble_transport.dart';
+import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
+import 'package:aergrow/data/sources/heart_rate_choice.dart';
 import 'package:aergrow/data/sources/rower_choice.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/features/connection/choose_devices_screen.dart';
@@ -25,12 +27,14 @@ import '../../support/localized_app.dart';
 import '../../support/test_database.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _h10 = FoundHeartRateMonitor(id: 'A0:9E:1A:00:00:01', name: 'Polar H10 1A2B3C4D');
 
 ProviderContainer _container({
   RowerChoice? chosen,
   FakeBleTransport? transport,
   LanguageStore? languages,
   AppDatabase? db,
+  FoundHeartRateMonitor? strap,
 }) {
   final container = ProviderContainer(overrides: [
     databaseProvider.overrideWithValue(db ?? openTestDatabase()),
@@ -38,13 +42,19 @@ ProviderContainer _container({
     bleTransportProvider.overrideWithValue(transport ?? FakeBleTransport()),
     rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(chosen)),
     languageStoreProvider.overrideWithValue(languages ?? MemoryLanguageStore()),
+    heartRateMonitorStoreProvider.overrideWithValue(MemoryHeartRateMonitorStore(strap)),
   ]);
   addTearDown(container.dispose);
   return container;
 }
 
-Future<ProviderContainer> _pumpStart(WidgetTester tester, {RowerChoice? chosen, AppDatabase? db}) async {
-  final container = _container(chosen: chosen, db: db);
+Future<ProviderContainer> _pumpStart(
+  WidgetTester tester, {
+  RowerChoice? chosen,
+  AppDatabase? db,
+  FoundHeartRateMonitor? strap,
+}) async {
+  final container = _container(chosen: chosen, db: db, strap: strap);
   await tester.pumpWidget(
     UncontrolledProviderScope(container: container, child: const LocalizedApp(home: StartScreen())),
   );
@@ -77,6 +87,38 @@ void main() {
       expect(find.text('Frei rudern'), findsOneWidget);
       expect(find.text('Sessions'), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows only the rower in the device row without a strap', (tester) async {
+      await _pumpStart(tester, chosen: const RowerChoice.device(_pm5));
+
+      final row = find.byKey(const Key('device-row'));
+      expect(find.descendant(of: row, matching: find.text('PM5 430000001 Row')), findsOneWidget);
+      expect(find.byKey(const Key('device-row-strap')), findsNothing);
+      expect(find.descendant(of: row, matching: find.byIcon(Icons.favorite)), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows the paired strap next to the rower in the device row', (tester) async {
+      await _pumpStart(tester, chosen: const RowerChoice.device(_pm5), strap: _h10);
+
+      final row = find.byKey(const Key('device-row'));
+      expect(find.descendant(of: row, matching: find.text('PM5 430000001 Row')), findsOneWidget);
+      final strap = find.descendant(of: row, matching: find.byKey(const Key('device-row-strap')));
+      expect(find.descendant(of: strap, matching: find.text('Polar H10 1A2B3C4D')), findsOneWidget);
+      expect(find.descendant(of: strap, matching: find.byIcon(Icons.favorite)), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('leads to "Geräte wählen" from the device row with a strap', (tester) async {
+      await _pumpStart(tester, chosen: const RowerChoice.simulator(), strap: _h10);
+
+      await tester.tap(find.text('Polar H10 1A2B3C4D'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ChooseDevicesScreen), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+      await tester.pump(const Duration(seconds: 15));
     });
 
     testWidgets('leads back to "Geräte wählen" from the device row', (tester) async {

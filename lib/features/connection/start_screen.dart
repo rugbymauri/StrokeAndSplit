@@ -8,11 +8,13 @@ import '../../app/design_tokens.dart';
 import '../../app/widgets/language_button.dart';
 import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
+import '../../data/sources/heart_rate_choice.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/rower_choice.dart';
 import '../../data/templates/session_template.dart';
 import '../../data/templates/template_providers.dart';
 import '../../l10n/l10n.dart';
+import '../live/metric_tile.dart' show HeartIcon;
 import '../sessions/sessions_screen.dart';
 import '../templates/templates_screen.dart';
 import 'choose_devices_screen.dart';
@@ -135,7 +137,8 @@ class _RowAgain extends ConsumerWidget {
   }
 }
 
-/// The chosen rower; tapping it leads back to "Geräte wählen".
+/// The chosen rower and the paired heart rate strap, if any (heart-rate,
+/// Design D8); tapping it leads back to "Geräte wählen".
 class _DeviceRow extends ConsumerWidget {
   const _DeviceRow();
 
@@ -157,11 +160,22 @@ class _DeviceRow extends ConsumerWidget {
         (Icons.smart_toy_outlined, l10n.sourceSimulatorFtmsName, l10n.startSimulatorFtmsHint),
       RowerChoice() => (Icons.smart_toy_outlined, l10n.sourceSimulatorName, l10n.startSimulatorHint),
     };
+    final strap = ref.watch(chosenHeartRateMonitorProvider);
     return OptionCard(
       key: const Key('device-row'),
       icon: icon,
       title: title,
       subtitle: subtitle,
+      detail: strap == null
+          ? null
+          : Row(
+              key: const Key('device-row-strap'),
+              children: [
+                const HeartIcon(size: 14),
+                const SizedBox(width: AppSpacing.xs),
+                Flexible(child: Text(strap.name, style: AppTextStyles.subtitle, overflow: TextOverflow.ellipsis)),
+              ],
+            ),
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ChooseDevicesScreen())),
     );
   }

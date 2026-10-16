@@ -5,7 +5,7 @@ import '../../app/design_tokens.dart';
 /// A card to tap with icon, title and a line below, as in the canvas "Start".
 ///
 /// With [selected] it is one of several options and shows a radio mark,
-/// otherwise a chevron.
+/// otherwise a chevron. [detail] adds a line below the subtitle.
 class OptionCard extends StatelessWidget {
   const OptionCard({
     super.key,
@@ -14,6 +14,7 @@ class OptionCard extends StatelessWidget {
     required this.subtitle,
     required this.onTap,
     this.selected,
+    this.detail,
   });
 
   final IconData icon;
@@ -21,6 +22,7 @@ class OptionCard extends StatelessWidget {
   final String subtitle;
   final VoidCallback? onTap;
   final bool? selected;
+  final Widget? detail;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +57,7 @@ class OptionCard extends StatelessWidget {
                         Text(title, style: AppTextStyles.cardTitle),
                         const SizedBox(height: 2),
                         Text(subtitle, style: AppTextStyles.subtitle),
+                        if (detail case final detail?) ...[const SizedBox(height: AppSpacing.xs), detail],
                       ],
                     ),
                   ),
