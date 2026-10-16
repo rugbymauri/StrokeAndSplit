@@ -58,7 +58,7 @@ Wird die App während einer Session beendet, bleibt die Session bis kurz davor e
 4. Vorlage antippen klappt sie mit ihren Zonen und Bändern auf. **Starten** verbindet das gewählte Rudergerät und startet die Session sofort. Der Stift öffnet den Editor, dort lässt sich die Vorlage auch löschen.
 5. Nach der letzten Runde endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit dem Anteil in der Zone, die beste mit Stern. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
 
-Im Live-Display mit Vorlage ist die Pace der grösste Wert. Darunter steht der Zonenstatus mit dem Band („In der Zone · 2:05–2:10“, sonst „Schneller“ bzw. „Langsamer“), die Schlagzahl-Karte zeigt ihr Band ebenso („Mehr Schläge“, „Weniger Schläge“). Blau heisst in der Zone, orange ausserhalb. Dazu kommen Kacheln für Rundenzeit, Watt, Puls (wenn das Rudergerät ihn liefert) und den Anteil in der Zone.
+Im Live-Display mit Vorlage ist die Pace der grösste Wert. Darunter steht der Zonenstatus mit dem Band („In der Zone · 2:05–2:10“, sonst „Schneller“ bzw. „Langsamer“), die Schlagzahl-Karte zeigt ihr Band ebenso („Mehr Schläge“, „Weniger Schläge“). Blau heisst in der Zone, orange ausserhalb. Dazu kommen Kacheln für Rundenzeit, Watt, Puls (wenn Gurt oder Rudergerät ihn liefern) und den Anteil in der Zone.
 
 Um die Pace läuft ein Fortschrittsrahmen aus drei Spuren, jede beginnt oben in der Mitte und läuft im Uhrzeigersinn, an der Spitze sitzt ein Schiffchen:
 
@@ -101,6 +101,19 @@ Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen
 Die Pace-Box zeigt in der Zeile **Ghost** den Abstand zum Ghost der Vorlage (aussen): auf Distanzstrecken in Sekunden, auf Zeitstrecken in Metern, z.B. „7.6 s vor dir“ (Rückstand, orange), „12 m hinter dir“ (Vorsprung, blau) oder „gleichauf“. Ohne Ghost aussen fehlt die Zeile, die Ghosts auf den anderen Spuren laufen trotzdem.
 
 Die Ghosts folgen den Bestenlisten live: Wird eine Runde oder Zonenfahrt der laufenden Session neuer Platz 1, läuft der Ghost dieser Spur ab der nächsten Runde bzw. Fahrt gegen sie. Im Simulator laufen die Ghosts ebenso mit. Da Simulator-Sessions nicht in die Bestenlisten kommen, werden sie selbst nie Ghost. In der aufgeklappten Vorlage trägt Platz 1 das Ghost-Symbol.
+
+### Pulsgurt
+
+Ein Brustgurt mit dem Bluetooth-Standard Heart Rate (z.B. Polar H10) liefert Puls und RR-Intervalle direkt an die App, unabhängig vom Rudergerät. Er ist optional.
+
+1. In **Geräte wählen** unter **Pulsgurt** auf **Gurt koppeln** tippen. Die Gurt-Suche listet nur Gurte, keine Rudergeräte. Findet sie in 15 s keinen, zeigt sie Tipps: Elektroden anfeuchten und Gurt anlegen, Gurt von anderen Apps oder Uhren trennen. Gurt antippen koppelt ihn. Die App merkt ihn sich über einen Neustart hinaus, **Gurt wechseln** wählt einen anderen, **Vergessen** entkoppelt ihn. **Weiter** hängt nur vom Rudergerät ab, der Startbildschirm zeigt den Gurt neben dem Rudergerät.
+2. Sobald die App mit einem PM5 oder FTMS-Rudergerät verbunden ist, verbindet sie den gekoppelten Gurt von selbst. Mit Simulator oder Replay verbindet sie keinen Gurt. Bricht die Verbindung ab, versucht sie es 30 s lang erneut, ein Ausfall des Gurts stört Rudergerät und Session nicht. Wird das Rudergerät bewusst getrennt, trennt sie auch den Gurt.
+
+Für den Puls gilt: Gurt vor Rudergerät vor kein Puls. Der Gurt zählt, solange seine letzte Messung höchstens 3 s alt ist, sonst gilt der Puls des PM5 bzw. FTMS-Rudergeräts. Woher der Puls stammt, zeigt die App nicht an. Ohne Puls fehlt der Wert.
+
+Im Live-Display steht in der Kopfzeile neben der Verbindung des Rudergeräts ein Herz mit Punkt für den Gurt: grün verbunden, orange beim (Wieder-)Verbinden, leerer Ring wartend oder getrennt. Scheitert die Verbindung, erscheint eine Meldung mit dem Hinweis, dass viele Gurte nur eine oder zwei Bluetooth-Verbindungen gleichzeitig erlauben, und **Erneut versuchen**. Beim Puls steht klein das letzte RR-Intervall (z.B. „812 ms“), es verschwindet, wenn 3 s lang keines nachkommt.
+
+Die Zusammenfassung zeigt **Ø Puls** und **Max. Puls**, sobald es einen Puls gab, mit Gurt dazu die Kurve der RR-Intervalle und „HRV (RMSSD) 16 ms“ (ab zwei Intervallen, aus den ungefilterten Intervallen). Die Gurt-Pakete werden wie die des Rudergeräts aufgezeichnet, exportiert und beim Import neu ausgewertet.
 
 ### Sprache
 
@@ -147,7 +160,7 @@ Zahlen mit Mehrzahl über `plural`, Namen in Anführungszeichen stehen samt Zeic
 
 ## Dateiformat `.aergrow`
 
-gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format, Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren.
+gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format, Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Pakete eines Pulsgurts stehen mit `"c": "2a37"` auf derselben Zeitachse, der `session`-Block im Header enthält, sofern vorhanden, `averageHeartRate`, `maxHeartRate` und `rmssdMs`. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren.
 
 Eine Session auf einer Vorlage hat im Header zusätzlich die Vorlage und die geruderte Version der Strecke:
 

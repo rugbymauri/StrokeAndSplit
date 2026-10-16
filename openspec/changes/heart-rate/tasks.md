@@ -48,6 +48,6 @@ Parallel arbeiten: Die Gruppen 1, 2 und 4 hängen an keinem anderen Task dieses 
 
 ## 6. Abschluss und Integration am echten Gerät
 
-- [ ] 6.1 README ergänzen: Gurt in „Geräte wählen“ koppeln, Vorrangregel für PM5 und FTMS, RR/RMSSD, Fixture. Verifikation: README-Abschnitt vorhanden und mit dem Verhalten der App abgeglichen
-- [ ] 6.2 `make check` grün. Verifikation: Analyse und alle Tests von App und `erg_protocol` ohne Fehler
+- [x] 6.1 README ergänzen: Gurt in „Geräte wählen“ koppeln, Vorrangregel für PM5 und FTMS, RR/RMSSD, Fixture. Verifikation: README-Abschnitt vorhanden und mit dem Verhalten der App abgeglichen
+- [x] 6.2 `make check` grün. Verifikation: Analyse und alle Tests von App und `erg_protocol` ohne Fehler
 - [ ] 6.3 Manuell auf Android und Linux mit Gurt, je einmal mit PM5 und mit FTMS-Rudergerät (oder `make ftms-rower`): Koppeln, automatisch verbinden, Gurt kurz ausser Reichweite (Wiederverbinden), Gurt ablegen (Rückfall auf den Puls des Rudergeräts), Session aufzeichnen, Zusammenfassung prüfen, Replay und Export/Import. Verifikation: Ergebnis im Plattform-Status des README festgehalten
