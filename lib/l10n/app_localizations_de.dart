@@ -906,4 +906,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String courseVersionHint(int count) {
     return '$count× gerudert. Änderst du Länge oder Zonen, entsteht eine neue Version. Alte Rundenzeiten bleiben vergleichbar.';
   }
+
+  @override
+  String get ghostSymbolLabel => 'Ghost';
 }
