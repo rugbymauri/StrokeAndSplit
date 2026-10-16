@@ -20,7 +20,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
-| 6 | `statistics` | 10/13 | Gruppe 1 und Anzeige teilweise in `main` | – |
+| 6 | `statistics` | 11/13 | Anzeige umgesetzt, in `main` gemergt | README (5.1), Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 3 und 6 |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 | 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
@@ -169,6 +169,7 @@ Gruppe 1 umgesetzt (2026-10-16, Tasks 1.1–1.6, `lib/data/statistics/`):
 - [x] Entschieden (Nutzer, 2026-10-16): importierte Sessions werden nicht mit der Statistik verbunden. Task 1.7: Spalte `sessions.imported`, Schema 5 mit `from4To5`, der Import setzt sie, alle Ranglisten lassen importierte Sessions weg; Spec-Szenario „Import“ und Design D1/D3 angepasst, `heart-rate` auf Schema 6 nachgeführt.
 - [x] Task 3.1 Plätze 1–3 in der aufgeklappten Vorlage (`template_podium.dart`), Lücke für das Ghost-Symbol bei Platz 1. Vorläufig: Überschrift „Bestleistungen“ und Hinweistexte selbst formuliert; Datum als `DateFormat.yMd`; ist die aktuelle Länge noch nie gerudert, erscheint der Hinweis statt einer älteren Rangliste.
 - [x] Tasks 2.1/2.2 Detailansicht von Strecke und Zone (`course_detail_screen.dart`, `zone_detail_screen.dart`, gemeinsam `lib/features/statistics/ranking_sections.dart`), Tipp in der Liste öffnet sie, Stift öffnet den Editor. Vorläufig: nach dem Speichern zurück in die Detailansicht; Löschen bleibt in Liste bzw. Editor; Zeit im Rundenformat (`0:18.2`); Datum kurz ohne Uhrzeit; hat die aktuelle Länge keine Einträge, fehlt ihre Rangliste ohne eigenen Hinweis.
+- [x] Task 4.1 Platzmarken in der Zusammenfassung (`session_places.dart`, `sessionPlacesProvider`): Session neben dem Titel, Runden und Zonenfahrten („Sprint · Platz 1“) in der Rundenzeile; Marken folgen der Rangliste live; Simulator, Replay und Import ohne Marken. Vorläufig: neutrale Pille für alle Plätze (kein Ghost-Violett); Session ohne Vorlage ohne eigene Marke.
 
 ### 7. `ghost`: gegen die eigene Bestzeit rudern
 
