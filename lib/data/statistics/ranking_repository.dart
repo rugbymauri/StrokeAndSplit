@@ -61,6 +61,47 @@ class RankingRepository {
     );
   }
 
+  /// The sessions on template [templateId] with all planned laps complete,
+  /// ranked by the sum of their laps; one ranking per course length and
+  /// number of laps, the current ones first (Design D2). A template with an
+  /// open number of laps has no ranking.
+  Future<List<Ranking>> template(int templateId) async {
+    final current = await _db.customSelect('''
+        SELECT c.axis AS axis, v.length AS length, b.laps AS laps
+        FROM template_blocks b
+        JOIN courses c ON c.id = b.course_id
+        JOIN course_versions v ON v.course_id = c.id
+        WHERE b.template_id = ? AND b.position = 0
+        ORDER BY v.version DESC LIMIT 1''', variables: [Variable.withInt(templateId)]).getSingleOrNull();
+    final laps = current?.read<int?>('laps');
+    if (current == null || laps == null) return [];
+
+    final rows = await _db.customSelect('''
+        SELECT s.id AS session, s.started_at AS started_at, c.axis AS axis, v.length AS length, s.planned_laps AS laps,
+          MIN(l.start_wall_ms) AS start_wall, MAX(l.end_wall_ms) AS end_wall,
+          MIN(l.start_distance_dm) AS start_distance, MAX(l.end_distance_dm) AS end_distance,
+          SUM(l.end_wall_ms - l.start_wall_ms) AS duration, SUM(l.end_distance_dm - l.start_distance_dm) AS distance
+        FROM sessions s
+        JOIN laps l ON l.session_id = s.id
+        JOIN course_versions v ON v.id = s.course_version_id
+        JOIN courses c ON c.id = v.course_id
+        WHERE s.template_id = ? AND l.complete = 1 AND l.lap_no <= s.planned_laps
+        GROUP BY s.id
+        HAVING COUNT(*) = s.planned_laps''', variables: [Variable.withInt(templateId)]).get();
+    return _rankings(
+      [
+        for (final row in rows)
+          (
+            _axis(row),
+            row.read<int>('length'),
+            row.read<int>('laps'),
+            _entry(row, durationMs: row.read<int>('duration'), distanceDm: row.read<int>('distance')),
+          ),
+      ],
+      current: (_axis(current), current.read<int>('length'), laps),
+    );
+  }
+
   static RankingEntry _segmentEntry(QueryRow row) {
     final startWallMs = row.read<int>('lap_wall') + row.read<int>('before_wall');
     final startDistanceDm = row.read<int>('lap_distance') + row.read<int>('before_distance');
@@ -78,7 +119,7 @@ class RankingRepository {
 
   static CourseAxis _axis(QueryRow row) => CourseAxis.values.byName(row.read<String>('axis'));
 
-  RankingEntry _entry(QueryRow row, {int? lap, int? durationMs, int? distanceDm}) => RankingEntry(
+  static RankingEntry _entry(QueryRow row, {int? lap, int? durationMs, int? distanceDm}) => RankingEntry(
         sessionId: row.read<int>('session'),
         startedAt: row.read<DateTime>('started_at'),
         lap: lap,

@@ -202,4 +202,58 @@ void main() {
       expect(_values(await rankings.zone(sprintId)), ['100: 18']);
     });
   });
+
+  group('template', () {
+    late int x3;
+
+    setUp(() async => x3 = await templates.create('Seerunde x3', courseId: seerunde, laps: 3));
+
+    /// Rows [template] with laps of [lapMs] each over 1000 m.
+    Future<int> row(int template, List<int> lapMs, {bool lastComplete = true}) async => storeRowedSession(
+          db,
+          template: (await templates.get(template))!,
+          laps: [
+            for (final (i, ms) in lapMs.indexed)
+              RowedLap.single(ms, 1000, complete: lastComplete || i < lapMs.length - 1),
+          ],
+        );
+
+    test('ranks sessions with all laps by their sum', () async {
+      await row(x3, [250000, 251000, 250800]);
+      final best = await row(x3, [248000, 248100, 248000]);
+
+      final ranked = await rankings.template(x3);
+
+      expect(_values(ranked), ['1000: 744, 751']);
+      final first = ranked.single.entries.first;
+      expect((first.sessionId, first.lap, first.durationMs, first.distanceDm), (best, null, 744100, 30000));
+      expect((first.startWallMs, first.endWallMs, first.startDistanceDm, first.endDistanceDm), (0, 744100, 0, 30000));
+      expect(ranked.single.laps, 3);
+    });
+
+    test('leaves out a session that ended before its last lap', () async {
+      await row(x3, [250000, 251000]);
+      await row(x3, [250000, 251000, 100000], lastComplete: false);
+
+      expect(await rankings.template(x3), isEmpty);
+    });
+
+    test('has a ranking per number of laps, the current one first', () async {
+      await row(x3, [250000, 251000, 250800]);
+      await templates.update(x3, name: 'Seerunde x3', courseId: seerunde, laps: 4);
+      await row(x3, [250000, 251000, 250800, 252000]);
+
+      final ranked = await rankings.template(x3);
+
+      expect([for (final r in ranked) (r.length, r.laps, r.entries.length)], [(1000, 4, 1), (1000, 3, 1)]);
+    });
+
+    test('has no ranking for an open number of laps, its laps count for the course', () async {
+      final open = await templates.create('Seerunde offen', courseId: seerunde, laps: null);
+      await row(open, [250000, 251000]);
+
+      expect(await rankings.template(open), isEmpty);
+      expect(_values(await rankings.course(seerunde)), ['1000: 250, 251']);
+    });
+  });
 }
