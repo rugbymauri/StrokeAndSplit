@@ -19,7 +19,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
-| 5 | `heart-rate` | 5/25 | in Umsetzung | Entscheid F17; Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
+| 5 | `heart-rate` | 9/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 5/13 | in Umsetzung | – |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
@@ -154,6 +154,7 @@ Entscheide F3 und F4 getroffen (Design D7, D8).
 - [x] Artefakte an `device-types`, `ui-design` und `statistics` angeglichen (2026-10-16): BLE-Rudergerät statt PM5 (`BleRowerSource`, `erg_protocol`), Vorrangregel in einem `HeartRateDecoder`, der den Decoder des Rudergeräts umhüllt; FTMS-Puls dekodiert schon und dient als Rückfall; Schema 6 mit `from5To6`. `tasks.md` neu: 25 Tasks in 6 Gruppen; 2, 4 und der Spike (1) parallel, 3 nach 2.1.
 - [ ] Archivieren: `device-types` vor `heart-rate`, weil dessen MODIFIED-Anforderungen auf `device-types` aufbauen.
 - [x] Tasks 2.1–2.5 Protokoll: `HeartBeatIntervals` mit `intervalEnds` (D4), `StatusTick.copyWith(heartRate:)`, Parser und Encoder für `2a37`, `HeartRateDecoder` umhüllt PM5- und FTMS-Decoder (`ErgDecoder.forProtocol`). Vorläufig: Gurt-Puls 0 gilt als kein Wert; Gurt gilt bis einschliesslich 3 s; `elapsed` der RR-Ereignisse ist die des letzten Ticks. Offen: 2.6 braucht die Fixture vom Gerät.
+- [x] Tasks 4.1, 4.2, 4.4, 4.5 Gurt-Verbindung: `HeartRateTransport` (`scanHeartRateMonitors`, `connectHeartRateMonitor`), `setUpHeartRateMonitor`, `BleRowerSource.attachHeartRate`, gemeinsame 30-s-Schleife `reconnectWithin`, `heartRateMonitorProvider` mit Phasen und `retry()`. Vorläufig: Gurt nur im Speicher bis 4.3; nach 30 s ohne Rudergerät wird der Gurt getrennt; nach Fehler nur über `retry()`; der Provider verbindet nur, solange ihn jemand beobachtet (5.3 hängt ihn ein). Manuell offen: echter Gurt in der Suche. F18 entschieden: Gurt in `shared_preferences`.
 
 ### 6. `statistics`: Ranglisten pro Vorlage, Strecke und Zone
 
@@ -231,7 +232,7 @@ Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwech
 | ~~F13~~ | Rückfallsprache: **keine** (2026-10-16), die Sprache wird in der App gewählt (F14) | translations | entschieden |
 | ~~F14~~ | Sprachwahl: **in der App** (2026-10-16), Start auf Deutsch, Systemsprache wird nicht beachtet | translations | entschieden |
 | F15 | Schweizer Rechtschreibung (`ss` statt `ß`, wie heute im Code) als `de`? **Vorläufig ja** (2026-10-16, nach Vorschlag) | translations | vorläufig entschieden |
-| F17 | Gemerkter Gurt: Tabelle `settings` (Design D6) oder `shared_preferences` wie Rudergerät und Sprache? Empfehlung: `shared_preferences`, dann entfällt die Tabelle `settings` | heart-rate | heart-rate |
+| ~~F18~~ | Gemerkter Gurt: **`shared_preferences`** wie Rudergerät und Sprache, keine Tabelle `settings` (2026-10-16) | heart-rate | entschieden |
 | F16 | Wo wird die gewählte Sprache gespeichert? **Vorläufig `shared_preferences`** (2026-10-16, nach Vorschlag): keine Migration, `heart-rate` bekommt Schema 6, weil `statistics` 5 nimmt | translations, heart-rate | vorläufig entschieden |
 | F17 | Release nur für Tags auf `main`? **Vorläufig ja** (2026-10-16, nach Vorschlag): Tags ausserhalb von `main` lassen `verify-tag` fehlschlagen | gitlab-pipeline | gitlab-pipeline |
 

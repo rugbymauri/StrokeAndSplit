@@ -1,6 +1,6 @@
 # Tasks
 
-Voraussetzungen: `device-types`, `ui-design` und `statistics` (Schema 5) sind in `main`. `device-types` wird vor `heart-rate` archiviert, weil die MODIFIED-Anforderungen auf seinem Text aufbauen. Die Frage F17 (gemerkter Gurt in `settings` oder `shared_preferences`, Design D6) ist vor den Tasks 3.1 und 4.3 entschieden.
+Voraussetzungen: `device-types`, `ui-design` und `statistics` (Schema 5) sind in `main`. `device-types` wird vor `heart-rate` archiviert, weil die MODIFIED-Anforderungen auf seinem Text aufbauen. Die Frage F18 (gemerkter Gurt in `settings` oder `shared_preferences`, Design D6) ist vor den Tasks 3.1 und 4.3 entschieden.
 
 Parallel arbeiten: Die Gruppen 1, 2 und 4 hängen an keinem anderen Task dieses Changes und können gleichzeitig starten. Innerhalb der Gruppen und für die übrigen Gruppen gilt:
 - Gruppe 2: 2.1 zuerst (Ereignis und `copyWith` als Vertrag für die Gruppen 3 und 5), danach 2.2 und 2.3 parallel, 2.4 nach 2.2 und 2.3, 2.5 nach 2.4, 2.6 nach 2.4 und 1.2.
@@ -25,7 +25,7 @@ Parallel arbeiten: Die Gruppen 1, 2 und 4 hängen an keinem anderen Task dieses 
 
 ## 3. Datenbank (Capability session-recording)
 
-- [ ] 3.1 Schema auf `schemaVersion` 6 (Design D5, D6 nach F17): Spalten `averageHeartRate`, `maxHeartRate`, `rmssdMs` in `sessions`, Tabelle `rr_intervals` mit Index, Tabelle `settings` nur, wenn F17 bei D6 bleibt. Migrationsschritt `from5To6`, `make codegen` und `make schema` ausführen. Verifikation: Migrationstests 5→6 und 1→6 sind grün, bestehende Sessions bleiben erhalten und haben `null` in den neuen Spalten
+- [ ] 3.1 Schema auf `schemaVersion` 6 (Design D5): Spalten `averageHeartRate`, `maxHeartRate`, `rmssdMs` in `sessions`, Tabelle `rr_intervals` mit Index. Migrationsschritt `from5To6`, `make codegen` und `make schema` ausführen. Verifikation: Migrationstests 5→6 und 1→6 sind grün, bestehende Sessions bleiben erhalten und haben `null` in den neuen Spalten
 - [ ] 3.2 `SessionAccumulator` schreibt `HeartBeatIntervals` mit Endzeit nach Design D4 in `rr_intervals`, auf der Session-Zeitachse wie die übrigen Zeilen. Verifikation: Unit-Test mit einer Messung aus zwei Intervallen prüft beide Zeilen und ihre Zeiten
 - [ ] 3.3 `SessionRepository.finish` berechnet Ø-Puls, Max-Puls und RMSSD. Ohne Puls bzw. mit weniger als zwei RR-Intervallen bleibt der jeweilige Wert `null`. Verifikation: Unit-Tests inklusive des Spec-Beispiels 800/810/790 ms ergibt 16 ms und einer Session nur mit PM5-Puls
 - [ ] 3.4 Export/Import: Der `session`-Block im Header enthält die neuen Werte, und ein Import baut `rr_intervals` aus den Rohpaketen neu auf. Verifikation: Test exportiert und importiert je eine PM5- und eine FTMS-Session mit Gurt-Paketen und vergleicht Puls, RR und Zusammenfassung
@@ -34,7 +34,7 @@ Parallel arbeiten: Die Gruppen 1, 2 und 4 hängen an keinem anderen Task dieses 
 
 - [x] 4.1 `HeartRateTransport` mit `FoundHeartRateMonitor`, `HeartRateLink`, `HeartRateConnectException` und einem Fake für Tests in `lib/data/sources/ble/` definieren (Design D2), dazu `heartRateTransportProvider` in `platform_providers.dart`. Verifikation: `flutter analyze` sauber, der Fake wird von einem ersten Unit-Test genutzt
 - [x] 4.2 Gurt-Einrichtung neben `setUpRower` auf `GattConnection` (ohne Heart Rate Service `HeartRateConnectException`, sonst `0x2A37` abonnieren) und Implementierung in `FlutterBluePlusTransport`: Suche nur mit Service `0x180D`, 15-s-Timeout, geteilte Readiness-Prüfung. Verifikation: Unit-Tests der Einrichtung mit Fake-`GattConnection`; manuell erscheint ein Gurt in der Suche, ein PM5 oder FTMS-Rudergerät nicht
-- [ ] 4.3 Gemerkten Gurt speichern, lesen und löschen nach D6 bzw. F17, mit `chosenHeartRateMonitorProvider` (koppeln, wechseln, vergessen) neben `chosenRowerProvider`. Verifikation: Unit-Test übersteht ein erneutes Öffnen des Speichers (In-Memory-Datenbank bei `settings`, Speicher-Store bei `shared_preferences`) und vergisst den Gurt
+- [ ] 4.3 Gemerkten Gurt speichern, lesen und löschen in `shared_preferences` nach D6, mit `chosenHeartRateMonitorProvider` (koppeln, wechseln, vergessen) neben `chosenRowerProvider`. Verifikation: Unit-Test übersteht ein erneutes Öffnen des Speichers (Speicher-Store) und vergisst den Gurt
 - [x] 4.4 `BleRowerSource.attachHeartRate` und `detachHeartRate` stempeln Gurt-Pakete mit der eigenen Uhr (Design D1); ein Wiederverbinden des Rudergeräts lässt das Gurt-Abonnement bestehen. Verifikation: Unit-Tests mit Fake-Transport zeigen `2a37`-Pakete in `source.packets` auf derselben Zeitachse, für PM5 und FTMS, und auch nach einem Wiederverbinden des Rudergeräts
 - [x] 4.5 `heartRateMonitorProvider` mit Zustandsautomat nach Design D7: Verbinden nur bei verbundener `BleRowerSource` (PM5 oder FTMS), Trennen bei bewusstem Stopp, Quellenwechsel oder Vergessen, 30-s-Wiederverbinden, Grund des Fehlschlags im Zustand „getrennt“, erneuter Versuch auf Anfrage. Den Reconnect-Teil mit `BleRowerSource` teilen, wenn das sauber geht. Verifikation: Unit-Tests mit Fake-Transports für alle Übergänge, inklusive „FTMS verbindet den Gurt“, „Simulator und Replay verbinden keinen Gurt“ und „Gurt-Ausfall lässt das Rudergerät unberührt“
 

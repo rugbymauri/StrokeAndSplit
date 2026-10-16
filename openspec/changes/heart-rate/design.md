@@ -86,20 +86,17 @@ Eine Messung kann mehrere Intervalle enthalten. Das letzte endet zur Paketzeit `
 ```
  sessions      + averageHeartRate int?  + maxHeartRate int?  + rmssdMs int?
  rr_intervals  (sessionId -> sessions cascade, tMs, rrMs)   Index (sessionId, tMs)
- settings      (key text PK, value text)                     siehe D6 und F17
 ```
 
-`SessionAccumulator` schreibt aus `HeartBeatIntervals` die Zeilen in `rr_intervals`. `SessionRepository.finish` berechnet den Durchschnitt aus den Samples mit Puls, das Maximum und RMSSD (`sqrt(mean((rr[i+1]-rr[i])^2))`, gerundet, erst ab zwei Intervallen). Der Export schreibt die drei Werte in den `session`-Block des Headers. Der Import baut alles aus den Rohpaketen neu auf und braucht keine Sonderbehandlung. Die Migration von 5 auf 6 ergänzt Spalten und Tabellen, bestehende Sessions behalten `null`. Snapshot und Migrationstest kommen über `make schema`.
+`SessionAccumulator` schreibt aus `HeartBeatIntervals` die Zeilen in `rr_intervals`. `SessionRepository.finish` berechnet den Durchschnitt aus den Samples mit Puls, das Maximum und RMSSD (`sqrt(mean((rr[i+1]-rr[i])^2))`, gerundet, erst ab zwei Intervallen). Der Export schreibt die drei Werte in den `session`-Block des Headers. Der Import baut alles aus den Rohpaketen neu auf und braucht keine Sonderbehandlung. Die Migration von 5 auf 6 ergänzt Spalten und die Tabelle `rr_intervals`, bestehende Sessions behalten `null`. Snapshot und Migrationstest kommen über `make schema`.
 
 *Alternative:* RR-Intervalle nur in den Rohpaketen belassen und für die Zusammenfassung jedes Mal neu dekodieren. Verworfen, weil Liste und Zusammenfassung sonst die ganze Session parsen müssten.
 
-### D6: Gemerkter Gurt in einer `settings`-Tabelle
+### D6: Gemerkter Gurt in `shared_preferences` (F18, entschieden 2026-10-16)
 
-Die App speichert den Gurt als `heart_rate_monitor.id` und `heart_rate_monitor.name` in einer schlichten Key-Value-Tabelle in derselben drift-Datenbank.
+Die App merkt sich den Gurt wie das Rudergerät (`rower_choice.dart`) und die Sprache in `shared_preferences`, mit Id und Name. Das Muster folgt `RowerChoiceStore`: Store-Schnittstelle, Implementierung mit `SharedPreferencesWithCache`, Speicher-Variante für Tests, Öffnen in `main`. Eine Tabelle `settings` gibt es nicht.
 
-*Alternative:* `shared_preferences`. Verworfen, weil es eine neue Dependency mit eigenem Linux-Backend wäre. Die DB-Migration ist ohnehin fällig.
-
-*Stand 2026-10-16, offen (F17):* Die Begründung trifft nicht mehr zu. `shared_preferences` ist seit `ui-design` eine Dependency und hält das gemerkte Rudergerät (`rower_choice.dart`) und die Sprache. Ob der Gurt ebenfalls dorthin gehört und die Tabelle `settings` entfällt, entscheidet der Nutzer, siehe Open Questions.
+*Alternative:* eine Key-Value-Tabelle `settings` in der drift-Datenbank. Verworfen, weil Rudergerät und Sprache schon in `shared_preferences` liegen und der Gurt aus demselben Screen kommt.
 
 ### D7: Lebenszyklus über einen eigenen Notifier
 
@@ -145,4 +142,4 @@ Die Migration von `schemaVersion` 5 auf 6 fügt nur hinzu. Bestehende Sessions b
 
 ## Open Questions
 
-- **F17: Gemerkter Gurt in `settings` oder `shared_preferences`?** D6 plant eine Tabelle `settings`, das gemerkte Rudergerät und die Sprache liegen aber in `shared_preferences`. Mit `shared_preferences` entfällt die Tabelle `settings` in D5, der Gurt folgt dem Muster von `RowerChoiceStore` (Store-Schnittstelle, Implementierung mit `SharedPreferencesWithCache`, Speicher-Variante für Tests, Öffnen in `main`), und die Tasks 3.1 und 4.3 werden entsprechend angepasst.
+Keine.
