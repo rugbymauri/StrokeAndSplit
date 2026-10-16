@@ -38,4 +38,4 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 ## 6. Abschluss
 
 - [ ] 6.1 Screenshots der umgesetzten Screens mit dem Canvas vergleichen und Abweichungen im Canvas oder im Code bereinigen. Verifikation: manuelle Sichtprüfung auf Android hoch und quer sowie Linux
-- [ ] 6.2 README-Abschnitt zur Bedienung aktualisieren. Verifikation: Durchsicht
+- [x] 6.2 README-Abschnitt zur Bedienung aktualisieren. Verifikation: Durchsicht
