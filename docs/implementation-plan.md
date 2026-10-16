@@ -17,7 +17,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
-| 3 | `ui-design` | 8/18 | in Arbeit | – |
+| 3 | `ui-design` | 9/18 | in Arbeit | – |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
 | 6 | `statistics` | 6/12 | Gruppe 1 in `main`, Rest nach 3 | – |
@@ -119,6 +119,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Task 2.2 `ProgressFrame` in `lib/features/live/progress_frame.dart` mit Goldens. Entschieden (2026-10-16): Startkerbe oben in der Mitte auf Strecken- und Rundenspur, leere innere Spur als Token `AppColors.trackInner`. Vorläufig: ohne Pace färbt die Abschnittsspur `zoneOut`; Masse feste Pixel aus dem Canvas.
 - [x] Task 3.1 `LiveLayout.of(Size)` in `lib/features/live/live_layout.dart`: Querformat nur, wenn breiter als hoch; gilt vorerst für die Fläche der Messwerte.
 - [x] Task 2.3 `PaceBox` in `lib/features/live/pace_box.dart`, Legende „Runde 2 / 3“ mit MODIFIED-Delta zu `course-rowing`. Bis 3.3 zeigt `course_bar.dart` noch „Runde 2 von 3“ (`courseLapOf` entfällt mit 3.3). Vorläufig: unter 260 px Höhe wird der Inhalt verkleinert (auf dem Gerät prüfen, 6.1); Zonenstatus „in der Zone“ klein wie bisher.
+- [x] Task 5.2 Zusammenfassung nach Canvas (`session_summary_screen.dart`), Platz für die Marken aus `statistics` rechts der Runden und neben dem Titel. Vorläufig: Anteil in der Zone der Session aus den Runden nach Dauer gewichtet (Näherung); Kopf mit Vorlage und Quelle; Schläge als vierter Durchschnittswert; beste Runde mit Stern; „Fertig“ schliesst nur die Zusammenfassung. Offen: „Fertig“ zum Startbildschirm? Anteil exakt über die Abschnitte?
 - [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Primärfarbe Blau `zoneIn` (Nutzer, 2026-10-16), gefüllter Button bleibt `text` wie im Canvas. Vorläufig: Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`).
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen

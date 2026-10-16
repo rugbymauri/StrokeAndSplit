@@ -366,13 +366,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionTime => 'Time';
 
   @override
-  String get sessionAveragePace => '⌀ Pace /500 m';
+  String get sessionAveragePace => '⌀ Pace';
 
   @override
   String get sessionAverageWatts => '⌀ Watts';
 
   @override
-  String get sessionAverageStrokeRate => '⌀ Strokes/min';
+  String get sessionAverageStrokeRate => '⌀ spm';
 
   @override
   String get sessionStrokes => 'Strokes';
@@ -381,6 +381,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String sessionLap(int lap) {
     return 'Lap $lap';
   }
+
+  @override
+  String get summaryTitle => 'Session finished';
+
+  @override
+  String get summaryInZone => 'In the zone';
+
+  @override
+  String get summaryLaps => 'Laps';
+
+  @override
+  String get summaryLapBarHint => 'Bar: share in the zone per lap';
+
+  @override
+  String get summaryBestLap => 'Best lap';
+
+  @override
+  String get actionDone => 'Done';
 
   @override
   String get sourceRower => 'Rower';
