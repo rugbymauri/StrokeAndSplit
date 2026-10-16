@@ -218,6 +218,13 @@ class SessionRepository {
       ..orderBy([(l) => OrderingTerm.asc(l.lapNo)]);
   }
 
+  /// The RR intervals of a session in the order of their end times, on the
+  /// session's wall-clock axis.
+  Future<List<RrIntervalRow>> rrIntervals(int id) => (_db.select(_db.rrIntervals)
+        ..where((r) => r.sessionId.equals(id))
+        ..orderBy([(r) => OrderingTerm.asc(r.tMs), (r) => OrderingTerm.asc(r.rowId)]))
+      .get();
+
   Future<bool> hasRawPackets(int id) async {
     final row = await (_db.select(_db.rawPackets)
           ..where((r) => r.sessionId.equals(id))

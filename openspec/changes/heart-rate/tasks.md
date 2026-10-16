@@ -44,7 +44,7 @@ Parallel arbeiten: Die Gruppen 1, 2 und 4 hängen an keinem anderen Task dieses 
 - [x] 5.2 Startbildschirm: `_DeviceRow` zeigt den gekoppelten Gurt neben dem Rudergerät (Design D8). Verifikation: Widget-Tests für Gerätezeile mit und ohne Gurt, Antippen führt weiter zu „Geräte wählen“
 - [x] 5.3 Live-Display: Gurt-Indikator neben `ConnectionIndicator` in der Kopfzeile, nur bei gekoppeltem Gurt und `BleRowerSource`; bei gescheiterter Verbindung die Meldung mit Hinweis auf begrenzte Verbindungen und „Erneut versuchen“. Verifikation: Widget-Tests für verbunden, wiederverbindend, Fehlschlag mit Meldung (Fake-Transport, der beim Verbinden wirft) und Simulator ohne Indikator
 - [x] 5.4 Live-Display: letztes RR-Intervall klein beim Puls in `live_free.dart` und `live_course.dart`, ausgeblendet ab 3 s Abstand zum jüngsten Tick, ohne Hinweis auf die Puls-Herkunft. Verifikation: Widget-Tests für „812 ms“, Puls nur vom Rudergerät und veraltetes RR; die bestehenden Layout-Tests für Hoch- und Querformat bleiben grün
-- [ ] 5.5 Zusammenfassung: Ø/Max-Puls, RR-Kurve per `CustomPainter` und „HRV (RMSSD) xx ms“, alles nur bei vorhandenen Daten. Verifikation: Widget-Tests für Session mit RR, nur mit Puls vom Rudergerät und ohne Puls
+- [x] 5.5 Zusammenfassung: Ø/Max-Puls, RR-Kurve per `CustomPainter` und „HRV (RMSSD) xx ms“, alles nur bei vorhandenen Daten. Verifikation: Widget-Tests für Session mit RR, nur mit Puls vom Rudergerät und ohne Puls
 
 ## 6. Abschluss und Integration am echten Gerät
 

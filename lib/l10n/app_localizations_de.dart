@@ -506,6 +506,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get summaryTitle => 'Session beendet';
 
   @override
+  String get sessionAverageHeartRate => 'Ø Puls';
+
+  @override
+  String get sessionMaxHeartRate => 'Max. Puls';
+
+  @override
+  String get summaryRrIntervals => 'RR-Intervalle';
+
+  @override
+  String summaryRrCurve(int min, int max) {
+    return 'Verlauf der RR-Intervalle zwischen $min und $max ms';
+  }
+
+  @override
+  String summaryRmssd(int ms) {
+    return 'HRV (RMSSD) $ms ms';
+  }
+
+  @override
   String get summaryLaps => 'Runden';
 
   @override

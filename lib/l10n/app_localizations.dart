@@ -913,6 +913,36 @@ abstract class AppLocalizations {
   /// **'Session beendet'**
   String get summaryTitle;
 
+  /// Summary: label of the average heart rate in beats per minute
+  ///
+  /// In de, this message translates to:
+  /// **'Ø Puls'**
+  String get sessionAverageHeartRate;
+
+  /// Summary: label of the highest heart rate in beats per minute
+  ///
+  /// In de, this message translates to:
+  /// **'Max. Puls'**
+  String get sessionMaxHeartRate;
+
+  /// Summary: title above the curve of the intervals from one heart beat to the next, as sent by the heart rate strap
+  ///
+  /// In de, this message translates to:
+  /// **'RR-Intervalle'**
+  String get summaryRrIntervals;
+
+  /// Summary: screen reader text of the curve of the RR intervals over the session
+  ///
+  /// In de, this message translates to:
+  /// **'Verlauf der RR-Intervalle zwischen {min} und {max} ms'**
+  String summaryRrCurve(int min, int max);
+
+  /// Summary: heart rate variability of the session as RMSSD in whole milliseconds
+  ///
+  /// In de, this message translates to:
+  /// **'HRV (RMSSD) {ms} ms'**
+  String summaryRmssd(int ms);
+
   /// Summary: heading above the laps, written in capitals
   ///
   /// In de, this message translates to:

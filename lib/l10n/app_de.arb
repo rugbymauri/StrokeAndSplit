@@ -685,6 +685,42 @@
   "@summaryTitle": {
     "description": "Summary: title above the totals of a session"
   },
+  "sessionAverageHeartRate": "Ø Puls",
+  "@sessionAverageHeartRate": {
+    "description": "Summary: label of the average heart rate in beats per minute"
+  },
+  "sessionMaxHeartRate": "Max. Puls",
+  "@sessionMaxHeartRate": {
+    "description": "Summary: label of the highest heart rate in beats per minute"
+  },
+  "summaryRrIntervals": "RR-Intervalle",
+  "@summaryRrIntervals": {
+    "description": "Summary: title above the curve of the intervals from one heart beat to the next, as sent by the heart rate strap"
+  },
+  "summaryRrCurve": "Verlauf der RR-Intervalle zwischen {min} und {max} ms",
+  "@summaryRrCurve": {
+    "description": "Summary: screen reader text of the curve of the RR intervals over the session",
+    "placeholders": {
+      "min": {
+        "type": "int",
+        "example": "640"
+      },
+      "max": {
+        "type": "int",
+        "example": "910"
+      }
+    }
+  },
+  "summaryRmssd": "HRV (RMSSD) {ms} ms",
+  "@summaryRmssd": {
+    "description": "Summary: heart rate variability of the session as RMSSD in whole milliseconds",
+    "placeholders": {
+      "ms": {
+        "type": "int",
+        "example": "16"
+      }
+    }
+  },
   "summaryLaps": "Runden",
   "@summaryLaps": {
     "description": "Summary: heading above the laps, written in capitals"

@@ -29,6 +29,11 @@ final sessionLapsProvider = StreamProvider.family<List<LapRow>, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).watchLaps(id),
 );
 
+/// The RR intervals of a stored session, oldest first; empty without a strap.
+final sessionRrIntervalsProvider = FutureProvider.family<List<RrIntervalRow>, int>(
+  (ref, id) => ref.watch(sessionRepositoryProvider).rrIntervals(id),
+);
+
 /// A session being recorded right now.
 class ActiveRecording {
   const ActiveRecording({required this.sessionId, required this.progress, this.template, this.lap});
