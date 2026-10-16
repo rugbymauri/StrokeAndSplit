@@ -18,10 +18,10 @@ void main() {
     };
   }
 
-  test('lists Barlow Condensed 700 and IBM Plex Sans 400, 500 and 600', () async {
+  test('lists Barlow Condensed 500 and 700 and IBM Plex Sans 400, 500 and 600', () async {
     final families = await manifest();
 
-    expect([for (final (_, weight) in families['Barlow Condensed']!) weight], [700]);
+    expect([for (final (_, weight) in families['Barlow Condensed']!) weight], [500, 700]);
     expect([for (final (_, weight) in families['IBM Plex Sans']!) weight], [400, 500, 600]);
   });
 

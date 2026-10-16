@@ -61,7 +61,7 @@ Farben:
 
 Blau und Orange unterscheiden sich auch in der Helligkeit, damit der Zonenstatus bei Rot-Grün-Schwäche lesbar bleibt. Dazu kommen immer Pfeil oder Text (bestehende Spec „Zonenstatus ohne Farbe erkennbar“).
 
-Schriften: Barlow Condensed 700 für alle Messwerte, IBM Plex Sans 400/500/600 für Text. Beschriftungen über Werten sind 12–13 px, Grossbuchstaben mit Sperrung 0.08 em.
+Schriften: Barlow Condensed 700 für alle Messwerte und 500 für Einheiten und Zeiten (entschieden 2026-10-16), IBM Plex Sans 400/500/600 für Text. Beschriftungen über Werten sind 12–13 px, Grossbuchstaben mit Sperrung 0.08 em.
 
 Radien: Karten 14–16 px, Pace-Box 28 px, Buttons 12–16 px. Abstände in Schritten von 4 px, Seitenrand 20 px im Hochformat und 48 px im Querformat, damit Kamera-Notch und Gestenleiste nichts verdecken.
 
@@ -167,7 +167,7 @@ Neue und geänderte Texte stehen nur in `lib/l10n/app_de.arb` und `lib/l10n/app_
 
 - **Platz im Hochformat mit Vorlage**: Pace-Box, Schlagzahl, Kacheln und Kraftkurve sind auf 390 × 844 knapp. Auf kleineren Geräten fällt zuerst die Kraftkurve weg, danach werden die Kacheln einzeilig. Die bestehenden Layout-Tests in allen vier Grössen sichern das ab.
 - **Schiffchen überlappen**: Liegen eigener Wert und Ghost sehr nah beieinander, verdeckt ein Schiffchen das andere teilweise. Vorerst liegt der Ghost oben. Erweist sich das am Erg als unlesbar, wird der Ghost nach aussen versetzt.
-- **Schriften als Assets** vergrössern die App um etwa 400 kB.
+- **Schriften als Assets** vergrössern die App um etwa 800 kB. Ihre Lizenzen (OFL) stehen auf der Lizenzseite der App.
 
 ## Open Questions
 

@@ -67,7 +67,7 @@ abstract final class AppTextStyles {
   static const valueUnit = TextStyle(
     fontFamily: AppFonts.display,
     fontSize: 20,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w500,
     color: AppColors.textMuted,
   );
 
