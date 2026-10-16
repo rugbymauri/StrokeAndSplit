@@ -102,7 +102,7 @@ Vor dem Start angepasst (2026-10-16, in Proposal, Design, Specs und Tasks eingea
 
 Vorläufig, vom Nutzer zu bestätigen:
 - [x] D6 Geräte zuerst (Nutzer, 2026-10-16): Die App beginnt mit „Geräte wählen“ (Rudergerät inkl. Simulatoren, optional Pulsgurt aus `heart-rate`), dann Startbildschirm mit Gerätezeile. Der Quellen-Dialog beim Start einer Vorlage fällt weg. `heart-rate` 5.1 koppelt den Gurt dort statt auf dem Startbildschirm.
-- [ ] Offen: Beim nächsten App-Start „Geräte wählen“ überspringen, wenn das letzte Rudergerät gefunden wird?
+- [x] „Geräte wählen“ wird übersprungen, wenn das zuletzt gewählte Rudergerät gefunden wird (Nutzer, 2026-10-16). Vorläufig: Suche bis 10 s, Simulator als letzte Wahl geht direkt zum Startbildschirm.
 - [ ] D8 Sprachwahl bleibt Symbol in der App-Leiste des Startbildschirms, zieht in Einstellungen um, sobald es weitere gibt.
 - [x] Legende „Runde 2 / 3“ (Nutzer, 2026-10-16); dafür MODIFIED-Delta zu `course-rowing` nötig (mit 2.3). Vorläufig: Bereich „200–800 m“ entfällt.
 - [x] OFL-Lizenzen der Schriften auf der Lizenzseite der App (`registerFontLicenses` in `lib/app/font_licenses.dart`) und Barlow Condensed 500 für Einheiten (Nutzer, 2026-10-16).
