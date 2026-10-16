@@ -188,6 +188,18 @@ abstract class AppLocalizations {
   /// **'Suche {device} …'**
   String launchSearching(String device);
 
+  /// Start screen: label above the tile with the template of the newest session
+  ///
+  /// In de, this message translates to:
+  /// **'Nochmal'**
+  String get startAgain;
+
+  /// Start screen, tile 'Again': when the session was rowed; days is the number of days since, below a week
+  ///
+  /// In de, this message translates to:
+  /// **'{days, plural, =0{heute} =1{gestern} other{vor {days} Tagen}}'**
+  String startAgainDaysAgo(int days);
+
   /// Zone editor: the zone has no name
   ///
   /// In de, this message translates to:

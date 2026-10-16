@@ -59,6 +59,21 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get startAgain => 'Nochmal';
+
+  @override
+  String startAgainDaysAgo(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'vor $days Tagen',
+      one: 'gestern',
+      zero: 'heute',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get zoneErrorNameMissing => 'Der Name fehlt.';
 
   @override

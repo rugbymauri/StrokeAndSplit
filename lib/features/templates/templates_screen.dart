@@ -13,7 +13,10 @@ import 'template_format.dart';
 
 /// Templates, courses and zones in three tabs.
 class TemplatesScreen extends StatelessWidget {
-  const TemplatesScreen({super.key});
+  const TemplatesScreen({super.key, this.selectedTemplateId});
+
+  /// The template shown as chosen, e.g. from "Nochmal" on the start screen.
+  final int? selectedTemplateId;
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +28,12 @@ class TemplatesScreen extends StatelessWidget {
           title: Text(l10n.templatesTitle),
           bottom: TabBar(tabs: [Tab(text: l10n.tabTemplates), Tab(text: l10n.tabCourses), Tab(text: l10n.tabZones)]),
         ),
-        body: const TabBarView(
-          children: [_TemplatesTab(), CoursesScreen(embedded: true), ZonesScreen(embedded: true)],
+        body: TabBarView(
+          children: [
+            _TemplatesTab(selectedTemplateId: selectedTemplateId),
+            const CoursesScreen(embedded: true),
+            const ZonesScreen(embedded: true),
+          ],
         ),
       ),
     );
@@ -35,7 +42,9 @@ class TemplatesScreen extends StatelessWidget {
 
 /// All templates, to start, create, edit and delete them.
 class _TemplatesTab extends ConsumerWidget {
-  const _TemplatesTab();
+  const _TemplatesTab({this.selectedTemplateId});
+
+  final int? selectedTemplateId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -55,7 +64,10 @@ class _TemplatesTab extends ConsumerWidget {
         AsyncData(:final value) => ListView.builder(
             padding: const EdgeInsets.only(bottom: 88),
             itemCount: value.length,
-            itemBuilder: (context, i) => _TemplateTile(template: value[i]),
+            itemBuilder: (context, i) => _TemplateTile(
+              template: value[i],
+              selected: value[i].id == selectedTemplateId,
+            ),
           ),
         AsyncError(:final error) => Center(child: Text(l10n.templatesLoadFailed('$error'))),
         _ => const Center(child: CircularProgressIndicator()),
@@ -114,14 +126,17 @@ class _NoCourse extends StatelessWidget {
 enum _Action { edit, delete }
 
 class _TemplateTile extends ConsumerWidget {
-  const _TemplateTile({required this.template});
+  const _TemplateTile({required this.template, this.selected = false});
 
   final SessionTemplate template;
+  final bool selected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     return ListTile(
+      key: Key('template-${template.id}'),
+      selected: selected,
       leading: const Icon(Icons.flag_outlined),
       title: Text(template.name),
       subtitle: Text('${template.course.name} · ${formatLaps(l10n, template.laps)}'),

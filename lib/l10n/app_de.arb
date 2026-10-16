@@ -65,6 +65,19 @@
       }
     }
   },
+  "startAgain": "Nochmal",
+  "@startAgain": {
+    "description": "Start screen: label above the tile with the template of the newest session"
+  },
+  "startAgainDaysAgo": "{days, plural, =0{heute} =1{gestern} other{vor {days} Tagen}}",
+  "@startAgainDaysAgo": {
+    "description": "Start screen, tile 'Again': when the session was rowed; days is the number of days since, below a week",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "zoneErrorNameMissing": "Der Name fehlt.",
   "@zoneErrorNameMissing": {
     "description": "Zone editor: the zone has no name"

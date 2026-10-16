@@ -15,6 +15,8 @@
   "devicesNext": "Continue",
   "devicesNotFound": "not found",
   "launchSearching": "Looking for {device} …",
+  "startAgain": "Again",
+  "startAgainDaysAgo": "{days, plural, =0{today} =1{yesterday} other{{days} days ago}}",
   "zoneErrorNameMissing": "The name is missing.",
   "zoneErrorLengthMissing": "The length is missing.",
   "zoneErrorBandMissing": "A band is missing: pace, stroke rate or both.",

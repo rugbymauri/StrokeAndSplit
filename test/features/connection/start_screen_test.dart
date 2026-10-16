@@ -1,11 +1,16 @@
 import 'package:aergrow/app/aergrow_app.dart';
 import 'package:aergrow/app/app_language.dart';
 import 'package:aergrow/app/platform_providers.dart';
+import 'package:aergrow/data/courses/course.dart';
+import 'package:aergrow/data/courses/course_repository.dart';
+import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
+import 'package:aergrow/data/sessions/session_repository.dart';
 import 'package:aergrow/data/sources/ble/ble_transport.dart';
 import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/data/sources/rower_choice.dart';
+import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/features/connection/choose_devices_screen.dart';
 import 'package:aergrow/features/connection/start_screen.dart';
 import 'package:aergrow/features/live/live_screen.dart';
@@ -21,9 +26,14 @@ import '../../support/test_database.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 
-ProviderContainer _container({RowerChoice? chosen, FakeBleTransport? transport, LanguageStore? languages}) {
+ProviderContainer _container({
+  RowerChoice? chosen,
+  FakeBleTransport? transport,
+  LanguageStore? languages,
+  AppDatabase? db,
+}) {
   final container = ProviderContainer(overrides: [
-    databaseProvider.overrideWithValue(openTestDatabase()),
+    databaseProvider.overrideWithValue(db ?? openTestDatabase()),
     wakelockProvider.overrideWithValue(FakeWakelock()),
     bleTransportProvider.overrideWithValue(transport ?? FakeBleTransport()),
     rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(chosen)),
@@ -33,13 +43,21 @@ ProviderContainer _container({RowerChoice? chosen, FakeBleTransport? transport, 
   return container;
 }
 
-Future<ProviderContainer> _pumpStart(WidgetTester tester, {RowerChoice? chosen}) async {
-  final container = _container(chosen: chosen);
+Future<ProviderContainer> _pumpStart(WidgetTester tester, {RowerChoice? chosen, AppDatabase? db}) async {
+  final container = _container(chosen: chosen, db: db);
   await tester.pumpWidget(
     UncontrolledProviderScope(container: container, child: const LocalizedApp(home: StartScreen())),
   );
-  await tester.pumpAndSettle();
+  await _settle(tester);
   return container;
+}
+
+/// Lets drift deliver its stream queries.
+Future<void> _settle(WidgetTester tester) async {
+  for (var i = 0; i < 5; i++) {
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+    await tester.pumpAndSettle();
+  }
 }
 
 Future<ProviderContainer> _launch(WidgetTester tester, ProviderContainer container) async {
@@ -157,6 +175,102 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
       await start();
       expect(find.text('Just row'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+  });
+
+  group('"Nochmal"', () {
+    /// Two templates and a session with each; the one with [newest] is rowed yesterday.
+    Future<(AppDatabase, Map<String, int>)> rowed(WidgetTester tester, {String newest = 'Seerunde x3'}) async {
+      final db = openTestDatabase();
+      final ids = (await tester.runAsync(() async {
+        final course = await CourseRepository(db).create(
+          'Seerunde',
+          CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+        );
+        final templates = TemplateRepository(db);
+        final ids = {
+          'Seerunde x3': await templates.create('Seerunde x3', courseId: course, laps: 3),
+          'Seerunde offen': await templates.create('Seerunde offen', courseId: course, laps: null),
+        };
+        final now = DateTime.now();
+        for (final name in ids.keys) {
+          await SessionRepository(db).create(
+            startedAt: now.subtract(Duration(days: name == newest ? 1 : 3)),
+            source: ErgSourceKind.simulator,
+            template: await templates.get(ids[name]!),
+          );
+        }
+        return ids;
+      }))!;
+      return (db, ids);
+    }
+
+    testWidgets('shows the template of the newest session and opens it chosen', (tester) async {
+      final (db, ids) = await rowed(tester);
+      await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
+
+      final tile = find.byKey(const Key('row-again'));
+      expect(find.text('NOCHMAL'), findsOneWidget);
+      expect(find.descendant(of: tile, matching: find.text('Seerunde x3')), findsOneWidget);
+      expect(find.descendant(of: tile, matching: find.text('gestern')), findsOneWidget);
+
+      await tester.tap(tile);
+      await _settle(tester);
+
+      expect(find.byType(TemplatesScreen), findsOneWidget);
+      ListTile template(String name) => tester.widget(find.byKey(Key('template-${ids[name]}')));
+      expect(template('Seerunde x3').selected, isTrue);
+      expect(template('Seerunde offen').selected, isFalse);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('says how many days ago the session was', (tester) async {
+      final (db, _) = await rowed(tester, newest: 'none');
+      await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
+
+      expect(find.text('vor 3 Tagen'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('is missing without a session', (tester) async {
+      await _pumpStart(tester, chosen: const RowerChoice.simulator());
+
+      expect(find.byKey(const Key('row-again')), findsNothing);
+      expect(find.text('NOCHMAL'), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('is missing when the template of the only session is deleted', (tester) async {
+      final db = openTestDatabase();
+      await tester.runAsync(() async {
+        final course = await CourseRepository(db).create(
+          'Seerunde',
+          CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+        );
+        final templates = TemplateRepository(db);
+        final id = await templates.create('Seerunde x3', courseId: course, laps: 3);
+        await SessionRepository(db).create(
+          startedAt: DateTime.now(),
+          source: ErgSourceKind.simulator,
+          template: await templates.get(id),
+        );
+        await templates.delete(id);
+      });
+      await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
+
+      expect(find.byKey(const Key('row-again')), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('skips the newest session when its template is deleted', (tester) async {
+      final (db, ids) = await rowed(tester);
+      await tester.runAsync(() => TemplateRepository(db).delete(ids['Seerunde x3']!));
+      await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
+
+      final tile = find.byKey(const Key('row-again'));
+      expect(find.descendant(of: tile, matching: find.text('Seerunde offen')), findsOneWidget);
+      expect(find.descendant(of: tile, matching: find.text('vor 3 Tagen')), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
   });
