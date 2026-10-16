@@ -7,6 +7,7 @@ import 'app/font_licenses.dart';
 import 'data/db/database.dart';
 import 'data/sessions/session_providers.dart';
 import 'data/sessions/session_repository.dart';
+import 'data/sources/heart_rate_choice.dart';
 import 'data/sources/rower_choice.dart';
 
 Future<void> main() async {
@@ -18,11 +19,13 @@ Future<void> main() async {
   // Read before the first frame, so it already shows the chosen language.
   final languages = await PreferencesLanguageStore.open();
   final rower = await PreferencesRowerChoiceStore.open();
+  final heartRateMonitor = await PreferencesHeartRateMonitorStore.open();
   runApp(ProviderScope(
     overrides: [
       databaseProvider.overrideWithValue(db),
       languageStoreProvider.overrideWithValue(languages),
       rowerChoiceStoreProvider.overrideWithValue(rower),
+      heartRateMonitorStoreProvider.overrideWithValue(heartRateMonitor),
     ],
     child: const AergRowApp(),
   ));
