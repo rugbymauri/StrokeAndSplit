@@ -284,6 +284,24 @@ void main() {
       await tester.pump(const Duration(seconds: 15));
     });
 
+    testWidgets('offers the language choice on "Geräte wählen" at the first start', (tester) async {
+      final languages = MemoryLanguageStore();
+      await _launch(tester, _container(languages: languages));
+      expect(find.text('Geräte wählen'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Sprache'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ChooseDevicesScreen), findsOneWidget);
+      expect(find.text('Choose devices'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
+      expect(find.byTooltip('Language'), findsOneWidget);
+      expect(languages.read(), 'en');
+      await tester.pump(const Duration(seconds: 15));
+    });
+
     testWidgets('goes straight to the start screen after a simulator', (tester) async {
       await _launch(tester, _container(chosen: const RowerChoice.simulator()));
 
