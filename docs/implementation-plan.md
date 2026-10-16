@@ -9,7 +9,7 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `device-types` und `translations`; Change `statistics` geplant.
+Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `device-types` und `translations`; Change `statistics` geplant; Change `gitlab-pipeline` geplant.
 
 ## Überblick
 
@@ -23,6 +23,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 6 | `statistics` | 6/12 | Gruppe 1 in `main`, Rest nach 3 | – |
 | 7 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 3 und 6 |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
+| 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
 
 ## Warum diese Reihenfolge
 
@@ -34,6 +35,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 6. **`statistics`** hängt an keinem offenen Change: Die Ranglisten werden aus den Runden aus `courses` und `zones` berechnet. Er kann auch vor `ui-design` kommen, dann gestaltet `ui-design` die neuen Elemente mit.
 7. **`ghost`** braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`, denn der Ghost ist Platz 1.
 8. **`rename-stroke-and-split`** zuletzt, damit nicht jeder Change auf halbem Weg die Namen wechselt. Nach `translations` steht der Anzeigename an einer Stelle in den ARB-Dateien.
+9. **`gitlab-pipeline`** hängt an keinem Change und ändert kein App-Verhalten. Er kann parallel laufen. Kommt er vor `rename-stroke-and-split`, stellt der Rename die Namen in CI mit um.
 
 ## Changes
 
@@ -177,6 +179,17 @@ Vor dem Start:
 - [ ] Entscheide F9, F10.
 - [ ] Domains sichern, Markenrecherche (Swissreg, EUIPO, USPTO). Ausserhalb der App, durch den Nutzer.
 - [ ] Neue App-ID ist unter Android eine neue App: Umzug per Export/Import im README beschreiben (Task im Change).
+- [ ] Ist `gitlab-pipeline` schon umgesetzt: `APP_NAME` in `.gitlab-ci.yml`, Default in `tool/build_appimage.sh` und `linux/packaging/app.desktop.in` (`Name`, `StartupWMClass`) mit umstellen (Design D9 von `gitlab-pipeline`). Task in `tasks.md` ergänzen.
+
+### 9. `gitlab-pipeline`: Tests in CI, Releases mit APK und AppImage
+
+Ziel: `make check` in jeder MR und auf `main`. Ein Tag `vX.Y.Z` auf `main` erzeugt ein GitLab-Release mit einer debug-signierten Universal-APK und einem Linux-AppImage (x86_64), gebaut in Docker-Images (`cirruslabs/flutter`). Version aus dem Tag, Versionscode `CI_PIPELINE_IID`, Downloads in der Generic Package Registry.
+
+Vor dem Start:
+- [ ] Task 1.1: Gibt es den Image-Tag `ghcr.io/cirruslabs/flutter:3.47.7`? Beim Planen nicht bestätigt, Fallback in Design D1.
+- [ ] Task 2.2 (Nutzer, in GitLab): Debug-Keystore als protected File-Variable `ANDROID_DEBUG_KEYSTORE`, `v*` als geschützten Tag einrichten.
+
+Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwechsel am besten zusammen mit der neuen App-ID aus `rename-stroke-and-split`), eigenes Logo statt des Platzhalter-Icons.
 
 ## Offene Entscheide
 
@@ -198,6 +211,7 @@ Vor dem Start:
 | ~~F14~~ | Sprachwahl: **in der App** (2026-10-16), Start auf Deutsch, Systemsprache wird nicht beachtet | translations | entschieden |
 | F15 | Schweizer Rechtschreibung (`ss` statt `ß`, wie heute im Code) als `de`? **Vorläufig ja** (2026-10-16, nach Vorschlag) | translations | vorläufig entschieden |
 | F16 | Wo wird die gewählte Sprache gespeichert? **Vorläufig `shared_preferences`** (2026-10-16, nach Vorschlag): keine Migration, `heart-rate` bleibt Schema 5 | translations, heart-rate | vorläufig entschieden |
+| F17 | Release nur für Tags auf `main`? **Vorläufig ja** (2026-10-16, nach Vorschlag): Tags ausserhalb von `main` lassen `verify-tag` fehlschlagen | gitlab-pipeline | gitlab-pipeline |
 
 ## Offene Punkte
 
