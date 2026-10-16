@@ -18,9 +18,9 @@
 
 ## 4. Runden-Logik (Capability course-rowing, Kern)
 
-- [ ] 4.1 Reiner `LapTracker` (Design D2): Achsenposition, Runden- und Segmentgrenzen mit Interpolation, Überschuss an die nächste Runde, mehrere Grenzen zwischen zwei Messpunkten, `finished` bei fester Rundenzahl. Verifikation: Unit-Tests mit konstruierten Messpunkten, darunter das Spec-Beispiel 998 m/1003 m mit dem Ergebnis 3:59.4
-- [ ] 4.2 Zonenbewertung im `LapTracker` (Design D3): Zonenstatus mit Richtung, zeitgewichteter Anteil pro Segment und Runde, fehlende Werte zählen als ausserhalb, Teilung von Intervallen an Segmentgrenzen. Verifikation: Unit-Tests für 45 von 60 s gleich 75 %, Pause im Segment und freies Segment
-- [ ] 4.3 Abschluss einer angefangenen Runde als unvollständig. Verifikation: Unit-Test „bei 1400 m beendet“ ergibt Runde 1 vollständig und Runde 2 unvollständig mit 400 m
+- [x] 4.1 Reiner `LapTracker` (Design D2): Achsenposition, Runden- und Segmentgrenzen mit Interpolation, Überschuss an die nächste Runde, mehrere Grenzen zwischen zwei Messpunkten, `finished` bei fester Rundenzahl. Verifikation: Unit-Tests mit konstruierten Messpunkten, darunter das Spec-Beispiel 998 m/1003 m mit dem Ergebnis 3:59.4
+- [x] 4.2 Zonenbewertung im `LapTracker` (Design D3): Zonenstatus mit Richtung, zeitgewichteter Anteil pro Segment und Runde, fehlende Werte zählen als ausserhalb, Teilung von Intervallen an Segmentgrenzen. Verifikation: Unit-Tests für 45 von 60 s gleich 75 %, Pause im Segment und freies Segment
+- [x] 4.3 Abschluss einer angefangenen Runde als unvollständig. Verifikation: Unit-Test „bei 1400 m beendet“ ergibt Runde 1 vollständig und Runde 2 unvollständig mit 400 m
 
 ## 5. Aufzeichnung auf einer Strecke (session-recording, course-rowing)
 
