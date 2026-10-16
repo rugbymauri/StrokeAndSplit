@@ -23,7 +23,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 12/13 | in Umsetzung | – |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Domain- und Markenrecherche (Nutzer) |
-| 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
+| 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 
 ## Warum diese Reihenfolge
 
@@ -213,8 +213,10 @@ Vor dem Start:
 Ziel: `make check` in jeder MR und auf `main`. Ein Tag `vX.Y.Z` auf `main` erzeugt ein GitLab-Release mit einer debug-signierten Universal-APK und einem Linux-AppImage (x86_64), gebaut in Docker-Images (`cirruslabs/flutter`). Version aus dem Tag, Versionscode `CI_PIPELINE_IID`, Downloads in der Generic Package Registry.
 
 Vor dem Start:
-- [ ] Task 1.1: Gibt es den Image-Tag `ghcr.io/cirruslabs/flutter:3.47.7`? Beim Planen nicht bestätigt, Fallback in Design D1.
-- [ ] Task 2.2 (Nutzer, in GitLab): Debug-Keystore als protected File-Variable `ANDROID_DEBUG_KEYSTORE`, `v*` als geschützten Tag einrichten.
+- [x] Task 1.1: Einen Image-Tag `3.47.7` gibt es nicht (Liste endet bei `3.44.0` mit Dart 3.12). Die Jobs nutzen `3.44.0` für JDK und Android-SDK und stellen Flutter im `before_script` auf 3.47.7 um (Design D1).
+- [ ] Task 2.2 (Nutzer, in GitLab): Debug-Keystore **Base64-kodiert** als protected File-Variable `ANDROID_DEBUG_KEYSTORE` (GitLab speichert Variablen als Text, Design D5), `v*` als geschützten Tag einrichten. Anleitung im README unter „Einrichtung in GitLab“.
+- [x] Umgesetzt (2026-10-16): `check` in jeder Pipeline, `build-apk`, `build-appimage`, `verify-tag`, `upload`, `release` für Tags `vX.Y.Z`; `make apk`, `make appimage`; Branch-Pipeline 312096 grün. Workflow-Regel für `web`/`api` ergänzt, damit Pipelines von Hand startbar sind. Andere Tags lassen nur `check` laufen.
+- [ ] Offen: Probe-Release `v0.1.0` nach 2.2 verifiziert 2.3, 3.3 und 4.1–4.5; AppImage-Fenster kurz ansehen (3.2); README-Durchsicht (5.1); danach 5.2.
 
 Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwechsel am besten zusammen mit der neuen App-ID aus `rename-stroke-and-split`), eigenes Logo statt des Platzhalter-Icons.
 
