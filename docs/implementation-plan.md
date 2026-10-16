@@ -15,7 +15,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
-| 1 | `device-types` | 28/33 | in Arbeit auf `feature/device-types` | – |
+| 1 | `device-types` | 29/33 | umgesetzt auf `feature/device-types`, nicht gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `ui-design` | 0/18 | nach 1 | Entscheid Puls-Herkunft (F1) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
@@ -43,7 +43,7 @@ Vor dem Start anpassen:
 - [x] MODIFIED-Anforderungen gegen die Main-Specs geprüft: Kein Szenario geht verloren, `courses` und `zones` haben nur Anforderungen ergänzt. `openspec validate device-types --strict` ist gültig.
 - [x] Task 2.5, 4.2 und 7.3: Export, End-to-End-Test und manueller Test mit Strecke und eingebauten Zonen.
 
-In Arbeit seit 2026-10-16 auf `feature/device-types`. Die manuellen Tests 7.1–7.3 macht der Nutzer in einer späteren Session; bis dahin bleibt der Change offen.
+Umgesetzt am 2026-10-16 auf `feature/device-types`: `make check` grün (261 App-, 86 Package-Tests), `openspec validate device-types --strict` gültig. Offen sind nur Task 3.5 (Erg-Typ-Werte prüfen) und die manuellen Tests 7.1–7.3, die der Nutzer in einer späteren Session macht. Der Branch ist nicht nach `main` gemergt; die folgenden Changes bauen auf ihm auf, bis der Nutzer den Merge freigibt. Archiviert wird nach den manuellen Tests.
 
 Bei der Umsetzung mitnehmen:
 - [x] Zeile über 120 Zeichen in `Stroke.toString` (Task 2.1) umgebrochen.
