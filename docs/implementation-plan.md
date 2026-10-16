@@ -9,7 +9,7 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`; `device-types` an diesen Stand angepasst.
+Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones` und `device-types`; Change `statistics` geplant.
 
 ## Überblick
 
@@ -19,8 +19,9 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 | 2 | `ui-design` | 0/18 | nach 1 | Entscheid Puls-Herkunft (F1) |
 | 3 | `force-curve` | 0/8 | nach 2 | Spike am echten PM5 (Characteristic bestätigen) |
 | 4 | `heart-rate` | 0/22 | nach 1 und 2 | Entscheide F3, F4 |
-| 5 | `ghost` | – (keine Tasks) | nein | Entscheide F5–F8, dann Specs und Tasks; braucht 2 |
-| 6 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
+| 5 | `statistics` | – (keine Tasks) | ja, nach Tasks | `tasks.md` (`/opsx:continue statistics`) |
+| 6 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 2 und 5 |
+| 7 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 
 ## Warum diese Reihenfolge
 
@@ -28,8 +29,9 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses` und `zones`
 2. **`ui-design`** schafft das Layout, in das Kraftkurve, Puls und Ghost ihren reservierten Platz bekommen. Erst danach lohnt sich deren Anzeige.
 3. **`force-curve`** ist klein und hängt nur an einem Spike am PM5 und am Layout aus 2.
 4. **`heart-rate`** kommt nach `device-types`, weil beide dieselben Anforderungen ändern und der Gurt an die Quelle andockt, die `device-types` umbaut.
-5. **`ghost`** braucht den Fortschrittsrahmen aus `ui-design` und vorher Entscheide, wer der Ghost ist.
-6. **`rename-stroke-and-split`** zuletzt, damit nicht jeder Change auf halbem Weg die Namen wechselt.
+5. **`statistics`** hängt an keinem offenen Change: Die Ranglisten werden aus den Runden aus `courses` und `zones` berechnet. Er kann auch vor `ui-design` kommen, dann gestaltet `ui-design` die neuen Elemente mit.
+6. **`ghost`** braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`, denn der Ghost ist Platz 1.
+7. **`rename-stroke-and-split`** zuletzt, damit nicht jeder Change auf halbem Weg die Namen wechselt.
 
 ## Changes
 
@@ -98,13 +100,25 @@ Vor dem Start anpassen:
 
 Offene Entscheide: F3, F4.
 
-### 5. `ghost`: gegen die eigene Bestzeit rudern
+### 5. `statistics`: Ranglisten pro Vorlage, Strecke und Zone
 
-Ziel: violettes Schiffchen auf den Spuren des Fortschrittsrahmens, Abstand in Metern und Sekunden, Ghost-Zeit in der Vorlagenwahl. Daten liefern die gespeicherten Runden aus `courses`.
+Ziel: Plätze 1–3 jeder Vorlage, Strecke und Zone. Gewertet wird die Zeit (Distanzachse) bzw. die Meter (Zeitachse) nach Wanduhr inklusive Pausen, dazu Pace und Datum. Anzeige in der Vorlagenwahl, in einer neuen Detailansicht von Strecke und Zone und als Marke in der Zusammenfassung. Proposal, Design und Spec stehen (2026-10-16), Entscheide in Design D2–D6.
 
-Blockiert: `design.md` hat offene Fragen F5–F8. Danach Specs zur Auswahl des Ghosts und `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design`.
+Vor dem Start:
+- [ ] `tasks.md` erstellen (`/opsx:continue statistics`).
+- [ ] Reihenfolge zu `ui-design` festlegen. Kommt `statistics` zuerst, übernimmt `ui-design` die Plätze in Vorlagenwahl, Detailansicht und Zusammenfassung (Design D6).
 
-### 6. `rename-stroke-and-split`: App heisst „Stroke & Split“
+Bei der Umsetzung mitnehmen:
+- Kein Schema-Wechsel geplant (Design D1). Erst messen, dann bei Bedarf einen Index auf `laps`/`lap_segments` ergänzen.
+- Gezählt werden nur die Quellen `pm5` und `ftms`, nicht `simulator` und `replay` (Design D3).
+
+### 6. `ghost`: gegen die eigene Bestzeit rudern
+
+Ziel: violettes Schiffchen auf den Spuren des Fortschrittsrahmens, Abstand in Metern und Sekunden, Ghost-Symbol bei Platz 1 in der Vorlagenwahl. Der Ghost jeder Spur ist Platz 1 der Rangliste dieser Ebene aus `statistics` (F5, Design D2, Spec „Platz 1 ist der Ghost“).
+
+Blockiert: `design.md` hat offene Fragen F6–F8. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
+
+### 7. `rename-stroke-and-split`: App heisst „Stroke & Split“
 
 Ziel: Anzeigename, Paket- und App-ID `strokesplit`, Dateiendung `.strokesplit`, Import liest weiter `.aergrow`.
 
@@ -121,7 +135,7 @@ Vor dem Start:
 | ~~F2~~ | Startbildschirm: **Mittelweg** (2026-10-16): Quelle, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit der zuletzt geruderten Vorlage, Link „Sessions“ | ui-design | entschieden |
 | F3 | Welcher Puls gilt, wenn FTMS-Gerät und Gurt beide liefern? | heart-rate | heart-rate |
 | F4 | Gurt auch mit FTMS-Rudergeräten automatisch verbinden? | heart-rate | heart-rate |
-| F5 | Wer ist der Ghost: (a) beste Runde dieser Streckenversion, (b) letzte Session derselben Vorlage, (c) wählbar? | ghost | ghost |
+| ~~F5~~ | Wer ist der Ghost: **Platz 1 der Rangliste jeder Ebene** aus `statistics`, einer pro Spur (2026-10-16) | ghost | entschieden |
 | F6 | Welcher Abstand steht in der Box, wenn er pro Ebene verschieden ist? | ghost | ghost |
 | F7 | Meter, Sekunden oder beides? Am Erg prüfen. | ghost | ghost |
 | F8 | Schiffchen bei kleinem Abstand: überlappen lassen oder Ghost nach aussen rücken? | ghost | ghost |
