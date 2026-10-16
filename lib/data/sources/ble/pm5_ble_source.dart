@@ -35,6 +35,9 @@ class Pm5BleSource implements ErgSource {
   ErgSourceKind get kind => ErgSourceKind.pm5;
 
   @override
+  ErgProtocol get protocol => ErgProtocol.pm5;
+
+  @override
   String get name => device.name;
 
   @override

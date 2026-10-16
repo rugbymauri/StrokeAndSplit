@@ -62,6 +62,9 @@ class SimulatedSource implements ErgSource {
   ErgSourceKind get kind => ErgSourceKind.simulator;
 
   @override
+  ErgProtocol get protocol => ErgProtocol.pm5;
+
+  @override
   String get name => 'Simulator';
 
   @override
