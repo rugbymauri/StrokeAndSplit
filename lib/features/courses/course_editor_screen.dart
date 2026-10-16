@@ -168,7 +168,12 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
               Text(l10n.courseSequence, style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               if (layout.definition case final definition?) ...[
-                CourseStrip(key: const Key('course-strip'), definition: definition, height: 12),
+                CourseStrip(
+                  key: const Key('course-strip'),
+                  definition: definition,
+                  height: CourseStrip.namedHeight,
+                  showNames: true,
+                ),
                 const SizedBox(height: 8),
                 for (final (i, segment) in definition.segments.indexed)
                   _SectionTile(

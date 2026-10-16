@@ -283,6 +283,8 @@ void main() {
       await tester.pump();
 
       for (final (name, start) in [('Sprint', '500'), ('Ausdauer', '1000')]) {
+        await tester.ensureVisible(find.text('Zone einbauen'));
+        await tester.pump();
         await tester.tap(find.text('Zone einbauen'));
         await setup.settle(tester);
         await tester.tap(find.text('Neue Zone anlegen'));
