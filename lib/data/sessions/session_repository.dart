@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
@@ -13,6 +14,18 @@ import '../zones/zone_repository.dart';
 import '../sources/erg_source.dart';
 import '../templates/session_template.dart';
 import 'session_accumulator.dart';
+
+/// The root mean square of successive differences of [intervalsMs], rounded
+/// to whole milliseconds; null with fewer than two intervals (Design D5).
+int? rmssd(List<int> intervalsMs) {
+  if (intervalsMs.length < 2) return null;
+  var sum = 0;
+  for (var i = 1; i < intervalsMs.length; i++) {
+    final difference = intervalsMs[i] - intervalsMs[i - 1];
+    sum += difference * difference;
+  }
+  return sqrt(sum / (intervalsMs.length - 1)).round();
+}
 
 /// Stores sessions with their samples, strokes and raw notifications.
 class SessionRepository {
@@ -84,7 +97,13 @@ class SessionRepository {
   Future<void> finish(int id, {SessionStatus status = SessionStatus.complete, DateTime? endedAt}) async {
     final samples = _db.samples;
     final values = await (_db.selectOnly(samples)
-          ..addColumns([samples.tMs.max(), samples.distanceDm.max(), samples.watts.avg()])
+          ..addColumns([
+            samples.tMs.max(),
+            samples.distanceDm.max(),
+            samples.watts.avg(),
+            samples.heartRate.avg(),
+            samples.heartRate.max(),
+          ])
           ..where(samples.sessionId.equals(id)))
         .getSingle();
     final strokeCount = await (_db.selectOnly(_db.strokes)
@@ -96,6 +115,13 @@ class SessionRepository {
     final durationMs = values.read(samples.tMs.max()) ?? 0;
     final distanceDm = values.read(samples.distanceDm.max()) ?? 0;
     final averageWatts = values.read(samples.watts.avg());
+    final averageHeartRate = values.read(samples.heartRate.avg());
+    final rr = await (_db.selectOnly(_db.rrIntervals)
+          ..addColumns([_db.rrIntervals.rrMs])
+          ..where(_db.rrIntervals.sessionId.equals(id))
+          ..orderBy([OrderingTerm.asc(_db.rrIntervals.tMs), OrderingTerm.asc(_db.rrIntervals.rowId)]))
+        .map((row) => row.read(_db.rrIntervals.rrMs)!)
+        .get();
     await (_db.update(_db.sessions)..where((s) => s.id.equals(id))).write(SessionsCompanion(
       status: Value(status),
       endedAt: Value(endedAt),
@@ -106,6 +132,9 @@ class SessionRepository {
       averageWatts: Value(averageWatts?.round()),
       averageStrokeRate: Value(durationMs > 0 && strokeCount > 0 ? strokeCount * 60000 / durationMs : null),
       strokeCount: Value(strokeCount),
+      averageHeartRate: Value(averageHeartRate?.round()),
+      maxHeartRate: Value(values.read(samples.heartRate.max())),
+      rmssdMs: Value(rmssd(rr)),
     ));
   }
 
