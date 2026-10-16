@@ -69,6 +69,16 @@ Abweichend von der Erwartung „bis 20 Bytes, fest“ ist nur, dass das letzte P
 
 Die Karte erscheint, sobald die Quelle Kraftkurven unterstützt. PM5 und Simulator tun das, FTMS-Ruderer nicht. Bis zum ersten Schlag zeigt sie eine gestrichelte Grundlinie mit „Warte auf ersten Schlag“.
 
+### D4: Schlaglänge an der Kurve
+
+Zur Kurve zeigt die Karte die Schlaglänge (Durchzugslänge) desselben Schlags, weil Kraftverlauf und Länge zusammen zeigen, ob ein Schlag lang und kräftig oder kurz und hastig war. Hinzugefügt am 2026-10-16 auf Wunsch des Nutzers.
+
+- **Quelle**: Byte 6 des ersten `0x0035` eines Schlags, 0.01 m, also genau das Paket, nach dem die Kurve kommt. Der Kurven-Decoder übernimmt den Wert in das Kurvenereignis, weil das Schlag-Ereignis mit derselben Länge erst am Ende der Erholung entsteht. Im Mitschnitt vom 2026-10-16 lagen die Werte bei 0.59–1.12 m (Schlag 4: `0x6a` = 1.06 m), im ersten Spike bei 0.85–1.03 m. Schlag 1 meldet 0.38 m, hat aber keine Kurve und damit auch keine Anzeige.
+- **Fehlende Länge**: Ein Wert 0 oder eine Quelle ohne Durchzugslänge ergibt „nicht vorhanden“ (wie `Stroke.driveLengthMeters` aus `device-types`). Dann entfällt die Angabe, die Kurve bleibt unverändert; es erscheint weder „0 m“ noch ein Strich. FTMS liefert keine Durchzugslänge und auch keine Kurve, zeigt also beides nicht.
+- **Format**: zwei Nachkommastellen mit Einheit, Dezimalzeichen nach App-Sprache wie bei der Schlagzahl: „1,02 m“ auf Deutsch, „1.02 m“ auf Englisch.
+- **Ort**: Grosse Karte (Live: freies Rudern): rechts in der Kopfzeile der Karte vor der Legende, in `textMuted`, Schriftgrösse der Legende. Schmaler Streifen „Kraft“ und die beiden Querformat-Layouts: rechts oben über der Kurve, klein in `textMuted` (im Querformat mit Vorlage in `text` wie die Kurve). Die Angabe gehört immer zur hervorgehobenen Kurve des letzten Schlags; für den vorherigen Schlag wird keine Länge gezeigt.
+- **Simulator**: liefert die Länge mit jeder Kurve, mit leichter Streuung um einen plausiblen Wert.
+
 ## Risks / Trade-offs
 
 - **Bandbreite**: Die zusätzlichen Notifications (4–8 pro Schlag) belasten die BLE-Verbindung. Im Mitschnitt vom 2026-10-16 (etwa 70 s) ging kein Paket verloren, das Abonnement bleibt deshalb fest. Zeigen längere Sessions Abbrüche, wird es optional und lässt sich abschalten.
