@@ -50,6 +50,7 @@ class SessionRepository {
     String? templateName,
     int? courseVersionId,
     int? plannedLaps,
+    bool imported = false,
   }) {
     return _db.into(_db.sessions).insert(SessionsCompanion.insert(
           startedAt: startedAt,
@@ -61,6 +62,7 @@ class SessionRepository {
           templateName: Value(templateName),
           courseVersionId: Value(courseVersionId),
           plannedLaps: Value(plannedLaps),
+          imported: Value(imported),
         ));
   }
 
@@ -248,7 +250,9 @@ class SessionRepository {
 
   /// Imports an `.aergrow` file or an uncompressed raw recording. Samples,
   /// strokes and summary are derived from the raw notifications again, so
-  /// decoder fixes apply to imported sessions too. Returns the new id.
+  /// decoder fixes apply to imported sessions too. The session is marked as
+  /// imported and counts in no ranking (Change statistics, Design D3).
+  /// Returns the new id.
   Future<int> import(List<int> bytes) async {
     final isGzip = bytes.length > 2 && bytes[0] == 0x1f && bytes[1] == 0x8b;
     final text = utf8.decode(isGzip ? gzip.decode(bytes) : bytes);
@@ -271,6 +275,7 @@ class SessionRepository {
       templateName: template?['name'] as String?,
       courseVersionId: course == null ? null : await _importCourse(course.name, course.definition),
       plannedLaps: template?['laps'] as int?,
+      imported: true,
     );
     final accumulator = SessionAccumulator(
       id,

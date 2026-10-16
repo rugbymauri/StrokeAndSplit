@@ -10,6 +10,7 @@ import 'package:aergrow/data/statistics/ranking_repository.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
 import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fixtures.dart';
@@ -347,7 +348,7 @@ void main() {
       expect((await rankings.course(lake)).single.entries, hasLength(3));
     });
 
-    test('counts a PM5 session imported on another device for its course and zone', () async {
+    test('leaves a PM5 session imported on another device out of all rankings', () async {
       // just_row as "Seerunde x3" on the phone, on a 40 m course with "Tempo" from 20 to 40 m.
       const tempo = Zone(name: 'Tempo', axis: CourseAxis.distance, length: 20, paceFastCs: 10000, paceSlowCs: 20000);
       final phone = openTestDatabase();
@@ -376,14 +377,21 @@ void main() {
 
       final course = (await CourseRepository(laptop).all()).single;
       final zone = (await ZoneRepository(laptop).all()).single;
+      // The import links no template; linked by hand, the session still must not count.
+      final laptopTemplate = await TemplateRepository(laptop).create('Seerunde x3', courseId: course.id, laps: 3);
+      await (laptop.update(laptop.sessions)..where((s) => s.id.equals(imported)))
+          .write(SessionsCompanion(templateId: Value(laptopTemplate)));
+
+      expect((await SessionRepository(laptop).get(imported))!.imported, isTrue);
       final laptopRankings = RankingRepository(laptop);
-      final laps = (await laptopRankings.course(course.id)).single.entries;
-      final rides = (await laptopRankings.zone(zone.id)).single.entries;
-      expect({for (final e in laps) e.sessionId}, {imported});
-      expect(laps, hasLength(3));
-      expect(rides, hasLength(3));
-      expect([for (final e in laps) e.durationMs]..sort(),
-          [for (final e in (await RankingRepository(phone).course(courseId)).single.entries) e.durationMs]..sort());
+      expect(await laptopRankings.course(course.id), isEmpty);
+      expect(await laptopRankings.zone(zone.id), isEmpty);
+      expect(await laptopRankings.template(laptopTemplate), isEmpty);
+      // On the phone, where it was rowed, the session counts.
+      final phoneRankings = RankingRepository(phone);
+      expect((await phoneRankings.course(courseId)).single.entries, hasLength(3));
+      expect((await phoneRankings.zone(tempoId)).single.entries, hasLength(3));
+      expect((await phoneRankings.template(templateId)).single.entries, hasLength(1));
     });
   });
 }

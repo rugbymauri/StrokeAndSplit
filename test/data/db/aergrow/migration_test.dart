@@ -14,6 +14,7 @@ import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
+import 'generated/schema_v4.dart' as v4;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -85,7 +86,7 @@ void main() {
 
       final db = AppDatabase(schema.newConnection());
       // The repository reads the current schema.
-      await verifier.migrateAndValidate(db, 4);
+      await verifier.migrateAndValidate(db, 5);
       final repository = SessionRepository(db);
 
       final session = (await repository.get(1))!;
@@ -263,7 +264,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 4);
+      await verifier.migrateAndValidate(db, 5);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.deviceName, session.strokeCount),
@@ -362,7 +363,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 4);
+      await verifier.migrateAndValidate(db, 5);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.courseVersionId), (ErgProtocol.pm5, 1));
@@ -396,6 +397,73 @@ void main() {
       expect(stroke.driveLengthMeters, isNull);
       expect(stroke.peakForceNewtons, isNull);
       expect((await db.select(db.sessions).get()).single.protocol, ErgProtocol.ftms);
+      await db.close();
+    });
+  });
+
+  group('to version 5', () {
+    test('keeps the sessions of version 4 as not imported', () async {
+      final schema = await verifier.schemaAt(4);
+      final old = v4.DatabaseAtV4(schema.newConnection());
+      await old.batch((b) {
+        b.insertAll(old.sessions, [
+          v4.SessionsCompanion.insert(
+            startedAt: 0,
+            status: 'complete',
+            source: 'pm5',
+            deviceName: const Value('PM5 Test'),
+          ),
+          v4.SessionsCompanion.insert(
+            startedAt: 0,
+            status: 'complete',
+            source: 'ftms',
+            protocol: const Value('ftms'),
+          ),
+        ]);
+      });
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 5);
+
+      final sessions = await (db.select(db.sessions)
+            ..orderBy([(s) => OrderingTerm.asc(s.id)]))
+          .get();
+      expect(
+        sessions.map((s) => (s.protocol, s.deviceName, s.imported)),
+        [(ErgProtocol.pm5, 'PM5 Test', false), (ErgProtocol.ftms, null, false)],
+      );
+      await db.close();
+    });
+
+    test('keeps the sessions of version 1 as not imported', () async {
+      final schema = await verifier.schemaAt(1);
+      final old = v1.DatabaseAtV1(schema.newConnection());
+      await old.into(old.sessions).insert(
+            v1.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'pm5',
+            ),
+          );
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 5);
+
+      final session = (await db.select(db.sessions).get()).single;
+      expect((session.protocol, session.imported), (ErgProtocol.pm5, false));
+      await db.close();
+    });
+
+    test('marks new sessions as not imported', () async {
+      final db = openTestDatabase();
+      await db.into(db.sessions).insert(SessionsCompanion.insert(
+            startedAt: DateTime(2026, 10, 16),
+            status: SessionStatus.complete,
+            source: ErgSourceKind.pm5,
+          ));
+      expect((await db.select(db.sessions).get()).single.imported, isFalse);
       await db.close();
     });
   });

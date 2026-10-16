@@ -1111,6 +1111,21 @@ class $SessionsTable extends Sessions
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _importedMeta = const VerificationMeta(
+    'imported',
+  );
+  @override
+  late final GeneratedColumn<bool> imported = GeneratedColumn<bool>(
+    'imported',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("imported" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1130,6 +1145,7 @@ class $SessionsTable extends Sessions
     templateName,
     courseVersionId,
     plannedLaps,
+    imported,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1247,6 +1263,12 @@ class $SessionsTable extends Sessions
         ),
       );
     }
+    if (data.containsKey('imported')) {
+      context.handle(
+        _importedMeta,
+        imported.isAcceptableOrUnknown(data['imported']!, _importedMeta),
+      );
+    }
     return context;
   }
 
@@ -1330,6 +1352,10 @@ class $SessionsTable extends Sessions
         DriftSqlType.int,
         data['${effectivePrefix}planned_laps'],
       ),
+      imported: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}imported'],
+      )!,
     );
   }
 
@@ -1370,6 +1396,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
 
   /// Null for an open number of laps.
   final int? plannedLaps;
+
+  /// Set by the import; imported sessions count in no ranking (Change
+  /// statistics, Design D3). Sessions before schema 5 count as recorded here.
+  final bool imported;
   const SessionRow({
     required this.id,
     required this.startedAt,
@@ -1388,6 +1418,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     this.templateName,
     this.courseVersionId,
     this.plannedLaps,
+    required this.imported,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1439,6 +1470,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     if (!nullToAbsent || plannedLaps != null) {
       map['planned_laps'] = Variable<int>(plannedLaps);
     }
+    map['imported'] = Variable<bool>(imported);
     return map;
   }
 
@@ -1479,6 +1511,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       plannedLaps: plannedLaps == null && nullToAbsent
           ? const Value.absent()
           : Value(plannedLaps),
+      imported: Value(imported),
     );
   }
 
@@ -1513,6 +1546,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       templateName: serializer.fromJson<String?>(json['templateName']),
       courseVersionId: serializer.fromJson<int?>(json['courseVersionId']),
       plannedLaps: serializer.fromJson<int?>(json['plannedLaps']),
+      imported: serializer.fromJson<bool>(json['imported']),
     );
   }
   @override
@@ -1542,6 +1576,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       'templateName': serializer.toJson<String?>(templateName),
       'courseVersionId': serializer.toJson<int?>(courseVersionId),
       'plannedLaps': serializer.toJson<int?>(plannedLaps),
+      'imported': serializer.toJson<bool>(imported),
     };
   }
 
@@ -1563,6 +1598,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     Value<String?> templateName = const Value.absent(),
     Value<int?> courseVersionId = const Value.absent(),
     Value<int?> plannedLaps = const Value.absent(),
+    bool? imported,
   }) => SessionRow(
     id: id ?? this.id,
     startedAt: startedAt ?? this.startedAt,
@@ -1587,6 +1623,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         ? courseVersionId.value
         : this.courseVersionId,
     plannedLaps: plannedLaps.present ? plannedLaps.value : this.plannedLaps,
+    imported: imported ?? this.imported,
   );
   SessionRow copyWithCompanion(SessionsCompanion data) {
     return SessionRow(
@@ -1629,6 +1666,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       plannedLaps: data.plannedLaps.present
           ? data.plannedLaps.value
           : this.plannedLaps,
+      imported: data.imported.present ? data.imported.value : this.imported,
     );
   }
 
@@ -1651,7 +1689,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ..write('templateId: $templateId, ')
           ..write('templateName: $templateName, ')
           ..write('courseVersionId: $courseVersionId, ')
-          ..write('plannedLaps: $plannedLaps')
+          ..write('plannedLaps: $plannedLaps, ')
+          ..write('imported: $imported')
           ..write(')'))
         .toString();
   }
@@ -1675,6 +1714,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     templateName,
     courseVersionId,
     plannedLaps,
+    imported,
   );
   @override
   bool operator ==(Object other) =>
@@ -1696,7 +1736,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           other.templateId == this.templateId &&
           other.templateName == this.templateName &&
           other.courseVersionId == this.courseVersionId &&
-          other.plannedLaps == this.plannedLaps);
+          other.plannedLaps == this.plannedLaps &&
+          other.imported == this.imported);
 }
 
 class SessionsCompanion extends UpdateCompanion<SessionRow> {
@@ -1717,6 +1758,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
   final Value<String?> templateName;
   final Value<int?> courseVersionId;
   final Value<int?> plannedLaps;
+  final Value<bool> imported;
   const SessionsCompanion({
     this.id = const Value.absent(),
     this.startedAt = const Value.absent(),
@@ -1735,6 +1777,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.templateName = const Value.absent(),
     this.courseVersionId = const Value.absent(),
     this.plannedLaps = const Value.absent(),
+    this.imported = const Value.absent(),
   });
   SessionsCompanion.insert({
     this.id = const Value.absent(),
@@ -1754,6 +1797,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.templateName = const Value.absent(),
     this.courseVersionId = const Value.absent(),
     this.plannedLaps = const Value.absent(),
+    this.imported = const Value.absent(),
   }) : startedAt = Value(startedAt),
        status = Value(status),
        source = Value(source);
@@ -1775,6 +1819,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Expression<String>? templateName,
     Expression<int>? courseVersionId,
     Expression<int>? plannedLaps,
+    Expression<bool>? imported,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1794,6 +1839,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       if (templateName != null) 'template_name': templateName,
       if (courseVersionId != null) 'course_version_id': courseVersionId,
       if (plannedLaps != null) 'planned_laps': plannedLaps,
+      if (imported != null) 'imported': imported,
     });
   }
 
@@ -1815,6 +1861,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Value<String?>? templateName,
     Value<int?>? courseVersionId,
     Value<int?>? plannedLaps,
+    Value<bool>? imported,
   }) {
     return SessionsCompanion(
       id: id ?? this.id,
@@ -1834,6 +1881,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       templateName: templateName ?? this.templateName,
       courseVersionId: courseVersionId ?? this.courseVersionId,
       plannedLaps: plannedLaps ?? this.plannedLaps,
+      imported: imported ?? this.imported,
     );
   }
 
@@ -1897,6 +1945,9 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     if (plannedLaps.present) {
       map['planned_laps'] = Variable<int>(plannedLaps.value);
     }
+    if (imported.present) {
+      map['imported'] = Variable<bool>(imported.value);
+    }
     return map;
   }
 
@@ -1919,7 +1970,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
           ..write('templateId: $templateId, ')
           ..write('templateName: $templateName, ')
           ..write('courseVersionId: $courseVersionId, ')
-          ..write('plannedLaps: $plannedLaps')
+          ..write('plannedLaps: $plannedLaps, ')
+          ..write('imported: $imported')
           ..write(')'))
         .toString();
   }
@@ -7304,6 +7356,7 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   Value<String?> templateName,
   Value<int?> courseVersionId,
   Value<int?> plannedLaps,
+  Value<bool> imported,
 });
 typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<int> id,
@@ -7323,6 +7376,7 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<String?> templateName,
   Value<int?> courseVersionId,
   Value<int?> plannedLaps,
+  Value<bool> imported,
 });
 
 final class $$SessionsTableReferences
@@ -7542,6 +7596,11 @@ class $$SessionsTableFilterComposer
 
   ColumnFilters<int> get plannedLaps => $composableBuilder(
     column: $table.plannedLaps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get imported => $composableBuilder(
+    column: $table.imported,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7801,6 +7860,11 @@ class $$SessionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get imported => $composableBuilder(
+    column: $table.imported,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$TemplatesTableOrderingComposer get templateId {
     final $$TemplatesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -7919,6 +7983,9 @@ class $$SessionsTableAnnotationComposer
     column: $table.plannedLaps,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get imported =>
+      $composableBuilder(column: $table.imported, builder: (column) => column);
 
   $$TemplatesTableAnnotationComposer get templateId {
     final $$TemplatesTableAnnotationComposer composer = $composerBuilder(
@@ -8145,6 +8212,7 @@ class $$SessionsTableTableManager
                 Value<String?> templateName = const Value.absent(),
                 Value<int?> courseVersionId = const Value.absent(),
                 Value<int?> plannedLaps = const Value.absent(),
+                Value<bool> imported = const Value.absent(),
               }) => SessionsCompanion(
                 id: id,
                 startedAt: startedAt,
@@ -8163,6 +8231,7 @@ class $$SessionsTableTableManager
                 templateName: templateName,
                 courseVersionId: courseVersionId,
                 plannedLaps: plannedLaps,
+                imported: imported,
               ),
           createCompanionCallback:
               ({
@@ -8183,6 +8252,7 @@ class $$SessionsTableTableManager
                 Value<String?> templateName = const Value.absent(),
                 Value<int?> courseVersionId = const Value.absent(),
                 Value<int?> plannedLaps = const Value.absent(),
+                Value<bool> imported = const Value.absent(),
               }) => SessionsCompanion.insert(
                 id: id,
                 startedAt: startedAt,
@@ -8201,6 +8271,7 @@ class $$SessionsTableTableManager
                 templateName: templateName,
                 courseVersionId: courseVersionId,
                 plannedLaps: plannedLaps,
+                imported: imported,
               ),
           withReferenceMapper: (p0) => p0
               .map(
