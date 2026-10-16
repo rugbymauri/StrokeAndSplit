@@ -1,6 +1,10 @@
 import 'package:aergrow/data/courses/course.dart';
 import 'package:aergrow/data/courses/course_repository.dart';
+import 'package:aergrow/data/courses/course_layout.dart';
 import 'package:aergrow/data/db/database.dart';
+import 'package:aergrow/data/sessions/session_accumulator.dart';
+import 'package:aergrow/data/sessions/session_repository.dart';
+import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/statistics/ranking.dart';
 import 'package:aergrow/data/statistics/ranking_repository.dart';
 import 'package:aergrow/data/templates/template_repository.dart';
@@ -8,6 +12,7 @@ import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fixtures.dart';
 import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 
@@ -254,6 +259,131 @@ void main() {
 
       expect(await rankings.template(open), isEmpty);
       expect(_values(await rankings.course(seerunde)), ['1000: 250, 251']);
+    });
+  });
+
+  group('what counts', () {
+    const sprint = Zone(name: 'Sprint', axis: CourseAxis.distance, length: 100, paceFastCs: 9000, paceSlowCs: 10000);
+    late ZoneRepository zones;
+    late int sprintId;
+    late int lake;
+    late int x3;
+
+    /// A lap of the lake with the sprint in [sprintMs].
+    RowedLap lap(int sprintMs) => RowedLap([(110000, 450), (sprintMs, 100), (110000, 450)]);
+
+    Future<int> row(List<int> sprintMs, {ErgSourceKind source = ErgSourceKind.pm5}) async => storeRowedSession(
+          db,
+          template: (await templates.get(x3))!,
+          source: source,
+          laps: [for (final ms in sprintMs) lap(ms)],
+        );
+
+    setUp(() async {
+      zones = ZoneRepository(db);
+      sprintId = await zones.create(sprint);
+      lake = await courses.create(
+        'Seerunde mit Sprint',
+        CourseDefinition(axis: CourseAxis.distance, length: 1000, segments: [
+          const CourseSegment(length: 450),
+          sprint.copyWith(id: sprintId).segment,
+          const CourseSegment(length: 450),
+        ]),
+      );
+      x3 = await templates.create('Seerunde x3', courseId: lake, laps: 3);
+    });
+
+    test('counts no session of the simulator or a replay', () async {
+      await row([18000, 18000, 18000], source: ErgSourceKind.simulator);
+      await row([18000, 18000, 18000], source: ErgSourceKind.replay);
+
+      expect(await rankings.course(lake), isEmpty);
+      expect(await rankings.zone(sprintId), isEmpty);
+      expect(await rankings.template(x3), isEmpty);
+    });
+
+    test('counts sessions of FTMS rowers', () async {
+      await row([18000, 18000, 18000], source: ErgSourceKind.ftms);
+
+      expect(_values(await rankings.template(x3)), ['1000: 714']);
+    });
+
+    test('has no ranking of a deleted zone, and the sessions keep their sprints', () async {
+      final id = await row([18000, 18000, 18000]);
+
+      await zones.delete(sprintId);
+
+      expect(await rankings.zone(sprintId), isEmpty);
+      final rowed = await CourseRepository(db).atVersion((await SessionRepository(db).get(id))!.courseVersionId!);
+      expect(rowed.definition.segments[1].zoneName, 'Sprint');
+      expect(await (db.select(db.lapSegments)..where((s) => s.sessionId.equals(id))).get(), hasLength(9));
+    });
+
+    test('counts the laps of a deleted template for its course', () async {
+      await row([18000, 18000, 18000]);
+
+      await templates.delete(x3);
+
+      expect(await rankings.template(x3), isEmpty);
+      expect(_values(await rankings.course(lake)), ['1000: 238, 238, 238']);
+    });
+
+    test('has no ranking of a deleted course', () async {
+      await row([18000, 18000, 18000]);
+
+      await courses.delete(lake);
+
+      expect(await rankings.course(lake), isEmpty);
+    });
+
+    test('moves the others up when a session is deleted', () async {
+      final best = await row([17000, 18000, 19000]);
+      await row([17500, 18500, 19500]);
+
+      await SessionRepository(db).delete(best);
+
+      expect([for (final e in (await rankings.zone(sprintId)).single.entries) e.durationMs], [17500, 18500, 19500]);
+      expect(await rankings.template(x3), hasLength(1));
+      expect((await rankings.course(lake)).single.entries, hasLength(3));
+    });
+
+    test('counts a PM5 session imported on another device for its course and zone', () async {
+      // just_row as "Seerunde x3" on the phone, on a 40 m course with "Tempo" from 20 to 40 m.
+      const tempo = Zone(name: 'Tempo', axis: CourseAxis.distance, length: 20, paceFastCs: 10000, paceSlowCs: 20000);
+      final phone = openTestDatabase();
+      final tempoId = await ZoneRepository(phone).create(tempo);
+      final definition = resolveCourse(
+        axis: CourseAxis.distance,
+        length: 40,
+        placements: [ZonePlacement(zoneId: tempoId, start: 20)],
+        zones: {tempoId: tempo.copyWith(id: tempoId)},
+      ).definition!;
+      final courseId = await CourseRepository(phone).create('Seerunde', definition);
+      final phoneTemplates = TemplateRepository(phone);
+      final templateId = await phoneTemplates.create('Seerunde x3', courseId: courseId, laps: 3);
+      final template = (await phoneTemplates.get(templateId))!;
+      final sessions = SessionRepository(phone);
+      final recorded = await sessions.create(startedAt: DateTime.utc(2026, 10, 16, 7), source: ErgSourceKind.pm5,
+          template: template);
+      final accumulator = SessionAccumulator(recorded, course: definition, plannedLaps: 3);
+      loadFixture('just_row').packets.forEach(accumulator.add);
+      accumulator.finish();
+      await sessions.write(accumulator.takeBatch());
+      await sessions.finish(recorded);
+
+      final laptop = openTestDatabase();
+      final imported = await SessionRepository(laptop).import(await sessions.export(recorded));
+
+      final course = (await CourseRepository(laptop).all()).single;
+      final zone = (await ZoneRepository(laptop).all()).single;
+      final laptopRankings = RankingRepository(laptop);
+      final laps = (await laptopRankings.course(course.id)).single.entries;
+      final rides = (await laptopRankings.zone(zone.id)).single.entries;
+      expect({for (final e in laps) e.sessionId}, {imported});
+      expect(laps, hasLength(3));
+      expect(rides, hasLength(3));
+      expect([for (final e in laps) e.durationMs]..sort(),
+          [for (final e in (await RankingRepository(phone).course(courseId)).single.entries) e.durationMs]..sort());
     });
   });
 }

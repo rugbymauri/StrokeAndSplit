@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../db/database.dart';
+import '../sources/erg_source.dart';
 import 'ranking.dart';
 
 /// Computes the rankings from the stored sessions on every call, so they
@@ -9,6 +10,9 @@ class RankingRepository {
   RankingRepository(this._db);
 
   final AppDatabase _db;
+
+  /// Only sessions rowed on an erg count, also when imported (Design D3).
+  static final _counted = "s.source IN ('${ErgSourceKind.pm5.name}', '${ErgSourceKind.ftms.name}')";
 
   /// The complete laps on course [courseId], one ranking per length of the
   /// rowed versions, the current length first (Design D2).
@@ -21,7 +25,8 @@ class RankingRepository {
         JOIN sessions s ON s.id = l.session_id
         JOIN course_versions v ON v.id = s.course_version_id
         JOIN courses c ON c.id = v.course_id
-        WHERE v.course_id = ? AND l.complete = 1''', variables: [Variable.withInt(courseId)]).get();
+        WHERE v.course_id = ? AND c.deleted_at IS NULL AND l.complete = 1 AND $_counted''',
+        variables: [Variable.withInt(courseId)]).get();
     final current = await _db.customSelect('''
         SELECT c.axis AS axis, v.length AS length
         FROM course_versions v JOIN courses c ON c.id = v.course_id
@@ -52,7 +57,9 @@ class RankingRepository {
         JOIN course_segments cs ON cs.version_id = s.course_version_id AND cs.position = ls.position
         JOIN course_versions v ON v.id = cs.version_id
         JOIN courses c ON c.id = v.course_id
-        WHERE cs.zone_id = ? AND l.complete = 1''', variables: [Variable.withInt(zoneId)]).get();
+        JOIN zones z ON z.id = cs.zone_id
+        WHERE cs.zone_id = ? AND z.deleted_at IS NULL AND l.complete = 1 AND $_counted''',
+        variables: [Variable.withInt(zoneId)]).get();
     final current = await _db.customSelect('SELECT axis, length FROM zones WHERE id = ?',
         variables: [Variable.withInt(zoneId)]).getSingleOrNull();
     return _rankings(
@@ -85,7 +92,7 @@ class RankingRepository {
         JOIN laps l ON l.session_id = s.id
         JOIN course_versions v ON v.id = s.course_version_id
         JOIN courses c ON c.id = v.course_id
-        WHERE s.template_id = ? AND l.complete = 1 AND l.lap_no <= s.planned_laps
+        WHERE s.template_id = ? AND l.complete = 1 AND l.lap_no <= s.planned_laps AND $_counted
         GROUP BY s.id
         HAVING COUNT(*) = s.planned_laps''', variables: [Variable.withInt(templateId)]).get();
     return _rankings(
