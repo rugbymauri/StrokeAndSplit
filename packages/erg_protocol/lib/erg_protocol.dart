@@ -9,6 +9,7 @@ export 'src/ftms/ftms_encoder.dart';
 export 'src/ftms/ftms_ids.dart';
 export 'src/ftms/pm5_to_ftms.dart';
 export 'src/ftms/rower_data.dart';
+export 'src/heart_rate/heart_rate_decoder.dart';
 export 'src/heart_rate/heart_rate_encoder.dart';
 export 'src/heart_rate/heart_rate_ids.dart';
 export 'src/heart_rate/heart_rate_measurement.dart';

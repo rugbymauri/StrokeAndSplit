@@ -253,7 +253,10 @@ void main() {
     });
   });
 
-  test('is the decoder of the FTMS protocol', () {
-    expect(ErgDecoder.forProtocol(ErgProtocol.ftms), isA<FtmsDecoder>());
+  test('is the decoder of the FTMS protocol, with chest strap support', () {
+    expect(
+      ErgDecoder.forProtocol(ErgProtocol.ftms),
+      isA<HeartRateDecoder>().having((d) => d.inner, 'inner', isA<FtmsDecoder>()),
+    );
   });
 }
