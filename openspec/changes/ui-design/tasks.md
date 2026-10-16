@@ -6,7 +6,7 @@
 - [ ] 1.2 Theme mit den Tokens aus Design D1 (Farben, Schriftstile, Radien, Abstände) in `lib/app`. Bestehende Screens nutzen es. Verifikation: bestehende Widget-Tests grün
 - [ ] 1.3 Widget `SegmentBar` nach Design D4 (Breite, frei/Band, Helligkeit nach Tempo, Auswahl). Verifikation: Widget-Tests für freie Strecke, ein Band und abgestufte Pace-Bänder
 
-- [ ] 1.4 Widget `OarStepper` nach Design D7 (Ruderblatt-Form, gross und kompakt, Schritt, Grenzen, gesperrte Taste, Wiederholung beim Gedrückthalten, Screenreader-Beschriftung). Verifikation: Widget-Tests für Schritt, Grenze, Gedrückthalten und Semantics
+- [x] 1.4 Widget `OarStepper` nach Design D7 (Ruderblatt-Form, gross und kompakt, Schritt, Grenzen, gesperrte Taste, Wiederholung beim Gedrückthalten, Screenreader-Beschriftung). Verifikation: Widget-Tests für Schritt, Grenze, Gedrückthalten und Semantics
 
 ## 2. Fortschrittsrahmen
 

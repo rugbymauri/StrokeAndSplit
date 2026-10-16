@@ -726,4 +726,36 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get actionOk => 'OK';
+
+  @override
+  String oarStepperMore(String step) {
+    return '$step mehr';
+  }
+
+  @override
+  String oarStepperLess(String step) {
+    return '$step weniger';
+  }
+
+  @override
+  String stepSeconds(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: '$seconds Sekunden',
+      one: '1 Sekunde',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String stepStrokes(int strokes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      strokes,
+      locale: localeName,
+      other: '$strokes Schläge',
+      one: '1 Schlag',
+    );
+    return '$_temp0';
+  }
 }
