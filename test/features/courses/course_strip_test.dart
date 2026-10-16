@@ -90,6 +90,43 @@ void main() {
     ]);
   });
 
+  testWidgets('shades the pace bands in proportion to the pace, keeping close bands apart', (tester) async {
+    await _pump(
+      tester,
+      CourseStrip(
+        definition: _course(const [
+          // Middles 1:50, 1:55 and 2:30.
+          CourseSegment(length: 100, paceFastCs: 10900, paceSlowCs: 11100),
+          CourseSegment(length: 100, paceFastCs: 11400, paceSlowCs: 11600),
+          CourseSegment(length: 100, paceFastCs: 14900, paceSlowCs: 15100),
+        ]),
+      ),
+    );
+
+    // 1:55 is 5 of 40 seconds slower, less than the smallest step.
+    expect([for (final i in [0, 1, 2]) _colorOf(tester, i)], [
+      CourseStrip.fastestPace,
+      Color.lerp(CourseStrip.fastestPace, CourseStrip.slowestPace, CourseStrip.minShadeStep),
+      CourseStrip.slowestPace,
+    ]);
+  });
+
+  testWidgets('a band far from the others keeps its proportional shade', (tester) async {
+    await _pump(
+      tester,
+      CourseStrip(
+        definition: _course(const [
+          // Middles 1:50, 2:20 and 2:30.
+          CourseSegment(length: 100, paceFastCs: 10900, paceSlowCs: 11100),
+          CourseSegment(length: 100, paceFastCs: 13900, paceSlowCs: 14100),
+          CourseSegment(length: 100, paceFastCs: 14900, paceSlowCs: 15100),
+        ]),
+      ),
+    );
+
+    expect(_colorOf(tester, 1), Color.lerp(CourseStrip.fastestPace, CourseStrip.slowestPace, 0.75));
+  });
+
   testWidgets('tapping a segment reports its index', (tester) async {
     int? tapped;
     await _pump(

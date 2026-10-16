@@ -84,26 +84,42 @@ class CourseStrip extends StatelessWidget {
   static Color _textOn(Color background) =>
       ThemeData.estimateBrightnessForColor(background) == Brightness.light ? AppColors.bg : AppColors.text;
 
+  /// The smallest step in shade between two distinct pace bands, as a share
+  /// of the range from [fastestPace] to [slowestPace].
+  static const minShadeStep = 0.15;
+
   /// The colour of each segment: free gaps [AppColors.line], zones
-  /// [AppColors.zoneIn], or shaded from [slowestPace] to [fastestPace] when
-  /// the zones have more than one distinct pace band.
+  /// [AppColors.zoneIn], or shaded from [fastestPace] to [slowestPace] in
+  /// proportion to the pace when the zones have more than one distinct pace band.
   static List<Color> segmentColors(List<CourseSegment> segments) {
-    // A band is ranked by its middle; equal bands get the same shade.
+    final shades = _paceShades(segments);
+    return [
+      for (final s in segments)
+        if (s.isFree)
+          AppColors.line
+        else if (!s.hasPaceBand || shades.length < 2)
+          AppColors.zoneIn
+        else
+          Color.lerp(fastestPace, slowestPace, shades[_paceSum(s)]!)!,
+    ];
+  }
+
+  /// Maps the middle of each distinct pace band to a shade from 0 (fastest) to
+  /// 1 (slowest), proportional to the pace but at least [minShadeStep] apart.
+  static Map<int, double> _paceShades(List<CourseSegment> segments) {
     final paces = {
       for (final s in segments)
         if (s.hasPaceBand) _paceSum(s),
     }.toList()
       ..sort();
-    return [
-      for (final s in segments)
-        if (s.isFree)
-          AppColors.line
-        else if (!s.hasPaceBand || paces.length < 2)
-          AppColors.zoneIn
-        else
-          // Paces are times, so the smallest is the fastest and brightest.
-          Color.lerp(fastestPace, slowestPace, paces.indexOf(_paceSum(s)) / (paces.length - 1))!,
-    ];
+    if (paces.length < 2) return {};
+    final range = paces.last - paces.first;
+    final step = math.min(minShadeStep, 1 / (paces.length - 1));
+    final shades = <double>[0];
+    for (final pace in paces.skip(1)) {
+      shades.add(math.max((pace - paces.first) / range, shades.last + step));
+    }
+    return {for (final (i, pace) in paces.indexed) pace: shades[i] / shades.last};
   }
 
   static int _paceSum(CourseSegment s) => s.paceFastCs! + s.paceSlowCs!;
