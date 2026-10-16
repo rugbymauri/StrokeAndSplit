@@ -51,9 +51,9 @@ Farben:
 | `line` | `#2A3138` | Rahmen, Trennlinien, freie Abschnitte |
 | `track` | `#242B32` | leere Fortschrittsspur |
 | `trackInner` | `#1B3550` | leere innere Spur (Abschnitt), leicht blau getönt |
-| `text` | `#E8ECEF` | Text, Zahlen, primärer Button |
+| `text` | `#E8ECEF` | Text, Zahlen |
 | `textMuted` | `#9AA4AD` | Beschriftungen |
-| `zoneIn` | `#5AB0FF` | in der Zone, Zone mit Band, Primärfarbe (Fokus, Schalter, Auswahl) |
+| `zoneIn` | `#5AB0FF` | in der Zone, Zone mit Band, Primärfarbe (Fokus, Schalter, Auswahl, gefüllter Button; entschieden 2026-10-16) |
 | `zoneInSurface` / `zoneInText` | `#0F2438` / `#A9D3FF` | Karte bzw. Text in der Zone |
 | `zoneOut` | `#FF9A3D` | ausserhalb der Zone, Fehler, Löschen |
 | `zoneOutSurface` / `zoneOutText` | `#33200F` / `#FFC58F` | Karte bzw. Text ausserhalb |
