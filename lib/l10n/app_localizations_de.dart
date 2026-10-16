@@ -361,13 +361,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sessionTime => 'Zeit';
 
   @override
-  String get sessionAveragePace => '⌀ Pace /500 m';
+  String get sessionAveragePace => '⌀ Pace';
 
   @override
   String get sessionAverageWatts => '⌀ Watt';
 
   @override
-  String get sessionAverageStrokeRate => '⌀ Schläge/min';
+  String get sessionAverageStrokeRate => '⌀ spm';
 
   @override
   String get sessionStrokes => 'Schläge';
@@ -376,6 +376,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String sessionLap(int lap) {
     return 'Runde $lap';
   }
+
+  @override
+  String get summaryTitle => 'Session beendet';
+
+  @override
+  String get summaryInZone => 'In der Zone';
+
+  @override
+  String get summaryLaps => 'Runden';
+
+  @override
+  String get summaryLapBarHint => 'Balken: Anteil in der Zone pro Runde';
+
+  @override
+  String get summaryBestLap => 'Beste Runde';
+
+  @override
+  String get actionDone => 'Fertig';
 
   @override
   String get sourceRower => 'Rudergerät';

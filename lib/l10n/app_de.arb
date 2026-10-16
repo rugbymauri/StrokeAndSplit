@@ -487,7 +487,7 @@
   "@sessionTime": {
     "description": "Summary: label of the time rowed"
   },
-  "sessionAveragePace": "⌀ Pace /500 m",
+  "sessionAveragePace": "⌀ Pace",
   "@sessionAveragePace": {
     "description": "Summary: label of the average pace per 500 metres"
   },
@@ -495,7 +495,7 @@
   "@sessionAverageWatts": {
     "description": "Summary: label of the average power"
   },
-  "sessionAverageStrokeRate": "⌀ Schläge/min",
+  "sessionAverageStrokeRate": "⌀ spm",
   "@sessionAverageStrokeRate": {
     "description": "Summary: label of the average stroke rate"
   },
@@ -511,6 +511,30 @@
         "type": "int"
       }
     }
+  },
+  "summaryTitle": "Session beendet",
+  "@summaryTitle": {
+    "description": "Summary: title above the totals of a session"
+  },
+  "summaryInZone": "In der Zone",
+  "@summaryInZone": {
+    "description": "Summary: label of the share of time within the bands over all laps"
+  },
+  "summaryLaps": "Runden",
+  "@summaryLaps": {
+    "description": "Summary: heading above the laps, written in capitals"
+  },
+  "summaryLapBarHint": "Balken: Anteil in der Zone pro Runde",
+  "@summaryLapBarHint": {
+    "description": "Summary: explains the bar in each lap row"
+  },
+  "summaryBestLap": "Beste Runde",
+  "@summaryBestLap": {
+    "description": "Summary: marks the fastest lap of a distance course or the longest of a time course"
+  },
+  "actionDone": "Fertig",
+  "@actionDone": {
+    "description": "Closes the summary of a session"
   },
   "sourceRower": "Rudergerät",
   "@sourceRower": {

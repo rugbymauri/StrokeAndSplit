@@ -218,9 +218,9 @@ void main() {
 
     expect(setup.container.read(sessionRecorderProvider), isNull);
     expect(find.byType(SessionSummaryScreen), findsOneWidget);
-    expect(find.text('Sprint · 100 m'), findsOneWidget);
+    expect(find.textContaining('3 × 100 m'), findsOneWidget);
     expect(find.byKey(const Key('lap-best')), findsOneWidget);
-    expect(find.text('Runde 3'), findsOneWidget);
+    expect(find.byKey(const Key('lap-value')), findsNWidgets(3));
 
     await setup.container.read(activeErgSourceProvider.notifier).clear();
     await disposeWidgetsWithDatabase(tester);
