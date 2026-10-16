@@ -38,6 +38,9 @@ check: analyze test ## Run analysis and tests (same as tool/check.sh)
 codegen: ## Generate code (drift, ...) with build_runner
 	$(DART) run build_runner build --delete-conflicting-outputs
 
+l10n: ## Generate the translations from lib/l10n/*.arb (after changing an ARB file)
+	$(FLUTTER) gen-l10n
+
 schema: ## Snapshot the drift schema and generate migration tests (after bumping schemaVersion)
 	$(DART) run drift_dev make-migrations
 
