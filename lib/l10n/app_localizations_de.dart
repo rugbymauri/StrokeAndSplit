@@ -234,6 +234,29 @@ class AppLocalizationsDe extends AppLocalizations {
   String get stateDisconnected => 'Getrennt';
 
   @override
+  String heartRateStateLabel(String state) {
+    return 'Pulsgurt: $state';
+  }
+
+  @override
+  String get heartRateStateWaiting => 'Wartet auf das Rudergerät';
+
+  @override
+  String get heartRateFailedUnreachable =>
+      'Pulsgurt nicht erreichbar. Viele Gurte erlauben nur eine oder zwei Bluetooth-Verbindungen gleichzeitig. Trenne ihn von Uhr oder Rudergerät und versuche es erneut.';
+
+  @override
+  String get heartRateFailedNoService =>
+      'Das gekoppelte Gerät liefert keinen Puls. Koppele in „Geräte wählen“ einen Pulsgurt.';
+
+  @override
+  String get heartRateFailedLost =>
+      'Verbindung zum Pulsgurt verloren. Sitzt er richtig und ist er in Reichweite?';
+
+  @override
+  String get heartRateRetry => 'Erneut versuchen';
+
+  @override
   String get sourceSimulator => 'SIMULATOR';
 
   @override

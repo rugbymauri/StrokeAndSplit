@@ -16,6 +16,7 @@ import '../../data/sources/simulated_source.dart';
 import '../../data/templates/session_template.dart';
 import '../../l10n/l10n.dart';
 import '../connection/connection_indicator.dart';
+import '../connection/heart_rate_indicator.dart';
 import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
 import 'live_course.dart';
@@ -179,6 +180,8 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
           title: Row(
             children: [
               const ConnectionIndicator(),
+              // The strap, if any; it also keeps the strap connected while rowing (Design D7).
+              const HeartRateIndicator(),
               const SizedBox(width: AppSpacing.m),
               Flexible(
                 child: Text(
@@ -202,6 +205,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
           child: Column(
             children: [
               const ConnectionNotice(),
+              const HeartRateNotice(),
               if (_stale && connected)
                 MaterialBanner(
                   content: Text(context.l10n.liveStale),

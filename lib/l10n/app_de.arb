@@ -299,6 +299,36 @@
   "@stateDisconnected": {
     "description": "Connection indicator: no connection"
   },
+  "heartRateStateLabel": "Pulsgurt: {state}",
+  "@heartRateStateLabel": {
+    "description": "Live display: screen reader text and tooltip of the dot that shows the heart rate strap's connection state",
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "Verbunden"
+      }
+    }
+  },
+  "heartRateStateWaiting": "Wartet auf das Rudergerät",
+  "@heartRateStateWaiting": {
+    "description": "Live display: the heart rate strap is paired, but waits for the rower to be connected before it connects"
+  },
+  "heartRateFailedUnreachable": "Pulsgurt nicht erreichbar. Viele Gurte erlauben nur eine oder zwei Bluetooth-Verbindungen gleichzeitig. Trenne ihn von Uhr oder Rudergerät und versuche es erneut.",
+  "@heartRateFailedUnreachable": {
+    "description": "Live display: the heart rate strap could not be connected, e.g. because it is already connected to a watch or the rower"
+  },
+  "heartRateFailedNoService": "Das gekoppelte Gerät liefert keinen Puls. Koppele in „Geräte wählen“ einen Pulsgurt.",
+  "@heartRateFailedNoService": {
+    "description": "Live display: the paired device offers no Heart Rate service; „Geräte wählen“ is the screen to choose rower and strap"
+  },
+  "heartRateFailedLost": "Verbindung zum Pulsgurt verloren. Sitzt er richtig und ist er in Reichweite?",
+  "@heartRateFailedLost": {
+    "description": "Live display: the heart rate strap dropped and could not be reconnected within 30 seconds"
+  },
+  "heartRateRetry": "Erneut versuchen",
+  "@heartRateRetry": {
+    "description": "Live display: button that tries again to connect the heart rate strap"
+  },
   "sourceSimulator": "SIMULATOR",
   "@sourceSimulator": {
     "description": "Badge while the simulator delivers the data"

@@ -433,6 +433,42 @@ abstract class AppLocalizations {
   /// **'Getrennt'**
   String get stateDisconnected;
 
+  /// Live display: screen reader text and tooltip of the dot that shows the heart rate strap's connection state
+  ///
+  /// In de, this message translates to:
+  /// **'Pulsgurt: {state}'**
+  String heartRateStateLabel(String state);
+
+  /// Live display: the heart rate strap is paired, but waits for the rower to be connected before it connects
+  ///
+  /// In de, this message translates to:
+  /// **'Wartet auf das Rudergerät'**
+  String get heartRateStateWaiting;
+
+  /// Live display: the heart rate strap could not be connected, e.g. because it is already connected to a watch or the rower
+  ///
+  /// In de, this message translates to:
+  /// **'Pulsgurt nicht erreichbar. Viele Gurte erlauben nur eine oder zwei Bluetooth-Verbindungen gleichzeitig. Trenne ihn von Uhr oder Rudergerät und versuche es erneut.'**
+  String get heartRateFailedUnreachable;
+
+  /// Live display: the paired device offers no Heart Rate service; „Geräte wählen“ is the screen to choose rower and strap
+  ///
+  /// In de, this message translates to:
+  /// **'Das gekoppelte Gerät liefert keinen Puls. Koppele in „Geräte wählen“ einen Pulsgurt.'**
+  String get heartRateFailedNoService;
+
+  /// Live display: the heart rate strap dropped and could not be reconnected within 30 seconds
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung zum Pulsgurt verloren. Sitzt er richtig und ist er in Reichweite?'**
+  String get heartRateFailedLost;
+
+  /// Live display: button that tries again to connect the heart rate strap
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut versuchen'**
+  String get heartRateRetry;
+
   /// Badge while the simulator delivers the data
   ///
   /// In de, this message translates to:
