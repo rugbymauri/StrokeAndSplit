@@ -20,7 +20,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 3 | `ui-design` | 7/18 | in Arbeit | Entscheid Puls-Herkunft (F1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
-| 6 | `statistics` | 0/12 | Gruppe 1 jederzeit, Rest nach 3 | – |
+| 6 | `statistics` | 6/12 | Gruppe 1 in `main`, Rest nach 3 | – |
 | 7 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 3 und 6 |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 
@@ -150,6 +150,11 @@ Vor dem Start:
 Bei der Umsetzung mitnehmen:
 - Kein Schema-Wechsel geplant (Design D1). Task 1.6 misst. Braucht es einen Index, erhöht dessen Migration das Schema; die Nummer mit `heart-rate` (Schema 5) abstimmen.
 - Gezählt werden nur die Quellen `pm5` und `ftms`, nicht `simulator` und `replay` (Design D3).
+
+Gruppe 1 umgesetzt (2026-10-16, Tasks 1.1–1.6, `lib/data/statistics/`):
+- [x] Messung 1.6: 200 Sessions mit je 3 Runden und 2 Zonen, alle vier Abfragen zusammen 22–69 ms. Kein Index, kein Schema-Wechsel, Schema bleibt 4.
+- [x] Kleine Entscheide: aktuelle Länge zuerst, ältere nach Länge aufsteigend; zusätzlich nach Achse gruppiert; bei Gleichstand gewinnt, wer früher gerudert hat; Status der Session wird nicht gefiltert (auch abgebrochene Sessions zählen mit vollständigen Runden); Vorlage mit heute offener Rundenzahl hat keine Rangliste.
+- [ ] Offen: Importierte Sessions haben kein `templateId` und zählen darum nicht für die Rangliste ihrer Vorlage (Spec-Szenario „Import“). Vorschlag: beim Import mit einer Vorlage gleichen Namens, gleicher Strecke und Rundenzahl verknüpfen. Ändert das Import-Verhalten aus `course-rowing`, Entscheid des Nutzers.
 
 ### 7. `ghost`: gegen die eigene Bestzeit rudern
 
