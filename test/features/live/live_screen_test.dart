@@ -93,6 +93,16 @@ ActiveRecording _onCourse({
   );
 }
 
+/// The pace, found by [key], is taller on screen than every other text.
+void _expectLargestPace(WidgetTester tester, Key key) {
+  final pace = tester.getRect(find.byKey(key)).height;
+  for (final text in tester.widgetList<Text>(find.byType(Text))) {
+    if (text.key == key) continue;
+    final reason = text.data ?? text.textSpan?.toPlainText();
+    expect(tester.getRect(find.byWidget(text)).height, lessThan(pace), reason: reason);
+  }
+}
+
 class _Harness {
   // Synchronous, so an emitted event is handled before the next frame.
   final events = StreamController<RowingEvent>.broadcast(sync: true);
@@ -133,10 +143,12 @@ void main() {
 
     expect(find.text('2:05.3'), findsOneWidget);
     expect(find.text('12:34'), findsOneWidget);
-    expect(find.text('3021'), findsOneWidget);
+    expect(find.text('3\u00A0021 m'), findsOneWidget);
     expect(find.text('179'), findsOneWidget);
-    expect(find.text('24'), findsOneWidget);
-    expect(find.text('151'), findsOneWidget);
+    expect(find.text('24 spm'), findsOneWidget);
+    expect(find.text('Puls 151'), findsOneWidget);
+    // 12:34 over 3021.7 m.
+    expect(find.text('⌀ Pace 2:04.8'), findsOneWidget);
   });
 
   testWidgets('hides the heart rate without a monitor', (tester) async {
@@ -144,7 +156,16 @@ void main() {
     await harness.pump(tester);
     await harness.emit(tester, _tick());
 
-    expect(find.text('Puls'), findsNothing);
+    expect(find.byKey(const Key('metric-hr')), findsNothing);
+    expect(find.textContaining('Puls'), findsNothing);
+  });
+
+  testWidgets('leaves out the force curve without data', (tester) async {
+    final harness = _Harness();
+    await harness.pump(tester);
+    await harness.emit(tester, _tick());
+
+    expect(find.byKey(const Key('force-curve')), findsNothing);
   });
 
   for (final (size, layout) in const [
@@ -173,12 +194,13 @@ void main() {
         await harness.emit(tester, _tick(heartRate: 151));
 
         // Overflows would be reported as exceptions and fail the test.
-        final pace = tester.getSize(find.byKey(const Key('metric-pace')));
-        for (final key in ['metric-elapsed', 'metric-distance', 'metric-watts', 'metric-spm', 'metric-hr']) {
-          final other = tester.getSize(find.byKey(Key(key)));
-          expect(pace.width * pace.height, greaterThan(other.width * other.height), reason: key);
-        }
+        if (!template) _expectLargestPace(tester, const Key('metric-pace'));
         if (template) {
+          final pace = tester.getSize(find.byKey(const Key('metric-pace')));
+          for (final key in ['metric-elapsed', 'metric-distance', 'metric-watts', 'metric-spm', 'metric-hr']) {
+            final other = tester.getSize(find.byKey(Key(key)));
+            expect(pace.width * pace.height, greaterThan(other.width * other.height), reason: key);
+          }
           for (final key in const [
             'course-lap',
             'course-segment',
@@ -223,7 +245,7 @@ void main() {
       expect(find.text('280 m to go'), findsOneWidget);
       expect(find.text('faster'), findsOneWidget);
       expect(find.text('more strokes'), findsOneWidget);
-      for (final label in ['Time', 'Meters', 'Watts', 'Strokes/min', 'Heart rate', 'Pace /500 m', 'End session']) {
+      for (final label in ['Time', 'Distance', 'Watts', 'Stroke rate', 'Heart rate', 'Pace /500 m', 'End session']) {
         expect(find.text(label), findsOneWidget, reason: label);
       }
       // The pace keeps the PM5 format in every language.

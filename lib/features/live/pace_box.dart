@@ -109,17 +109,13 @@ class PaceBox extends StatelessWidget {
 
   /// What is left, rounded up: metres with grouped thousands, e.g. `1 460 m`, or a time on a time course.
   String _amount(double left) => course.axis == CourseAxis.distance
-      ? '${_grouped(left.ceil())} m'
+      ? '${formatGrouped(left.ceil())} m'
       : formatElapsed(Duration(seconds: left.ceil()));
 
   /// Rowed of [total], rounded down, e.g. `1 460 / 3 000 m` or `24:20 / 50:00`.
   String _done(double done, int total) => course.axis == CourseAxis.distance
-      ? '${_grouped(done.floor())} / ${_grouped(total)} m'
+      ? '${formatGrouped(done.floor())} / ${formatGrouped(total)} m'
       : '${formatElapsed(Duration(seconds: done.floor()))} / ${formatElapsed(Duration(seconds: total))}';
-
-  /// Thousands separated by a no-break space, as in the canvas.
-  static String _grouped(int value) =>
-      value.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+$)'), (_) => ' ');
 }
 
 /// The zone status of the pace as symbol and word, not only as colour, with the band.

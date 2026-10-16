@@ -219,19 +219,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get metricTime => 'Zeit';
 
   @override
-  String get metricDistance => 'Meter';
+  String get metricDistance => 'Distanz';
 
   @override
   String get metricWatts => 'Watt';
 
   @override
-  String get metricStrokeRate => 'Schläge/min';
+  String get metricStrokeRate => 'Schlagzahl';
 
   @override
   String get metricHeartRate => 'Puls';
 
   @override
   String get metricPace => 'Pace /500 m';
+
+  @override
+  String get metricCalories => 'Kalorien';
+
+  @override
+  String get metricAveragePace => '⌀ Pace';
+
+  @override
+  String get liveForceCurve => 'Kraftkurve';
 
   @override
   String courseLap(int lap) {

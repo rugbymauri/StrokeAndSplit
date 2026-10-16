@@ -17,6 +17,7 @@ import '../sessions/session_summary_screen.dart';
 import '../simulator/simulator_controls.dart';
 import 'course_bar.dart';
 import 'formatters.dart';
+import 'live_free.dart';
 import 'live_layout.dart';
 
 /// After this long without data the shown values are marked as outdated.
@@ -122,6 +123,19 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SessionSummaryScreen(sessionId: id)));
   }
 
+  /// Starts a session, or ends the running one.
+  Widget _sessionButton(ActiveRecording? recording, bool connected) => recording == null
+      ? FilledButton.icon(
+          onPressed: connected ? _startSession : null,
+          icon: const Icon(Icons.fiber_manual_record),
+          label: Text(context.l10n.liveStartSession),
+        )
+      : FilledButton.tonalIcon(
+          onPressed: _stopSession,
+          icon: const Icon(Icons.stop),
+          label: Text(context.l10n.liveStopSession),
+        );
+
   @override
   Widget build(BuildContext context) {
     final source = ref.watch(activeErgSourceProvider);
@@ -152,34 +166,30 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                   content: Text(context.l10n.liveStale),
                   actions: [const SizedBox.shrink()],
                 ),
-              if ((recording?.lap, recording?.template) case (final lap?, final template?))
+              if ((recording?.lap, recording?.template) case (final lap?, final template?)) ...[
                 CourseBar(lap: lap, course: template.course.definition),
-              Expanded(
-                child: _Metrics(
-                  tick: _tick,
-                  session: recording?.progress,
-                  paceZone: ZoneHint.pace(context.l10n, recording?.lap?.pace),
-                  strokeRateZone: ZoneHint.strokeRate(context.l10n, recording?.lap?.strokeRate),
-                  outdated: _stale,
+                Expanded(
+                  child: _Metrics(
+                    tick: _tick,
+                    session: recording?.progress,
+                    paceZone: ZoneHint.pace(context.l10n, recording?.lap?.pace),
+                    strokeRateZone: ZoneHint.strokeRate(context.l10n, recording?.lap?.strokeRate),
+                    outdated: _stale,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: recording == null
-                      ? FilledButton.icon(
-                          onPressed: connected ? _startSession : null,
-                          icon: const Icon(Icons.fiber_manual_record),
-                          label: Text(context.l10n.liveStartSession),
-                        )
-                      : FilledButton.tonalIcon(
-                          onPressed: _stopSession,
-                          icon: const Icon(Icons.stop),
-                          label: Text(context.l10n.liveStopSession),
-                        ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+                  child: SizedBox(width: double.infinity, child: _sessionButton(recording, connected)),
                 ),
-              ),
+              ] else
+                Expanded(
+                  child: FreeLiveView(
+                    tick: _tick,
+                    session: recording?.progress,
+                    outdated: _stale,
+                    action: _sessionButton(recording, connected),
+                  ),
+                ),
               if (source is SimulatedSource)
                 SimulatorControls(
                   source: source,

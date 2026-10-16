@@ -282,7 +282,7 @@
   "@metricTime": {
     "description": "Live display: label of the elapsed time"
   },
-  "metricDistance": "Meter",
+  "metricDistance": "Distanz",
   "@metricDistance": {
     "description": "Live display: label of the distance rowed"
   },
@@ -290,7 +290,7 @@
   "@metricWatts": {
     "description": "Live display: label of the power"
   },
-  "metricStrokeRate": "Schläge/min",
+  "metricStrokeRate": "Schlagzahl",
   "@metricStrokeRate": {
     "description": "Live display: label of the stroke rate"
   },
@@ -301,6 +301,18 @@
   "metricPace": "Pace /500 m",
   "@metricPace": {
     "description": "Live display: label of the pace per 500 metres"
+  },
+  "metricCalories": "Kalorien",
+  "@metricCalories": {
+    "description": "Live display: label of the calories burnt, in the line below the tiles"
+  },
+  "metricAveragePace": "⌀ Pace",
+  "@metricAveragePace": {
+    "description": "Live display: label of the average pace per 500 metres since the start, in the line below the tiles"
+  },
+  "liveForceCurve": "Kraftkurve",
+  "@liveForceCurve": {
+    "description": "Live display: title of the force curve of the last stroke"
   },
   "courseLap": "Runde {lap}",
   "@courseLap": {

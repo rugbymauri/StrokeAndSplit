@@ -418,7 +418,7 @@ abstract class AppLocalizations {
   /// Live display: label of the distance rowed
   ///
   /// In de, this message translates to:
-  /// **'Meter'**
+  /// **'Distanz'**
   String get metricDistance;
 
   /// Live display: label of the power
@@ -430,7 +430,7 @@ abstract class AppLocalizations {
   /// Live display: label of the stroke rate
   ///
   /// In de, this message translates to:
-  /// **'Schläge/min'**
+  /// **'Schlagzahl'**
   String get metricStrokeRate;
 
   /// Live display: label of the heart rate
@@ -444,6 +444,24 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Pace /500 m'**
   String get metricPace;
+
+  /// Live display: label of the calories burnt, in the line below the tiles
+  ///
+  /// In de, this message translates to:
+  /// **'Kalorien'**
+  String get metricCalories;
+
+  /// Live display: label of the average pace per 500 metres since the start, in the line below the tiles
+  ///
+  /// In de, this message translates to:
+  /// **'⌀ Pace'**
+  String get metricAveragePace;
+
+  /// Live display: title of the force curve of the last stroke
+  ///
+  /// In de, this message translates to:
+  /// **'Kraftkurve'**
+  String get liveForceCurve;
 
   /// Course bar: the current lap of an open number of laps
   ///
