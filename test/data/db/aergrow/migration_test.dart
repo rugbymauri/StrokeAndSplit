@@ -15,6 +15,7 @@ import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
+import 'generated/schema_v5.dart' as v5;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -86,7 +87,7 @@ void main() {
 
       final db = AppDatabase(schema.newConnection());
       // The repository reads the current schema.
-      await verifier.migrateAndValidate(db, 5);
+      await verifier.migrateAndValidate(db, 6);
       final repository = SessionRepository(db);
 
       final session = (await repository.get(1))!;
@@ -264,7 +265,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 5);
+      await verifier.migrateAndValidate(db, 6);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.deviceName, session.strokeCount),
@@ -363,7 +364,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 5);
+      await verifier.migrateAndValidate(db, 6);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.courseVersionId), (ErgProtocol.pm5, 1));
@@ -424,7 +425,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 5);
+      await verifier.migrateAndValidate(db, 6);
 
       final sessions = await (db.select(db.sessions)
             ..orderBy([(s) => OrderingTerm.asc(s.id)]))
@@ -449,7 +450,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 5);
+      await verifier.migrateAndValidate(db, 6);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.imported), (ErgProtocol.pm5, false));
@@ -464,6 +465,112 @@ void main() {
             source: ErgSourceKind.pm5,
           ));
       expect((await db.select(db.sessions).get()).single.imported, isFalse);
+      await db.close();
+    });
+  });
+
+  group('to version 6', () {
+    Future<void> expectNoPulseSummary(AppDatabase db) async {
+      final sessions = await (db.select(db.sessions)
+            ..orderBy([(s) => OrderingTerm.asc(s.id)]))
+          .get();
+      expect(
+        sessions.map(
+          (s) => (s.averageHeartRate, s.maxHeartRate, s.rmssdMs),
+        ),
+        everyElement((null, null, null)),
+      );
+      expect(await db.select(db.rrIntervals).get(), isEmpty);
+    }
+
+    test('keeps the sessions of version 5 without pulse summary', () async {
+      final schema = await verifier.schemaAt(5);
+      final old = v5.DatabaseAtV5(schema.newConnection());
+      await old.batch((b) {
+        b.insertAll(old.sessions, [
+          v5.SessionsCompanion.insert(
+            startedAt: 0,
+            status: 'complete',
+            source: 'pm5',
+            deviceName: const Value('PM5 Test'),
+            durationMs: const Value(60000),
+            distanceDm: const Value(2500),
+          ),
+          v5.SessionsCompanion.insert(
+            startedAt: 0,
+            status: 'complete',
+            source: 'ftms',
+            protocol: const Value('ftms'),
+            imported: const Value(1),
+          ),
+        ]);
+        b.insert(
+          old.samples,
+          v5.SamplesCompanion.insert(
+            sessionId: 1,
+            tMs: 60000,
+            distanceDm: 2500,
+            heartRate: const Value(142),
+          ),
+        );
+      });
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 6);
+
+      final sessions = await (db.select(db.sessions)
+            ..orderBy([(s) => OrderingTerm.asc(s.id)]))
+          .get();
+      expect(
+        sessions.map((s) => (s.protocol, s.distanceDm, s.imported)),
+        [(ErgProtocol.pm5, 2500, false), (ErgProtocol.ftms, 0, true)],
+      );
+      expect((await db.select(db.samples).get()).single.heartRate, 142);
+      await expectNoPulseSummary(db);
+      await db.close();
+    });
+
+    test('keeps the sessions of version 1 without pulse summary', () async {
+      final schema = await verifier.schemaAt(1);
+      final old = v1.DatabaseAtV1(schema.newConnection());
+      await old.into(old.sessions).insert(
+            v1.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'pm5',
+              strokeCount: const Value(20),
+            ),
+          );
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 6);
+
+      final session = (await db.select(db.sessions).get()).single;
+      expect((session.protocol, session.strokeCount), (ErgProtocol.pm5, 20));
+      await expectNoPulseSummary(db);
+      await db.close();
+    });
+
+    test('stores RR intervals and deletes them with their session', () async {
+      final db = openTestDatabase();
+      final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
+            startedAt: DateTime(2026, 10, 16),
+            status: SessionStatus.complete,
+            source: ErgSourceKind.pm5,
+          ));
+      await db.batch((b) => b.insertAll(db.rrIntervals, [
+            RrIntervalsCompanion.insert(sessionId: id, tMs: 800, rrMs: 800),
+            RrIntervalsCompanion.insert(sessionId: id, tMs: 1610, rrMs: 810),
+          ]));
+      expect(
+        (await db.select(db.rrIntervals).get()).map((r) => (r.tMs, r.rrMs)),
+        [(800, 800), (1610, 810)],
+      );
+
+      await (db.delete(db.sessions)..where((s) => s.id.equals(id))).go();
+      expect(await db.select(db.rrIntervals).get(), isEmpty);
       await db.close();
     });
   });

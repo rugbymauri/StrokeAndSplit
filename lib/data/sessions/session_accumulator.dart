@@ -14,6 +14,7 @@ class SessionBatch {
     required this.rawPackets,
     this.laps = const [],
     this.lapSegments = const [],
+    this.rrIntervals = const [],
   });
 
   final List<SamplesCompanion> samples;
@@ -21,9 +22,15 @@ class SessionBatch {
   final List<RawPacketsCompanion> rawPackets;
   final List<LapsCompanion> laps;
   final List<LapSegmentsCompanion> lapSegments;
+  final List<RrIntervalsCompanion> rrIntervals;
 
   bool get isEmpty =>
-      samples.isEmpty && strokes.isEmpty && rawPackets.isEmpty && laps.isEmpty && lapSegments.isEmpty;
+      samples.isEmpty &&
+      strokes.isEmpty &&
+      rawPackets.isEmpty &&
+      laps.isEmpty &&
+      lapSegments.isEmpty &&
+      rrIntervals.isEmpty;
 }
 
 /// Turns the notifications of one session into session-relative rows.
@@ -56,6 +63,7 @@ class SessionAccumulator {
   var _samples = <SamplesCompanion>[];
   var _strokes = <StrokesCompanion>[];
   var _rawPackets = <RawPacketsCompanion>[];
+  var _rrIntervals = <RrIntervalsCompanion>[];
 
   /// Time and distance since the session started.
   SessionProgress get progress => _offset?.current ?? const SessionProgress(distanceMeters: 0, elapsed: Duration.zero);
@@ -99,10 +107,12 @@ class SessionAccumulator {
       lapSegments: [
         for (final segment in tracker?.takeSegments() ?? const <SegmentResult>[]) segmentCompanion(sessionId, segment),
       ],
+      rrIntervals: _rrIntervals,
     );
     _samples = [];
     _strokes = [];
     _rawPackets = [];
+    _rrIntervals = [];
     return batch;
   }
 
@@ -116,8 +126,7 @@ class SessionAccumulator {
         // A reset shows up as counters going backwards, see SessionOffset.
         break;
       case HeartBeatIntervals():
-        // RR intervals are not stored yet.
-        break;
+        _onHeartBeats(event);
     }
   }
 
@@ -148,6 +157,20 @@ class SessionAccumulator {
       calories: Value(tick.calories),
       wallMs: Value(_wallMs),
     ));
+  }
+
+  /// Stores each interval at the time it ended (Design D4), on the wall-clock
+  /// axis of the raw packets: unlike the rower's clock it keeps running in a
+  /// pause, while the heart keeps beating.
+  void _onHeartBeats(HeartBeatIntervals beats) {
+    final first = _firstPacketTime!;
+    for (final (i, end) in beats.intervalEnds.indexed) {
+      _rrIntervals.add(RrIntervalsCompanion.insert(
+        sessionId: sessionId,
+        tMs: (end - first).inMilliseconds,
+        rrMs: beats.intervalsMs[i],
+      ));
+    }
   }
 
   void _onStroke(Stroke stroke) {

@@ -150,6 +150,12 @@ class Sessions extends Table {
   /// Set by the import; imported sessions count in no ranking (Change
   /// statistics, Design D3). Sessions before schema 5 count as recorded here.
   BoolColumn get imported => boolean().withDefault(const Constant(false))();
+
+  // Pulse summary (Change heart-rate, Design D5); null without heart rate or,
+  // for RMSSD, with fewer than two RR intervals.
+  IntColumn get averageHeartRate => integer().nullable()();
+  IntColumn get maxHeartRate => integer().nullable()();
+  IntColumn get rmssdMs => integer().nullable()();
 }
 
 /// Session-relative values per status tick (Design D6/D7).
@@ -196,6 +202,16 @@ class RawPackets extends Table {
   IntColumn get tMs => integer()();
   TextColumn get characteristicId => text()();
   BlobColumn get bytes => blob()();
+}
+
+/// The beat-to-beat intervals of a strap (Change heart-rate, Design D4/D5),
+/// each at the session time it ended.
+@DataClassName('RrIntervalRow')
+@TableIndex(name: 'rr_intervals_session_time', columns: {#sessionId, #tMs})
+class RrIntervals extends Table {
+  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get tMs => integer()();
+  IntColumn get rrMs => integer()();
 }
 
 /// The laps of a session on a course; times are wall-clock times.
@@ -247,6 +263,7 @@ class LapSegments extends Table {
     TemplateBlocks,
     Laps,
     LapSegments,
+    RrIntervals,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -256,7 +273,7 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase.local() => AppDatabase(driftDatabase(name: 'aergrow'));
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -298,6 +315,15 @@ class AppDatabase extends _$AppDatabase {
           // existing sessions count as recorded on this device.
           from4To5: (m, schema) async {
             await m.addColumn(schema.sessions, schema.sessions.imported);
+          },
+          // Heart rate straps (Change heart-rate, Design D5); existing sessions
+          // keep no pulse summary.
+          from5To6: (m, schema) async {
+            await m.addColumn(schema.sessions, schema.sessions.averageHeartRate);
+            await m.addColumn(schema.sessions, schema.sessions.maxHeartRate);
+            await m.addColumn(schema.sessions, schema.sessions.rmssdMs);
+            await m.createTable(schema.rrIntervals);
+            await m.createIndex(schema.rrIntervalsSessionTime);
           },
         ),
         beforeOpen: (details) async {
