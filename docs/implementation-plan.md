@@ -17,7 +17,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
-| 3 | `ui-design` | 0/18 | nach 2 | Entscheid Puls-Herkunft (F1) |
+| 3 | `ui-design` | 7/18 | in Arbeit | Entscheid Puls-Herkunft (F1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
 | 6 | `statistics` | 0/12 | Gruppe 1 jederzeit, Rest nach 3 | – |
@@ -91,20 +91,33 @@ Vor dem Start:
 
 Ziel: dunkles Thema, Barlow Condensed/IBM Plex Sans, Fortschrittsrahmen um die Pace, neue Editoren, Startbildschirm, Zusammenfassung. Canvas
 
-Vor dem Start anpassen:
-- [ ] Task 1.3 `SegmentBar` überschneidet sich mit `CourseStrip` aus `zones` (`lib/features/courses/course_strip.dart`): ausbauen statt doppelt bauen.
-- [ ] Task 4.1 „Tabs Vorlagen und Strecken“: Die drei Tabs Vorlagen | Strecken | Zonen gibt es seit `zones` schon. Task auf das Gestalten reduzieren.
-- [ ] Task 3.3: `course_bar.dart` zeigt seit `zones` den Zonennamen bzw. „frei“; das muss in die Pace-Box übernommen werden.
-- [ ] Spec-Delta `live-display` spricht von „Segmenten“ und „Segmentspur“; Begriffe mit `zones` abgleichen (Abschnitt = Zone oder frei).
-- [ ] Startbildschirm: Quellenwahl muss FTMS-Rudergeräte aus `device-types` aufnehmen.
-- [ ] Neue Texte über die ARB-Dateien aus `translations`, nicht hart codiert.
-- [ ] Platz für die Sprachwahl aus `translations` im neuen Layout festlegen (Einstellungen bzw. Startbildschirm).
+Vor dem Start angepasst (2026-10-16, in Proposal, Design, Specs und Tasks eingearbeitet):
+- [x] Task 1.3 baut `CourseStrip` aus `zones` aus statt einer zweiten `SegmentBar` (D4 „Ablaufbalken“).
+- [x] Task 4.1 gestaltet nur die bestehenden drei Tabs Vorlagen | Strecken | Zonen.
+- [x] Task 3.3: Tabelle in D3, wohin jede Angabe aus `course_bar.dart` wandert (Zonenname bzw. „frei“ in die Legende).
+- [x] Begriffe: Abschnitt = Zone oder frei, Spur heisst „Abschnittsspur“; Szenario „Freier Abschnitt“ ergänzt.
+- [x] Startbildschirm: Quellenwahl mit FTMS-Rudergeräten (D6, Task 5.1).
+- [x] Neue Texte nur über die ARB-Dateien (D9).
+- [x] Sprachwahl (D8).
+
+Vorläufig, vom Nutzer zu bestätigen:
+- [ ] D6 Quelle: „Rudergerät“ (PM5 und FTMS), „Simulator“, „Simulator (FTMS)“ auf dem Startbildschirm gilt für „Rudern“, „Frei rudern“ und „Nochmal“; der Quellen-Dialog beim Start einer Vorlage fällt weg.
+- [ ] D8 Sprachwahl bleibt Symbol in der App-Leiste des Startbildschirms, zieht in Einstellungen um, sobald es weitere gibt.
+- [ ] Legende „Runde 2 von 3“ statt „Runde 2 / 3“ (passt zur Spec `course-rowing`); Bereich „200–800 m“ entfällt.
+- [ ] OFL-Lizenzen der Schriften in der Lizenzseite der App (`LicenseRegistry`) zeigen? Keinem Task zugeordnet.
 
 Offene Entscheide: F1. F2 (Mittelweg, Design D6) und F12 (Schritte auf der Zeitachse, Design D7) sind entschieden.
 
 - [x] F2 in Proposal, Design D6 und Task 5.1 eingetragen.
 - [x] Ruderblatt-Tasten für Zahlen (2026-10-16) als Design D7, Spec `number-steppers` und Tasks 1.4 und 4.4 aufgenommen. Betrifft auch die Editoren aus `zones`.
 - [x] F12 entschieden: Zeitachse Strecke 30 s, Zone und Startposition 10 s (Design D7, Spec `number-steppers`).
+- [x] Task 1.4 `OarStepper` in `lib/app/widgets/`, D1-Farben als `AppColors` in `lib/app/design_tokens.dart` (Grundlage für 1.2). Vorläufig: Tasten waagrecht wie im Canvas, keine Tooltips (beissen sich mit Gedrückthalten), Blattrand `#4A545E` und Gedrückt-Farbe `#1D3A55` als private Konstanten, Beschriftung „mehr/weniger“ statt „kürzer/länger“. Offen für 4.4: Hintergrund `bg` für kompakte Felder in Karten.
+- [x] Task 1.1 Schriften unter `assets/fonts/` mit OFL (IBM Plex Sans aus `IBM/plex`, weil google/fonts nur die variable Schrift führt); zusammen ca. 715 kB statt der geschätzten 400 kB.
+- [x] Task 2.1 `ProgressFrameModel` in `lib/features/live/progress_frame_model.dart`.
+- [x] Task 1.3 `CourseStrip` nach D4 (Höhe 8 px in Listen, 28 px mit Zonennamen im Strecken-Editor). Vorläufig: Helligkeit nach Rang der Pace-Bänder in gleichen Schritten, Zonen ohne Pace-Band in `zoneIn`, freie Lücken ohne Text; Auswahl (`selected`, `onSegmentTap`) nur vorbereitet, Anbindung mit 4.3.
+- [x] Task 2.2 `ProgressFrame` in `lib/features/live/progress_frame.dart` mit Goldens. Entschieden (2026-10-16): Startkerbe oben in der Mitte auf Strecken- und Rundenspur, leere innere Spur als Token `AppColors.trackInner`. Vorläufig: ohne Pace färbt die Abschnittsspur `zoneOut`; Masse feste Pixel aus dem Canvas.
+- [x] Task 3.1 `LiveLayout.of(Size)` in `lib/features/live/live_layout.dart`: Querformat nur, wenn breiter als hoch; gilt vorerst für die Fläche der Messwerte.
+- [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Vorläufig: Primärfarbe `text` statt Blau (Blau bleibt „in der Zone“, auch Fokus und Schalter sind weiss), Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`). Offen: Barlow Condensed 500 für Einheiten bündeln?
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 

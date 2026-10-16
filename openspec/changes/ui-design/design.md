@@ -36,7 +36,7 @@ Die Kraftkurve, das Herz-Symbol beim Puls und die Ghost-Schiffchen sind in den L
 **Non-Goals:**
 - Helles Thema. Die App bleibt vorerst dunkel.
 - Animationen über das Nachführen der Spuren hinaus.
-- Neue Daten. Alles, was gezeigt wird, liefern `foundation` und `courses` bereits.
+- Neue Daten. Alles, was gezeigt wird, liefern `foundation`, `courses`, `zones` und `device-types` bereits.
 
 ## Decisions
 
@@ -48,11 +48,12 @@ Farben:
 |---|---|---|
 | `bg` | `#0E1114` | Hintergrund |
 | `surface` | `#161B20` | Karten, Kacheln |
-| `line` | `#2A3138` | Rahmen, Trennlinien, freie Segmente |
+| `line` | `#2A3138` | Rahmen, Trennlinien, freie Abschnitte |
 | `track` | `#242B32` | leere Fortschrittsspur |
+| `trackInner` | `#1B3550` | leere innere Spur (Abschnitt), leicht blau getönt |
 | `text` | `#E8ECEF` | Text, Zahlen, primärer Button |
 | `textMuted` | `#9AA4AD` | Beschriftungen |
-| `zoneIn` | `#5AB0FF` | in der Zone, Segment mit Band |
+| `zoneIn` | `#5AB0FF` | in der Zone, Zone mit Band |
 | `zoneInSurface` / `zoneInText` | `#0F2438` / `#A9D3FF` | Karte bzw. Text in der Zone |
 | `zoneOut` | `#FF9A3D` | ausserhalb der Zone, Fehler, Löschen |
 | `zoneOutSurface` / `zoneOutText` | `#33200F` / `#FFC58F` | Karte bzw. Text ausserhalb |
@@ -79,30 +80,48 @@ Die Grössen skalieren mit dem Platz. Massgebend ist das Verhältnis aus dem Can
 
 ### D3: Fortschrittsrahmen
 
+Begriffe wie in `zones`: Eine Strecke besteht aus Abschnitten. Ein Abschnitt ist eine eingebaute Zone oder frei. Im Code heisst ein Abschnitt weiterhin `CourseSegment`.
+
 Der Rahmen der Pace-Box besteht aus drei ineinanderliegenden Spuren in der Form der Box, also Rechtecke mit abgerundeten Ecken:
 
 | Spur | Lage | Farbe | Fortschritt |
 |---|---|---|---|
 | Strecke | aussen | `text` | Achsenposition über alle Runden / (Streckenlänge × Rundenzahl) |
 | Runde | Mitte | `textMuted` | Position in der aktuellen Runde / Streckenlänge |
-| Segment | innen | `zoneIn` bzw. `zoneOut` | Position im aktuellen Segment / Segmentlänge |
+| Abschnitt | innen | `zoneIn` bzw. `zoneOut` | Position im aktuellen Abschnitt / Abschnittslänge |
 
-- Jede Spur beginnt oben in der Mitte und läuft im Uhrzeigersinn. Die leere Spur ist in `track` sichtbar, die innere leere Spur leicht blau getönt.
-- Kerben in der Farbe der Box markieren auf der Streckenspur die Rundengrenzen und auf der Rundenspur die Segmentgrenzen.
+- Jede Spur beginnt oben in der Mitte und läuft im Uhrzeigersinn. Die leere Spur ist in `track` sichtbar, die innere leere Spur in `trackInner`.
+- Kerben in der Farbe der Box markieren auf der Streckenspur die Rundengrenzen und auf der Rundenspur die Abschnittsgrenzen. Strecken- und Rundenspur haben zusätzlich oben in der Mitte eine Kerbe am Start.
 - Die gefüllte Spur endet gerade. An ihrer Spitze sitzt ein Schiffchen in der Farbe der Spur, eine Raute von etwa 22 × 14 px mit 2 px dunklem Rand. Es ist breiter als die Spur (10 px), damit es auf der gefüllten Spur sichtbar bleibt. Das Schiffchen folgt der Laufrichtung und dreht sich in den Ecken mit der Tangente.
-- Die Farbe der Segmentspur folgt dem Zonenstatus der Pace. In einem freien Segment ist sie `textMuted`.
+- Die Farbe der Abschnittsspur folgt dem Zonenstatus der Pace. In einem freien Abschnitt und in einer Zone ohne Pace-Band ist sie `textMuted`.
 - Bei offener Rundenzahl entfällt die Streckenspur, weil die Gesamtlänge unbekannt ist. Die Rundenspur rückt nach aussen.
 - Die Position wird als Bogenlänge auf dem Pfad berechnet (`PathMetrics`), damit gleiche Anteile überall gleich lang sind, auch in den Ecken.
 
-Inhalt der Box von oben nach unten: Beschriftung „Pace /500 m“, die Pace, Zonenstatus mit Band (z. B. „In der Zone · 2:05–2:10“), eine Trennlinie und die Legende. Die Legende hat eine Zeile pro Spur mit Farbpunkt, Bezeichnung und Restangabe, z. B. „Gesamt 1 460 / 3 000 m“, „Runde 2 / 3 noch 540 m“, „Zone Tempo noch 206 m“ bzw. „frei noch 206 m“ (Zonenname aus `zones`). Bei Zeitstrecken stehen statt Metern Zeiten.
+Inhalt der Box von oben nach unten: Beschriftung „Pace /500 m“, die Pace, Zonenstatus mit Band (z. B. „In der Zone · 2:05–2:10“), eine Trennlinie und die Legende. Die Legende hat eine Zeile pro Spur mit Farbpunkt, Bezeichnung und Restangabe, z. B. „Gesamt 1 460 / 3 000 m“, „Runde 2 von 3 · noch 540 m“, „Tempo · noch 340 m“ bzw. „frei · noch 340 m“. Bei Zeitstrecken stehen statt Metern Zeiten. Die Runde heisst wie bisher „Runde 2 von 3“ bzw. bei offener Rundenzahl „Runde 2“, damit die Spec `course-rowing` gilt.
+
+Was die bisherige Streckenleiste `course_bar.dart` zeigt, wandert in die Pace-Box und die Kacheln (Task 3.3):
+
+| `course_bar.dart` | neu |
+|---|---|
+| Runde („Runde 2 von 3“) | Legende, Zeile der Rundenspur |
+| Zonenname bzw. „frei“ (`segment.zoneName`, ohne Namen „Zone“) | Legende, Zeile der Abschnittsspur |
+| Rest bis Abschnittsende | Legende, Zeile der Abschnittsspur |
+| Pace-Band | Zonenstatus unter der Pace |
+| Schlagzahl-Band | Schlagzahl-Karte |
+| Anteil in der Zone | Kachel „in der Zone“ |
+| Bereich des Abschnitts („200–800 m“) | entfällt, die Abschnittsspur zeigt die Lage |
+
+`ZoneHint` zieht aus `course_bar.dart` in eine eigene Datei, die Datei selbst entfällt.
+
+Berechnung: Eine reine Funktion bildet aus `LapProgress` und der Streckendefinition ein Modell mit den Anteilen der Spuren (0–1), den Grenzen als Anteile (Rundengrenzen auf der Streckenspur, Abschnittsgrenzen auf der Rundenspur) und den Restangaben als Zahlen in der Einheit der Strecke. Die Position in der Runde ist das Abschnittsende minus der Rest. Bei offener Rundenzahl fehlt die Streckenspur im Modell. Formatieren und Übersetzen macht das Widget, damit das Modell ohne `BuildContext` testbar bleibt.
 
 Platz für den Ghost: Der Change `ghost` setzt auf jede Spur ein zweites, kleineres Schiffchen in `ghost` (etwa 18 × 7 px) und eine vierte Zeile in der Legende. Liegen beide Schiffchen übereinander, liegt das des Ghosts oben. Das Widget nimmt dafür optionale Ghost-Positionen pro Spur entgegen.
 
 *Alternative*: drei konzentrische Kreise um die Pace. Im Canvas ausprobiert und verworfen. Die Pace wird im Kreis kleiner, und die Restangaben finden keinen Platz.
 
-### D4: Segmentbalken
+### D4: Ablaufbalken
 
-Ein wiederverwendbares Widget zeigt die Segmente einer Strecke als Balken. Breite heisst Länge, Grau heisst frei, Blau heisst mit Band. Haben mehrere Segmente ein Pace-Band, werden schnellere Bänder heller dargestellt. Die Abstufung reicht von `#2F5577` (langsamstes Band) bis `#A9D3FF` (schnellstes). Haben die Segmente nur ein Schlagzahl-Band, sind sie einheitlich `zoneIn`. Höhe: 8–10 px in Listen, 28 px mit Zonennamen im Strecken-Editor. Die gewählte Zone hat einen Umriss in `text`. Mit `zones` sind die Abschnitte mit Band die eingebauten Zonen, die grauen die freien Lücken.
+Der bestehende `CourseStrip` aus `zones` (`lib/features/courses/course_strip.dart`) wird ausgebaut, statt ein zweites Widget `SegmentBar` zu bauen. Er zeigt die Abschnitte einer Strecke als Balken. Breite heisst Länge, Grau heisst frei, Blau heisst mit Band. Haben mehrere Zonen ein Pace-Band, werden schnellere Bänder heller dargestellt. Die Abstufung reicht von `#2F5577` (langsamstes Band) bis `#A9D3FF` (schnellstes). Haben die Zonen nur ein Schlagzahl-Band, sind sie einheitlich `zoneIn`. Höhe: 8–10 px in Listen, 28 px mit Zonennamen im Strecken-Editor. Die gewählte Zone hat einen Umriss in `text`. Die Abschnitte mit Band sind die eingebauten Zonen, die grauen (`line`) die freien Lücken. Die bestehenden Aufrufe in Streckenliste und Strecken-Editor bleiben und bekommen die neue Darstellung.
 
 ### D5: Segmentlänge ändern (entfällt)
 
@@ -111,12 +130,13 @@ Die manuelle Segmentlänge ersetzt der Change `zones`: Strecken bestehen dort au
 ### D6: Navigation
 
 - Startbildschirm (entschieden 2026-10-16, Mittelweg statt Canvas): oben die Quelle, darunter „Rudern“ und „Frei rudern“, dann die Kachel „Nochmal“ und der Link „Sessions“.
+  - Quelle (vorläufig, 2026-10-16, nach Vorschlag): drei Möglichkeiten, „Rudergerät“, „Simulator“ und „Simulator (FTMS)“. „Rudergerät“ öffnet die Geräteliste aus `device-types`, die PM5 und FTMS-Rudergeräte findet. Die gewählte Quelle gilt für „Rudern“, „Frei rudern“ und „Nochmal“. Der Quellen-Dialog beim Start einer Vorlage (heute in `templates_screen.dart`) entfällt damit. *Alternative*: den Dialog behalten und die Quelle erst beim Start fragen. Verworfen, weil die Quelle im Canvas oben auf dem Startbildschirm steht und am Erg meist gleich bleibt.
   - „Rudern“ öffnet „Vorlage wählen“. „Frei rudern“ startet direkt.
   - „Nochmal“ zeigt die Vorlage der jüngsten Session, deren Vorlage noch existiert, mit Name und Datum der Session („gestern“). Antippen öffnet „Vorlage wählen“ mit dieser Vorlage vorausgewählt. Gibt es keine solche Session, fehlt die Kachel.
   - Keine Kacheln für alle Vorlagen und keine Liste der letzten Sessions: Der Bildschirm bleibt ruhig, und der häufigste Fall, dieselbe Vorlage noch einmal zu rudern, braucht trotzdem nur zwei Tipps.
   - *Alternativen:* wie im Canvas (alle Vorlagen als Kacheln, letzte Sessions) oder ganz schlank (nur Quelle, „Rudern“, „Frei rudern“). Verworfen, weil der Canvas am Erg zu voll ist und die schlanke Variante für die Lieblingsvorlage einen Schritt mehr braucht.
 - „Vorlage wählen“ klappt die gewählte Vorlage auf, mit Bändern, Ghost-Bestzeit (sobald `ghost` da ist) und „Starten“. Der Stift öffnet den Vorlagen-Editor.
-- Der Tab „Strecken“ zeigt die Streckenliste. Eine Strecke öffnet den Strecken-Editor. Der dritte Tab „Zonen“ und „Zone einbauen“ kommen mit `zones`.
+- Die drei Tabs „Vorlagen“, „Strecken“ und „Zonen“ bestehen seit `zones` (`templates_screen.dart`). Dieser Change gestaltet sie nur neu, Aufbau und Navigation bleiben. Eine Strecke öffnet den Strecken-Editor, eine Zone den Zonen-Editor.
 
 ### D7: Ruderblatt-Tasten für Zahlen
 
@@ -131,6 +151,16 @@ Zahlen werden in allen Editoren mit einem Tastenpaar eingestellt, nicht getippt 
 - Blau bleibt für „in der Zone“ reserviert. Darum sind beide Richtungen gleich gefärbt und unterscheiden sich nur durch die Richtung.
 
 *Alternativen*: Textfelder mit Zahlentastatur wie bisher, oder ein Rad zum Drehen. Verworfen: Die Tastatur verdeckt am Handy den halben Editor, und ein Rad ist mit nassen Fingern ungenau.
+
+### D8: Sprachwahl (vorläufig)
+
+Vorläufig entschieden am 2026-10-16, nach Vorschlag: Die Sprachwahl aus `translations` (dort Design D3) bleibt ein Symbol in der App-Leiste des Startbildschirms und öffnet wie heute den Dialog mit den Sprachen. Sie bekommt nur die Gestaltung aus D1 (Symbol in `textMuted`, Touch-Ziel ab 44 px). Der Canvas zeigt keinen Platz dafür.
+
+*Alternativen*: ein eigener Einstellungs-Screen oder ein Eintrag unter dem Link „Sessions“. Verworfen, solange die Sprache die einzige Einstellung ist. Kommen weitere Einstellungen dazu, etwa der Brustgurt aus `heart-rate`, zieht die Sprachwahl in einen Einstellungs-Screen um.
+
+### D9: Texte
+
+Neue und geänderte Texte stehen nur in `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb`, jeder mit `@`-Beschreibung. `make l10n` erzeugt den Code, der eingecheckt wird. Bestehende Schlüssel werden weiterverwendet, wo der Text gleich bleibt. Fest im Code bleiben nur Einheiten, Formate und Eigennamen wie in `translations`.
 
 ## Risks / Trade-offs
 

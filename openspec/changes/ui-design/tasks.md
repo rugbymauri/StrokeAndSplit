@@ -1,36 +1,38 @@
 # Tasks
 
+Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschreibung, danach `make l10n` (Design D9). Das gilt für jeden Task.
+
 ## 1. Grundlagen
 
-- [ ] 1.1 Schriften Barlow Condensed und IBM Plex Sans als Assets einbinden, Lizenzen (OFL) ablegen. Verifikation: `make check` grün, Schriften erscheinen ohne Netz
-- [ ] 1.2 Theme mit den Tokens aus Design D1 (Farben, Schriftstile, Radien, Abstände) in `lib/app`. Bestehende Screens nutzen es. Verifikation: bestehende Widget-Tests grün
-- [ ] 1.3 Widget `SegmentBar` nach Design D4 (Breite, frei/Band, Helligkeit nach Tempo, Auswahl). Verifikation: Widget-Tests für freie Strecke, ein Band und abgestufte Pace-Bänder
+- [x] 1.1 Schriften Barlow Condensed und IBM Plex Sans als Assets einbinden, Lizenzen (OFL) ablegen. Verifikation: `make check` grün, Schriften erscheinen ohne Netz
+- [x] 1.2 Theme mit den Tokens aus Design D1 (Farben, Schriftstile, Radien, Abstände) in `lib/app`. Bestehende Screens nutzen es. Verifikation: bestehende Widget-Tests grün
+- [x] 1.3 `CourseStrip` aus `zones` (`lib/features/courses/course_strip.dart`) nach Design D4 ausbauen statt ein neues Widget `SegmentBar` zu bauen: Tokens, Breite, frei/Zone, Helligkeit nach Tempo, Auswahl, Höhen. Bestehende Aufrufe in Streckenliste und Strecken-Editor bleiben. Verifikation: Widget-Tests für freie Strecke, eine Zone und abgestufte Pace-Bänder
 
-- [ ] 1.4 Widget `OarStepper` nach Design D7 (Ruderblatt-Form, gross und kompakt, Schritt, Grenzen, gesperrte Taste, Wiederholung beim Gedrückthalten, Screenreader-Beschriftung). Verifikation: Widget-Tests für Schritt, Grenze, Gedrückthalten und Semantics
+- [x] 1.4 Widget `OarStepper` nach Design D7 (Ruderblatt-Form, gross und kompakt, Schritt, Grenzen, gesperrte Taste, Wiederholung beim Gedrückthalten, Screenreader-Beschriftung). Verifikation: Widget-Tests für Schritt, Grenze, Gedrückthalten und Semantics
 
 ## 2. Fortschrittsrahmen
 
-- [ ] 2.1 Reine Funktion, die aus Lap-Tracker-Zustand und Vorlage die drei Anteile, die Grenzen und die Restangaben berechnet. Verifikation: Unit-Tests für das Spec-Beispiel 460 m in Runde 2, für eine Zeitstrecke und für offene Rundenzahl
-- [ ] 2.2 `ProgressFrame` als `CustomPainter` nach Design D3: drei Spuren in Boxform, Start oben Mitte, Kerben, gerade Enden, Schiffchen mit Tangente, Farbe der Segmentspur nach Zonenstatus, optionale Ghost-Positionen. Verifikation: Golden-Tests für 0 %, 46 % (Unterkante), 38 % (in einer Ecke) und 100 %, mit und ohne Streckenspur
-- [ ] 2.3 Pace-Box mit Rahmen, Pace, Zonenstatus und Legende. Verifikation: Widget-Tests für in der Zone, zu langsam und freies Segment
+- [x] 2.1 Reine Funktion, die aus Lap-Tracker-Zustand und Vorlage die drei Anteile, die Grenzen (Runden und Abschnitte) und die Restangaben berechnet (Design D3, Berechnung). Verifikation: Unit-Tests für das Spec-Beispiel 460 m in Runde 2, für eine Zeitstrecke und für offene Rundenzahl
+- [x] 2.2 `ProgressFrame` als `CustomPainter` nach Design D3: drei Spuren in Boxform, Start oben Mitte, Kerben, gerade Enden, Schiffchen mit Tangente, Farbe der Abschnittsspur nach Zonenstatus, optionale Ghost-Positionen. Verifikation: Golden-Tests für 0 %, 46 % (Unterkante), 38 % (in einer Ecke) und 100 %, mit und ohne Streckenspur
+- [ ] 2.3 Pace-Box mit Rahmen, Pace, Zonenstatus und Legende mit Zonenname bzw. „frei“ und „Runde 2 von 3“. Verifikation: Widget-Tests für in der Zone, zu langsam, Zone ohne Name und freier Abschnitt
 
 ## 3. Live-Display
 
-- [ ] 3.1 Layout-Wahl nach Seitenverhältnis (Design D2). Verifikation: Widget-Test 1200 × 700 ergibt Querformat, 390 × 844 Hochformat
+- [x] 3.1 Layout-Wahl nach Seitenverhältnis (Design D2). Verifikation: Widget-Test 1200 × 700 ergibt Querformat, 390 × 844 Hochformat
 - [ ] 3.2 Live frei, hoch und quer, nach den Canvas-Screens „Live: freies Rudern“ und „Live quer: freies Rudern“. Fläche für die Kraftkurve vorhanden, ohne Daten ausgeblendet. Verifikation: bestehende Layout-Tests in allen vier Grössen ohne Überlauf
-- [ ] 3.3 Live mit Vorlage, hoch und quer, nach „Live: Vorlage mit Zonen“ und „Live quer: Vorlage mit Zonen“, Schlagzahl-Karte mit Zonenstatus, vier Kacheln. `course_bar.dart` entfällt. Verifikation: Layout-Tests in allen vier Grössen mit Vorlage ohne Überlauf, Pace bleibt der grösste Text
+- [ ] 3.3 Live mit Vorlage, hoch und quer, nach „Live: Vorlage mit Zonen“ und „Live quer: Vorlage mit Zonen“, Schlagzahl-Karte mit Zonenstatus, vier Kacheln. Was `course_bar.dart` zeigt, nach der Tabelle in Design D3 übernehmen, insbesondere Zonenname bzw. „frei“ in die Legende der Pace-Box; `ZoneHint` in eine eigene Datei, danach entfällt `course_bar.dart`. Verifikation: Layout-Tests in allen vier Grössen mit Vorlage ohne Überlauf, Pace bleibt der grösste Text; bestehende Tests zu Runde, Zonenname, „frei“ und Rest auf die Pace-Box umgestellt und grün
 
 ## 4. Vorlagen und Strecken
 
-- [ ] 4.1 Gemeinsamer Screen mit Tabs „Vorlagen“ und „Strecken“ nach „Vorlage wählen“ und „Streckenliste“, aufklappbare Vorlage mit „Starten“. Verifikation: Widget-Tests für Tabwechsel, Auswahl und Start mit dem Simulator
+- [ ] 4.1 Die bestehenden drei Tabs „Vorlagen“, „Strecken“ und „Zonen“ aus `zones` nach „Vorlage wählen“ und „Streckenliste“ gestalten, Aufbau und Navigation bleiben; aufklappbare Vorlage mit „Starten“. Verifikation: bestehende Tests zum Tabwechsel grün, Widget-Tests für Aufklappen, Auswahl und Start mit der gewählten Quelle
 - [ ] 4.2 Vorlagen-Editor nach „Vorlagen-Editor“ (Umschalter feste Anzahl/offen, Zähler, Ergebnis-Zeile). Verifikation: Widget-Tests für feste und offene Rundenzahl
-- [ ] 4.3 Gestaltung der Streckenliste und des Strecken-Kopfs (Name, Achse, Länge, Segmentbalken) nach „Streckenliste“ und „Strecken-Editor“. Einbauen von Zonen und Zonen-Editor setzt der Change `zones` um. Verifikation: Widget-Tests für Streckenliste und Versionierungshinweis
+- [ ] 4.3 Gestaltung der Streckenliste und des Strecken-Kopfs (Name, Achse, Länge, Ablaufbalken) nach „Streckenliste“ und „Strecken-Editor“. Einbauen von Zonen und Zonen-Editor setzt der Change `zones` um. Verifikation: Widget-Tests für Streckenliste und Versionierungshinweis
 
 - [ ] 4.4 Zahlenfelder durch `OarStepper` ersetzen: Rundenzahl im Vorlagen-Editor, Länge im Strecken-Editor, Länge, Pace- und Schlagzahl-Band im Zonen-Editor, Startposition in „Zone einbauen“, mit den Schritten aus D7. Verifikation: bestehende Editor-Tests auf Tippen umgestellt und grün, Widget-Tests für die Spec-Szenarien „Pace-Band anpassen“ und „Zone verschieben“
 
 ## 5. Start und Zusammenfassung
 
-- [ ] 5.1 Startbildschirm nach Design D6 (Quelle, „Rudern“, „Frei rudern“, Kachel „Nochmal“, Link „Sessions“), Gestaltung nach „Start“ im Canvas. Verifikation: Widget-Tests für Simulator wählen, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit vorausgewählter Vorlage, keine Kachel ohne Session und keine Kachel, wenn die Vorlage der jüngsten Session gelöscht ist
+- [ ] 5.1 Startbildschirm nach Design D6 (Quelle mit „Rudergerät“ für PM5 und FTMS, „Simulator“ und „Simulator (FTMS)“, „Rudern“, „Frei rudern“, Kachel „Nochmal“, Link „Sessions“) und Sprachwahl in der App-Leiste nach D8, Gestaltung nach „Start“ im Canvas. Der Quellen-Dialog beim Start einer Vorlage entfällt. Verifikation: Widget-Tests für Simulator und Simulator (FTMS) wählen, Rudergerät öffnet die Geräteliste, Sprachwahl, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit vorausgewählter Vorlage, keine Kachel ohne Session und keine Kachel, wenn die Vorlage der jüngsten Session gelöscht ist
 - [ ] 5.2 Zusammenfassung nach „Zusammenfassung“ mit Rundenbalken für den Anteil in der Zone. Verifikation: Widget-Tests für Distanz- und Zeitstrecke sowie eine freie Session
 
 ## 6. Abschluss

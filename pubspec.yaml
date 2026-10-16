@@ -106,3 +106,18 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  # Bundled so the app looks the same offline (ui-design, Design D1); licences next to the files.
+  fonts:
+    - family: Barlow Condensed
+      fonts:
+        - asset: assets/fonts/BarlowCondensed/BarlowCondensed-Bold.ttf
+          weight: 700
+    - family: IBM Plex Sans
+      fonts:
+        - asset: assets/fonts/IBMPlexSans/IBMPlexSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSans/IBMPlexSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSans/IBMPlexSans-SemiBold.ttf
+          weight: 600

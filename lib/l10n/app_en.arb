@@ -193,5 +193,9 @@
   "invalidPace": "The pace “{text}” is not valid.",
   "invalidStrokeRate": "The stroke rate “{text}” is not valid.",
   "dateTimePattern": "MMM d, y, HH:mm",
-  "actionOk": "OK"
+  "actionOk": "OK",
+  "oarStepperMore": "{step} more",
+  "oarStepperLess": "{step} less",
+  "stepSeconds": "{seconds, plural, =1{1 second} other{{seconds} seconds}}",
+  "stepStrokes": "{strokes, plural, =1{1 stroke} other{{strokes} strokes}}"
 }
