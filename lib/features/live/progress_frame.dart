@@ -42,9 +42,6 @@ class ProgressFrame extends StatelessWidget {
   }
 }
 
-// Not in the token table of D1: the empty segment track, tinted blue.
-const _segmentTrack = Color(0xFF1B3550);
-
 /// Paints the box and its tracks. Each track starts at the top centre and
 /// runs clockwise; positions are arc lengths, so equal shares are equally long.
 class ProgressFramePainter extends CustomPainter {
@@ -77,7 +74,7 @@ class ProgressFramePainter extends CustomPainter {
     final tracks = [
       if (model.course case final course?) (course, AppColors.track, AppColors.text, ghost?.course),
       (model.lap, AppColors.track, AppColors.textMuted, ghost?.lap),
-      (model.segment, _segmentTrack, segmentColor(pace), ghost?.segment),
+      (model.segment, AppColors.trackInner, segmentColor(pace), ghost?.segment),
     ];
     final metrics = [
       for (var i = 0; i < tracks.length; i++) _outline(box, trackWidth / 2 + i * (trackWidth + trackGap)),
@@ -93,6 +90,8 @@ class ProgressFramePainter extends CustomPainter {
       if (track.share > 0) canvas.drawPath(metric.extractPath(0, track.share * metric.length), stroke..color = filled);
     }
     for (var i = 0; i < tracks.length; i++) {
+      // Course and lap track mark their start; the segment track is the last one.
+      if (i < tracks.length - 1) _notch(canvas, metrics[i], 0);
       for (final boundary in tracks[i].$1.boundaries) {
         _notch(canvas, metrics[i], boundary);
       }

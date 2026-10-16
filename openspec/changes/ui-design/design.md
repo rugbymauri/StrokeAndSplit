@@ -50,6 +50,7 @@ Farben:
 | `surface` | `#161B20` | Karten, Kacheln |
 | `line` | `#2A3138` | Rahmen, Trennlinien, freie Abschnitte |
 | `track` | `#242B32` | leere Fortschrittsspur |
+| `trackInner` | `#1B3550` | leere innere Spur (Abschnitt), leicht blau getönt |
 | `text` | `#E8ECEF` | Text, Zahlen, primärer Button |
 | `textMuted` | `#9AA4AD` | Beschriftungen |
 | `zoneIn` | `#5AB0FF` | in der Zone, Zone mit Band |
@@ -89,8 +90,8 @@ Der Rahmen der Pace-Box besteht aus drei ineinanderliegenden Spuren in der Form 
 | Runde | Mitte | `textMuted` | Position in der aktuellen Runde / Streckenlänge |
 | Abschnitt | innen | `zoneIn` bzw. `zoneOut` | Position im aktuellen Abschnitt / Abschnittslänge |
 
-- Jede Spur beginnt oben in der Mitte und läuft im Uhrzeigersinn. Die leere Spur ist in `track` sichtbar, die innere leere Spur leicht blau getönt.
-- Kerben in der Farbe der Box markieren auf der Streckenspur die Rundengrenzen und auf der Rundenspur die Abschnittsgrenzen.
+- Jede Spur beginnt oben in der Mitte und läuft im Uhrzeigersinn. Die leere Spur ist in `track` sichtbar, die innere leere Spur in `trackInner`.
+- Kerben in der Farbe der Box markieren auf der Streckenspur die Rundengrenzen und auf der Rundenspur die Abschnittsgrenzen. Strecken- und Rundenspur haben zusätzlich oben in der Mitte eine Kerbe am Start.
 - Die gefüllte Spur endet gerade. An ihrer Spitze sitzt ein Schiffchen in der Farbe der Spur, eine Raute von etwa 22 × 14 px mit 2 px dunklem Rand. Es ist breiter als die Spur (10 px), damit es auf der gefüllten Spur sichtbar bleibt. Das Schiffchen folgt der Laufrichtung und dreht sich in den Ecken mit der Tangente.
 - Die Farbe der Abschnittsspur folgt dem Zonenstatus der Pace. In einem freien Abschnitt und in einer Zone ohne Pace-Band ist sie `textMuted`.
 - Bei offener Rundenzahl entfällt die Streckenspur, weil die Gesamtlänge unbekannt ist. Die Rundenspur rückt nach aussen.

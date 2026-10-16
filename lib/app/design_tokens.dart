@@ -14,6 +14,9 @@ abstract final class AppColors {
   /// Empty progress track.
   static const track = Color(0xFF242B32);
 
+  /// Empty inner progress track (segment), tinted blue.
+  static const trackInner = Color(0xFF1B3550);
+
   /// Text, numbers and the primary button.
   static const text = Color(0xFFE8ECEF);
 
