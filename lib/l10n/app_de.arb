@@ -578,10 +578,6 @@
   "@summaryTitle": {
     "description": "Summary: title above the totals of a session"
   },
-  "summaryInZone": "In der Zone",
-  "@summaryInZone": {
-    "description": "Summary: label of the share of time within the bands over all laps"
-  },
   "summaryLaps": "Runden",
   "@summaryLaps": {
     "description": "Summary: heading above the laps, written in capitals"

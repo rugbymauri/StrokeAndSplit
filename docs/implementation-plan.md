@@ -9,7 +9,7 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `device-types` und `translations`; Change `statistics` geplant.
+Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `device-types` und `translations`; Change `statistics` geplant; Change `gitlab-pipeline` geplant.
 
 ## Überblick
 
@@ -23,6 +23,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 6 | `statistics` | 6/12 | Gruppe 1 in `main`, Rest nach 3 | – |
 | 7 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 3 und 6 |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
+| 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
 
 ## Warum diese Reihenfolge
 
@@ -34,6 +35,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 6. **`statistics`** hängt an keinem offenen Change: Die Ranglisten werden aus den Runden aus `courses` und `zones` berechnet. Er kann auch vor `ui-design` kommen, dann gestaltet `ui-design` die neuen Elemente mit.
 7. **`ghost`** braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`, denn der Ghost ist Platz 1.
 8. **`rename-stroke-and-split`** zuletzt, damit nicht jeder Change auf halbem Weg die Namen wechselt. Nach `translations` steht der Anzeigename an einer Stelle in den ARB-Dateien.
+9. **`gitlab-pipeline`** hängt an keinem Change und ändert kein App-Verhalten. Er kann parallel laufen. Kommt er vor `rename-stroke-and-split`, stellt der Rename die Namen in CI mit um.
 
 ## Changes
 
@@ -121,8 +123,8 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Task 3.2/3.3 Live-Display hoch und quer, frei (`live_free.dart`) und mit Vorlage (`live_course.dart`, Pace-Box, Schlagzahl-Karte, Kacheln); `course_bar.dart` und `courseLapOf` entfallen, `ZoneHint` in `zone_hint.dart`, Zonenstatus grossgeschrieben (Nutzer). Fläche für die Kraftkurve vorhanden, ohne Daten ausgeblendet. Vorläufig: andere Werte höchstens 80 % der Pace-Grösse; mit Vorlage entfallen Zeit/Distanz (Legende „Gesamt“); quer kurzer Button „Beenden“; Kopfzeile des Canvas („PM5 verbunden · Frei“) nicht umgesetzt. Für 6.1: 640 × 480 kürzt die Legende; `LiveLayoutBuilder` ungenutzt.
 - [x] Task 2.3 `PaceBox` in `lib/features/live/pace_box.dart`, Legende „Runde 2 / 3“ mit MODIFIED-Delta zu `course-rowing`. Bis 3.3 zeigt `course_bar.dart` noch „Runde 2 von 3“ (`courseLapOf` entfällt mit 3.3). Vorläufig: unter 260 px Höhe wird der Inhalt verkleinert (auf dem Gerät prüfen, 6.1); Zonenstatus „in der Zone“ klein wie bisher.
 - [x] Task 5.1 „Geräte wählen“ (`choose_devices_screen.dart`, gemerktes Rudergerät in `rower_choice.dart`, `LaunchScreen` sucht es bis 10 s) und Startbildschirm mit Gerätezeile, „Rudern“, „Frei rudern“, „Nochmal“, „Sessions“; Quellen-Dialog beim Vorlagenstart entfernt. Vorläufig: „Nochmal“ fällt auf eine ältere Session zurück, wenn die Vorlage der jüngsten gelöscht ist; Pulsgurt-Bereich fehlt bis `heart-rate`. Nur am Gerät prüfbar: Wiederverbinden per ID ohne Scan (BlueZ), 10-s-Suche mit PM5/FTMS, Bluetooth aus beim Start.
-- [x] Task 5.2 Zusammenfassung nach Canvas (`session_summary_screen.dart`), Platz für die Marken aus `statistics` rechts der Runden und neben dem Titel. Vorläufig: Anteil in der Zone der Session aus den Runden nach Dauer gewichtet (Näherung); Kopf mit Vorlage und Quelle; Schläge als vierter Durchschnittswert; beste Runde mit Stern; „Fertig“ schliesst nur die Zusammenfassung. Offen: „Fertig“ zum Startbildschirm? Anteil exakt über die Abschnitte?
-- [x] Task 4.2 Vorlagen-Editor (Umschalter „Feste Anzahl“/„Offen bis Stopp“, Runden mit `OarStepper`, Ergebnis-Zeile ohne Zeitschätzung) und 4.4 Zahlenfelder als `OarStepper` in Strecken-, Zonen-Editor und „Zone einbauen“; `OarStepper.background` für Karten. Vorläufig: Startwerte neue Strecke 2000 m bzw. 4:00, neue Zone 100 m bzw. 1:00 mit Pace-Band 2:00–2:05 (Schlagzahl-Band aus, sonst 24–26); Grenzen Pace 1:00–5:00, Schlagzahl 10–60, Runden bis 99; Texte aus dem Canvas („Pace-Band“, „Schnellste“ …).
+- [x] Task 5.2 Zusammenfassung nach Canvas (`session_summary_screen.dart`), Platz für die Marken aus `statistics` rechts der Runden und neben dem Titel. Entschieden (Nutzer, 2026-10-16): kein Anteil in der Zone für die ganze Session, nur pro Runde; „Fertig“ nach einer Session trennt und führt zum Startbildschirm. Vorläufig: Kopf mit Vorlage und Quelle; Schläge als vierter Durchschnittswert; beste Runde mit Stern.
+- [x] Task 4.2 Vorlagen-Editor (Umschalter „Feste Anzahl“/„Offen bis Stopp“, Runden mit `OarStepper`, Ergebnis-Zeile ohne Zeitschätzung) und 4.4 Zahlenfelder als `OarStepper` in Strecken-, Zonen-Editor und „Zone einbauen“; `OarStepper.background` für Karten. Entschieden (Nutzer, 2026-10-16): Pace-Band einer neuen Zone startet bei 2:45–2:50; Grenzen Pace 1:00–5:00, Schlagzahl 10–60, Runden bis 99. Vorläufig: Startwerte neue Strecke 2000 m bzw. 4:00, neue Zone 100 m bzw. 1:00 (Schlagzahl-Band aus, sonst 24–26); Texte aus dem Canvas („Pace-Band“, „Schnellste“ …).
 - [x] Task 4.3 Streckenliste (Karte mit Balken, „12× gerudert“, Legende) und Strecken-Kopf (Achse/Länge nebeneinander, Positionen am grossen Balken, Abschnitte als Karte, Versionierungshinweis); `courseRowCountsProvider` zählt Sessions pro Strecke. Vorläufig: Antippen im Balken öffnet „Zone verschieben“ bzw. „Zone einbauen“ an der Lücke; Liste zählt alle Versionen, Hinweis nur die neueste (Simulator zählt mit); Hinweistext wörtlich aus dem Canvas; Button „Strecke anlegen“.
 - [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Primärfarbe Blau `zoneIn` (Nutzer, 2026-10-16), gefüllter Button bleibt `text` wie im Canvas. Vorläufig: Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`).
 
@@ -177,6 +179,17 @@ Vor dem Start:
 - [ ] Entscheide F9, F10.
 - [ ] Domains sichern, Markenrecherche (Swissreg, EUIPO, USPTO). Ausserhalb der App, durch den Nutzer.
 - [ ] Neue App-ID ist unter Android eine neue App: Umzug per Export/Import im README beschreiben (Task im Change).
+- [ ] Ist `gitlab-pipeline` schon umgesetzt: `APP_NAME` in `.gitlab-ci.yml`, Default in `tool/build_appimage.sh` und `linux/packaging/app.desktop.in` (`Name`, `StartupWMClass`) mit umstellen (Design D9 von `gitlab-pipeline`). Task in `tasks.md` ergänzen.
+
+### 9. `gitlab-pipeline`: Tests in CI, Releases mit APK und AppImage
+
+Ziel: `make check` in jeder MR und auf `main`. Ein Tag `vX.Y.Z` auf `main` erzeugt ein GitLab-Release mit einer debug-signierten Universal-APK und einem Linux-AppImage (x86_64), gebaut in Docker-Images (`cirruslabs/flutter`). Version aus dem Tag, Versionscode `CI_PIPELINE_IID`, Downloads in der Generic Package Registry.
+
+Vor dem Start:
+- [ ] Task 1.1: Gibt es den Image-Tag `ghcr.io/cirruslabs/flutter:3.47.7`? Beim Planen nicht bestätigt, Fallback in Design D1.
+- [ ] Task 2.2 (Nutzer, in GitLab): Debug-Keystore als protected File-Variable `ANDROID_DEBUG_KEYSTORE`, `v*` als geschützten Tag einrichten.
+
+Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwechsel am besten zusammen mit der neuen App-ID aus `rename-stroke-and-split`), eigenes Logo statt des Platzhalter-Icons.
 
 ## Offene Entscheide
 
@@ -198,6 +211,7 @@ Vor dem Start:
 | ~~F14~~ | Sprachwahl: **in der App** (2026-10-16), Start auf Deutsch, Systemsprache wird nicht beachtet | translations | entschieden |
 | F15 | Schweizer Rechtschreibung (`ss` statt `ß`, wie heute im Code) als `de`? **Vorläufig ja** (2026-10-16, nach Vorschlag) | translations | vorläufig entschieden |
 | F16 | Wo wird die gewählte Sprache gespeichert? **Vorläufig `shared_preferences`** (2026-10-16, nach Vorschlag): keine Migration, `heart-rate` bleibt Schema 5 | translations, heart-rate | vorläufig entschieden |
+| F17 | Release nur für Tags auf `main`? **Vorläufig ja** (2026-10-16, nach Vorschlag): Tags ausserhalb von `main` lassen `verify-tag` fehlschlagen | gitlab-pipeline | gitlab-pipeline |
 
 ## Offene Punkte
 
