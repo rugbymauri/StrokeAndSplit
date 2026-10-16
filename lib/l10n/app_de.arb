@@ -435,6 +435,10 @@
   "@liveStopShort": {
     "description": "Live display in landscape on a template: short button that ends the recorded session"
   },
+  "liveReadyForFirstStroke": "Bereit – startet mit dem ersten Schlag",
+  "@liveReadyForFirstStroke": {
+    "description": "Live display on a template: notice while the session waits for the first stroke to start"
+  },
   "liveForceCurve": "Kraftkurve",
   "@liveForceCurve": {
     "description": "Live display: title of the force curve of the last stroke"

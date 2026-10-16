@@ -23,6 +23,7 @@ import 'live_course.dart';
 import 'live_free.dart';
 import 'live_status.dart';
 import 'progress_frame.dart';
+import 'ready_hint.dart';
 
 /// After this long without data the shown values are marked as outdated.
 const staleAfter = Duration(seconds: 3);
@@ -31,7 +32,7 @@ const staleAfter = Duration(seconds: 3);
 class LiveScreen extends ConsumerStatefulWidget {
   const LiveScreen({super.key, this.template});
 
-  /// Started as a session as soon as the source is connected.
+  /// Made ready as a session as soon as the source is connected; it starts with the first stroke.
   final SessionTemplate? template;
 
   @override
@@ -224,6 +225,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
             children: [
               const ConnectionNotice(),
               const HeartRateNotice(),
+              if (recording?.ready ?? false) const ReadyHint(),
               if (_stale && connected)
                 MaterialBanner(
                   content: Text(context.l10n.liveStale),
