@@ -14,15 +14,19 @@ Läuft eine Vorlage mit Ghost, SHALL der Fortschrittsrahmen auf jeder Spur, für
 - **THEN** zeigt nur die Rundenspur ein Ghost-Schiffchen
 
 ### Requirement: Abstand zum Ghost anzeigen
-Läuft eine Vorlage mit Ghost, SHALL die Pace-Box den Abstand zum Ghost in Metern und Sekunden zeigen und kennzeichnen, ob der Nutzer vorne oder hinten liegt, nicht allein über Farbe.
+Läuft auf der Streckenspur ein Ghost, SHALL die Pace-Box den Abstand zu diesem Ghost der Vorlage zeigen: auf einer Distanzachse in Sekunden, auf einer Zeitachse in Metern. Sie MUST kennzeichnen, ob der Nutzer vorne oder hinten liegt, nicht allein über Farbe. Läuft auf der Streckenspur kein Ghost, MUST die Box keinen Abstand zeigen.
 
-#### Scenario: Rückstand
-- **WHEN** der Ghost 30 m vor dem Nutzer liegt
-- **THEN** zeigt die Box „30 m vor dir“ mit dem Zeitabstand und markiert den Rückstand
+#### Scenario: Rückstand auf einer Distanzachse
+- **WHEN** der Ghost der Vorlage die aktuelle Distanz des Nutzers 7.6 s früher erreicht hat
+- **THEN** zeigt die Box „7.6 s vor dir“ und markiert den Rückstand
 
-#### Scenario: Vorsprung
-- **WHEN** der Nutzer 12 m vor dem Ghost liegt
-- **THEN** zeigt die Box „12 m hinter dir“ mit dem Zeitabstand und markiert den Vorsprung
+#### Scenario: Vorsprung auf einer Zeitachse
+- **WHEN** der Nutzer zur gleichen Zeit 12 m weiter ist als der Ghost der Vorlage
+- **THEN** zeigt die Box „12 m hinter dir“ und markiert den Vorsprung
+
+#### Scenario: Kein Ghost der Vorlage
+- **WHEN** die Vorlage eine offene Rundenzahl hat
+- **THEN** zeigt die Box keinen Abstand, und die Rundenspur zeigt trotzdem den Ghost der besten Runde
 
 ### Requirement: Platz 1 ist der Ghost
 Der Ghost jeder Spur SHALL der Eintrag auf Platz 1 der Rangliste dieser Ebene sein: aussen die Rangliste der Vorlage, in der Mitte die der Strecke und innen die der Zone des aktuellen Abschnitts. Der Ghost der Runde MUST mit jeder Runde neu starten, der Ghost der Zone mit jeder Fahrt durch die Zone. Hat eine Ebene keine Rangliste oder noch keinen Eintrag, MUST auf ihrer Spur kein Ghost laufen.
