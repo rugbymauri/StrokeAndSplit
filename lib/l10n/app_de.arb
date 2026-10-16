@@ -718,5 +718,169 @@
   "templateLaps": "Runden",
   "@templateLaps": {
     "description": "Template editor: label of the number of laps"
+  },
+  "coursesTitle": "Strecken",
+  "@coursesTitle": {
+    "description": "Courses: title"
+  },
+  "coursesEmpty": "Noch keine Strecken angelegt.",
+  "@coursesEmpty": {
+    "description": "Courses: there is no course"
+  },
+  "coursesLoadFailed": "Strecken konnten nicht geladen werden: {error}",
+  "@coursesLoadFailed": {
+    "description": "Courses: loading failed; error is the technical error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "courseDeleteTitle": "Strecke löschen?",
+  "@courseDeleteTitle": {
+    "description": "Courses: title of the delete confirmation"
+  },
+  "courseDeleteBody": "„{name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten ihre Runden.",
+  "@courseDeleteBody": {
+    "description": "Courses: delete confirmation; name is the course",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "courseDeleteTemplates": "Diese Vorlagen verwenden die Strecke und werden mitgelöscht: {templates}.",
+  "@courseDeleteTemplates": {
+    "description": "Courses: templates deleted with the course; templates is a list of quoted names",
+    "placeholders": {
+      "templates": {
+        "type": "String"
+      }
+    }
+  },
+  "courseNew": "Neue Strecke",
+  "@courseNew": {
+    "description": "Course editor: title for a new course"
+  },
+  "courseEdit": "Strecke bearbeiten",
+  "@courseEdit": {
+    "description": "Course editor: title for an existing course"
+  },
+  "courseNameMissing": "Der Name fehlt.",
+  "@courseNameMissing": {
+    "description": "Course editor: the course has no name"
+  },
+  "courseLengthFirst": "Gib zuerst die Länge der Strecke ein.",
+  "@courseLengthFirst": {
+    "description": "Course editor: a zone is placed before the length is known"
+  },
+  "courseLengthHint": "Gib eine Länge ein, um Zonen einzubauen.",
+  "@courseLengthHint": {
+    "description": "Course editor: shown instead of the parts while there is no length"
+  },
+  "courseSequence": "Ablauf",
+  "@courseSequence": {
+    "description": "Course editor: heading above the parts of the course"
+  },
+  "coursePlaceZone": "Zone einbauen",
+  "@coursePlaceZone": {
+    "description": "Course editor: button and dialog title to place a zone"
+  },
+  "courseMoveZone": "Zone verschieben",
+  "@courseMoveZone": {
+    "description": "Course editor: dialog title to move a placed zone"
+  },
+  "coursePlaceHere": "Hier eine Zone einbauen",
+  "@coursePlaceHere": {
+    "description": "Course editor: tooltip on a free part"
+  },
+  "courseRemoveZone": "Zone entfernen",
+  "@courseRemoveZone": {
+    "description": "Course editor: tooltip on a placed zone"
+  },
+  "coursePlace": "Einbauen",
+  "@coursePlace": {
+    "description": "Place dialog: button that places the zone"
+  },
+  "courseMove": "Verschieben",
+  "@courseMove": {
+    "description": "Place dialog: button that moves the zone"
+  },
+  "courseNoZones": "Noch keine Zonen angelegt. Lege zuerst eine an.",
+  "@courseNoZones": {
+    "description": "Place dialog: there is no zone"
+  },
+  "zoneCreate": "Neue Zone anlegen",
+  "@zoneCreate": {
+    "description": "Place dialog: button that creates a zone"
+  },
+  "courseStart": "Start ({unit})",
+  "@courseStart": {
+    "description": "Place dialog: label of the start; unit is 'm' or 'm:ss'",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "courseRange": "Strecke: {range}",
+  "@courseRange": {
+    "description": "Place dialog: the range of the course, e.g. '0–2000 m'",
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "coursePlacedAt": "„{zone}“ liegt bei {range}.",
+  "@coursePlacedAt": {
+    "description": "Place dialog: where the zone would lie, e.g. '500–600 m'",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "courseOtherAxis": "andere Achse",
+  "@courseOtherAxis": {
+    "description": "Place dialog: the zone is measured in time on a distance course or the other way round"
+  },
+  "axisDistance": "Distanz",
+  "@axisDistance": {
+    "description": "Courses and zones measured in metres"
+  },
+  "axisTime": "Zeit",
+  "@axisTime": {
+    "description": "Courses and zones measured in time"
+  },
+  "fieldLength": "Länge ({unit})",
+  "@fieldLength": {
+    "description": "Label of the length; unit is 'm' or 'm:ss'",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidLength": "Die Länge „{text}“ ist ungültig.",
+  "@invalidLength": {
+    "description": "Editors: the length typed cannot be read",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidStart": "Der Start „{text}“ ist ungültig.",
+  "@invalidStart": {
+    "description": "Place dialog: the start typed cannot be read",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
   }
 }

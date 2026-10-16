@@ -11,9 +11,9 @@ String formatPaceBound(int centiseconds) {
   return tenths % 10 == 0 ? text : '$text.${tenths % 10}';
 }
 
-/// The bands of a segment, e.g. `2:05–2:10 · 20–22 spm`, or `frei`.
+/// The bands of a zone's segment, e.g. `2:05–2:10 · 20–22 spm`; empty for a
+/// free part.
 String formatSegmentBands(CourseSegment segment) {
-  if (segment.isFree) return 'frei';
   return [
     if (segment.hasPaceBand) '${formatPaceBound(segment.paceFastCs!)}–${formatPaceBound(segment.paceSlowCs!)}',
     if (segment.hasSpmBand) '${segment.spmMin}–${segment.spmMax} spm',

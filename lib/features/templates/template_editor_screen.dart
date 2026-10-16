@@ -88,7 +88,7 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
                 decoration: InputDecoration(labelText: l10n.templateCourse),
                 items: [
                   for (final c in courses)
-                    DropdownMenuItem(value: c.id, child: Text('${c.name} · ${courseSummary(c)}')),
+                    DropdownMenuItem(value: c.id, child: Text('${c.name} · ${courseSummary(l10n, c)}')),
                 ],
                 onChanged: (id) => setState(() => _courseId = id),
               ),

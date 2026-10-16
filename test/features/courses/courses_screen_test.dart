@@ -299,6 +299,23 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
+  testWidgets('shows the editor in English', (tester) async {
+    final setup = _Setup();
+    await setup.pump(tester, home: const CourseEditorScreen(), locale: const Locale('en'));
+
+    expect(find.text('New course'), findsOneWidget);
+    expect(find.text('Distance'), findsOneWidget);
+    expect(find.text('Length (m)'), findsOneWidget);
+    expect(find.text('Enter a length to place zones.'), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('course-length')), '2x');
+    await tester.tap(find.byTooltip('Save'));
+    await setup.settle(tester);
+
+    expect(find.text('The name is missing.'), findsOneWidget);
+    expect(find.text('The length “2x” is not valid.'), findsOneWidget);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
   testWidgets('renames a course', (tester) async {
     final setup = _Setup();
     await tester.runAsync(

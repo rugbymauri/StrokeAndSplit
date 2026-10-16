@@ -948,6 +948,180 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Runden'**
   String get templateLaps;
+
+  /// Courses: title
+  ///
+  /// In de, this message translates to:
+  /// **'Strecken'**
+  String get coursesTitle;
+
+  /// Courses: there is no course
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Strecken angelegt.'**
+  String get coursesEmpty;
+
+  /// Courses: loading failed; error is the technical error
+  ///
+  /// In de, this message translates to:
+  /// **'Strecken konnten nicht geladen werden: {error}'**
+  String coursesLoadFailed(String error);
+
+  /// Courses: title of the delete confirmation
+  ///
+  /// In de, this message translates to:
+  /// **'Strecke löschen?'**
+  String get courseDeleteTitle;
+
+  /// Courses: delete confirmation; name is the course
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten ihre Runden.'**
+  String courseDeleteBody(String name);
+
+  /// Courses: templates deleted with the course; templates is a list of quoted names
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: {templates}.'**
+  String courseDeleteTemplates(String templates);
+
+  /// Course editor: title for a new course
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Strecke'**
+  String get courseNew;
+
+  /// Course editor: title for an existing course
+  ///
+  /// In de, this message translates to:
+  /// **'Strecke bearbeiten'**
+  String get courseEdit;
+
+  /// Course editor: the course has no name
+  ///
+  /// In de, this message translates to:
+  /// **'Der Name fehlt.'**
+  String get courseNameMissing;
+
+  /// Course editor: a zone is placed before the length is known
+  ///
+  /// In de, this message translates to:
+  /// **'Gib zuerst die Länge der Strecke ein.'**
+  String get courseLengthFirst;
+
+  /// Course editor: shown instead of the parts while there is no length
+  ///
+  /// In de, this message translates to:
+  /// **'Gib eine Länge ein, um Zonen einzubauen.'**
+  String get courseLengthHint;
+
+  /// Course editor: heading above the parts of the course
+  ///
+  /// In de, this message translates to:
+  /// **'Ablauf'**
+  String get courseSequence;
+
+  /// Course editor: button and dialog title to place a zone
+  ///
+  /// In de, this message translates to:
+  /// **'Zone einbauen'**
+  String get coursePlaceZone;
+
+  /// Course editor: dialog title to move a placed zone
+  ///
+  /// In de, this message translates to:
+  /// **'Zone verschieben'**
+  String get courseMoveZone;
+
+  /// Course editor: tooltip on a free part
+  ///
+  /// In de, this message translates to:
+  /// **'Hier eine Zone einbauen'**
+  String get coursePlaceHere;
+
+  /// Course editor: tooltip on a placed zone
+  ///
+  /// In de, this message translates to:
+  /// **'Zone entfernen'**
+  String get courseRemoveZone;
+
+  /// Place dialog: button that places the zone
+  ///
+  /// In de, this message translates to:
+  /// **'Einbauen'**
+  String get coursePlace;
+
+  /// Place dialog: button that moves the zone
+  ///
+  /// In de, this message translates to:
+  /// **'Verschieben'**
+  String get courseMove;
+
+  /// Place dialog: there is no zone
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Zonen angelegt. Lege zuerst eine an.'**
+  String get courseNoZones;
+
+  /// Place dialog: button that creates a zone
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Zone anlegen'**
+  String get zoneCreate;
+
+  /// Place dialog: label of the start; unit is 'm' or 'm:ss'
+  ///
+  /// In de, this message translates to:
+  /// **'Start ({unit})'**
+  String courseStart(String unit);
+
+  /// Place dialog: the range of the course, e.g. '0–2000 m'
+  ///
+  /// In de, this message translates to:
+  /// **'Strecke: {range}'**
+  String courseRange(String range);
+
+  /// Place dialog: where the zone would lie, e.g. '500–600 m'
+  ///
+  /// In de, this message translates to:
+  /// **'„{zone}“ liegt bei {range}.'**
+  String coursePlacedAt(String zone, String range);
+
+  /// Place dialog: the zone is measured in time on a distance course or the other way round
+  ///
+  /// In de, this message translates to:
+  /// **'andere Achse'**
+  String get courseOtherAxis;
+
+  /// Courses and zones measured in metres
+  ///
+  /// In de, this message translates to:
+  /// **'Distanz'**
+  String get axisDistance;
+
+  /// Courses and zones measured in time
+  ///
+  /// In de, this message translates to:
+  /// **'Zeit'**
+  String get axisTime;
+
+  /// Label of the length; unit is 'm' or 'm:ss'
+  ///
+  /// In de, this message translates to:
+  /// **'Länge ({unit})'**
+  String fieldLength(String unit);
+
+  /// Editors: the length typed cannot be read
+  ///
+  /// In de, this message translates to:
+  /// **'Die Länge „{text}“ ist ungültig.'**
+  String invalidLength(String text);
+
+  /// Place dialog: the start typed cannot be read
+  ///
+  /// In de, this message translates to:
+  /// **'Der Start „{text}“ ist ungültig.'**
+  String invalidStart(String text);
 }
 
 class _AppLocalizationsDelegate

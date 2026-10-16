@@ -520,4 +520,109 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get templateLaps => 'Laps';
+
+  @override
+  String get coursesTitle => 'Courses';
+
+  @override
+  String get coursesEmpty => 'No courses yet.';
+
+  @override
+  String coursesLoadFailed(String error) {
+    return 'Courses could not be loaded: $error';
+  }
+
+  @override
+  String get courseDeleteTitle => 'Delete course?';
+
+  @override
+  String courseDeleteBody(String name) {
+    return '“$name” disappears from the list. Sessions already rowed keep their laps.';
+  }
+
+  @override
+  String courseDeleteTemplates(String templates) {
+    return 'These templates use the course and are deleted with it: $templates.';
+  }
+
+  @override
+  String get courseNew => 'New course';
+
+  @override
+  String get courseEdit => 'Edit course';
+
+  @override
+  String get courseNameMissing => 'The name is missing.';
+
+  @override
+  String get courseLengthFirst => 'Enter the length of the course first.';
+
+  @override
+  String get courseLengthHint => 'Enter a length to place zones.';
+
+  @override
+  String get courseSequence => 'Sequence';
+
+  @override
+  String get coursePlaceZone => 'Place zone';
+
+  @override
+  String get courseMoveZone => 'Move zone';
+
+  @override
+  String get coursePlaceHere => 'Place a zone here';
+
+  @override
+  String get courseRemoveZone => 'Remove zone';
+
+  @override
+  String get coursePlace => 'Place';
+
+  @override
+  String get courseMove => 'Move';
+
+  @override
+  String get courseNoZones => 'No zones yet. Create one first.';
+
+  @override
+  String get zoneCreate => 'New zone';
+
+  @override
+  String courseStart(String unit) {
+    return 'Start ($unit)';
+  }
+
+  @override
+  String courseRange(String range) {
+    return 'Course: $range';
+  }
+
+  @override
+  String coursePlacedAt(String zone, String range) {
+    return '“$zone” lies at $range.';
+  }
+
+  @override
+  String get courseOtherAxis => 'other axis';
+
+  @override
+  String get axisDistance => 'Distance';
+
+  @override
+  String get axisTime => 'Time';
+
+  @override
+  String fieldLength(String unit) {
+    return 'Length ($unit)';
+  }
+
+  @override
+  String invalidLength(String text) {
+    return 'The length “$text” is not valid.';
+  }
+
+  @override
+  String invalidStart(String text) {
+    return 'The start “$text” is not valid.';
+  }
 }

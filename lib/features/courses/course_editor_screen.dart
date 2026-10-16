@@ -56,7 +56,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
   Future<void> _place({int? index, int? start}) async {
     final length = _lengthValue;
     if (length == null || length <= 0) {
-      setState(() => _errors = ['Gib zuerst die Länge der Strecke ein.']);
+      setState(() => _errors = [context.l10n.courseLengthFirst]);
       return;
     }
     final placement = await showDialog<ZonePlacement>(
@@ -84,13 +84,13 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = context.l10n;
     final errors = <String>[];
     final name = _name.text.trim();
-    if (name.isEmpty) errors.add('Der Name fehlt.');
+    if (name.isEmpty) errors.add(l10n.courseNameMissing);
     final lengthText = _length.text.trim();
-    if (lengthText.isNotEmpty && _lengthValue == null) errors.add('Die Länge „$lengthText“ ist ungültig.');
+    if (lengthText.isNotEmpty && _lengthValue == null) errors.add(l10n.invalidLength(lengthText));
     final layout = _layout(_zones);
-    final l10n = context.l10n;
     if (_lengthValue != null || lengthText.isEmpty) {
       errors.addAll([for (final e in layout.errors) placementErrorText(l10n, e)]);
     }
@@ -117,11 +117,12 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     final unit = _axis == CourseAxis.distance ? 'm' : 'm:ss';
     final layout = _layout(zones);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isNew ? 'Neue Strecke' : 'Strecke bearbeiten'),
-        actions: [IconButton(tooltip: 'Speichern', icon: const Icon(Icons.check), onPressed: _save)],
+        title: Text(_isNew ? l10n.courseNew : l10n.courseEdit),
+        actions: [IconButton(tooltip: l10n.actionSave, icon: const Icon(Icons.check), onPressed: _save)],
       ),
       body: Center(
         child: ConstrainedBox(
@@ -133,13 +134,21 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
               TextField(
                 key: const Key('course-name'),
                 controller: _name,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: l10n.fieldName),
               ),
               const SizedBox(height: 16),
               SegmentedButton<CourseAxis>(
-                segments: const [
-                  ButtonSegment(value: CourseAxis.distance, label: Text('Distanz'), icon: Icon(Icons.straighten)),
-                  ButtonSegment(value: CourseAxis.time, label: Text('Zeit'), icon: Icon(Icons.timer_outlined)),
+                segments: [
+                  ButtonSegment(
+                    value: CourseAxis.distance,
+                    label: Text(l10n.axisDistance),
+                    icon: const Icon(Icons.straighten),
+                  ),
+                  ButtonSegment(
+                    value: CourseAxis.time,
+                    label: Text(l10n.axisTime),
+                    icon: const Icon(Icons.timer_outlined),
+                  ),
                 ],
                 selected: {_axis},
                 // The axis of a stored course stays, its laps would not compare;
@@ -152,11 +161,11 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                 key: const Key('course-length'),
                 controller: _length,
                 keyboardType: _axis == CourseAxis.distance ? TextInputType.number : TextInputType.datetime,
-                decoration: InputDecoration(labelText: 'Länge ($unit)'),
+                decoration: InputDecoration(labelText: l10n.fieldLength(unit)),
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 24),
-              Text('Ablauf', style: theme.textTheme.titleMedium),
+              Text(l10n.courseSequence, style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               if (layout.definition case final definition?) ...[
                 CourseStrip(key: const Key('course-strip'), definition: definition, height: 12),
@@ -173,7 +182,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                   ),
               ] else if (_lengthValue != null && _lengthValue! > 0) ...[
                 // The length no longer fits the zones: show them as placed.
-                ErrorCard(errors: [for (final e in layout.errors) placementErrorText(context.l10n, e)]),
+                ErrorCard(errors: [for (final e in layout.errors) placementErrorText(l10n, e)]),
                 for (final (i, p) in _placements.indexed)
                   if (zones[p.zoneId] case final zone?)
                     _SectionTile(
@@ -185,7 +194,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                       onRemove: () => _remove(i),
                     ),
               ] else
-                Text('Gib eine Länge ein, um Zonen einzubauen.', style: theme.textTheme.bodySmall),
+                Text(l10n.courseLengthHint, style: theme.textTheme.bodySmall),
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerLeft,
@@ -193,11 +202,11 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                   key: const Key('place-zone'),
                   onPressed: _place,
                   icon: const Icon(Icons.add),
-                  label: const Text('Zone einbauen'),
+                  label: Text(l10n.coursePlaceZone),
                 ),
               ),
               const SizedBox(height: 24),
-              FilledButton(onPressed: _save, child: const Text('Speichern')),
+              FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
             ],
           ),
         ),
@@ -235,18 +244,19 @@ class _SectionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final free = segment.zoneId == null;
+    final l10n = context.l10n;
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Icon(free ? Icons.remove : Icons.flag, color: free ? colors.outline : colors.primary),
-      title: Text(free ? 'frei' : segment.zoneName ?? 'Zone'),
+      title: Text(free ? l10n.segmentFree : segment.zoneName ?? l10n.segmentZone),
       subtitle: Text([
         formatCourseRange(axis, start, start + segment.length),
         if (!free) formatSegmentBands(segment),
       ].join(' · ')),
       onTap: onMove,
       trailing: free
-          ? IconButton(tooltip: 'Hier eine Zone einbauen', icon: const Icon(Icons.add), onPressed: onPlace)
-          : IconButton(tooltip: 'Zone entfernen', icon: const Icon(Icons.close), onPressed: onRemove),
+          ? IconButton(tooltip: l10n.coursePlaceHere, icon: const Icon(Icons.add), onPressed: onPlace)
+          : IconButton(tooltip: l10n.courseRemoveZone, icon: const Icon(Icons.close), onPressed: onRemove),
     );
   }
 }
@@ -306,7 +316,7 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
     final zone = zones[_zoneId];
     if (zone == null) return (null, null);
     final start = parseCourseLength(widget.axis, _start.text);
-    if (start == null) return (null, 'Der Start „${_start.text.trim()}“ ist ungültig.');
+    if (start == null) return (null, context.l10n.invalidStart(_start.text.trim()));
     final placement = ZonePlacement(zoneId: zone.id, start: start);
     final placements = [...widget.others, placement];
     final layout = resolveCourse(axis: widget.axis, length: widget.length, placements: placements, zones: zones);
@@ -326,18 +336,20 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
     final (placement, error) = _check(zones);
     final zone = zones[_zoneId];
     final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final unit = widget.axis == CourseAxis.distance ? 'm' : 'm:ss';
 
     return AlertDialog(
-      title: Text(widget.initial == null ? 'Zone einbauen' : 'Zone verschieben'),
+      title: Text(widget.initial == null ? l10n.coursePlaceZone : l10n.courseMoveZone),
       content: SizedBox(
         width: 480,
         child: ListView(
           shrinkWrap: true,
           children: [
             if (usages.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: Text('Noch keine Zonen angelegt. Lege zuerst eine an.'),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(l10n.courseNoZones),
               ),
             for (final u in usages)
               _ZoneOption(
@@ -351,7 +363,7 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
               child: TextButton.icon(
                 onPressed: _createZone,
                 icon: const Icon(Icons.add),
-                label: const Text('Neue Zone anlegen'),
+                label: Text(l10n.zoneCreate),
               ),
             ),
             const SizedBox(height: 8),
@@ -360,16 +372,18 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
               controller: _start,
               keyboardType: widget.axis == CourseAxis.distance ? TextInputType.number : TextInputType.datetime,
               decoration: InputDecoration(
-                labelText: 'Start (${widget.axis == CourseAxis.distance ? 'm' : 'm:ss'})',
-                helperText: 'Strecke: ${formatCourseRange(widget.axis, 0, widget.length)}',
+                labelText: l10n.courseStart(unit),
+                helperText: l10n.courseRange(formatCourseRange(widget.axis, 0, widget.length)),
               ),
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 12),
             if (zone != null && placement != null && error == null)
               Text(
-                '„${zone.name}“ liegt bei '
-                '${formatCourseRange(widget.axis, placement.start, placement.start + zone.length)}.',
+                l10n.coursePlacedAt(
+                  zone.name,
+                  formatCourseRange(widget.axis, placement.start, placement.start + zone.length),
+                ),
                 key: const Key('place-preview'),
               )
             else if (error != null)
@@ -378,10 +392,10 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Abbrechen')),
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.actionCancel)),
         FilledButton(
           onPressed: placement != null && error == null ? () => Navigator.of(context).pop(placement) : null,
-          child: Text(widget.initial == null ? 'Einbauen' : 'Verschieben'),
+          child: Text(widget.initial == null ? l10n.coursePlace : l10n.courseMove),
         ),
       ],
     );
@@ -406,7 +420,7 @@ class _ZoneOption extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       leading: Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked),
       title: Text(zone.name),
-      subtitle: Text(enabled ? zoneSummary(zone) : '${zoneSummary(zone)} · andere Achse'),
+      subtitle: Text(enabled ? zoneSummary(zone) : '${zoneSummary(zone)} · ${context.l10n.courseOtherAxis}'),
       onTap: enabled ? onTap : null,
     );
   }

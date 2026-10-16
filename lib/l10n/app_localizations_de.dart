@@ -525,4 +525,109 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get templateLaps => 'Runden';
+
+  @override
+  String get coursesTitle => 'Strecken';
+
+  @override
+  String get coursesEmpty => 'Noch keine Strecken angelegt.';
+
+  @override
+  String coursesLoadFailed(String error) {
+    return 'Strecken konnten nicht geladen werden: $error';
+  }
+
+  @override
+  String get courseDeleteTitle => 'Strecke löschen?';
+
+  @override
+  String courseDeleteBody(String name) {
+    return '„$name“ verschwindet aus der Liste. Bereits geruderte Sessions behalten ihre Runden.';
+  }
+
+  @override
+  String courseDeleteTemplates(String templates) {
+    return 'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: $templates.';
+  }
+
+  @override
+  String get courseNew => 'Neue Strecke';
+
+  @override
+  String get courseEdit => 'Strecke bearbeiten';
+
+  @override
+  String get courseNameMissing => 'Der Name fehlt.';
+
+  @override
+  String get courseLengthFirst => 'Gib zuerst die Länge der Strecke ein.';
+
+  @override
+  String get courseLengthHint => 'Gib eine Länge ein, um Zonen einzubauen.';
+
+  @override
+  String get courseSequence => 'Ablauf';
+
+  @override
+  String get coursePlaceZone => 'Zone einbauen';
+
+  @override
+  String get courseMoveZone => 'Zone verschieben';
+
+  @override
+  String get coursePlaceHere => 'Hier eine Zone einbauen';
+
+  @override
+  String get courseRemoveZone => 'Zone entfernen';
+
+  @override
+  String get coursePlace => 'Einbauen';
+
+  @override
+  String get courseMove => 'Verschieben';
+
+  @override
+  String get courseNoZones => 'Noch keine Zonen angelegt. Lege zuerst eine an.';
+
+  @override
+  String get zoneCreate => 'Neue Zone anlegen';
+
+  @override
+  String courseStart(String unit) {
+    return 'Start ($unit)';
+  }
+
+  @override
+  String courseRange(String range) {
+    return 'Strecke: $range';
+  }
+
+  @override
+  String coursePlacedAt(String zone, String range) {
+    return '„$zone“ liegt bei $range.';
+  }
+
+  @override
+  String get courseOtherAxis => 'andere Achse';
+
+  @override
+  String get axisDistance => 'Distanz';
+
+  @override
+  String get axisTime => 'Zeit';
+
+  @override
+  String fieldLength(String unit) {
+    return 'Länge ($unit)';
+  }
+
+  @override
+  String invalidLength(String text) {
+    return 'Die Länge „$text“ ist ungültig.';
+  }
+
+  @override
+  String invalidStart(String text) {
+    return 'Der Start „$text“ ist ungültig.';
+  }
 }
