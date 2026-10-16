@@ -103,6 +103,60 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'AergRow'**
   String get appTitle;
+
+  /// Start screen: option that searches for a PM5 or FTMS rower over Bluetooth.
+  ///
+  /// In de, this message translates to:
+  /// **'Rudergerät suchen'**
+  String get startFindRower;
+
+  /// Start screen: explanation below 'Find rower'.
+  ///
+  /// In de, this message translates to:
+  /// **'Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden'**
+  String get startFindRowerHint;
+
+  /// Start screen: option that rows with the built-in simulator.
+  ///
+  /// In de, this message translates to:
+  /// **'Simulator'**
+  String get startSimulator;
+
+  /// Start screen: explanation below 'Simulator'.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne Erg ausprobieren, mit simuliertem Ruderer'**
+  String get startSimulatorHint;
+
+  /// Start screen: option that opens templates, courses and zones.
+  ///
+  /// In de, this message translates to:
+  /// **'Vorlage rudern'**
+  String get startTemplate;
+
+  /// Start screen: explanation below 'Row a template'.
+  ///
+  /// In de, this message translates to:
+  /// **'Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl'**
+  String get startTemplateHint;
+
+  /// Start screen: option that opens the recorded sessions.
+  ///
+  /// In de, this message translates to:
+  /// **'Sessions'**
+  String get startSessions;
+
+  /// Start screen: explanation below 'Sessions'.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufgezeichnete Sessions ansehen, abspielen und austauschen'**
+  String get startSessionsHint;
+
+  /// Tooltip of the language button and title of the language dialog.
+  ///
+  /// In de, this message translates to:
+  /// **'Sprache'**
+  String get languageChoice;
 }
 
 class _AppLocalizationsDelegate

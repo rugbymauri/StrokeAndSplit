@@ -1,5 +1,43 @@
 {
   "@@locale": "de",
   "appTitle": "AergRow",
-  "@appTitle": {"description": "Name of the app, e.g. in the task switcher."}
+  "@appTitle": {
+    "description": "Name of the app, e.g. in the task switcher."
+  },
+  "startFindRower": "Rudergerät suchen",
+  "@startFindRower": {
+    "description": "Start screen: option that searches for a PM5 or FTMS rower over Bluetooth."
+  },
+  "startFindRowerHint": "Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden",
+  "@startFindRowerHint": {
+    "description": "Start screen: explanation below 'Find rower'."
+  },
+  "startSimulator": "Simulator",
+  "@startSimulator": {
+    "description": "Start screen: option that rows with the built-in simulator."
+  },
+  "startSimulatorHint": "Ohne Erg ausprobieren, mit simuliertem Ruderer",
+  "@startSimulatorHint": {
+    "description": "Start screen: explanation below 'Simulator'."
+  },
+  "startTemplate": "Vorlage rudern",
+  "@startTemplate": {
+    "description": "Start screen: option that opens templates, courses and zones."
+  },
+  "startTemplateHint": "Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl",
+  "@startTemplateHint": {
+    "description": "Start screen: explanation below 'Row a template'."
+  },
+  "startSessions": "Sessions",
+  "@startSessions": {
+    "description": "Start screen: option that opens the recorded sessions."
+  },
+  "startSessionsHint": "Aufgezeichnete Sessions ansehen, abspielen und austauschen",
+  "@startSessionsHint": {
+    "description": "Start screen: explanation below 'Sessions'."
+  },
+  "languageChoice": "Sprache",
+  "@languageChoice": {
+    "description": "Tooltip of the language button and title of the language dialog."
+  }
 }

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/connection/start_screen.dart';
 import '../l10n/l10n.dart';
+import 'app_language.dart';
 
-class AergRowApp extends StatelessWidget {
+class AergRowApp extends ConsumerWidget {
   const AergRowApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       onGenerateTitle: (context) => context.l10n.appTitle,
       debugShowCheckedModeBanner: false,
@@ -16,7 +18,7 @@ class AergRowApp extends StatelessWidget {
       darkTheme: ThemeData(colorSchemeSeed: const Color(0xFF0B6E99), brightness: Brightness.dark),
       themeMode: ThemeMode.dark,
       // Always set, so the system language plays no role (Design D2).
-      locale: const Locale('de'),
+      locale: ref.watch(appLanguageProvider).locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const StartScreen(),

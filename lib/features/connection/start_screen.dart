@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/app_language.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/simulated_source.dart';
 import '../live/live_screen.dart';
 import '../sessions/sessions_screen.dart';
 import '../templates/templates_screen.dart';
+import '../../l10n/l10n.dart';
 import 'device_list_screen.dart';
 
 /// Lets the user pick where the rowing data comes from.
@@ -14,8 +16,18 @@ class StartScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('AergRow')),
+      appBar: AppBar(
+        title: Text(l10n.appTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            tooltip: l10n.languageChoice,
+            onPressed: () => _chooseLanguage(context, ref),
+          ),
+        ],
+      ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 480),
@@ -25,15 +37,15 @@ class StartScreen extends ConsumerWidget {
             children: [
               _SourceOption(
                 icon: Icons.bluetooth_searching,
-                title: 'Rudergerät suchen',
-                subtitle: 'Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden',
+                title: l10n.startFindRower,
+                subtitle: l10n.startFindRowerHint,
                 onTap: () => Navigator.of(context)
                     .push(MaterialPageRoute<void>(builder: (_) => const DeviceListScreen())),
               ),
               _SourceOption(
                 icon: Icons.smart_toy_outlined,
-                title: 'Simulator',
-                subtitle: 'Ohne Erg ausprobieren, mit simuliertem Ruderer',
+                title: l10n.startSimulator,
+                subtitle: l10n.startSimulatorHint,
                 onTap: () async {
                   await ref.read(activeErgSourceProvider.notifier).use(SimulatedSource());
                   if (!context.mounted) return;
@@ -42,15 +54,15 @@ class StartScreen extends ConsumerWidget {
               ),
               _SourceOption(
                 icon: Icons.flag_outlined,
-                title: 'Vorlage rudern',
-                subtitle: 'Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl',
+                title: l10n.startTemplate,
+                subtitle: l10n.startTemplateHint,
                 onTap: () => Navigator.of(context)
                     .push(MaterialPageRoute<void>(builder: (_) => const TemplatesScreen())),
               ),
               _SourceOption(
                 icon: Icons.replay,
-                title: 'Sessions',
-                subtitle: 'Aufgezeichnete Sessions ansehen, abspielen und austauschen',
+                title: l10n.startSessions,
+                subtitle: l10n.startSessionsHint,
                 onTap: () => Navigator.of(context)
                     .push(MaterialPageRoute<void>(builder: (_) => const SessionsScreen())),
               ),
@@ -60,6 +72,29 @@ class StartScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Lets the user pick the language of the app; it applies at once (Design D3).
+Future<void> _chooseLanguage(BuildContext context, WidgetRef ref) async {
+  final current = ref.read(appLanguageProvider);
+  final chosen = await showDialog<AppLanguage>(
+    context: context,
+    builder: (context) => SimpleDialog(
+      title: Text(context.l10n.languageChoice),
+      children: [
+        for (final language in AppLanguage.values)
+          SimpleDialogOption(
+            key: Key('language-${language.name}'),
+            onPressed: () => Navigator.of(context).pop(language),
+            child: ListTile(
+              title: Text(language.nativeName),
+              trailing: language == current ? const Icon(Icons.check) : null,
+            ),
+          ),
+      ],
+    ),
+  );
+  if (chosen != null) await ref.read(appLanguageProvider.notifier).choose(chosen);
 }
 
 class _SourceOption extends StatelessWidget {

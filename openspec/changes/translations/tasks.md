@@ -7,8 +7,8 @@
 
 ## 2. Sprachwahl
 
-- [ ] 2.1 `AppLanguage`, `LanguageStore` über `SharedPreferencesWithCache` und `appLanguageProvider` nach D2; `main` lädt den Store vor `runApp`, `MaterialApp` folgt der Sprache. Verifikation: Unit-Tests für Standard `de`, gespeicherte Sprache, unbekannten Wert und Schreiben bei der Wahl
-- [ ] 2.2 Sprachwahl im Startbildschirm nach D3, Sprachen in ihrer eigenen Schreibweise, Wahl gilt sofort. Verifikation: Widget-Test wechselt auf „English“, der Startbildschirm zeigt „Find rower“, ein neuer Container mit demselben Store startet englisch
+- [x] 2.1 `AppLanguage`, `LanguageStore` über `SharedPreferencesWithCache` und `appLanguageProvider` nach D2; `main` lädt den Store vor `runApp`, `MaterialApp` folgt der Sprache. Verifikation: Unit-Tests für Standard `de`, gespeicherte Sprache, unbekannten Wert und Schreiben bei der Wahl
+- [x] 2.2 Sprachwahl im Startbildschirm nach D3, Sprachen in ihrer eigenen Schreibweise, Wahl gilt sofort. Verifikation: Widget-Test wechselt auf „English“, der Startbildschirm zeigt „Find rower“, ein neuer Container mit demselben Store startet englisch
 
 ## 3. Datenschicht ohne Sätze
 

@@ -11,4 +11,35 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get appTitle => 'AergRow';
+
+  @override
+  String get startFindRower => 'Rudergerät suchen';
+
+  @override
+  String get startFindRowerHint =>
+      'Mit deinem PM5 oder FTMS-Rudergerät über Bluetooth verbinden';
+
+  @override
+  String get startSimulator => 'Simulator';
+
+  @override
+  String get startSimulatorHint =>
+      'Ohne Erg ausprobieren, mit simuliertem Ruderer';
+
+  @override
+  String get startTemplate => 'Vorlage rudern';
+
+  @override
+  String get startTemplateHint =>
+      'Eine Strecke in Runden rudern, mit Zonen für Pace und Schlagzahl';
+
+  @override
+  String get startSessions => 'Sessions';
+
+  @override
+  String get startSessionsHint =>
+      'Aufgezeichnete Sessions ansehen, abspielen und austauschen';
+
+  @override
+  String get languageChoice => 'Sprache';
 }

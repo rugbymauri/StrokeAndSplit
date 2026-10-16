@@ -11,4 +11,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appTitle => 'AergRow';
+
+  @override
+  String get startFindRower => 'Find rower';
+
+  @override
+  String get startFindRowerHint =>
+      'Connect to your PM5 or FTMS rower over Bluetooth';
+
+  @override
+  String get startSimulator => 'Simulator';
+
+  @override
+  String get startSimulatorHint =>
+      'Try it without an erg, with a simulated rower';
+
+  @override
+  String get startTemplate => 'Row a template';
+
+  @override
+  String get startTemplateHint =>
+      'Row a course in laps, with zones for pace and stroke rate';
+
+  @override
+  String get startSessions => 'Sessions';
+
+  @override
+  String get startSessionsHint => 'View, replay and share recorded sessions';
+
+  @override
+  String get languageChoice => 'Language';
 }
