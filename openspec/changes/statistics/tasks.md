@@ -23,7 +23,7 @@ Sie starten deshalb erst, wenn `ui-design` umgesetzt ist (siehe `docs/implementa
 
 ## 3. Plätze in der Vorlagenwahl
 
-- [ ] 3.1 Die aufgeklappte Vorlage zeigt Platz 1–3 der Rangliste für ihre aktuelle Streckenlänge und Rundenzahl mit Wert, Pace und Datum. Ohne Eintrag und bei offener Rundenzahl erscheint ein Hinweis. Platz 1 lässt Raum für das Ghost-Symbol aus `ghost`. Verifikation: Widget-Tests für „Zwei Einträge“, „Noch nie gerudert“ und offene Rundenzahl
+- [x] 3.1 Die aufgeklappte Vorlage zeigt Platz 1–3 der Rangliste für ihre aktuelle Streckenlänge und Rundenzahl mit Wert, Pace und Datum. Ohne Eintrag und bei offener Rundenzahl erscheint ein Hinweis. Platz 1 lässt Raum für das Ghost-Symbol aus `ghost`. Verifikation: Widget-Tests für „Zwei Einträge“, „Noch nie gerudert“ und offene Rundenzahl
 
 ## 4. Plätze in der Zusammenfassung
 
