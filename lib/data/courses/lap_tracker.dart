@@ -42,6 +42,7 @@ class LapProgress {
     required this.pace,
     required this.strokeRate,
     required this.lapInZoneShare,
+    this.lapTime = Duration.zero,
   });
 
   /// Starting at 1.
@@ -61,6 +62,9 @@ class LapProgress {
 
   /// Share of time in the zone so far in this lap; null without bands.
   final double? lapInZoneShare;
+
+  /// Wall-clock time since the lap started, pauses included as in the lap results.
+  final Duration lapTime;
 }
 
 /// A lap, with wall-clock times and session distances.
@@ -196,6 +200,7 @@ class LapTracker {
       pace: _paceStatus(segment, _previous.paceCs),
       strokeRate: _spmStatus(segment, _previous.strokeRate),
       lapInZoneShare: lapInZone > 0 ? (_lapInZoneMs + _segmentInZoneMs) / lapInZone : null,
+      lapTime: Duration(milliseconds: (_previous.wallMs - _lapStartPoint.wallMs).round()),
     );
   }
 

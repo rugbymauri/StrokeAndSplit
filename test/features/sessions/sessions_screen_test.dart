@@ -132,10 +132,8 @@ void main() {
 
     expect(setup.container.read(activeErgSourceProvider)?.kind, ErgSourceKind.replay);
     expect(find.text('REPLAY'), findsOneWidget);
-    final distance = tester.widget<Text>(
-      find.descendant(of: find.byKey(const Key('metric-distance')), matching: find.byType(Text)).last,
-    );
-    expect(int.parse(distance.data!), greaterThan(0));
+    final distance = tester.widget<Text>(find.byKey(const Key('metric-distance'))).textSpan!.toPlainText();
+    expect(int.parse(distance.replaceAll(RegExp(r'\D'), '')), greaterThan(0));
     await setup.tearDown(tester);
   });
 

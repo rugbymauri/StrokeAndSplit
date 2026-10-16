@@ -35,6 +35,9 @@ String formatLapTime(Duration time) {
 /// Distance in whole meters, e.g. `1234`.
 String formatDistance(double meters) => meters.floor().toString();
 
+/// Whole numbers with thousands separated by a no-break space, as in the canvas, e.g. `3 021`.
+String formatGrouped(int value) => value.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+$)'), (_) => '\u00A0');
+
 /// Whole numbers like watts or strokes per minute; a dash when unknown.
 String formatWhole(int? value) => value?.toString() ?? _noValue;
 

@@ -282,7 +282,7 @@
   "@metricTime": {
     "description": "Live display: label of the elapsed time"
   },
-  "metricDistance": "Meter",
+  "metricDistance": "Distanz",
   "@metricDistance": {
     "description": "Live display: label of the distance rowed"
   },
@@ -290,7 +290,7 @@
   "@metricWatts": {
     "description": "Live display: label of the power"
   },
-  "metricStrokeRate": "Schläge/min",
+  "metricStrokeRate": "Schlagzahl",
   "@metricStrokeRate": {
     "description": "Live display: label of the stroke rate"
   },
@@ -302,23 +302,35 @@
   "@metricPace": {
     "description": "Live display: label of the pace per 500 metres"
   },
+  "metricCalories": "Kalorien",
+  "@metricCalories": {
+    "description": "Live display: label of the calories burnt, in the line below the tiles"
+  },
+  "metricAveragePace": "Ø Pace",
+  "@metricAveragePace": {
+    "description": "Live display: label of the average pace per 500 metres since the start, in the line below the tiles"
+  },
+  "metricLapTime": "Runde",
+  "@metricLapTime": {
+    "description": "Live display on a template: label of the time rowed in the current lap"
+  },
+  "metricInZone": "In Zone",
+  "@metricInZone": {
+    "description": "Live display on a template: label of the share of the lap rowed within the zone, e.g. '78 %'"
+  },
+  "liveStopShort": "Beenden",
+  "@liveStopShort": {
+    "description": "Live display in landscape on a template: short button that ends the recorded session"
+  },
+  "liveForceCurve": "Kraftkurve",
+  "@liveForceCurve": {
+    "description": "Live display: title of the force curve of the last stroke"
+  },
   "courseLap": "Runde {lap}",
   "@courseLap": {
     "description": "Course bar: the current lap of an open number of laps",
     "placeholders": {
       "lap": {
-        "type": "int"
-      }
-    }
-  },
-  "courseLapOf": "Runde {lap} von {laps}",
-  "@courseLapOf": {
-    "description": "Course bar: the current lap and the planned number of laps",
-    "placeholders": {
-      "lap": {
-        "type": "int"
-      },
-      "laps": {
         "type": "int"
       }
     }
@@ -365,31 +377,31 @@
       }
     }
   },
-  "hintInZone": "in der Zone",
+  "hintInZone": "In der Zone",
   "@hintInZone": {
     "description": "Live display: the value is within the zone's band"
   },
-  "hintFaster": "schneller",
+  "hintFaster": "Schneller",
   "@hintFaster": {
     "description": "Live display: row faster to reach the pace band"
   },
-  "hintSlower": "langsamer",
+  "hintSlower": "Langsamer",
   "@hintSlower": {
     "description": "Live display: row slower to reach the pace band"
   },
-  "hintNoPace": "keine Pace",
+  "hintNoPace": "Keine Pace",
   "@hintNoPace": {
     "description": "Live display: there is no pace to compare with the band"
   },
-  "hintMoreStrokes": "mehr Schläge",
+  "hintMoreStrokes": "Mehr Schläge",
   "@hintMoreStrokes": {
     "description": "Live display: raise the stroke rate to reach the band"
   },
-  "hintFewerStrokes": "weniger Schläge",
+  "hintFewerStrokes": "Weniger Schläge",
   "@hintFewerStrokes": {
     "description": "Live display: lower the stroke rate to reach the band"
   },
-  "hintNoStrokes": "keine Schläge",
+  "hintNoStrokes": "Keine Schläge",
   "@hintNoStrokes": {
     "description": "Live display: there is no stroke rate to compare with the band"
   },
