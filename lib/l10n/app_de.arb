@@ -39,5 +39,33 @@
   "languageChoice": "Sprache",
   "@languageChoice": {
     "description": "Tooltip of the language button and title of the language dialog."
+  },
+  "zoneErrorNameMissing": "Der Name fehlt.",
+  "@zoneErrorNameMissing": {
+    "description": "Zone editor: the zone has no name"
+  },
+  "zoneErrorLengthMissing": "Die Länge fehlt.",
+  "@zoneErrorLengthMissing": {
+    "description": "Zone editor: the zone has no length"
+  },
+  "zoneErrorBandMissing": "Es fehlt ein Band: Pace, Schlagzahl oder beides.",
+  "@zoneErrorBandMissing": {
+    "description": "Zone editor: neither a pace nor a stroke rate band is set"
+  },
+  "zoneErrorPaceBoundMissing": "Für das Pace-Band fehlt eine Grenze.",
+  "@zoneErrorPaceBoundMissing": {
+    "description": "Zone editor: only one bound of the pace band is set"
+  },
+  "zoneErrorPaceReversed": "Die schnellste Pace ist langsamer als die langsamste.",
+  "@zoneErrorPaceReversed": {
+    "description": "Zone editor: the pace bounds are the wrong way round"
+  },
+  "zoneErrorSpmBoundMissing": "Für das Schlagzahl-Band fehlt eine Grenze.",
+  "@zoneErrorSpmBoundMissing": {
+    "description": "Zone editor: only one bound of the stroke rate band is set"
+  },
+  "zoneErrorSpmReversed": "Die niedrigste Schlagzahl liegt über der höchsten.",
+  "@zoneErrorSpmReversed": {
+    "description": "Zone editor: the stroke rate bounds are the wrong way round"
   }
 }

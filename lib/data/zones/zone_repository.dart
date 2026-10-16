@@ -26,8 +26,8 @@ class ZoneRepository {
 
   final AppDatabase _db;
 
-  /// Stores a new zone and returns its id; throws an [ArgumentError] for a
-  /// zone with [zoneErrors].
+  /// Stores a new zone and returns its id; throws a [ZoneValidationException]
+  /// for a zone with [zoneErrors].
   Future<int> create(Zone zone) {
     _check(zone);
     return _db.into(_db.zones).insert(ZonesCompanion.insert(
@@ -187,7 +187,7 @@ class ZoneRepository {
 
   static void _check(Zone zone) {
     final errors = zoneErrors(zone);
-    if (errors.isNotEmpty) throw ArgumentError(errors.join(' '));
+    if (errors.isNotEmpty) throw ZoneValidationException(errors);
   }
 
   static Zone _zone(ZoneRow row) => Zone(

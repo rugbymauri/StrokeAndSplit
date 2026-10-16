@@ -41,4 +41,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageChoice => 'Language';
+
+  @override
+  String get zoneErrorNameMissing => 'The name is missing.';
+
+  @override
+  String get zoneErrorLengthMissing => 'The length is missing.';
+
+  @override
+  String get zoneErrorBandMissing =>
+      'A band is missing: pace, stroke rate or both.';
+
+  @override
+  String get zoneErrorPaceBoundMissing => 'The pace band is missing a bound.';
+
+  @override
+  String get zoneErrorPaceReversed =>
+      'The fastest pace is slower than the slowest.';
+
+  @override
+  String get zoneErrorSpmBoundMissing =>
+      'The stroke rate band is missing a bound.';
+
+  @override
+  String get zoneErrorSpmReversed =>
+      'The lowest stroke rate is above the highest.';
 }

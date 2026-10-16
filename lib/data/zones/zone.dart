@@ -82,24 +82,36 @@ class ZoneUsage {
   final int courses;
 }
 
-/// What is wrong with [zone], in words for the user; empty when it can be
-/// saved.
-List<String> zoneErrors(Zone zone) {
-  final errors = <String>[];
-  if (zone.name.trim().isEmpty) errors.add('Der Name fehlt.');
-  if (zone.length <= 0) errors.add('Die Länge fehlt.');
+/// Why a zone cannot be saved; the screens put it into words (Design D4).
+enum ZoneError { nameMissing, lengthMissing, bandMissing, paceBoundMissing, paceReversed, spmBoundMissing, spmReversed }
+
+/// Thrown when a zone with [errors] is to be stored.
+class ZoneValidationException implements Exception {
+  const ZoneValidationException(this.errors);
+
+  final List<ZoneError> errors;
+
+  @override
+  String toString() => 'ZoneValidationException(${errors.map((e) => e.name).join(', ')})';
+}
+
+/// What is wrong with [zone]; empty when it can be saved.
+List<ZoneError> zoneErrors(Zone zone) {
+  final errors = <ZoneError>[];
+  if (zone.name.trim().isEmpty) errors.add(ZoneError.nameMissing);
+  if (zone.length <= 0) errors.add(ZoneError.lengthMissing);
   final paceSet = zone.paceFastCs != null || zone.paceSlowCs != null;
   final spmSet = zone.spmMin != null || zone.spmMax != null;
-  if (!paceSet && !spmSet) errors.add('Es fehlt ein Band: Pace, Schlagzahl oder beides.');
+  if (!paceSet && !spmSet) errors.add(ZoneError.bandMissing);
   if (paceSet && (zone.paceFastCs == null || zone.paceSlowCs == null)) {
-    errors.add('Für das Pace-Band fehlt eine Grenze.');
+    errors.add(ZoneError.paceBoundMissing);
   } else if (paceSet && zone.paceFastCs! > zone.paceSlowCs!) {
-    errors.add('Die schnellste Pace ist langsamer als die langsamste.');
+    errors.add(ZoneError.paceReversed);
   }
   if (spmSet && (zone.spmMin == null || zone.spmMax == null)) {
-    errors.add('Für das Schlagzahl-Band fehlt eine Grenze.');
+    errors.add(ZoneError.spmBoundMissing);
   } else if (spmSet && zone.spmMin! > zone.spmMax!) {
-    errors.add('Die niedrigste Schlagzahl liegt über der höchsten.');
+    errors.add(ZoneError.spmReversed);
   }
   return errors;
 }

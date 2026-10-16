@@ -4,6 +4,7 @@ import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/zones/zone.dart';
 import 'package:aergrow/data/zones/zone_repository.dart';
+import 'package:aergrow/features/zones/zone_editor_screen.dart';
 import 'package:aergrow/features/zones/zones_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -110,6 +111,23 @@ void main() {
     await setup.settle(tester);
 
     expect(find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'), findsOneWidget);
+    expect(await tester.runAsync(setup.zones.all), isEmpty);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('says in English what keeps a zone from being saved', (tester) async {
+    final setup = _Setup();
+    addTearDown(setup.container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: setup.container,
+      child: const LocalizedApp(locale: Locale('en'), home: ZoneEditorScreen()),
+    ));
+    await _enter(tester, {'name': 'Halb', 'length': '100', 'pace-fast': '1:45', 'spm-min': '34', 'spm-max': '30'});
+    await tester.tap(find.byType(FilledButton));
+    await setup.settle(tester);
+
+    expect(find.text('The pace band is missing a bound.'), findsOneWidget);
+    expect(find.text('The lowest stroke rate is above the highest.'), findsOneWidget);
     expect(await tester.runAsync(setup.zones.all), isEmpty);
     await disposeWidgetsWithDatabase(tester);
   });

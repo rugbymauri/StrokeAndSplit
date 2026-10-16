@@ -101,32 +101,35 @@ void main() {
     test('a zone without any band', () {
       const zone = Zone(name: 'Nichts', axis: CourseAxis.distance, length: 100);
 
-      expect(zoneErrors(zone), ['Es fehlt ein Band: Pace, Schlagzahl oder beides.']);
-      expect(() => zones.create(zone), throwsArgumentError);
+      expect(zoneErrors(zone), [ZoneError.bandMissing]);
+      expect(
+        () => zones.create(zone),
+        throwsA(isA<ZoneValidationException>().having((e) => e.errors, 'errors', [ZoneError.bandMissing])),
+      );
     });
 
     test('a stroke rate band the wrong way round', () {
       const zone = Zone(name: 'Falsch', axis: CourseAxis.distance, length: 100, spmMin: 22, spmMax: 20);
 
-      expect(zoneErrors(zone), ['Die niedrigste Schlagzahl liegt über der höchsten.']);
+      expect(zoneErrors(zone), [ZoneError.spmReversed]);
     });
 
     test('a pace band the wrong way round', () {
       const zone = Zone(name: 'Falsch', axis: CourseAxis.distance, length: 100, paceFastCs: 13000, paceSlowCs: 12500);
 
-      expect(zoneErrors(zone), ['Die schnellste Pace ist langsamer als die langsamste.']);
+      expect(zoneErrors(zone), [ZoneError.paceReversed]);
     });
 
     test('a band with only one bound', () {
       const zone = Zone(name: 'Halb', axis: CourseAxis.distance, length: 100, paceFastCs: 12500);
 
-      expect(zoneErrors(zone), ['Für das Pace-Band fehlt eine Grenze.']);
+      expect(zoneErrors(zone), [ZoneError.paceBoundMissing]);
     });
 
     test('a zone without name or length', () {
       const zone = Zone(name: ' ', axis: CourseAxis.distance, length: 0, spmMin: 20, spmMax: 22);
 
-      expect(zoneErrors(zone), ['Der Name fehlt.', 'Die Länge fehlt.']);
+      expect(zoneErrors(zone), [ZoneError.nameMissing, ZoneError.lengthMissing]);
     });
   });
 

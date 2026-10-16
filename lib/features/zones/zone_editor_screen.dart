@@ -6,7 +6,9 @@ import '../../data/zones/zone.dart';
 import '../../data/zones/zone_providers.dart';
 import '../../data/zones/zone_repository.dart';
 import '../courses/course_format.dart';
+import '../../l10n/l10n.dart';
 import '../courses/error_card.dart';
+import 'zone_error_text.dart';
 
 /// Creates a zone, or edits [zone] when given. A new zone starts with [axis]
 /// when given, e.g. when it is created for a course. Pops with the id of a
@@ -80,7 +82,8 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
       spmMax: field(_spmMax, int.tryParse, 'Die Schlagzahl'),
     );
     if (errors.isNotEmpty) return null;
-    errors.addAll(zoneErrors(zone));
+    final l10n = context.l10n;
+    errors.addAll([for (final e in zoneErrors(zone)) zoneErrorText(l10n, e)]);
     return errors.isEmpty ? zone : null;
   }
 

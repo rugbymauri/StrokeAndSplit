@@ -157,6 +157,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Sprache'**
   String get languageChoice;
+
+  /// Zone editor: the zone has no name
+  ///
+  /// In de, this message translates to:
+  /// **'Der Name fehlt.'**
+  String get zoneErrorNameMissing;
+
+  /// Zone editor: the zone has no length
+  ///
+  /// In de, this message translates to:
+  /// **'Die Länge fehlt.'**
+  String get zoneErrorLengthMissing;
+
+  /// Zone editor: neither a pace nor a stroke rate band is set
+  ///
+  /// In de, this message translates to:
+  /// **'Es fehlt ein Band: Pace, Schlagzahl oder beides.'**
+  String get zoneErrorBandMissing;
+
+  /// Zone editor: only one bound of the pace band is set
+  ///
+  /// In de, this message translates to:
+  /// **'Für das Pace-Band fehlt eine Grenze.'**
+  String get zoneErrorPaceBoundMissing;
+
+  /// Zone editor: the pace bounds are the wrong way round
+  ///
+  /// In de, this message translates to:
+  /// **'Die schnellste Pace ist langsamer als die langsamste.'**
+  String get zoneErrorPaceReversed;
+
+  /// Zone editor: only one bound of the stroke rate band is set
+  ///
+  /// In de, this message translates to:
+  /// **'Für das Schlagzahl-Band fehlt eine Grenze.'**
+  String get zoneErrorSpmBoundMissing;
+
+  /// Zone editor: the stroke rate bounds are the wrong way round
+  ///
+  /// In de, this message translates to:
+  /// **'Die niedrigste Schlagzahl liegt über der höchsten.'**
+  String get zoneErrorSpmReversed;
 }
 
 class _AppLocalizationsDelegate

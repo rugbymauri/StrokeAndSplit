@@ -9,5 +9,12 @@
   "startTemplateHint": "Row a course in laps, with zones for pace and stroke rate",
   "startSessions": "Sessions",
   "startSessionsHint": "View, replay and share recorded sessions",
-  "languageChoice": "Language"
+  "languageChoice": "Language",
+  "zoneErrorNameMissing": "The name is missing.",
+  "zoneErrorLengthMissing": "The length is missing.",
+  "zoneErrorBandMissing": "A band is missing: pace, stroke rate or both.",
+  "zoneErrorPaceBoundMissing": "The pace band is missing a bound.",
+  "zoneErrorPaceReversed": "The fastest pace is slower than the slowest.",
+  "zoneErrorSpmBoundMissing": "The stroke rate band is missing a bound.",
+  "zoneErrorSpmReversed": "The lowest stroke rate is above the highest."
 }
