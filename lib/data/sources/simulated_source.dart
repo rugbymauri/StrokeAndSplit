@@ -90,6 +90,9 @@ class SimulatedSource implements ErgSource {
   ErgSourceKind get kind => ErgSourceKind.simulator;
 
   @override
+  bool get providesForceCurves => protocol == ErgProtocol.pm5;
+
+  @override
   String get name => 'Simulator';
 
   @override

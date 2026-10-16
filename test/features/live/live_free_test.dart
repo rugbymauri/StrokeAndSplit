@@ -1,3 +1,4 @@
+import 'package:aergrow/features/live/force_curve.dart';
 import 'package:aergrow/features/live/live_free.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,16 @@ const _tick = StatusTick(
   calories: 118,
 );
 
-const _forces = <double>[0, 20, 60, 110, 140, 150, 130, 90, 40, 0];
+final _curves = const ForceCurves()
+    .add(StrokeForceCurve(elapsed: Duration.zero, strokeNumber: 3, forcesNewtons: [0, 30, 80, 120, 130, 100, 50, 0]))
+    .add(StrokeForceCurve(
+      elapsed: Duration.zero,
+      strokeNumber: 4,
+      forcesNewtons: [0, 20, 60, 110, 140, 150, 130, 90, 40, 0],
+      driveLengthMeters: 1.06,
+    ));
 
-Future<void> _pump(WidgetTester tester, Size size, {List<double>? forces = _forces}) async {
+Future<void> _pump(WidgetTester tester, Size size, {ForceCurves? forceCurves}) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -29,7 +37,7 @@ Future<void> _pump(WidgetTester tester, Size size, {List<double>? forces = _forc
       body: FreeLiveView(
         tick: _tick,
         session: null,
-        forces: forces,
+        forceCurves: forceCurves,
         action: FilledButton(onPressed: () {}, child: const Text('Session beenden')),
       ),
     ),
@@ -38,7 +46,7 @@ Future<void> _pump(WidgetTester tester, Size size, {List<double>? forces = _forc
 
 void main() {
   testWidgets('shows the values of the canvas screen', (tester) async {
-    await _pump(tester, const Size(390, 844));
+    await _pump(tester, const Size(390, 844), forceCurves: _curves);
 
     expect(find.text('2:07.4'), findsOneWidget);
     expect(find.text('21 spm'), findsOneWidget);
@@ -50,14 +58,22 @@ void main() {
     expect(find.text('Kraftkurve'), findsOneWidget);
   });
 
-  testWidgets('leaves out the force curve without data', (tester) async {
-    await _pump(tester, const Size(390, 844), forces: null);
+  testWidgets('leaves out the force curve for a source without one', (tester) async {
+    await _pump(tester, const Size(390, 844));
 
     expect(find.byKey(const Key('force-curve')), findsNothing);
   });
 
+  testWidgets('waits for the first curve with the card in place', (tester) async {
+    await _pump(tester, const Size(390, 844), forceCurves: const ForceCurves());
+
+    expect(find.byKey(const Key('force-curve')), findsOneWidget);
+    expect(find.byKey(const Key('force-curve-waiting')), findsOneWidget);
+    expect(find.byKey(const Key('force-curve-length')), findsNothing);
+  });
+
   testWidgets('leaves out the force curve first when space is short', (tester) async {
-    await _pump(tester, const Size(360, 600));
+    await _pump(tester, const Size(360, 600), forceCurves: _curves);
 
     expect(tester.takeException(), isNull);
     expect(find.byKey(const Key('force-curve')), findsNothing);
@@ -71,10 +87,11 @@ void main() {
   };
   for (final MapEntry(key: name, value: size) in sizes.entries) {
     testWidgets('fits a $name with the force curve and the pace as the largest text', (tester) async {
-      await _pump(tester, size);
+      await _pump(tester, size, forceCurves: _curves);
 
       expect(tester.takeException(), isNull);
       expect(find.byKey(const Key('force-curve')), findsOneWidget);
+      expect(find.text('1,06 m'), findsOneWidget);
       final pace = tester.getRect(find.byKey(const Key('metric-pace'))).height;
       for (final text in tester.widgetList<Text>(find.byType(Text))) {
         if (text.key == const Key('metric-pace')) continue;

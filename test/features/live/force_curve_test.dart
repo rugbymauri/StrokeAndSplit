@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:aergrow/app/design_tokens.dart';
 import 'package:aergrow/features/live/force_curve.dart';
+import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -68,6 +69,29 @@ const _inlineSize = Size(380, 88);
 const _tintedSize = Size(220, 120);
 
 void main() {
+  group('ForceCurves', () {
+    StrokeForceCurve curve(int strokeNumber) =>
+        StrokeForceCurve(elapsed: Duration.zero, strokeNumber: strokeNumber, forcesNewtons: const [0, 100, 0]);
+
+    test('keeps the latest curve and the one before', () {
+      final curves = const ForceCurves().add(curve(2)).add(curve(3)).add(curve(4));
+
+      expect(curves.last?.strokeNumber, 4);
+      expect(curves.previous?.strokeNumber, 3);
+    });
+
+    test('has no previous curve after the first one', () {
+      expect(const ForceCurves().add(curve(2)).previous, isNull);
+    });
+
+    test('drops the previous curve when the stroke numbers start over', () {
+      final curves = const ForceCurves().add(curve(17)).add(curve(2));
+
+      expect(curves.last?.strokeNumber, 2);
+      expect(curves.previous, isNull);
+    });
+  });
+
   setUpAll(_loadFonts);
 
   group('in the card', () {

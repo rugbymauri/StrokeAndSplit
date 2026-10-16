@@ -30,8 +30,8 @@ class StrokeRateCard extends StatelessWidget {
   /// Value below the label as in the landscape canvas, else beside it.
   final bool landscape;
 
-  /// Below the value in landscape, e.g. the force curve.
-  final Widget? footer;
+  /// Builds what goes below the value in landscape, e.g. the force curve, in the colour of the label.
+  final Widget Function(Color foreground)? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +103,7 @@ class StrokeRateCard extends StatelessWidget {
                 children: [
                   Row(children: [Expanded(child: label), if (status != null) Flexible(child: status)]),
                   Flexible(flex: 2, child: Center(child: value)),
-                  if (footer != null) Expanded(flex: 3, child: footer),
+                  if (footer != null) Expanded(flex: 3, child: footer(foreground)),
                 ],
               )
             : Row(
