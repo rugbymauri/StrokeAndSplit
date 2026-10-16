@@ -99,6 +99,7 @@ Gemessen am 2026-10-16 (Fixture `force_curve.jsonl`). Die Kurve eines Schlags ko
 - 4–8 Pakete, 34–68 Werte pro Schlag, etwa 62 Werte pro Sekunde Durchzug.
 - Das Maximum der Kurve ist die Spitzenkraft aus `0x0035` ganzzahlig abgeschnitten (`0x0035` liefert 0.1 lbf, die Kurve ganze lbf).
 - Die Schläge 0 und 1 nach dem Start liefern keine Kurve.
+- `Pm5Decoder` setzt die Pakete zu einem `StrokeForceCurve` mit Schlagnummer und Durchzugslänge aus dem vorangehenden `0x0035` zusammen. Fehlt ein Paket, passt die Paketzahl nicht oder beginnt vorher ein neuer Schlag, wird die Kurve verworfen.
 
 Beispiel, erstes und letztes Paket eines Schlags mit 7 Paketen: `79 00 06 00 06 00 06 00 13 00 …` (7 Pakete, 9 Werte, Zähler 0, 6 lbf, 6 lbf, …) und `76 06 13 00 04 00 04 00 03 00 00 00 00 00` (6 Werte, Zähler 6).
 

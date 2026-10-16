@@ -6,10 +6,20 @@ abstract final class Pm5Characteristics {
   static const sampleRate = '0034';
   static const strokeData = '0035';
   static const additionalStrokeData = '0036';
+
+  /// Force curve of a stroke, in several notifications after its drive.
+  static const forceCurve = '003d';
   static const multiplexed = '0080';
 
   /// Characteristics a client subscribes to for live data.
-  static const subscribed = [generalStatus, additionalStatus, additionalStatus2, strokeData, additionalStrokeData];
+  static const subscribed = [
+    generalStatus,
+    additionalStatus,
+    additionalStatus2,
+    strokeData,
+    additionalStrokeData,
+    forceCurve,
+  ];
 
   /// Full 128-bit UUID of a PM5 service or characteristic.
   static String uuid(String shortId) => 'ce06$shortId-43e5-11e4-916c-0800200c9a66';

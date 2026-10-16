@@ -53,11 +53,11 @@ class _FakeConnection implements GattConnection {
   Future<void> disconnect() async => disconnected = true;
 }
 
-const _pm5Characteristics = {'0031', '0032', '0033', '0034', '0035', '0036'};
+const _pm5Characteristics = {'0031', '0032', '0033', '0034', '0035', '0036', '003d'};
 
 /// A PM5 that sends its first Additional Status with [ergType], or none.
-_FakeConnection _pm5Connection(int? ergType) {
-  final connection = _FakeConnection(_pm5Characteristics);
+_FakeConnection _pm5Connection(int? ergType, {Set<String> characteristics = _pm5Characteristics}) {
+  final connection = _FakeConnection(characteristics);
   connection.onSubscribe = (id) {
     if (id == Pm5Characteristics.additionalStatus && ergType != null) {
       scheduleMicrotask(() => connection.notify(id, [...List.filled(16, 0), ergType]));
@@ -161,9 +161,19 @@ void main() {
       connection
         ..notify('0031', [1])
         ..notify('2ad1', [1])
-        ..notify('0035', [1]);
+        ..notify('0035', [1])
+        ..notify('003d', [1]);
 
-      expect(received, ['0031', '0035']);
+      expect(received, ['0031', '0035', '003d']);
+    });
+
+    test('connects to a PM5 without force curve and subscribes to the rest', () {
+      final connection = _pm5Connection(0, characteristics: _pm5Characteristics.difference({'003d'}));
+      final (link, error, _) = _setUp(connection, _pm5);
+
+      expect(error, isNull);
+      expect(link, isNotNull);
+      expect(connection.subscribed, Pm5Characteristics.subscribed.where((id) => id != '003d'));
     });
   });
 

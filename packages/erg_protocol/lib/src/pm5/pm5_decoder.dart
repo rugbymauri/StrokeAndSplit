@@ -10,8 +10,9 @@ import 'pm5_characteristics.dart';
 /// Turns PM5 notifications into [RowingEvent]s.
 ///
 /// Stateful: the three status characteristics are merged into one
-/// [StatusTick], and the two stroke data notifications per stroke into one
-/// [Stroke]. Byte layouts are documented in the package README.
+/// [StatusTick], the two stroke data notifications per stroke into one
+/// [Stroke], and the force curve packets of a stroke into one
+/// [StrokeForceCurve]. Byte layouts are documented in the package README.
 class Pm5Decoder implements ErgDecoder {
   Pm5Decoder({this.onWarning});
 
@@ -24,6 +25,7 @@ class Pm5Decoder implements ErgDecoder {
     Pm5Characteristics.additionalStatus2: 8,
     Pm5Characteristics.strokeData: 20,
     Pm5Characteristics.additionalStrokeData: 9,
+    Pm5Characteristics.forceCurve: 4,
   };
 
   _General? _general;
@@ -34,6 +36,9 @@ class Pm5Decoder implements ErgDecoder {
   _StrokePart? _pendingStroke;
   int? _lastEmittedStroke;
   (int count, int watts)? _strokePower;
+
+  _StrokePart? _lastStrokeData;
+  _CurveParts? _curve;
 
   @override
   List<RowingEvent> decode(RawPacket packet) {
@@ -55,12 +60,17 @@ class Pm5Decoder implements ErgDecoder {
       Pm5Characteristics.additionalStatus => _onStatusPart(_Additional.parse(bytes)),
       Pm5Characteristics.additionalStatus2 => _onStatusPart(_Additional2.parse(bytes)),
       Pm5Characteristics.strokeData => _onStrokeData(_StrokePart.parse(bytes)),
+      Pm5Characteristics.forceCurve => _onForceCurve(packet, bytes),
       _ => _onAdditionalStrokeData(bytes),
     };
   }
 
   @override
-  List<RowingEvent> flush() => [..._flushStatus(), ..._flushStroke()];
+  List<RowingEvent> flush() {
+    // An unfinished curve stays incomplete for good.
+    _curve = null;
+    return [..._flushStatus(), ..._flushStroke()];
+  }
 
   List<RowingEvent> _drop(RawPacket packet, String reason) {
     onWarning?.call('Dropped ${packet.characteristicId} packet at ${packet.time.inMilliseconds} ms: $reason');
@@ -115,6 +125,8 @@ class Pm5Decoder implements ErgDecoder {
         _pendingStroke = null;
         _lastEmittedStroke = null;
         _strokePower = null;
+        _lastStrokeData = null;
+        _curve = null;
       }
       if (isReset || general.state != previous.state) {
         events.add(WorkoutStateChanged(
@@ -148,6 +160,13 @@ class Pm5Decoder implements ErgDecoder {
   // number, recovery time of the previous stroke) and at the end of the
   // recovery (same number, final recovery time).
   List<RowingEvent> _onStrokeData(_StrokePart part) {
+    _lastStrokeData = part;
+    final curve = _curve;
+    if (curve != null && curve.stroke.count != part.count) {
+      _curve = null;
+      _warnIncomplete(curve, 'stroke ${part.count} began first');
+    }
+
     final pending = _pendingStroke;
     if (pending == null) {
       // A closing notification for a stroke already emitted is ignored.
@@ -159,6 +178,60 @@ class Pm5Decoder implements ErgDecoder {
     _pendingStroke = part.count == pending.count ? null : part;
     return [_toStroke(pending, recoveryRaw: part.recoveryRaw)];
   }
+
+  // The curve of a stroke follows the first 0x0035 of that stroke in several
+  // packets, counted from 0 (Design D1). It is emitted only once all packets
+  // have arrived in order.
+  List<RowingEvent> _onForceCurve(RawPacket packet, Uint8List bytes) {
+    final total = bytes[0] >> 4;
+    final valueCount = bytes[0] & 0x0f;
+    final counter = bytes[1];
+    if (total == 0 || valueCount == 0 || valueCount > _maxCurveValues || counter >= total) {
+      return _drop(packet, 'invalid force curve header ${bytes[0]}/${bytes[1]}');
+    }
+    if (bytes.length < 2 + 2 * valueCount) {
+      return _drop(packet, 'force curve packet with ${bytes.length} bytes for $valueCount values');
+    }
+
+    if (counter == 0) {
+      final open = _curve;
+      if (open != null) _warnIncomplete(open, 'the next curve began');
+      _curve = null;
+      final stroke = _lastStrokeData;
+      if (stroke == null) return _drop(packet, 'force curve without preceding stroke data');
+      _curve = _CurveParts(stroke, total);
+    }
+    final curve = _curve;
+    if (curve == null) return _drop(packet, 'force curve packet $counter without its first packet');
+    if (curve.total != total || curve.nextCounter != counter) {
+      _curve = null;
+      return _drop(packet, 'force curve of stroke ${curve.stroke.count} is incomplete, expected packet '
+          '${curve.nextCounter} of ${curve.total}, got $counter of $total');
+    }
+
+    for (var i = 0; i < valueCount; i++) {
+      curve.forcesLbf.add(_u16(bytes, 2 + 2 * i));
+    }
+    curve.nextCounter++;
+    if (curve.nextCounter < total) return const [];
+
+    _curve = null;
+    final stroke = curve.stroke;
+    return [
+      StrokeForceCurve(
+        elapsed: Duration(milliseconds: stroke.elapsedRaw * 10),
+        strokeNumber: stroke.count,
+        forcesNewtons: [for (final f in curve.forcesLbf) f * newtonsPerPoundForce],
+        driveLengthMeters: stroke.driveLengthRaw == 0 ? null : stroke.driveLengthRaw / 100,
+      ),
+    ];
+  }
+
+  static const _maxCurveValues = 9;
+
+  void _warnIncomplete(_CurveParts curve, String reason) => onWarning?.call(
+      'Discarded incomplete force curve of stroke ${curve.stroke.count} after ${curve.nextCounter} of '
+      '${curve.total} packets: $reason');
 
   List<RowingEvent> _onAdditionalStrokeData(Uint8List bytes) {
     _strokePower = (_u16(bytes, 7), _u16(bytes, 3));
@@ -263,4 +336,17 @@ class _StrokePart {
   final int peakForceRaw;
   final int averageForceRaw;
   final int count;
+}
+
+/// The force curve packets of one stroke received so far.
+class _CurveParts {
+  _CurveParts(this.stroke, this.total);
+
+  /// The 0x0035 the curve follows.
+  final _StrokePart stroke;
+
+  /// Number of packets the curve announces.
+  final int total;
+  var nextCounter = 0;
+  final forcesLbf = <int>[];
 }

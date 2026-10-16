@@ -125,6 +125,9 @@ class SessionAccumulator {
       case WorkoutStateChanged():
         // A reset shows up as counters going backwards, see SessionOffset.
         break;
+      case StrokeForceCurve():
+        // Kept as raw packets only; a replay decodes them again.
+        break;
       case HeartBeatIntervals():
         _onHeartBeats(event);
     }

@@ -61,6 +61,38 @@ class Pm5Encoder {
   RawPacket encodeRecoveryEnd(Stroke stroke, {required Duration at}) =>
       RawPacket(time: at, characteristicId: Pm5Characteristics.strokeData, bytes: _strokeData(stroke));
 
+  /// The force curve notifications sent right after [encodeDriveEnd]: nine
+  /// values in whole pound-force per packet, the last packet shorter.
+  ///
+  /// Throws an [ArgumentError] for an empty curve or one with more values than
+  /// fit into 15 packets.
+  List<RawPacket> encodeForceCurve(List<double> forcesNewtons, {required Duration at}) {
+    const perPacket = 9, maxPackets = 15;
+    if (forcesNewtons.isEmpty || forcesNewtons.length > perPacket * maxPackets) {
+      throw ArgumentError.value(
+          forcesNewtons.length, 'forcesNewtons', 'must hold 1 to ${perPacket * maxPackets} values');
+    }
+    final total = (forcesNewtons.length / perPacket).ceil();
+    return [
+      for (var counter = 0; counter < total; counter++)
+        RawPacket(
+          time: at,
+          characteristicId: Pm5Characteristics.forceCurve,
+          bytes: _curvePacket(total, counter, forcesNewtons.skip(counter * perPacket).take(perPacket).toList()),
+        ),
+    ];
+  }
+
+  static Uint8List _curvePacket(int total, int counter, List<double> forcesNewtons) {
+    final packet = _Bytes(2 + 2 * forcesNewtons.length)
+      ..u8(0, total << 4 | forcesNewtons.length)
+      ..u8(1, counter);
+    for (final (i, force) in forcesNewtons.indexed) {
+      packet.u16(2 + 2 * i, (force / newtonsPerPoundForce).round());
+    }
+    return packet.bytes;
+  }
+
   Uint8List _strokeData(Stroke stroke) => (_Bytes(20)
         ..u24(0, _centi(stroke.elapsed))
         ..u24(3, (stroke.distanceMeters * 10).round())

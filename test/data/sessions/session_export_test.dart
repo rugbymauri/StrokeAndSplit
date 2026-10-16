@@ -58,6 +58,15 @@ Future<int> _record(SessionRepository repository, String fixture) async {
   return id;
 }
 
+/// The force curves of [recording] as stroke number, drive length and values.
+List<String> _curves(RawRecording recording) {
+  final decoder = ErgDecoder.forProtocol(ErgProtocol.pm5);
+  return [for (final p in recording.packets) ...decoder.decode(p), ...decoder.flush()]
+      .whereType<StrokeForceCurve>()
+      .map((c) => '${c.strokeNumber} ${c.driveLengthMeters} ${c.forcesNewtons}')
+      .toList();
+}
+
 void main() {
   for (final fixture in ['just_row', 'pause', 'reset']) {
     test('export and import of $fixture give the same summary', () async {
@@ -71,6 +80,21 @@ void main() {
       expect((await laptop.rawRecording(imported)).packets.length, (await phone.rawRecording(recorded)).packets.length);
     });
   }
+
+  test('stores the force curve packets and gives the same curves after export and import', () async {
+    final phone = SessionRepository(openTestDatabase());
+    final laptop = SessionRepository(openTestDatabase());
+    final recorded = await _record(phone, 'force_curve');
+
+    final stored = await phone.rawRecording(recorded);
+    final imported = await laptop.rawRecording(await laptop.import(await phone.export(recorded)));
+
+    final fixture = loadFixture('force_curve');
+    bool isCurve(RawPacket p) => p.characteristicId == Pm5Characteristics.forceCurve;
+    expect(stored.packets.where(isCurve).length, fixture.packets.where(isCurve).length);
+    expect(_curves(imported), hasLength(17));
+    expect(_curves(imported), _curves(stored));
+  });
 
   test('writes a gzip-compressed AergRow raw recording with the summary in the header', () async {
     final repository = SessionRepository(openTestDatabase());

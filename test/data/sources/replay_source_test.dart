@@ -61,6 +61,30 @@ void main() {
     });
   });
 
+  test('replays the force curves of a PM5 recording with their timing', () {
+    final recording = RawRecording.parseLines(
+        File('packages/erg_protocol/test/fixtures/force_curve.jsonl').readAsLinesSync());
+    fakeAsync((async) {
+      final decoder = ErgDecoder.forProtocol(ReplaySource(recording).protocol, onWarning: (w) => fail(w));
+      final curves = <(Duration, StrokeForceCurve)>[];
+      final source = ReplaySource(recording);
+      source.packets.listen((p) {
+        for (final curve in decoder.decode(p).whereType<StrokeForceCurve>()) {
+          curves.add((async.elapsed, curve));
+        }
+      });
+      source.start();
+      async.elapse(recording.packets.last.time + const Duration(seconds: 1));
+
+      final expected = _decode(recording.packets).where((e) => e.startsWith('StrokeForceCurve')).toList();
+      expect(curves.map((c) => c.$2.toString()), orderedEquals(expected));
+      expect(curves.map((c) => c.$2.strokeNumber), [for (var n = 2; n <= 18; n++) n]);
+      // Each curve arrives when its last packet was recorded.
+      final lastCurvePacket = recording.packets.lastWhere((p) => p.characteristicId == Pm5Characteristics.forceCurve);
+      expect(curves.last.$1, lastCurvePacket.time);
+    });
+  });
+
   test('takes the protocol from the header of the recording', () {
     expect(ReplaySource(_recording).protocol, ErgProtocol.pm5, reason: 'the fixture names no protocol');
     final ftms = RawRecording(
