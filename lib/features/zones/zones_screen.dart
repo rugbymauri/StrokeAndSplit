@@ -8,10 +8,11 @@ import '../../data/zones/zone_providers.dart';
 import '../../l10n/l10n.dart';
 import '../connection/option_card.dart';
 import '../courses/course_strip.dart';
+import 'zone_detail_screen.dart';
 import 'zone_editor_screen.dart';
 import 'zone_format.dart';
 
-/// All zones by axis, to create, edit and delete them; [embedded] in a tab
+/// All zones by axis, to look at their places, create, edit and delete them; [embedded] in a tab
 /// it has no app bar of its own.
 class ZonesScreen extends ConsumerWidget {
   const ZonesScreen({super.key, this.embedded = false});
@@ -132,7 +133,7 @@ class _ZoneTile extends StatelessWidget {
         key: Key('zone-usage-${zone.id}'),
         style: AppTextStyles.caption,
       ),
-      onTap: () => openZoneEditor(context, zone: zone),
+      onTap: () => openZoneDetail(context, zone),
     );
   }
 }
