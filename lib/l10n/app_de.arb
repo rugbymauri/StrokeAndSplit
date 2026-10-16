@@ -261,5 +261,152 @@
   "bluetoothUnsupported": "Dieses Gerät unterstützt kein Bluetooth LE.",
   "@bluetoothUnsupported": {
     "description": "Device list: the phone or computer has no Bluetooth LE"
+  },
+  "liveDisconnect": "Trennen",
+  "@liveDisconnect": {
+    "description": "Live display: button that ends the connection"
+  },
+  "liveStale": "Keine Daten seit 3 Sekunden, die Werte sind veraltet.",
+  "@liveStale": {
+    "description": "Live display: banner when the rower stopped sending data"
+  },
+  "liveStartSession": "Session starten",
+  "@liveStartSession": {
+    "description": "Live display: button that starts recording a session"
+  },
+  "liveStopSession": "Session beenden",
+  "@liveStopSession": {
+    "description": "Live display: button that ends the recorded session"
+  },
+  "metricTime": "Zeit",
+  "@metricTime": {
+    "description": "Live display: label of the elapsed time"
+  },
+  "metricDistance": "Meter",
+  "@metricDistance": {
+    "description": "Live display: label of the distance rowed"
+  },
+  "metricWatts": "Watt",
+  "@metricWatts": {
+    "description": "Live display: label of the power"
+  },
+  "metricStrokeRate": "Schläge/min",
+  "@metricStrokeRate": {
+    "description": "Live display: label of the stroke rate"
+  },
+  "metricHeartRate": "Puls",
+  "@metricHeartRate": {
+    "description": "Live display: label of the heart rate"
+  },
+  "metricPace": "Pace /500 m",
+  "@metricPace": {
+    "description": "Live display: label of the pace per 500 metres"
+  },
+  "courseLap": "Runde {lap}",
+  "@courseLap": {
+    "description": "Course bar: the current lap of an open number of laps",
+    "placeholders": {
+      "lap": {
+        "type": "int"
+      }
+    }
+  },
+  "courseLapOf": "Runde {lap} von {laps}",
+  "@courseLapOf": {
+    "description": "Course bar: the current lap and the planned number of laps",
+    "placeholders": {
+      "lap": {
+        "type": "int"
+      },
+      "laps": {
+        "type": "int"
+      }
+    }
+  },
+  "segmentFree": "frei",
+  "@segmentFree": {
+    "description": "A part of a course without a zone"
+  },
+  "segmentZone": "Zone",
+  "@segmentZone": {
+    "description": "Name shown for a zone whose name is not known"
+  },
+  "courseRest": "noch {rest}",
+  "@courseRest": {
+    "description": "Course bar: what is left of the zone or free part; rest is e.g. '280 m' or '1:20'",
+    "placeholders": {
+      "rest": {
+        "type": "String"
+      }
+    }
+  },
+  "courseInZoneShare": "Zone {percent} %",
+  "@courseInZoneShare": {
+    "description": "Course bar: share of the lap rowed within the zone",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "hintInZone": "in der Zone",
+  "@hintInZone": {
+    "description": "Live display: the value is within the zone's band"
+  },
+  "hintFaster": "schneller",
+  "@hintFaster": {
+    "description": "Live display: row faster to reach the pace band"
+  },
+  "hintSlower": "langsamer",
+  "@hintSlower": {
+    "description": "Live display: row slower to reach the pace band"
+  },
+  "hintNoPace": "keine Pace",
+  "@hintNoPace": {
+    "description": "Live display: there is no pace to compare with the band"
+  },
+  "hintMoreStrokes": "mehr Schläge",
+  "@hintMoreStrokes": {
+    "description": "Live display: raise the stroke rate to reach the band"
+  },
+  "hintFewerStrokes": "weniger Schläge",
+  "@hintFewerStrokes": {
+    "description": "Live display: lower the stroke rate to reach the band"
+  },
+  "hintNoStrokes": "keine Schläge",
+  "@hintNoStrokes": {
+    "description": "Live display: there is no stroke rate to compare with the band"
+  },
+  "simTargetPace": "Ziel-Pace",
+  "@simTargetPace": {
+    "description": "Simulator: label of the pace the simulator rows"
+  },
+  "simTargetStrokeRate": "Ziel-SPM",
+  "@simTargetStrokeRate": {
+    "description": "Simulator: label of the stroke rate the simulator rows"
+  },
+  "simFaster": "Schneller",
+  "@simFaster": {
+    "description": "Simulator: tooltip to make the pace faster"
+  },
+  "simSlower": "Langsamer",
+  "@simSlower": {
+    "description": "Simulator: tooltip to make the pace slower"
+  },
+  "simMoreStrokes": "Mehr Schläge",
+  "@simMoreStrokes": {
+    "description": "Simulator: tooltip to raise the stroke rate"
+  },
+  "simFewerStrokes": "Weniger Schläge",
+  "@simFewerStrokes": {
+    "description": "Simulator: tooltip to lower the stroke rate"
+  },
+  "simPause": "Pause",
+  "@simPause": {
+    "description": "Simulator: button that pauses rowing"
+  },
+  "simResume": "Weiterrudern",
+  "@simResume": {
+    "description": "Simulator: button that resumes rowing"
   }
 }

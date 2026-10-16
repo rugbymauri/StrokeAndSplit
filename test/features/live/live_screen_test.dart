@@ -97,7 +97,12 @@ class _Harness {
   final events = StreamController<RowingEvent>.broadcast(sync: true);
   final wakelock = FakeWakelock();
 
-  Future<void> pump(WidgetTester tester, {Size size = const Size(390, 844), ActiveRecording? recording}) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    Size size = const Size(390, 844),
+    ActiveRecording? recording,
+    Locale locale = const Locale('de'),
+  }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -109,7 +114,7 @@ class _Harness {
         wakelockProvider.overrideWithValue(wakelock),
         if (recording != null) sessionRecorderProvider.overrideWith(() => _Recording(recording)),
       ],
-      child: const LocalizedApp(home: LiveScreen()),
+      child: LocalizedApp(locale: locale, home: const LiveScreen()),
     ));
   }
 
@@ -190,6 +195,26 @@ void main() {
       expect(find.text('noch 280 m'), findsOneWidget);
       expect(find.text('2:05–2:10 · 20–22 spm'), findsOneWidget);
       expect(find.text('Zone 75 %'), findsOneWidget);
+    });
+
+    testWidgets('shows the course and the values in English', (tester) async {
+      final harness = _Harness();
+      await harness.pump(
+        tester,
+        recording: _onCourse(pace: BandStatus.above, strokeRate: BandStatus.below),
+        locale: const Locale('en'),
+      );
+      await harness.emit(tester, _tick(heartRate: 151));
+
+      expect(find.text('Lap 2 of 3'), findsOneWidget);
+      expect(find.text('280 m to go'), findsOneWidget);
+      expect(find.text('faster'), findsOneWidget);
+      expect(find.text('more strokes'), findsOneWidget);
+      for (final label in ['Time', 'Meters', 'Watts', 'Strokes/min', 'Heart rate', 'Pace /500 m', 'End session']) {
+        expect(find.text(label), findsOneWidget, reason: label);
+      }
+      // The pace keeps the PM5 format in every language.
+      expect(find.text('2:05.3'), findsOneWidget);
     });
 
     testWidgets('marks pace and stroke rate in the zone', (tester) async {

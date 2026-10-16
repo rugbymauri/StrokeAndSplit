@@ -384,6 +384,192 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Dieses Gerät unterstützt kein Bluetooth LE.'**
   String get bluetoothUnsupported;
+
+  /// Live display: button that ends the connection
+  ///
+  /// In de, this message translates to:
+  /// **'Trennen'**
+  String get liveDisconnect;
+
+  /// Live display: banner when the rower stopped sending data
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Daten seit 3 Sekunden, die Werte sind veraltet.'**
+  String get liveStale;
+
+  /// Live display: button that starts recording a session
+  ///
+  /// In de, this message translates to:
+  /// **'Session starten'**
+  String get liveStartSession;
+
+  /// Live display: button that ends the recorded session
+  ///
+  /// In de, this message translates to:
+  /// **'Session beenden'**
+  String get liveStopSession;
+
+  /// Live display: label of the elapsed time
+  ///
+  /// In de, this message translates to:
+  /// **'Zeit'**
+  String get metricTime;
+
+  /// Live display: label of the distance rowed
+  ///
+  /// In de, this message translates to:
+  /// **'Meter'**
+  String get metricDistance;
+
+  /// Live display: label of the power
+  ///
+  /// In de, this message translates to:
+  /// **'Watt'**
+  String get metricWatts;
+
+  /// Live display: label of the stroke rate
+  ///
+  /// In de, this message translates to:
+  /// **'Schläge/min'**
+  String get metricStrokeRate;
+
+  /// Live display: label of the heart rate
+  ///
+  /// In de, this message translates to:
+  /// **'Puls'**
+  String get metricHeartRate;
+
+  /// Live display: label of the pace per 500 metres
+  ///
+  /// In de, this message translates to:
+  /// **'Pace /500 m'**
+  String get metricPace;
+
+  /// Course bar: the current lap of an open number of laps
+  ///
+  /// In de, this message translates to:
+  /// **'Runde {lap}'**
+  String courseLap(int lap);
+
+  /// Course bar: the current lap and the planned number of laps
+  ///
+  /// In de, this message translates to:
+  /// **'Runde {lap} von {laps}'**
+  String courseLapOf(int lap, int laps);
+
+  /// A part of a course without a zone
+  ///
+  /// In de, this message translates to:
+  /// **'frei'**
+  String get segmentFree;
+
+  /// Name shown for a zone whose name is not known
+  ///
+  /// In de, this message translates to:
+  /// **'Zone'**
+  String get segmentZone;
+
+  /// Course bar: what is left of the zone or free part; rest is e.g. '280 m' or '1:20'
+  ///
+  /// In de, this message translates to:
+  /// **'noch {rest}'**
+  String courseRest(String rest);
+
+  /// Course bar: share of the lap rowed within the zone
+  ///
+  /// In de, this message translates to:
+  /// **'Zone {percent} %'**
+  String courseInZoneShare(int percent);
+
+  /// Live display: the value is within the zone's band
+  ///
+  /// In de, this message translates to:
+  /// **'in der Zone'**
+  String get hintInZone;
+
+  /// Live display: row faster to reach the pace band
+  ///
+  /// In de, this message translates to:
+  /// **'schneller'**
+  String get hintFaster;
+
+  /// Live display: row slower to reach the pace band
+  ///
+  /// In de, this message translates to:
+  /// **'langsamer'**
+  String get hintSlower;
+
+  /// Live display: there is no pace to compare with the band
+  ///
+  /// In de, this message translates to:
+  /// **'keine Pace'**
+  String get hintNoPace;
+
+  /// Live display: raise the stroke rate to reach the band
+  ///
+  /// In de, this message translates to:
+  /// **'mehr Schläge'**
+  String get hintMoreStrokes;
+
+  /// Live display: lower the stroke rate to reach the band
+  ///
+  /// In de, this message translates to:
+  /// **'weniger Schläge'**
+  String get hintFewerStrokes;
+
+  /// Live display: there is no stroke rate to compare with the band
+  ///
+  /// In de, this message translates to:
+  /// **'keine Schläge'**
+  String get hintNoStrokes;
+
+  /// Simulator: label of the pace the simulator rows
+  ///
+  /// In de, this message translates to:
+  /// **'Ziel-Pace'**
+  String get simTargetPace;
+
+  /// Simulator: label of the stroke rate the simulator rows
+  ///
+  /// In de, this message translates to:
+  /// **'Ziel-SPM'**
+  String get simTargetStrokeRate;
+
+  /// Simulator: tooltip to make the pace faster
+  ///
+  /// In de, this message translates to:
+  /// **'Schneller'**
+  String get simFaster;
+
+  /// Simulator: tooltip to make the pace slower
+  ///
+  /// In de, this message translates to:
+  /// **'Langsamer'**
+  String get simSlower;
+
+  /// Simulator: tooltip to raise the stroke rate
+  ///
+  /// In de, this message translates to:
+  /// **'Mehr Schläge'**
+  String get simMoreStrokes;
+
+  /// Simulator: tooltip to lower the stroke rate
+  ///
+  /// In de, this message translates to:
+  /// **'Weniger Schläge'**
+  String get simFewerStrokes;
+
+  /// Simulator: button that pauses rowing
+  ///
+  /// In de, this message translates to:
+  /// **'Pause'**
+  String get simPause;
+
+  /// Simulator: button that resumes rowing
+  ///
+  /// In de, this message translates to:
+  /// **'Weiterrudern'**
+  String get simResume;
 }
 
 class _AppLocalizationsDelegate

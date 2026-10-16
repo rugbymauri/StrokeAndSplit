@@ -199,4 +199,105 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bluetoothUnsupported =>
       'This device does not support Bluetooth LE.';
+
+  @override
+  String get liveDisconnect => 'Disconnect';
+
+  @override
+  String get liveStale => 'No data for 3 seconds, the values are out of date.';
+
+  @override
+  String get liveStartSession => 'Start session';
+
+  @override
+  String get liveStopSession => 'End session';
+
+  @override
+  String get metricTime => 'Time';
+
+  @override
+  String get metricDistance => 'Meters';
+
+  @override
+  String get metricWatts => 'Watts';
+
+  @override
+  String get metricStrokeRate => 'Strokes/min';
+
+  @override
+  String get metricHeartRate => 'Heart rate';
+
+  @override
+  String get metricPace => 'Pace /500 m';
+
+  @override
+  String courseLap(int lap) {
+    return 'Lap $lap';
+  }
+
+  @override
+  String courseLapOf(int lap, int laps) {
+    return 'Lap $lap of $laps';
+  }
+
+  @override
+  String get segmentFree => 'free';
+
+  @override
+  String get segmentZone => 'Zone';
+
+  @override
+  String courseRest(String rest) {
+    return '$rest to go';
+  }
+
+  @override
+  String courseInZoneShare(int percent) {
+    return 'Zone $percent %';
+  }
+
+  @override
+  String get hintInZone => 'in the zone';
+
+  @override
+  String get hintFaster => 'faster';
+
+  @override
+  String get hintSlower => 'slower';
+
+  @override
+  String get hintNoPace => 'no pace';
+
+  @override
+  String get hintMoreStrokes => 'more strokes';
+
+  @override
+  String get hintFewerStrokes => 'fewer strokes';
+
+  @override
+  String get hintNoStrokes => 'no strokes';
+
+  @override
+  String get simTargetPace => 'Target pace';
+
+  @override
+  String get simTargetStrokeRate => 'Target SPM';
+
+  @override
+  String get simFaster => 'Faster';
+
+  @override
+  String get simSlower => 'Slower';
+
+  @override
+  String get simMoreStrokes => 'More strokes';
+
+  @override
+  String get simFewerStrokes => 'Fewer strokes';
+
+  @override
+  String get simPause => 'Pause';
+
+  @override
+  String get simResume => 'Resume';
 }

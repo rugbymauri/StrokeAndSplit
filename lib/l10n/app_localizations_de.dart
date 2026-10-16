@@ -201,4 +201,106 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get bluetoothUnsupported =>
       'Dieses Gerät unterstützt kein Bluetooth LE.';
+
+  @override
+  String get liveDisconnect => 'Trennen';
+
+  @override
+  String get liveStale =>
+      'Keine Daten seit 3 Sekunden, die Werte sind veraltet.';
+
+  @override
+  String get liveStartSession => 'Session starten';
+
+  @override
+  String get liveStopSession => 'Session beenden';
+
+  @override
+  String get metricTime => 'Zeit';
+
+  @override
+  String get metricDistance => 'Meter';
+
+  @override
+  String get metricWatts => 'Watt';
+
+  @override
+  String get metricStrokeRate => 'Schläge/min';
+
+  @override
+  String get metricHeartRate => 'Puls';
+
+  @override
+  String get metricPace => 'Pace /500 m';
+
+  @override
+  String courseLap(int lap) {
+    return 'Runde $lap';
+  }
+
+  @override
+  String courseLapOf(int lap, int laps) {
+    return 'Runde $lap von $laps';
+  }
+
+  @override
+  String get segmentFree => 'frei';
+
+  @override
+  String get segmentZone => 'Zone';
+
+  @override
+  String courseRest(String rest) {
+    return 'noch $rest';
+  }
+
+  @override
+  String courseInZoneShare(int percent) {
+    return 'Zone $percent %';
+  }
+
+  @override
+  String get hintInZone => 'in der Zone';
+
+  @override
+  String get hintFaster => 'schneller';
+
+  @override
+  String get hintSlower => 'langsamer';
+
+  @override
+  String get hintNoPace => 'keine Pace';
+
+  @override
+  String get hintMoreStrokes => 'mehr Schläge';
+
+  @override
+  String get hintFewerStrokes => 'weniger Schläge';
+
+  @override
+  String get hintNoStrokes => 'keine Schläge';
+
+  @override
+  String get simTargetPace => 'Ziel-Pace';
+
+  @override
+  String get simTargetStrokeRate => 'Ziel-SPM';
+
+  @override
+  String get simFaster => 'Schneller';
+
+  @override
+  String get simSlower => 'Langsamer';
+
+  @override
+  String get simMoreStrokes => 'Mehr Schläge';
+
+  @override
+  String get simFewerStrokes => 'Weniger Schläge';
+
+  @override
+  String get simPause => 'Pause';
+
+  @override
+  String get simResume => 'Weiterrudern';
 }
