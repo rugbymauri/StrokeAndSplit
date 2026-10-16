@@ -411,6 +411,34 @@
       }
     }
   },
+  "paceBoxGhost": "Ghost",
+  "@paceBoxGhost": {
+    "description": "Pace box: legend line with the gap to the ghost of the template, i.e. its best session rowed again for comparison; followed by e.g. '7.6 s vor dir'"
+  },
+  "paceBoxGhostAhead": "{amount} vor dir",
+  "@paceBoxGhostAhead": {
+    "description": "Pace box: the ghost is ahead of the rower, who is behind, by a time or a distance",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "7.6 s"
+      }
+    }
+  },
+  "paceBoxGhostBehind": "{amount} hinter dir",
+  "@paceBoxGhostBehind": {
+    "description": "Pace box: the ghost is behind the rower, who is ahead, by a time or a distance",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "12 m"
+      }
+    }
+  },
+  "paceBoxGhostLevel": "gleichauf",
+  "@paceBoxGhostLevel": {
+    "description": "Pace box: the rower and the ghost are level"
+  },
   "hintInZone": "In der Zone",
   "@hintInZone": {
     "description": "Live display: the value is within the zone's band"

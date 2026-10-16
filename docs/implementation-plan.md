@@ -21,7 +21,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 5/25 | in Umsetzung | Entscheid F17; Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
-| 7 | `ghost` | 3/13 | in Umsetzung | – |
+| 7 | `ghost` | 4/13 | in Umsetzung | – |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 | 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
 
@@ -189,6 +189,7 @@ Entscheide F6–F8 getroffen (Design D4, D5).
 - [x] Entschieden (Nutzer, 2026-10-16, Design D6): auf Zeitstrecken sitzt der Ghost neben dem eigenen Schiffchen, so gewollt; eine neue Bestleistung in derselben Session wird ab der nächsten Runde bzw. Fahrt zum Ghost; in der Vorlagenwahl nur das Symbol; im Simulator läuft der Ghost mit. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
 - [x] Gruppe 1: `GhostTrack`, `GhostPoint`, `GhostGap` in `lib/data/ghost/ghost.dart`, `GhostSymbol` in `lib/app/widgets/ghost_symbol.dart`. Vorläufig: Symbol 10 × 4 px mit 1 px Rand (Höhe aus dem Canvas); Gleichstand als Abstand 0 ohne Rückstand.
 - [x] Task 6.1 `GhostSymbol` bei Platz 1 in `TemplatePodium`, Platz 2 und 3 mit leerem Slot gleicher Breite.
+- [x] Task 5.1 Ghost-Zeile in der Pace-Box (`PaceBox.ghostGap`): „7.6 s vor dir“ orange, „12 m hinter dir“ blau, ab 60 s als `1:12.3`. Vorläufig: Gleichstand als „gleichauf“ gedämpft; Zehntel immer mit Punkt; `_aroundPace` 160 → 190, die Pace wird mit Ghost-Zeile etwas kleiner.
 
 ### 8. `rename-stroke-and-split`: App heisst „Stroke & Split“
 

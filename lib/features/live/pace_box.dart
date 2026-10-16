@@ -3,8 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../app/design_tokens.dart';
+import '../../app/widgets/ghost_symbol.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/lap_tracker.dart';
+import '../../data/ghost/ghost.dart';
 import '../../l10n/l10n.dart';
 import '../courses/course_format.dart';
 import 'zone_hint.dart';
@@ -15,9 +17,17 @@ import 'progress_frame_model.dart';
 
 /// The pace while rowing a template, inside the progress frame, with the
 /// zone status of the pace and a legend line for each track (ui-design,
-/// Design D3). It needs a bounded size; the pace shrinks to fit.
+/// Design D3), plus the gap to the ghost of the template (Change ghost,
+/// Design D1, D4). It needs a bounded size; the pace shrinks to fit.
 class PaceBox extends StatelessWidget {
-  const PaceBox({super.key, required this.progress, required this.course, required this.pace, this.ghost});
+  const PaceBox({
+    super.key,
+    required this.progress,
+    required this.course,
+    required this.pace,
+    this.ghost,
+    this.ghostGap,
+  });
 
   final LapProgress progress;
   final CourseDefinition course;
@@ -26,14 +36,19 @@ class PaceBox extends StatelessWidget {
   final Duration? pace;
   final FrameGhost? ghost;
 
+  /// The gap to the ghost of the whole template; null without one, and then
+  /// the box has no ghost line.
+  final GhostGap? ghostGap;
+
   /// Room for the zone status, kept free without one so the pace stays put.
   static const statusHeight = 32.0;
 
   /// The height inside the frame below which the content shrinks as a whole.
   static const minContentHeight = 260.0;
 
-  /// What the content takes besides the pace, generously: label, zone status, divider and legend.
-  static const _aroundPace = 160.0;
+  /// What the content takes besides the pace, generously: label, zone status, divider and
+  /// legend including the ghost line, so [paceFontSizeFor] holds with or without a ghost.
+  static const _aroundPace = 190.0;
 
   /// At least the font size of the pace in a box of [size], so values next to the
   /// box can be kept smaller.
@@ -97,13 +112,13 @@ class PaceBox extends StatelessWidget {
                 if (model.course != null)
                   _LegendLine(
                     key: const Key('pace-box-course'),
-                    color: AppColors.text,
+                    marker: const _Dot(AppColors.text),
                     label: l10n.paceBoxTotal,
                     value: _done(model.courseDone!, model.courseLength!),
                   ),
                 _LegendLine(
                   key: const Key('pace-box-lap'),
-                  color: AppColors.textMuted,
+                  marker: const _Dot(AppColors.textMuted),
                   label: switch (progress.plannedLaps) {
                     null => l10n.courseLap(progress.lap),
                     final laps => l10n.paceBoxLapOf(progress.lap, laps),
@@ -112,17 +127,47 @@ class PaceBox extends StatelessWidget {
                 ),
                 _LegendLine(
                   key: const Key('pace-box-segment'),
-                  color: ProgressFramePainter.segmentColor(progress.pace),
+                  marker: _Dot(ProgressFramePainter.segmentColor(progress.pace)),
                   // The zone the rower is in, or a free gap (Change zones, Design D7).
                   label: segment.isFree ? l10n.segmentFree : segment.zoneName ?? l10n.segmentZone,
                   value: l10n.courseRest(_amount(model.segmentRemaining)),
                 ),
+                if (ghostGap case final gap?) _ghostLine(l10n, gap),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  /// The gap to the ghost: behind in orange, ahead in blue, and in words either way,
+  /// e.g. `7.6 s vor dir` or `12 m hinter dir` (Change ghost, Design D4).
+  static Widget _ghostLine(AppLocalizations l10n, GhostGap gap) {
+    final (amount, level) = switch (gap.axis) {
+      CourseAxis.distance => (_seconds(gap.amount), (gap.amount * 10).round() == 0),
+      CourseAxis.time => ('${formatGrouped(gap.amount.round())} m', gap.amount.round() == 0),
+    };
+    final (value, color, kind) = level
+        ? (l10n.paceBoxGhostLevel, AppColors.textMuted, 'level')
+        : gap.ghostAhead
+            ? (l10n.paceBoxGhostAhead(amount), AppColors.zoneOut, 'behind')
+            : (l10n.paceBoxGhostBehind(amount), AppColors.zoneIn, 'ahead');
+    return _LegendLine(
+      key: Key('pace-box-ghost-$kind'),
+      marker: const GhostSymbol(),
+      label: l10n.paceBoxGhost,
+      value: value,
+      valueColor: color,
+    );
+  }
+
+  /// Seconds with tenths like the pace, e.g. `7.6 s`; from a minute on like a lap time, e.g. `1:12.3`.
+  static String _seconds(double seconds) {
+    final tenths = (seconds * 10).round();
+    return tenths < 600
+        ? '${tenths ~/ 10}.${tenths % 10} s'
+        : formatLapTime(Duration(milliseconds: tenths * 100));
   }
 
   /// The pace band of [segment], e.g. `2:05–2:10`; null without one.
@@ -180,15 +225,36 @@ class _Status extends StatelessWidget {
   }
 }
 
-/// One line of the legend: the colour of its track, what it is and what is left.
-class _LegendLine extends StatelessWidget {
-  const _LegendLine({super.key, required this.color, required this.label, required this.value});
+/// The colour of a track in the legend.
+class _Dot extends StatelessWidget {
+  const _Dot(this.color);
 
   final Color color;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        child: const SizedBox.square(dimension: _LegendLine.markerWidth),
+      );
+}
+
+/// One line of the legend: the mark of its track, what it is and how far.
+class _LegendLine extends StatelessWidget {
+  const _LegendLine({
+    super.key,
+    required this.marker,
+    required this.label,
+    required this.value,
+    this.valueColor = AppColors.textMuted,
+  });
+
+  /// The width of [marker]: a dot or the ghost symbol.
+  static const markerWidth = 10.0;
+
+  final Widget marker;
   final String label;
   final String value;
-
-  static const _dot = 10.0;
+  final Color valueColor;
 
   @override
   Widget build(BuildContext context) {
@@ -201,10 +267,7 @@ class _LegendLine extends StatelessWidget {
   Widget _row(double width) {
     return Row(
       children: [
-        DecoratedBox(
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          child: const SizedBox.square(dimension: _dot),
-        ),
+        SizedBox(width: markerWidth, child: Center(child: marker)),
         const SizedBox(width: AppSpacing.s),
         Expanded(
           child: Text(
@@ -217,13 +280,13 @@ class _LegendLine extends StatelessWidget {
         const SizedBox(width: AppSpacing.s),
         // The value wins over the label, and shrinks only if it alone is too wide.
         ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: width - _dot - AppSpacing.s * 2),
+          constraints: BoxConstraints(maxWidth: width - markerWidth - AppSpacing.s * 2),
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.textMuted,
+                color: valueColor,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
