@@ -4,8 +4,7 @@ import 'design_tokens.dart';
 
 /// The dark theme of the app, built from the tokens of design D1.
 ///
-/// The primary colour is blue ([AppColors.zoneIn]); the filled button stays in
-/// [AppColors.text] as in the canvas (design D1).
+/// The primary colour is blue ([AppColors.zoneIn]), also for the filled button.
 ThemeData appTheme() {
   const colors = ColorScheme(
     brightness: Brightness.dark,
@@ -72,7 +71,7 @@ ThemeData appTheme() {
     listTileTheme: const ListTileThemeData(iconColor: AppColors.textMuted),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.text,
+        backgroundColor: AppColors.zoneIn,
         foregroundColor: AppColors.bg,
         shape: cardShape,
         textStyle: AppTextStyles.button.copyWith(fontWeight: FontWeight.w600),
