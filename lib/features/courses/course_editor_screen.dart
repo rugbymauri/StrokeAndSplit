@@ -6,11 +6,13 @@ import '../../data/courses/course_layout.dart';
 import '../../data/courses/course_providers.dart';
 import '../../data/zones/zone.dart';
 import '../../data/zones/zone_providers.dart';
+import '../../l10n/l10n.dart';
 import '../zones/zone_format.dart';
 import '../zones/zones_screen.dart';
 import 'course_format.dart';
 import 'course_strip.dart';
 import 'error_card.dart';
+import 'placement_error_text.dart';
 
 /// Creates a course, or edits [course] when given: its length and the zones
 /// placed in it (Change zones).
@@ -88,7 +90,10 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     final lengthText = _length.text.trim();
     if (lengthText.isNotEmpty && _lengthValue == null) errors.add('Die Länge „$lengthText“ ist ungültig.');
     final layout = _layout(_zones);
-    if (_lengthValue != null || lengthText.isEmpty) errors.addAll(layout.errors.map((e) => e.message));
+    final l10n = context.l10n;
+    if (_lengthValue != null || lengthText.isEmpty) {
+      errors.addAll([for (final e in layout.errors) placementErrorText(l10n, e)]);
+    }
     if (errors.isNotEmpty) {
       setState(() => _errors = errors);
       return;
@@ -168,7 +173,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                   ),
               ] else if (_lengthValue != null && _lengthValue! > 0) ...[
                 // The length no longer fits the zones: show them as placed.
-                ErrorCard(errors: [for (final e in layout.errors) e.message]),
+                ErrorCard(errors: [for (final e in layout.errors) placementErrorText(context.l10n, e)]),
                 for (final (i, p) in _placements.indexed)
                   if (zones[p.zoneId] case final zone?)
                     _SectionTile(
@@ -306,7 +311,7 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
     final placements = [...widget.others, placement];
     final layout = resolveCourse(axis: widget.axis, length: widget.length, placements: placements, zones: zones);
     final error = layout.errors.where((e) => e.placements.contains(placements.length - 1)).firstOrNull;
-    return (placement, error?.message);
+    return (placement, error == null ? null : placementErrorText(context.l10n, error));
   }
 
   Future<void> _createZone() async {

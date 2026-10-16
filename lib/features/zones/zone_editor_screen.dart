@@ -103,10 +103,9 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
       }
       await repository.update(zone);
     } on ZoneConflict catch (conflict) {
-      setState(() => _errors = [
-            'Die Änderung passt nicht in ${conflict.courses.map((c) => '„$c“').join(', ')}: Dort würde die Zone '
-                'über das Streckenende ragen oder eine andere Zone überschneiden.',
-          ]);
+      if (!mounted) return;
+      final l10n = context.l10n;
+      setState(() => _errors = [l10n.zoneConflict(l10n.quotedNames(conflict.courses))]);
       return;
     }
     if (mounted) Navigator.of(context).pop();

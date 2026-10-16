@@ -67,5 +67,88 @@
   "zoneErrorSpmReversed": "Die niedrigste Schlagzahl liegt über der höchsten.",
   "@zoneErrorSpmReversed": {
     "description": "Zone editor: the stroke rate bounds are the wrong way round"
+  },
+  "quotedName": "„{name}“",
+  "@quotedName": {
+    "description": "A name the user gave, in quotes, e.g. in a list of courses",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "placementLengthMissing": "Die Länge fehlt.",
+  "@placementLengthMissing": {
+    "description": "Course editor: the course has no length"
+  },
+  "placementZoneMissing": "Eine eingebaute Zone gibt es nicht mehr.",
+  "@placementZoneMissing": {
+    "description": "Course editor: a zone placed in the course was deleted"
+  },
+  "placementAxisMismatch": "„{zone}“ misst {zoneAxis, select, distance{Distanz} other{Zeit}}, die Strecke {courseAxis, select, distance{Distanz} other{Zeit}}.",
+  "@placementAxisMismatch": {
+    "description": "Course editor: the zone and the course have different axes; the axes are 'distance' or 'time'",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "zoneAxis": {
+        "type": "String"
+      },
+      "courseAxis": {
+        "type": "String"
+      }
+    }
+  },
+  "placementBeforeStart": "„{zone}“ beginnt vor dem Start der Strecke.",
+  "@placementBeforeStart": {
+    "description": "Course editor: the zone is placed before 0",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "placementBeyondEnd": "„{zone}“ ({range}) ragt über das Streckenende bei {length}.",
+  "@placementBeyondEnd": {
+    "description": "Course editor: the zone ends after the course; range and length are formatted, e.g. '1800–2300 m' and '2000 m'",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "range": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "placementOverlap": "„{zone}“ ({range}) überschneidet „{other}“ ({otherRange}).",
+  "@placementOverlap": {
+    "description": "Course editor: two placed zones overlap; the ranges are formatted, e.g. '1000–1500 m'",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "range": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      },
+      "otherRange": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneConflict": "Die Änderung passt nicht in {courses}: Dort würde die Zone über das Streckenende ragen oder eine andere Zone überschneiden.",
+  "@zoneConflict": {
+    "description": "Zone editor: the changed zone no longer fits the courses it is placed in; courses is a list of quoted names",
+    "placeholders": {
+      "courses": {
+        "type": "String"
+      }
+    }
   }
 }

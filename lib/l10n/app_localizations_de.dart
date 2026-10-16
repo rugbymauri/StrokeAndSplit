@@ -68,4 +68,57 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get zoneErrorSpmReversed =>
       'Die niedrigste Schlagzahl liegt über der höchsten.';
+
+  @override
+  String quotedName(String name) {
+    return '„$name“';
+  }
+
+  @override
+  String get placementLengthMissing => 'Die Länge fehlt.';
+
+  @override
+  String get placementZoneMissing => 'Eine eingebaute Zone gibt es nicht mehr.';
+
+  @override
+  String placementAxisMismatch(
+    String zone,
+    String zoneAxis,
+    String courseAxis,
+  ) {
+    String _temp0 = intl.Intl.selectLogic(zoneAxis, {
+      'distance': 'Distanz',
+      'other': 'Zeit',
+    });
+    String _temp1 = intl.Intl.selectLogic(courseAxis, {
+      'distance': 'Distanz',
+      'other': 'Zeit',
+    });
+    return '„$zone“ misst $_temp0, die Strecke $_temp1.';
+  }
+
+  @override
+  String placementBeforeStart(String zone) {
+    return '„$zone“ beginnt vor dem Start der Strecke.';
+  }
+
+  @override
+  String placementBeyondEnd(String zone, String range, String length) {
+    return '„$zone“ ($range) ragt über das Streckenende bei $length.';
+  }
+
+  @override
+  String placementOverlap(
+    String zone,
+    String range,
+    String other,
+    String otherRange,
+  ) {
+    return '„$zone“ ($range) überschneidet „$other“ ($otherRange).';
+  }
+
+  @override
+  String zoneConflict(String courses) {
+    return 'Die Änderung passt nicht in $courses: Dort würde die Zone über das Streckenende ragen oder eine andere Zone überschneiden.';
+  }
 }

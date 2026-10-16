@@ -66,4 +66,57 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get zoneErrorSpmReversed =>
       'The lowest stroke rate is above the highest.';
+
+  @override
+  String quotedName(String name) {
+    return '“$name”';
+  }
+
+  @override
+  String get placementLengthMissing => 'The length is missing.';
+
+  @override
+  String get placementZoneMissing => 'A placed zone no longer exists.';
+
+  @override
+  String placementAxisMismatch(
+    String zone,
+    String zoneAxis,
+    String courseAxis,
+  ) {
+    String _temp0 = intl.Intl.selectLogic(zoneAxis, {
+      'distance': 'distance',
+      'other': 'time',
+    });
+    String _temp1 = intl.Intl.selectLogic(courseAxis, {
+      'distance': 'distance',
+      'other': 'time',
+    });
+    return '“$zone” is measured in $_temp0, the course in $_temp1.';
+  }
+
+  @override
+  String placementBeforeStart(String zone) {
+    return '“$zone” begins before the start of the course.';
+  }
+
+  @override
+  String placementBeyondEnd(String zone, String range, String length) {
+    return '“$zone” ($range) extends past the end of the course at $length.';
+  }
+
+  @override
+  String placementOverlap(
+    String zone,
+    String range,
+    String other,
+    String otherRange,
+  ) {
+    return '“$zone” ($range) overlaps “$other” ($otherRange).';
+  }
+
+  @override
+  String zoneConflict(String courses) {
+    return 'The change does not fit $courses: there the zone would extend past the end of the course or overlap another zone.';
+  }
 }

@@ -199,6 +199,59 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die niedrigste Schlagzahl liegt über der höchsten.'**
   String get zoneErrorSpmReversed;
+
+  /// A name the user gave, in quotes, e.g. in a list of courses
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“'**
+  String quotedName(String name);
+
+  /// Course editor: the course has no length
+  ///
+  /// In de, this message translates to:
+  /// **'Die Länge fehlt.'**
+  String get placementLengthMissing;
+
+  /// Course editor: a zone placed in the course was deleted
+  ///
+  /// In de, this message translates to:
+  /// **'Eine eingebaute Zone gibt es nicht mehr.'**
+  String get placementZoneMissing;
+
+  /// Course editor: the zone and the course have different axes; the axes are 'distance' or 'time'
+  ///
+  /// In de, this message translates to:
+  /// **'„{zone}“ misst {zoneAxis, select, distance{Distanz} other{Zeit}}, die Strecke {courseAxis, select, distance{Distanz} other{Zeit}}.'**
+  String placementAxisMismatch(String zone, String zoneAxis, String courseAxis);
+
+  /// Course editor: the zone is placed before 0
+  ///
+  /// In de, this message translates to:
+  /// **'„{zone}“ beginnt vor dem Start der Strecke.'**
+  String placementBeforeStart(String zone);
+
+  /// Course editor: the zone ends after the course; range and length are formatted, e.g. '1800–2300 m' and '2000 m'
+  ///
+  /// In de, this message translates to:
+  /// **'„{zone}“ ({range}) ragt über das Streckenende bei {length}.'**
+  String placementBeyondEnd(String zone, String range, String length);
+
+  /// Course editor: two placed zones overlap; the ranges are formatted, e.g. '1000–1500 m'
+  ///
+  /// In de, this message translates to:
+  /// **'„{zone}“ ({range}) überschneidet „{other}“ ({otherRange}).'**
+  String placementOverlap(
+    String zone,
+    String range,
+    String other,
+    String otherRange,
+  );
+
+  /// Zone editor: the changed zone no longer fits the courses it is placed in; courses is a list of quoted names
+  ///
+  /// In de, this message translates to:
+  /// **'Die Änderung passt nicht in {courses}: Dort würde die Zone über das Streckenende ragen oder eine andere Zone überschneiden.'**
+  String zoneConflict(String courses);
 }
 
 class _AppLocalizationsDelegate

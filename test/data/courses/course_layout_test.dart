@@ -70,40 +70,50 @@ void main() {
     final layout = _resolve([(2, 1000), (2, 1300)]);
 
     expect(layout.isValid, isFalse);
-    expect(layout.errors.single.message,
-        '„Ausdauer 2:30“ (1300–1800 m) überschneidet „Ausdauer 2:30“ (1000–1500 m).');
-    expect(layout.errors.single.placements, {0, 1});
+    final error = layout.errors.single;
+    expect(error.kind, PlacementErrorKind.overlap);
+    expect((error.zone, error.range, error.other, error.otherRange),
+        ('Ausdauer 2:30', '1300–1800 m', 'Ausdauer 2:30', '1000–1500 m'));
+    expect(error.placements, {0, 1});
   });
 
   test('rejects a zone beyond the end of the course', () {
     final layout = _resolve([(2, 1800)]);
 
-    expect(layout.errors.single.message, '„Ausdauer 2:30“ (1800–2300 m) ragt über das Streckenende bei 2000 m.');
+    final error = layout.errors.single;
+    expect(error.kind, PlacementErrorKind.beyondEnd);
+    expect((error.zone, error.range, error.courseLength), ('Ausdauer 2:30', '1800–2300 m', '2000 m'));
+    expect(error.placements, {0});
   });
 
   test('rejects a zone before the start', () {
-    expect(_resolve([(1, -50)]).errors.single.message, '„Sprint“ beginnt vor dem Start der Strecke.');
+    final error = _resolve([(1, -50)]).errors.single;
+    expect((error.kind, error.zone), (PlacementErrorKind.beforeStart, 'Sprint'));
   });
 
   test('rejects a zone of the other axis', () {
     final layout = _resolve([(3, 0)]);
 
-    expect(layout.errors.single.message, '„Vier Minuten“ misst Zeit, die Strecke Distanz.');
+    final error = layout.errors.single;
+    expect((error.kind, error.zone), (PlacementErrorKind.axisMismatch, 'Vier Minuten'));
+    expect((error.zoneAxis, error.courseAxis), (CourseAxis.time, CourseAxis.distance));
   });
 
   test('rejects a zone that is gone', () {
-    expect(_resolve([(9, 0)]).errors.single.message, 'Eine eingebaute Zone gibt es nicht mehr.');
+    final error = _resolve([(9, 0)]).errors.single;
+    expect(error.kind, PlacementErrorKind.zoneMissing);
+    expect(error.placements, {0});
   });
 
   test('lays out a time course in m:ss', () {
     final layout = _resolve([(3, 60)], axis: CourseAxis.time, length: 600);
 
     expect(_sections(layout.definition!), ['0–60 frei', '60–300 Vier Minuten', '300–600 frei']);
-    expect(_resolve([(3, 400)], axis: CourseAxis.time, length: 600).errors.single.message,
-        '„Vier Minuten“ (6:40–10:40) ragt über das Streckenende bei 10:00.');
+    final error = _resolve([(3, 400)], axis: CourseAxis.time, length: 600).errors.single;
+    expect((error.kind, error.range, error.courseLength), (PlacementErrorKind.beyondEnd, '6:40–10:40', '10:00'));
   });
 
   test('needs a length', () {
-    expect(_resolve([], length: 0).errors.single.message, 'Die Länge fehlt.');
+    expect(_resolve([], length: 0).errors.single.kind, PlacementErrorKind.lengthMissing);
   });
 }

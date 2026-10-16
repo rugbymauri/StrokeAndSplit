@@ -16,5 +16,13 @@
   "zoneErrorPaceBoundMissing": "The pace band is missing a bound.",
   "zoneErrorPaceReversed": "The fastest pace is slower than the slowest.",
   "zoneErrorSpmBoundMissing": "The stroke rate band is missing a bound.",
-  "zoneErrorSpmReversed": "The lowest stroke rate is above the highest."
+  "zoneErrorSpmReversed": "The lowest stroke rate is above the highest.",
+  "quotedName": "“{name}”",
+  "placementLengthMissing": "The length is missing.",
+  "placementZoneMissing": "A placed zone no longer exists.",
+  "placementAxisMismatch": "“{zone}” is measured in {zoneAxis, select, distance{distance} other{time}}, the course in {courseAxis, select, distance{distance} other{time}}.",
+  "placementBeforeStart": "“{zone}” begins before the start of the course.",
+  "placementBeyondEnd": "“{zone}” ({range}) extends past the end of the course at {length}.",
+  "placementOverlap": "“{zone}” ({range}) overlaps “{other}” ({otherRange}).",
+  "zoneConflict": "The change does not fit {courses}: there the zone would extend past the end of the course or overlap another zone."
 }
