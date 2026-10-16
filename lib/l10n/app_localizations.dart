@@ -1266,6 +1266,30 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'OK'**
   String get actionOk;
+
+  /// Screen reader label of the number button whose oar blade points up, e.g. '5 Sekunden mehr'
+  ///
+  /// In de, this message translates to:
+  /// **'{step} mehr'**
+  String oarStepperMore(String step);
+
+  /// Screen reader label of the number button whose oar blade points down, e.g. '1 Schlag weniger'
+  ///
+  /// In de, this message translates to:
+  /// **'{step} weniger'**
+  String oarStepperLess(String step);
+
+  /// Step of a number button in seconds, read out by screen readers, e.g. for the pace
+  ///
+  /// In de, this message translates to:
+  /// **'{seconds, plural, =1{1 Sekunde} other{{seconds} Sekunden}}'**
+  String stepSeconds(int seconds);
+
+  /// Step of a number button in strokes per minute, read out by screen readers
+  ///
+  /// In de, this message translates to:
+  /// **'{strokes, plural, =1{1 Schlag} other{{strokes} Schläge}}'**
+  String stepStrokes(int strokes);
 }
 
 class _AppLocalizationsDelegate

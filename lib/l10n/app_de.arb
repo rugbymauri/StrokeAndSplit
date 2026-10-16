@@ -1013,5 +1013,43 @@
   "actionOk": "OK",
   "@actionOk": {
     "description": "Button that closes a message"
+  },
+  "oarStepperMore": "{step} mehr",
+  "@oarStepperMore": {
+    "description": "Screen reader label of the number button whose oar blade points up, e.g. '5 Sekunden mehr'",
+    "placeholders": {
+      "step": {
+        "type": "String",
+        "example": "5 Sekunden"
+      }
+    }
+  },
+  "oarStepperLess": "{step} weniger",
+  "@oarStepperLess": {
+    "description": "Screen reader label of the number button whose oar blade points down, e.g. '1 Schlag weniger'",
+    "placeholders": {
+      "step": {
+        "type": "String",
+        "example": "1 Schlag"
+      }
+    }
+  },
+  "stepSeconds": "{seconds, plural, =1{1 Sekunde} other{{seconds} Sekunden}}",
+  "@stepSeconds": {
+    "description": "Step of a number button in seconds, read out by screen readers, e.g. for the pace",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "stepStrokes": "{strokes, plural, =1{1 Schlag} other{{strokes} Schläge}}",
+  "@stepStrokes": {
+    "description": "Step of a number button in strokes per minute, read out by screen readers",
+    "placeholders": {
+      "strokes": {
+        "type": "int"
+      }
+    }
   }
 }
