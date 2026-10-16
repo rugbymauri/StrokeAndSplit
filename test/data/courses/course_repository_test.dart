@@ -159,4 +159,19 @@ void main() {
     await courses.create('Seerunde', _seerunde);
     await expectation;
   });
+
+  test('counts how often a course was rowed, in all versions and in the newest', () async {
+    final id = await courses.create('Seerunde', _seerunde);
+    await courses.create('Vier Minuten', CourseDefinition.single(axis: CourseAxis.time, length: 240));
+    final first = (await courses.get(id))!.versionId;
+    await _rowSession(db, first);
+    await _rowSession(db, first);
+    expect(await courses.rowCounts(), {id: (total: 2, newest: 2)});
+
+    await courses.updateDefinition(id, CourseDefinition.single(axis: CourseAxis.distance, length: 1200));
+    expect(await courses.rowCounts(), {id: (total: 2, newest: 0)});
+
+    await _rowSession(db, (await courses.get(id))!.versionId);
+    expect(await courses.rowCounts(), {id: (total: 3, newest: 1)});
+  });
 }

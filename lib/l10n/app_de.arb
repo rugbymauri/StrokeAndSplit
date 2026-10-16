@@ -316,7 +316,7 @@
   "@metricTime": {
     "description": "Live display: label of the elapsed time"
   },
-  "metricDistance": "Meter",
+  "metricDistance": "Distanz",
   "@metricDistance": {
     "description": "Live display: label of the distance rowed"
   },
@@ -324,7 +324,7 @@
   "@metricWatts": {
     "description": "Live display: label of the power"
   },
-  "metricStrokeRate": "Schläge/min",
+  "metricStrokeRate": "Schlagzahl",
   "@metricStrokeRate": {
     "description": "Live display: label of the stroke rate"
   },
@@ -336,23 +336,35 @@
   "@metricPace": {
     "description": "Live display: label of the pace per 500 metres"
   },
+  "metricCalories": "Kalorien",
+  "@metricCalories": {
+    "description": "Live display: label of the calories burnt, in the line below the tiles"
+  },
+  "metricAveragePace": "Ø Pace",
+  "@metricAveragePace": {
+    "description": "Live display: label of the average pace per 500 metres since the start, in the line below the tiles"
+  },
+  "metricLapTime": "Runde",
+  "@metricLapTime": {
+    "description": "Live display on a template: label of the time rowed in the current lap"
+  },
+  "metricInZone": "In Zone",
+  "@metricInZone": {
+    "description": "Live display on a template: label of the share of the lap rowed within the zone, e.g. '78 %'"
+  },
+  "liveStopShort": "Beenden",
+  "@liveStopShort": {
+    "description": "Live display in landscape on a template: short button that ends the recorded session"
+  },
+  "liveForceCurve": "Kraftkurve",
+  "@liveForceCurve": {
+    "description": "Live display: title of the force curve of the last stroke"
+  },
   "courseLap": "Runde {lap}",
   "@courseLap": {
     "description": "Course bar: the current lap of an open number of laps",
     "placeholders": {
       "lap": {
-        "type": "int"
-      }
-    }
-  },
-  "courseLapOf": "Runde {lap} von {laps}",
-  "@courseLapOf": {
-    "description": "Course bar: the current lap and the planned number of laps",
-    "placeholders": {
-      "lap": {
-        "type": "int"
-      },
-      "laps": {
         "type": "int"
       }
     }
@@ -399,31 +411,31 @@
       }
     }
   },
-  "hintInZone": "in der Zone",
+  "hintInZone": "In der Zone",
   "@hintInZone": {
     "description": "Live display: the value is within the zone's band"
   },
-  "hintFaster": "schneller",
+  "hintFaster": "Schneller",
   "@hintFaster": {
     "description": "Live display: row faster to reach the pace band"
   },
-  "hintSlower": "langsamer",
+  "hintSlower": "Langsamer",
   "@hintSlower": {
     "description": "Live display: row slower to reach the pace band"
   },
-  "hintNoPace": "keine Pace",
+  "hintNoPace": "Keine Pace",
   "@hintNoPace": {
     "description": "Live display: there is no pace to compare with the band"
   },
-  "hintMoreStrokes": "mehr Schläge",
+  "hintMoreStrokes": "Mehr Schläge",
   "@hintMoreStrokes": {
     "description": "Live display: raise the stroke rate to reach the band"
   },
-  "hintFewerStrokes": "weniger Schläge",
+  "hintFewerStrokes": "Weniger Schläge",
   "@hintFewerStrokes": {
     "description": "Live display: lower the stroke rate to reach the band"
   },
-  "hintNoStrokes": "keine Schläge",
+  "hintNoStrokes": "Keine Schläge",
   "@hintNoStrokes": {
     "description": "Live display: there is no stroke rate to compare with the band"
   },
@@ -756,25 +768,38 @@
   "@templateCourseMissing": {
     "description": "Template editor: no course chosen"
   },
-  "templateLapsInvalid": "Die Rundenzahl muss mindestens 1 sein.",
-  "@templateLapsInvalid": {
-    "description": "Template editor: the number of laps is below 1"
-  },
   "templateCourse": "Strecke",
   "@templateCourse": {
     "description": "Template editor: label of the course field"
   },
-  "templateOpenLaps": "Offene Rundenzahl",
-  "@templateOpenLaps": {
-    "description": "Template editor: switch for an open number of laps"
+  "templateFixedLaps": "Feste Anzahl",
+  "@templateFixedLaps": {
+    "description": "Template editor: choice for a fixed number of laps"
   },
-  "templateOpenLapsHint": "Runden, bis du die Session beendest",
-  "@templateOpenLapsHint": {
-    "description": "Template editor: what an open number of laps means"
+  "templateOpenLaps": "Offen bis Stopp",
+  "@templateOpenLaps": {
+    "description": "Template editor: choice for an open number of laps, rowed until the session ends"
   },
   "templateLaps": "Runden",
   "@templateLaps": {
     "description": "Template editor: label of the number of laps"
+  },
+  "templateLapsUnit": "{laps, plural, =1{Runde} other{Runden}}",
+  "@templateLapsUnit": {
+    "description": "Template editor: unit after the number of laps, without the number",
+    "placeholders": {
+      "laps": {
+        "type": "int"
+      }
+    }
+  },
+  "templateResult": "Ergibt",
+  "@templateResult": {
+    "description": "Template editor: label of the line with the total length of all laps"
+  },
+  "templateResultOpen": "pro Runde, bis du die Session beendest",
+  "@templateResultOpen": {
+    "description": "Template editor: after the length of one lap when the number of laps is open"
   },
   "coursesTitle": "Strecken",
   "@coursesTitle": {
@@ -826,14 +851,6 @@
   "courseNameMissing": "Der Name fehlt.",
   "@courseNameMissing": {
     "description": "Course editor: the course has no name"
-  },
-  "courseLengthFirst": "Gib zuerst die Länge der Strecke ein.",
-  "@courseLengthFirst": {
-    "description": "Course editor: a zone is placed before the length is known"
-  },
-  "courseLengthHint": "Gib eine Länge ein, um Zonen einzubauen.",
-  "@courseLengthHint": {
-    "description": "Course editor: shown instead of the parts while there is no length"
   },
   "courseSequence": "Ablauf",
   "@courseSequence": {
@@ -922,24 +939,6 @@
       }
     }
   },
-  "invalidLength": "Die Länge „{text}“ ist ungültig.",
-  "@invalidLength": {
-    "description": "Editors: the length typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
-  "invalidStart": "Der Start „{text}“ ist ungültig.",
-  "@invalidStart": {
-    "description": "Place dialog: the start typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
   "zonesTitle": "Zonen",
   "@zonesTitle": {
     "description": "Zones: title"
@@ -1017,51 +1016,33 @@
   "@zoneNameHint": {
     "description": "Zone editor: example of a zone name"
   },
-  "zonePaceBand": "Pace pro 500 m",
+  "zonePaceBand": "Pace-Band",
   "@zonePaceBand": {
-    "description": "Zone editor: heading of the pace band"
+    "description": "Zone editor: title and switch of the pace band per 500 m"
   },
-  "zonePaceFastest": "schnellste",
+  "zonePaceFastest": "Schnellste",
   "@zonePaceFastest": {
-    "description": "Zone editor: the fastest pace of the band"
+    "description": "Zone editor: label of the fastest pace of the band"
   },
-  "zonePaceSlowest": "langsamste",
+  "zonePaceSlowest": "Langsamste",
   "@zonePaceSlowest": {
-    "description": "Zone editor: the slowest pace of the band"
+    "description": "Zone editor: label of the slowest pace of the band"
   },
-  "zoneSpmBand": "Schlagzahl",
+  "zoneSpmBand": "Schlagzahl-Band",
   "@zoneSpmBand": {
-    "description": "Zone editor: heading of the stroke rate band"
+    "description": "Zone editor: title and switch of the stroke rate band"
   },
-  "zoneSpmFrom": "ab",
+  "zoneSpmFrom": "Mindestens",
   "@zoneSpmFrom": {
-    "description": "Zone editor: the lowest stroke rate of the band"
+    "description": "Zone editor: label of the lowest stroke rate of the band"
   },
-  "zoneSpmTo": "bis",
+  "zoneSpmTo": "Höchstens",
   "@zoneSpmTo": {
-    "description": "Zone editor: the highest stroke rate of the band"
+    "description": "Zone editor: label of the highest stroke rate of the band"
   },
   "zoneBandHint": "Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.",
   "@zoneBandHint": {
     "description": "Zone editor: what a zone needs"
-  },
-  "invalidPace": "Die Pace „{text}“ ist ungültig.",
-  "@invalidPace": {
-    "description": "Zone editor: the pace typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
-  },
-  "invalidStrokeRate": "Die Schlagzahl „{text}“ ist ungültig.",
-  "@invalidStrokeRate": {
-    "description": "Zone editor: the stroke rate typed cannot be read",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      }
-    }
   },
   "dateTimePattern": "dd.MM.yyyy, HH:mm",
   "@dateTimePattern": {
@@ -1105,6 +1086,59 @@
     "description": "Step of a number button in strokes per minute, read out by screen readers",
     "placeholders": {
       "strokes": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldAxis": "Achse",
+  "@fieldAxis": {
+    "description": "Label of the axis of a course: distance or time"
+  },
+  "fieldLengthPlain": "Länge",
+  "@fieldLengthPlain": {
+    "description": "Label above the length of a course, written in capitals"
+  },
+  "courseZonesSummary": "{count, plural, =0{ohne Zonen} =1{Zone {name}} other{{count} Zonen}}",
+  "@courseZonesSummary": {
+    "description": "Course list: the zones placed in a course; name is the zone when there is only one",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String",
+        "example": "Tempo"
+      }
+    }
+  },
+  "courseRowedCount": "{count, plural, =0{noch nie gerudert} other{{count}× gerudert}}",
+  "@courseRowedCount": {
+    "description": "Course list: how often a course was rowed in sessions",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "courseLegendShade": "Helligkeit = Tempo",
+  "@courseLegendShade": {
+    "description": "Course list: legend saying that brighter zones in the bar have a faster pace band"
+  },
+  "courseZoneFrom": "ab {start}",
+  "@courseZoneFrom": {
+    "description": "Course editor: where a placed zone starts, e.g. 'ab 500 m'",
+    "placeholders": {
+      "start": {
+        "type": "String",
+        "example": "500 m"
+      }
+    }
+  },
+  "courseVersionHint": "{count}× gerudert. Änderst du Länge oder Zonen, entsteht eine neue Version. Alte Rundenzeiten bleiben vergleichbar.",
+  "@courseVersionHint": {
+    "description": "Course editor: hint that changing a course already rowed in its newest version stores a new version",
+    "placeholders": {
+      "count": {
         "type": "int"
       }
     }

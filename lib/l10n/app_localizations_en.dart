@@ -244,13 +244,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricTime => 'Time';
 
   @override
-  String get metricDistance => 'Meters';
+  String get metricDistance => 'Distance';
 
   @override
   String get metricWatts => 'Watts';
 
   @override
-  String get metricStrokeRate => 'Strokes/min';
+  String get metricStrokeRate => 'Stroke rate';
 
   @override
   String get metricHeartRate => 'Heart rate';
@@ -259,13 +259,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricPace => 'Pace /500 m';
 
   @override
-  String courseLap(int lap) {
-    return 'Lap $lap';
-  }
+  String get metricCalories => 'Calories';
 
   @override
-  String courseLapOf(int lap, int laps) {
-    return 'Lap $lap of $laps';
+  String get metricAveragePace => 'Ø pace';
+
+  @override
+  String get metricLapTime => 'Lap';
+
+  @override
+  String get metricInZone => 'In zone';
+
+  @override
+  String get liveStopShort => 'End';
+
+  @override
+  String get liveForceCurve => 'Force curve';
+
+  @override
+  String courseLap(int lap) {
+    return 'Lap $lap';
   }
 
   @override
@@ -293,25 +306,25 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hintInZone => 'in the zone';
+  String get hintInZone => 'In the zone';
 
   @override
-  String get hintFaster => 'faster';
+  String get hintFaster => 'Faster';
 
   @override
-  String get hintSlower => 'slower';
+  String get hintSlower => 'Slower';
 
   @override
-  String get hintNoPace => 'no pace';
+  String get hintNoPace => 'No pace';
 
   @override
-  String get hintMoreStrokes => 'more strokes';
+  String get hintMoreStrokes => 'More strokes';
 
   @override
-  String get hintFewerStrokes => 'fewer strokes';
+  String get hintFewerStrokes => 'Fewer strokes';
 
   @override
-  String get hintNoStrokes => 'no strokes';
+  String get hintNoStrokes => 'No strokes';
 
   @override
   String get simTargetPace => 'Target pace';
@@ -549,19 +562,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get templateCourseMissing => 'Choose a course.';
 
   @override
-  String get templateLapsInvalid => 'The number of laps must be at least 1.';
-
-  @override
   String get templateCourse => 'Course';
 
   @override
-  String get templateOpenLaps => 'Open number of laps';
+  String get templateFixedLaps => 'Fixed number';
 
   @override
-  String get templateOpenLapsHint => 'Laps until you end the session';
+  String get templateOpenLaps => 'Open until stop';
 
   @override
   String get templateLaps => 'Laps';
+
+  @override
+  String templateLapsUnit(int laps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      laps,
+      locale: localeName,
+      other: 'laps',
+      one: 'lap',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get templateResult => 'Total';
+
+  @override
+  String get templateResultOpen => 'per lap, until you end the session';
 
   @override
   String get coursesTitle => 'Courses';
@@ -595,12 +622,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get courseNameMissing => 'The name is missing.';
-
-  @override
-  String get courseLengthFirst => 'Enter the length of the course first.';
-
-  @override
-  String get courseLengthHint => 'Enter a length to place zones.';
 
   @override
   String get courseSequence => 'Sequence';
@@ -656,16 +677,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String fieldLength(String unit) {
     return 'Length ($unit)';
-  }
-
-  @override
-  String invalidLength(String text) {
-    return 'The length “$text” is not valid.';
-  }
-
-  @override
-  String invalidStart(String text) {
-    return 'The start “$text” is not valid.';
   }
 
   @override
@@ -727,36 +738,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zoneNameHint => 'e.g. Sprint';
 
   @override
-  String get zonePaceBand => 'Pace per 500 m';
+  String get zonePaceBand => 'Pace band';
 
   @override
-  String get zonePaceFastest => 'fastest';
+  String get zonePaceFastest => 'Fastest';
 
   @override
-  String get zonePaceSlowest => 'slowest';
+  String get zonePaceSlowest => 'Slowest';
 
   @override
-  String get zoneSpmBand => 'Stroke rate';
+  String get zoneSpmBand => 'Stroke rate band';
 
   @override
-  String get zoneSpmFrom => 'from';
+  String get zoneSpmFrom => 'At least';
 
   @override
-  String get zoneSpmTo => 'to';
+  String get zoneSpmTo => 'At most';
 
   @override
   String get zoneBandHint =>
       'At least one band is needed: pace, stroke rate or both.';
-
-  @override
-  String invalidPace(String text) {
-    return 'The pace “$text” is not valid.';
-  }
-
-  @override
-  String invalidStrokeRate(String text) {
-    return 'The stroke rate “$text” is not valid.';
-  }
 
   @override
   String get dateTimePattern => 'MMM d, y, HH:mm';
@@ -794,5 +795,54 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 stroke',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get fieldAxis => 'Axis';
+
+  @override
+  String get fieldLengthPlain => 'Length';
+
+  @override
+  String courseZonesSummary(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count zones',
+      one: 'zone $name',
+      zero: 'no zones',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String courseRowedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'rowed $count×',
+      one: 'rowed once',
+      zero: 'never rowed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get courseLegendShade => 'Brighter = faster';
+
+  @override
+  String courseZoneFrom(String start) {
+    return 'from $start';
+  }
+
+  @override
+  String courseVersionHint(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Rowed $count×.',
+      one: 'Rowed once.',
+    );
+    return '$_temp0 Changing the length or zones creates a new version. Earlier lap times stay comparable.';
   }
 }

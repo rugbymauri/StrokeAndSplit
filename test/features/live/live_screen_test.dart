@@ -9,6 +9,7 @@ import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/data/templates/session_template.dart';
 import 'package:aergrow/features/live/live_layout.dart';
 import 'package:aergrow/features/live/live_screen.dart';
+import 'package:aergrow/features/live/pace_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -89,8 +90,20 @@ ActiveRecording _onCourse({
       pace: pace,
       strokeRate: strokeRate,
       lapInZoneShare: segment.isFree ? null : 0.75,
+      lapTime: const Duration(minutes: 2, seconds: 31),
     ),
   );
+}
+
+/// The pace, found by [key], is taller on screen than every other text in [view] but the buttons.
+void _expectLargestPace(WidgetTester tester, Finder view, Key key) {
+  final pace = tester.getRect(find.byKey(key)).height;
+  final buttons = tester.widgetList<Text>(find.descendant(of: find.byType(FilledButton), matching: find.byType(Text)));
+  for (final text in tester.widgetList<Text>(find.descendant(of: view, matching: find.byType(Text)))) {
+    if (text.key == key || buttons.contains(text)) continue;
+    final reason = text.data ?? text.textSpan?.toPlainText();
+    expect(tester.getRect(find.byWidget(text)).height, lessThan(pace), reason: reason);
+  }
 }
 
 class _Harness {
@@ -133,10 +146,12 @@ void main() {
 
     expect(find.text('2:05.3'), findsOneWidget);
     expect(find.text('12:34'), findsOneWidget);
-    expect(find.text('3021'), findsOneWidget);
+    expect(find.text('3\u00A0021 m'), findsOneWidget);
     expect(find.text('179'), findsOneWidget);
-    expect(find.text('24'), findsOneWidget);
-    expect(find.text('151'), findsOneWidget);
+    expect(find.text('24 spm'), findsOneWidget);
+    expect(find.text('Puls 151'), findsOneWidget);
+    // 12:34 over 3021.7 m.
+    expect(find.text('Ø Pace 2:04.8'), findsOneWidget);
   });
 
   testWidgets('hides the heart rate without a monitor', (tester) async {
@@ -144,7 +159,16 @@ void main() {
     await harness.pump(tester);
     await harness.emit(tester, _tick());
 
-    expect(find.text('Puls'), findsNothing);
+    expect(find.byKey(const Key('metric-hr')), findsNothing);
+    expect(find.textContaining('Puls'), findsNothing);
+  });
+
+  testWidgets('leaves out the force curve without data', (tester) async {
+    final harness = _Harness();
+    await harness.pump(tester);
+    await harness.emit(tester, _tick());
+
+    expect(find.byKey(const Key('force-curve')), findsNothing);
   });
 
   for (final (size, layout) in const [
@@ -173,19 +197,20 @@ void main() {
         await harness.emit(tester, _tick(heartRate: 151));
 
         // Overflows would be reported as exceptions and fail the test.
-        final pace = tester.getSize(find.byKey(const Key('metric-pace')));
-        for (final key in ['metric-elapsed', 'metric-distance', 'metric-watts', 'metric-spm', 'metric-hr']) {
-          final other = tester.getSize(find.byKey(Key(key)));
-          expect(pace.width * pace.height, greaterThan(other.width * other.height), reason: key);
-        }
+        final view = find.byKey(ValueKey(LiveLayout.of(size)));
+        _expectLargestPace(tester, view, Key(template ? 'pace-box-pace' : 'metric-pace'));
         if (template) {
           for (final key in const [
-            'course-lap',
-            'course-segment',
-            'course-range',
-            'course-rest',
-            'course-bands',
-            'course-zone',
+            'pace-box-course',
+            'pace-box-lap',
+            'pace-box-segment',
+            'pace-box-status',
+            'stroke-card-status',
+            'metric-spm',
+            'metric-lap-time',
+            'metric-watts',
+            'metric-hr',
+            'metric-zone-share',
           ]) {
             final rect = tester.getRect(find.byKey(Key(key)));
             expect(rect.bottom, lessThanOrEqualTo(size.height), reason: key);
@@ -197,17 +222,28 @@ void main() {
   }
 
   group('on a template', () {
-    testWidgets('shows lap, zone, rest, bands and the share in the zone', (tester) async {
+    /// The legend line with [key] in the pace box shows [label] and [value].
+    void expectLine(String key, String label, String value) {
+      final line = find.byKey(Key(key));
+      expect(find.descendant(of: line, matching: find.text(label)), findsOneWidget, reason: key);
+      expect(find.descendant(of: line, matching: find.text(value)), findsOneWidget, reason: key);
+    }
+
+    testWidgets('shows lap, zone and rest in the pace box, the bands and the share in the zone', (tester) async {
       final harness = _Harness();
       await harness.pump(tester, recording: _onCourse());
       await harness.emit(tester, _tick());
 
-      expect(find.text('Runde 2 von 3'), findsOneWidget);
-      expect(find.text('Tempo'), findsOneWidget);
-      expect(find.text('200–800 m'), findsOneWidget);
-      expect(find.text('noch 280 m'), findsOneWidget);
-      expect(find.text('2:05–2:10 · 20–22 spm'), findsOneWidget);
-      expect(find.text('Zone 75 %'), findsOneWidget);
+      expectLine('pace-box-course', 'Gesamt', '1\u00A0520 / 3\u00A0000 m');
+      expectLine('pace-box-lap', 'Runde 2 / 3', 'noch 480 m');
+      expectLine('pace-box-segment', 'Tempo', 'noch 280 m');
+      expect(find.text('In der Zone · 2:05–2:10'), findsOneWidget);
+      expect(find.text('In der Zone · 20–22 spm'), findsOneWidget);
+      expect(find.text('24 spm'), findsOneWidget);
+      expect(find.text('2:31'), findsOneWidget);
+      expect(find.text('75 %'), findsOneWidget);
+      // The range of the segment is left to the progress frame.
+      expect(find.text('200–800 m'), findsNothing);
     });
 
     testWidgets('shows the course and the values in English', (tester) async {
@@ -219,11 +255,11 @@ void main() {
       );
       await harness.emit(tester, _tick(heartRate: 151));
 
-      expect(find.text('Lap 2 of 3'), findsOneWidget);
-      expect(find.text('280 m to go'), findsOneWidget);
-      expect(find.text('faster'), findsOneWidget);
-      expect(find.text('more strokes'), findsOneWidget);
-      for (final label in ['Time', 'Meters', 'Watts', 'Strokes/min', 'Heart rate', 'Pace /500 m', 'End session']) {
+      expectLine('pace-box-lap', 'Lap 2 / 3', '480 m to go');
+      expectLine('pace-box-segment', 'Tempo', '280 m to go');
+      expect(find.text('Faster · 2:05–2:10'), findsOneWidget);
+      expect(find.text('More strokes · 20–22 spm'), findsOneWidget);
+      for (final label in ['Lap', 'Watts', 'Heart rate', 'In zone', 'PACE /500 M', 'STROKE RATE', 'End session']) {
         expect(find.text(label), findsOneWidget, reason: label);
       }
       // The pace keeps the PM5 format in every language.
@@ -235,8 +271,9 @@ void main() {
       await harness.pump(tester, recording: _onCourse());
       await harness.emit(tester, _tick());
 
-      expect(find.byKey(const Key('zone-in')), findsNWidgets(2));
-      expect(find.text('in der Zone'), findsNWidgets(2));
+      expect(find.byKey(const Key('pace-box-zone-in')), findsOneWidget);
+      expect(find.byKey(const Key('stroke-card-zone-in')), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle), findsNWidgets(2));
     });
 
     testWidgets('shows in which direction a value is off, not by colour alone', (tester) async {
@@ -244,10 +281,11 @@ void main() {
       await harness.pump(tester, recording: _onCourse(pace: BandStatus.above, strokeRate: BandStatus.below));
       await harness.emit(tester, _tick());
 
-      expect(find.byKey(const Key('zone-out')), findsNWidgets(2));
-      expect(find.text('schneller'), findsOneWidget);
+      expect(find.byKey(const Key('pace-box-zone-out')), findsOneWidget);
+      expect(find.byKey(const Key('stroke-card-zone-out')), findsOneWidget);
+      expect(find.text('Schneller · 2:05–2:10'), findsOneWidget);
       expect(find.byIcon(Icons.arrow_upward), findsNWidgets(2));
-      expect(find.text('mehr Schläge'), findsOneWidget);
+      expect(find.text('Mehr Schläge · 20–22 spm'), findsOneWidget);
     });
 
     testWidgets('shows a free gap without bands', (tester) async {
@@ -262,21 +300,30 @@ void main() {
       );
       await harness.emit(tester, _tick());
 
-      expect(find.text('frei'), findsOneWidget);
-      expect(find.text('noch 280 m'), findsOneWidget);
-      expect(find.byKey(const Key('course-bands')), findsNothing);
-      expect(find.byKey(const Key('zone-in')), findsNothing);
-      expect(find.byKey(const Key('zone-out')), findsNothing);
-      expect(find.textContaining('Zone'), findsNothing);
+      expectLine('pace-box-segment', 'frei', 'noch 280 m');
+      expect(find.byKey(const Key('pace-box-status')), findsNothing);
+      expect(find.byKey(const Key('stroke-card-status')), findsNothing);
+      expect(find.byKey(const Key('pace-box-zone-in')), findsNothing);
+      expect(find.byKey(const Key('stroke-card-zone-in')), findsNothing);
+      expect(find.byKey(const Key('stroke-card-zone-out')), findsNothing);
+      expect(find.text('–'), findsOneWidget);
+    });
+
+    testWidgets('ends the session with a short button in landscape', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, size: const Size(844, 390), recording: _onCourse());
+      await harness.emit(tester, _tick());
+
+      expect(find.text('Beenden'), findsOneWidget);
     });
   });
 
-  testWidgets('shows no course bar on a free session', (tester) async {
+  testWidgets('shows no pace box on a free session', (tester) async {
     final harness = _Harness();
     await harness.pump(tester);
     await harness.emit(tester, _tick());
 
-    expect(find.byKey(const Key('course-lap')), findsNothing);
+    expect(find.byType(PaceBox), findsNothing);
   });
 
   testWidgets('marks the values as outdated after 3 seconds without data', (tester) async {
