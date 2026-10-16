@@ -19,9 +19,9 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
-| 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
+| 5 | `heart-rate` | 0/22 | ja, 1 und 3 umgesetzt | Artefakte an FTMS und `ui-design` angleichen, dann umsetzen |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
-| 7 | `ghost` | – (keine Tasks) | nein | Entscheide F6–F8, dann Tasks; braucht 3 und 6 |
+| 7 | `ghost` | – (keine Tasks) | ja, nach 3 und 6 | `tasks.md` erstellen |
 | 8 | `rename-stroke-and-split` | 0/10 | zuletzt | Entscheide F9, F10; Domain- und Markenrecherche |
 | 9 | `gitlab-pipeline` | 0/17 | jederzeit | Nutzer: Debug-Keystore als CI-Variable, `v*` als geschützter Tag (Task 2.2) |
 
@@ -149,7 +149,7 @@ Vor dem Start anpassen:
 - [ ] Design bindet den Gurt an `Pm5BleSource`; nach `device-types` gibt es auch FTMS-Quellen. Festlegen, ob der Gurt auch mit FTMS verbunden wird.
 - [ ] Gleiche MODIFIED-Anforderungen wie `device-types` (`rowing-telemetry` „Laufende Messwerte bereitstellen“, `session-recording` „Session vollständig speichern“, „Rohdaten für Replay speichern“): Deltas auf den Text nach dem Archivieren von `device-types` umschreiben, sonst überschreibt das Archiv dessen Änderungen.
 
-Offene Entscheide: F3, F4.
+Entscheide F3 und F4 getroffen (Design D7, D8).
 
 ### 6. `statistics`: Ranglisten pro Vorlage, Strecke und Zone
 
@@ -179,7 +179,7 @@ Gruppe 1 umgesetzt (2026-10-16, Tasks 1.1–1.6, `lib/data/statistics/`):
 
 Ziel: violettes Schiffchen auf den Spuren des Fortschrittsrahmens, Abstand in Metern und Sekunden, Ghost-Symbol bei Platz 1 in der Vorlagenwahl. Der Ghost jeder Spur ist Platz 1 der Rangliste dieser Ebene aus `statistics` (F5, Design D2, Spec „Platz 1 ist der Ghost“).
 
-Blockiert: `design.md` hat offene Fragen F6–F8. Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
+Entscheide F6–F8 getroffen (Design D4, D5). Danach `tasks.md` ergänzen (`/opsx:continue ghost`). Braucht den Fortschrittsrahmen aus `ui-design` und die Ranglisten aus `statistics`.
 
 ### 8. `rename-stroke-and-split`: App heisst „Stroke & Split“
 
@@ -207,12 +207,12 @@ Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwech
 |---|---|---|---|
 | ~~F1~~ | Puls-Herkunft: Gurt in „Geräte wählen“ wählen; Puls vom BLE-Gurt, sonst vom PM5, sonst keine Anzeige; Herkunft wird **nicht** angezeigt (2026-10-16) | ui-design, heart-rate | entschieden |
 | ~~F2~~ | Startbildschirm: **Mittelweg** (2026-10-16): Quelle, „Rudern“, „Frei rudern“, Kachel „Nochmal“ mit der zuletzt geruderten Vorlage, Link „Sessions“ | ui-design | entschieden |
-| F3 | Welcher Puls gilt, wenn FTMS-Gerät und Gurt beide liefern? | heart-rate | heart-rate |
-| F4 | Gurt auch mit FTMS-Rudergeräten automatisch verbinden? | heart-rate | heart-rate |
+| ~~F3~~ | Welcher Puls gilt, wenn FTMS-Gerät und Gurt beide liefern: **der Gurt** (2026-10-16) | heart-rate | entschieden |
+| ~~F4~~ | Gurt auch mit FTMS-Rudergeräten automatisch verbinden: **ja** (2026-10-16) | heart-rate | entschieden |
 | ~~F5~~ | Wer ist der Ghost: **Platz 1 der Rangliste jeder Ebene** aus `statistics`, einer pro Spur (2026-10-16) | ghost | entschieden |
-| F6 | Welcher Abstand steht in der Box, wenn er pro Ebene verschieden ist? | ghost | ghost |
-| F7 | Meter, Sekunden oder beides? Am Erg prüfen. | ghost | ghost |
-| F8 | Schiffchen bei kleinem Abstand: überlappen lassen oder Ghost nach aussen rücken? | ghost | ghost |
+| ~~F6~~ | Welcher Abstand steht in der Box: **der zum Ghost der ganzen Vorlage** (2026-10-16) | ghost | entschieden |
+| ~~F7~~ | Einheit des Abstands: **Sekunden auf der Distanzachse, Meter auf der Zeitachse** (2026-10-16) | ghost | entschieden |
+| ~~F8~~ | Schiffchen bei kleinem Abstand: **Ghost rückt nach aussen** (2026-10-16) | ghost | entschieden |
 | F9 | „Stroke & Split“ oder „Stroke and Split“? | rename | rename |
 | F10 | App-ID `ch.strokesplit` oder `ch.<herausgeber>.strokesplit`? | rename | rename |
 | F11 | Live-Display beim Übergang in eine Zone vorwarnen, z.B. „Sprint in 50 m“? (offen aus `zones`) | – (neuer Change) | – |

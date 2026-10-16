@@ -99,11 +99,12 @@ Die App speichert den Gurt als `heart_rate_monitor.id` und `heart_rate_monitor.n
                                                                +--- 30 s ----+
 ```
 
-`heartRateMonitorProvider` beobachtet `activeErgSourceProvider` und `ergConnectionStateProvider`. Nur bei einer `Pm5BleSource` im Zustand „verbunden“ verbindet er den Gurt und hängt dessen Strom an die Quelle (D1). Wiederverbindet sich der PM5, bleibt der Gurt verbunden. Wird der PM5 bewusst gestoppt oder die Quelle gewechselt, trennt er den Gurt. Das Wiederverbinden innerhalb von 30 s folgt derselben Logik wie in `Pm5BleSource`. Lässt sich diese Logik ohne Verrenkungen herauslösen, nutzen beide sie gemeinsam.
+`heartRateMonitorProvider` beobachtet `activeErgSourceProvider` und `ergConnectionStateProvider`. Bei einer BLE-Quelle eines Rudergeräts im Zustand „verbunden“, also PM5 oder FTMS (F4, entschieden 2026-10-16), verbindet er den gemerkten Gurt automatisch und hängt dessen Strom an die Quelle (D1). Simulator und Replay verbinden keinen Gurt. Wiederverbindet sich der PM5, bleibt der Gurt verbunden. Wird der PM5 bewusst gestoppt oder die Quelle gewechselt, trennt er den Gurt. Das Wiederverbinden innerhalb von 30 s folgt derselben Logik wie in `Pm5BleSource`. Lässt sich diese Logik ohne Verrenkungen herauslösen, nutzen beide sie gemeinsam.
 
 ### D8: Anzeige
 
 - Puls-Herkunft (F1, entschieden 2026-10-16): Gurt vor PM5 vor keinem Puls nach der Vorrangregel (D3); die Herkunft wird im Live-Display nicht angezeigt, ohne Puls fehlt die Kachel bzw. der Wert.
+- FTMS-Rudergerät und Gurt (F3, entschieden 2026-10-16): Liefern beide einen Puls, gilt der Gurt, wie beim PM5. Der Puls des FTMS-Geräts dient nur als Rückfall, wenn kein Gurt verbunden ist oder er keine Werte liefert.
 - **Geräte wählen** (vor dem Startbildschirm, `ui-design` D6, entschieden 2026-10-16): ein Bereich „Pulsgurt“ mit dem gekoppelten Gurt oder „Kein Gurt“ sowie den Aktionen Koppeln/Wechseln (öffnet die Gurt-Suche) und Vergessen. Der Pulsgurt ist optional, „Weiter“ geht auch ohne. Der Startbildschirm zeigt den Gurt in der Gerätezeile.
 - **Live-Display**: Ein zweiter Indikator steht neben dem bestehenden `ConnectionIndicator`. Die Puls-Kachel zeigt unter dem Wert klein das letzte RR-Intervall. Den letzten `HeartBeatIntervals` merkt sich das Display und blendet ihn aus, wenn der jüngste `StatusTick` mehr als 3 s später liegt. Das funktioniert so auch im Replay.
 - **Zusammenfassung**: Ø/Max-Puls als weitere Kennzahlen. Bei RR-Daten kommt eine Kurve mit `CustomPainter` dazu (keine Chart-Dependency, eine einzige Linie) sowie „HRV (RMSSD) xx ms“.
