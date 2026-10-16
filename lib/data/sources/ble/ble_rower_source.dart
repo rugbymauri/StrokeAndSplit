@@ -5,6 +5,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 import '../erg_source.dart';
 import 'ble_transport.dart';
+import 'reconnect.dart';
 
 /// A real rower, PM5 or FTMS, connected over Bluetooth LE.
 ///
@@ -115,26 +116,18 @@ class BleRowerSource implements ErgSource {
   Future<void> _reconnect() async {
     _detach();
     _setState(ErgConnectionState.reconnecting);
-    final deadline = clock.now().add(reconnectWindow);
-
-    while (!_stopped) {
-      final remaining = deadline.difference(clock.now());
-      if (remaining <= Duration.zero) break;
-      try {
-        final link = await _transport.connect(device).timeout(remaining);
-        if (_stopped) {
-          await link.disconnect();
-          return;
-        }
-        _attach(link);
-        return;
-      } catch (_) {
-        final left = deadline.difference(clock.now());
-        if (left <= Duration.zero) break;
-        await Future<void>.delayed(left < retryDelay ? left : retryDelay);
-      }
+    final link = await reconnectWithin(
+      connect: () => _transport.connect(device),
+      window: reconnectWindow,
+      retryDelay: retryDelay,
+      cancelled: () => _stopped,
+      discard: (link) => link.disconnect(),
+    );
+    if (link != null) {
+      _attach(link);
+    } else if (!_stopped) {
+      _setState(ErgConnectionState.disconnected);
     }
-    if (!_stopped) _setState(ErgConnectionState.disconnected);
   }
 
   void _setState(ErgConnectionState state) {
