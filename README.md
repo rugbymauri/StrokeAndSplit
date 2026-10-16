@@ -2,7 +2,7 @@
 
 Ruder-App für den Concept2-RowErg mit PM5 und für Rudergeräte mit dem Bluetooth-Standard FTMS (Fitness Machine Service). Sie verbindet sich per Bluetooth mit dem Rudergerät, zeigt die Werte live und zeichnet Sessions lokal auf. Läuft auf Android, iOS und dem Linux-Desktop. Ohne Rudergerät funktioniert sie mit dem eingebauten Simulator, der wahlweise wie ein PM5 oder wie ein FTMS-Rudergerät sendet. Ein PM5 am SkiErg oder BikeErg und FTMS-Geräte, die keine Rudergeräte sind, werden abgewiesen.
 
-Die Gamification heisst hier „gegen sich selbst rudern“. Vorhanden sind Verbindung, Live-Display, Simulator, Aufzeichnung und Replay (Change `foundation`), Strecken mit Zonen und Runden (Changes `courses` und `zones`) sowie FTMS-Rudergeräte (Change `device-types`). Geplant sind Ghost und Progression.
+Die Gamification heisst hier „gegen sich selbst rudern“. Vorhanden sind Verbindung, Live-Display, Simulator, Aufzeichnung und Replay (Change `foundation`), Strecken mit Zonen und Runden (Changes `courses` und `zones`), FTMS-Rudergeräte (Change `device-types`) sowie Deutsch und Englisch (Change `translations`). Geplant sind Ghost und Progression.
 
 ## Setup
 
@@ -26,6 +26,7 @@ Alle Befehle zeigt `make help`.
 |---|---|
 | `make run` / `make run-android` | App auf Linux bzw. einem per USB verbundenen Android-Gerät starten |
 | `make check` | Statische Analyse und Tests von App und `erg_protocol` |
+| `make l10n` | Übersetzungen neu erzeugen, nach Änderungen an `lib/l10n/app_*.arb` |
 | `make codegen` | drift-Code neu erzeugen, nach Änderungen an `lib/data/db/database.dart` |
 | `make schema` | Schema-Snapshot und Migrationstests erzeugen, nach dem Erhöhen von `schemaVersion` |
 | `make spike` / `make spike-android` | Minimal-App, die Rohpakete von PM5 und FTMS-Rudergeräten mitschneidet (siehe unten) |
@@ -55,6 +56,10 @@ Eine geänderte Zone gilt in allen Strecken, die sie enthalten. Passt sie danach
 
 Runden laufen nach Wanduhr: Eine Pause kostet bei Distanzstrecken Zeit und bei Zeitstrecken Meter, auch wenn der PM5 seine Uhr anhält. Wird eine schon geruderte Strecke geändert, auch über eine ihrer Zonen, entsteht eine neue Version, alte Sessions behalten ihre.
 
+### Sprache
+
+Die App startet auf Deutsch. Das Sprach-Symbol oben rechts im Startbildschirm schaltet zwischen **Deutsch** und **English** um. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Vorlagen), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten bleiben wie am PM5 (`2:05.3`).
+
 ## Projektstruktur
 
 ```
@@ -67,6 +72,7 @@ lib/
     zones/             Wiederverwendbare Zonen
     templates/         Vorlagen aus Strecke und Rundenzahl
     sessions/          Aufzeichnung, Zusammenfassung, Export/Import
+  l10n/                Übersetzungen: app_de.arb (Vorlage), app_en.arb und der erzeugte Code
   features/
     connection/        Startbildschirm, PM5-Suche, Verbindungsanzeige
     courses/           Strecken-Liste und -Editor mit „Zone einbauen“
@@ -82,6 +88,16 @@ openspec/              Anforderungen, Design und Tasks (OpenSpec)
 ```
 
 Alle Quellen liefern rohe PM5-Pakete. Ein einziger Decoder in `erg_protocol` macht daraus Messwerte. So laufen Simulator und Replay durch denselben Code wie der echte PM5. Die Byte-Layouts und Beobachtungen am echten PM5 stehen in [`packages/erg_protocol/README.md`](packages/erg_protocol/README.md).
+
+## Texte und Übersetzungen
+
+Neue Texte der Oberfläche kommen nur über die ARB-Dateien in `lib/l10n/`, nie als Literal in den Code:
+
+1. Den Key mit dem deutschen Text und einer `@`-Beschreibung in `app_de.arb` eintragen. Die Beschreibung ist Pflicht und sagt, wo der Text steht und was Platzhalter enthalten.
+2. Denselben Key in `app_en.arb` übersetzen. Ein Test schlägt fehl, wenn einer Sprache ein Key fehlt oder sie einen zu viel hat.
+3. `make l10n` erzeugt den Code neu, im Widget dann `context.l10n.<key>`. Der erzeugte Code wird eingecheckt.
+
+Zahlen mit Mehrzahl über `plural`, Namen in Anführungszeichen stehen samt Zeichen in der ARB-Datei (`„{name}“` bzw. `“{name}”`). `lib/data/` liefert keine Sätze, sondern Codes, die `lib/features/` übersetzt. Ohne Übersetzung bleiben Einheiten (`m`, `spm`), Formate wie Pace und Zeiten und Eigennamen (PM5, FTMS, Concept2, ErgData). Eine weitere Sprache braucht eine weitere `app_<code>.arb`, einen Eintrag in `AppLanguage` und das Datumsmuster `dateTimePattern`. Deutsch folgt der Schweizer Rechtschreibung (`ss` statt `ß`).
 
 ## Dateiformat `.aergrow`
 

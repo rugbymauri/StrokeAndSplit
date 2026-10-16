@@ -31,8 +31,8 @@
 
 ## 6. Abschluss
 
-- [ ] 6.1 Suche nach verbliebenen Text-Literalen in `lib/features/` und `lib/app/`; was übrig bleibt, ist begründet (Einheiten, Formate, Eigennamen). README: Abschnitt Sprache und Hinweis „neue Texte nur über die ARB-Dateien“ für Beitragende. Verifikation: Durchsicht der Suchergebnisse, README gelesen
-- [ ] 6.2 `make check` grün und `openspec validate translations --strict` gültig
+- [x] 6.1 Suche nach verbliebenen Text-Literalen in `lib/features/` und `lib/app/`; was übrig bleibt, ist begründet (Einheiten, Formate, Eigennamen). README: Abschnitt Sprache und Hinweis „neue Texte nur über die ARB-Dateien“ für Beitragende. Verifikation: Durchsicht der Suchergebnisse, README gelesen
+- [x] 6.2 `make check` grün und `openspec validate translations --strict` gültig
 - [ ] 6.3 Manuell auf Linux und Android: Sprache wechseln, App neu starten, alle Screens in beiden Sprachen durchgehen, keine abgeschnittenen Texte
 
 ## Workflow follow-up

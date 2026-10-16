@@ -16,7 +16,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones` un
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
-| 2 | `translations` | 14/16 | in Arbeit auf `feature/translations` | – |
+| 2 | `translations` | 15/16 | umgesetzt auf `feature/translations`, manueller Test 6.3 offen | – |
 | 3 | `ui-design` | 0/18 | nach 2 | Entscheid Puls-Herkunft (F1) |
 | 4 | `force-curve` | 0/8 | nach 3 | Spike am echten PM5 (Characteristic bestätigen) |
 | 5 | `heart-rate` | 0/22 | nach 1 und 3 | Entscheide F3, F4 |
@@ -82,6 +82,8 @@ Vor dem Start:
 - [x] F15 und F16 vorläufig nach Vorschlag entschieden (Schweizer Rechtschreibung, `shared_preferences`), im Design als D6 und D2. Der Nutzer kann sie noch kippen.
 - Sprachwahl vorerst als Symbol im Startbildschirm (Design D3); `ui-design` verlegt sie.
 - Texte des Startbildschirms schon mit Task 2.2 übersetzt, weil der Test der Sprachwahl sie braucht; Task 4.1 übernimmt den Rest der Verbindung.
+- Nach 6.1 bleiben als Literale nur Einheiten (`m`, `spm`, `m:ss`), Formate, Eigennamen (PM5, FTMS, Concept2) und der Dateityp „AergRow-Session“ im Dateidialog; den benennt `rename-stroke-and-split` um.
+- Offen ist nur noch der manuelle Test 6.3 auf Linux und Android (User).
 
 ### 3. `ui-design`: Designsprache und neue Screens aus dem Claude-Design-Canvas
 
