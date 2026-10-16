@@ -141,6 +141,21 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
+  testWidgets('closes with the course deleted while it is open', (tester) async {
+    final setup = _Setup();
+    final id = await setup.seerunde(tester);
+    await setup.pump(tester);
+    await setup.open(tester, 'Seerunde');
+    expect(find.byType(CourseDetailScreen), findsOneWidget);
+
+    await tester.runAsync(() => setup.courses.delete(id));
+    await setup.settle(tester);
+
+    expect(find.byType(CourseDetailScreen), findsNothing);
+    expect(find.textContaining('Noch keine Strecken angelegt.'), findsOneWidget);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
   testWidgets('shows the details in English', (tester) async {
     final setup = _Setup();
     final id = await setup.seerunde(tester);
