@@ -165,7 +165,8 @@ Entscheide F3 und F4 getroffen (Design D7, D8).
 - [x] Tasks 4.3, 3.1–3.4: Gurt in `shared_preferences` (Key `heartRateMonitor`, JSON id/name); Schema 6 mit `rr_intervals` und Ø/Max-Puls/RMSSD in `sessions`; RR-Intervalle auf der Wanduhr-Achse der Session (nicht der PM5-Uhr, die in Pausen steht); Export/Import mit Pulswerten. Vorläufig: frühe Intervalle der ersten Messung können leicht negative Zeiten haben.
 - [x] Tasks 5.1, 5.2: Bereich „Pulsgurt“ in „Geräte wählen“ mit eigener Gurt-Suche (`heart_rate_search_screen.dart`, 15 s, Tipps, „Erneut suchen“), Koppeln/Wechseln/Vergessen; Startbildschirm zeigt den Gurt unter dem Rudergerät. Vorläufig: Wahl in der Suche koppelt sofort; der Berechtigungstext der Gurt-Suche spricht noch vom Rudergerät.
 - [x] Tasks 5.3–5.5: `HeartRateIndicator` neben `ConnectionIndicator` mit `HeartRateNotice` und „Erneut versuchen“; Gurt verbindet app-weit, sobald das Rudergerät verbunden ist (`ref.listen` in `aergrow_app.dart`, D7); letztes RR-Intervall klein beim Puls, ausgeblendet ab 3 s; Zusammenfassung mit Ø/Max-Puls, RR-Kurve und HRV (RMSSD). Vorläufig: RR-Kurve und Herz in `AppColors.zoneOut` (orange) wie das bestehende `HeartIcon`; Text „Wartet auf das Rudergerät“ für einen bereiten Gurt.
-- [x] Tasks 6.1, 6.2: README-Abschnitt „Pulsgurt“, Dateiformat um `2a37` und Pulswerte ergänzt. Offen: 1.1/1.2 Mitschnitt mit Gurt und 6.3 Test am Gerät (Nutzer hat keinen Gurt); 2.6 braucht die Fixture.
+- [x] Tasks 6.1, 6.2: README-Abschnitt „Pulsgurt“, Dateiformat um `2a37` und Pulswerte ergänzt. Offen: 1.1/1.2 Mitschnitt mit Gurt und 6.3 Test am Gerät; 2.6 braucht die Fixture.
+- [x] Erster Gerätetest (Nutzer, 2026-10-16): BLE-Gurt ohne PM5 gekoppelt, Puls wird angezeigt. Offen für 6.3: mit PM5 und mit FTMS-Rudergerät, Wiederverbinden, Rückfall auf den Puls des Rudergeräts, Zusammenfassung, Replay, Export/Import; danach 1.1/1.2 Mitschnitt mit `make spike`.
 
 ### 6. `statistics`: Ranglisten pro Vorlage, Strecke und Zone
 
