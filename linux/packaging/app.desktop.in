@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=AergRow
+Name=Stroke & Split
 Comment=Rowing app for the Concept2 RowErg and FTMS rowers
 Exec=@APP_NAME@
 Icon=@APP_NAME@

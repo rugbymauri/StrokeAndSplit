@@ -167,7 +167,7 @@ void main() {
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
       await tester.pump();
     }
-    expect(find.textContaining('keine lesbare AergRow-Session'), findsOneWidget);
+    expect(find.textContaining('keine lesbare Stroke & Split-Session'), findsOneWidget);
     await setup.tearDown(tester);
   });
 

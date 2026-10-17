@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'AergRow';
+  String get appTitle => 'Stroke & Split';
 
   @override
   String get startSimulatorHint =>

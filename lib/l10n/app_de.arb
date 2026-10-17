@@ -1,6 +1,6 @@
 {
   "@@locale": "de",
-  "appTitle": "AergRow",
+  "appTitle": "Stroke & Split",
   "@appTitle": {
     "description": "Name of the app, e.g. in the task switcher."
   },

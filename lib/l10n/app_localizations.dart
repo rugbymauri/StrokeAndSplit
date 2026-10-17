@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// Name of the app, e.g. in the task switcher.
   ///
   /// In de, this message translates to:
-  /// **'AergRow'**
+  /// **'Stroke & Split'**
   String get appTitle;
 
   /// Choose devices and start screen: explanation below 'Simulator'
