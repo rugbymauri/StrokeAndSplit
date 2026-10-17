@@ -58,7 +58,7 @@ class PluginSessionFiles implements SessionFiles {
 
   // Mobile pickers know no `.aergrow` type, so they offer all files there.
   static List<XTypeGroup> get _typeGroups =>
-      _isMobile ? const [] : const [XTypeGroup(label: 'AergRow-Session', extensions: ['aergrow', 'jsonl'])];
+      _isMobile ? const [] : const [XTypeGroup(label: 'Stroke & Split-Session', extensions: ['aergrow', 'jsonl'])];
 
   @override
   Future<bool> save(String fileName, List<int> bytes) async {

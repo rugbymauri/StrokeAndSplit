@@ -7,7 +7,7 @@
 
 ## 1. Sichtbarer Name
 
-- [ ] 1.1 Anzeigename „Stroke & Split“ in App-Titel, Startbildschirm, Meldungen, Android-Label, iOS `CFBundleDisplayName`, Linux-Fenstertitel und macOS-Produktname. Verifikation: `make check` grün, `git grep -i "aergrow"` findet keinen sichtbaren Text mehr in `lib`
+- [x] 1.1 Anzeigename „Stroke & Split“ in App-Titel, Startbildschirm, Meldungen, Android-Label, iOS `CFBundleDisplayName`, Linux-Fenstertitel und macOS-Produktname. Verifikation: `make check` grün, `git grep -i "aergrow"` findet keinen sichtbaren Text mehr in `lib`
 
 ## 2. Session-Dateien
 
