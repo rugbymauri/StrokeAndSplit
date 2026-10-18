@@ -643,6 +643,12 @@ abstract class AppLocalizations {
   /// **'Warte auf ersten Schlag'**
   String get liveForceCurveWaiting;
 
+  /// Live display: a force in whole Newton, on the scale beside the force curve and as the peak force of the last stroke
+  ///
+  /// In de, this message translates to:
+  /// **'{newtons} N'**
+  String liveForceNewtons(int newtons);
+
   /// Course bar: the current lap of an open number of laps
   ///
   /// In de, this message translates to:

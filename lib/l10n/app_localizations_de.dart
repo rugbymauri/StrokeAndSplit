@@ -353,6 +353,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get liveForceCurveWaiting => 'Warte auf ersten Schlag';
 
   @override
+  String liveForceNewtons(int newtons) {
+    return '$newtons N';
+  }
+
+  @override
   String courseLap(int lap) {
     return 'Runde $lap';
   }

@@ -455,6 +455,15 @@
   "@liveForceCurveWaiting": {
     "description": "Live display: force curve card before the first curve of the session has arrived"
   },
+  "liveForceNewtons": "{newtons} N",
+  "@liveForceNewtons": {
+    "description": "Live display: a force in whole Newton, on the scale beside the force curve and as the peak force of the last stroke",
+    "placeholders": {
+      "newtons": {
+        "type": "int"
+      }
+    }
+  },
   "courseLap": "Runde {lap}",
   "@courseLap": {
     "description": "Course bar: the current lap of an open number of laps",
