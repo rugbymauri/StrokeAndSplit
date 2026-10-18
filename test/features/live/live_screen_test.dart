@@ -22,6 +22,7 @@ import 'package:aergrow/features/live/progress_frame.dart';
 import 'package:aergrow/features/live/stroke_rate_card.dart';
 import 'package:aergrow/features/simulator/simulator_controls.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
@@ -435,7 +436,8 @@ void main() {
       expectLine('pace-box-lap', 'Lap 2 / 3', '480 m to go');
       expectLine('pace-box-segment', 'Tempo', '280 m to go');
       expect(find.text('Faster · 2:05–2:10'), findsOneWidget);
-      expect(find.text('More strokes · 20–22 spm'), findsOneWidget);
+      expect(find.text('More strokes'), findsOneWidget);
+      expect(find.text('20–22 spm'), findsOneWidget);
       for (final label in ['Lap', 'Watts', 'Heart rate', 'PACE /500 M', 'STROKE RATE', 'End session']) {
         expect(find.text(label), findsOneWidget, reason: label);
       }
@@ -462,7 +464,8 @@ void main() {
       expect(find.byKey(const Key('stroke-card-zone-out')), findsOneWidget);
       expect(find.text('Schneller · 2:05–2:10'), findsOneWidget);
       expect(find.byIcon(Icons.arrow_upward), findsNWidgets(2));
-      expect(find.text('Mehr Schläge · 20–22 spm'), findsOneWidget);
+      expect(find.text('Mehr Schläge'), findsOneWidget);
+      expect(find.text('20–22 spm'), findsOneWidget);
     });
 
     testWidgets('shows a free gap without bands', (tester) async {
@@ -831,5 +834,75 @@ void main() {
       expect(height(tester, 'pace-box-pace'), greaterThan(90));
       expect(height(tester, 'metric-watts'), greaterThan(40));
     });
+  });
+
+  // The stroke rate card tells the rower to take more or fewer strokes as clearly as the pace box (Design D3).
+  group('stroke rate instruction', () {
+    // Measured in the fonts of the app, as the instruction shrinks to fit.
+    setUpAll(loadAppFonts);
+
+    for (final MapEntry(key: name, value: size) in layouts.entries) {
+      for (final (status, text, icon) in const [
+        (BandStatus.below, 'Mehr Schläge', Icons.arrow_upward),
+        (BandStatus.above, 'Weniger Schläge', Icons.arrow_downward),
+      ]) {
+        testWidgets('shows "$text" on a $name', (tester) async {
+          final harness = _Harness();
+          await harness.pump(tester, size: size, recording: _onCourse(strokeRate: status));
+          await harness.emit(tester, _tick(heartRate: 151));
+
+          final card = find.byType(StrokeRateCard);
+          final pill = find.byKey(const Key('stroke-card-pill'));
+          expect(find.descendant(of: card, matching: pill), findsOneWidget);
+          expect(find.descendant(of: pill, matching: find.byIcon(icon)), findsOneWidget);
+          final word = find.byKey(const Key('stroke-card-status'));
+          // Complete, not cut off, and larger than the label.
+          expect(tester.widget<Text>(word).data, text);
+          expect(tester.renderObject<RenderParagraph>(word).didExceedMaxLines, isFalse);
+          expect(tester.getRect(word).height, greaterThan(tester.getRect(find.text('SCHLAGZAHL')).height));
+          // Filled in the colour out of the zone, so it stands out on the tinted card.
+          final fill = find.descendant(of: pill, matching: find.byType(DecoratedBox)).first;
+          expect((tester.widget<DecoratedBox>(fill).decoration as BoxDecoration).color, AppColors.zoneOut);
+          // The band beside it, below the pill or beside the value.
+          final band = find.descendant(of: card, matching: find.textContaining('20–22 spm', findRichText: true));
+          expect(band, findsOneWidget);
+          final bounds = tester.getRect(card);
+          for (final rect in [tester.getRect(pill), tester.getRect(band)]) {
+            expect(bounds.contains(rect.topLeft) && bounds.contains(rect.bottomRight - const Offset(1, 1)), isTrue);
+            expect(rect.bottom, lessThanOrEqualTo(size.height));
+            expect(rect.right, lessThanOrEqualTo(size.width));
+          }
+        });
+      }
+
+      testWidgets('stays quiet in the zone on a $name', (tester) async {
+        final harness = _Harness();
+        await harness.pump(tester, size: size, recording: _onCourse());
+        await harness.emit(tester, _tick(heartRate: 151));
+
+        expect(find.byKey(const Key('stroke-card-pill')), findsNothing);
+        expect(find.byKey(const Key('stroke-card-zone-in')), findsOneWidget);
+        expect(find.textContaining('In der Zone'), findsNWidgets(2));
+      });
+
+      testWidgets('shows no instruction in a free gap on a $name', (tester) async {
+        final harness = _Harness();
+        await harness.pump(
+          tester,
+          size: size,
+          recording: _onCourse(
+            segment: const CourseSegment(length: 600),
+            pace: BandStatus.none,
+            strokeRate: BandStatus.none,
+          ),
+        );
+        await harness.emit(tester, _tick(heartRate: 151));
+
+        expect(find.byKey(const Key('stroke-card-pill')), findsNothing);
+        expect(find.byKey(const Key('stroke-card-status')), findsNothing);
+        expect(find.text('Mehr Schläge'), findsNothing);
+        expect(find.text('Weniger Schläge'), findsNothing);
+      });
+    }
   });
 }

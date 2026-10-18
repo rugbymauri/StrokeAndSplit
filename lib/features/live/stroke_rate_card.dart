@@ -50,24 +50,55 @@ class StrokeRateCard extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
-    final status = hint == null
-        ? null
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(hint.icon, size: 14, color: foreground),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  band == null || landscape ? hint.text : '${hint.text} · $band',
-                  key: const Key('stroke-card-status'),
-                  style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, color: foreground),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+    // In the zone a quiet line; out of it an instruction as a pill like in the pace box, which stands out
+    // and keeps its words, on a line of its own below the label (Design D3).
+    final Widget? status = switch (hint) {
+      null => null,
+      ZoneHint(inZone: true) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(hint.icon, size: 14, color: foreground),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                band == null || landscape ? hint.text : '${hint.text} · $band',
+                key: const Key('stroke-card-status'),
+                style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, color: foreground),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ZoneHint(inZone: false) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ZonePill(
+              key: const Key('stroke-card-pill'),
+              hint: hint,
+              textKey: const Key('stroke-card-status'),
+              filled: true,
+              // Below the label there is no room for a second line in portrait, while the landscape
+              // card can be too narrow for one.
+              scaleDown: !landscape,
+              maxLines: landscape ? 2 : 1,
+              dense: true,
+            ),
+            // The pill is too narrow for the band beside the word; in landscape it is beside the value.
+            if (band != null && !landscape) ...[
+              const SizedBox(height: 2),
+              Text(
+                band,
+                key: const Key('stroke-card-band'),
+                style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, color: foreground),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
-          );
+          ],
+        ),
+    };
     final value = FittedBox(
       fit: BoxFit.scaleDown,
       child: Text.rich(
@@ -103,7 +134,13 @@ class StrokeRateCard extends StatelessWidget {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(children: [Expanded(child: label), if (status != null) Flexible(child: status)]),
+                  if (hint == null || hint.inZone)
+                    Row(children: [Expanded(child: label), if (status != null) Flexible(child: status)])
+                  else ...[
+                    label,
+                    const SizedBox(height: 6),
+                    status!,
+                  ],
                   Flexible(flex: 2, child: Center(child: value)),
                   if (footer != null) Expanded(flex: 3, child: footer(foreground)),
                 ],
@@ -114,7 +151,10 @@ class StrokeRateCard extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [label, if (status != null) ...[const SizedBox(height: 2), status]],
+                      children: [
+                        label,
+                        if (status != null) ...[SizedBox(height: hint!.inZone ? 2 : AppSpacing.xs), status],
+                      ],
                     ),
                   ),
                   const SizedBox(width: AppSpacing.m),

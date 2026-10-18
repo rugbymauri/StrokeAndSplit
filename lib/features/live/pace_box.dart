@@ -108,7 +108,16 @@ class PaceBox extends StatelessWidget {
                 ),
                 SizedBox(
                   height: statusHeight,
-                  child: hint == null ? null : Center(child: _Status(hint: hint, band: _paceBand(segment))),
+                  child: hint == null
+                      ? null
+                      : Center(
+                          child: ZonePill(
+                            key: Key('pace-box-zone-${hint.inZone ? 'in' : 'out'}'),
+                            hint: hint,
+                            band: _paceBand(segment),
+                            textKey: const Key('pace-box-status'),
+                          ),
+                        ),
                 ),
                 const Padding(padding: EdgeInsets.symmetric(vertical: AppSpacing.s), child: Divider(height: 1)),
                 if (model.course != null)
@@ -186,45 +195,6 @@ class PaceBox extends StatelessWidget {
   String _done(double done, int total) => course.axis == CourseAxis.distance
       ? '${formatGrouped(done.floor())} / ${formatGrouped(total)} m'
       : '${formatElapsed(Duration(seconds: done.floor()))} / ${formatElapsed(Duration(seconds: total))}';
-}
-
-/// The zone status of the pace as symbol and word, not only as colour, with the band.
-class _Status extends StatelessWidget {
-  const _Status({required this.hint, required this.band});
-
-  final ZoneHint hint;
-  final String? band;
-
-  @override
-  Widget build(BuildContext context) {
-    final (background, foreground) = hint.inZone
-        ? (AppColors.zoneInSurface, AppColors.zoneInText)
-        : (AppColors.zoneOutSurface, AppColors.zoneOutText);
-    final band = this.band;
-    return DecoratedBox(
-      key: Key('pace-box-zone-${hint.inZone ? 'in' : 'out'}'),
-      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(PaceBox.statusHeight / 2)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(hint.icon, size: 18, color: foreground),
-            const SizedBox(width: AppSpacing.s),
-            Flexible(
-              child: Text(
-                band == null ? hint.text : '${hint.text} · $band',
-                key: const Key('pace-box-status'),
-                style: AppTextStyles.button.copyWith(color: foreground),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 /// The colour of a track in the legend.
