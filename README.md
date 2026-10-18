@@ -97,7 +97,7 @@ Beim Rudern einer Vorlage läuft auf jeder Spur des Fortschrittsrahmens ein Ghos
 | Mitte | Platz 1 der Strecke mit gleicher Länge | startet mit jeder Runde neu |
 | innen | Platz 1 der Zone des aktuellen Abschnitts mit gleicher Länge | startet mit jeder Fahrt durch die Zone neu |
 
-Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen nicht bei offener Rundenzahl, innen nicht in einem freien Abschnitt, beim freien Rudern gar keiner. Kämen sich Ghost und eigenes Schiffchen in die Quere, rückt der Ghost quer zur Spur nach aussen und kehrt auf die Mitte zurück, sobald wieder Platz ist. Auf Zeitstrecken liegen beide immer auf gleicher Höhe, der Ghost also daneben.
+Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen nicht bei offener Rundenzahl, innen nicht in einem freien Abschnitt, beim freien Rudern gar keiner. Kämen sich Ghost und eigenes Schiffchen in die Quere, rückt der Ghost quer zur Spur nach aussen und kehrt auf die Mitte zurück, sobald wieder Platz ist. Auf Zeitstrecken lägen beide immer auf gleicher Höhe, dort zeigt der Rahmen deshalb keinen Ghost.
 
 Die Pace-Box zeigt in der Zeile **Ghost** den Abstand zum Ghost der Vorlage (aussen): auf Distanzstrecken in Sekunden, auf Zeitstrecken in Metern, z.B. „7.6 s vor dir“ (Rückstand, orange), „12 m hinter dir“ (Vorsprung, blau) oder „gleichauf“. Ohne Ghost aussen fehlt die Zeile, die Ghosts auf den anderen Spuren laufen trotzdem.
 
