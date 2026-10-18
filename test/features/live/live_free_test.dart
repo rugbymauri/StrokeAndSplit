@@ -91,7 +91,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.byKey(const Key('force-curve')), findsOneWidget);
-      expect(find.text('1,06 m'), findsOneWidget);
+      expect(find.text('106 cm'), findsOneWidget);
       final pace = tester.getRect(find.byKey(const Key('metric-pace'))).height;
       for (final text in tester.widgetList<Text>(find.byType(Text))) {
         if (text.key == const Key('metric-pace')) continue;

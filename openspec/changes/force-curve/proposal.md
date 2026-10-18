@@ -8,7 +8,7 @@ Pace und Watt sagen, wie schnell man rudert, aber nicht, wie der Schlag aussieht
 
 - **Kraftkurve lesen**: Die App abonniert beim PM5 die Kraftkurven-Daten (laut Concept2-BLE-Spezifikation die Characteristic 0x003D, vor der Umsetzung per Spike-Mitschnitt zu bestätigen) und setzt die Teilpakete eines Schlags zu einer Kurve zusammen.
 - **Kraftkurve anzeigen**: Das Live-Display zeigt die Kurve des letzten Schlags als Linie mit Fläche und dahinter die des vorherigen Schlags in Grau. Vor dem ersten Schlag zeigt die Karte „Warte auf ersten Schlag“. Liefert die Quelle keine Kurve, entfällt die Karte und die übrigen Werte rücken nach.
-- **Schlaglänge**: Neben der Kurve des letzten Schlags steht dessen Durchzugslänge, etwa „1,02 m“. Fehlt die Länge, etwa bei FTMS-Ruderern, entfällt die Angabe.
+- **Schlaglänge**: Neben der Kurve des letzten Schlags steht dessen Durchzugslänge in Zentimetern, etwa „102 cm“. Fehlt die Länge, etwa bei FTMS-Ruderern, entfällt die Angabe.
 - **Aufzeichnen und abspielen**: Die Kurvenpakete werden als Rohdaten mit der Session gespeichert, exportiert und importiert. Ein Replay zeigt die Kurve wie live.
 - **Simulator**: Der Simulator liefert eine plausible Kurve pro Schlag, damit sich die Anzeige ohne Erg testen lässt.
 

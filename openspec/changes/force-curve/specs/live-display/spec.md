@@ -22,11 +22,11 @@ Unterstützt die Quelle Kraftkurven, SHALL das Live-Display die Kurve des letzte
 - **THEN** zeigt das Display keine Kraftkurven-Karte, und die übrigen Werte nutzen den Platz
 
 ### Requirement: Schlaglänge zur Kraftkurve
-Liefert die Quelle zur Kraftkurve die Durchzugslänge desselben Schlags, SHALL die Kraftkurven-Karte diese Schlaglänge in Metern mit zwei Nachkommastellen neben der Kurve des letzten Schlags zeigen, etwa „1,02 m“. Fehlt die Länge, MUST die Angabe entfallen, ohne einen Ersatzwert wie „0 m“ zu zeigen.
+Liefert die Quelle zur Kraftkurve die Durchzugslänge desselben Schlags, SHALL die Kraftkurven-Karte diese Schlaglänge in ganzen Zentimetern neben der Kurve des letzten Schlags zeigen, etwa „102 cm“. Fehlt die Länge, MUST die Angabe entfallen, ohne einen Ersatzwert wie „0 cm“ zu zeigen.
 
 #### Scenario: Schlag mit Länge
 - **WHEN** der PM5 nach einem Durchzug von 1.06 m die Kurve dieses Schlags liefert
-- **THEN** zeigt die Karte die neue Kurve zusammen mit „1,06 m“ (auf Englisch „1.06 m“)
+- **THEN** zeigt die Karte die neue Kurve zusammen mit „106 cm“
 
 #### Scenario: Kurve ohne Länge
 - **WHEN** zu einer Kurve keine Durchzugslänge vorliegt, etwa weil der Wert fehlt oder 0 ist

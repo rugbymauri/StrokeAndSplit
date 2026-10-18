@@ -55,7 +55,7 @@ List<StrokeForceCurve> _fixtureCurves() {
 }
 
 /// The drive length of [curve] as the live display shows it in German.
-String _length(StrokeForceCurve curve) => '${curve.driveLengthMeters!.toStringAsFixed(2).replaceAll('.', ',')} m';
+String _length(StrokeForceCurve curve) => '${(curve.driveLengthMeters! * 100).round()} cm';
 
 StatusTick _tick({int? heartRate, Duration elapsed = _elapsed}) => StatusTick(
       elapsed: elapsed,
@@ -286,12 +286,12 @@ void main() {
       expect(find.byKey(const Key('force-curve-waiting')), findsNothing);
       expect(find.text('Vorheriger'), findsNothing);
       // Stroke 4 of the fixture (Design D4).
-      expect(find.text('1,06 m'), findsOneWidget);
+      expect(find.text('106 cm'), findsOneWidget);
 
       await harness.emit(tester, curves[3]);
       expect(find.text('Letzter'), findsOneWidget);
       expect(find.text('Vorheriger'), findsOneWidget);
-      expect(find.text('1,06 m'), findsNothing);
+      expect(find.text('106 cm'), findsNothing);
       expect(find.text(_length(curves[3])), findsOneWidget);
     });
 
@@ -389,7 +389,7 @@ void main() {
         } else if (state == ErgConnectionState.connected && !simulator) {
           // The drive length of stroke 4 at the last curve, inside the card and the screen.
           final card = tester.getRect(find.byKey(const Key('force-curve')));
-          final length = tester.getRect(find.text('1,06 m'));
+          final length = tester.getRect(find.text('106 cm'));
           expect(card.contains(length.topLeft) && card.contains(length.bottomRight - const Offset(1, 1)), isTrue);
           expect(length.bottom, lessThanOrEqualTo(size.height));
           expect(length.right, lessThanOrEqualTo(size.width));
@@ -506,7 +506,7 @@ void main() {
         final card = find.byType(StrokeRateCard);
         final title = tester.widget<Text>(find.descendant(of: card, matching: find.text('Kraftkurve')));
         expect(title.style?.color, color);
-        expect(find.descendant(of: card, matching: find.text('1,06 m')), findsOneWidget);
+        expect(find.descendant(of: card, matching: find.text('106 cm')), findsOneWidget);
       });
     }
   });
