@@ -64,6 +64,10 @@ Blau und Orange unterscheiden sich auch in der Helligkeit, damit der Zonenstatus
 
 Schriften: Barlow Condensed 700 für alle Messwerte und 500 für Einheiten und Zeiten (entschieden 2026-10-16), IBM Plex Sans 400/500/600 für Text. Beschriftungen über Werten sind 12–13 px, Grossbuchstaben mit Sperrung 0.08 em.
 
+Werte im Live-Display (entschieden 2026-10-18 vom Nutzer): Pace, Schlagzahl und die Kacheln (Zeit, Distanz, Runde, Watt, Puls) sowie die Werte beim freien Rudern stehen in Barlow 700, Einheiten in 500 (Token `AppFonts.liveValue`). Die Werte füllen meist die Breite ihrer Karte; Barlow ist bei gleicher Breite rund 12 % niedriger als Barlow Condensed („0:00.0“ bei 100 px: 281 statt 249 px breit), so bleibt Höhe für Pace-Box und Kraftkurve. Zusammenfassung, Statistik, Editoren und Titel bleiben bei Barlow Condensed.
+
+*Alternative*: Barlow Semi Condensed. Verworfen, weil sie nur rund 6 % breiter ist als Barlow Condensed (265 px) und im Screenshot kaum niedriger wirkt. IBM Plex Sans wäre noch breiter (302 px), verliert aber den Zusammenhang mit den Zahlen der übrigen Screens.
+
 Radien: Karten 14–16 px, Pace-Box 28 px, Buttons 12–16 px. Abstände in Schritten von 4 px, Seitenrand 20 px im Hochformat und 48 px im Querformat, damit Kamera-Notch und Gestenleiste nichts verdecken.
 
 *Alternative*: Schriften über das Paket `google_fonts` laden. Verworfen, weil die App am Erg oft ohne Netz läuft und beim ersten Start sonst mit einer Ersatzschrift erscheint.
@@ -72,9 +76,9 @@ Radien: Karten 14–16 px, Pace-Box 28 px, Buttons 12–16 px. Abstände in Schr
 
 Das Live-Display wählt das Layout nach dem Seitenverhältnis des verfügbaren Platzes, nicht nach der Geräteausrichtung. Breiter als hoch heisst Querformat. Damit funktioniert ein breites Laptop-Fenster wie ein Handy quer.
 
-- **Hoch, frei**: Pace oben, darunter 2 × 2 Kacheln, eine Zeile mit Nebenwerten, die Kraftkurve und unten „Session beenden“.
+- **Hoch, frei**: Pace oben, darunter 2 × 2 Kacheln, eine Zeile mit Nebenwerten, die Kraftkurve und unten „Session beenden“. Die Pace nimmt höchstens 22 % der Höhe und nicht mehr, als sie bei der Breite braucht; der Rest geht an die Kacheln.
 - **Quer, frei**: links die Pace mit der Kraftkurve darunter, rechts 2 × 2 Kacheln und „Session beenden“.
-- **Hoch, Vorlage**: Pace-Box über die volle Breite, darunter Schlagzahl-Karte, zwei Reihen kleiner Kacheln, oben die Session (Zeit, Distanz), darunter die Runde (Rundenzeit, Watt, Puls; die Kachel „in der Zone“ entfiel nach dem Gerätetest, der Anteil steht in der Zusammenfassung), Kraftkurve und „Session beenden“. Fünf Kacheln nebeneinander wären auf einem 360 px breiten Handy zu schmal für „1 520 m“; die Kraftkurve weicht dafür auf kleinen Handys zuerst.
+- **Hoch, Vorlage**: Pace-Box über die volle Breite, darunter Schlagzahl-Karte, zwei Reihen kleiner Kacheln, oben die Session (Zeit, Distanz), darunter die Runde (Rundenzeit, Watt, Puls; die Kachel „in der Zone“ entfiel nach dem Gerätetest, der Anteil steht in der Zusammenfassung), Kraftkurve und „Session beenden“. Fünf Kacheln nebeneinander wären auf einem 360 px breiten Handy zu schmal für „1 520 m“; die Kraftkurve weicht dafür auf kleinen Handys zuerst, sobald die Pace-Box mit ihr unter 336 px Höhe fiele. Masse mit Barlow (2026-10-18): Schlagzahl-Karte 80 px (vorher 88), Kacheln 64 px (vorher 76), Kraftkurve 72 px, Abstand 10 px; Werte der Kacheln höchstens 42 px (vorher 48), Schlagzahl höchstens 64 px (vorher 80). Damit hat die Kraftkurve ab 718 px Innenhöhe Platz (vorher 806), also auch auf 360 × 740, und auf 390 × 844 ist die Pace-Box mit Kraftkurve 444 statt 412 px hoch.
 - **Quer, Vorlage**: links die Pace-Box fast über die volle Höhe, in der Mitte die Schlagzahl-Karte mit Kraftkurve und darunter Zeit und Distanz der Session nebeneinander, rechts eine schmale Spalte mit den drei Kacheln der Runde und „Beenden“. Fünf Kacheln passen auf einem Handy quer nicht in die Seitenspalte.
 
 Die Grössen skalieren mit dem Platz. Massgebend ist das Verhältnis aus dem Canvas, nicht der absolute Pixelwert.
@@ -183,9 +187,9 @@ Neue und geänderte Texte stehen nur in `lib/l10n/app_de.arb` und `lib/l10n/app_
 
 ## Risks / Trade-offs
 
-- **Platz im Hochformat mit Vorlage**: Pace-Box, Schlagzahl, Kacheln und Kraftkurve sind auf 390 × 844 knapp. Auf kleineren Geräten fällt zuerst die Kraftkurve weg, danach werden die Kacheln einzeilig. Die bestehenden Layout-Tests in allen vier Grössen sichern das ab.
+- **Platz im Hochformat mit Vorlage**: Pace-Box, Schlagzahl, Kacheln und Kraftkurve sind auf 360 × 740 knapp; dort ist die Pace-Box mit Kraftkurve 340 px hoch und ihr Inhalt schrumpft leicht. Auf kleineren Geräten fällt zuerst die Kraftkurve weg, danach werden die Kacheln einzeilig. Die bestehenden Layout-Tests in allen vier Grössen sichern das ab.
 - **Schiffchen überlappen**: Liegen eigener Wert und Ghost sehr nah beieinander, verdeckt ein Schiffchen das andere teilweise. Vorerst liegt der Ghost oben. Erweist sich das am Erg als unlesbar, wird der Ghost nach aussen versetzt.
-- **Schriften als Assets** vergrössern die App um etwa 800 kB. Ihre Lizenzen (OFL) stehen auf der Lizenzseite der App.
+- **Schriften als Assets** vergrössern die App um etwa 1 MB (Barlow für das Live-Display kam mit rund 210 kB dazu). Ihre Lizenzen (OFL) stehen auf der Lizenzseite der App.
 
 ## Open Questions
 
