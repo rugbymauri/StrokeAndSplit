@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:aergrow/app/font_licenses.dart';
+import 'package:strokesplit/app/font_licenses.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

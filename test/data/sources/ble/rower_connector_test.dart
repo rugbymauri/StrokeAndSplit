@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
-import 'package:aergrow/data/sources/ble/rower_connector.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
+import 'package:strokesplit/data/sources/ble/rower_connector.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -1,9 +1,9 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/course_repository.dart';
-import 'package:aergrow/data/sessions/session_providers.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/statistics/session_places.dart';
-import 'package:aergrow/data/templates/template_repository.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course_repository.dart';
+import 'package:strokesplit/data/sessions/session_providers.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/statistics/session_places.dart';
+import 'package:strokesplit/data/templates/template_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

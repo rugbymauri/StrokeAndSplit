@@ -1,9 +1,9 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/lap_tracker.dart';
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/sessions/session_accumulator.dart';
-import 'package:aergrow/data/sessions/session_repository.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/lap_tracker.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sessions/session_accumulator.dart';
+import 'package:strokesplit/data/sessions/session_repository.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 

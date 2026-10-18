@@ -1,4 +1,4 @@
-import 'package:aergrow/app/platform_providers.dart';
+import 'package:strokesplit/app/platform_providers.dart';
 
 /// Keeps "saved" files in memory and hands out [toOpen] when a file is picked.
 class FakeSessionFiles implements SessionFiles {

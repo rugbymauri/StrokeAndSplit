@@ -1,10 +1,10 @@
-import 'package:aergrow/app/aergrow_app.dart';
-import 'package:aergrow/app/platform_providers.dart';
-import 'package:aergrow/data/sources/ble/ble_rower_source.dart';
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
-import 'package:aergrow/data/sources/erg_source_providers.dart';
-import 'package:aergrow/data/sources/heart_rate_choice.dart';
+import 'package:strokesplit/app/strokesplit_app.dart';
+import 'package:strokesplit/app/platform_providers.dart';
+import 'package:strokesplit/data/sources/ble/ble_rower_source.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
+import 'package:strokesplit/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/data/sources/heart_rate_choice.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,7 +15,7 @@ void main() {
   testWidgets('the app starts on "Geräte wählen"', (tester) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [bleTransportProvider.overrideWithValue(FakeBleTransport())],
-      child: const AergRowApp(),
+      child: const StrokeSplitApp(),
     ));
     await tester.pump();
 
@@ -34,7 +34,7 @@ void main() {
       heartRateMonitorStoreProvider.overrideWithValue(MemoryHeartRateMonitorStore(h10)),
     ]);
     addTearDown(container.dispose);
-    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const AergRowApp()));
+    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const StrokeSplitApp()));
 
     await container
         .read(activeErgSourceProvider.notifier)

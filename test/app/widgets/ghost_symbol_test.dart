@@ -1,5 +1,5 @@
-import 'package:aergrow/app/design_tokens.dart';
-import 'package:aergrow/app/widgets/ghost_symbol.dart';
+import 'package:strokesplit/app/design_tokens.dart';
+import 'package:strokesplit/app/widgets/ghost_symbol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,6 +1,6 @@
-import 'package:aergrow/app/design_tokens.dart';
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/features/courses/course_strip.dart';
+import 'package:strokesplit/app/design_tokens.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/features/courses/course_strip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,7 +1,7 @@
-import 'package:aergrow/data/sources/ble/ble_rower_source.dart';
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/rower_choice.dart';
-import 'package:aergrow/data/sources/simulated_source.dart';
+import 'package:strokesplit/data/sources/ble/ble_rower_source.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/rower_choice.dart';
+import 'package:strokesplit/data/sources/simulated_source.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

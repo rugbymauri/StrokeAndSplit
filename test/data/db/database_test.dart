@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';

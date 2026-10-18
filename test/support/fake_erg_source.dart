@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:aergrow/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 /// An [ErgSource] driven by the test.

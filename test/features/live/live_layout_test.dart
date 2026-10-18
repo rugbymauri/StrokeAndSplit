@@ -1,4 +1,4 @@
-import 'package:aergrow/features/live/live_layout.dart';
+import 'package:strokesplit/features/live/live_layout.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 

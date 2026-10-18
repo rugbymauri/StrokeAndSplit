@@ -1,4 +1,4 @@
-import 'package:aergrow/data/sessions/first_stroke.dart';
+import 'package:strokesplit/data/sessions/first_stroke.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 

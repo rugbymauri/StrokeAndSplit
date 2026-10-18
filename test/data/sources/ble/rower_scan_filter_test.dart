@@ -1,4 +1,4 @@
-import 'package:aergrow/data/sources/ble/rower_scan_filter.dart';
+import 'package:strokesplit/data/sources/ble/rower_scan_filter.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter_test/flutter_test.dart';
 

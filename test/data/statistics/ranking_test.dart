@@ -1,5 +1,5 @@
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/statistics/ranking.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/statistics/ranking.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// A lap of session [session] rowed in [ms] over [metres].

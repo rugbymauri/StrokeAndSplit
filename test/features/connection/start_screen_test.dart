@@ -1,23 +1,23 @@
-import 'package:aergrow/app/aergrow_app.dart';
-import 'package:aergrow/app/app_language.dart';
-import 'package:aergrow/app/platform_providers.dart';
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/course_repository.dart';
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/sessions/session_providers.dart';
-import 'package:aergrow/data/sessions/session_repository.dart';
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/sources/erg_source_providers.dart';
-import 'package:aergrow/data/sources/heart_rate_choice.dart';
-import 'package:aergrow/data/sources/rower_choice.dart';
-import 'package:aergrow/data/templates/template_repository.dart';
-import 'package:aergrow/features/connection/choose_devices_screen.dart';
-import 'package:aergrow/features/connection/start_screen.dart';
-import 'package:aergrow/features/live/live_screen.dart';
-import 'package:aergrow/features/sessions/sessions_screen.dart';
-import 'package:aergrow/features/templates/templates_screen.dart';
+import 'package:strokesplit/app/strokesplit_app.dart';
+import 'package:strokesplit/app/app_language.dart';
+import 'package:strokesplit/app/platform_providers.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course_repository.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sessions/session_providers.dart';
+import 'package:strokesplit/data/sessions/session_repository.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/data/sources/heart_rate_choice.dart';
+import 'package:strokesplit/data/sources/rower_choice.dart';
+import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/features/connection/choose_devices_screen.dart';
+import 'package:strokesplit/features/connection/start_screen.dart';
+import 'package:strokesplit/features/live/live_screen.dart';
+import 'package:strokesplit/features/sessions/sessions_screen.dart';
+import 'package:strokesplit/features/templates/templates_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -71,7 +71,7 @@ Future<void> _settle(WidgetTester tester) async {
 }
 
 Future<ProviderContainer> _launch(WidgetTester tester, ProviderContainer container) async {
-  await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const AergRowApp()));
+  await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const StrokeSplitApp()));
   await tester.pump();
   return container;
 }

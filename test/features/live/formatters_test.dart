@@ -1,5 +1,5 @@
-import 'package:aergrow/features/live/formatters.dart';
-import 'package:aergrow/l10n/l10n.dart';
+import 'package:strokesplit/features/live/formatters.dart';
+import 'package:strokesplit/l10n/l10n.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';

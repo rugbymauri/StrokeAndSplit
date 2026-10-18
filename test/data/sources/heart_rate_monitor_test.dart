@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:aergrow/app/platform_providers.dart';
-import 'package:aergrow/data/sources/ble/ble_rower_source.dart';
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/sources/erg_source_providers.dart';
-import 'package:aergrow/data/sources/heart_rate_choice.dart';
-import 'package:aergrow/data/sources/heart_rate_monitor.dart';
+import 'package:strokesplit/app/platform_providers.dart';
+import 'package:strokesplit/data/sources/ble/ble_rower_source.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/data/sources/heart_rate_choice.dart';
+import 'package:strokesplit/data/sources/heart_rate_monitor.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

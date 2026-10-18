@@ -1,6 +1,6 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/course_layout.dart';
-import 'package:aergrow/data/zones/zone.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course_layout.dart';
+import 'package:strokesplit/data/zones/zone.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _sprint = Zone(

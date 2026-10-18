@@ -1,4 +1,4 @@
-import 'package:aergrow/data/sources/ble/heart_rate_scan_filter.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_scan_filter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

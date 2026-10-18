@@ -1,14 +1,14 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/course_repository.dart';
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/ghost/ghost.dart';
-import 'package:aergrow/data/ghost/ghost_repository.dart';
-import 'package:aergrow/data/statistics/ranking.dart';
-import 'package:aergrow/data/statistics/ranking_repository.dart';
-import 'package:aergrow/data/templates/session_template.dart';
-import 'package:aergrow/data/templates/template_repository.dart';
-import 'package:aergrow/data/zones/zone.dart';
-import 'package:aergrow/data/zones/zone_repository.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course_repository.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/ghost/ghost.dart';
+import 'package:strokesplit/data/ghost/ghost_repository.dart';
+import 'package:strokesplit/data/statistics/ranking.dart';
+import 'package:strokesplit/data/statistics/ranking_repository.dart';
+import 'package:strokesplit/data/templates/session_template.dart';
+import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/zones/zone.dart';
+import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/ghost_sessions.dart';

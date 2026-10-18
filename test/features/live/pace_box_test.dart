@@ -1,9 +1,9 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/app/design_tokens.dart';
-import 'package:aergrow/app/widgets/ghost_symbol.dart';
-import 'package:aergrow/data/courses/lap_tracker.dart';
-import 'package:aergrow/data/ghost/ghost.dart';
-import 'package:aergrow/features/live/pace_box.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/app/design_tokens.dart';
+import 'package:strokesplit/app/widgets/ghost_symbol.dart';
+import 'package:strokesplit/data/courses/lap_tracker.dart';
+import 'package:strokesplit/data/ghost/ghost.dart';
+import 'package:strokesplit/features/live/pace_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

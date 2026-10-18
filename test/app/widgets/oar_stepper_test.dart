@@ -1,6 +1,6 @@
-import 'package:aergrow/app/design_tokens.dart';
-import 'package:aergrow/app/widgets/oar_stepper.dart';
-import 'package:aergrow/l10n/l10n.dart';
+import 'package:strokesplit/app/design_tokens.dart';
+import 'package:strokesplit/app/widgets/oar_stepper.dart';
+import 'package:strokesplit/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';

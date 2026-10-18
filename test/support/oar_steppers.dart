@@ -1,4 +1,4 @@
-import 'package:aergrow/app/widgets/oar_stepper.dart';
+import 'package:strokesplit/app/widgets/oar_stepper.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 

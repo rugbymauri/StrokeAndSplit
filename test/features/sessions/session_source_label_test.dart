@@ -1,7 +1,7 @@
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/features/sessions/session_summary_screen.dart';
-import 'package:aergrow/l10n/l10n.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/features/sessions/session_summary_screen.dart';
+import 'package:strokesplit/l10n/l10n.dart';
 import 'package:drift/drift.dart' hide isNull;
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/widgets.dart';

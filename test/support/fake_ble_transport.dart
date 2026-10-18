@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:aergrow/app/platform_providers.dart';
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/app/platform_providers.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
 
 /// A [BleTransport] whose answers are set by the test.
 class FakeBleTransport implements BleTransport {

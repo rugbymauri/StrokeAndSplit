@@ -1,4 +1,4 @@
-import 'package:aergrow/data/db/database.dart';
+import 'package:strokesplit/data/db/database.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
 
 /// A [HeartRateTransport] whose answers are set by the test.
 class FakeHeartRateTransport implements HeartRateTransport {

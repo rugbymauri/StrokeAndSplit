@@ -1,6 +1,6 @@
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/templates/session_template.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/templates/session_template.dart';
 import 'package:drift/drift.dart';
 
 /// A lap as stored after rowing: its segments in order, each with its time

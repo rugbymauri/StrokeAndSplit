@@ -1,5 +1,5 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/ghost/ghost.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/ghost/ghost.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// 100 m in 20 s, a pause of 10 s, then 100 m in 25 s.
