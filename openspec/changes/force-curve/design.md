@@ -60,7 +60,13 @@ Abweichend von der Erwartung „bis 20 Bytes, fest“ ist nur, dass das letzte P
 
 ### D2: Darstellung
 
-- Die x-Achse ist der Index des Werts im Schlag, auf die Breite gestreckt. Die y-Achse reicht von 0 bis zum Maximum der beiden gezeigten Kurven, damit beide vergleichbar bleiben.
+- Die x-Achse ist der Index des Werts im Schlag, auf die Breite gestreckt.
+- Die y-Achse ist eine absolute, feste Kraftskala von 0 bis 1000 N, nicht das Maximum der gezeigten Kurven. So ist ein schwacher Schlag sichtbar niedriger als ein kräftiger, und Schläge bleiben über die ganze Session vergleichbar. Geändert am 2026-10-18 auf Wunsch des Nutzers nach dem Test am PM5 („der höchste Wert geht immer auf 100 %, die Anzeige sollte aber absolut sein“); vorher reichte die Achse bis zum Maximum der beiden Kurven.
+  - **Obergrenze 1000 N**: Die 17 Kurven der Fixture haben Spitzen von 33–148 lbf, also 147–658 N, der ganze Mitschnitt bis 660 N. Freizeitruderer erreichen am Concept2 etwa 400–800 N, kräftige Ruderer über 1000 N. Mit 1000 N liegt ein typischer Schlag bei zwei Dritteln der Höhe, ein schwacher deutlich darunter, und es bleibt Luft nach oben.
+  - **Stufen statt Abschneiden**: Geht eine Kurve über die Skala, wächst sie auf das nächste Vielfache von 500 N (1500 N, 2000 N, …). Die Skala wächst nur, nie zurück, damit sie innerhalb einer Session nicht springt. Sie beginnt wieder bei 1000 N, wenn die Quelle wechselt oder die Schlagnummern neu beginnen (neues Workout); `ForceCurves` hält sie dafür mit den Kurven.
+  - Letzter und vorheriger Schlag stehen immer auf derselben Skala; reicht sie für eine der beiden Kurven nicht, gilt die nächste Stufe für beide.
+- **Hilfslinien**: dezente Linien von 1 px alle 500 N (`line`, im Querformat mit Vorlage `text` der Karte mit 30 % Deckkraft), in allen vier Varianten. In der grossen Karte und in beiden Querformat-Layouts trägt jede Linie links darunter eine Beschriftung in 10 px, etwa „500 N“ und „1000 N“; der schmale Streifen „Kraft“ hat dafür neben der Schlaglänge keinen Platz und zeigt nur die Linien. Ist die Kurve zu niedrig, um die Beschriftungen ohne Überlappung zu setzen, entfallen sie auch dort.
+- **Spitzenkraft**: Die Spitzenkraft des letzten Schlags steht als ganze Newton vor der Schlaglänge, etwa „620 N  106 cm“, in derselben Schrift wie die Schlaglänge (D4); sie ist klein und bleibt deutlich unter der Pace. Wird es eng, verkleinern sich beide Angaben zusammen, statt überzulaufen.
 - Letzter Schlag: Linie 3 px in `zoneIn`, darunter Fläche in derselben Farbe mit 16 % Deckkraft. Im Querformat mit Vorlage steht die Kurve auf orangem Grund und ist deshalb in `text` gezeichnet.
 - Vorheriger Schlag: Linie 2 px in `#5A646E`, ohne Fläche.
 - Legende nur in der grossen Karte: „Letzter“ und „Vorheriger“.
