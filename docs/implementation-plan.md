@@ -21,7 +21,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 4 | `force-curve` | 10/11 | in Umsetzung | – |
 | 5 | `heart-rate` | 21/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
-| 7 | `ghost` | 12/13 | in Umsetzung | – |
+| 7 | `ghost` | 13/14 | in Umsetzung | – |
 | 8 | `rename-stroke-and-split` | 10/11 | zuletzt | Domain- und Markenrecherche (Nutzer) |
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 
@@ -214,6 +214,7 @@ Entscheide F6–F8 getroffen (Design D4, D5).
 - [x] Tasks 2.1, 2.2, 3.1–3.3: `GhostRepository.track`, `liveGhostsProvider` (folgt der Rangliste live, auch im Simulator), `LapProgress.courseTime/segmentTime/courseDistanceDm`, `ghostShares` und `ghostGap` in `lib/data/ghost/ghost_progress.dart`. Vorläufig: neue Bestleistung wird erst nach dem Schreiben der Runde Ghost, also bis etwa 2 s nach Beginn der nächsten Runde (das Schiffchen springt einmal); kein Abstand mehr, wenn man weiter ist, als der Ghost je kam.
 - [x] Task 7.1 Ghosts im Live-Display: `LiveScreen` rechnet `ghostShares` und `ghostGap` pro Tick und gibt sie an `CourseLiveView`; oberes Padding hochkant jetzt 10 px (Überhang des Ghosts). Offen: 8.1 README, 8.2 Test am Gerät (Nutzer).
 - [x] Task 8.1 README-Abschnitt „Ghost“. Offen: 8.2 Test am Gerät (Nutzer), danach archivieren (nach `statistics`).
+- [x] Nachtrag (Nutzer, 2026-10-18, `feature/time-course-no-ghost`): Auf Zeitstrecken zeigt der Rahmen keinen Ghost mehr, der Vorsprung oder Rückstand steht nur in Metern in der Pace-Box (D6 geändert, Task 7.2).
 
 ### 8. `rename-stroke-and-split`: App heisst „Stroke & Split“
 
