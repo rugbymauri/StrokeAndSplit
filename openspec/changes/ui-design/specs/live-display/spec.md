@@ -55,3 +55,26 @@ Pace und Zeit SHALL im Format Minuten:Sekunden angezeigt werden (z.B. „2:05“
 #### Scenario: Pace wird auf ganze Sekunden gerundet
 - **WHEN** die aktuelle Pace 125,6 Sekunden pro 500 m beträgt
 - **THEN** zeigt das Display „2:06“
+
+### Requirement: Zonenstatus ohne Farbe erkennbar
+Der Zonenstatus SHALL nicht allein über Farbe vermittelt werden. Ausserhalb der Zone MUST ein Richtungssymbol oder Text die Abweichung zeigen. Liegt die Schlagzahl ausserhalb ihres Bands, MUST die Schlagzahl-Karte in Hoch- und Querformat eine deutliche Anweisung zeigen: Pfeil nach oben und „Mehr Schläge“ bzw. Pfeil nach unten und „Weniger Schläge“, zusammen mit dem Band, in der Farbe für ausserhalb der Zone, vollständig lesbar und mindestens so auffällig wie der Zonenstatus der Pace. In der Zone SHALL der Status dezent bleiben, und ohne Schlagzahl-Band MUST die Anweisung entfallen.
+
+#### Scenario: Ausserhalb der Zone
+- **WHEN** die Pace langsamer als das Band ist
+- **THEN** zeigt das Display neben der Farbe einen Pfeil bzw. den Hinweis „schneller“
+
+#### Scenario: Schlagzahl zu niedrig
+- **WHEN** die aktuelle Zone das Schlagzahl-Band 20–22 spm hat und die Schlagzahl 18 spm beträgt
+- **THEN** zeigt die Schlagzahl-Karte gut sichtbar einen Pfeil nach oben, „Mehr Schläge“ und das Band 20–22 spm
+
+#### Scenario: Schlagzahl zu hoch
+- **WHEN** die aktuelle Zone das Schlagzahl-Band 20–22 spm hat und die Schlagzahl 24 spm beträgt
+- **THEN** zeigt die Schlagzahl-Karte gut sichtbar einen Pfeil nach unten, „Weniger Schläge“ und das Band 20–22 spm
+
+#### Scenario: Schlagzahl in der Zone
+- **WHEN** die Schlagzahl im Band liegt
+- **THEN** zeigt die Schlagzahl-Karte dezent „In der Zone“ und keine Anweisung
+
+#### Scenario: Abschnitt ohne Schlagzahl-Band
+- **WHEN** der aktuelle Abschnitt frei ist oder seine Zone kein Schlagzahl-Band hat
+- **THEN** zeigt die Schlagzahl-Karte keine Anweisung
