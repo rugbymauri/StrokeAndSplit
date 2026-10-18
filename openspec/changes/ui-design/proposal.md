@@ -2,7 +2,7 @@
 
 ## Why
 
-Die Screens aus `foundation` und `courses` sind funktional, folgen aber keiner gemeinsamen Gestaltung. Am Erg muss man die Werte aus etwa einem Meter Abstand und unter Belastung lesen. Dafür braucht es eine klare Designsprache mit grossen Zahlen, wenig Text und Farben, die eine feste Bedeutung haben. Ausserdem fehlt beim Rudern einer Vorlage ein Überblick auf einen Blick: Wo stehe ich in der Strecke, in der Runde und im aktuellen Abschnitt (Zone oder frei)? Das Design dafür ist im Claude-Design-Canvas „AergRow Frontend“ festgelegt (Link und Screens in `design.md`).
+Die Screens aus `foundation` und `courses` sind funktional, folgen aber keiner gemeinsamen Gestaltung. Am Erg muss man die Werte aus etwa einem Meter Abstand und unter Belastung lesen. Dafür braucht es eine klare Designsprache mit grossen Zahlen, wenig Text und Farben, die eine feste Bedeutung haben. Ausserdem fehlt beim Rudern einer Vorlage ein Überblick auf einen Blick: Wo stehe ich in der Strecke, in der Runde und im aktuellen Abschnitt (Zone oder frei)? Das Design dafür ist im Claude-Design-Canvas „Stroke & Split Frontend“ festgelegt (Link und Screens in `design.md`).
 
 ## What Changes
 

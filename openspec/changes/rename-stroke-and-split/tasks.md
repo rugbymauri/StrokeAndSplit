@@ -26,4 +26,4 @@
 
 - [x] 4.1 README mit neuem Namen und Abschnitt zum Umzug der Sessions per Export und Import auf Android und iOS. Verifikation: Durchsicht
 - [x] 4.2 Specs und Change-Dokumente mit `.aergrow` auf das neue Format aktualisieren, soweit sie nicht archiviert sind. Verifikation: `openspec validate --all` grün
-- [ ] 4.3 Canvas „AergRow Frontend“ auf den neuen Namen umstellen. Verifikation: Startbildschirm und Canvas-Titel zeigen „Stroke & Split“
+- [x] 4.3 Canvas „AergRow Frontend“ auf den neuen Namen umstellen. Verifikation: Startbildschirm und Canvas-Titel zeigen „Stroke & Split“

@@ -2,7 +2,7 @@
 
 ## Context
 
-Gestaltung aus dem Claude-Design-Canvas **AergRow Frontend** (privat, Freigabe über das Share-Menü). Relevante Screens: „Live: Vorlage mit Zonen“, „Live quer: Vorlage mit Zonen“ (Ghost auf allen drei Spuren und Zeile in der Legende) und „Vorlage wählen“ (Ghost-Zeit in der aufgeklappten Vorlage).
+Gestaltung aus dem Claude-Design-Canvas **Stroke & Split Frontend** (privat, Freigabe über das Share-Menü). Relevante Screens: „Live: Vorlage mit Zonen“, „Live quer: Vorlage mit Zonen“ (Ghost auf allen drei Spuren und Zeile in der Legende) und „Vorlage wählen“ (Ghost-Zeit in der aufgeklappten Vorlage).
 
 ## Decisions
 

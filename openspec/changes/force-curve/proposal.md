@@ -34,4 +34,4 @@ Keine.
 - `lib/features/live`: Karte mit der Kurve. Ihr Platz ist im Change `ui-design` vorgesehen.
 - `lib/spike`: abonniert die Kurvenpakete; ein Ausschnitt des Mitschnitts wird Test-Fixture.
 - Keine Schema-Änderung: Die Kurvenpakete laufen als Rohpakete in die bestehende Tabelle `raw_packets`.
-- Design: Canvas „AergRow Frontend“, Screens „Live: freies Rudern“, „Live: Vorlage mit Zonen“, die beiden Querformat-Screens und „Zustände: Kraftkurve & Puls“ (Abschnitt Kraftkurve).
+- Design: Canvas „Stroke & Split Frontend“, Screens „Live: freies Rudern“, „Live: Vorlage mit Zonen“, die beiden Querformat-Screens und „Zustände: Kraftkurve & Puls“ (Abschnitt Kraftkurve).
