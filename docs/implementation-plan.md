@@ -234,7 +234,7 @@ Vor dem Start:
 - [x] Umgesetzt (2026-10-16): `check` in jeder Pipeline, `build-apk`, `build-appimage`, `verify-tag`, `upload`, `release` für Tags `vX.Y.Z`; `make apk`, `make appimage`; Branch-Pipeline 312096 grün. Workflow-Regel für `web`/`api` ergänzt, damit Pipelines von Hand startbar sind. Andere Tags lassen nur `check` laufen.
 - [ ] Offen: Probe-Release `v0.1.0` nach 2.2 verifiziert 2.3, 3.3 und 4.1–4.5; AppImage-Fenster kurz ansehen (3.2); README-Durchsicht (5.1); danach 5.2.
 
-Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwechsel am besten zusammen mit der neuen App-ID aus `rename-stroke-and-split`), eigenes Logo statt des Platzhalter-Icons.
+Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwechsel am besten zusammen mit der neuen App-ID aus `rename-stroke-and-split`). Eigenes App-Icon statt des Platzhalters: erledigt (2026-10-18, `feature/app-icon`, `make icons`).
 
 ### 10. `start-on-first-stroke`: Vorlage startet mit dem ersten Ruderschlag
 
