@@ -18,6 +18,7 @@
 - [x] 3.1 Dart-Paket `aergrow` → `strokesplit`, `AergRowApp` → `StrokeSplitApp`, Dateinamen, als ein mechanischer Commit. Verifikation: `make check` grün
 - [x] 3.2 Plattform-IDs auf `ch.strokesplit.strokesplit`, Linux `BINARY_NAME` und `APPLICATION_ID`, Makefile-Pfade. Verifikation: `make build-linux` und `make run-android` starten die App unter dem neuen Namen
 - [ ] 3.3 Datenbank `strokesplit` mit Übernahme einer vorhandenen `aergrow`-Datenbank (Design D2). Verifikation: Unit-Test mit einer Datei `aergrow` im Datenverzeichnis, manueller Test auf Linux mit bestehenden Sessions
+  - Unit-Test in `test/data/db/legacy_database_test.dart`; offen: manueller Test auf Linux
 
 - [x] 3.4 Pipeline und AppImage auf den neuen Namen (Design D9 von `gitlab-pipeline`): `APP_NAME` und `APPLICATION_ID` in `.gitlab-ci.yml`, Defaults in `tool/build_appimage.sh`; `linux/packaging/app.desktop.in` übernimmt `Exec`, `Icon` und `StartupWMClass` aus diesen Werten. Verifikation: `tool/build_appimage.sh` packt `build/appimage/strokesplit-<Version>-x86_64.AppImage`
 
