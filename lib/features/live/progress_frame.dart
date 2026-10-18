@@ -105,6 +105,17 @@ class ProgressFramePainter extends CustomPainter {
       final metric = metrics[i];
       canvas.drawPath(metric.extractPath(0, metric.length), stroke..color = empty);
       if (track.share > 0) canvas.drawPath(metric.extractPath(0, track.share * metric.length), stroke..color = filled);
+      // Zones stand out brighter than the free parts, empty and filled.
+      for (final (start, end) in track.zones) {
+        canvas.drawPath(metric.extractPath(start * metric.length, end * metric.length), stroke..color = AppColors.trackZone);
+        final filledEnd = end < track.share ? end : track.share;
+        if (filledEnd > start) {
+          canvas.drawPath(
+            metric.extractPath(start * metric.length, filledEnd * metric.length),
+            stroke..color = AppColors.text,
+          );
+        }
+      }
     }
     for (var i = 0; i < tracks.length; i++) {
       // Course and lap track mark their start; the segment track is the last one.

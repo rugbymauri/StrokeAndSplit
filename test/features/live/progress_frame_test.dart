@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// whose zone runs from 200 to 800 m of 1000 m.
 ProgressFrameModel _filled(double share, {bool openLaps = false}) => ProgressFrameModel(
       course: openLaps ? null : FrameTrack(share: share, boundaries: const [1 / 3, 2 / 3]),
-      lap: FrameTrack(share: share, boundaries: const [0.2, 0.8]),
+      lap: FrameTrack(share: share, boundaries: const [0.2, 0.8], zones: const [(0.2, 0.8)]),
       segment: FrameTrack(share: share, boundaries: const []),
       courseDone: openLaps ? null : share * 3000,
       courseLength: openLaps ? null : 3000,

@@ -58,6 +58,15 @@ void main() {
     expect(frame.segment.boundaries, isEmpty);
   });
 
+  test('marks the zones on the lap track only', () {
+    final frame = ProgressFrameModel.of(_rowed(_seerunde, 1460, laps: 3), _seerunde);
+
+    expect(frame.lap.zones, [(0.2, 0.8)]);
+    expect(frame.course!.zones, isEmpty);
+    expect(frame.segment.zones, isEmpty);
+    expect(ProgressFrameModel.of(_timed(_intervals, 30), _intervals).lap.zones, [(0.25, 0.75)]);
+  });
+
   test('counts seconds on a time course', () {
     final frame = ProgressFrameModel.of(_timed(_intervals, 330, laps: 2), _intervals);
 
