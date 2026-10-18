@@ -70,6 +70,9 @@ class CourseLiveView extends StatelessWidget {
 
   static const _gap = 10.0;
 
+  /// The height of the pace box in portrait below which the force curve gives way.
+  static const _minBoxHeightWithCurve = 336.0;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -90,18 +93,20 @@ class CourseLiveView extends StatelessWidget {
       AppSpacing.pagePortrait,
       AppSpacing.s,
     );
-    const strokeHeight = 88.0;
-    const tilesHeight = 76.0;
+    const strokeHeight = 80.0;
+    const tilesHeight = 64.0;
     const curveHeight = 72.0;
     const buttonHeight = 52.0;
     final inner = padding.deflateSize(size);
-    // The force curve goes first when space is short (Design, Risks).
-    final curve = forceCurves != null && inner.height >= 720 + tilesHeight + _gap;
     // Two rows of tiles, the session above the lap, as five side by side would be too narrow on a phone.
-    final boxHeight =
-        inner.height - strokeHeight - 2 * tilesHeight - buttonHeight - 4 * _gap - (curve ? curveHeight + _gap : 0);
+    final rest = inner.height - strokeHeight - 2 * tilesHeight - buttonHeight - 4 * _gap;
+    // The force curve goes first when space is short (Design, Risks): only while the pace box keeps
+    // [_minBoxHeightWithCurve], so on a phone of 360 × 740 as well.
+    final curve = forceCurves != null && rest - curveHeight - _gap >= _minBoxHeightWithCurve;
+    final boxHeight = rest - (curve ? curveHeight + _gap : 0);
     final cap = PaceBox.paceFontSizeFor(Size(inner.width, boxHeight)) * valueShareOfPace;
-    final valueSize = math.min(48.0, cap);
+    // Lower than with Barlow Condensed, as the wider [AppFonts.liveValue] fills a tile at a smaller size.
+    final valueSize = math.min(42.0, cap);
     return Padding(
       key: const ValueKey(LiveLayout.portrait),
       padding: padding,
@@ -110,7 +115,7 @@ class CourseLiveView extends StatelessWidget {
         children: [
           SizedBox(height: boxHeight, child: _dim(_paceBox())),
           const SizedBox(height: _gap),
-          SizedBox(height: strokeHeight, child: _dim(_strokeRate(math.min(80, cap)))),
+          SizedBox(height: strokeHeight, child: _dim(_strokeRate(math.min(64, cap)))),
           const SizedBox(height: _gap),
           SizedBox(height: tilesHeight, child: _dim(_tileRow(_sessionTiles(context, valueSize)))),
           const SizedBox(height: _gap),
