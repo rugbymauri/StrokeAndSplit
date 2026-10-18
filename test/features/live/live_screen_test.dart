@@ -375,6 +375,8 @@ void main() {
             'pace-box-status',
             'stroke-card-status',
             'metric-spm',
+            'metric-elapsed',
+            'metric-distance',
             'metric-lap-time',
             'metric-watts',
             'metric-hr',
@@ -420,6 +422,9 @@ void main() {
       expect(find.text('In der Zone · 20–22 spm'), findsOneWidget);
       expect(find.text('24 spm'), findsOneWidget);
       expect(find.text('2:31'), findsOneWidget);
+      // The time of the session, not that of the rower, as in free rowing.
+      expect(tester.widget<Text>(find.byKey(const Key('metric-elapsed'))).textSpan!.toPlainText(), '6:20');
+      expect(tester.widget<Text>(find.byKey(const Key('metric-distance'))).textSpan!.toPlainText(), '1\u00A0520 m');
       expect(find.text('75 %'), findsNothing);
       // The range of the segment is left to the progress frame.
       expect(find.text('200–800 m'), findsNothing);
@@ -439,7 +444,16 @@ void main() {
       expect(find.text('Faster · 2:05–2:10'), findsOneWidget);
       expect(find.text('More strokes'), findsOneWidget);
       expect(find.text('20–22 spm'), findsOneWidget);
-      for (final label in ['Lap', 'Watts', 'Heart rate', 'PACE /500 M', 'STROKE RATE', 'End session']) {
+      for (final label in [
+        'Time',
+        'Distance',
+        'Lap',
+        'Watts',
+        'Heart rate',
+        'PACE /500 M',
+        'STROKE RATE',
+        'End session',
+      ]) {
         expect(find.text(label), findsOneWidget, reason: label);
       }
       // The pace keeps the PM5 format in every language.
@@ -849,20 +863,33 @@ void main() {
       }
     });
 
-    testWidgets('fills the tiles on a template with values larger than before', (tester) async {
+    for (final size in const [Size(390, 844), Size(360, 740)]) {
+      testWidgets('fills the tiles on a template with values larger than before at ${size.width.toInt()} px',
+          (tester) async {
+        final harness = _Harness();
+        await harness.pump(tester, size: size, recording: _onCourse());
+        await harness.emit(tester, _tick(heartRate: 151));
+
+        // 22 and 52 before; the two rows of tiles still fit on a narrow phone.
+        for (final key in ['metric-elapsed', 'metric-distance', 'metric-lap-time', 'metric-watts', 'metric-hr']) {
+          expect(height(tester, key), greaterThan(30), reason: key);
+        }
+        expect(height(tester, 'metric-spm'), greaterThan(60));
+        // 12 and 13 before.
+        expect(fontSize(tester, 'Watt'), lessThanOrEqualTo(10));
+        expect(fontSize(tester, 'SCHLAGZAHL'), lessThanOrEqualTo(11));
+        expect(fontSize(tester, 'PACE /500 M'), lessThanOrEqualTo(11));
+      });
+    }
+
+    testWidgets('fits time and distance of the session into the side column in landscape', (tester) async {
       final harness = _Harness();
-      await harness.pump(tester, recording: _onCourse());
+      await harness.pump(tester, size: const Size(844, 390), recording: _onCourse());
       await harness.emit(tester, _tick(heartRate: 151));
 
-      // 22 and 52 before.
-      for (final key in ['metric-lap-time', 'metric-watts', 'metric-hr']) {
-        expect(height(tester, key), greaterThan(30), reason: key);
+      for (final key in ['metric-elapsed', 'metric-distance', 'metric-lap-time', 'metric-watts', 'metric-hr']) {
+        expect(height(tester, key), greaterThan(16), reason: key);
       }
-      expect(height(tester, 'metric-spm'), greaterThan(60));
-      // 12 and 13 before.
-      expect(fontSize(tester, 'Watt'), lessThanOrEqualTo(10));
-      expect(fontSize(tester, 'SCHLAGZAHL'), lessThanOrEqualTo(11));
-      expect(fontSize(tester, 'PACE /500 M'), lessThanOrEqualTo(11));
     });
 
     testWidgets('fills the pace box when it shrinks in landscape', (tester) async {

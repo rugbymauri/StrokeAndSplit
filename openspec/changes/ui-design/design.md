@@ -74,8 +74,8 @@ Das Live-Display wählt das Layout nach dem Seitenverhältnis des verfügbaren P
 
 - **Hoch, frei**: Pace oben, darunter 2 × 2 Kacheln, eine Zeile mit Nebenwerten, die Kraftkurve und unten „Session beenden“.
 - **Quer, frei**: links die Pace mit der Kraftkurve darunter, rechts 2 × 2 Kacheln und „Session beenden“.
-- **Hoch, Vorlage**: Pace-Box über die volle Breite, darunter Schlagzahl-Karte, drei kleine Kacheln (Rundenzeit, Watt, Puls; die Kachel „in der Zone“ entfiel nach dem Gerätetest, der Anteil steht in der Zusammenfassung), Kraftkurve und „Session beenden“.
-- **Quer, Vorlage**: links die Pace-Box fast über die volle Höhe, in der Mitte die Schlagzahl-Karte mit Kraftkurve, rechts eine schmale Spalte mit den drei Kacheln und „Beenden“.
+- **Hoch, Vorlage**: Pace-Box über die volle Breite, darunter Schlagzahl-Karte, zwei Reihen kleiner Kacheln, oben die Session (Zeit, Distanz), darunter die Runde (Rundenzeit, Watt, Puls; die Kachel „in der Zone“ entfiel nach dem Gerätetest, der Anteil steht in der Zusammenfassung), Kraftkurve und „Session beenden“. Fünf Kacheln nebeneinander wären auf einem 360 px breiten Handy zu schmal für „1 520 m“; die Kraftkurve weicht dafür auf kleinen Handys zuerst.
+- **Quer, Vorlage**: links die Pace-Box fast über die volle Höhe, in der Mitte die Schlagzahl-Karte mit Kraftkurve und darunter Zeit und Distanz der Session nebeneinander, rechts eine schmale Spalte mit den drei Kacheln der Runde und „Beenden“. Fünf Kacheln passen auf einem Handy quer nicht in die Seitenspalte.
 
 Die Grössen skalieren mit dem Platz. Massgebend ist das Verhältnis aus dem Canvas, nicht der absolute Pixelwert.
 
