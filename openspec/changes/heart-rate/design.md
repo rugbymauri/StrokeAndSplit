@@ -138,7 +138,7 @@ Der Spike sucht zusätzlich nach `0x180D`, verbindet optional einen Gurt neben d
 
 ## Migration Plan
 
-Die Migration von `schemaVersion` 5 auf 6 fügt nur hinzu. Bestehende Sessions bekommen keine Pulszusammenfassung nachträglich. Ein erneuter Import ihrer `.aergrow`-Datei würde sie erzeugen, die App macht das aber nicht automatisch. Rollback heisst: die ältere App-Version installieren und die Datenbank neu anlegen, denn drift-Downgrades werden nicht unterstützt.
+Die Migration von `schemaVersion` 5 auf 6 fügt nur hinzu. Bestehende Sessions bekommen keine Pulszusammenfassung nachträglich. Ein erneuter Import ihrer `.strokesplit`-Datei würde sie erzeugen, die App macht das aber nicht automatisch. Rollback heisst: die ältere App-Version installieren und die Datenbank neu anlegen, denn drift-Downgrades werden nicht unterstützt.
 
 ## Open Questions
 

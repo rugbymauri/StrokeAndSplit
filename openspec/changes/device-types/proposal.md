@@ -11,7 +11,7 @@ AergRow funktioniert heute nur mit einem Concept2 PM5. Viele Rudergeräte andere
 - **Ein Decoder pro Protokoll, ein gemeinsames Ergebnis**: Rohpakete bleiben die Wahrheit und tragen künftig ihr Protokoll (PM5 oder FTMS). Beide Decoder liefern dieselben Messwerte und Ereignisse. FTMS-Daten werden nicht in PM5-Pakete übersetzt.
 - **Optionale Schlagdetails**: Ein Schlag-Ereignis hat weiterhin Nummer, Zeit und Distanz. Durchzugslänge, Durchzugs- und Erholungszeit sowie Kräfte sind optional, weil FTMS sie nicht liefert. Fehlende Werte werden nicht erfunden. **BREAKING** für das Datenbankschema: die betroffenen Spalten werden nullable, eine Migration ist nötig.
 - **Eigene Uhr und Reset-Erkennung bei FTMS**: Fehlt die Zeit im Paket, misst die App sie selbst. Fallen Distanz oder Zeit zurück, gilt das als Reset am Gerät, und die Session zählt ohne Rücksprung weiter.
-- **Protokoll in Aufnahmen**: Sessions, `.aergrow`-Dateien und Spike-Mitschnitte vermerken das Protokoll, damit Replay und Import den richtigen Decoder wählen. Bestehende Dateien ohne Angabe gelten als PM5.
+- **Protokoll in Aufnahmen**: Sessions, `.strokesplit`-Dateien und Spike-Mitschnitte vermerken das Protokoll, damit Replay und Import den richtigen Decoder wählen. Bestehende Dateien ohne Angabe gelten als PM5.
 - **Verifikation ohne FTMS-Hardware**, da kein Gerät zur Verfügung steht:
   1. Unit-Tests mit Paketen nach Spezifikation, inklusive aller Flag-Kombinationen und fehlerhafter Pakete.
   2. Ein FTMS-Modus im Simulator, der die ganze Kette von Live-Display bis Export durchläuft.
@@ -36,13 +36,13 @@ _Keine._ Die Änderungen erweitern die bestehenden Capabilities um eine zweite G
 - `erg-connection`: Die Suche findet PM5 und FTMS-Rudergeräte und zeigt nur Rudergeräte. Ein PM5 an SkiErg oder BikeErg wird abgewiesen. Verbinden, Wiederverbinden und Trennen gelten für beide Gerätearten. Hinweise und Fehlermeldungen sind nicht mehr PM5-spezifisch.
 - `rowing-telemetry`: Messwerte und Ereignisse kommen aus PM5- oder FTMS-Daten, mit gleicher Form und Bedeutung. Schlagdetails sind optional. Bei FTMS fehlt der Workout-Zustand, Zeit und Reset ermittelt die App selbst. Unplausible Werte aus FTMS werden verworfen.
 - `erg-simulation`: Der Simulator kann wahlweise als PM5 oder als FTMS-Rudergerät Daten liefern. Die Anzeige der Datenquelle unterscheidet PM5 und FTMS-Gerät.
-- `session-recording`: Das Überstehen eines Resets am Gerät gilt auch für FTMS. Die Rohdaten und das `.aergrow`-Format vermerken das Protokoll, und der Import wählt danach den Decoder.
+- `session-recording`: Das Überstehen eines Resets am Gerät gilt auch für FTMS. Die Rohdaten und das `.strokesplit`-Format vermerken das Protokoll, und der Import wählt danach den Decoder.
 
 ## Impact
 
 - **Code**: `lib/data/sources/` (neue FTMS-BLE-Quelle, Scan nach PM5 und FTMS, Abweisen von Nicht-RowErgs), `lib/features/connection/` (Geräteliste und Texte), Simulator und Replay. Das Package `packages/pm5_protocol/` wird voraussichtlich zu einem Protokoll-Package mit PM5- und FTMS-Teil umgebaut. Wie es heisst und aufgeteilt wird, entscheidet das Design.
 - **Datenbank**: Schema-Migration (`schemaVersion` erhöhen, `make schema`) für nullable Schlagdetails und das Protokoll der Rohdaten.
-- **Dateiformat**: Der `.aergrow`-Header bekommt ein Protokollfeld. Das Format bleibt abwärtskompatibel.
+- **Dateiformat**: Der `.strokesplit`-Header bekommt ein Protokollfeld. Das Format bleibt abwärtskompatibel.
 - **Werkzeuge**: neuer Software-Rower unter `tool/` (Linux, BlueZ als GATT-Peripheral). Der Spike schneidet zusätzlich FTMS mit.
 - **Andere Changes**: Strecken und Zonen (`courses`, `zones`, bereits auf `main`) brauchen nur Pace, Schlagzahl, Zeit und Distanz, und die liefert FTMS. Die Migration baut auf deren Schema 3 auf. Mit `heart-rate` überschneidet sich die Herzfrequenz aus FTMS, und beide ändern dieselben Requirements in `rowing-telemetry` und `session-recording`: `heart-rate` wird nach dem Archivieren dieses Changes auf dessen Text angepasst.
 - **Risiken**: Manche Geräte senden erst nach einem Start über den FTMS Control Point (`0x2AD9`). Hersteller weichen vom Standard ab, etwa mit falschen Flags, 0 statt „kein Wert“ oder anderen Einheiten. Beides lässt sich ohne echte Hardware nur nach Spezifikation und defensiv abfangen.
