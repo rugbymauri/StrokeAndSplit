@@ -17,6 +17,9 @@ abstract final class AppColors {
   /// Empty inner progress track (segment), tinted blue.
   static const trackInner = Color(0xFF1B3550);
 
+  /// Empty part of a zone on the lap track, brighter than [track].
+  static const trackZone = Color(0xFF3E4A56);
+
   /// Text and numbers.
   static const text = Color(0xFFE8ECEF);
 

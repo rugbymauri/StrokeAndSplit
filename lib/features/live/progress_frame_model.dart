@@ -3,14 +3,17 @@ import 'package:flutter/foundation.dart' show immutable;
 import '../../data/courses/course.dart';
 import '../../data/courses/lap_tracker.dart';
 
-/// One track of the progress frame: how much of it is filled and where its
-/// notches sit, both as shares from 0 to 1.
+/// One track of the progress frame: how much of it is filled, where its
+/// notches sit and which parts of it are zones, all as shares from 0 to 1.
 @immutable
 class FrameTrack {
-  const FrameTrack({required this.share, required this.boundaries});
+  const FrameTrack({required this.share, required this.boundaries, this.zones = const []});
 
   final double share;
   final List<double> boundaries;
+
+  /// Start and end of each zone on the track, drawn brighter than the free parts.
+  final List<(double, double)> zones;
 }
 
 /// What the progress frame around the pace shows (ui-design, Design D3):
@@ -37,6 +40,10 @@ class ProgressFrameModel {
     final lap = FrameTrack(
       share: _share(inLap, length),
       boundaries: [for (final end in ends.take(ends.length - 1)) end / length],
+      zones: [
+        for (var i = 0; i < definition.segments.length; i++)
+          if (!definition.segments[i].isFree) (definition.segmentStarts[i] / length, ends[i] / length),
+      ],
     );
     final segment = FrameTrack(
       share: segmentLength > 0 ? _share(inLap - progress.segmentStart, segmentLength) : 1,
