@@ -187,7 +187,7 @@ class _SpikeScreenState extends State<SpikeScreen> {
 
   Future<Directory> _logDirectory() async {
     // On Android, the app-specific external directory is reachable via
-    // `adb pull /sdcard/Android/data/ch.aergrow.aergrow/files/`.
+    // `adb pull /sdcard/Android/data/ch.strokesplit.strokesplit/files/`.
     if (Platform.isAndroid) {
       final external = await getExternalStorageDirectory();
       if (external != null) return external;

@@ -16,7 +16,7 @@
 ## 3. Kennungen
 
 - [x] 3.1 Dart-Paket `aergrow` → `strokesplit`, `AergRowApp` → `StrokeSplitApp`, Dateinamen, als ein mechanischer Commit. Verifikation: `make check` grün
-- [ ] 3.2 Plattform-IDs auf `ch.strokesplit.strokesplit`, Linux `BINARY_NAME` und `APPLICATION_ID`, Makefile-Pfade. Verifikation: `make build-linux` und `make run-android` starten die App unter dem neuen Namen
+- [x] 3.2 Plattform-IDs auf `ch.strokesplit.strokesplit`, Linux `BINARY_NAME` und `APPLICATION_ID`, Makefile-Pfade. Verifikation: `make build-linux` und `make run-android` starten die App unter dem neuen Namen
 - [ ] 3.3 Datenbank `strokesplit` mit Übernahme einer vorhandenen `aergrow`-Datenbank (Design D2). Verifikation: Unit-Test mit einer Datei `aergrow` im Datenverzeichnis, manueller Test auf Linux mit bestehenden Sessions
 
 ## 4. Dokumentation

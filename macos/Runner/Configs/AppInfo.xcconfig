@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = aergrow
+PRODUCT_NAME = strokesplit
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = ch.aergrow.aergrow
+PRODUCT_BUNDLE_IDENTIFIER = ch.strokesplit.strokesplit
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 ch.aergrow. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 ch.strokesplit. All rights reserved.

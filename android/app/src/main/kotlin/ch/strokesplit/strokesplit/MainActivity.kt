@@ -1,4 +1,4 @@
-package ch.aergrow.aergrow
+package ch.strokesplit.strokesplit
 
 import io.flutter.embedding.android.FlutterActivity
 
