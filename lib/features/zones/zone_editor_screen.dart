@@ -35,7 +35,7 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
   // it is switched on.
   late var _hasPace = _zone == null || _zone.paceFastCs != null || _zone.paceSlowCs != null;
   late var _paceFast = _zone?.paceFastCs ?? _zone?.paceSlowCs ?? 16500;
-  late var _paceSlow = _zone?.paceSlowCs ?? _paceFast + 500;
+  late var _paceSlow = _zone?.paceSlowCs ?? _paceFast + _paceGap;
   late var _hasSpm = _zone?.spmMin != null || _zone?.spmMax != null;
   late var _spmMin = _zone?.spmMin ?? _zone?.spmMax ?? 24;
   late var _spmMax = _zone?.spmMax ?? _spmMin + 2;
@@ -220,8 +220,9 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
                       label: l10n.zonePaceFastest,
                       value: _paceFast,
                       min: _paceMin,
-                      max: _paceSlow,
-                      onChanged: (v) => _paceFast = v,
+                      // The slowest pace moves along and stays within the range.
+                      max: _paceMax - (_paceSlow - _paceFast),
+                      onChanged: _movePaceBand,
                     ),
                   ),
                   _Field(
@@ -279,6 +280,12 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
     );
   }
 
+  /// Moves the whole pace band with its fastest pace, keeping the gap (design D7).
+  void _movePaceBand(int fast) {
+    _paceSlow += fast - _paceFast;
+    _paceFast = fast;
+  }
+
   Widget _paceStepper({
     required String key,
     required String label,
@@ -329,6 +336,9 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
 const _paceStep = 500;
 const _paceMin = 6000;
 const _paceMax = 30000;
+
+/// Gap between the bounds of the pace band of a new zone: 10 s (design D7).
+const _paceGap = 1000;
 
 /// Stroke rates a rower can hold.
 const _spmLowest = 10;

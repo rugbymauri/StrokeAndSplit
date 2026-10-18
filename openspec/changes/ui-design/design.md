@@ -156,11 +156,14 @@ Zahlen werden in allen Editoren mit einem Tastenpaar eingestellt, nicht getippt 
 - **Grössen**: gross 56 × 60 px für einzelne Werte in voller Breite (Runden, Startposition einer Zone), kompakt 44 × 47 px in Feldern nebeneinander (Länge, Pace- und Schlagzahl-Band). Der Wert steht zwischen den Tasten, die Einheit darunter bzw. daneben.
 - **Zustände**: bereit; gedrückt mit Blatt `#1D3A55`, Rand und Pfeil in `zoneIn`; gesperrt am Minimum oder Maximum mit 35 % Deckkraft.
 - **Schritte**: Pace 5 s, Schlagzahl 1 spm, Runden 1, Streckenlänge 100 m, Zonenlänge 10 m, Startposition einer Zone 50 m. Auf der Zeitachse (entschieden 2026-10-16): Streckenlänge 30 s, Zonenlänge und Startposition 10 s.
+- **Pace-Band mit 10 s Abstand** (entschieden 2026-10-17): Eine neue Zone beginnt mit einem Pace-Band, dessen Grenzen 10 s auseinanderliegen (2:45–2:55). Die schnellste Pace verschiebt das ganze Band: Die langsamste wandert mit, der Abstand bleibt, wie er ist. Die langsamste Pace ändert nur sich selbst und damit den Abstand. „Mehr“ an der schnellsten Pace ist gesperrt, sobald die langsamste 5:00 erreichen würde; die Grenzen 1:00 und 5:00 und „schnellste nicht langsamer als langsamste“ gelten weiter. Das Schlagzahl-Band bleibt unverändert, dort stellt jede Grenze nur sich selbst ein.
 - **Gedrückt halten** wiederholt den Schritt, nach etwa einer Sekunde schneller, damit auch 10 000 m schnell erreicht sind.
 - Die Grenzen kommen aus der bestehenden Validierung der Felder. Eine Taste, deren Schritt die Grenze überschreiten würde, ist gesperrt.
 - Blau bleibt für „in der Zone“ reserviert. Darum sind beide Richtungen gleich gefärbt und unterscheiden sich nur durch die Richtung.
 
 *Alternativen*: Textfelder mit Zahlentastatur wie bisher, oder ein Rad zum Drehen. Verworfen: Die Tastatur verdeckt am Handy den halben Editor, und ein Rad ist mit nassen Fingern ungenau.
+
+*Alternativen zum Pace-Band*: Einen festen Abstand von 10 s erzwingen, oder die langsamste Pace an der Obergrenze stehen lassen und den Abstand verkleinern. Verworfen: Ein fester Abstand verhindert engere oder weitere Bänder, und ein Abstand, der sich am Rand still verkleinert, überrascht beim Zurückschieben.
 
 ### D8: Sprachwahl
 
