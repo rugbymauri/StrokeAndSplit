@@ -48,7 +48,7 @@ void main() {
   testWidgets('shows the values of the canvas screen', (tester) async {
     await _pump(tester, const Size(390, 844), forceCurves: _curves);
 
-    expect(find.text('2:07.4'), findsOneWidget);
+    expect(find.text('2:07'), findsOneWidget);
     expect(find.text('21 spm'), findsOneWidget);
     expect(find.text('172'), findsOneWidget);
     expect(find.text('8:32'), findsOneWidget);

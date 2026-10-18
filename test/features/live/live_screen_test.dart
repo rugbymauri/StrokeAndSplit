@@ -203,14 +203,14 @@ void main() {
     await harness.pump(tester);
     await harness.emit(tester, _tick(heartRate: 151));
 
-    expect(find.text('2:05.3'), findsOneWidget);
+    expect(find.text('2:05'), findsOneWidget);
     expect(find.text('12:34'), findsOneWidget);
     expect(find.text('3\u00A0021 m'), findsOneWidget);
     expect(find.text('179'), findsOneWidget);
     expect(find.text('24 spm'), findsOneWidget);
     expect(find.text('Puls 151'), findsOneWidget);
     // 12:34 over 3021.7 m.
-    expect(find.text('Ø Pace 2:04.8'), findsOneWidget);
+    expect(find.text('Ø Pace 2:05'), findsOneWidget);
   });
 
   testWidgets('hides the heart rate without a monitor', (tester) async {
@@ -440,7 +440,7 @@ void main() {
         expect(find.text(label), findsOneWidget, reason: label);
       }
       // The pace keeps the PM5 format in every language.
-      expect(find.text('2:05.3'), findsOneWidget);
+      expect(find.text('2:05'), findsOneWidget);
     });
 
     testWidgets('marks pace and stroke rate in the zone', (tester) async {

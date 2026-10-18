@@ -118,7 +118,7 @@ Die Zusammenfassung zeigt **Ø Puls** und **Max. Puls**, sobald es einen Puls ga
 
 ### Sprache
 
-Die App startet auf Deutsch. Das Sprach-Symbol oben rechts auf „Geräte wählen“ und dem Startbildschirm schaltet zwischen **Deutsch** und **English** um, also schon beim ersten Start. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Vorlagen), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten bleiben wie am PM5 (`2:05.3`).
+Die App startet auf Deutsch. Das Sprach-Symbol oben rechts auf „Geräte wählen“ und dem Startbildschirm schaltet zwischen **Deutsch** und **English** um, also schon beim ersten Start. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Vorlagen), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten erscheinen in jeder Sprache gleich (`2:05`, `12:34`).
 
 ## Projektstruktur
 

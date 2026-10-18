@@ -12,18 +12,18 @@ void main() {
   setUpAll(initializeDateFormatting);
 
   group('formatPace', () {
-    test('shows minutes, seconds and tenths', () {
-      expect(formatPace(const Duration(milliseconds: 125300)), '2:05.3');
-      expect(formatPace(const Duration(milliseconds: 98040)), '1:38.0');
+    test('shows minutes and whole seconds', () {
+      expect(formatPace(const Duration(milliseconds: 125300)), '2:05');
+      expect(formatPace(const Duration(milliseconds: 98040)), '1:38');
     });
 
-    test('rounds to tenths, carrying over into the next minute', () {
-      expect(formatPace(const Duration(milliseconds: 125349)), '2:05.3');
-      expect(formatPace(const Duration(milliseconds: 119960)), '2:00.0');
+    test('rounds to whole seconds, carrying over into the next minute', () {
+      expect(formatPace(const Duration(milliseconds: 125600)), '2:06');
+      expect(formatPace(const Duration(milliseconds: 119500)), '2:00');
     });
 
     test('shows placeholders without a pace', () {
-      expect(formatPace(null), '–:––.–');
+      expect(formatPace(null), '–:––');
     });
   });
 
@@ -76,7 +76,7 @@ void main() {
 
   test('keeps pace and times the same in every language', () {
     // They take no language: the PM5 shows them the same way everywhere (Design D5).
-    expect(formatPace(const Duration(milliseconds: 125300)), '2:05.3');
+    expect(formatPace(const Duration(milliseconds: 125300)), '2:05');
     expect(formatLapTime(const Duration(milliseconds: 239400)), '3:59.4');
   });
 }

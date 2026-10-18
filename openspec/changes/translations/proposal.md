@@ -10,7 +10,7 @@ Die Oberfläche ist heute fest deutsch: rund 250 Texte stehen direkt in den Scre
 - Die Sprache wird in der App gewählt, die Wahl bleibt über einen Neustart erhalten. Beim ersten Start ist die App deutsch, die Systemsprache spielt keine Rolle (Entscheide F13, F14).
 - Deutsch heisst Schweizer Rechtschreibung mit „ss“ statt „ß“, wie heute (F15, vorläufig nach Vorschlag).
 - Die Datenschicht liefert Fehler als Codes mit Werten statt als deutsche Sätze. Die Oberfläche macht daraus Text in der gewählten Sprache. Betroffen sind die Prüfung von Zonen, das Einbauen von Zonen in Strecken und das Verbinden mit einem Rudergerät.
-- Datum und Dezimalzahlen folgen der Sprache, z.B. „15.10.2026, 18:30“ und „22,5“ auf Deutsch. Pace und Zeiten bleiben im Format des PM5 (`2:05.3`).
+- Datum und Dezimalzahlen folgen der Sprache, z.B. „15.10.2026, 18:30“ und „22,5“ auf Deutsch. Pace und Zeiten bleiben im Format des PM5 (`2:05`).
 - Was Nutzer selbst benennen (Zonen, Strecken, Vorlagen) und Gerätenamen werden nicht übersetzt.
 
 Nicht Teil dieses Changes: der BLE-Spike (Entwicklerwerkzeug, bleibt deutsch), Log- und Ausnahmetexte für Entwickler (bleiben englisch) und die Gestaltung der Sprachwahl im neuen Layout (kommt mit `ui-design`).

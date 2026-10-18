@@ -95,9 +95,9 @@ void main() {
 
     expect(find.byType(ZoneDetailScreen), findsOneWidget);
     expect(find.text('BESTENLISTE 100 M · AKTUELL'), findsOneWidget);
-    expect(_place(tester, 100, 1), ['1', '0:18.2', '1.10.2026', '1:31.0 /500 m']);
-    expect(_place(tester, 100, 2), ['2', '0:18.5', '5.10.2026', '1:32.5 /500 m']);
-    expect(_place(tester, 100, 3), ['3', '0:18.9', '1.10.2026', '1:34.5 /500 m']);
+    expect(_place(tester, 100, 1), ['1', '0:18.2', '1.10.2026', '1:31 /500 m']);
+    expect(_place(tester, 100, 2), ['2', '0:18.5', '5.10.2026', '1:33 /500 m']);
+    expect(_place(tester, 100, 3), ['3', '0:18.9', '1.10.2026', '1:35 /500 m']);
     expect(find.byKey(const Key('place-4')), findsNothing);
     await disposeWidgetsWithDatabase(tester);
   });

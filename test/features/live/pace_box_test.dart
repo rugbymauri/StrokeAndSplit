@@ -83,7 +83,7 @@ void main() {
   testWidgets('shows the pace in the zone with its band, the lap and the zone', (tester) async {
     await _pump(tester, _at(460));
 
-    expect(_text(tester, const Key('pace-box-pace')), '2:07.0');
+    expect(_text(tester, const Key('pace-box-pace')), '2:07');
     expect(find.text('PACE /500 M'), findsOneWidget);
     expect(find.byKey(const Key('pace-box-zone-in')), findsOneWidget);
     expect(_text(tester, const Key('pace-box-status')), 'In der Zone · 2:05–2:10');
@@ -96,7 +96,7 @@ void main() {
   testWidgets('asks for a faster pace when too slow, with an arrow and a word', (tester) async {
     await _pump(tester, _at(460, pace: BandStatus.above), pace: const Duration(minutes: 2, seconds: 13));
 
-    expect(_text(tester, const Key('pace-box-pace')), '2:13.0');
+    expect(_text(tester, const Key('pace-box-pace')), '2:13');
     expect(find.byKey(const Key('pace-box-zone-out')), findsOneWidget);
     expect(_text(tester, const Key('pace-box-status')), 'Schneller · 2:05–2:10');
     expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
@@ -148,7 +148,7 @@ void main() {
   testWidgets('shows a dash without a pace', (tester) async {
     await _pump(tester, _at(460, pace: BandStatus.missing), pace: null);
 
-    expect(_text(tester, const Key('pace-box-pace')), '–:––.–');
+    expect(_text(tester, const Key('pace-box-pace')), '–:––');
     expect(_text(tester, const Key('pace-box-status')), 'Keine Pace · 2:05–2:10');
   });
 
