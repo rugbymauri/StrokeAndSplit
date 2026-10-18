@@ -377,7 +377,6 @@ void main() {
             'metric-watts',
             'metric-hr',
             'metric-rr',
-            'metric-zone-share',
           ]) {
             final rect = tester.getRect(find.byKey(Key(key)));
             expect(rect.bottom, lessThanOrEqualTo(size.height), reason: key);
@@ -407,7 +406,7 @@ void main() {
       expect(find.descendant(of: line, matching: find.text(value)), findsOneWidget, reason: key);
     }
 
-    testWidgets('shows lap, zone and rest in the pace box, the bands and the share in the zone', (tester) async {
+    testWidgets('shows lap, zone and rest in the pace box and the bands', (tester) async {
       final harness = _Harness();
       await harness.pump(tester, recording: _onCourse());
       await harness.emit(tester, _tick());
@@ -419,7 +418,7 @@ void main() {
       expect(find.text('In der Zone · 20–22 spm'), findsOneWidget);
       expect(find.text('24 spm'), findsOneWidget);
       expect(find.text('2:31'), findsOneWidget);
-      expect(find.text('75 %'), findsOneWidget);
+      expect(find.text('75 %'), findsNothing);
       // The range of the segment is left to the progress frame.
       expect(find.text('200–800 m'), findsNothing);
     });
@@ -437,7 +436,7 @@ void main() {
       expectLine('pace-box-segment', 'Tempo', '280 m to go');
       expect(find.text('Faster · 2:05–2:10'), findsOneWidget);
       expect(find.text('More strokes · 20–22 spm'), findsOneWidget);
-      for (final label in ['Lap', 'Watts', 'Heart rate', 'In zone', 'PACE /500 M', 'STROKE RATE', 'End session']) {
+      for (final label in ['Lap', 'Watts', 'Heart rate', 'PACE /500 M', 'STROKE RATE', 'End session']) {
         expect(find.text(label), findsOneWidget, reason: label);
       }
       // The pace keeps the PM5 format in every language.
@@ -484,7 +483,6 @@ void main() {
       expect(find.byKey(const Key('pace-box-zone-in')), findsNothing);
       expect(find.byKey(const Key('stroke-card-zone-in')), findsNothing);
       expect(find.byKey(const Key('stroke-card-zone-out')), findsNothing);
-      expect(find.text('–'), findsOneWidget);
     });
 
     testWidgets('ends the session with a short button in landscape', (tester) async {
@@ -814,7 +812,7 @@ void main() {
       await harness.emit(tester, _tick(heartRate: 151));
 
       // 22 and 52 before.
-      for (final key in ['metric-lap-time', 'metric-watts', 'metric-hr', 'metric-zone-share']) {
+      for (final key in ['metric-lap-time', 'metric-watts', 'metric-hr']) {
         expect(height(tester, key), greaterThan(30), reason: key);
       }
       expect(height(tester, 'metric-spm'), greaterThan(60));

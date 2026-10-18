@@ -331,9 +331,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get metricLapTime => 'Runde';
 
   @override
-  String get metricInZone => 'In Zone';
-
-  @override
   String get liveStopShort => 'Beenden';
 
   @override

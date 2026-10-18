@@ -329,9 +329,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricLapTime => 'Lap';
 
   @override
-  String get metricInZone => 'In zone';
-
-  @override
   String get liveStopShort => 'End';
 
   @override
