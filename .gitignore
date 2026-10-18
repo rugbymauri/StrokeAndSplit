@@ -50,3 +50,6 @@ app.*.map.json
 # Git worktrees for parallel work
 /.claude/worktrees/
 /worktrees/
+
+# Diff images written by failed golden tests
+**/failures/
