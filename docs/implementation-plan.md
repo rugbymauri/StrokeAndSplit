@@ -136,6 +136,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Task 3.4 (Nutzer, 2026-10-17): Schlagzahl-Karte zeigt ausserhalb des Bands eine Pille „↑ Mehr Schläge“ / „↓ Weniger Schläge“ wie die Pace-Box, nie abgeschnitten (vorher 13-px-Text mit Ellipsis). Offen: Pace-Pille schneidet auf 360 px Breite das Band ab.
 - [x] Nach Gerätetest (Nutzer, 2026-10-17): Fortschrittsrahmen hebt Zonen auf der Rundenspur heller hervor (leer `trackZone`, gefüllt `text`) und markiert das Rundenende mit einer hellen Linie (Rundenspur oben, Streckenspur an jeder Rundengrenze).
 - [x] Tasks 5.3, 5.4 (Nutzer, 2026-10-18): Trennen nicht mehr im Live-Display, sondern in der Gerätezeile des Startbildschirms; Zurück, Esc und „Fertig“ führen zum Start und halten die Verbindung; „Sessions“ als Button. Offen: Wortlaut in `start-on-first-stroke` (Szenario „Trennen vor dem ersten Schlag“, Task 3.3) beim Archivieren angleichen.
+- [x] Nachtrag (Nutzer, 2026-10-18, `feature/course-session-time`, Task 5.5): Beim Rudern einer Vorlage zeigen die Kacheln auch Zeit und Distanz der Session, hochkant als eigene Reihe über Runde/Watt/Puls, quer unter der Schlagzahl-Karte. Die Kraftkurve braucht hochkant jetzt 806 px Innenhöhe (vorher 720), bei 360×740 entfällt sie.
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 

@@ -210,6 +210,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     return CourseLiveView(
       tick: _tick,
       rrIntervalMs: _rrIntervalMs,
+      session: recording?.progress,
       lap: lap,
       course: template.course.definition,
       outdated: _stale,

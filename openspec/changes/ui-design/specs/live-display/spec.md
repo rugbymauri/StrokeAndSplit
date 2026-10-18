@@ -43,6 +43,10 @@ Das Live-Display SHALL bei mehr Breite als Höhe ein eigenes Querformat-Layout v
 - **WHEN** das Handy im Querformat steckt und eine Vorlage läuft
 - **THEN** steht die Pace-Box mit Fortschrittsrahmen links fast über die volle Höhe, und Schlagzahl und weitere Werte stehen daneben
 
+#### Scenario: Zeit und Distanz der Session mit Vorlage
+- **WHEN** eine Vorlage seit 6:20 läuft und die Session 1520 m zurückgelegt hat
+- **THEN** zeigt das Live-Display neben Rundenzeit, Watt und Puls die Kacheln „Zeit“ mit 6:20 und „Distanz“ mit 1 520 m, im Hochformat auch auf einem 360 px breiten Handy und im Querformat, ohne dass ein Wert abgeschnitten wird
+
 ### Requirement: Live-Display ohne Trennen verlassen
 Das Live-Display SHALL kein Bedienelement zum Trennen zeigen. Zurück (Geste oder Taste) und auf dem Desktop die Esc-Taste MUST zum Startbildschirm führen, ohne die Verbindung zu trennen. Eine laufende Session MUST dabei wie mit „Session beenden“ gespeichert werden, eine bereite Session, die noch auf den ersten Schlag wartet, MUST verworfen werden. Der Bildschirm MUST nach dem Verlassen wieder ausgehen dürfen.
 
