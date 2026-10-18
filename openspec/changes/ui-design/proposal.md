@@ -8,7 +8,7 @@ Die Screens aus `foundation` und `courses` sind funktional, folgen aber keiner g
 
 - **Designsprache**: dunkles Thema, Barlow Condensed für Zahlen, IBM Plex Sans für Text, feste Farbbedeutungen (Blau: in der Zone, Orange: ausserhalb, Violett: Ghost), Touch-Ziele ab 44 px. Die Werte stehen als Tokens in `design.md`.
 - **Geräte zuerst**: Die App beginnt mit „Geräte wählen“: Rudergerät (PM5 oder FTMS-Rudergerät aus `device-types`, oder Simulator im PM5- bzw. FTMS-Modus) und optional der Pulsgurt aus `heart-rate`; danach geht es zum Startbildschirm.
-- **Startbildschirm**: gewählte Geräte als kompakte Zeile, „Rudern“, „Frei rudern“, eine Kachel „Nochmal“ mit der zuletzt geruderten Vorlage und ein Link zu den Sessions. Schlanker als im Canvas, der Kacheln aller Vorlagen und eine Liste der letzten Sessions zeigt. Die Sprachwahl aus `translations` bleibt als Symbol in der App-Leiste des Startbildschirms und steht auch auf „Geräte wählen“, damit sie schon beim ersten Start erreichbar ist.
+- **Startbildschirm**: gewählte Geräte als kompakte Zeile, „Rudern“, „Frei rudern“, eine Kachel „Nochmal“ mit der zuletzt geruderten Vorlage und ein Button zu den Sessions. Nach dem Rudern bleibt das Rudergerät verbunden; die Gerätezeile zeigt das und bietet „Trennen“ an, das Live-Display hat kein Trennen-Symbol mehr (Zurück, Esc und „Fertig“ führen zum Startbildschirm). Schlanker als im Canvas, der Kacheln aller Vorlagen und eine Liste der letzten Sessions zeigt. Die Sprachwahl aus `translations` bleibt als Symbol in der App-Leiste des Startbildschirms und steht auch auf „Geräte wählen“, damit sie schon beim ersten Start erreichbar ist.
 - **Live-Display frei**: grosse Pace, Kacheln für Schlagzahl, Watt, Zeit und Distanz, eine Zeile für Puls, Kalorien und Ø Pace. Eigene Layouts für Hoch- und Querformat.
 - **Live-Display mit Vorlage**: Die Pace steht in einer Box mit abgerundeten Ecken. Der Rahmen der Box zeigt den Fortschritt als drei Spuren wie bei einer Uhr: aussen die Gesamtstrecke, in der Mitte die Runde, innen der aktuelle Abschnitt (Zone oder frei). Die Spitze jeder Spur ist ein Schiffchen. In der Box stehen Pace, Zonenstatus mit Band und die Restangaben zu Strecke, Runde und Abschnitt, beim Abschnitt mit dem Zonennamen bzw. „frei“. Die Angaben der bisherigen Streckenleiste (`course_bar.dart`) gehen darin auf. Die Schlagzahl hat eine eigene, kleinere Karte mit Zonenstatus.
 - **Vorlagen, Strecken und Zonen**: Der gemeinsame Screen mit den Tabs „Vorlagen“, „Strecken“ und „Zonen“ besteht seit `zones` und wird neu gestaltet. Jede Vorlage und jede Strecke zeigt einen Ablaufbalken (Breite: Länge, Blau: Zone mit Band, Grau: frei, Helligkeit: Tempo). Dafür wird der bestehende `CourseStrip` aus `zones` ausgebaut. Neu gestaltete Editoren für Vorlage und Strecke. Zonen, ihr Editor und das Einbauen in Strecken kommen aus `zones` und bekommen hier nur die Gestaltung.
@@ -27,6 +27,7 @@ Nicht Teil dieses Changes: das Lesen und Anzeigen der Kraftkurve (Change `force-
 ### Modified Capabilities
 
 - `live-display`: Fortschrittsrahmen um die Pace beim Rudern einer Vorlage, mit einer Spur für den aktuellen Abschnitt (Zone oder frei), eigene Layouts für Hoch- und Querformat.
+- `erg-connection`: Die Verbindung bleibt nach dem Rudern bestehen, bis der Nutzer sie auf dem Startbildschirm trennt oder ein anderes Gerät wählt.
 
 ## Impact
 

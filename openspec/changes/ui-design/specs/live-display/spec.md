@@ -43,6 +43,25 @@ Das Live-Display SHALL bei mehr Breite als Höhe ein eigenes Querformat-Layout v
 - **WHEN** das Handy im Querformat steckt und eine Vorlage läuft
 - **THEN** steht die Pace-Box mit Fortschrittsrahmen links fast über die volle Höhe, und Schlagzahl und weitere Werte stehen daneben
 
+### Requirement: Live-Display ohne Trennen verlassen
+Das Live-Display SHALL kein Bedienelement zum Trennen zeigen. Zurück (Geste oder Taste) und auf dem Desktop die Esc-Taste MUST zum Startbildschirm führen, ohne die Verbindung zu trennen. Eine laufende Session MUST dabei wie mit „Session beenden“ gespeichert werden, eine bereite Session, die noch auf den ersten Schlag wartet, MUST verworfen werden. Der Bildschirm MUST nach dem Verlassen wieder ausgehen dürfen.
+
+#### Scenario: Kein Trennen-Symbol
+- **WHEN** der Nutzer frei oder mit einer Vorlage rudert, im Hoch- oder Querformat
+- **THEN** zeigt das Live-Display Verbindungspunkt, Pulsgurt und Quelle, aber kein Symbol zum Trennen
+
+#### Scenario: Esc auf dem Desktop
+- **WHEN** der Nutzer auf dem Linux-Desktop im Live-Display Esc drückt
+- **THEN** zeigt die App den Startbildschirm, das Rudergerät bleibt verbunden und der Bildschirm darf wieder ausgehen
+
+#### Scenario: Zurück während einer Session
+- **WHEN** der Nutzer während einer laufenden Session zurück geht
+- **THEN** wird die Session gespeichert und die App zeigt den Startbildschirm
+
+#### Scenario: Zurück vor dem ersten Schlag
+- **WHEN** der Nutzer eine Vorlage startet und vor dem ersten Schlag zurück geht
+- **THEN** wird keine Session gespeichert, und das Rudergerät bleibt verbunden
+
 ## MODIFIED Requirements
 
 ### Requirement: Werte in gewohnten Formaten anzeigen
