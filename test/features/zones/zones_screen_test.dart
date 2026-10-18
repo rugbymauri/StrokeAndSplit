@@ -214,11 +214,11 @@ void main() {
       await tester.pump();
 
       expect(find.descendant(of: fastest, matching: find.text('1:50')), findsOneWidget);
-      // Not slower than the slowest pace.
-      expect(tester.widget<OarStepper>(fastest).canIncrease, isFalse);
+      // The slowest pace moves along.
+      expect(stepperValue(tester, const Key('zone-pace-slow')), 11500);
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
-      expect(find.text('100 m · 1:50–1:50 · 30–34 spm'), findsOneWidget);
+      expect(find.text('100 m · 1:50–1:55 · 30–34 spm'), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -248,6 +248,80 @@ void main() {
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
       expect(find.text('100 m · 1:45–1:50 · 34–34 spm'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+  });
+
+  group('pace band', () {
+    const fast = Key('zone-pace-fast');
+    const slow = Key('zone-pace-slow');
+
+    (int, int) band(WidgetTester tester) => (stepperValue(tester, fast), stepperValue(tester, slow));
+
+    Future<_Setup> openNewZone(WidgetTester tester) async {
+      final setup = _Setup();
+      await setup.pump(tester);
+      await tester.tap(find.text('Zone anlegen'));
+      await tester.pumpAndSettle();
+      return setup;
+    }
+
+    testWidgets('starts a new zone with a gap of 10 s', (tester) async {
+      await openNewZone(tester);
+
+      expect(band(tester), (16500, 17500));
+      expect(find.descendant(of: find.byKey(fast), matching: find.text('2:45')), findsOneWidget);
+      expect(find.descendant(of: find.byKey(slow), matching: find.text('2:55')), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('moves the slowest pace along with the fastest', (tester) async {
+      final setup = await openNewZone(tester);
+
+      await tapStep(tester, fast, more: false);
+      expect(band(tester), (16000, 17000));
+      await stepTo(tester, fast, 12000);
+      expect(band(tester), (12000, 13000));
+      await tapStep(tester, fast, more: true);
+      expect(band(tester), (12500, 13500));
+
+      await _name(tester, 'Band');
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+      expect(find.text('100 m · 2:05–2:15'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('changes only the slowest pace and keeps the new gap', (tester) async {
+      await openNewZone(tester);
+      await stepTo(tester, fast, 12000);
+
+      await tapStep(tester, slow, more: true);
+      expect(band(tester), (12000, 13500));
+      await tapStep(tester, fast, more: false);
+      expect(band(tester), (11500, 13000));
+
+      await stepTo(tester, slow, 11500);
+      expect(band(tester), (11500, 11500));
+      // Not faster than the fastest pace.
+      expect(tester.widget<OarStepper>(find.byKey(slow)).canDecrease, isFalse);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('stops the band at 1:00 and 5:00', (tester) async {
+      await openNewZone(tester);
+
+      await stepTo(tester, fast, 29000);
+      expect(band(tester), (29000, 30000));
+      // The slowest pace would leave the range.
+      expect(tester.widget<OarStepper>(find.byKey(fast)).canIncrease, isFalse);
+      expect(tester.widget<OarStepper>(find.byKey(slow)).canIncrease, isFalse);
+      await tapStep(tester, fast, more: true);
+      expect(band(tester), (29000, 30000));
+
+      await stepTo(tester, fast, 6000);
+      expect(band(tester), (6000, 7000));
+      expect(tester.widget<OarStepper>(find.byKey(fast)).canDecrease, isFalse);
       await disposeWidgetsWithDatabase(tester);
     });
   });

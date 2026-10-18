@@ -29,7 +29,7 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 - [x] 4.3 Gestaltung der Streckenliste und des Strecken-Kopfs (Name, Achse, Länge, Ablaufbalken) nach „Streckenliste“ und „Strecken-Editor“. Einbauen von Zonen und Zonen-Editor setzt der Change `zones` um. Verifikation: Widget-Tests für Streckenliste und Versionierungshinweis
 
 - [x] 4.4 Zahlenfelder durch `OarStepper` ersetzen: Rundenzahl im Vorlagen-Editor, Länge im Strecken-Editor, Länge, Pace- und Schlagzahl-Band im Zonen-Editor, Startposition in „Zone einbauen“, mit den Schritten aus D7. Verifikation: bestehende Editor-Tests auf Tippen umgestellt und grün, Widget-Tests für die Spec-Szenarien „Pace-Band anpassen“ und „Zone verschieben“
-- [ ] 4.5 Pace-Band im Zonen-Editor nach D7 mit 10 s Abstand vorbelegen und mit der schnellsten Pace als Ganzes verschieben, die langsamste Pace ändert nur sich selbst; Schlagzahl-Band bleibt. Verifikation: Widget-Tests für neue Zone, schnellste Pace verschieben, langsamste einzeln verstellen und gesperrte Taste an der Obergrenze
+- [x] 4.5 Pace-Band im Zonen-Editor nach D7 mit 10 s Abstand vorbelegen und mit der schnellsten Pace als Ganzes verschieben, die langsamste Pace ändert nur sich selbst; Schlagzahl-Band bleibt. Verifikation: Widget-Tests für neue Zone, schnellste Pace verschieben, langsamste einzeln verstellen und gesperrte Taste an der Obergrenze
 
 ## 5. Start und Zusammenfassung
 
