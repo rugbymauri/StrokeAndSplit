@@ -18,7 +18,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
-| 4 | `force-curve` | 9/10 | in Umsetzung | – |
+| 4 | `force-curve` | 10/11 | in Umsetzung | – |
 | 5 | `heart-rate` | 21/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 12/13 | in Umsetzung | – |
@@ -151,6 +151,7 @@ Vor dem Start:
 - [x] Tasks 3.1, 3.2: Widget `ForceCurve` (Varianten card/strip/inline/tinted, letzter und vorheriger Schlag, Warten), Schlaglänge per `formatDriveLength`, neues Token `AppColors.previousCurve`. Vorläufig: Läufe gleicher Werte für die Darstellung zusammengefasst und geglättet.
 - [x] Task 3.3: Kraftkurve mit Schlaglänge in allen vier Live-Layouts; Quellen melden `providesForceCurves` (PM5 und PM5-Simulator ja, FTMS nein, Replay nur mit Kurvenpaketen). Feste Kartenhöhen aus ui-design beibehalten (120/72 px statt ~96/44 px).
 - [x] Nach Gerätetest (Nutzer, 2026-10-17): Schlaglänge in ganzen Zentimetern („106 cm“), Spec und D4 nachgeführt; Kachel „In Zone“ im Live-Display mit Vorlage entfernt (Anteil weiter in der Zusammenfassung).
+- [x] Task 3.5 (Nutzer, 2026-10-18): Kraftkurve auf absoluter Skala 0–1000 N (Stufen von 500 N nur nach oben, Rücksetzen bei neuer Quelle/Session), Hilfslinien alle 500 N, Spitzenkraft „620 N“ neben der Schlaglänge. Fixture-Spitzen 147–658 N.
 
 ### 5. `heart-rate`: Brustgurt direkt koppeln, RR-Intervalle, HRV
 
