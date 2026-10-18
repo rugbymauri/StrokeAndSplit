@@ -6,7 +6,7 @@ import 'package:strokesplit/app/font_licenses.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('shows the OFL of both bundled fonts on the licence page', () async {
+  test('shows the OFL of every bundled font on the licence page', () async {
     registerFontLicenses();
 
     final entries = await LicenseRegistry.licenses.toList();
