@@ -1,13 +1,13 @@
-import 'package:aergrow/app/platform_providers.dart';
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/course_repository.dart';
-import 'package:aergrow/data/sessions/session_accumulator.dart';
-import 'package:aergrow/data/sessions/session_providers.dart';
-import 'package:aergrow/data/sessions/session_repository.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/sources/erg_source_providers.dart';
-import 'package:aergrow/data/templates/template_repository.dart';
-import 'package:aergrow/features/sessions/sessions_screen.dart';
+import 'package:strokesplit/app/platform_providers.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course_repository.dart';
+import 'package:strokesplit/data/sessions/session_accumulator.dart';
+import 'package:strokesplit/data/sessions/session_providers.dart';
+import 'package:strokesplit/data/sessions/session_repository.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/features/sessions/sessions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -149,7 +149,7 @@ void main() {
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
       await tester.pump();
     }
-    expect(setup.files.saved.keys, ['aergrow-2026-10-15-1830.aergrow']);
+    expect(setup.files.saved.keys, ['strokesplit-2026-10-15-1830.strokesplit']);
     expect(find.text('Session exportiert.'), findsOneWidget);
 
     setup.files.toOpen = setup.files.saved.values.single;

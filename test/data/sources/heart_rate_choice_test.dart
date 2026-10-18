@@ -1,5 +1,5 @@
-import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
-import 'package:aergrow/data/sources/heart_rate_choice.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
+import 'package:strokesplit/data/sources/heart_rate_choice.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

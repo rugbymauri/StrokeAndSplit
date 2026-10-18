@@ -1,4 +1,4 @@
-import 'package:aergrow/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

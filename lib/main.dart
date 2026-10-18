@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'app/aergrow_app.dart';
+import 'app/strokesplit_app.dart';
 import 'app/app_language.dart';
 import 'app/font_licenses.dart';
 import 'data/db/database.dart';
@@ -27,6 +27,6 @@ Future<void> main() async {
       rowerChoiceStoreProvider.overrideWithValue(rower),
       heartRateMonitorStoreProvider.overrideWithValue(heartRateMonitor),
     ],
-    child: const AergRowApp(),
+    child: const StrokeSplitApp(),
   ));
 }

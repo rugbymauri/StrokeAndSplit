@@ -1,10 +1,10 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/course_repository.dart';
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/sessions/session_accumulator.dart';
-import 'package:aergrow/data/sessions/session_repository.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/templates/template_repository.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course_repository.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sessions/session_accumulator.dart';
+import 'package:strokesplit/data/sessions/session_repository.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/templates/template_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fixtures.dart';

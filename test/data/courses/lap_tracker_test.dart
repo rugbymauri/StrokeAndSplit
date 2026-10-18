@@ -1,5 +1,5 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/lap_tracker.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/lap_tracker.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _band = CourseSegment(length: 600, paceFastCs: 12500, paceSlowCs: 13000, spmMin: 20, spmMax: 22);

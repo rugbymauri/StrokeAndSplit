@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:aergrow/app/design_tokens.dart';
-import 'package:aergrow/features/live/force_curve.dart';
+import 'package:strokesplit/app/design_tokens.dart';
+import 'package:strokesplit/features/live/force_curve.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

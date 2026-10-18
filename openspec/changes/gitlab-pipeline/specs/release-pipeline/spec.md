@@ -82,7 +82,7 @@ Die Downloads eines Releases SHALL über die Release-Seite im GitLab-Projekt err
 
 #### Scenario: Dateinamen
 - **WHEN** das Release `v1.2.0` erzeugt wird
-- **THEN** heissen die Dateien so, dass Version und Plattform ohne Öffnen erkennbar sind, z. B. `aergrow-1.2.0-android.apk` und `aergrow-1.2.0-x86_64.AppImage`
+- **THEN** heissen die Dateien so, dass Version und Plattform ohne Öffnen erkennbar sind, z. B. `strokesplit-1.2.0-android.apk` und `strokesplit-1.2.0-x86_64.AppImage`
 
 ### Requirement: Kein Überschreiben veröffentlichter Releases
 Die Pipeline SHALL ein bestehendes Release oder seine Downloads nicht überschreiben. Ein erneuter Lauf zu einem Tag, zu dem bereits ein Release existiert, SHALL fehlschlagen.

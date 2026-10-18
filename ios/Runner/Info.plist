@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>AergRow verbindet sich per Bluetooth mit deinem Concept2 PM5, um deine Ruderdaten live anzuzeigen.</string>
+	<string>Stroke &amp; Split verbindet sich per Bluetooth mit deinem Concept2 PM5, um deine Ruderdaten live anzuzeigen.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

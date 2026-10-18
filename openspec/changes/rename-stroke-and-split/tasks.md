@@ -2,8 +2,8 @@
 
 ## 0. Vorbereitung
 
-- [ ] 0.1 Offene Fragen aus `design.md` klären (Schreibweise, App-ID) und Domains sichern. Verifikation: Entscheide in `design.md` nachgetragen
-- [ ] 0.2 Offene Branches mergen, bevor die Umsetzung beginnt (Design D3). Verifikation: `git branch --no-merged main` zeigt keine Feature-Branches mehr
+- [x] 0.1 Offene Fragen aus `design.md` klären (Schreibweise, App-ID) und Domains sichern. Verifikation: Entscheide in `design.md` nachgetragen
+- [x] 0.2 Offene Branches mergen, bevor die Umsetzung beginnt (Design D3). Verifikation: `git branch --no-merged main` zeigt keine Feature-Branches mehr
 
 ## 1. Sichtbarer Name
 
@@ -11,16 +11,19 @@
 
 ## 2. Session-Dateien
 
-- [ ] 2.1 Export mit `.strokesplit` und `strokesplit-raw`, Import akzeptiert alt und neu, Dateidialog mit beiden Endungen. Verifikation: Unit-Tests für Roundtrip im neuen Format und Import der unveränderten Fixtures `just_row.jsonl`, `pause.jsonl`, `reset.jsonl`
+- [x] 2.1 Export mit `.strokesplit` und `strokesplit-raw`, Import akzeptiert alt und neu, Dateidialog mit beiden Endungen. Verifikation: Unit-Tests für Roundtrip im neuen Format und Import der unveränderten Fixtures `just_row.jsonl`, `pause.jsonl`, `reset.jsonl`
 
 ## 3. Kennungen
 
-- [ ] 3.1 Dart-Paket `aergrow` → `strokesplit`, `AergRowApp` → `StrokeSplitApp`, Dateinamen, als ein mechanischer Commit. Verifikation: `make check` grün
-- [ ] 3.2 Plattform-IDs auf `ch.strokesplit.strokesplit`, Linux `BINARY_NAME` und `APPLICATION_ID`, Makefile-Pfade. Verifikation: `make build-linux` und `make run-android` starten die App unter dem neuen Namen
+- [x] 3.1 Dart-Paket `aergrow` → `strokesplit`, `AergRowApp` → `StrokeSplitApp`, Dateinamen, als ein mechanischer Commit. Verifikation: `make check` grün
+- [x] 3.2 Plattform-IDs auf `ch.strokesplit.strokesplit`, Linux `BINARY_NAME` und `APPLICATION_ID`, Makefile-Pfade. Verifikation: `make build-linux` und `make run-android` starten die App unter dem neuen Namen
 - [ ] 3.3 Datenbank `strokesplit` mit Übernahme einer vorhandenen `aergrow`-Datenbank (Design D2). Verifikation: Unit-Test mit einer Datei `aergrow` im Datenverzeichnis, manueller Test auf Linux mit bestehenden Sessions
+  - Unit-Test in `test/data/db/legacy_database_test.dart`; offen: manueller Test auf Linux
+
+- [x] 3.4 Pipeline und AppImage auf den neuen Namen (Design D9 von `gitlab-pipeline`): `APP_NAME` und `APPLICATION_ID` in `.gitlab-ci.yml`, Defaults in `tool/build_appimage.sh`; `linux/packaging/app.desktop.in` übernimmt `Exec`, `Icon` und `StartupWMClass` aus diesen Werten. Verifikation: `tool/build_appimage.sh` packt `build/appimage/strokesplit-<Version>-x86_64.AppImage`
 
 ## 4. Dokumentation
 
-- [ ] 4.1 README mit neuem Namen und Abschnitt zum Umzug der Sessions per Export und Import auf Android und iOS. Verifikation: Durchsicht
-- [ ] 4.2 Specs und Change-Dokumente mit `.aergrow` auf das neue Format aktualisieren, soweit sie nicht archiviert sind. Verifikation: `openspec validate --all` grün
-- [ ] 4.3 Canvas „AergRow Frontend“ auf den neuen Namen umstellen. Verifikation: Startbildschirm und Canvas-Titel zeigen „Stroke & Split“
+- [x] 4.1 README mit neuem Namen und Abschnitt zum Umzug der Sessions per Export und Import auf Android und iOS. Verifikation: Durchsicht
+- [x] 4.2 Specs und Change-Dokumente mit `.aergrow` auf das neue Format aktualisieren, soweit sie nicht archiviert sind. Verifikation: `openspec validate --all` grün
+- [x] 4.3 Canvas „AergRow Frontend“ auf den neuen Namen umstellen. Verifikation: Startbildschirm und Canvas-Titel zeigen „Stroke & Split“

@@ -22,7 +22,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 5 | `heart-rate` | 21/25 | in Umsetzung | Spike mit Gurt am Gerät (1.1/1.2, Nutzer) |
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 12/13 | in Umsetzung | – |
-| 8 | `rename-stroke-and-split` | 1/10 | zuletzt | Domain- und Markenrecherche (Nutzer) |
+| 8 | `rename-stroke-and-split` | 10/11 | zuletzt | Domain- und Markenrecherche (Nutzer) |
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 
 ## Warum diese Reihenfolge
@@ -221,10 +221,11 @@ Ziel: Anzeigename, Paket- und App-ID `strokesplit`, Dateiendung `.strokesplit`, 
 
 Vor dem Start:
 - [x] Entscheide F9, F10 (2026-10-16): „Stroke & Split“, App-ID `ch.strokesplit`.
-- [ ] Domains sichern, Markenrecherche (Swissreg, EUIPO, USPTO). Ausserhalb der App, durch den Nutzer.
-- [ ] Neue App-ID ist unter Android eine neue App: Umzug per Export/Import im README beschreiben (Task im Change).
-- [ ] Ist `gitlab-pipeline` schon umgesetzt: `APP_NAME` in `.gitlab-ci.yml`, Default in `tool/build_appimage.sh` und `linux/packaging/app.desktop.in` (`Name`, `StartupWMClass`) mit umstellen (Design D9 von `gitlab-pipeline`). Task in `tasks.md` ergänzen.
+- [x] Domains sichern, Markenrecherche (Swissreg, EUIPO, USPTO). Ausserhalb der App, durch den Nutzer; Namensrechte bestätigt (2026-10-18).
+- [x] Neue App-ID ist unter Android eine neue App: Umzug per Export/Import im README beschreiben (Task im Change).
+- [x] Ist `gitlab-pipeline` schon umgesetzt: `APP_NAME` in `.gitlab-ci.yml`, Default in `tool/build_appimage.sh` und `linux/packaging/app.desktop.in` (`Name`, `StartupWMClass`) mit umstellen (Design D9 von `gitlab-pipeline`). Task in `tasks.md` ergänzen.
 - [x] Task 1.1 vorgezogen (Nutzer, 2026-10-17): Anzeigename „Stroke & Split“ in App, Android-Label, iOS, macOS (`CFBundleDisplayName`, `PRODUCT_NAME` bleibt), Linux-Fenstertitel, Desktop-Datei und Dateidialog. Dateiendung, Paket, App-ID und Datenbank bleiben vorerst `aergrow`; die App-ID-Änderung (3.2) installiert eine neue App neben der alten.
+- [x] Umgesetzt (2026-10-18, `feature/rename-strokesplit`): Export `.strokesplit`/`strokesplit-raw` (Import liest weiter `.aergrow`), Dart-Paket `strokesplit`, App-ID `ch.strokesplit.strokesplit` auf allen Plattformen, CI-`APP_NAME` und AppImage `strokesplit` (Task 3.4), Übernahme von `aergrow.sqlite` unter Linux, README-Abschnitt „Umzug von AergRow“, Canvas „Stroke & Split Frontend“. Offen: 3.3 manueller Test auf Linux mit bestehenden Sessions. macOS (Sandbox) zieht wie Android/iOS per Export/Import um. drift-Schema-Ordner heissen weiter `aergrow`.
 
 ### 9. `gitlab-pipeline`: Tests in CI, Releases mit APK und AppImage
 

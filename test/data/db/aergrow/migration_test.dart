@@ -2,10 +2,10 @@
 // ignore_for_file: unused_local_variable, unused_import
 import 'package:drift/drift.dart' hide isNull;
 import 'package:drift_dev/api/migrations_native.dart';
-import 'package:aergrow/data/db/database.dart';
+import 'package:strokesplit/data/db/database.dart';
 import 'package:erg_protocol/erg_protocol.dart';
-import 'package:aergrow/data/sessions/session_repository.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sessions/session_repository.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../support/test_database.dart';

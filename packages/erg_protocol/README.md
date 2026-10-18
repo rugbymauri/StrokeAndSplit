@@ -200,4 +200,4 @@ Nach dem Verbinden: Indicate aktivieren, `0x00` (Request Control) schreiben und 
 | `force_curve.jsonl` | ca. 55 s Just Row mit Kraftkurve `003d`, Schläge 0–18, 17 Kurven mit Spitzenkräften von 34 bis 149 lbf, Ausschnitt aus dem Mitschnitt vom 2026-10-16 |
 | `ftms_just_row.jsonl` | `just_row.jsonl` als FTMS-Rower: ein Rower-Data-Datensatz pro Sekunde, erzeugt mit `dart run erg_protocol:pm5_to_ftms test/fixtures/just_row.jsonl test/fixtures/ftms_just_row.jsonl` |
 
-`pm5_to_ftms` liest `.jsonl` und `.aergrow` und übernimmt Schlagzähler, Distanz, Pace, Leistung, Energie und Zeit des PM5. Die Fixture ist keine Aufnahme eines echten FTMS-Geräts; die bleibt für den Spike offen.
+`pm5_to_ftms` liest `.jsonl`, `.strokesplit` und das ältere `.aergrow` und übernimmt Schlagzähler, Distanz, Pace, Leistung, Energie und Zeit des PM5. Die Fixture ist keine Aufnahme eines echten FTMS-Geräts; die bleibt für den Spike offen.

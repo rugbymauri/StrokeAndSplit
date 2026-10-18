@@ -1,7 +1,7 @@
-import 'package:aergrow/data/db/database.dart';
-import 'package:aergrow/data/sessions/session_providers.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sessions/session_providers.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';

@@ -46,14 +46,14 @@ Future<bool> deleteSession(BuildContext context, WidgetRef ref, SessionRow sessi
   return true;
 }
 
-/// File name of an exported session, e.g. `aergrow-2026-10-15-1830.aergrow`.
+/// File name of an exported session, e.g. `strokesplit-2026-10-15-1830.strokesplit`.
 String sessionFileName(SessionRow session) {
   final t = session.startedAt.toLocal();
   String two(int v) => v.toString().padLeft(2, '0');
-  return 'aergrow-${t.year}-${two(t.month)}-${two(t.day)}-${two(t.hour)}${two(t.minute)}.aergrow';
+  return 'strokesplit-${t.year}-${two(t.month)}-${two(t.day)}-${two(t.hour)}${two(t.minute)}.strokesplit';
 }
 
-/// Exports [session] with its raw data as an `.aergrow` file.
+/// Exports [session] with its raw data as a `.strokesplit` file.
 Future<void> exportSession(BuildContext context, WidgetRef ref, SessionRow session) async {
   final messenger = ScaffoldMessenger.of(context);
   final l10n = context.l10n;
@@ -66,7 +66,7 @@ Future<void> exportSession(BuildContext context, WidgetRef ref, SessionRow sessi
   }
 }
 
-/// Lets the user pick an `.aergrow` file and adds it to the sessions.
+/// Lets the user pick a `.strokesplit` or older `.aergrow` file and adds it to the sessions.
 Future<void> importSession(BuildContext context, WidgetRef ref) async {
   final messenger = ScaffoldMessenger.of(context);
   final l10n = context.l10n;

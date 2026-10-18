@@ -1,9 +1,11 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:erg_protocol/erg_protocol.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../sources/erg_source.dart';
 import 'database.steps.dart';
+import 'legacy_database.dart';
 
 part 'database.g.dart';
 
@@ -269,8 +271,16 @@ class LapSegments extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
-  /// The database file on the device.
-  factory AppDatabase.local() => AppDatabase(driftDatabase(name: 'aergrow'));
+  /// The database file on the device, taking over the one from before the
+  /// rename (Design D2).
+  factory AppDatabase.local() => AppDatabase(driftDatabase(
+        name: databaseName,
+        native: DriftNativeOptions(databaseDirectory: () async {
+          final directory = await getApplicationDocumentsDirectory();
+          await adoptLegacyDatabase(directory);
+          return directory;
+        }),
+      ));
 
   @override
   int get schemaVersion => 6;

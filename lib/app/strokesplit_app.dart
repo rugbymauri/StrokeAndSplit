@@ -7,8 +7,8 @@ import '../l10n/l10n.dart';
 import 'app_language.dart';
 import 'app_theme.dart';
 
-class AergRowApp extends ConsumerWidget {
-  const AergRowApp({super.key});
+class StrokeSplitApp extends ConsumerWidget {
+  const StrokeSplitApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

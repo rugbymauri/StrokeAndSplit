@@ -26,7 +26,7 @@ Stand heute:
 
 **Non-Goals:**
 - Rechts-nach-links-Sprachen.
-- Übersetzte Inhalte in Exportdateien. Der Header von `.aergrow` bleibt sprachneutral (Codes, Zahlen, Namen).
+- Übersetzte Inhalte in Exportdateien. Der Header von `.strokesplit` bleibt sprachneutral (Codes, Zahlen, Namen).
 - Der BLE-Spike und Texte für Entwickler (Logs, `toString`, Ausnahmen, die Programmierfehler melden).
 
 ## Decisions

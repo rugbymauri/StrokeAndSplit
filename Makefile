@@ -1,4 +1,4 @@
-# Development commands for AergRow. Run `make` to list them.
+# Development commands for Stroke & Split. Run `make` to list them.
 
 FLUTTER ?= $(or $(shell command -v flutter 2>/dev/null),$(HOME)/dev/flutter/bin/flutter)
 DART    ?= $(dir $(FLUTTER))dart
@@ -10,7 +10,7 @@ ANDROID_DEVICE ?= $(shell $(ADB) devices 2>/dev/null | awk 'NR > 1 && $$2 == "de
 PROTOCOL       := packages/erg_protocol
 SPIKE          := lib/spike/spike_main.dart
 RECORDINGS     := recordings
-ANDROID_FILES  := /sdcard/Android/data/ch.aergrow.aergrow/files
+ANDROID_FILES  := /sdcard/Android/data/ch.strokesplit.strokesplit/files
 
 # Optional version for release builds, e.g. `make apk BUILD_NAME=1.2.0 BUILD_NUMBER=42`.
 # Without them, Flutter takes the version from pubspec.yaml.

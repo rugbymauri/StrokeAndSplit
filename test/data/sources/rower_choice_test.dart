@@ -1,14 +1,14 @@
-import 'package:aergrow/data/sources/ble/ble_rower_source.dart';
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/rower_choice.dart';
-import 'package:aergrow/data/sources/simulated_source.dart';
+import 'package:strokesplit/data/sources/ble/ble_rower_source.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/rower_choice.dart';
+import 'package:strokesplit/data/sources/simulated_source.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
 
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
+const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
 
 void main() {
   test('a rower and both simulators survive storing', () {
@@ -20,7 +20,7 @@ void main() {
       expect(RowerChoice.decode(choice.encode()), choice);
     }
     final device = RowerChoice.decode(const RowerChoice.device(_ftms).encode())!.device!;
-    expect((device.name, device.protocol), ('AergRow FTMS Rower', ErgProtocol.ftms));
+    expect((device.name, device.protocol), ('Stroke & Split FTMS', ErgProtocol.ftms));
   });
 
   test('nothing stored or something unreadable means no choice', () {

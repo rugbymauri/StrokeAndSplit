@@ -1,14 +1,14 @@
-import 'package:aergrow/app/platform_providers.dart';
-import 'package:aergrow/data/sessions/session_providers.dart';
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
-import 'package:aergrow/data/sources/erg_source_providers.dart';
-import 'package:aergrow/data/sources/heart_rate_choice.dart';
-import 'package:aergrow/data/sources/rower_choice.dart';
-import 'package:aergrow/features/connection/choose_devices_screen.dart';
-import 'package:aergrow/features/connection/heart_rate_search_screen.dart';
-import 'package:aergrow/features/connection/start_screen.dart';
+import 'package:strokesplit/app/platform_providers.dart';
+import 'package:strokesplit/data/sessions/session_providers.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
+import 'package:strokesplit/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/data/sources/heart_rate_choice.dart';
+import 'package:strokesplit/data/sources/rower_choice.dart';
+import 'package:strokesplit/features/connection/choose_devices_screen.dart';
+import 'package:strokesplit/features/connection/heart_rate_search_screen.dart';
+import 'package:strokesplit/features/connection/start_screen.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +20,7 @@ import '../../support/localized_app.dart';
 import '../../support/test_database.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
+const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
 const _h10 = FoundHeartRateMonitor(id: 'A0:9E:1A:00:00:01', name: 'Polar H10 1A2B3C4D');
 const _tickr = FoundHeartRateMonitor(id: 'D4:22:CD:00:00:02', name: 'TICKR 1234');
 
@@ -103,7 +103,7 @@ void main() {
   testWidgets('lists an FTMS rower with its kind', (tester) async {
     await _pump(tester, FakeBleTransport(found: [_pm5, _ftms]));
 
-    expect(find.text('AergRow FTMS Rower'), findsOneWidget);
+    expect(find.text('Stroke & Split FTMS'), findsOneWidget);
     expect(find.text('FTMS · AA:BB:CC:DD:EE:FF'), findsOneWidget);
     await tester.pump(const Duration(seconds: 15));
   });
@@ -169,7 +169,7 @@ void main() {
   testWidgets('connects to an FTMS rower as an FTMS source', (tester) async {
     final container = await _pump(tester, FakeBleTransport(found: [_ftms]));
 
-    await tester.tap(find.text('AergRow FTMS Rower'));
+    await tester.tap(find.text('Stroke & Split FTMS'));
     await _continue(tester);
 
     final source = container.read(activeErgSourceProvider);

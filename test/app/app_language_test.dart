@@ -1,5 +1,5 @@
-import 'package:aergrow/app/app_language.dart';
-import 'package:aergrow/l10n/l10n.dart';
+import 'package:strokesplit/app/app_language.dart';
+import 'package:strokesplit/l10n/l10n.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

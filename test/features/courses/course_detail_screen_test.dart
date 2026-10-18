@@ -1,10 +1,10 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/course_repository.dart';
-import 'package:aergrow/data/sessions/session_providers.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/features/courses/course_detail_screen.dart';
-import 'package:aergrow/features/courses/course_editor_screen.dart';
-import 'package:aergrow/features/courses/courses_screen.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course_repository.dart';
+import 'package:strokesplit/data/sessions/session_providers.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/features/courses/course_detail_screen.dart';
+import 'package:strokesplit/features/courses/course_editor_screen.dart';
+import 'package:strokesplit/features/courses/courses_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

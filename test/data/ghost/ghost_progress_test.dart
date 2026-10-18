@@ -1,7 +1,7 @@
-import 'package:aergrow/data/courses/course.dart';
-import 'package:aergrow/data/courses/lap_tracker.dart';
-import 'package:aergrow/data/ghost/ghost.dart';
-import 'package:aergrow/data/ghost/ghost_progress.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/lap_tracker.dart';
+import 'package:strokesplit/data/ghost/ghost.dart';
+import 'package:strokesplit/data/ghost/ghost_progress.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final _seerunde = CourseDefinition.single(axis: CourseAxis.distance, length: 1000);

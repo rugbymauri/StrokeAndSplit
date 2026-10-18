@@ -1,5 +1,5 @@
-import 'package:aergrow/features/live/force_curve.dart';
-import 'package:aergrow/features/live/live_free.dart';
+import 'package:strokesplit/features/live/force_curve.dart';
+import 'package:strokesplit/features/live/live_free.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

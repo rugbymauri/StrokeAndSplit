@@ -1,12 +1,12 @@
-import 'package:aergrow/app/design_tokens.dart';
-import 'package:aergrow/app/platform_providers.dart';
-import 'package:aergrow/data/sources/ble/ble_rower_source.dart';
-import 'package:aergrow/data/sources/ble/ble_transport.dart';
-import 'package:aergrow/data/sources/ble/heart_rate_transport.dart';
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/sources/erg_source_providers.dart';
-import 'package:aergrow/data/sources/heart_rate_choice.dart';
-import 'package:aergrow/features/live/live_screen.dart';
+import 'package:strokesplit/app/design_tokens.dart';
+import 'package:strokesplit/app/platform_providers.dart';
+import 'package:strokesplit/data/sources/ble/ble_rower_source.dart';
+import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/data/sources/heart_rate_choice.dart';
+import 'package:strokesplit/features/live/live_screen.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +18,7 @@ import '../../support/fake_heart_rate_transport.dart';
 import '../../support/localized_app.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
+const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
 const _h10 = FoundHeartRateMonitor(id: 'A0:9E:1A:12:34:56', name: 'Polar H10 1A2B3C4D');
 const _busy = HeartRateConnectException(HeartRateConnectError.failed, message: 'busy');
 

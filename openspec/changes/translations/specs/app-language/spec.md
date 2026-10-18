@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Die Oberfläche von AergRow in der Sprache zeigen, die der Nutzer in der App wählt, zuerst Deutsch oder Englisch, und um weitere Sprachen erweiterbar bleiben.
+Die Oberfläche von Stroke & Split in der Sprache zeigen, die der Nutzer in der App wählt, zuerst Deutsch oder Englisch, und um weitere Sprachen erweiterbar bleiben.
 
 ## ADDED Requirements
 

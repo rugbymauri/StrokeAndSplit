@@ -10,8 +10,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-APP_NAME="${APP_NAME:-aergrow}"
-APPLICATION_ID="${APPLICATION_ID:-ch.aergrow.aergrow}"
+APP_NAME="${APP_NAME:-strokesplit}"
+APPLICATION_ID="${APPLICATION_ID:-ch.strokesplit.strokesplit}"
 VERSION="${1:-$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)}"
 
 # Pinned tools, verified by checksum. appimagetool would otherwise fetch the latest runtime.

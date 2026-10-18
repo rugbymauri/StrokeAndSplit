@@ -1,7 +1,7 @@
-import 'package:aergrow/app/design_tokens.dart';
-import 'package:aergrow/data/courses/lap_tracker.dart';
-import 'package:aergrow/features/live/progress_frame.dart';
-import 'package:aergrow/features/live/progress_frame_model.dart';
+import 'package:strokesplit/app/design_tokens.dart';
+import 'package:strokesplit/data/courses/lap_tracker.dart';
+import 'package:strokesplit/features/live/progress_frame.dart';
+import 'package:strokesplit/features/live/progress_frame_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

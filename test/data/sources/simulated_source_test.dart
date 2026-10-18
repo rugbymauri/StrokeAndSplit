@@ -1,5 +1,5 @@
-import 'package:aergrow/data/sources/erg_source.dart';
-import 'package:aergrow/data/sources/simulated_source.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/simulated_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';

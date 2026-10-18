@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:erg_protocol/erg_protocol.dart';
 
 /// `dart run erg_protocol:pm5_to_ftms <in> <out>`: turns a PM5 recording
-/// (`.jsonl` or `.aergrow`) into an FTMS recording in the raw format.
+/// (`.jsonl`, `.strokesplit` or the older `.aergrow`) into an FTMS recording in the raw format.
 void main(List<String> args) {
   if (args.length != 2) {
     stderr.writeln('Usage: dart run erg_protocol:pm5_to_ftms <pm5 recording> <ftms recording>');

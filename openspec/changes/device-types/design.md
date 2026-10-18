@@ -150,8 +150,8 @@ Danach `make schema` ausführen und die Migrationstests in `test/data/db/migrati
 
 Zwei Teile, damit die Protokolllogik nur in Dart existiert:
 
-1. **`dart run erg_protocol:pm5_to_ftms <in> <out>`**: Ein Dart-Skript im Package dekodiert eine PM5-Aufnahme (`.jsonl` oder `.aergrow`) und schreibt mit dem `FtmsEncoder` eine FTMS-Aufnahme im Rohformat mit `"protocol": "ftms"` und Paketen `2ad1` im Sekundentakt. Das Ergebnis dient auch als Test-Fixture.
-2. **`tool/ftms_rower/ftms_rower.py`**: Ein Python-Skript mit `bless` (BlueZ-GATT-Server über D-Bus) meldet sich als `AergRow FTMS Rower` mit Service `0x1826`, Service Data „Rower“, Rower Data `0x2AD1` und einem Control Point, der Request Control und Start bestätigt. Es spielt die FTMS-Aufnahme zeitgetreu als Notifications ab. Gestartet wird es mit `make ftms-rower FILE=…`, die Abhängigkeiten sind inline deklariert und laufen über `uv run`.
+1. **`dart run erg_protocol:pm5_to_ftms <in> <out>`**: Ein Dart-Skript im Package dekodiert eine PM5-Aufnahme (`.jsonl`, `.strokesplit` oder das ältere `.aergrow`) und schreibt mit dem `FtmsEncoder` eine FTMS-Aufnahme im Rohformat mit `"protocol": "ftms"` und Paketen `2ad1` im Sekundentakt. Das Ergebnis dient auch als Test-Fixture.
+2. **`tool/ftms_rower/ftms_rower.py`**: Ein Python-Skript mit `bless` (BlueZ-GATT-Server über D-Bus) meldet sich als `Stroke & Split FTMS` mit Service `0x1826`, Service Data „Rower“, Rower Data `0x2AD1` und einem Control Point, der Request Control und Start bestätigt. Es spielt die FTMS-Aufnahme zeitgetreu als Notifications ab. Gestartet wird es mit `make ftms-rower FILE=…`, die Abhängigkeiten sind inline deklariert und laufen über `uv run`.
 
 Getestet wird vom Android-Handy aus. Unter Linux kann derselbe Adapter nicht gleichzeitig Peripheral und Central für die eigene App sein.
 
@@ -174,6 +174,6 @@ Der Spike sucht auch nach FTMS-Rowern und schreibt deren Notifications von `0x2A
 
 1. Start von `main` (Schema 3).
 2. Schema 4: `Strokes` neu aufbauen, `Sessions.protocol` mit Default `pm5`. Bestehende Sessions bleiben vollständig und gelten als PM5.
-3. Alte `.aergrow`-Dateien ohne `protocol` werden als PM5 importiert.
+3. Alte Session-Dateien (`.strokesplit` oder `.aergrow`) ohne `protocol` werden als PM5 importiert.
 
 Einen Rollback gibt es nicht: Eine ältere App-Version kann eine Datenbank mit Schema 4 nicht öffnen. Bei einer lokalen Single-User-App ohne Verteilung ist das vertretbar.

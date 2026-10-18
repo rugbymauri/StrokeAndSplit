@@ -30,5 +30,5 @@ Keine. Die Anzeige nutzt die Ghost-Positionen, die das Widget aus `ui-design` be
 - `lib/data/sessions`: Den Verlauf (Wanduhr, Achsenposition) des Eintrags auf Platz 1 aus den `samples` seiner Session rekonstruieren. Den Eintrag liefert `statistics`. Keine Schema-Änderung, das war ein Ziel von `courses`.
 - `lib/features/live`: Ghost-Positionen an den Fortschrittsrahmen übergeben, Zeile in der Legende.
 - `lib/features/templates`: Ghost-Zeit in der Vorlagenwahl.
-- Design: Canvas „AergRow Frontend“, Screens „Live: Vorlage mit Zonen“, „Live quer: Vorlage mit Zonen“ und „Vorlage wählen“.
+- Design: Canvas „Stroke & Split Frontend“, Screens „Live: Vorlage mit Zonen“, „Live quer: Vorlage mit Zonen“ und „Vorlage wählen“.
 - Voraussetzung: `ui-design` und `statistics` sind umgesetzt.

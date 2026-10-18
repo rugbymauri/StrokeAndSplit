@@ -2,7 +2,7 @@
 
 ## Context
 
-Das Verhalten steht in den Specs, die Motivation in `proposal.md`. Die visuelle Vorlage ist der Claude-Design-Canvas **AergRow Frontend**:
+Das Verhalten steht in den Specs, die Motivation in `proposal.md`. Die visuelle Vorlage ist der Claude-Design-Canvas **Stroke & Split Frontend**:
 
 
 

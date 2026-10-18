@@ -1,7 +1,7 @@
-import 'package:aergrow/app/aergrow_app.dart';
-import 'package:aergrow/app/design_tokens.dart';
-import 'package:aergrow/data/sources/rower_choice.dart';
-import 'package:aergrow/features/connection/start_screen.dart';
+import 'package:strokesplit/app/strokesplit_app.dart';
+import 'package:strokesplit/app/design_tokens.dart';
+import 'package:strokesplit/data/sources/rower_choice.dart';
+import 'package:strokesplit/features/connection/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +11,7 @@ void main() {
   testWidgets('the app uses the dark theme with the colours and fonts of D1', (tester) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(const RowerChoice.simulator()))],
-      child: const AergRowApp(),
+      child: const StrokeSplitApp(),
     ));
 
     final theme = Theme.of(tester.element(find.byType(StartScreen)));

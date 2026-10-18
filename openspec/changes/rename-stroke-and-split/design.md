@@ -24,8 +24,8 @@ Das Design der App liegt im Claude-Design-Canvas „AergRow Frontend“. Dort st
 ### D2: Gespeicherte Daten
 
 - **Session-Dateien**: Der Export schreibt `.strokesplit` mit `strokesplit-raw`. Der Import akzeptiert beide Endungen und beide Formatnamen. Die Test-Fixtures bleiben unverändert im alten Format. Sie belegen so die Rückwärtskompatibilität.
-- **Datenbank**: Die App öffnet die Datenbank `strokesplit`. Existiert sie nicht, aber eine Datenbank `aergrow` am selben Ort, wird diese beim ersten Start umbenannt. Das betrifft vor allem Linux und macOS, wo der Speicherort nicht an der App-ID hängt. Unter Android und iOS liegt die alte Datenbank in der alten App und ist für die neue unsichtbar.
-- **Android und iOS**: Eine neue App-ID ist eine neue App. Die alte bleibt installiert, bis der Nutzer sie entfernt. Für den Umzug dient der bestehende Export und Import. Eine automatische Übernahme gibt es nicht, weil die App bisher nur auf Testgeräten läuft.
+- **Datenbank**: Die App öffnet die Datenbank `strokesplit`. Existiert sie nicht, aber eine Datenbank `aergrow` am selben Ort, wird diese beim ersten Start umbenannt. Das betrifft Linux, wo der Speicherort nicht an der App-ID hängt. Unter macOS läuft die App in der Sandbox, ihr Datenverzeichnis hängt an der Bundle-ID; dort gilt deshalb dasselbe wie unter Android und iOS. Unter Android und iOS liegt die alte Datenbank in der alten App und ist für die neue unsichtbar.
+- **Android, iOS und macOS**: Eine neue App-ID ist eine neue App. Die alte bleibt installiert, bis der Nutzer sie entfernt. Für den Umzug dient der bestehende Export und Import. Eine automatische Übernahme gibt es nicht, weil die App bisher nur auf Testgeräten läuft.
 
 *Alternative*: die App-ID `ch.aergrow.aergrow` behalten und nur den Anzeigenamen ändern. Damit bliebe die Installation erhalten, aber der alte Name stünde dauerhaft in der ID und später in den Store-Einträgen. Verworfen, solange es keine veröffentlichte Version gibt. Vor einer Store-Veröffentlichung ist die ID nicht mehr änderbar.
 
@@ -49,3 +49,4 @@ Keine. Entschieden (Nutzer, 2026-10-16):
 - Anzeigename mit „&“: **„Stroke & Split“** (F9).
 - App-ID **`ch.strokesplit`**, nicht mit der Domain des Herausgebers (F10).
 - Vor der Umsetzung Domains sichern und eine Markenrecherche bei Swissreg, EUIPO und USPTO machen.
+  Erledigt: Domains und Markenrecherche hat der Nutzer am 2026-10-18 bestätigt („Namensrechte passen“).

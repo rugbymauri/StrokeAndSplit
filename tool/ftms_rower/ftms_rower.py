@@ -4,10 +4,10 @@
 # ///
 """Software FTMS rower: plays an FTMS recording as a BlueZ GATT peripheral.
 
-    uv run tool/ftms_rower/ftms_rower.py <recording.jsonl|.aergrow> [--loop]
+    uv run tool/ftms_rower/ftms_rower.py <recording.jsonl|.strokesplit|.aergrow> [--loop]
 
 The recording comes from `dart run erg_protocol:pm5_to_ftms`. The rower
-advertises as "AergRow FTMS Rower" with the Fitness Machine service 0x1826
+advertises as "Stroke & Split FTMS" with the Fitness Machine service 0x1826
 and the Rower bit in its service data, confirms Request Control and
 Start/Resume on the control point and then sends the Rower Data records
 (0x2AD1) at their recorded times. The protocol logic lives in Dart; this
@@ -33,7 +33,7 @@ from bless import (
 from bless.backends.bluezdbus.dbus import advertisement
 from dbus_next import Variant
 
-NAME = "AergRow FTMS Rower"
+NAME = "Stroke & Split FTMS"
 FTMS = "00001826-0000-1000-8000-00805f9b34fb"
 FEATURE = "00002acc-0000-1000-8000-00805f9b34fb"
 ROWER_DATA = "00002ad1-0000-1000-8000-00805f9b34fb"
@@ -162,7 +162,7 @@ class Rower:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("recording", type=Path, help="FTMS recording (.jsonl or .aergrow)")
+    parser.add_argument("recording", type=Path, help="FTMS recording (.jsonl, .strokesplit or .aergrow)")
     parser.add_argument("--loop", action="store_true", help="start the recording again at its end")
     args = parser.parse_args()
     sys.stdout.reconfigure(line_buffering=True)

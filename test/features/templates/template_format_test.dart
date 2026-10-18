@@ -1,5 +1,5 @@
-import 'package:aergrow/features/templates/template_format.dart';
-import 'package:aergrow/l10n/l10n.dart';
+import 'package:strokesplit/features/templates/template_format.dart';
+import 'package:strokesplit/l10n/l10n.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 

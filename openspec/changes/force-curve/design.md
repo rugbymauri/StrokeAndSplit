@@ -2,7 +2,7 @@
 
 ## Context
 
-Das Verhalten steht in den Specs. Die Gestaltung stammt aus dem Claude-Design-Canvas **AergRow Frontend** (privat, Freigabe über das Share-Menü). Die Kurve erscheint dort an vier Stellen:
+Das Verhalten steht in den Specs. Die Gestaltung stammt aus dem Claude-Design-Canvas **Stroke & Split Frontend** (privat, Freigabe über das Share-Menü). Die Kurve erscheint dort an vier Stellen:
 
 | Screen im Canvas | Platz der Kurve |
 |---|---|
