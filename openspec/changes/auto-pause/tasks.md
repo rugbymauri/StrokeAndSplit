@@ -4,7 +4,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 1. Pausen erkennen
 
-- [ ] 1.1 Detektor `AutoPause` in `lib/data/sessions/auto_pause.dart` nach D1: Pakete mit Wanduhr-Zeit und Ereignissen, zählende Schläge ohne nachgereichten Schlag, Rhythmus bis 6 s, Beginn bei Rhythmus + 3 s, Ende mit Schlag oder Wechsel auf „rudert“ ab dem Anstieg der Distanz, Sessionzeit, abgeschlossene Pausen. Verifikation: Unit-Tests für Pause nach 3 s über dem Rhythmus, keine Pause bei 16 Schlägen pro Minute, Fortsetzen beim Schlag, Fortsetzen beim Wechsel auf „rudert“, nachgereichter Schlag beendet keine Pause, Pause vor dem ersten Schlag, Sessionzeit läuft nie rückwärts; mit `pause.jsonl` (eine Pause, Ende beim Anstieg der Distanz), `just_row`, `force_curve` und `ftms_just_row` (keine Pause beim Rudern)
+- [x] 1.1 Detektor `AutoPause` in `lib/data/sessions/auto_pause.dart` nach D1: Pakete mit Wanduhr-Zeit und Ereignissen, Schläge zur Zeit, zu der sie gerudert wurden, Rhythmus bis 6 s, Beginn bei Rhythmus + 3 s, Ende mit Schlag oder Wechsel auf „rudert“ ab dem Anstieg der Distanz, Sessionzeit, abgeschlossene Pausen. Verifikation: Unit-Tests für Pause nach 3 s über dem Rhythmus, keine Pause bei 16 Schlägen pro Minute, Fortsetzen beim Schlag, Fortsetzen beim Wechsel auf „rudert“, nachgereichter Schlag beendet keine Pause, Pause vor dem ersten Schlag, Sessionzeit läuft nie rückwärts; mit `pause.jsonl` (eine Pause, Ende beim Anstieg der Distanz), `force_curve` (keine Pause) und `just_row`, `ftms_just_row`, `reset` (Pausen nur, wo der Ruderer stand oder auslief)
 
 ## 2. Schema und Speicherung
 

@@ -28,17 +28,18 @@ Die Fixtures zeigen, wie ein Stillstand aussieht:
 
 Ein reiner Detektor (`lib/data/sessions/auto_pause.dart`) bekommt pro Paket dessen Wanduhr-Zeit und die dekodierten Ereignisse. Er arbeitet nur mit `Stroke` und `StatusTick`, also gleich für PM5 und FTMS.
 
-- **Zählende Schläge:** jedes `Stroke`-Ereignis, ausser es kommt im selben Paket wie ein `StatusTick` mit `isRowing == false`. Das ist der Schlag, den der PM5 beim Stillstand nachreicht (`pause.jsonl` bei 108.1 s); er darf eine Pause weder verzögern noch beenden.
-- **Rhythmus:** Abstand der letzten beiden zählenden Schläge, höchstens 6 s. Nach dem Start und nach einer Pause, solange es noch keine zwei Schläge gibt, ist er 0.
-- **Beginn der Pause:** letzter zählender Schlag (oder Beginn der Session bzw. Ende der letzten Pause, wenn seitdem keiner kam) + Rhythmus + 3 s. Die Pause beginnt genau zu diesem Zeitpunkt, erkannt wird sie mit dem ersten Paket danach. Die Zeit bis dahin zählt zur Session, es wird nichts rückwirkend abgezogen. So läuft die Sessionzeit nie rückwärts.
-- **Ende der Pause:** ein zählender Schlag oder ein Messwert, mit dem der Monitor von „rudert nicht“ auf „rudert“ wechselt. Beim Schlag endet die Pause mit dessen Paket. Beim Wechsel endet sie beim ersten Messwert, ab dem die Distanz wieder gestiegen ist (`pause.jsonl`: 188.3 s statt 189.1 s), frühestens aber bei ihrem Beginn. So geht vom ersten Schlag nach der Pause wenig verloren.
+- **Zeit eines Schlags:** Der PM5 meldet einen Schlag erst am Ende der Rückrollphase, den letzten vor dem Stillstand sogar erst, wenn er „rudert nicht“ meldet (`pause.jsonl`: 108.1 s für einen Schlag von etwa 102 s). Der Detektor setzt einen Schlag deshalb auf die Wanduhr-Zeit seines Pakets minus den Abstand zwischen der Monitor-Zeit des letzten Messwerts und der des Schlags. Bei FTMS ist der Abstand 0.
+- **Rhythmus:** der längere der letzten beiden Abstände zwischen Schlägen, höchstens 6 s, damit ein einzelner schneller Schlag ihn nicht verkürzt. Nach dem ersten Schlag seit Start oder Pause ist er noch unbekannt und zählt als 6 s.
+- **Beginn der Pause:** letzter Schlag + Rhythmus + 3 s; ohne Schlag seit Start oder Pause deren Zeitpunkt + 3 s. Die Pause beginnt genau zu diesem Zeitpunkt, erkannt wird sie mit dem ersten Paket danach. Die Zeit bis dahin zählt zur Session, es wird nichts rückwirkend abgezogen. Kommt danach ein Schlag, der vor dem Beginn der Pause gerudert wurde, verschiebt er sie nach hinten oder hebt sie auf, wenn der nächste Schlag danach noch nicht überfällig ist (`just_row.jsonl` bei 77.5 s: Schlag 3.2 s nach seinem Beginn gemeldet). Die Sessionzeit springt dabei nur vorwärts.
+- **Ende der Pause:** ein Schlag, der nach dem Beginn der Pause gerudert wurde, oder ein Messwert, mit dem der Monitor von „rudert nicht“ auf „rudert“ wechselt. Beim Schlag endet die Pause zu dessen Zeit. Beim Wechsel endet sie beim ersten Messwert, ab dem die Distanz nach mindestens 1 s Stillstand wieder steigt (`pause.jsonl`: 188.3 s statt 189.1 s), frühestens aber bei ihrem Beginn. So geht vom ersten Schlag nach der Pause wenig verloren.
 
 Alternativen:
 
 - *3 s seit dem letzten Schlag, wörtlich:* verworfen. Schläge kommen einmal pro Zyklus; bei 18 Schlägen pro Minute liegen 3.3 s dazwischen, die Session würde bei jedem Schlag kurz pausieren. „3 s ohne Schlag“ wird daher als „3 s ohne den fälligen Schlag“ umgesetzt (siehe offene Fragen).
 - *Pause, wenn die Distanz 3 s steht:* verworfen. Der PM5 zählt Distanz, solange das Schwungrad ausläuft, in `pause.jsonl` 7 s nach dem letzten Schlag; die Pause käme erst nach etwa 10 s.
 - *„rudert“ des Monitors:* nur als Ende der Pause genutzt. Als Beginn wäre es auf dem PM5 zu spät (s. o.) und auf FTMS nur eine Schwelle des eigenen Decoders.
-- *Distanzanstieg als Ende:* verworfen, weil die auslaufende Distanz eine früh erkannte Pause sofort wieder beenden würde.
+- *Distanzanstieg allein als Ende:* verworfen, weil die auslaufende Distanz eine früh erkannte Pause sofort wieder beenden würde.
+- *Schlag beim Paket des Schlags:* verworfen, weil der PM5 Schläge bis zu 6 s verspätet meldet; die Session würde mitten im Rudern pausieren oder mit dem nachgereichten Schlag weiterlaufen.
 
 ### D2: Sessionzeit als eigene Achse
 
