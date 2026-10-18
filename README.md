@@ -1,4 +1,4 @@
-# AergRow
+# Stroke & Split
 
 Ruder-App für den Concept2-RowErg mit PM5 und für Rudergeräte mit dem Bluetooth-Standard FTMS (Fitness Machine Service). Sie verbindet sich per Bluetooth mit dem Rudergerät, zeigt die Werte live und zeichnet Sessions lokal auf. Läuft auf Android, iOS und dem Linux-Desktop. Ohne Rudergerät funktioniert sie mit dem eingebauten Simulator, der wahlweise wie ein PM5 oder wie ein FTMS-Rudergerät sendet. Ein PM5 am SkiErg oder BikeErg und FTMS-Geräte, die keine Rudergeräte sind, werden abgewiesen.
 
@@ -41,7 +41,7 @@ Alle Befehle zeigt `make help`.
 
 1. **Geräte wählen**: Am PM5 das Bluetooth-Menü öffnen (Verbinden) bzw. ein FTMS-Rudergerät einschalten. Die App sucht beim Start und listet die gefundenen Rudergeräte, jeweils mit dem Hinweis, ob es ein PM5 oder ein FTMS-Gerät ist, darunter **Simulator** und **Simulator (FTMS)**. Gerät wählen und **Weiter**. Viele Rudergeräte erlauben nur eine Bluetooth-Verbindung, ErgData oder andere Apps müssen also getrennt sein. Ein FTMS-Rudergerät fordert die App nach dem Verbinden zum Senden auf, setzt es aber nie zurück.
 2. Die App merkt sich das Rudergerät. Beim nächsten Start sucht sie es bis zu 10 s, verbindet und überspringt „Geräte wählen“. Wird es nicht gefunden, erscheint „Geräte wählen“ mit diesem Gerät vorausgewählt. War es ein Simulator, geht es ohne Suche weiter.
-3. **Startbildschirm**: Oben steht das gewählte Rudergerät, Antippen führt zurück zu „Geräte wählen“. Ist es verbunden, steht darunter „Verbunden“, und **Trennen** beendet die Verbindung, etwa damit ErgData das Gerät übernehmen kann. Ein anderes Gerät in „Geräte wählen“ trennt das bisherige ebenfalls. **Rudern** öffnet die Vorlagen (siehe unten), **Frei rudern** das Live-Display ohne Vorlage, beide nutzen eine bestehende Verbindung oder verbinden neu. **Nochmal** zeigt die zuletzt geruderte Vorlage und öffnet sie aufgeklappt in den Vorlagen. Unter **Sessions** lassen sich Sessions abspielen, als `.aergrow` exportieren, importieren und löschen.
+3. **Startbildschirm**: Oben steht das gewählte Rudergerät, Antippen führt zurück zu „Geräte wählen“. Ist es verbunden, steht darunter „Verbunden“, und **Trennen** beendet die Verbindung, etwa damit ErgData das Gerät übernehmen kann. Ein anderes Gerät in „Geräte wählen“ trennt das bisherige ebenfalls. **Rudern** öffnet die Vorlagen (siehe unten), **Frei rudern** das Live-Display ohne Vorlage, beide nutzen eine bestehende Verbindung oder verbinden neu. **Nochmal** zeigt die zuletzt geruderte Vorlage und öffnet sie aufgeklappt in den Vorlagen. Unter **Sessions** lassen sich Sessions abspielen, als `.strokesplit` exportieren, importieren und löschen.
 4. Beim freien Rudern im Live-Display **Session starten**. Zeit und Distanz zählen ab 0, auch wenn das Gerät schon etwas anzeigt, und laufen über Resets am Gerät hinweg weiter. Bei FTMS misst die App die Zeit selbst und hält sie an, sobald 4 s lang weder Distanz noch Schläge dazukommen. Schlagdetails wie Kraft und Zuglänge liefert nur der PM5.
 5. **Session beenden** zeigt die Zusammenfassung mit Durchschnittswerten und, bei einer Vorlage, den Runden. **Fertig** führt zum Startbildschirm, das Rudergerät bleibt verbunden.
 
@@ -159,9 +159,9 @@ Neue Texte der Oberfläche kommen nur über die ARB-Dateien in `lib/l10n/`, nie 
 
 Zahlen mit Mehrzahl über `plural`, Namen in Anführungszeichen stehen samt Zeichen in der ARB-Datei (`„{name}“` bzw. `“{name}”`). `lib/data/` liefert keine Sätze, sondern Codes, die `lib/features/` übersetzt. Ohne Übersetzung bleiben Einheiten (`m`, `spm`), Formate wie Pace und Zeiten und Eigennamen (PM5, FTMS, Concept2, ErgData). Eine weitere Sprache braucht eine weitere `app_<code>.arb`, einen Eintrag in `AppLanguage` und das Datumsmuster `dateTimePattern`. Deutsch folgt der Schweizer Rechtschreibung (`ss` statt `ß`).
 
-## Dateiformat `.aergrow`
+## Dateiformat `.strokesplit`
 
-gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format, Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Pakete eines Pulsgurts stehen mit `"c": "2a37"` auf derselben Zeitachse, der `session`-Block im Header enthält, sofern vorhanden, `averageHeartRate`, `maxHeartRate` und `rmssdMs`. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren.
+gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format (`"format": "strokesplit-raw"`), Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Pakete eines Pulsgurts stehen mit `"c": "2a37"` auf derselben Zeitachse, der `session`-Block im Header enthält, sofern vorhanden, `averageHeartRate`, `maxHeartRate` und `rmssdMs`. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren. Dateien von vor der Umbenennung (Endung `.aergrow`, Format `aergrow-raw`) liest der Import weiterhin, die Test-Fixtures sind bewusst in diesem alten Format.
 
 Eine Session auf einer Vorlage hat im Header zusätzlich die Vorlage und die geruderte Version der Strecke:
 
@@ -190,7 +190,7 @@ Ohne echtes FTMS-Rudergerät lässt sich die FTMS-Anbindung mit einem Software-R
 Voraussetzungen: BlueZ mit eingeschaltetem Adapter und [`uv`](https://docs.astral.sh/uv/). Die Python-Abhängigkeit (`bless`) holt `uv` beim ersten Start selbst.
 
 ```sh
-# PM5-Aufnahme in eine FTMS-Aufnahme umrechnen (.jsonl oder .aergrow)
+# PM5-Aufnahme in eine FTMS-Aufnahme umrechnen (.jsonl, .strokesplit oder .aergrow)
 cd packages/erg_protocol && dart run erg_protocol:pm5_to_ftms test/fixtures/just_row.jsonl /tmp/ftms.jsonl
 # Software-Rower starten, ARGS=--loop spielt die Aufnahme endlos
 make ftms-rower FILE=packages/erg_protocol/test/fixtures/ftms_just_row.jsonl
@@ -222,7 +222,7 @@ git tag v1.2.0
 git push origin v1.2.0
 ```
 
-`verify-tag` bricht ab, wenn der Commit nicht auf `main` liegt oder es das Release schon gibt. Ein Release wird nie überschrieben, ein fehlerhaftes Release in GitLab löschen und mit einer neuen Version taggen. Der Versionsname der Pakete kommt aus dem Tag (`1.2.0`), der Android-Versionscode ist die Pipeline-Nummer (`CI_PIPELINE_IID`) und steigt damit mit jedem Release. `pubspec.yaml` bleibt unverändert. Das Release enthält `aergrow-1.2.0-android.apk` und `aergrow-1.2.0-x86_64.AppImage`. Die Dateien liegen dauerhaft in der Package Registry („Deploy → Package Registry“), die Release-Seite verlinkt sie.
+`verify-tag` bricht ab, wenn der Commit nicht auf `main` liegt oder es das Release schon gibt. Ein Release wird nie überschrieben, ein fehlerhaftes Release in GitLab löschen und mit einer neuen Version taggen. Der Versionsname der Pakete kommt aus dem Tag (`1.2.0`), der Android-Versionscode ist die Pipeline-Nummer (`CI_PIPELINE_IID`) und steigt damit mit jedem Release. `pubspec.yaml` bleibt unverändert. Das Release enthält `strokesplit-1.2.0-android.apk` und `strokesplit-1.2.0-x86_64.AppImage`. Die Dateien liegen dauerhaft in der Package Registry („Deploy → Package Registry“), die Release-Seite verlinkt sie.
 
 ### Einrichtung in GitLab (einmalig)
 
@@ -230,11 +230,11 @@ Alle APKs aus der Pipeline sind mit demselben Debug-Schlüssel signiert, damit e
 
 1. Keystore erzeugen:
    ```sh
-   keytool -genkeypair -v -keystore aergrow-debug.keystore -storetype PKCS12 \
+   keytool -genkeypair -v -keystore strokesplit-debug.keystore -storetype PKCS12 \
      -alias androiddebugkey -storepass android -keypass android \
      -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
    ```
-2. Den Keystore Base64-kodieren (`base64 -w0 aergrow-debug.keystore`) und unter „Settings → CI/CD → Variables“ als Variable `ANDROID_DEBUG_KEYSTORE` vom Typ **File** mit diesem Text als Wert anlegen. GitLab speichert Variablen als Text, die Binärdatei selbst liesse sich nicht hinterlegen, `build-apk` dekodiert sie wieder. Flags: **Protect variable** an, Sichtbarkeit **Visible** (eine Datei-Variable muss nicht maskiert werden).
+2. Den Keystore Base64-kodieren (`base64 -w0 strokesplit-debug.keystore`) und unter „Settings → CI/CD → Variables“ als Variable `ANDROID_DEBUG_KEYSTORE` vom Typ **File** mit diesem Text als Wert anlegen. GitLab speichert Variablen als Text, die Binärdatei selbst liesse sich nicht hinterlegen, `build-apk` dekodiert sie wieder. Flags: **Protect variable** an, Sichtbarkeit **Visible** (eine Datei-Variable muss nicht maskiert werden).
 3. Unter „Settings → Repository → Protected tags“ `v*` als geschützten Tag anlegen. Nur Pipelines zu geschützten Tags sehen die geschützte Variable.
 4. Die Keystore-Datei sicher aufbewahren. Geht sie verloren, müssen alle Nutzer die App vor dem nächsten Update deinstallieren.
 
@@ -242,16 +242,31 @@ Fehlt die Variable, bricht `build-apk` mit einer Meldung ab, statt mit einem Zuf
 
 ### Installation
 
-**Android**: Die APK von der Release-Seite laden. Das Projekt ist privat, im Handy-Browser muss man also bei GitLab angemeldet sein, sonst die Datei am Rechner laden und aufs Handy übertragen (z. B. `adb install aergrow-1.2.0-android.apk`). Beim Öffnen fragt Android, ob der Browser bzw. Dateimanager Apps aus unbekannten Quellen installieren darf. Eine neuere APK aus der Pipeline lässt sich über eine ältere installieren, die Sessions bleiben erhalten. Eine selbst gebaute APK (`make apk`, `make run-android`) hat einen anderen Schlüssel, vor dem Wechsel muss die App deinstalliert werden.
+**Android**: Die APK von der Release-Seite laden. Das Projekt ist privat, im Handy-Browser muss man also bei GitLab angemeldet sein, sonst die Datei am Rechner laden und aufs Handy übertragen (z. B. `adb install strokesplit-1.2.0-android.apk`). Beim Öffnen fragt Android, ob der Browser bzw. Dateimanager Apps aus unbekannten Quellen installieren darf. Eine neuere APK aus der Pipeline lässt sich über eine ältere installieren, die Sessions bleiben erhalten. Eine selbst gebaute APK (`make apk`, `make run-android`) hat einen anderen Schlüssel, vor dem Wechsel muss die App deinstalliert werden.
 
 **Linux**: Das AppImage für x86_64 laden, ausführbar machen und starten. GTK 3 muss installiert sein, auf GNOME- und KDE-Desktops ist es das in der Regel.
 
 ```sh
-chmod +x aergrow-1.2.0-x86_64.AppImage
-./aergrow-1.2.0-x86_64.AppImage
+chmod +x strokesplit-1.2.0-x86_64.AppImage
+./strokesplit-1.2.0-x86_64.AppImage
 ```
 
 Mit einem Werkzeug wie Gear Lever oder AppImageLauncher erscheint die App mit Name und Icon im Anwendungsmenü.
+
+### Umzug von AergRow
+
+Die App hiess früher „AergRow“ (App-ID `ch.aergrow.aergrow`). Seit der Umbenennung hat sie die App-ID `ch.strokesplit.strokesplit`.
+
+**Android, iOS und macOS**: Die neue App-ID macht Stroke & Split zu einer neuen App, die neben der alten installiert wird und deren Sessions nicht sieht. Der Umzug läuft über Export und Import:
+
+1. In der alten AergRow-App unter **Sessions** jede Session exportieren (`.aergrow`-Datei) und die Dateien ausserhalb der App sichern, z. B. in einem Cloud-Ordner oder auf dem Rechner.
+2. Stroke & Split installieren.
+3. In Stroke & Split unter **Sessions** → **Importieren** die `.aergrow`-Dateien einlesen.
+4. Erst wenn alle Sessions in Stroke & Split erscheinen, die alte App deinstallieren. Mit der Deinstallation löscht das System ihre Sessions.
+
+Strecken und Zonen kommen mit, soweit eine exportierte Session auf ihnen gerudert wurde. Vorlagen und nie geruderte Strecken müssen in Stroke & Split neu angelegt werden. Importierte Sessions zählen in keiner Bestenliste. Unter macOS gilt dasselbe, weil die Sandbox die Daten im Container der App-ID ablegt.
+
+**Linux**: Hier hängt der Speicherort nicht an der App-ID. Beim ersten Start übernimmt Stroke & Split die bisherige Datenbank `aergrow.sqlite` im Dokumente-Ordner (z. B. `~/Dokumente`), indem es sie in `strokesplit.sqlite` umbenennt. Sessions, Strecken, Zonen und Vorlagen bleiben erhalten.
 
 ## Plattform-Status
 
