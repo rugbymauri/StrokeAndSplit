@@ -15,7 +15,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 
 | # | Change | Tasks | Kann starten? | Wartet auf |
 |---|---|---|---|---|
-| 1 | `device-types` | 29/33 | umgesetzt, in `main` gemergt | Nutzer: Task 3.5 und manuelle Tests 7.1–7.3 |
+| 1 | `device-types` | 30/33 | umgesetzt, in `main` gemergt | Nutzer: manuelle Tests 7.1–7.3 |
 | 2 | `translations` | 15/16 | umgesetzt, in `main` gemergt | Nutzer: manueller Test 6.3 |
 | 3 | `ui-design` | 17/18 | umgesetzt, in `main` gemergt | Nutzer: Abgleich mit dem Canvas am Gerät (6.1) |
 | 4 | `force-curve` | 10/11 | in Umsetzung | – |
@@ -53,7 +53,7 @@ Umgesetzt am 2026-10-16 auf `feature/device-types`: `make check` grün (261 App-
 
 Bei der Umsetzung mitnehmen:
 - [x] Zeile über 120 Zeichen in `Stroke.toString` (Task 2.1) umgebrochen.
-- [ ] Task 3.5: `Pm5ErgType` ist umgesetzt, aber die Ski- und Bike-Werte sind nicht gegen das aktuelle Concept2-Dokument geprüft. Online war die Liste nicht zu finden, nur der Wert 0 (RowErg) ist an den Aufnahmen bestätigt. Der Nutzer prüft sie gegen die *PM5 Bluetooth Smart Interface Definition* oder an einem SkiErg/BikeErg, dann Task abhaken.
+- [x] Task 3.5 (Entscheid des Nutzers, 2026-10-18): Ski und Bike werden nicht getestet, die Werte bleiben aus der Spezifikation. Früherer Stand: `Pm5ErgType` ist umgesetzt, aber die Ski- und Bike-Werte sind nicht gegen das aktuelle Concept2-Dokument geprüft. Online war die Liste nicht zu finden, nur der Wert 0 (RowErg) ist an den Aufnahmen bestätigt. Der Nutzer prüft sie gegen die *PM5 Bluetooth Smart Interface Definition* oder an einem SkiErg/BikeErg, dann Task abhaken.
 - [x] Task 3.6: README-Abschnitt FTMS und Erg-Typ steht, die Fixtures-Tabelle kam mit Task 4.3 (`ftms_just_row.jsonl` ist aus `just_row.jsonl` umgerechnet, keine Aufnahme eines echten FTMS-Geräts).
 - Task 4.2: Zusätzlich zum Umschalter in der Simulator-Bedienung bietet „Vorlage rudern“ die Quelle „Simulator (FTMS)“ an, weil eine Vorlage die Session sofort startet und der Umschalter während einer Session gesperrt ist. Mit `ui-design` (Startbildschirm, Quellenwahl) übernehmen.
 - Reihenfolge: Abschnitt 3 (FTMS-Protokoll) vor 2.4/2.5 umgesetzt, weil deren Tests den FTMS-Decoder brauchen.

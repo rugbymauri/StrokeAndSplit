@@ -21,7 +21,7 @@
 - [x] 3.2 `FtmsEncoder` für Rower Data (Stroke Rate/Count, Distanz, Pace, Leistung, Energie, Zeit) (D10); Round-Trip-Tests Encoder → Parser
 - [x] 3.3 `FtmsDecoder` für `StatusTick`: Felder über More-Data-Teile zusammensetzen, Tick am Ende eines Datensatzes, eigene Uhr aus `RawPacket.time` nur während des Ruderns, Rudern-Erkennung über 4 s, Pace und Watt aus der Pace, Plausibilitätsgrenzen, `workoutType`/`workoutState` `unknown` (D8); Tests für Gerät ohne Zeitfeld, Pause, Pace 0, HR 0, Schlagzahl 120, Kalorien `0xFFFF`, gleiche Watt wie PM5 bei 2:00
 - [x] 3.4 `FtmsDecoder` für Schläge und Reset: ein `Stroke` je Zählerschritt ohne Details, kein Ereignis bei mehr als 10 Schlägen Sprung, Reset bei zurückfallender Distanz oder zurückfallendem Zähler (D8); Tests für 40→42, ersten Datensatz mitten im Rudern, Reset von 1500 m auf 0 m
-- [ ] 3.5 `Pm5ErgType` mit den Ski- und Bike-Werten aus der Concept2-Spezifikation (Werte gegen das aktuelle Dokument prüfen) und Auswertung von `0x0032` Byte 16 (D6); Unit-Tests für RowErg, SkiErg, BikeErg und unbekannte Werte
+- [x] 3.5 `Pm5ErgType` mit den Ski- und Bike-Werten aus der Concept2-Spezifikation und Auswertung von `0x0032` Byte 16 (D6); Unit-Tests für RowErg, SkiErg, BikeErg und unbekannte Werte. Die Ski- und Bike-Werte werden nicht an einem Gerät geprüft (Entscheid des Nutzers, 2026-10-18); bestätigt ist nur RowErg (0) an den Aufnahmen
 - [x] 3.6 Package-README: Abschnitt FTMS mit Byte-Layout von Rower Data, Control Point, eigener Uhr, Plausibilitätsgrenzen und der Erg-Typ-Tabelle; Fixtures-Tabelle ergänzt
 
 ## 4. Simulator und Test-Rower
