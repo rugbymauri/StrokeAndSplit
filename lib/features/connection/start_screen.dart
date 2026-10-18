@@ -23,7 +23,7 @@ import 'option_card.dart';
 import 'rower_connection.dart';
 
 /// The start screen after "Geräte wählen": the chosen rower, "Rudern",
-/// "Frei rudern" and the sessions (Design D6).
+/// "Frei rudern" and the button to the sessions (Design D6).
 class StartScreen extends ConsumerWidget {
   const StartScreen({super.key});
 
@@ -67,12 +67,13 @@ class StartScreen extends ConsumerWidget {
                 ),
                 const _RowAgain(),
                 const SizedBox(height: AppSpacing.xl),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    key: const Key('start-sessions'),
                     onPressed: () => navigator.push(MaterialPageRoute<void>(builder: (_) => const SessionsScreen())),
-                    style: TextButton.styleFrom(minimumSize: const Size(48, 48), textStyle: AppTextStyles.button),
-                    child: Text(l10n.startSessions),
+                    icon: const Icon(Icons.history),
+                    label: Text(l10n.startSessions),
                   ),
                 ),
               ],

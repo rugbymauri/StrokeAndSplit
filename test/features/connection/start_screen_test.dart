@@ -180,10 +180,32 @@ void main() {
       await tester.pump(const Duration(seconds: 15));
     });
 
-    testWidgets('opens the sessions', (tester) async {
+    for (final (name, size) in const [
+      ('portrait', Size(390, 844)),
+      ('landscape', Size(844, 390)),
+      ('a small window', Size(320, 480)),
+    ]) {
+      testWidgets('shows "Sessions" as a button across the width, $name', (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await _pumpStart(tester, chosen: const RowerChoice.simulator());
+
+        final button = find.byKey(const Key('start-sessions'));
+        await tester.scrollUntilVisible(button, 100);
+        expect(find.descendant(of: button, matching: find.text('Sessions')), findsOneWidget);
+        expect(find.descendant(of: button, matching: find.byIcon(Icons.history)), findsOneWidget);
+        expect(tester.widget(button), isA<OutlinedButton>());
+        expect(tester.getSize(button).width, tester.getSize(find.widgetWithText(OutlinedButton, 'Frei rudern')).width);
+        expect(tester.takeException(), isNull);
+        await disposeWidgetsWithDatabase(tester);
+      });
+    }
+
+    testWidgets('opens the sessions with the button', (tester) async {
       await _pumpStart(tester, chosen: const RowerChoice.simulator());
 
-      await tester.tap(find.text('Sessions'));
+      await tester.tap(find.byKey(const Key('start-sessions')));
       for (var i = 0; i < 5; i++) {
         await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
         await tester.pumpAndSettle();
@@ -255,6 +277,19 @@ void main() {
       expect(find.descendant(of: disconnect, matching: find.text('Trennen')), findsOneWidget);
       expect(find.descendant(of: disconnect, matching: find.byIcon(Icons.link_off)), findsOneWidget);
       expect(tester.getSize(disconnect).height, greaterThanOrEqualTo(48));
+      await end(tester, container);
+    });
+
+    testWidgets('fits "Trennen" into the device row of a small window', (tester) async {
+      tester.view.physicalSize = const Size(320, 480);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final container = await pumpConnected(tester);
+
+      expect(tester.takeException(), isNull);
+      final row = tester.getRect(find.byKey(const Key('device-row')));
+      final disconnect = tester.getRect(find.byKey(const Key('device-row-disconnect')));
+      expect(disconnect.right, lessThanOrEqualTo(row.right));
       await end(tester, container);
     });
 
