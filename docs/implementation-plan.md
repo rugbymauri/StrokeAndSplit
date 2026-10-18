@@ -146,6 +146,7 @@ Vor dem Start:
 - [x] Tasks 1.2, 2.1–2.3: Ereignis `StrokeForceCurve` (Schlagnummer, Kräfte in N, Schlaglänge), `Pm5Decoder` setzt `003d` zusammen und verwirft unvollständige Kurven, PM5 abonniert `003d`, Simulator sendet Kurven (Länge 1.05 ± 0.1 m), Replay getestet. Die Kurve kommt 1.5–2 s vor dem `Stroke` desselben Schlags.
 - [x] Tasks 3.1, 3.2: Widget `ForceCurve` (Varianten card/strip/inline/tinted, letzter und vorheriger Schlag, Warten), Schlaglänge per `formatDriveLength`, neues Token `AppColors.previousCurve`. Vorläufig: Läufe gleicher Werte für die Darstellung zusammengefasst und geglättet.
 - [x] Task 3.3: Kraftkurve mit Schlaglänge in allen vier Live-Layouts; Quellen melden `providesForceCurves` (PM5 und PM5-Simulator ja, FTMS nein, Replay nur mit Kurvenpaketen). Feste Kartenhöhen aus ui-design beibehalten (120/72 px statt ~96/44 px).
+- [x] Nach Gerätetest (Nutzer, 2026-10-17): Schlaglänge in ganzen Zentimetern („106 cm“), Spec und D4 nachgeführt; Kachel „In Zone“ im Live-Display mit Vorlage entfernt (Anteil weiter in der Zusammenfassung).
 
 ### 5. `heart-rate`: Brustgurt direkt koppeln, RR-Intervalle, HRV
 
