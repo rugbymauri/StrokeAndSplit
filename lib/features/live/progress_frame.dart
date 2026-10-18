@@ -124,6 +124,16 @@ class ProgressFramePainter extends CustomPainter {
         _notch(canvas, metrics[i], boundary);
       }
     }
+    // The end of a lap stands out as a bright line: at the top of the lap track,
+    // and at the end of every lap on the course track.
+    final lapTrack = tracks.length - 2;
+    _lapEnd(canvas, metrics[lapTrack], 0);
+    if (model.course case final course?) {
+      _lapEnd(canvas, metrics[0], 0);
+      for (final boundary in course.boundaries) {
+        _lapEnd(canvas, metrics[0], boundary);
+      }
+    }
     final boats = <List<Offset>>[];
     for (var i = 0; i < tracks.length; i++) {
       final (track, _, filled, _) = tracks[i];
@@ -217,6 +227,29 @@ class ProgressFramePainter extends CustomPainter {
       ..arcToPoint(Offset(rect.left + r, rect.top), radius: corner)
       ..close();
     return path.computeMetrics().first;
+  }
+
+  /// A bright line across the track where a lap ends, in a cut of the colour of the box.
+  static void _lapEnd(Canvas canvas, PathMetric metric, double share) {
+    final tangent = metric.getTangentForOffset(share * metric.length);
+    if (tangent == null) return;
+    final across = Offset(-tangent.vector.dy, tangent.vector.dx) * (trackWidth / 2 + 2);
+    canvas
+      ..drawLine(
+        tangent.position - across,
+        tangent.position + across,
+        Paint()
+          ..strokeWidth = 7
+          ..color = AppColors.surface,
+      )
+      ..drawLine(
+        tangent.position - across,
+        tangent.position + across,
+        Paint()
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round
+          ..color = AppColors.text,
+      );
   }
 
   /// A cut across the track in the colour of the box.
