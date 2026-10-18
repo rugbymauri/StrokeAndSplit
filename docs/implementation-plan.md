@@ -134,6 +134,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Nach Gerätetest (Nutzer, 2026-10-17): Pace überall in ganzen Sekunden („2:05“, gerundet), Spec `live-display` als MODIFIED in `ui-design`, `translations` und README nachgeführt.
 - [x] Task 4.5 (Nutzer, 2026-10-17): Pace-Band im Zonen-Editor startet mit 10 s Abstand, die schnellste Pace verschiebt das ganze Band, die langsamste ändert den Abstand; am Rand gesperrt.
 - [x] Task 3.4 (Nutzer, 2026-10-17): Schlagzahl-Karte zeigt ausserhalb des Bands eine Pille „↑ Mehr Schläge“ / „↓ Weniger Schläge“ wie die Pace-Box, nie abgeschnitten (vorher 13-px-Text mit Ellipsis). Offen: Pace-Pille schneidet auf 360 px Breite das Band ab.
+- [x] Nach Gerätetest (Nutzer, 2026-10-17): Fortschrittsrahmen hebt Zonen auf der Rundenspur heller hervor (leer `trackZone`, gefüllt `text`) und markiert das Rundenende mit einer hellen Linie (Rundenspur oben, Streckenspur an jeder Rundengrenze).
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 
