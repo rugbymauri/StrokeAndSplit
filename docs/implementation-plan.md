@@ -138,6 +138,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Tasks 5.3, 5.4 (Nutzer, 2026-10-18): Trennen nicht mehr im Live-Display, sondern in der Gerätezeile des Startbildschirms; Zurück, Esc und „Fertig“ führen zum Start und halten die Verbindung; „Sessions“ als Button. Offen: Wortlaut in `start-on-first-stroke` (Szenario „Trennen vor dem ersten Schlag“, Task 3.3) beim Archivieren angleichen.
 - [x] Nachtrag (Nutzer, 2026-10-18, `feature/course-session-time`, Task 5.5): Beim Rudern einer Vorlage zeigen die Kacheln auch Zeit und Distanz der Session, hochkant als eigene Reihe über Runde/Watt/Puls, quer unter der Schlagzahl-Karte. Die Kraftkurve braucht hochkant jetzt 806 px Innenhöhe (vorher 720), bei 360×740 entfällt sie.
 - [x] Nachtrag (Nutzer, 2026-10-18, `feature/stroke-card-frame`, Task 5.6): Schlagzahl-Karte ohne Band und Kraftkurven-Karte haben einen ruhigen Rahmen (`AppColors.trackZone`, 2 px).
+- [x] Nachtrag (Nutzer, 2026-10-18, `feature/live-value-font`, Task 5.7): Live-Werte in Barlow statt Barlow Condensed (bei gleicher Breite rund 12 % niedriger), übrige Screens bleiben Condensed. Hochkant mit Vorlage Schlagzahl-Karte 80 px, Kacheln 64 px; die Kraftkurve erscheint, solange die Pace-Box mit ihr mindestens 336 px hoch bleibt, damit wieder bei 360×740.
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 

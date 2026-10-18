@@ -54,10 +54,14 @@ abstract final class AppColors {
   static const connected = Color(0xFF4CD07D);
 }
 
-/// The two bundled font families (design D1).
+/// The bundled font families (design D1).
 abstract final class AppFonts {
-  /// Barlow Condensed, only in weight 700: every measured value and the titles.
+  /// Barlow Condensed in weight 700: the values outside the live display and the titles.
   static const display = 'Barlow Condensed';
+
+  /// Barlow in weight 700, wider and so lower than [display] at the same width: the values of the
+  /// live display, which leaves more room for the cards around them.
+  static const liveValue = 'Barlow';
 
   /// IBM Plex Sans in weights 400, 500 and 600: all other text.
   static const text = 'IBM Plex Sans';
@@ -67,14 +71,14 @@ abstract final class AppFonts {
 /// from the surrounding text.
 abstract final class AppTextStyles {
   /// The pace, always the largest value.
-  static const pace = TextStyle(fontFamily: AppFonts.display, fontSize: 128, fontWeight: FontWeight.w700, height: 1);
+  static const pace = TextStyle(fontFamily: AppFonts.liveValue, fontSize: 128, fontWeight: FontWeight.w700, height: 1);
 
   /// A value in a tile, e.g. stroke rate or watts, at most; it shrinks to fit its tile.
-  static const value = TextStyle(fontFamily: AppFonts.display, fontSize: 112, fontWeight: FontWeight.w700, height: 1);
+  static const value = TextStyle(fontFamily: AppFonts.liveValue, fontSize: 112, fontWeight: FontWeight.w700, height: 1);
 
   /// The unit after a [value], e.g. "spm".
   static const valueUnit = TextStyle(
-    fontFamily: AppFonts.display,
+    fontFamily: AppFonts.liveValue,
     fontSize: 20,
     fontWeight: FontWeight.w500,
     color: AppColors.textMuted,

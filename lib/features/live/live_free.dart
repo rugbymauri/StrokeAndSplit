@@ -63,8 +63,9 @@ class FreeLiveView extends StatelessWidget {
   Widget _portrait(BuildContext context, Size size) {
     const padding = EdgeInsets.symmetric(horizontal: AppSpacing.pagePortrait, vertical: AppSpacing.s);
     final inner = padding.deflateSize(size);
-    final paceHeight = (inner.height * 0.22).clamp(72.0, 160.0);
-    final pace = paceFontSize(Size(inner.width, paceHeight - _labelHeight));
+    final pace = paceFontSize(Size(inner.width, (inner.height * 0.22).clamp(72.0, 160.0) - _labelHeight));
+    // No higher than the pace needs: limited by the width, it leaves the rest to the tiles.
+    final paceHeight = pace + _labelHeight;
     // The force curve goes first when space is short (Design, Risks).
     final curve = forceCurves != null && inner.height >= 640;
     return Padding(

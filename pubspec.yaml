@@ -111,6 +111,7 @@ flutter:
   # The font licences, shown on the licence page of the app.
   assets:
     - assets/fonts/BarlowCondensed/OFL.txt
+    - assets/fonts/Barlow/OFL.txt
     - assets/fonts/IBMPlexSans/OFL.txt
 
   # Bundled so the app looks the same offline (ui-design, Design D1); licences next to the files.
@@ -120,6 +121,12 @@ flutter:
         - asset: assets/fonts/BarlowCondensed/BarlowCondensed-Medium.ttf
           weight: 500
         - asset: assets/fonts/BarlowCondensed/BarlowCondensed-Bold.ttf
+          weight: 700
+    - family: Barlow
+      fonts:
+        - asset: assets/fonts/Barlow/Barlow-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Barlow/Barlow-Bold.ttf
           weight: 700
     - family: IBM Plex Sans
       fonts:

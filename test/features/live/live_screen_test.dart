@@ -874,13 +874,24 @@ void main() {
         for (final key in ['metric-elapsed', 'metric-distance', 'metric-lap-time', 'metric-watts', 'metric-hr']) {
           expect(height(tester, key), greaterThan(30), reason: key);
         }
-        expect(height(tester, 'metric-spm'), greaterThan(60));
+        // 56 before Barlow, whose lower digits leave room for the force curve on a narrow phone as well.
+        expect(height(tester, 'metric-spm'), greaterThan(56));
+        expect(find.text('Kraft'), findsOneWidget);
         // 12 and 13 before.
         expect(fontSize(tester, 'Watt'), lessThanOrEqualTo(10));
         expect(fontSize(tester, 'SCHLAGZAHL'), lessThanOrEqualTo(11));
         expect(fontSize(tester, 'PACE /500 M'), lessThanOrEqualTo(11));
       });
     }
+
+    testWidgets('leaves out the force curve on a template on a phone lower than 360 × 740', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, size: const Size(360, 720), recording: _onCourse());
+      await harness.emit(tester, _tick(heartRate: 151));
+
+      expect(find.text('Kraft'), findsNothing);
+      expect(height(tester, 'pace-box-pace'), greaterThan(height(tester, 'metric-spm')));
+    });
 
     testWidgets('fits time and distance of the session into the side column in landscape', (tester) async {
       final harness = _Harness();

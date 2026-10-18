@@ -40,6 +40,7 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 - [x] 5.4 „Sessions“ auf dem Startbildschirm als Button über die volle Breite mit Symbol statt Link (Design D6). Verifikation: Widget-Test für Button und Sessionliste, Startbildschirm ohne Überlauf hoch, quer und im kleinen Fenster
 - [x] 5.5 Zeit und Distanz der Session beim Rudern einer Vorlage (Design D2): Kacheln „Zeit“ und „Distanz“ wie beim freien Rudern, im Hochformat als eigene Reihe über Rundenzeit, Watt und Puls, im Querformat unter der Schlagzahl-Karte. Verifikation: Widget-Tests für die Werte der Session statt des Rudergeräts, alle Kacheln ohne Überlauf in allen Layouts, lesbare Grösse bei 360 px Breite und im Querformat
 - [x] 5.6 Schlagzahl-Karte ohne Band und Kraftkurven-Karte mit ruhigem Rahmen (`AppColors.trackZone`, 2 px), damit sie sich vom Hintergrund abheben (Nutzer, 2026-10-18). Verifikation: Goldens der Kraftkurve neu, Live-Tests grün
+- [x] 5.7 Werte im Live-Display in der breiteren, niedrigeren Barlow statt Barlow Condensed, die gewonnene Höhe für Pace-Box und Kraftkurve nutzen (Design D1, D2; Nutzer, 2026-10-18). Verifikation: Live-Tests grün, Kraftkurve auf 360 × 740 mit Vorlage sichtbar und darunter nicht, Pace bleibt der grösste Text, Vorher/Nachher-Screenshots in sechs Grössen gesichtet
 
 ## 6. Abschluss
 
