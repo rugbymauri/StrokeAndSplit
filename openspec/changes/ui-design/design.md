@@ -74,8 +74,8 @@ Das Live-Display wählt das Layout nach dem Seitenverhältnis des verfügbaren P
 
 - **Hoch, frei**: Pace oben, darunter 2 × 2 Kacheln, eine Zeile mit Nebenwerten, die Kraftkurve und unten „Session beenden“.
 - **Quer, frei**: links die Pace mit der Kraftkurve darunter, rechts 2 × 2 Kacheln und „Session beenden“.
-- **Hoch, Vorlage**: Pace-Box über die volle Breite, darunter Schlagzahl-Karte, vier kleine Kacheln (Rundenzeit, Watt, Puls, Anteil in der Zone), Kraftkurve und „Session beenden“.
-- **Quer, Vorlage**: links die Pace-Box fast über die volle Höhe, in der Mitte die Schlagzahl-Karte mit Kraftkurve, rechts eine schmale Spalte mit den vier Kacheln und „Beenden“.
+- **Hoch, Vorlage**: Pace-Box über die volle Breite, darunter Schlagzahl-Karte, drei kleine Kacheln (Rundenzeit, Watt, Puls; die Kachel „in der Zone“ entfiel nach dem Gerätetest, der Anteil steht in der Zusammenfassung), Kraftkurve und „Session beenden“.
+- **Quer, Vorlage**: links die Pace-Box fast über die volle Höhe, in der Mitte die Schlagzahl-Karte mit Kraftkurve, rechts eine schmale Spalte mit den drei Kacheln und „Beenden“.
 
 Die Grössen skalieren mit dem Platz. Massgebend ist das Verhältnis aus dem Canvas, nicht der absolute Pixelwert.
 
@@ -117,7 +117,7 @@ Was die bisherige Streckenleiste `course_bar.dart` zeigt, wandert in die Pace-Bo
 | Rest bis Abschnittsende | Legende, Zeile der Abschnittsspur |
 | Pace-Band | Zonenstatus unter der Pace |
 | Schlagzahl-Band | Schlagzahl-Karte |
-| Anteil in der Zone | Kachel „in der Zone“ |
+| Anteil in der Zone | entfällt im Live-Display (Nutzer, 2026-10-17), nur in der Zusammenfassung |
 | Bereich des Abschnitts („200–800 m“) | entfällt, die Abschnittsspur zeigt die Lage |
 
 `ZoneHint` zieht aus `course_bar.dart` in eine eigene Datei, die Datei selbst entfällt.

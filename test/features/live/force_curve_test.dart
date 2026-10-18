@@ -190,7 +190,7 @@ void main() {
           background: background,
         );
 
-        expect(find.text('1,06 m'), findsOneWidget);
+        expect(find.text('106 cm'), findsOneWidget);
         await expectLater(find.byKey(_golden), matchesGoldenFile('goldens/force_curve_${name}_length.png'));
       });
     }
@@ -201,7 +201,7 @@ void main() {
         home: Material(child: ForceCurve(last: _last, driveLengthMeters: 1.06)),
       ));
 
-      expect(find.text('1.06 m'), findsOneWidget);
+      expect(find.text('106 cm'), findsOneWidget);
     });
 
     for (final length in [null, 0.0]) {
@@ -224,7 +224,7 @@ void main() {
     testWidgets('leaves it out while waiting for the first stroke', (tester) async {
       await _pump(tester, const ForceCurve(last: null, driveLengthMeters: 1.06), _cardSize);
 
-      expect(find.text('1,06 m'), findsNothing);
+      expect(find.text('106 cm'), findsNothing);
     });
   });
 }

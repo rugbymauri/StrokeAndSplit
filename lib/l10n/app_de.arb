@@ -427,10 +427,6 @@
   "@metricLapTime": {
     "description": "Live display on a template: label of the time rowed in the current lap"
   },
-  "metricInZone": "In Zone",
-  "@metricInZone": {
-    "description": "Live display on a template: label of the share of the lap rowed within the zone, e.g. '78 %'"
-  },
   "liveStopShort": "Beenden",
   "@liveStopShort": {
     "description": "Live display in landscape on a template: short button that ends the recorded session"

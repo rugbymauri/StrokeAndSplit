@@ -208,11 +208,10 @@ class CourseLiveView extends StatelessWidget {
           footer: footer,
         );
 
-  /// Lap time, watts, heart rate (only with a monitor) and the share in the zone.
+  /// Lap time, watts and heart rate (only with a monitor).
   List<Widget> _tiles(BuildContext context, double fontSize) {
     final l10n = context.l10n;
     final heartRate = tick?.heartRate;
-    final share = lap.lapInZoneShare;
     return [
       MetricTile(
         label: l10n.metricLapTime,
@@ -239,13 +238,6 @@ class CourseLiveView extends StatelessWidget {
           footnoteKey: const Key('metric-rr'),
           compact: true,
         ),
-      MetricTile(
-        label: l10n.metricInZone,
-        value: share == null ? '–' : '${(share * 100).round()} %',
-        valueKey: const Key('metric-zone-share'),
-        fontSize: fontSize,
-        compact: true,
-      ),
     ];
   }
 }

@@ -48,10 +48,10 @@ String formatRrInterval(int milliseconds) => '$milliseconds ms';
 String formatStrokeRate(AppLocalizations l10n, double? strokeRate) =>
     strokeRate == null ? _noValue : NumberFormat('0.0', l10n.localeName).format(strokeRate);
 
-/// A drive length in meters with two decimals, e.g. `1,06 m` in German, `1.06 m` in English;
-/// null without a length or for 0, so that nothing is shown instead of "0 m".
+/// A drive length in whole centimeters, e.g. `106 cm`;
+/// null without a length or for 0, so that nothing is shown instead of "0 cm".
 String? formatDriveLength(AppLocalizations l10n, double? meters) =>
-    meters == null || meters <= 0 ? null : '${NumberFormat('0.00', l10n.localeName).format(meters)} m';
+    meters == null || meters <= 0 ? null : '${NumberFormat('0', l10n.localeName).format(meters * 100)} cm';
 
 /// Local date and time, e.g. `15.10.2026, 18:30` in German, `Oct 15, 2026, 18:30` in English.
 String formatDateTime(AppLocalizations l10n, DateTime time) =>

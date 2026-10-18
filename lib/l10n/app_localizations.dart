@@ -601,12 +601,6 @@ abstract class AppLocalizations {
   /// **'Runde'**
   String get metricLapTime;
 
-  /// Live display on a template: label of the share of the lap rowed within the zone, e.g. '78 %'
-  ///
-  /// In de, this message translates to:
-  /// **'In Zone'**
-  String get metricInZone;
-
   /// Live display in landscape on a template: short button that ends the recorded session
   ///
   /// In de, this message translates to:

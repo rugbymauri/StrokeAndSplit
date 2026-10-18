@@ -15,6 +15,6 @@
 ## 3. Anzeige
 
 - [x] 3.1 Widget `ForceCurve` nach Design D2 mit den Zuständen aus D3. Verifikation: Golden-Tests für zwei Kurven, ersten Schlag und Warten
-- [x] 3.2 Schlaglänge an der Kurve nach Design D4, Format über `lib/features/live/formatters.dart`. Verifikation: Unit-Test für das Format („1,06 m“ auf Deutsch, „1.06 m“ auf Englisch); Golden-Tests mit Länge und ohne Länge (keine Angabe, kein „0 m“)
+- [x] 3.2 Schlaglänge an der Kurve nach Design D4, Format über `lib/features/live/formatters.dart`. Verifikation: Unit-Test für das Format („106 cm“; geändert am 2026-10-17, vorher „1,06 m“); Golden-Tests mit Länge und ohne Länge (keine Angabe, kein „0 cm“)
 - [x] 3.3 Einbau in die vier Live-Layouts an den Stellen aus der Tabelle in `design.md`, Karte entfällt ohne Unterstützung. Verifikation: bestehende Layout-Tests in allen vier Grössen ohne Überlauf, mit PM5-Fixture und mit einer Quelle ohne Kurve; Schlaglänge in allen vier Layouts sichtbar und ohne Überlauf
-- [ ] 3.4 Manueller Test am PM5 hoch und quer. Verifikation: Sichtprüfung, angezeigte Schlaglänge plausibel (etwa 0.6–1.2 m) und bei langen Schlägen sichtbar grösser als bei kurzen, Ergebnis in der README
+- [ ] 3.4 Manueller Test am PM5 hoch und quer. Verifikation: Sichtprüfung, angezeigte Schlaglänge plausibel (etwa 60–120 cm) und bei langen Schlägen sichtbar grösser als bei kurzen, Ergebnis in der README
