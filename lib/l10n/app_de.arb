@@ -36,6 +36,10 @@
   "@startConnectsLater": {
     "description": "Start screen: device row, the chosen rower is not connected right now"
   },
+  "startDisconnect": "Trennen",
+  "@startDisconnect": {
+    "description": "Start screen: button in the device row that ends the connection to the rower"
+  },
   "startSimulatorFtmsHint": "Wie ein FTMS-Rudergerät, ohne Schlagdetails",
   "@startSimulatorFtmsHint": {
     "description": "Choose devices and start screen: explanation below 'Simulator (FTMS)'"
@@ -374,10 +378,6 @@
   "bluetoothUnsupported": "Dieses Gerät unterstützt kein Bluetooth LE.",
   "@bluetoothUnsupported": {
     "description": "Device list: the phone or computer has no Bluetooth LE"
-  },
-  "liveDisconnect": "Trennen",
-  "@liveDisconnect": {
-    "description": "Live display: button that ends the connection"
   },
   "liveStale": "Keine Daten seit 3 Sekunden, die Werte sind veraltet.",
   "@liveStale": {

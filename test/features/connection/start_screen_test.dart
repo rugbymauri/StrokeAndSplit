@@ -180,10 +180,32 @@ void main() {
       await tester.pump(const Duration(seconds: 15));
     });
 
-    testWidgets('opens the sessions', (tester) async {
+    for (final (name, size) in const [
+      ('portrait', Size(390, 844)),
+      ('landscape', Size(844, 390)),
+      ('a small window', Size(320, 480)),
+    ]) {
+      testWidgets('shows "Sessions" as a button across the width, $name', (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await _pumpStart(tester, chosen: const RowerChoice.simulator());
+
+        final button = find.byKey(const Key('start-sessions'));
+        await tester.scrollUntilVisible(button, 100);
+        expect(find.descendant(of: button, matching: find.text('Sessions')), findsOneWidget);
+        expect(find.descendant(of: button, matching: find.byIcon(Icons.history)), findsOneWidget);
+        expect(tester.widget(button), isA<OutlinedButton>());
+        expect(tester.getSize(button).width, tester.getSize(find.widgetWithText(OutlinedButton, 'Frei rudern')).width);
+        expect(tester.takeException(), isNull);
+        await disposeWidgetsWithDatabase(tester);
+      });
+    }
+
+    testWidgets('opens the sessions with the button', (tester) async {
       await _pumpStart(tester, chosen: const RowerChoice.simulator());
 
-      await tester.tap(find.text('Sessions'));
+      await tester.tap(find.byKey(const Key('start-sessions')));
       for (var i = 0; i < 5; i++) {
         await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
         await tester.pumpAndSettle();
@@ -218,6 +240,139 @@ void main() {
       await start();
       expect(find.text('Just row'), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
+    });
+  });
+
+  group('with a connected rower', () {
+    /// The start screen with the PM5 chosen and connected, as after rowing.
+    Future<ProviderContainer> pumpConnected(WidgetTester tester, {AppDatabase? db}) async {
+      final container = _container(
+        chosen: const RowerChoice.device(_pm5),
+        transport: FakeBleTransport(found: [_pm5]),
+        db: db,
+      );
+      await container.read(activeErgSourceProvider.notifier).use(
+            const RowerChoice.device(_pm5).createSource(container.read(bleTransportProvider)),
+          );
+      await tester.pumpWidget(
+        UncontrolledProviderScope(container: container, child: const LocalizedApp(home: StartScreen())),
+      );
+      await _settle(tester);
+      return container;
+    }
+
+    Future<void> end(WidgetTester tester, ProviderContainer container) async {
+      await container.read(activeErgSourceProvider.notifier).clear();
+      await disposeWidgetsWithDatabase(tester);
+      await tester.pump(const Duration(seconds: 10));
+    }
+
+    testWidgets('shows it as connected and offers to disconnect', (tester) async {
+      final container = await pumpConnected(tester);
+
+      final row = find.byKey(const Key('device-row'));
+      expect(find.descendant(of: row, matching: find.text('PM5 430000001 Row')), findsOneWidget);
+      expect(find.descendant(of: row, matching: find.text('Verbunden')), findsOneWidget);
+      final disconnect = find.descendant(of: row, matching: find.byKey(const Key('device-row-disconnect')));
+      expect(find.descendant(of: disconnect, matching: find.text('Trennen')), findsOneWidget);
+      expect(find.descendant(of: disconnect, matching: find.byIcon(Icons.link_off)), findsOneWidget);
+      expect(tester.getSize(disconnect).height, greaterThanOrEqualTo(48));
+      await end(tester, container);
+    });
+
+    testWidgets('fits "Trennen" into the device row of a small window', (tester) async {
+      tester.view.physicalSize = const Size(320, 480);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final container = await pumpConnected(tester);
+
+      expect(tester.takeException(), isNull);
+      final row = tester.getRect(find.byKey(const Key('device-row')));
+      final disconnect = tester.getRect(find.byKey(const Key('device-row-disconnect')));
+      expect(disconnect.right, lessThanOrEqualTo(row.right));
+      await end(tester, container);
+    });
+
+    testWidgets('"Trennen" ends the connection and shows the rower as before', (tester) async {
+      final container = await pumpConnected(tester);
+      final source = container.read(activeErgSourceProvider)!;
+
+      await tester.tap(find.text('Trennen'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(activeErgSourceProvider), isNull);
+      expect(source.connectionState, ErgConnectionState.disconnected);
+      expect(find.text('Verbindet beim Start'), findsOneWidget);
+      expect(find.text('Trennen'), findsNothing);
+      expect(container.read(chosenRowerProvider)?.device, _pm5);
+      await end(tester, container);
+    });
+
+    testWidgets('"Frei rudern" uses the connection without connecting again', (tester) async {
+      final container = await pumpConnected(tester);
+      final source = container.read(activeErgSourceProvider);
+
+      await tester.tap(find.text('Frei rudern'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LiveScreen), findsOneWidget);
+      expect(container.read(activeErgSourceProvider), same(source));
+      await end(tester, container);
+    });
+
+    testWidgets('"Rudern" starts a template with the connection without connecting again', (tester) async {
+      final db = openTestDatabase();
+      await tester.runAsync(() async {
+        final course = await CourseRepository(db)
+            .create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 1000));
+        await TemplateRepository(db).create('Seerunde x3', courseId: course, laps: 3);
+      });
+      final container = await pumpConnected(tester, db: db);
+      final source = container.read(activeErgSourceProvider);
+
+      await tester.tap(find.text('Rudern'));
+      await _settle(tester);
+      await tester.tap(find.text('Seerunde x3'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Starten'));
+      await _settle(tester);
+
+      expect(find.byType(LiveScreen), findsOneWidget);
+      expect(container.read(activeErgSourceProvider), same(source));
+      await tester.runAsync(() => container.read(sessionRecorderProvider.notifier).stop());
+      await end(tester, container);
+    });
+
+    testWidgets('going back from the live display keeps it connected', (tester) async {
+      final container = await pumpConnected(tester);
+      final source = container.read(activeErgSourceProvider);
+      await tester.tap(find.text('Frei rudern'));
+      await tester.pumpAndSettle();
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(StartScreen), findsOneWidget);
+      expect(container.read(activeErgSourceProvider), same(source));
+      expect(find.text('Verbunden'), findsOneWidget);
+      await end(tester, container);
+    });
+
+    testWidgets('a simulator chosen in "Geräte wählen" ends the connection to the rower', (tester) async {
+      final container = await pumpConnected(tester);
+      final source = container.read(activeErgSourceProvider)!;
+
+      await tester.tap(find.text('PM5 430000001 Row'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Simulator'));
+      await tester.pump();
+      await tester.tap(find.text('Weiter'));
+      await tester.pumpAndSettle();
+
+      expect(source.connectionState, ErgConnectionState.disconnected);
+      expect(container.read(activeErgSourceProvider), isNull);
+      expect(find.text('Trennen'), findsNothing);
+      await end(tester, container);
     });
   });
 

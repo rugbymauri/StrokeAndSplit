@@ -18,11 +18,12 @@ import '../live/metric_tile.dart' show HeartIcon;
 import '../sessions/sessions_screen.dart';
 import '../templates/templates_screen.dart';
 import 'choose_devices_screen.dart';
+import 'connection_indicator.dart';
 import 'option_card.dart';
 import 'rower_connection.dart';
 
 /// The start screen after "Geräte wählen": the chosen rower, "Rudern",
-/// "Frei rudern" and the sessions (Design D6).
+/// "Frei rudern" and the button to the sessions (Design D6).
 class StartScreen extends ConsumerWidget {
   const StartScreen({super.key});
 
@@ -66,12 +67,13 @@ class StartScreen extends ConsumerWidget {
                 ),
                 const _RowAgain(),
                 const SizedBox(height: AppSpacing.xl),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    key: const Key('start-sessions'),
                     onPressed: () => navigator.push(MaterialPageRoute<void>(builder: (_) => const SessionsScreen())),
-                    style: TextButton.styleFrom(minimumSize: const Size(48, 48), textStyle: AppTextStyles.button),
-                    child: Text(l10n.startSessions),
+                    icon: const Icon(Icons.history),
+                    label: Text(l10n.startSessions),
                   ),
                 ),
               ],
@@ -138,7 +140,8 @@ class _RowAgain extends ConsumerWidget {
 }
 
 /// The chosen rower and the paired heart rate strap, if any (heart-rate,
-/// Design D8); tapping it leads back to "Geräte wählen".
+/// Design D8); tapping it leads back to "Geräte wählen". While the rower is
+/// connected it says so and offers to disconnect (Design D6).
 class _DeviceRow extends ConsumerWidget {
   const _DeviceRow();
 
@@ -146,16 +149,14 @@ class _DeviceRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final choice = ref.watch(chosenRowerProvider);
-    final connected = choice != null &&
+    final state = ref.watch(ergConnectionStateProvider).value ?? ErgConnectionState.disconnected;
+    // The connection stays after rowing until it is ended here or another rower is chosen.
+    final active = choice != null &&
         choice.isUsedBy(ref.watch(activeErgSourceProvider)) &&
-        ref.watch(ergConnectionStateProvider).value == ErgConnectionState.connected;
+        state != ErgConnectionState.disconnected;
     final (icon, title, subtitle) = switch (choice) {
       null => (Icons.bluetooth_searching, l10n.startNoRower, l10n.devicesTitle),
-      RowerChoice(:final device?) => (
-          Icons.rowing,
-          device.name,
-          connected ? l10n.stateConnected : l10n.startConnectsLater,
-        ),
+      RowerChoice(:final device?) => (Icons.rowing, device.name, l10n.startConnectsLater),
       RowerChoice(protocol: ErgProtocol.ftms) =>
         (Icons.smart_toy_outlined, l10n.sourceSimulatorFtmsName, l10n.startSimulatorFtmsHint),
       RowerChoice() => (Icons.smart_toy_outlined, l10n.sourceSimulatorName, l10n.startSimulatorHint),
@@ -165,7 +166,8 @@ class _DeviceRow extends ConsumerWidget {
       key: const Key('device-row'),
       icon: icon,
       title: title,
-      subtitle: subtitle,
+      subtitle: active ? connectionStateLabel(l10n, state) : subtitle,
+      subtitleColor: active ? connectionStateColor(state) : null,
       detail: strap == null
           ? null
           : Row(
@@ -176,6 +178,15 @@ class _DeviceRow extends ConsumerWidget {
                 Flexible(child: Text(strap.name, style: AppTextStyles.subtitle, overflow: TextOverflow.ellipsis)),
               ],
             ),
+      action: active
+          ? TextButton.icon(
+              key: const Key('device-row-disconnect'),
+              onPressed: () => ref.read(activeErgSourceProvider.notifier).clear(),
+              style: TextButton.styleFrom(minimumSize: const Size(48, 48), textStyle: AppTextStyles.button),
+              icon: const Icon(Icons.link_off),
+              label: Text(l10n.startDisconnect),
+            )
+          : null,
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ChooseDevicesScreen())),
     );
   }

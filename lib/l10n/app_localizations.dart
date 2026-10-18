@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'Verbindet beim Start'**
   String get startConnectsLater;
 
+  /// Start screen: button in the device row that ends the connection to the rower
+  ///
+  /// In de, this message translates to:
+  /// **'Trennen'**
+  String get startDisconnect;
+
   /// Choose devices and start screen: explanation below 'Simulator (FTMS)'
   ///
   /// In de, this message translates to:
@@ -522,12 +528,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Dieses Gerät unterstützt kein Bluetooth LE.'**
   String get bluetoothUnsupported;
-
-  /// Live display: button that ends the connection
-  ///
-  /// In de, this message translates to:
-  /// **'Trennen'**
-  String get liveDisconnect;
 
   /// Live display: banner when the rower stopped sending data
   ///

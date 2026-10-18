@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../app/design_tokens.dart';
-import '../../l10n/l10n.dart';
 import '../connection/connection_indicator.dart';
 import '../connection/heart_rate_indicator.dart';
 
-/// The connection of the rower and the strap, the source and the disconnect button as a
-/// compact group beside the session button, so the live display needs no title bar.
+/// The connection of the rower and the strap and the source as a compact group beside the
+/// session button, so the live display needs no title bar. Disconnecting is on the start screen.
 class LiveStatus extends StatelessWidget {
-  const LiveStatus({super.key, required this.onDisconnect});
-
-  /// Ends the connection; there is no back gesture on the Linux desktop.
-  final VoidCallback onDisconnect;
+  const LiveStatus({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,12 +19,6 @@ class LiveStatus extends StatelessWidget {
         // The strap, if any; it also keeps the strap connected while rowing (heart-rate, Design D7).
         const HeartRateIndicator(),
         const Padding(padding: EdgeInsets.only(left: AppSpacing.s), child: SourceBadge()),
-        IconButton(
-          onPressed: onDisconnect,
-          tooltip: context.l10n.liveDisconnect,
-          color: AppColors.textMuted,
-          icon: const Icon(Icons.link_off),
-        ),
       ],
     );
   }

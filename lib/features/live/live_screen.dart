@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
@@ -139,11 +140,24 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     super.dispose();
   }
 
-  Future<void> _disconnect() async {
-    // A running session is kept; it ends here like with the end session button.
+  var _leaving = false;
+
+  /// Back or Esc: back to the start screen, the rower stays connected; a replay goes back to the sessions.
+  Future<void> _leave() async {
+    if (_leaving) return;
+    _leaving = true;
+    // A running session is kept; it ends here like with the end session button. A ready one stores nothing.
     await ref.read(sessionRecorderProvider.notifier).stop();
+    final replay = ref.read(activeErgSourceProvider)?.kind == ErgSourceKind.replay;
+    await _endReplay();
+    if (!mounted) return;
+    replay ? Navigator.of(context).pop() : Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
+  /// A replay is no connection to keep; it ends with the live display.
+  Future<void> _endReplay() async {
+    if (ref.read(activeErgSourceProvider)?.kind != ErgSourceKind.replay) return;
     await ref.read(activeErgSourceProvider.notifier).clear();
-    if (mounted) Navigator.of(context).pop();
   }
 
   Future<void> _startSession() => ref.read(sessionRecorderProvider.notifier).start();
@@ -154,9 +168,9 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     if (await SessionSummaryScreen.showAfterSession(context, id)) await _leaveToStart();
   }
 
-  /// "Done" in the summary: end the connection and go back to the start screen.
+  /// "Done" in the summary: back to the start screen, the rower stays connected.
   Future<void> _leaveToStart() async {
-    await ref.read(activeErgSourceProvider.notifier).clear();
+    await _endReplay();
     if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
@@ -178,8 +192,8 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 
   static Widget _label(String text) => FittedBox(fit: BoxFit.scaleDown, child: Text(text, maxLines: 1));
 
-  /// Connection, strap, source and the disconnect button, beside the session button in place of a title bar.
-  Widget _status() => LiveStatus(onDisconnect: _disconnect);
+  /// Connection, strap and source, beside the session button in place of a title bar.
+  Widget _status() => const LiveStatus();
 
   /// The live view of [template] at [lap] with its ghosts, recomputed with
   /// every tick (Change ghost, Design D2–D4).
@@ -215,11 +229,11 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     final forceCurves = source != null && source.providesForceCurves ? _forceCurves : null;
     return PopScope(
       canPop: false,
-      // Going back ends the connection, the same as the disconnect button.
+      // Going back leads to the start screen and keeps the rower connected.
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) _disconnect();
+        if (!didPop) _leave();
       },
-      child: Scaffold(
+      child: _escapeLeaves(Scaffold(
         body: SafeArea(
           child: Column(
             children: [
@@ -255,7 +269,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
             ],
           ),
         ),
-      ),
+      )),
     );
   }
+
+  /// The Linux desktop has no back gesture; Esc does the same as going back.
+  Widget _escapeLeaves(Widget child) => CallbackShortcuts(
+        bindings: {const SingleActivator(LogicalKeyboardKey.escape): _leave},
+        child: Focus(autofocus: true, child: child),
+      );
 }
