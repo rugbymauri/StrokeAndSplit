@@ -77,6 +77,43 @@ void main() {
       expect(curves.last?.strokeNumber, 2);
       expect(curves.previous, isNull);
     });
+
+    StrokeForceCurve peaking(int strokeNumber, double peak) =>
+        StrokeForceCurve(elapsed: Duration.zero, strokeNumber: strokeNumber, forcesNewtons: [40, peak, 0]);
+
+    test('starts on the fixed scale, whatever the peak of the first curve', () {
+      expect(const ForceCurves().add(peaking(2, 300)).scaleNewtons, 1000);
+      expect(const ForceCurves().add(peaking(2, 658)).scaleNewtons, 1000);
+    });
+
+    test('widens the scale in steps for a stronger curve and never narrows it', () {
+      final strong = const ForceCurves().add(peaking(2, 600)).add(peaking(3, 1210));
+      final weakAfter = strong.add(peaking(4, 250)).add(peaking(5, 700));
+
+      expect(strong.scaleNewtons, 1500);
+      expect(weakAfter.scaleNewtons, 1500);
+      expect(weakAfter.add(peaking(6, 1600)).scaleNewtons, 2000);
+    });
+
+    test('starts the scale over when the stroke numbers start over', () {
+      final curves = const ForceCurves().add(peaking(30, 1210)).add(peaking(2, 500));
+
+      expect(curves.scaleNewtons, 1000);
+    });
+  });
+
+  group('ForceScale', () {
+    test('keeps the scale for a curve that fits on it', () {
+      expect(ForceScale.fitting(0), 1000);
+      expect(ForceScale.fitting(1000), 1000);
+      expect(ForceScale.fitting(700, atLeast: 1500), 1500);
+    });
+
+    test('goes to the next step of 500 N above the peak', () {
+      expect(ForceScale.fitting(1000.5), 1500);
+      expect(ForceScale.fitting(1500), 1500);
+      expect(ForceScale.fitting(1750), 2000);
+    });
   });
 
   setUpAll(loadAppFonts);
@@ -167,6 +204,89 @@ void main() {
 
     expect(find.text('Kraftkurve'), findsOneWidget);
     await expectLater(find.byKey(_golden), matchesGoldenFile('goldens/force_curve_tinted.png'));
+  });
+
+  group('on the absolute scale', () {
+    /// A curve that stays close to [peak] over most of the drive.
+    List<double> plateau(double peak) => [0, for (var i = 0; i < 20; i++) i.isEven ? peak : peak - 4, 0];
+
+    Future<void> pumpInline(WidgetTester tester, List<double> last, {double scale = 1000}) => _pump(
+          tester,
+          ForceCurve(last: last, scaleNewtons: scale, variant: ForceCurveVariant.inline),
+          _inlineSize,
+          background: AppColors.surface,
+        );
+
+    /// The point in the middle of the plot at the height of [force] on a scale up to [scale].
+    Offset at(double force, {double scale = 1000}) {
+      const top = 1.5;
+      return Offset(_inlineSize.width / 2, _inlineSize.height - (_inlineSize.height - top) * force / scale);
+    }
+
+    final plot = find.byKey(const Key('force-curve-plot'));
+
+    testWidgets('draws a weak stroke lower than a strong one', (tester) async {
+      await pumpInline(tester, plateau(900));
+      expect(plot, paints..path(includes: [at(200), at(600), at(850)], excludes: [at(950)]));
+
+      await pumpInline(tester, plateau(300));
+      expect(plot, paints..path(includes: [at(200)], excludes: [at(600), at(850)]));
+    });
+
+    testWidgets('draws a curve above the scale on the next step instead of cutting it off', (tester) async {
+      await pumpInline(tester, plateau(1200));
+
+      expect(plot, paints..path(includes: [at(1100, scale: 1500)], excludes: [at(1300, scale: 1500)]));
+      expect(find.text('1500 N'), findsOneWidget);
+    });
+
+    testWidgets('does not narrow a wider scale for a weak stroke', (tester) async {
+      await pumpInline(tester, plateau(300), scale: 1500);
+
+      expect(plot, paints..path(includes: [at(200, scale: 1500)], excludes: [at(400, scale: 1500)]));
+      expect(find.text('1500 N'), findsOneWidget);
+    });
+
+    testWidgets('draws the previous stroke on the same scale', (tester) async {
+      await _pump(
+        tester,
+        ForceCurve(last: plateau(300), previous: plateau(900), variant: ForceCurveVariant.inline),
+        _inlineSize,
+        background: AppColors.surface,
+      );
+
+      // The previous stroke first, as a line up near 900 N; the last one stays low.
+      expect(plot, paints..path(includes: [at(850)])..path(excludes: [at(600)]));
+    });
+
+    for (final (name, variant, size) in [
+      ('card', ForceCurveVariant.card, _cardSize),
+      ('inline', ForceCurveVariant.inline, _inlineSize),
+      ('tinted', ForceCurveVariant.tinted, _tintedSize),
+    ]) {
+      testWidgets('labels the guide lines and shows the peak: $name', (tester) async {
+        await _pump(tester, ForceCurve(last: _last, previous: _previous, variant: variant), size);
+
+        expect(find.text('500 N'), findsOneWidget);
+        expect(find.text('1000 N'), findsOneWidget);
+        expect(find.text('620 N'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    testWidgets('keeps only the lines in the narrow strip', (tester) async {
+      await _pump(tester, ForceCurve(last: _last, variant: ForceCurveVariant.strip), _stripSize);
+
+      expect(find.text('500 N'), findsNothing);
+      expect(find.text('620 N'), findsOneWidget);
+      expect(find.byKey(const Key('force-curve-plot')), paints..line()..line());
+    });
+
+    testWidgets('shows no peak while waiting', (tester) async {
+      await _pump(tester, const ForceCurve(last: null), _cardSize);
+
+      expect(find.byKey(const Key('force-curve-peak')), findsNothing);
+    });
   });
 
   group('with the drive length', () {

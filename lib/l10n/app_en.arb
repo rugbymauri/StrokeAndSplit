@@ -90,6 +90,7 @@
   "liveForceCurveLast": "Last",
   "liveForceCurvePrevious": "Previous",
   "liveForceCurveWaiting": "Waiting for the first stroke",
+  "liveForceNewtons": "{newtons} N",
   "courseLap": "Lap {lap}",
   "segmentFree": "free",
   "segmentZone": "Zone",
