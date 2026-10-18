@@ -18,7 +18,7 @@ import '../../support/fake_heart_rate_transport.dart';
 import '../../support/localized_app.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
+const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
 const _h10 = FoundHeartRateMonitor(id: 'A0:9E:1A:12:34:56', name: 'Polar H10 1A2B3C4D');
 const _busy = HeartRateConnectException(HeartRateConnectError.failed, message: 'busy');
 

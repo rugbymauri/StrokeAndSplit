@@ -48,7 +48,7 @@ RawRecording pm5ToFtms(RawRecording pm5, {Duration interval = const Duration(sec
       'version': 1,
       'source': 'ftms',
       'protocol': 'ftms',
-      'device': 'AergRow FTMS Rower',
+      'device': 'Stroke & Split FTMS',
       'recordedAt': ?pm5.metadata['recordedAt'],
       'convertedFrom': ?pm5.metadata['device'],
     },

@@ -18,8 +18,11 @@ void main() {
 
   test('the FTMS fixture is the converted PM5 fixture', () {
     final converted = pm5ToFtms(pm5);
-    // The fixture keeps the format name from before the rename.
-    expect({...ftms.metadata}..remove('format'), {...converted.metadata}..remove('format'));
+    // The fixture keeps the format and device name from before the rename.
+    Map<String, Object?> renamed(Map<String, Object?> metadata) =>
+        {...metadata}..removeWhere((key, _) => key == 'format' || key == 'device');
+    expect(renamed(ftms.metadata), renamed(converted.metadata));
+    expect(converted.metadata['device'], 'Stroke & Split FTMS');
     expect(ftms.toLines().skip(1), converted.toLines().skip(1));
   });
 

@@ -30,8 +30,8 @@ void main() {
   });
 
   test('lists an FTMS rower', () {
-    expect(found('AergRow FTMS Rower', services: ['1826'], data: {'1826': rower}),
-        ('AergRow FTMS Rower', ErgProtocol.ftms));
+    expect(found('Stroke & Split FTMS', services: ['1826'], data: {'1826': rower}),
+        ('Stroke & Split FTMS', ErgProtocol.ftms));
     expect(found('Rower', data: {'1826': rower}), ('Rower', ErgProtocol.ftms));
   });
 

@@ -11,7 +11,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 import '../../../support/fake_heart_rate_transport.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'AergRow FTMS Rower', protocol: ErgProtocol.ftms);
+const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
 
 class _FakeLink implements RowerLink {
   final _notifications = StreamController<(String, List<int>)>.broadcast();
@@ -209,7 +209,7 @@ void main() {
     });
 
     test('is an FTMS source', () {
-      expect((ftms.kind, ftms.protocol, ftms.name), (ErgSourceKind.ftms, ErgProtocol.ftms, 'AergRow FTMS Rower'));
+      expect((ftms.kind, ftms.protocol, ftms.name), (ErgSourceKind.ftms, ErgProtocol.ftms, 'Stroke & Split FTMS'));
     });
 
     test('reconnects without user action after a short drop', () {

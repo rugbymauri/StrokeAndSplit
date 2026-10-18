@@ -22,7 +22,7 @@ void main() {
 
   test('never lists a rower, even one offering the heart rate service', () {
     expect(found('PM5 430000001 Row', services: ['180d']), isNull);
-    expect(found('AergRow FTMS Rower', services: ['1826', '180d']), isNull);
+    expect(found('Stroke & Split FTMS', services: ['1826', '180d']), isNull);
     expect(found('Bike', services: ['180d'], data: {'1826': [0x01, 0x20, 0x00]}), isNull);
   });
 }

@@ -142,9 +142,9 @@ void main() {
   });
 
   test('imports an FTMS recording of the spike', () async {
-    final dir = await Directory.systemTemp.createTemp('aergrow-spike');
+    final dir = await Directory.systemTemp.createTemp('strokesplit-spike');
     addTearDown(() => dir.delete(recursive: true));
-    final writer = await RawLogWriter.create(dir, deviceName: 'AergRow FTMS Rower', protocol: 'ftms');
+    final writer = await RawLogWriter.create(dir, deviceName: 'Stroke & Split FTMS', protocol: 'ftms');
     await writer.close();
     final header = (await writer.file.readAsLines()).first;
     expect((jsonDecode(header) as Map)['format'], 'strokesplit-raw');
@@ -164,7 +164,7 @@ void main() {
 
     expect(writer.file.path, contains('ftms-'));
     expect((session.source, session.protocol), (ErgSourceKind.ftms, ErgProtocol.ftms));
-    expect(session.deviceName, 'AergRow FTMS Rower');
+    expect(session.deviceName, 'Stroke & Split FTMS');
     expect(session.distanceDm, closeTo(2100, 10));
     expect(await db.select(db.strokes).get(), hasLength(43));
   });
