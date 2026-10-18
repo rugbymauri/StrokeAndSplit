@@ -132,6 +132,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Task 1.2 dunkles Theme in `lib/app/app_theme.dart`, Tokens `AppFonts`, `AppTextStyles`, `AppRadii`, `AppSpacing`; kein helles Theme mehr. Primärfarbe Blau `zoneIn`, auch für den gefüllten Button (Nutzer, 2026-10-16). Vorläufig: Sekundärfarbe `textMuted`, Material-Schriftgrössen bleiben (Canvas-Grössen in `AppTextStyles`).
 - [x] Nach Gerätetest (Nutzer, 2026-10-16): Live-Display ohne Titelbalken (Verbindung, Puls, Quelle und Trennen neben dem Session-Button), Werte deutlich grösser (Obergrenze 56 → 112 px), Überschriften kleiner (10–11 px).
 - [x] Nach Gerätetest (Nutzer, 2026-10-17): Pace überall in ganzen Sekunden („2:05“, gerundet), Spec `live-display` als MODIFIED in `ui-design`, `translations` und README nachgeführt.
+- [x] Task 4.5 (Nutzer, 2026-10-17): Pace-Band im Zonen-Editor startet mit 10 s Abstand, die schnellste Pace verschiebt das ganze Band, die langsamste ändert den Abstand; am Rand gesperrt.
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 
