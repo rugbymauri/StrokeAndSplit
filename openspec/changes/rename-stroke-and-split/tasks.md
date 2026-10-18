@@ -2,8 +2,8 @@
 
 ## 0. Vorbereitung
 
-- [ ] 0.1 Offene Fragen aus `design.md` klären (Schreibweise, App-ID) und Domains sichern. Verifikation: Entscheide in `design.md` nachgetragen
-- [ ] 0.2 Offene Branches mergen, bevor die Umsetzung beginnt (Design D3). Verifikation: `git branch --no-merged main` zeigt keine Feature-Branches mehr
+- [x] 0.1 Offene Fragen aus `design.md` klären (Schreibweise, App-ID) und Domains sichern. Verifikation: Entscheide in `design.md` nachgetragen
+- [x] 0.2 Offene Branches mergen, bevor die Umsetzung beginnt (Design D3). Verifikation: `git branch --no-merged main` zeigt keine Feature-Branches mehr
 
 ## 1. Sichtbarer Name
 

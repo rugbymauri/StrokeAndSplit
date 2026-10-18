@@ -49,3 +49,4 @@ Keine. Entschieden (Nutzer, 2026-10-16):
 - Anzeigename mit „&“: **„Stroke & Split“** (F9).
 - App-ID **`ch.strokesplit`**, nicht mit der Domain des Herausgebers (F10).
 - Vor der Umsetzung Domains sichern und eine Markenrecherche bei Swissreg, EUIPO und USPTO machen.
+  Erledigt: Domains und Markenrecherche hat der Nutzer am 2026-10-18 bestätigt („Namensrechte passen“).
