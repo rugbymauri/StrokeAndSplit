@@ -39,7 +39,8 @@ class StrokeRateCard extends StatelessWidget {
     final l10n = context.l10n;
     final hint = ZoneHint.strokeRate(l10n, this.status);
     final (background, border, foreground) = switch (hint) {
-      null => (AppColors.surface, null, AppColors.textMuted),
+      // A quiet frame without a band, so the card stands out against the background like the pace box.
+      null => (AppColors.surface, AppColors.trackZone, AppColors.textMuted),
       ZoneHint(inZone: true) => (AppColors.zoneInSurface, AppColors.zoneIn, AppColors.zoneInText),
       ZoneHint(inZone: false) => (AppColors.zoneOutSurface, AppColors.zoneOut, AppColors.zoneOutText),
     };
@@ -126,7 +127,7 @@ class StrokeRateCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(landscape ? AppRadii.cardLarge : AppRadii.card),
-        border: border == null ? null : Border.all(color: border, width: 2),
+        border: Border.all(color: border, width: 2),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppSpacing.s),

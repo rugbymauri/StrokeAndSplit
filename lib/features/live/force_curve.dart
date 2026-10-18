@@ -187,7 +187,11 @@ class ForceCurve extends StatelessWidget {
 
   Widget _framed({required EdgeInsets padding, required Widget child}) => DecoratedBox(
         key: const Key('force-curve'),
-        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppRadii.card)),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadii.card),
+          border: Border.all(color: AppColors.trackZone, width: 2),
+        ),
         child: Padding(padding: padding, child: child),
       );
 
