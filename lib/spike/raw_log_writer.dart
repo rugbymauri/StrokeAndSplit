@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:erg_protocol/erg_protocol.dart';
+
 /// Writes raw notifications of a PM5 or FTMS rower as JSON lines: one header
 /// line, then one line per packet (`t`, `c`, `b`) or marker (`t`, `m`).
 ///
-/// This is the uncompressed form of the `.aergrow` export format, so spike
+/// This is the uncompressed form of the `.strokesplit` export format, so spike
 /// recordings can be used directly as test fixtures.
 class RawLogWriter {
   RawLogWriter._(this.file, this._sink, this._clock);
@@ -21,7 +23,7 @@ class RawLogWriter {
     final file = File('${dir.path}/$protocol-$stamp.jsonl');
     final sink = file.openWrite();
     sink.writeln(jsonEncode({
-      'format': 'aergrow-raw',
+      'format': RawRecording.formatName,
       'version': 1,
       'source': protocol,
       'protocol': protocol,

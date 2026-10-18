@@ -10,8 +10,8 @@ class RecordingMarker {
   final String text;
 }
 
-/// A recorded stream of PM5 notifications in the AergRow raw format: one JSON
-/// header line, then one line per packet (`t`, `c`, `b`) or marker (`t`, `m`).
+/// A recorded stream of PM5 notifications in the Stroke & Split raw format: one
+/// JSON header line, then one line per packet (`t`, `c`, `b`) or marker (`t`, `m`).
 class RawRecording {
   RawRecording({required this.metadata, required this.packets, this.markers = const []});
 
@@ -23,8 +23,8 @@ class RawRecording {
       throw const FormatException('Recording is empty');
     }
     final metadata = jsonDecode(iterator.current) as Map<String, Object?>;
-    if (metadata['format'] != formatName) {
-      throw FormatException('Not an AergRow recording: ${metadata['format']}');
+    if (!readableFormatNames.contains(metadata['format'])) {
+      throw FormatException('Not a Stroke & Split recording: ${metadata['format']}');
     }
 
     final packets = <RawPacket>[];
@@ -41,7 +41,12 @@ class RawRecording {
     return RawRecording(metadata: metadata, packets: packets, markers: markers);
   }
 
-  static const formatName = 'aergrow-raw';
+  /// The format name written into new recordings.
+  static const formatName = 'strokesplit-raw';
+
+  /// The format names read: the current one and the one from before the app
+  /// was renamed from AergRow, so older exports and recordings stay readable.
+  static const readableFormatNames = {formatName, 'aergrow-raw'};
 
   final Map<String, Object?> metadata;
   final List<RawPacket> packets;

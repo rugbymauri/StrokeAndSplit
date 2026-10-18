@@ -19,7 +19,16 @@ void main() {
     expect(reread.toLines(), orderedEquals(recording.toLines()));
   });
 
-  test('rejects files that are not AergRow recordings', () {
+  test('writes the current format name and reads recordings from before the rename', () {
+    final recording = loadFixture('just_row');
+    final rewritten = RawRecording(metadata: {...recording.metadata, 'format': RawRecording.formatName}, packets: []);
+
+    expect(recording.metadata['format'], 'aergrow-raw');
+    expect(RawRecording.formatName, 'strokesplit-raw');
+    expect(RawRecording.parseLines(rewritten.toLines()).metadata['format'], 'strokesplit-raw');
+  });
+
+  test('rejects files that are not Stroke & Split recordings', () {
     expect(() => RawRecording.parseLines(['{"format":"other"}']), throwsFormatException);
     expect(() => RawRecording.parseLines([]), throwsFormatException);
   });

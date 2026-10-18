@@ -79,6 +79,21 @@ void main() {
       expect(_summary((await laptop.get(imported))!), _summary((await phone.get(recorded))!));
       expect((await laptop.rawRecording(imported)).packets.length, (await phone.rawRecording(recorded)).packets.length);
     });
+
+    test('imports the unchanged $fixture fixture as an .aergrow file from before the rename', () async {
+      final phone = SessionRepository(openTestDatabase());
+      final laptop = SessionRepository(openTestDatabase());
+      final recorded = (await phone.get(await _record(phone, fixture)))!;
+      final file = File('packages/erg_protocol/test/fixtures/$fixture.jsonl').readAsBytesSync();
+      expect(utf8.decode(file), startsWith('{"format":"aergrow-raw"'));
+
+      final imported = (await laptop.get(await laptop.import(gzip.encode(file))))!;
+
+      expect(
+        (imported.distanceDm, imported.strokeCount, imported.durationMs),
+        (recorded.distanceDm, recorded.strokeCount, recorded.durationMs),
+      );
+    });
   }
 
   test('stores the force curve packets and gives the same curves after export and import', () async {
@@ -96,14 +111,14 @@ void main() {
     expect(_curves(imported), _curves(stored));
   });
 
-  test('writes a gzip-compressed AergRow raw recording with the summary in the header', () async {
+  test('writes a gzip-compressed Stroke & Split raw recording with the summary in the header', () async {
     final repository = SessionRepository(openTestDatabase());
     final id = await _record(repository, 'just_row');
 
     final lines = const LineSplitter().convert(utf8.decode(gzip.decode(await repository.export(id))));
     final header = jsonDecode(lines.first) as Map<String, Object?>;
 
-    expect(header['format'], 'aergrow-raw');
+    expect(header['format'], 'strokesplit-raw');
     expect(header['source'], 'pm5');
     expect(header['device'], 'PM5 430000001 Row');
     expect((header['session'] as Map)['distanceDm'], (await repository.get(id))!.distanceDm);
@@ -132,6 +147,7 @@ void main() {
     final writer = await RawLogWriter.create(dir, deviceName: 'AergRow FTMS Rower', protocol: 'ftms');
     await writer.close();
     final header = (await writer.file.readAsLines()).first;
+    expect((jsonDecode(header) as Map)['format'], 'strokesplit-raw');
     // The spike also records the control point answers and the machine status.
     final lines = [
       header,
@@ -190,7 +206,7 @@ void main() {
     expect((await laptop.get(imported))!.status, SessionStatus.incomplete);
   });
 
-  test('rejects files that are not AergRow recordings', () async {
+  test('rejects files that are not Stroke & Split recordings', () async {
     final repository = SessionRepository(openTestDatabase());
 
     expect(() => repository.import(utf8.encode('{"format":"other"}\n')), throwsFormatException);

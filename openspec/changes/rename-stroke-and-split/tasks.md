@@ -11,7 +11,7 @@
 
 ## 2. Session-Dateien
 
-- [ ] 2.1 Export mit `.strokesplit` und `strokesplit-raw`, Import akzeptiert alt und neu, Dateidialog mit beiden Endungen. Verifikation: Unit-Tests für Roundtrip im neuen Format und Import der unveränderten Fixtures `just_row.jsonl`, `pause.jsonl`, `reset.jsonl`
+- [x] 2.1 Export mit `.strokesplit` und `strokesplit-raw`, Import akzeptiert alt und neu, Dateidialog mit beiden Endungen. Verifikation: Unit-Tests für Roundtrip im neuen Format und Import der unveränderten Fixtures `just_row.jsonl`, `pause.jsonl`, `reset.jsonl`
 
 ## 3. Kennungen
 

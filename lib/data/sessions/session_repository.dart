@@ -233,7 +233,7 @@ class SessionRepository {
     return row != null;
   }
 
-  /// The raw notifications of a session, in the AergRow raw format.
+  /// The raw notifications of a session, in the Stroke & Split raw format.
   Future<RawRecording> rawRecording(int id) async {
     final session = await get(id);
     if (session == null) throw StateError('No session $id');
@@ -257,8 +257,8 @@ class SessionRepository {
     );
   }
 
-  /// The session as an `.aergrow` file (Design D8): gzip-compressed lines in
-  /// the AergRow raw format, with the summary in the header, and template and
+  /// The session as a `.strokesplit` file (Design D8): gzip-compressed lines
+  /// in the Stroke & Split raw format, with the summary in the header, and template and
   /// course of a session on a course (Design D7).
   Future<List<int>> export(int id) async {
     final session = (await get(id))!;
@@ -289,7 +289,7 @@ class SessionRepository {
     return gzip.encode(utf8.encode('${lines.join('\n')}\n'));
   }
 
-  /// Imports an `.aergrow` file or an uncompressed raw recording. Samples,
+  /// Imports a `.strokesplit` or older `.aergrow` file or an uncompressed raw recording. Samples,
   /// strokes, RR intervals and summary are derived from the raw notifications
   /// again, so
   /// decoder fixes apply to imported sessions too. The session is marked as

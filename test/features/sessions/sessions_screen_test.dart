@@ -149,7 +149,7 @@ void main() {
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
       await tester.pump();
     }
-    expect(setup.files.saved.keys, ['aergrow-2026-10-15-1830.aergrow']);
+    expect(setup.files.saved.keys, ['strokesplit-2026-10-15-1830.strokesplit']);
     expect(find.text('Session exportiert.'), findsOneWidget);
 
     setup.files.toOpen = setup.files.saved.values.single;
