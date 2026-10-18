@@ -23,6 +23,7 @@ import 'package:aergrow/features/live/stroke_rate_card.dart';
 import 'package:aergrow/features/simulator/simulator_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
@@ -551,15 +552,15 @@ void main() {
       ('portrait with a template', Size(390, 844), true),
       ('landscape with a template', Size(844, 390), true),
     ]) {
-      testWidgets('keeps disconnecting within reach, $name', (tester) async {
+      testWidgets('shows no disconnect button, $name', (tester) async {
         final harness = _Harness();
         await harness.pump(tester, size: size, recording: template ? _onCourse() : null);
 
-        expect(find.byTooltip('Trennen'), findsOneWidget);
-        expect(find.byKey(const Key('connection-dot')), findsOneWidget);
-        final button = tester.getRect(find.byTooltip('Trennen'));
-        expect(button.bottom, lessThanOrEqualTo(size.height));
-        expect(button.right, lessThanOrEqualTo(size.width));
+        expect(find.byTooltip('Trennen'), findsNothing);
+        expect(find.byIcon(Icons.link_off), findsNothing);
+        final status = find.byKey(const Key('live-status'));
+        expect(find.descendant(of: status, matching: find.byKey(const Key('connection-dot'))), findsOneWidget);
+        expect(find.descendant(of: status, matching: find.byType(HeartRateIndicator)), findsOneWidget);
       });
     }
 
@@ -573,17 +574,35 @@ void main() {
       );
     });
 
-    testWidgets('disconnects and goes back with the disconnect button', (tester) async {
-      final harness = _Harness();
-      final source = FakeErgSource();
-      await harness.pump(tester, source: source, pushed: true);
-      expect(find.byType(LiveScreen), findsOneWidget);
+    for (final (name, leave) in [
+      ('going back', (WidgetTester tester) => tester.binding.handlePopRoute()),
+      ('Esc', (WidgetTester tester) => tester.sendKeyEvent(LogicalKeyboardKey.escape)),
+    ]) {
+      testWidgets('leads to the start screen with $name and keeps the rower connected', (tester) async {
+        final harness = _Harness();
+        final source = FakeErgSource();
+        await harness.pump(tester, source: source, pushed: true);
+        expect(find.byType(LiveScreen), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Trennen'));
+        await leave(tester);
+        await tester.pumpAndSettle();
+
+        expect(source.stopped, isFalse);
+        expect(find.byType(LiveScreen), findsNothing);
+        expect(find.text('start'), findsOneWidget);
+        expect(harness.wakelock.enabled, isFalse);
+      });
+    }
+
+    testWidgets('ends a replay when going back', (tester) async {
+      final harness = _Harness();
+      final source = FakeErgSource(kind: ErgSourceKind.replay);
+      await harness.pump(tester, source: source, pushed: true);
+
+      await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
 
       expect(source.stopped, isTrue);
-      expect(find.byType(LiveScreen), findsNothing);
       expect(find.text('start'), findsOneWidget);
     });
   });

@@ -128,7 +128,7 @@ void main() {
     await harness.pump(tester);
     await harness.emit(tester, harness.packets.take(harness.trigger));
 
-    // Going back disconnects, like the disconnect button.
+    // Going back drops the ready session and keeps the rower connected.
     await tester.runAsync(() async {
       await tester.binding.handlePopRoute();
       await Future<void>.delayed(const Duration(milliseconds: 50));
@@ -136,7 +136,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(LiveScreen), findsNothing);
-    expect(harness.source.stopped, isTrue);
+    expect(harness.source.stopped, isFalse);
+    expect(harness.container.read(sessionRecorderProvider), isNull);
     expect(await tester.runAsync(harness.db.select(harness.db.sessions).get), isEmpty);
     await disposeWidgetsWithDatabase(tester);
   });

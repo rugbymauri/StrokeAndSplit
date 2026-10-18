@@ -38,6 +38,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get startConnectsLater => 'Verbindet beim Start';
 
   @override
+  String get startDisconnect => 'Trennen';
+
+  @override
   String get startSimulatorFtmsHint =>
       'Wie ein FTMS-Rudergerät, ohne Schlagdetails';
 
@@ -289,9 +292,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get bluetoothUnsupported =>
       'Dieses Gerät unterstützt kein Bluetooth LE.';
-
-  @override
-  String get liveDisconnect => 'Trennen';
 
   @override
   String get liveStale =>

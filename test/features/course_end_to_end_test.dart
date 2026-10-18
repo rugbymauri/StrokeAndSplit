@@ -5,6 +5,7 @@ import 'package:aergrow/data/courses/course_repository.dart';
 import 'package:aergrow/data/db/database.dart';
 import 'package:aergrow/data/sessions/session_providers.dart';
 import 'package:aergrow/data/sessions/session_repository.dart';
+import 'package:aergrow/data/sources/erg_source.dart';
 import 'package:aergrow/data/sources/erg_source_providers.dart';
 import 'package:aergrow/data/sources/rower_choice.dart';
 import 'package:aergrow/data/sources/simulated_source.dart';
@@ -152,11 +153,15 @@ void main() {
     expect(strokes, isNotEmpty);
     expect(strokes.every((s) => s.driveTimeMs == null), isTrue);
 
-    // Done leads back to the start screen and ends the connection.
+    // Done leads back to the start screen and keeps the simulator connected.
     await tester.tap(find.text('Fertig'));
     await tester.pumpAndSettle();
     expect(find.byType(SessionSummaryScreen), findsNothing);
     expect(find.byType(StartScreen), findsOneWidget);
+    expect(container.read(activeErgSourceProvider)?.kind, ErgSourceKind.simulator);
+    expect(find.text('Verbunden'), findsOneWidget);
+    await tester.tap(find.text('Trennen'));
+    await tester.pumpAndSettle();
     expect(container.read(activeErgSourceProvider), isNull);
     await disposeWidgetsWithDatabase(tester);
   });

@@ -38,6 +38,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startConnectsLater => 'Connects when you start rowing';
 
   @override
+  String get startDisconnect => 'Disconnect';
+
+  @override
   String get startSimulatorFtmsHint =>
       'Like an FTMS rower, without stroke details';
 
@@ -288,9 +291,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bluetoothUnsupported =>
       'This device does not support Bluetooth LE.';
-
-  @override
-  String get liveDisconnect => 'Disconnect';
 
   @override
   String get liveStale => 'No data for 3 seconds, the values are out of date.';
