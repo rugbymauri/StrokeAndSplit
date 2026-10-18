@@ -55,6 +55,8 @@ Hängt an den Gruppen 2–5.
 
 - [x] 7.1 `LiveScreen`/`CourseLiveView` lesen die Ghosts aus 2.2 für die laufende Vorlage, berechnen mit 3.2 und 3.3 bei jedem Tick `FrameGhost` und `GhostGap` und geben sie an `PaceBox` weiter, hochkant und quer. Frei rudern zeigt keinen Ghost. Verifikation: Widget-Tests mit Test-Datenbank und simuliertem Verlauf für „Runde 2“ (Rundenspur mit Ghost, Abstand in der Box), „Offene Rundenzahl“ (kein Abstand, Rundenspur mit Ghost), „Freier Abschnitt“ (Abschnittsspur ohne Ghost) und frei rudern
 
+- [x] 7.2 Auf einer Zeitstrecke gibt `LiveScreen` keinen `FrameGhost` weiter, der Abstand in Metern bleibt in der Pace-Box (D6). Verifikation: Widget-Test „Zeitstrecke“ in `live_screen_test.dart`
+
 ## 8. Abschluss
 
 - [x] 8.1 README um den Ghost ergänzen: wer auf welcher Spur Ghost ist, dass er mit jeder Runde bzw. Zonenfahrt neu startet, was der Abstand in der Box misst, und dass Simulator-Sessions nie Ghost sind. Verifikation: `make check` grün, `openspec validate ghost --strict` gültig, Durchsicht des README
