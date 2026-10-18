@@ -782,6 +782,27 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
+    testWidgets('Zeitstrecke: no ghost in the frame, the gap in metres in the box', (tester) async {
+      final template =
+          await templateOn(tester, CourseDefinition.single(axis: CourseAxis.time, length: 240), laps: 1);
+      // The best so far: 1 000 m in four minutes.
+      await tester.runAsync(
+          () => storeRowedSessionWithSamples(db, template: template, laps: [RowedLap.single(240000, 1000)]));
+
+      // 520 m after two minutes, where the ghost was at 500 m.
+      await show(
+        tester,
+        rowing(template, inLap: 120, lapSeconds: 120, courseSeconds: 120, segmentSeconds: 120, courseMetres: 520),
+      );
+
+      final box = paceBox(tester);
+      expect(box.ghost, isNull);
+      expect(box.ghostGap!.axis, CourseAxis.time);
+      expect(box.ghostGap!.ghostAhead, isFalse);
+      expect(box.ghostGap!.amount, closeTo(20, 1));
+      await disposeWidgetsWithDatabase(tester);
+    });
+
     testWidgets('rowing free shows no ghost', (tester) async {
       final template =
           await templateOn(tester, CourseDefinition.single(axis: CourseAxis.distance, length: 1000), laps: 1);

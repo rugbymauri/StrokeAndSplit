@@ -13,6 +13,13 @@ Läuft eine Vorlage mit Ghost, SHALL der Fortschrittsrahmen auf jeder Spur, für
 - **WHEN** für den Ghost nur Daten zur Runde vorhanden sind, nicht zum Segment
 - **THEN** zeigt nur die Rundenspur ein Ghost-Schiffchen
 
+### Requirement: Kein Ghost-Schiffchen auf Zeitstrecken
+Auf einer Zeitstrecke SHALL der Fortschrittsrahmen kein Ghost-Schiffchen zeigen, weil der Ghost dort immer an derselben Stelle stünde wie der Nutzer. Vorsprung oder Rückstand MUST dann allein die Pace-Box in Metern zeigen.
+
+#### Scenario: Zeitstrecke
+- **WHEN** der Nutzer eine Vorlage auf „Vier Minuten“ rudert und es dafür schon einen Ghost gibt
+- **THEN** zeigt der Rahmen auf keiner Spur ein Ghost-Schiffchen, und die Box zeigt den Abstand in Metern
+
 ### Requirement: Abstand zum Ghost anzeigen
 Läuft auf der Streckenspur ein Ghost, SHALL die Pace-Box den Abstand zu diesem Ghost der Vorlage zeigen: auf einer Distanzachse in Sekunden, auf einer Zeitachse in Metern. Sie MUST kennzeichnen, ob der Nutzer vorne oder hinten liegt, nicht allein über Farbe. Läuft auf der Streckenspur kein Ghost, MUST die Box keinen Abstand zeigen.
 

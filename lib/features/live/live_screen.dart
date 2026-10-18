@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../app/platform_providers.dart';
+import '../../data/db/database.dart' show CourseAxis;
 import '../../data/courses/lap_tracker.dart';
 import '../../data/ghost/ghost_progress.dart';
 import '../../data/ghost/ghost_providers.dart';
@@ -213,7 +214,10 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
       course: template.course.definition,
       outdated: _stale,
       forceCurves: forceCurves,
-      ghost: FrameGhost(course: shares.course, lap: shares.lap, segment: shares.segment),
+      // On a time course the ghost stands where the rower is; the box shows the gap in metres instead.
+      ghost: template.course.axis == CourseAxis.time
+          ? null
+          : FrameGhost(course: shares.course, lap: shares.lap, segment: shares.segment),
       ghostGap: ghostGap(lap, template.course.axis, ghosts.course),
       action: _sessionButton(recording, connected),
       shortAction: _sessionButton(recording, connected, short: true),
