@@ -77,9 +77,9 @@ void main() {
 
     expect(find.byType(CourseDetailScreen), findsOneWidget);
     expect(find.text('BESTENLISTE 1000 M · AKTUELL'), findsOneWidget);
-    expect(_place(tester, '1000', 1), ['1', '4:08.0', '1.10.2026', '2:04.0 /500 m']);
-    expect(_place(tester, '1000', 2), ['2', '4:09.0', '5.10.2026', '2:04.5 /500 m']);
-    expect(_place(tester, '1000', 3), ['3', '4:10.0', '1.10.2026', '2:05.0 /500 m']);
+    expect(_place(tester, '1000', 1), ['1', '4:08.0', '1.10.2026', '2:04 /500 m']);
+    expect(_place(tester, '1000', 2), ['2', '4:09.0', '5.10.2026', '2:05 /500 m']);
+    expect(_place(tester, '1000', 3), ['3', '4:10.0', '1.10.2026', '2:05 /500 m']);
     expect(find.byKey(const Key('place-4')), findsNothing);
     expect(find.text('Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
@@ -165,7 +165,7 @@ void main() {
     await setup.open(tester, 'Seerunde');
 
     expect(find.text('BEST RESULTS 1000 M · CURRENT'), findsOneWidget);
-    expect(_place(tester, '1000', 1), ['1', '4:10.0', '10/1/2026', '2:05.0 /500 m']);
+    expect(_place(tester, '1000', 1), ['1', '4:10.0', '10/1/2026', '2:05 /500 m']);
     expect(find.byTooltip('Edit'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });

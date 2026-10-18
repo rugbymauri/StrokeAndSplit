@@ -564,10 +564,10 @@ void main() {
 
       expect(inCard(id, find.text('BESTLEISTUNGEN')), findsOneWidget);
       expect(inPlace(1, '12:24.0'), findsOneWidget);
-      expect(inPlace(1, '2:04.0 /500 m'), findsOneWidget);
+      expect(inPlace(1, '2:04 /500 m'), findsOneWidget);
       expect(inPlace(1, '3.10.2026'), findsOneWidget);
       expect(inPlace(2, '12:30.0'), findsOneWidget);
-      expect(inPlace(2, '2:05.0 /500 m'), findsOneWidget);
+      expect(inPlace(2, '2:05 /500 m'), findsOneWidget);
       expect(inPlace(2, '1.10.2026'), findsOneWidget);
       expect(find.byKey(const Key('template-place-3')), findsNothing);
       expect(find.byKey(const Key('template-podium-hint')), findsNothing);

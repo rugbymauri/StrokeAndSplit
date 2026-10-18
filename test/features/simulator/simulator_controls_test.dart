@@ -19,7 +19,7 @@ void main() {
     await tester.tap(find.byTooltip('Schneller'));
     await tester.pump();
     expect(source.targetPace, const Duration(minutes: 2, seconds: 5));
-    expect(find.text('2:05.0'), findsOneWidget);
+    expect(find.text('2:05'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Langsamer'));
     await tester.tap(find.byTooltip('Langsamer'));

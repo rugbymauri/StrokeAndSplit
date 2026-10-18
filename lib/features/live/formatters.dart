@@ -8,13 +8,11 @@ import '../../l10n/l10n.dart';
 
 const _noValue = '–';
 
-/// Pace per 500 m with tenths, e.g. `2:05.3`.
+/// Pace per 500 m in whole seconds, e.g. `2:05`.
 String formatPace(Duration? pace) {
-  if (pace == null) return '–:––.–';
-  final tenths = (pace.inMilliseconds / 100).round();
-  final minutes = tenths ~/ 600;
-  final seconds = (tenths % 600) ~/ 10;
-  return '$minutes:${_two(seconds)}.${tenths % 10}';
+  if (pace == null) return '–:––';
+  final seconds = (pace.inMilliseconds / 1000).round();
+  return '${seconds ~/ 60}:${_two(seconds % 60)}';
 }
 
 /// Elapsed time, e.g. `12:34` or `1:02:03`.

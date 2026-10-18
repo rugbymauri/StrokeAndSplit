@@ -42,3 +42,16 @@ Das Live-Display SHALL bei mehr Breite als Höhe ein eigenes Querformat-Layout v
 #### Scenario: Handy quer mit Vorlage
 - **WHEN** das Handy im Querformat steckt und eine Vorlage läuft
 - **THEN** steht die Pace-Box mit Fortschrittsrahmen links fast über die volle Höhe, und Schlagzahl und weitere Werte stehen daneben
+
+## MODIFIED Requirements
+
+### Requirement: Werte in gewohnten Formaten anzeigen
+Pace und Zeit SHALL im Format Minuten:Sekunden angezeigt werden (z.B. „2:05“ bzw. „12:34“), die Pace in ganzen Sekunden ohne Zehntel, Distanz in ganzen Metern, Watt und Schlagzahl als ganze Zahlen, so wie es Ruderer vom PM5 kennen.
+
+#### Scenario: Pace-Darstellung
+- **WHEN** die aktuelle Pace 125,3 Sekunden pro 500 m beträgt
+- **THEN** zeigt das Display „2:05“
+
+#### Scenario: Pace wird auf ganze Sekunden gerundet
+- **WHEN** die aktuelle Pace 125,6 Sekunden pro 500 m beträgt
+- **THEN** zeigt das Display „2:06“

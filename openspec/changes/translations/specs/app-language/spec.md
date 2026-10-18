@@ -44,7 +44,7 @@ Namen, die der Nutzer vergibt (Zonen, Strecken, Vorlagen), und Namen von Geräte
 - **THEN** steht sie als „Seerunde x3“ in der Liste
 
 ### Requirement: Formate nach Sprache
-Datum, Uhrzeit und Dezimalzahlen SHALL im Format der gewählten Sprache erscheinen. Pace, Zeiten und Rundenzeiten MUST in jeder Sprache das Format des PM5 behalten (`2:05.3`, `12:34`).
+Datum, Uhrzeit und Dezimalzahlen SHALL im Format der gewählten Sprache erscheinen. Pace, Zeiten und Rundenzeiten MUST in jeder Sprache das Format des PM5 behalten (`2:05`, `12:34`).
 
 #### Scenario: Datum und Dezimalzahl auf Deutsch
 - **WHEN** die Oberfläche deutsch ist und eine Session am 15. Oktober 2026 um 18:30 mit Ø 22.5 Schlägen pro Minute gespeichert ist
@@ -56,4 +56,4 @@ Datum, Uhrzeit und Dezimalzahlen SHALL im Format der gewählten Sprache erschein
 
 #### Scenario: Pace in jeder Sprache gleich
 - **WHEN** die Pace 2 Minuten 5,3 Sekunden pro 500 m beträgt
-- **THEN** steht sie in jeder Sprache als „2:05.3“
+- **THEN** steht sie in jeder Sprache als „2:05“
