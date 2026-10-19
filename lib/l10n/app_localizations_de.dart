@@ -1014,7 +1014,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get rankingPausesHint =>
-      'Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.';
+      'Pausen zählen nicht, auch nicht in der Pace. Ausnahme: ältere Sessions ohne automatische Pause.';
 
   @override
   String get rankingEmpty =>

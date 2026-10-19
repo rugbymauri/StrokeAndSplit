@@ -81,7 +81,10 @@ void main() {
     expect(_place(tester, '1000', 2), ['2', '4:09.0', '5.10.2026', '2:05 /500 m']);
     expect(_place(tester, '1000', 3), ['3', '4:10.0', '1.10.2026', '2:05 /500 m']);
     expect(find.byKey(const Key('place-4')), findsNothing);
-    expect(find.text('Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.'), findsOneWidget);
+    expect(
+      find.text('Pausen zählen nicht, auch nicht in der Pace. Ausnahme: ältere Sessions ohne automatische Pause.'),
+      findsOneWidget,
+    );
     await disposeWidgetsWithDatabase(tester);
   });
 

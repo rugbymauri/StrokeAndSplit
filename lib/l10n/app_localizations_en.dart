@@ -1010,7 +1010,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rankingPausesHint =>
-      'Measured by the wall clock: pauses count, also in the pace.';
+      'Pauses don\'t count, not even in the pace. Except: older sessions without automatic pausing.';
 
   @override
   String get rankingEmpty =>

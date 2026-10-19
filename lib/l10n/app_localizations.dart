@@ -1177,7 +1177,7 @@ abstract class AppLocalizations {
   /// **'Bei offener Rundenzahl gibt es keine Bestzeit.'**
   String get templatePodiumOpenLaps;
 
-  /// Templates: pace per 500 m of a place, pauses included
+  /// Templates: pace per 500 m of a place, pauses left out
   ///
   /// In de, this message translates to:
   /// **'{pace} /500 m'**
@@ -1651,16 +1651,16 @@ abstract class AppLocalizations {
   /// **'Platz {place}'**
   String rankingPlace(int place);
 
-  /// Rankings: pace per 500 metres of an entry, pauses included
+  /// Rankings: pace per 500 metres of an entry, pauses left out
   ///
   /// In de, this message translates to:
   /// **'{pace} /500 m'**
   String rankingPace(String pace);
 
-  /// Course and zone details: hint below the rankings that times and paces include pauses
+  /// Course and zone details: hint below the rankings that times and paces leave out pauses, except in sessions recorded before the automatic pause (Change auto-pause)
   ///
   /// In de, this message translates to:
-  /// **'Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.'**
+  /// **'Pausen zählen nicht, auch nicht in der Pace. Ausnahme: ältere Sessions ohne automatische Pause.'**
   String get rankingPausesHint;
 
   /// Course and zone details: shown instead of places when nothing was rowed yet

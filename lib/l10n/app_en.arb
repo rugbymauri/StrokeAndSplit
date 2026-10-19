@@ -259,7 +259,7 @@
   "rankingLengthCurrent": "Best results {length} · current",
   "rankingPlace": "Place {place}",
   "rankingPace": "{pace} /500 m",
-  "rankingPausesHint": "Measured by the wall clock: pauses count, also in the pace.",
+  "rankingPausesHint": "Pauses don't count, not even in the pace. Except: older sessions without automatic pausing.",
   "rankingEmpty": "No best time yet. Only complete laps on an erg count, not in the simulator.",
   "rankingLoadFailed": "Could not load the best results: {error}",
   "courseZoneFrom": "from {start}",
