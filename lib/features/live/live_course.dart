@@ -225,9 +225,10 @@ class CourseLiveView extends StatelessWidget {
         ],
       );
 
-  /// Time and distance of the whole session, as in free rowing.
+  /// Time and distance of the whole session, as in free rowing, and the calories when the rower sends them.
   List<Widget> _sessionTiles(BuildContext context, double fontSize) {
     final l10n = context.l10n;
+    final calories = tick?.calories;
     return [
       MetricTile(
         label: l10n.metricTime,
@@ -244,6 +245,14 @@ class CourseLiveView extends StatelessWidget {
         fontSize: fontSize,
         compact: true,
       ),
+      if (calories != null)
+        MetricTile(
+          label: l10n.metricCalories,
+          value: formatWhole(calories),
+          valueKey: const Key('metric-calories'),
+          fontSize: fontSize,
+          compact: true,
+        ),
     ];
   }
 
