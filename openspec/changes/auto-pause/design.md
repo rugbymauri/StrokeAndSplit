@@ -76,7 +76,7 @@ Sessionzeit = Wanduhr minus abgeschlossene Pausen minus laufende Pause. Der Accu
 - [Bis zur Erkennung zählt der Stillstand zur Session, etwa Rhythmus + 3 s pro Pause] → So gewollt, damit die Zeit nie rückwärts läuft.
 - [`laps.*_wall_ms` heisst anders, als es ab Schema 7 enthält] → Kommentar im Schema und hier; Umbenennen bei Bedarf in einem späteren Change.
 - [Offene Changes mit Schema-Änderungen (`force-curve`, `heart-rate`-Nacharbeiten) kollidieren bei der Schema-Nummer] → Wer später merged, zählt hoch und erzeugt den Snapshot neu.
-- [Der Change `statistics` (noch nicht archiviert) verlangt „Pause zählt mit“] → Kann hier nicht per Delta geändert werden, weil seine Spec noch nicht unter `openspec/specs` liegt; beim Archivieren von `statistics` bzw. danach dieses Changes nachziehen.
+- [Der Change `statistics` (noch nicht archiviert) verlangte „Pause zählt mit“] → Kann hier nicht per Delta geändert werden, weil seine Spec noch nicht unter `openspec/specs` liegt. Darum direkt in `openspec/changes/statistics` angepasst (Szenario „Pause zählt nicht“, D4 Pace, Proposal) mit Verweis auf diesen Change.
 
 ## Migration Plan
 
@@ -84,10 +84,10 @@ Schema 6 → 7: `samples.active_ms` (nullable), `sessions.pause_count` und `sess
 
 ## Open Questions
 
-Defaults sind gesetzt und umgesetzt; der Nutzer kann sie später ändern, ohne dass sich der Aufbau ändert:
+Keine. Die folgenden Punkte waren offen und sind mit dem Nutzer entschieden (2026-10-19), wie umgesetzt:
 
-1. **Schwelle relativ zum Rhythmus:** Umgesetzt ist „3 s nach dem fälligen Schlag“ statt „3 s nach dem letzten Schlag“ (D1). Soll es wörtlich 3 s ab dem letzten Schlag sein, pausieren langsame Rhythmen unter etwa 20 Schlägen pro Minute fälschlich.
-2. **Pause vor dem ersten Schlag bei freiem Rudern:** Wer „Session starten“ wählt und erst später rudert, bekommt nach 3 s eine Pause, die in der Zusammenfassung mitzählt. Alternative: Die Sessionzeit startet erst mit dem ersten Schlag, wie bei Vorlagen.
-3. **Pause am Ende:** Eine beim Beenden laufende Pause wird verworfen und nicht gezählt. Alternative: als Pause speichern.
-4. **Ghost in der Pause:** Der Ghost steht still, weil er auf der Sessionzeit läuft. Alternative wäre ein Ghost, der auf der Wanduhr weiterfährt.
-5. **Gemischte Ranglisten:** Alte Runden mit Pausen bleiben in den Ranglisten. Alternative: alte Sessions beim Update aus den Rohdaten neu berechnen.
+1. **Schwelle relativ zum Rhythmus:** „3 s nach dem fälligen Schlag“ (D1), nicht „3 s nach dem letzten Schlag“. Sonst pausierten langsame Rhythmen unter etwa 20 Schlägen pro Minute fälschlich.
+2. **Pause vor dem ersten Schlag bei freiem Rudern:** Freies Rudern startet weiterhin sofort. Wer erst später rudert, bekommt nach 3 s eine Pause, die in der Zusammenfassung mitzählt.
+3. **Pause am Ende:** Eine beim Beenden laufende Pause wird verworfen und nicht gezählt.
+4. **Ghost in der Pause:** Der Ghost steht still, weil er auf der Sessionzeit läuft.
+5. **Gemischte Ranglisten:** Alte Runden mit Pausen bleiben unverändert in den Ranglisten; sie werden nicht aus den Rohdaten neu berechnet.
