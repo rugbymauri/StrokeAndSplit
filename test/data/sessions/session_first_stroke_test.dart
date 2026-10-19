@@ -104,7 +104,10 @@ void main() {
       expect(samples.first.wallMs, lessThan(10), reason: 'the last of the packets of the base status');
       // The rower starts at 0 m and 0:00 itself, so the session has all of it.
       expect(session.distanceDm, (ticks.last.distanceMeters * 10).round());
-      expect(session.durationMs, ticks.last.elapsed.inMilliseconds);
+      // The session time leaves out the pauses of the recording (Change auto-pause).
+      final activeMs = samples.map((s) => s.activeMs!).reduce((a, b) => a > b ? a : b);
+      expect(session.durationMs, activeMs);
+      expect(activeMs, lessThan(samples.last.wallMs!));
       final raw = await db.select(db.rawPackets).get();
       expect(raw, hasLength(packets.length - first), reason: 'raw packets from the base on');
       expect(raw.first.tMs, 0);

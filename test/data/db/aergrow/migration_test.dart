@@ -16,6 +16,7 @@ import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
 import 'generated/schema_v5.dart' as v5;
+import 'generated/schema_v6.dart' as v6;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -87,7 +88,7 @@ void main() {
 
       final db = AppDatabase(schema.newConnection());
       // The repository reads the current schema.
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
       final repository = SessionRepository(db);
 
       final session = (await repository.get(1))!;
@@ -265,7 +266,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.deviceName, session.strokeCount),
@@ -364,7 +365,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.courseVersionId), (ErgProtocol.pm5, 1));
@@ -425,7 +426,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
 
       final sessions = await (db.select(db.sessions)
             ..orderBy([(s) => OrderingTerm.asc(s.id)]))
@@ -450,7 +451,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.imported), (ErgProtocol.pm5, false));
@@ -517,7 +518,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
 
       final sessions = await (db.select(db.sessions)
             ..orderBy([(s) => OrderingTerm.asc(s.id)]))
@@ -545,7 +546,7 @@ void main() {
       await old.close();
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.strokeCount), (ErgProtocol.pm5, 20));
@@ -571,6 +572,69 @@ void main() {
 
       await (db.delete(db.sessions)..where((s) => s.id.equals(id))).go();
       expect(await db.select(db.rrIntervals).get(), isEmpty);
+      await db.close();
+    });
+  });
+
+  group('to version 7', () {
+    test('keeps the sessions of version 6 with their times and no pauses', () async {
+      final schema = await verifier.schemaAt(6);
+      final old = v6.DatabaseAtV6(schema.newConnection());
+      await old.batch((b) {
+        b.insert(
+          old.sessions,
+          v6.SessionsCompanion.insert(
+            startedAt: 0,
+            status: 'complete',
+            source: 'pm5',
+            durationMs: const Value(90000),
+            distanceDm: const Value(2500),
+          ),
+        );
+        b.insert(
+          old.samples,
+          v6.SamplesCompanion.insert(
+            sessionId: 1,
+            tMs: 60000,
+            distanceDm: 2500,
+            wallMs: const Value(90000),
+          ),
+        );
+      });
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 7);
+
+      final session = (await db.select(db.sessions).get()).single;
+      expect(
+        (session.durationMs, session.pauseCount, session.pausedMs),
+        (90000, 0, 0),
+      );
+      final sample = (await db.select(db.samples).get()).single;
+      expect((sample.tMs, sample.wallMs, sample.activeMs), (60000, 90000, null));
+      expect(await db.select(db.pauses).get(), isEmpty);
+      await db.close();
+    });
+
+    test('stores pauses and deletes them with their session', () async {
+      final db = openTestDatabase();
+      final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
+            startedAt: DateTime(2026, 10, 18),
+            status: SessionStatus.complete,
+            source: ErgSourceKind.pm5,
+          ));
+      await db.into(db.pauses).insert(
+            PausesCompanion.insert(
+              sessionId: id,
+              startWallMs: 60000,
+              endWallMs: 90000,
+            ),
+          );
+      expect(await db.select(db.pauses).get(), hasLength(1));
+
+      await (db.delete(db.sessions)..where((s) => s.id.equals(id))).go();
+      expect(await db.select(db.pauses).get(), isEmpty);
       await db.close();
     });
   });

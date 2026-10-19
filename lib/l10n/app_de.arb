@@ -435,6 +435,10 @@
   "@liveReadyForFirstStroke": {
     "description": "Live display on a template: notice while the session waits for the first stroke to start"
   },
+  "livePaused": "Pause",
+  "@livePaused": {
+    "description": "Live display: large notice while the session is paused because the rower stopped; it goes on with the next stroke"
+  },
   "liveForceCurve": "Kraftkurve",
   "@liveForceCurve": {
     "description": "Live display: title of the force curve of the last stroke"
@@ -697,6 +701,15 @@
   "@sessionStrokes": {
     "description": "Summary: label of the number of strokes"
   },
+  "summaryPauses": "{count, plural, =1{1 Pause} other{{count} Pausen}}",
+  "@summaryPauses": {
+    "description": "Summary: label of the tile with the total time of the pauses of a session, with their number (Change auto-pause)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sessionLap": "Runde {lap}",
   "@sessionLap": {
     "description": "Summary: a lap of the course",
@@ -922,7 +935,7 @@
   },
   "templatePodiumPace": "{pace} /500 m",
   "@templatePodiumPace": {
-    "description": "Templates: pace per 500 m of a place, pauses included",
+    "description": "Templates: pace per 500 m of a place, pauses left out",
     "placeholders": {
       "pace": {
         "type": "String",
@@ -1375,7 +1388,7 @@
   },
   "rankingPace": "{pace} /500 m",
   "@rankingPace": {
-    "description": "Rankings: pace per 500 metres of an entry, pauses included",
+    "description": "Rankings: pace per 500 metres of an entry, pauses left out",
     "placeholders": {
       "pace": {
         "type": "String",
@@ -1383,9 +1396,9 @@
       }
     }
   },
-  "rankingPausesHint": "Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.",
+  "rankingPausesHint": "Pausen zählen nicht, auch nicht in der Pace. Ausnahme: ältere Sessions ohne automatische Pause.",
   "@rankingPausesHint": {
-    "description": "Course and zone details: hint below the rankings that times and paces include pauses"
+    "description": "Course and zone details: hint below the rankings that times and paces leave out pauses, except in sessions recorded before the automatic pause (Change auto-pause)"
   },
   "rankingEmpty": "Noch keine Bestzeit. Es zählen nur vollständige Runden am Rudergerät, nicht im Simulator.",
   "@rankingEmpty": {

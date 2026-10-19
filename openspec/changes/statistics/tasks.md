@@ -9,7 +9,7 @@ Sie starten deshalb erst, wenn `ui-design` umgesetzt ist (siehe `docs/implementa
 
 ## 1. Ranglisten berechnen
 
-- [x] 1.1 Typen für Rangliste und Eintrag mit Wert, Pace, Datum und Verweis auf Session, Runde, Abschnittsposition sowie Beginn und Ende (Wanduhr, Distanz) nach Design D5. Dazu eine reine Funktion, die Einträge nach Achse wertet (Zeit aufsteigend, Meter absteigend, bei Gleichstand der frühere vorne) und die Pace mit Pausen berechnet (D4). Verifikation: Unit-Tests für die Spec-Szenarien „Distanzzone“, „Zeitstrecke“, „Pause zählt mit“ und „Gleichstand“
+- [x] 1.1 Typen für Rangliste und Eintrag mit Wert, Pace, Datum und Verweis auf Session, Runde, Abschnittsposition sowie Beginn und Ende (Wanduhr, Distanz) nach Design D5. Dazu eine reine Funktion, die Einträge nach Achse wertet (Zeit aufsteigend, Meter absteigend, bei Gleichstand der frühere vorne) und die Pace mit Pausen berechnet (D4). Verifikation: Unit-Tests für die Spec-Szenarien „Distanzzone“, „Zeitstrecke“, „Pause zählt nicht“ (vormals „Pause zählt mit“, angepasst mit Change `auto-pause`) und „Gleichstand“
 - [x] 1.2 Rangliste einer Strecke als Abfrage über `laps` und `course_versions`, gruppiert nach Länge der geruderten Version, nur vollständige Runden (D2). Verifikation: Unit-Tests mit der Test-Datenbank für „Über Vorlagen hinweg“, „Länge geändert“, „Nur Zonen geändert“ und eine unvollständige Runde, die nicht zählt
 - [x] 1.3 Rangliste einer Zone als Abfrage über `lap_segments` und das `course_segments` der geruderten Version, gruppiert nach Abschnittslänge, nur aus vollständigen Runden. Beginn und Ende des Abschnitts aus dem Rundenbeginn und den Abschnitten davor (D2, D5). Verifikation: Unit-Tests für „Über Strecken hinweg“, „Mehrfach in einer Session“ (sechs Einträge) und „Zone verlängert“, dazu ein Test, dass Beginn und Ende des zweiten Sprints einer Runde stimmen
 - [x] 1.4 Rangliste einer Vorlage: Sessions mit `plannedLaps` vollständigen Runden, Summe der Runden, gruppiert nach Streckenlänge und Rundenzahl, keine Rangliste bei offener Rundenzahl (D2). Verifikation: Unit-Tests für „Drei Runden“, „Abgebrochene Session“, „Rundenzahl geändert“ und „Offene Rundenzahl“
@@ -19,7 +19,7 @@ Sie starten deshalb erst, wenn `ui-design` umgesetzt ist (siehe `docs/implementa
 
 ## 2. Detailansicht von Strecke und Zone
 
-- [x] 2.1 Detailansicht einer Strecke, die sich per Tipp aus der Streckenliste öffnet. Sie zeigt die Plätze 1–3 pro Länge, die aktuelle Länge zuerst, mit Wert, Pace und Datum, einen Hinweis, dass Pausen mitzählen, und den Weg zum Bearbeiten. Ohne Eintrag erscheint ein Hinweis statt der Plätze. Gestaltung im Stil von `ui-design`. Verifikation: Widget-Tests für „Mehrere Längen“, eine Strecke ohne Einträge und den Weg zum Editor
+- [x] 2.1 Detailansicht einer Strecke, die sich per Tipp aus der Streckenliste öffnet. Sie zeigt die Plätze 1–3 pro Länge, die aktuelle Länge zuerst, mit Wert, Pace und Datum, einen Hinweis, dass Pausen nicht zählen (vor `auto-pause`: mitzählen), und den Weg zum Bearbeiten. Ohne Eintrag erscheint ein Hinweis statt der Plätze. Gestaltung im Stil von `ui-design`. Verifikation: Widget-Tests für „Mehrere Längen“, eine Strecke ohne Einträge und den Weg zum Editor
 - [x] 2.2 Dasselbe für Zonen, geöffnet aus der Zonenliste. Verifikation: Widget-Tests für „Zone ansehen“ und eine Zone mit zwei Längen
 
 ## 3. Plätze in der Vorlagenwahl

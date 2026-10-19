@@ -335,6 +335,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveReadyForFirstStroke => 'Ready – starts with your first stroke';
 
   @override
+  String get livePaused => 'Paused';
+
+  @override
   String get liveForceCurve => 'Force curve';
 
   @override
@@ -511,6 +514,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sessionStrokes => 'Strokes';
+
+  @override
+  String summaryPauses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pauses',
+      one: '1 pause',
+    );
+    return '$_temp0';
+  }
 
   @override
   String sessionLap(int lap) {
@@ -996,7 +1010,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rankingPausesHint =>
-      'Measured by the wall clock: pauses count, also in the pace.';
+      'Pauses don\'t count, not even in the pace. Except: older sessions without automatic pausing.';
 
   @override
   String get rankingEmpty =>

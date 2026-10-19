@@ -204,6 +204,7 @@ void main() {
     expect(find.text('2512 m'), findsOneWidget);
     expect(find.text('In der Zone'), findsNothing);
     expect(find.text('RUNDEN'), findsNothing);
+    expect(find.byKey(const Key('summary-pauses')), findsNothing, reason: 'no pauses');
     for (final value in ['Ø Pace 2:05', 'Ø spm 22,5', 'Ø Watt 178', 'Schläge 236']) {
       expect(find.text(value), findsOneWidget, reason: value);
     }
@@ -215,6 +216,28 @@ void main() {
     expect(find.text('open'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
+
+  for (final (locale, count, label) in const [('de', 1, '1 Pause'), ('de', 2, '2 Pausen'), ('en', 2, '2 pauses')]) {
+    testWidgets('shows $label with their total time ($locale)', (tester) async {
+      final db = openTestDatabase();
+      final id = await tester.runAsync(() => db.into(db.sessions).insert(SessionsCompanion.insert(
+            startedAt: _startedAt,
+            status: SessionStatus.complete,
+            source: ErgSourceKind.pm5,
+            durationMs: const Value(630000),
+            distanceDm: const Value(25120),
+            pauseCount: Value(count),
+            pausedMs: const Value(95000),
+          )));
+      await _pump(tester, db, id!, locale: Locale(locale));
+
+      final tile = find.byKey(const Key('summary-pauses'));
+      expect(find.descendant(of: tile, matching: find.text(label)), findsOneWidget);
+      expect(find.descendant(of: tile, matching: find.text('1:35')), findsOneWidget);
+      expect(find.text('10:30'), findsOneWidget, reason: 'the time without the pauses');
+      await disposeWidgetsWithDatabase(tester);
+    });
+  }
 
   testWidgets('shows the summary in English', (tester) async {
     final db = openTestDatabase();

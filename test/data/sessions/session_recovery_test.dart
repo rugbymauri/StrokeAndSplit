@@ -31,7 +31,10 @@ void main() {
     final session = await repository.get(id);
     expect(recovered, 1);
     expect(session!.status, SessionStatus.incomplete);
-    expect(session.durationMs, writtenProgress.elapsed.inMilliseconds);
+    // The session time of the last stored sample (Change auto-pause).
+    final stored = await db.select(db.samples).get();
+    expect(session.durationMs, stored.map((s) => s.activeMs!).reduce((a, b) => a > b ? a : b));
+    expect(session.durationMs, lessThanOrEqualTo(writtenProgress.elapsed.inMilliseconds));
     expect(session.distanceDm, (writtenProgress.distanceMeters * 10).round());
     expect(session.distanceDm, greaterThan(0));
   });
@@ -75,7 +78,8 @@ void main() {
     final laps = await db.select(db.laps).get();
     expect([for (final l in laps) (l.lapNo, l.complete)], [(1, true), (2, true), (3, false)]);
     expect(laps.last.startDistanceDm, laps[1].endDistanceDm);
-    expect((laps.last.endWallMs, laps.last.endDistanceDm), (lastSample.wallMs, lastSample.distanceDm));
+    // Laps run on the session time (Change auto-pause).
+    expect((laps.last.endWallMs, laps.last.endDistanceDm), (lastSample.activeMs, lastSample.distanceDm));
     expect((await repository.get(id))!.status, SessionStatus.incomplete);
     final segments = await db.select(db.lapSegments).get();
     expect([for (final s in segments) s.lapNo], [1, 2, 3]);

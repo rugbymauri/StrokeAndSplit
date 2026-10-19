@@ -158,6 +158,10 @@ class Sessions extends Table {
   IntColumn get averageHeartRate => integer().nullable()();
   IntColumn get maxHeartRate => integer().nullable()();
   IntColumn get rmssdMs => integer().nullable()();
+
+  // Pause summary (Change auto-pause, Design D3); sessions before schema 7 have none.
+  IntColumn get pauseCount => integer().withDefault(const Constant(0))();
+  IntColumn get pausedMs => integer().withDefault(const Constant(0))();
 }
 
 /// Session-relative values per status tick (Design D6/D7).
@@ -176,6 +180,11 @@ class Samples extends Table {
   /// Wall-clock time since the first notification; keeps running while the
   /// PM5 pauses its clock. Null for sessions recorded before schema 2.
   IntColumn get wallMs => integer().nullable()();
+
+  /// Session time: the wall-clock time without the pauses of the session
+  /// (Change auto-pause, Design D2). Null for sessions recorded before
+  /// schema 7, which had no pauses; their session time is [wallMs].
+  IntColumn get activeMs => integer().nullable()();
 }
 
 @DataClassName('StrokeRow')
@@ -216,7 +225,9 @@ class RrIntervals extends Table {
   IntColumn get rrMs => integer()();
 }
 
-/// The laps of a session on a course; times are wall-clock times.
+/// The laps of a session on a course. The `*WallMs` times are session times
+/// (Change auto-pause, Design D2): the wall clock without the pauses, which
+/// sessions before schema 7 did not know, so for them it is the wall clock.
 @DataClassName('LapRow')
 class Laps extends Table {
   IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
@@ -236,6 +247,18 @@ class Laps extends Table {
 
   @override
   Set<Column> get primaryKey => {sessionId, lapNo};
+}
+
+/// The pauses of a session (Change auto-pause, Design D3), on the
+/// wall-clock axis of its samples and raw notifications.
+@DataClassName('PauseRow')
+class Pauses extends Table {
+  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get startWallMs => integer()();
+  IntColumn get endWallMs => integer()();
+
+  @override
+  Set<Column> get primaryKey => {sessionId, startWallMs};
 }
 
 @DataClassName('LapSegmentRow')
@@ -266,6 +289,7 @@ class LapSegments extends Table {
     Laps,
     LapSegments,
     RrIntervals,
+    Pauses,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -283,7 +307,7 @@ class AppDatabase extends _$AppDatabase {
       ));
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -334,6 +358,14 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(schema.sessions, schema.sessions.rmssdMs);
             await m.createTable(schema.rrIntervals);
             await m.createIndex(schema.rrIntervalsSessionTime);
+          },
+          // Auto-pause (Change auto-pause, Design D3); existing sessions keep
+          // their times and have no pauses.
+          from6To7: (m, schema) async {
+            await m.addColumn(schema.sessions, schema.sessions.pauseCount);
+            await m.addColumn(schema.sessions, schema.sessions.pausedMs);
+            await m.addColumn(schema.samples, schema.samples.activeMs);
+            await m.createTable(schema.pauses);
           },
         ),
         beforeOpen: (details) async {

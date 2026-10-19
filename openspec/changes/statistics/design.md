@@ -15,7 +15,7 @@ Alles, was die Ranglisten brauchen, wird seit `courses` und `zones` schon gespei
     +--> templateId, plannedLaps, source, startedAt
 ```
 
-- Die Zeiten von Runden und Abschnitten sind Wanduhrzeiten inklusive Pausen (`course-rowing`, „Fortschritt nach Wanduhr messen“).
+- Die Zeiten von Runden und Abschnitten sind Sessionzeiten ohne Pausen (`course-rowing`, „Fortschritt nach Sessionzeit messen“, Change `auto-pause`). Bei Sessions von vor `auto-pause` sind es Wanduhrzeiten inklusive Pausen.
 - Eine Zone gehört zu einem Abschnitt einer Runde über `lap_segments.position` und das `course_segments` der Version, die die Session gerudert hat. Dort steht auch die Länge der Zone zu diesem Zeitpunkt.
 - Strecken und Zonen werden weich gelöscht (`deletedAt`). Eine gelöschte Vorlage setzt `sessions.templateId` auf `NULL`, eine gelöschte Session löscht ihre Runden und Abschnitte mit.
 
@@ -64,7 +64,7 @@ Zeigt sich am Gerät, dass die Abfragen zu langsam sind, kommt ein Index auf `la
 
 ### D4: Pace
 
-Pace pro 500 m = Wanduhrzeit des Eintrags ÷ Distanz × 500. Pausen gehen also in die Pace ein. Sie passt dann zur Zeit, nach der der Platz bestimmt wird, auch wenn sie von der Ruder-Pace im Live-Display abweicht.
+Pace pro 500 m = Sessionzeit des Eintrags ÷ Distanz × 500. Seit Change `auto-pause` gehen Pausen weder in die Zeit noch in die Pace ein, bei älteren Sessions schon (Wanduhr). Die Pace passt so zur Zeit, nach der der Platz bestimmt wird.
 
 ### D5: Eintrag für den Ghost
 
@@ -72,7 +72,7 @@ Jeder Eintrag trägt:
 - `sessionId`,
 - die Runde,
 - bei Zonen die Position des Abschnitts,
-- Beginn und Ende als Wanduhrzeit und Distanz.
+- Beginn und Ende als Sessionzeit (vor `auto-pause`: Wanduhrzeit) und Distanz.
 
 Für Runden steht das direkt in `laps`. Für Abschnitte ergibt es sich aus dem Rundenbeginn und den Abschnitten davor. Mehr braucht `ghost` nicht, um den Verlauf aus den `samples` zu lesen.
 

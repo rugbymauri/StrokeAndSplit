@@ -7,7 +7,7 @@ Bestimmt aus den geruderten Sessions die besten Leistungen pro Vorlage, Strecke 
 ## ADDED Requirements
 
 ### Requirement: Leistung nach Achse werten
-Ein Eintrag einer Rangliste SHALL auf einer Distanzachse nach der benötigten Zeit und auf einer Zeitachse nach den erreichten Metern gewertet werden, beides nach Wanduhr inklusive Pausen. Kürzere Zeit bzw. mehr Meter MUST besser platziert sein. Bei Gleichstand MUST der frühere Eintrag vorne liegen. Zu jedem Eintrag SHALL die App das Datum der Session und die Pace pro 500 m zeigen.
+Ein Eintrag einer Rangliste SHALL auf einer Distanzachse nach der benötigten Zeit und auf einer Zeitachse nach den erreichten Metern gewertet werden, beides nach Sessionzeit ohne Pausen (Change `auto-pause`; Sessions von davor nach Wanduhr). Kürzere Zeit bzw. mehr Meter MUST besser platziert sein. Bei Gleichstand MUST der frühere Eintrag vorne liegen. Zu jedem Eintrag SHALL die App das Datum der Session und die Pace pro 500 m zeigen.
 
 #### Scenario: Distanzzone
 - **WHEN** die 100-m-Zone „Sprint“ einmal in 18.9 s und einmal in 18.2 s gerudert wurde
@@ -17,9 +17,9 @@ Ein Eintrag einer Rangliste SHALL auf einer Distanzachse nach der benötigten Ze
 - **WHEN** auf der 4-min-Strecke „Vier Minuten“ Runden mit 1012 m und 1030 m gerudert wurden
 - **THEN** steht 1030 m auf Platz 1
 
-#### Scenario: Pause zählt mit
+#### Scenario: Pause zählt nicht
 - **WHEN** eine 1000-m-Runde in 4:00 Ruderzeit mit 30 Sekunden Pause gerudert wurde
-- **THEN** zählt sie mit 4:30
+- **THEN** zählt sie mit 4:00 und einer Pace von 2:00.0
 
 #### Scenario: Gleichstand
 - **WHEN** zwei Runden mit 4:08.0 gerudert wurden, am 1. und am 5. Oktober

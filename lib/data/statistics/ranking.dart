@@ -4,8 +4,9 @@ import '../db/database.dart';
 
 /// A rowed lap, zone or session in a ranking (Change statistics, Design D5).
 ///
-/// Times are wall-clock times since the start of the session, distances are
-/// session distances; both include pauses.
+/// Times are session times since the start of the session, distances are
+/// session distances. Session times leave out the pauses (Change auto-pause);
+/// in sessions from before auto-pause they are wall-clock times with pauses.
 @immutable
 class RankingEntry {
   const RankingEntry({

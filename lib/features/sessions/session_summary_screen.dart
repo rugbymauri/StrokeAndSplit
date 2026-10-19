@@ -219,7 +219,7 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// Time, distance and, with bands, the share in the zone.
+/// Time, distance and, with pauses, their number and total time.
 class _Totals extends StatelessWidget {
   const _Totals({required this.session});
 
@@ -231,6 +231,13 @@ class _Totals extends StatelessWidget {
     final tiles = [
       _Tile(label: l10n.sessionTime, value: formatElapsed(Duration(milliseconds: session.durationMs))),
       _Tile(label: l10n.sessionDistance, value: '${session.distanceDm ~/ 10}', unit: 'm'),
+      // Only with pauses (Change auto-pause, Design D3); the time above leaves them out.
+      if (session.pauseCount > 0)
+        _Tile(
+          key: const Key('summary-pauses'),
+          label: l10n.summaryPauses(session.pauseCount),
+          value: formatElapsed(Duration(milliseconds: session.pausedMs)),
+        ),
     ];
     return IntrinsicHeight(
       child: Row(
@@ -247,7 +254,7 @@ class _Totals extends StatelessWidget {
 }
 
 class _Tile extends StatelessWidget {
-  const _Tile({required this.label, required this.value, this.unit});
+  const _Tile({super.key, required this.label, required this.value, this.unit});
 
   final String label;
   final String value;

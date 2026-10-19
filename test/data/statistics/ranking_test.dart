@@ -33,12 +33,12 @@ void main() {
     expect([for (final e in ranked) e.distanceDm ~/ 10], [1030, 1012]);
   });
 
-  test('counts a pause in the time and the pace', () {
-    // 4:00 of rowing and 30 s of pause, measured by the wall clock.
-    final lap = _lap(1, 270000, 1000);
+  test('leaves a pause out of the time and the pace', () {
+    // 4:00 of rowing and 30 s of pause: the lap holds the session time (Change auto-pause).
+    final lap = _lap(1, 240000, 1000);
 
-    expect(lap.durationMs, 270000);
-    expect(lap.paceCs, 13500);
+    expect(lap.durationMs, 240000);
+    expect(lap.paceCs, 12000);
   });
 
   test('puts the earlier entry ahead on a tie', () {

@@ -338,6 +338,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bereit – startet mit dem ersten Schlag';
 
   @override
+  String get livePaused => 'Pause';
+
+  @override
   String get liveForceCurve => 'Kraftkurve';
 
   @override
@@ -514,6 +517,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get sessionStrokes => 'Schläge';
+
+  @override
+  String summaryPauses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Pausen',
+      one: '1 Pause',
+    );
+    return '$_temp0';
+  }
 
   @override
   String sessionLap(int lap) {
@@ -1000,7 +1014,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get rankingPausesHint =>
-      'Gemessen nach Wanduhr: Pausen zählen mit, auch in der Pace.';
+      'Pausen zählen nicht, auch nicht in der Pace. Ausnahme: ältere Sessions ohne automatische Pause.';
 
   @override
   String get rankingEmpty =>

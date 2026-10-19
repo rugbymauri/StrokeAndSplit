@@ -35,6 +35,8 @@ Map<String, Object?> _summary(SessionRow s) => {
       'averageHeartRate': s.averageHeartRate,
       'maxHeartRate': s.maxHeartRate,
       'rmssdMs': s.rmssdMs,
+      'pauseCount': s.pauseCount,
+      'pausedMs': s.pausedMs,
     };
 
 Future<int> _record(SessionRepository repository, String fixture) async {
@@ -77,6 +79,13 @@ void main() {
       final imported = await laptop.import(await phone.export(recorded));
 
       expect(_summary((await laptop.get(imported))!), _summary((await phone.get(recorded))!));
+      // The pauses come from the raw packets again (Change auto-pause).
+      final pauses = await phone.pauses(recorded);
+      expect(pauses, isNotEmpty, reason: 'the recording stops now and then');
+      expect(
+        [for (final p in await laptop.pauses(imported)) (p.startWallMs, p.endWallMs)],
+        [for (final p in pauses) (p.startWallMs, p.endWallMs)],
+      );
       expect((await laptop.rawRecording(imported)).packets.length, (await phone.rawRecording(recorded)).packets.length);
     });
 
@@ -90,8 +99,8 @@ void main() {
       final imported = (await laptop.get(await laptop.import(gzip.encode(file))))!;
 
       expect(
-        (imported.distanceDm, imported.strokeCount, imported.durationMs),
-        (recorded.distanceDm, recorded.strokeCount, recorded.durationMs),
+        (imported.distanceDm, imported.strokeCount, imported.durationMs, imported.pauseCount),
+        (recorded.distanceDm, recorded.strokeCount, recorded.durationMs, recorded.pauseCount),
       );
     });
   }
@@ -121,7 +130,12 @@ void main() {
     expect(header['format'], 'strokesplit-raw');
     expect(header['source'], 'pm5');
     expect(header['device'], 'PM5 430000001 Row');
-    expect((header['session'] as Map)['distanceDm'], (await repository.get(id))!.distanceDm);
+    final session = (await repository.get(id))!;
+    expect((header['session'] as Map)['distanceDm'], session.distanceDm);
+    expect(
+      ((header['session'] as Map)['pauseCount'], (header['session'] as Map)['pausedMs']),
+      (session.pauseCount, session.pausedMs),
+    );
   });
 
   test('imports an uncompressed raw recording, e.g. from the spike', () async {
