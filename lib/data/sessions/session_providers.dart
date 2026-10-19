@@ -10,6 +10,7 @@ import '../sources/erg_source.dart';
 import '../sources/erg_source_providers.dart';
 import '../templates/session_template.dart';
 import 'first_stroke.dart';
+import 'pace_track.dart';
 import 'session_accumulator.dart';
 import 'session_repository.dart';
 
@@ -33,6 +34,16 @@ final sessionLapsProvider = StreamProvider.family<List<LapRow>, int>(
 /// The RR intervals of a stored session, oldest first; empty without a strap.
 final sessionRrIntervalsProvider = FutureProvider.family<List<RrIntervalRow>, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).rrIntervals(id),
+);
+
+/// The lowest heart rate of a stored session; null without one.
+final sessionMinHeartRateProvider = FutureProvider.family<int?, int>(
+  (ref, id) => ref.watch(sessionRepositoryProvider).minHeartRate(id),
+);
+
+/// The pace of a stored session over its rowed time; empty without samples.
+final sessionPaceTrackProvider = FutureProvider.family<PaceTrack, int>(
+  (ref, id) => ref.watch(sessionRepositoryProvider).paceTrack(id),
 );
 
 /// A session being recorded right now, or with a template one that is ready

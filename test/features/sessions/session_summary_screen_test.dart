@@ -382,6 +382,71 @@ void main() {
     });
   });
 
+  group('pace', () {
+    /// Stores a free session of 60 s: 30 s at 2:05, then 30 s at 1:40.
+    Future<int> paceSession(AppDatabase db) async {
+      final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
+            startedAt: _startedAt,
+            status: SessionStatus.complete,
+            source: ErgSourceKind.pm5,
+            durationMs: const Value(60000),
+            distanceDm: const Value(2700),
+            averagePaceCs: const Value(11111),
+          ));
+      for (var s = 0; s <= 60; s++) {
+        final distanceDm = s <= 30 ? s * 40 : 1200 + (s - 30) * 50;
+        await db.into(db.samples).insert(SamplesCompanion.insert(sessionId: id, tMs: s * 1000, distanceDm: distanceDm));
+      }
+      return id;
+    }
+
+    testWidgets('shows the fastest, slowest and average pace and the pace over the session', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final db = openTestDatabase();
+      final id = await tester.runAsync(() => paceSession(db));
+      await _pump(tester, db, id!);
+      await tester.scrollUntilVisible(find.byKey(const Key('summary-pace-curve')), 100);
+
+      expect(find.text('PACE /500 M'), findsOneWidget);
+      expect(find.text('Schnellste 1:40'), findsOneWidget);
+      expect(find.text('Ø 1:51'), findsOneWidget);
+      expect(find.text('Langsamste 2:05'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Verlauf der Pace zwischen 1:40 und 2:05, im Durchschnitt 1:51'),
+        findsOneWidget,
+      );
+      final painter = tester
+          .widget<CustomPaint>(find.descendant(
+            of: find.byKey(const Key('summary-pace-curve')),
+            matching: find.byType(CustomPaint),
+          ))
+          .painter! as PaceCurvePainter;
+      expect(painter.steps, [
+        for (final t in [10000, 20000, 30000]) (t, 12500),
+        for (final t in [40000, 50000, 60000]) (t, 10000),
+      ]);
+      expect(painter.averageCs, 11111);
+      semantics.dispose();
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('shows no pace curve without samples', (tester) async {
+      final db = openTestDatabase();
+      final id = await tester.runAsync(() => db.into(db.sessions).insert(SessionsCompanion.insert(
+            startedAt: _startedAt,
+            status: SessionStatus.complete,
+            source: ErgSourceKind.pm5,
+            durationMs: const Value(60000),
+            distanceDm: const Value(2700),
+          )));
+      await _pump(tester, db, id!);
+
+      expect(find.text('PACE /500 M'), findsNothing);
+      expect(find.byKey(const Key('summary-pace-curve')), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
+  });
+
   group('heart rate', () {
     /// Stores a PM5 session with the given heart rate summary and RR intervals.
     Future<int> heartRateSession(
@@ -390,6 +455,7 @@ void main() {
       int? max,
       int? rmssd,
       List<(int, int)> intervals = const [],
+      List<int?> heartRates = const [],
     }) async {
       final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
             startedAt: _startedAt,
@@ -404,6 +470,14 @@ void main() {
       for (final (tMs, rrMs) in intervals) {
         await db.into(db.rrIntervals).insert(RrIntervalsCompanion.insert(sessionId: id, tMs: tMs, rrMs: rrMs));
       }
+      for (final (i, heartRate) in heartRates.indexed) {
+        await db.into(db.samples).insert(SamplesCompanion.insert(
+              sessionId: id,
+              tMs: i * 1000,
+              distanceDm: i * 40,
+              heartRate: Value(heartRate),
+            ));
+      }
       return id;
     }
 
@@ -416,10 +490,13 @@ void main() {
             max: 171,
             rmssd: 16,
             intervals: [(800, 800), (1610, 810), (2400, 790)],
+            // A lost contact sends 0 or nothing, which is no heart rate.
+            heartRates: [null, 0, 118, 142, 171],
           ));
       await _pump(tester, db, id!);
 
       expect(find.text('Ø Puls 142'), findsOneWidget);
+      expect(find.text('Min. Puls 118'), findsOneWidget);
       expect(find.text('Max. Puls 171'), findsOneWidget);
       expect(find.text('RR-INTERVALLE'), findsOneWidget);
       expect(find.byKey(const Key('summary-rr-curve')), findsOneWidget);
@@ -445,6 +522,7 @@ void main() {
 
       expect(find.text('Ø Puls 138'), findsOneWidget);
       expect(find.text('Max. Puls 165'), findsOneWidget);
+      expect(find.textContaining('Min. Puls'), findsNothing, reason: 'no samples with a heart rate');
       expect(find.text('RR-INTERVALLE'), findsNothing);
       expect(find.byKey(const Key('summary-rr-curve')), findsNothing);
       expect(find.textContaining('RMSSD'), findsNothing);

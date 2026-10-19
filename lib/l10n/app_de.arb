@@ -727,6 +727,10 @@
   "@sessionAverageHeartRate": {
     "description": "Summary: label of the average heart rate in beats per minute"
   },
+  "sessionMinHeartRate": "Min. Puls",
+  "@sessionMinHeartRate": {
+    "description": "Summary: label of the lowest heart rate in beats per minute"
+  },
   "sessionMaxHeartRate": "Max. Puls",
   "@sessionMaxHeartRate": {
     "description": "Summary: label of the highest heart rate in beats per minute"
@@ -746,6 +750,40 @@
       "max": {
         "type": "int",
         "example": "910"
+      }
+    }
+  },
+  "summaryPace": "Pace /500 m",
+  "@summaryPace": {
+    "description": "Summary: title above the curve of the pace over the session"
+  },
+  "summaryPaceFastest": "Schnellste",
+  "@summaryPaceFastest": {
+    "description": "Summary: label of the fastest pace of a step of the session"
+  },
+  "summaryPaceSlowest": "Langsamste",
+  "@summaryPaceSlowest": {
+    "description": "Summary: label of the slowest pace of a step of the session"
+  },
+  "summaryPaceAverage": "Ø",
+  "@summaryPaceAverage": {
+    "description": "Summary: label of the average pace beside the fastest and slowest one, and of its line in the curve"
+  },
+  "summaryPaceCurve": "Verlauf der Pace zwischen {fastest} und {slowest}, im Durchschnitt {average}",
+  "@summaryPaceCurve": {
+    "description": "Summary: screen reader text of the curve of the pace over the session",
+    "placeholders": {
+      "fastest": {
+        "type": "String",
+        "example": "1:58"
+      },
+      "slowest": {
+        "type": "String",
+        "example": "2:14"
+      },
+      "average": {
+        "type": "String",
+        "example": "2:05"
       }
     }
   },

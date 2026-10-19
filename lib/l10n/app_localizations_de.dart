@@ -541,6 +541,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sessionAverageHeartRate => 'Ø Puls';
 
   @override
+  String get sessionMinHeartRate => 'Min. Puls';
+
+  @override
   String get sessionMaxHeartRate => 'Max. Puls';
 
   @override
@@ -549,6 +552,23 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String summaryRrCurve(int min, int max) {
     return 'Verlauf der RR-Intervalle zwischen $min und $max ms';
+  }
+
+  @override
+  String get summaryPace => 'Pace /500 m';
+
+  @override
+  String get summaryPaceFastest => 'Schnellste';
+
+  @override
+  String get summaryPaceSlowest => 'Langsamste';
+
+  @override
+  String get summaryPaceAverage => 'Ø';
+
+  @override
+  String summaryPaceCurve(String fastest, String slowest, String average) {
+    return 'Verlauf der Pace zwischen $fastest und $slowest, im Durchschnitt $average';
   }
 
   @override

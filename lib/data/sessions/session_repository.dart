@@ -13,6 +13,7 @@ import '../courses/lap_tracker.dart';
 import '../zones/zone_repository.dart';
 import '../sources/erg_source.dart';
 import '../templates/session_template.dart';
+import 'pace_track.dart';
 import 'session_accumulator.dart';
 
 /// The root mean square of successive differences of [intervalsMs], rounded
@@ -245,6 +246,28 @@ class SessionRepository {
         ..where((r) => r.sessionId.equals(id))
         ..orderBy([(r) => OrderingTerm.asc(r.tMs), (r) => OrderingTerm.asc(r.rowId)]))
       .get();
+
+  /// The lowest heart rate of a stored session; null without one. Not stored with the session, so older
+  /// sessions show it as well.
+  Future<int?> minHeartRate(int id) async {
+    final lowest = _db.samples.heartRate.min();
+    final row = await (_db.selectOnly(_db.samples)
+          ..addColumns([lowest])
+          ..where(_db.samples.sessionId.equals(id) & _db.samples.heartRate.isBiggerThanValue(0)))
+        .getSingle();
+    return row.read(lowest);
+  }
+
+  /// The pace of a stored session in steps of rowed time, without its pauses; empty without samples.
+  Future<PaceTrack> paceTrack(int id) async {
+    final time = coalesce([_db.samples.activeMs, _db.samples.tMs]);
+    final rows = await (_db.selectOnly(_db.samples)
+          ..addColumns([time, _db.samples.distanceDm])
+          ..where(_db.samples.sessionId.equals(id))
+          ..orderBy([OrderingTerm.asc(_db.samples.tMs)]))
+        .get();
+    return PaceTrack.of([for (final row in rows) (row.read(time)!, row.read(_db.samples.distanceDm)!)]);
+  }
 
   Future<bool> hasRawPackets(int id) async {
     final row = await (_db.select(_db.rawPackets)

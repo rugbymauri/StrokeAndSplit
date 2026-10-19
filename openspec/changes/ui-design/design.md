@@ -185,6 +185,12 @@ Entschieden am 2026-10-16 vom Nutzer: Die Sprachwahl aus `translations` (dort De
 
 Neue und geänderte Texte stehen nur in `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb`, jeder mit `@`-Beschreibung. `make l10n` erzeugt den Code, der eingecheckt wird. Bestehende Schlüssel werden weiterverwendet, wo der Text gleich bleibt. Fest im Code bleiben nur Einheiten, Formate und Eigennamen wie in `translations`.
 
+### D10: Pace und Puls in der Zusammenfassung
+
+Pace (entschieden 2026-10-19 vom Nutzer): Unter den Durchschnitten steht ein Abschnitt „Pace /500 m“ mit der schnellsten, der durchschnittlichen und der langsamsten Pace und darunter ihrem Verlauf über die Session als Kurve wie bei den RR-Intervallen, schneller oben, der Durchschnitt als gestrichelte Linie. Die Kurve besteht aus Schritten gleicher geruderter Zeit, mindestens 10 s, höchstens rund 60 pro Session; jeder Schritt rechnet seine Pace aus der in ihm geruderten Distanz. So zählen Pausen nicht (die geruderte Zeit steht dann still), einzelne Schläge schlagen nicht aus, und die Schritte passen zur Ø Pace aus Zeit und Distanz. Schnellste und langsamste Pace sind die eines Schritts, nicht eines einzelnen Schlags. Ein letzter Schritt unter einem halben fällt weg. Ohne gespeicherte Samples (Import) fehlt der Abschnitt. Berechnet wird beim Anzeigen, ohne neue Spalte, damit auch ältere Sessions die Kurve zeigen.
+
+Puls (entschieden 2026-10-19 vom Nutzer): Neben Ø und Max. Puls steht der niedrigste Puls, ebenfalls beim Anzeigen aus den Samples gelesen; 0 (Kontakt verloren) zählt nicht.
+
 ## Risks / Trade-offs
 
 - **Platz im Hochformat mit Vorlage**: Pace-Box, Schlagzahl, Kacheln und Kraftkurve sind auf 360 × 740 knapp; dort ist die Pace-Box mit Kraftkurve 340 px hoch und ihr Inhalt schrumpft leicht. Auf kleineren Geräten fällt zuerst die Kraftkurve weg, danach werden die Kacheln einzeilig. Die bestehenden Layout-Tests in allen vier Grössen sichern das ab.
