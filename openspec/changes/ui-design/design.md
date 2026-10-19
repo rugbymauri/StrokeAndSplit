@@ -110,6 +110,8 @@ Der Rahmen der Pace-Box besteht aus drei ineinanderliegenden Spuren in der Form 
 
 Inhalt der Box von oben nach unten: Beschriftung „Pace /500 m“, die Pace, Zonenstatus mit Band (z. B. „In der Zone · 2:05–2:10“), eine Trennlinie und die Legende. Die Legende hat eine Zeile pro Spur mit Farbpunkt, Bezeichnung und Restangabe, z. B. „Gesamt 1 460 / 3 000 m“, „Runde 2 / 3 · noch 540 m“, „Tempo · noch 340 m“ bzw. „frei · noch 340 m“. Bei Zeitstrecken stehen statt Metern Zeiten. Die Runde heisst knapp „Runde 2 / 3“ statt wie bisher „Runde 2 von 3“, bei offener Rundenzahl weiterhin „Runde 2“ (entschieden 2026-10-16). Die Spec `course-rowing` ändert sich entsprechend.
 
+Ø Pace in der Box (entschieden 2026-10-19 vom Nutzer): Die erste Zeile der Legende, ohne Markierung, weil sie zu keiner Spur gehört, zeigt die Ø Pace der ganzen Session aus Zeit und Distanz wie beim freien Rudern, z. B. „Ø Pace 2:05“, vor dem ersten Meter „–:––“. Als vierte Kachel neben Zeit, Distanz und Kalorien wären die Werte auf einem 360 px breiten Handy zu klein geworden (unter 30 px hoch, quer unter 16 px).
+
 Was die bisherige Streckenleiste `course_bar.dart` zeigt, wandert in die Pace-Box und die Kacheln (Task 3.3):
 
 | `course_bar.dart` | neu |

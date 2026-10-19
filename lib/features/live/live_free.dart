@@ -267,12 +267,10 @@ class _SideValues extends StatelessWidget {
   }
 
   /// Per 500 m since the start; null before the first metre.
-  Duration? _averagePace() {
-    final distance = session?.distanceMeters ?? tick?.distanceMeters ?? 0;
-    final elapsed = session?.elapsed ?? tick?.elapsed ?? Duration.zero;
-    if (distance < 1) return null;
-    return Duration(milliseconds: (elapsed.inMilliseconds * 500 / distance).round());
-  }
+  Duration? _averagePace() => averagePace(
+        session?.distanceMeters ?? tick?.distanceMeters ?? 0,
+        session?.elapsed ?? tick?.elapsed ?? Duration.zero,
+      );
 
   Widget _item(String label, String value, Key key, {Widget? icon, String? note, Key? noteKey}) {
     return FittedBox(

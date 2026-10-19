@@ -370,6 +370,7 @@ void main() {
           final box = tester.getRect(find.byType(PaceBox));
           expect(box.top - tester.getRect(view).top, greaterThanOrEqualTo(ProgressFramePainter.overhang));
           for (final key in const [
+            'pace-box-average',
             'pace-box-course',
             'pace-box-lap',
             'pace-box-segment',
@@ -429,6 +430,8 @@ void main() {
       expectLine('pace-box-course', 'Gesamt', '1\u00A0520 / 3\u00A0000 m');
       expectLine('pace-box-lap', 'Runde 2 / 3', 'noch 480 m');
       expectLine('pace-box-segment', 'Tempo', 'noch 280 m');
+      // 6:20 for 1 520 m of the session.
+      expectLine('pace-box-average', 'Ø Pace', '2:05');
       expect(find.text('In der Zone · 2:05–2:10'), findsOneWidget);
       expect(find.text('In der Zone · 20–22 spm'), findsOneWidget);
       expect(find.text('24 spm'), findsOneWidget);
@@ -470,7 +473,8 @@ void main() {
         expect(find.text(label), findsOneWidget, reason: label);
       }
       // The pace keeps the PM5 format in every language.
-      expect(find.text('2:05'), findsOneWidget);
+      expect(tester.widget<Text>(find.byKey(const Key('pace-box-pace'))).data, '2:05');
+      expectLine('pace-box-average', 'Ø pace', '2:05');
     });
 
     testWidgets('marks pace and stroke rate in the zone', (tester) async {
