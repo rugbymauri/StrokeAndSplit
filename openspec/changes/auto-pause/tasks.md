@@ -25,5 +25,5 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 5. Abschluss
 
-- [ ] 5.1 `make check` grün und `openspec validate --all --strict` grün
+- [x] 5.1 `make check` grün und `openspec validate --all --strict` grün
 - [ ] 5.2 Manueller Gerätetest mit PM5 und einem FTMS-Rudergerät: frei und mit Vorlage rudern, anhalten (Pause nach etwa 3 s über dem Rhythmus, „Pause“ sichtbar, Zeit, Restzeit und Ghost stehen), weiterrudern (weiter ab dem Stand vor der Pause), langsam mit 16–18 Schlägen pro Minute rudern ohne Pause, Zusammenfassung mit Pausen, Export und Import
