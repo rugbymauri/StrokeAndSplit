@@ -91,7 +91,7 @@ Vor dem Start:
 
 ### 3. `ui-design`: Designsprache und neue Screens aus dem Claude-Design-Canvas
 
-Ziel: dunkles Thema, Barlow Condensed/IBM Plex Sans, Fortschrittsrahmen um die Pace, neue Editoren, Startbildschirm, Zusammenfassung. Canvas
+Ziel: dunkles Thema, Barlow Condensed/IBM Plex Sans, Fortschrittsrahmen um die Pace, neue Editoren, Startbildschirm, Zusammenfassung. Vorlage ist der Design-Canvas „Stroke & Split Frontend“.
 
 Vor dem Start angepasst (2026-10-16, in Proposal, Design, Specs und Tasks eingearbeitet):
 - [x] Task 1.3 baut `CourseStrip` aus `zones` aus statt einer zweiten `SegmentBar` (D4 „Ablaufbalken“).

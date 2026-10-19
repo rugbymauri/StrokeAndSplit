@@ -2,9 +2,7 @@
 
 ## Context
 
-Das Verhalten steht in den Specs, die Motivation in `proposal.md`. Die visuelle Vorlage ist der Claude-Design-Canvas **Stroke & Split Frontend**:
-
-
+Das Verhalten steht in den Specs, die Motivation in `proposal.md`. Die visuelle Vorlage ist der Claude-Design-Canvas **Stroke & Split Frontend**.
 
 Der Canvas ist privat. Wer ihn öffnen soll, braucht eine Freigabe über das Share-Menü des Canvas. Die Screens darin sind statische Mockups ohne echte Daten.
 
