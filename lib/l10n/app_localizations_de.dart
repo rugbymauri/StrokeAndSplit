@@ -541,6 +541,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sessionAverageHeartRate => 'Ø Puls';
 
   @override
+  String get sessionMinHeartRate => 'Min. Puls';
+
+  @override
   String get sessionMaxHeartRate => 'Max. Puls';
 
   @override

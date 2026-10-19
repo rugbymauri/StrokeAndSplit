@@ -961,6 +961,12 @@ abstract class AppLocalizations {
   /// **'Ø Puls'**
   String get sessionAverageHeartRate;
 
+  /// Summary: label of the lowest heart rate in beats per minute
+  ///
+  /// In de, this message translates to:
+  /// **'Min. Puls'**
+  String get sessionMinHeartRate;
+
   /// Summary: label of the highest heart rate in beats per minute
   ///
   /// In de, this message translates to:

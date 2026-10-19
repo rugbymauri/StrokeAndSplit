@@ -44,6 +44,7 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 - [x] 5.8 Kalorien des Rudergeräts (PM5 0x0033, FTMS Total Energy) beim Rudern einer Vorlage als dritte Kachel neben Zeit und Distanz der Session; ohne Wert keine Kachel (Nutzer, 2026-10-19). Verifikation: Widget-Tests für Kachel mit Wert, keine Kachel ohne Wert, kein Überlauf in allen Layouts
 - [x] 5.9 Pace-Box beim Rudern einer Vorlage wie die Schlagzahl-Karte in der Zonenfarbe getönt (im Band blau, ausserhalb orange, Pille voll), im freien Abschnitt unverändert (Design D3; Nutzer, 2026-10-19). Verifikation: Tests für Farbe der Box, Beschriftung und Pille in, ausserhalb und ohne Band; Goldens des Fortschrittsrahmens neu und gesichtet
 - [x] 5.10 Zusammenfassung: schnellste, durchschnittliche und langsamste Pace und ihr Verlauf als Kurve in Schritten gleicher geruderter Zeit, ohne Pausen (Design D10; Nutzer, 2026-10-19). Verifikation: Unit-Tests der Schritte (gleichmässig, Wechsel, Pause, kurzer letzter Schritt, lange Session), Widget-Tests mit und ohne Samples
+- [x] 5.11 Zusammenfassung: niedrigster Puls neben Ø und Max. Puls, aus den Samples ohne 0 (Design D10; Nutzer, 2026-10-19). Verifikation: Widget-Tests mit Samples und ohne
 
 ## 6. Abschluss
 

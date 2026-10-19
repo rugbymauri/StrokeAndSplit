@@ -455,6 +455,7 @@ void main() {
       int? max,
       int? rmssd,
       List<(int, int)> intervals = const [],
+      List<int?> heartRates = const [],
     }) async {
       final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
             startedAt: _startedAt,
@@ -469,6 +470,14 @@ void main() {
       for (final (tMs, rrMs) in intervals) {
         await db.into(db.rrIntervals).insert(RrIntervalsCompanion.insert(sessionId: id, tMs: tMs, rrMs: rrMs));
       }
+      for (final (i, heartRate) in heartRates.indexed) {
+        await db.into(db.samples).insert(SamplesCompanion.insert(
+              sessionId: id,
+              tMs: i * 1000,
+              distanceDm: i * 40,
+              heartRate: Value(heartRate),
+            ));
+      }
       return id;
     }
 
@@ -481,10 +490,13 @@ void main() {
             max: 171,
             rmssd: 16,
             intervals: [(800, 800), (1610, 810), (2400, 790)],
+            // A lost contact sends 0 or nothing, which is no heart rate.
+            heartRates: [null, 0, 118, 142, 171],
           ));
       await _pump(tester, db, id!);
 
       expect(find.text('Ø Puls 142'), findsOneWidget);
+      expect(find.text('Min. Puls 118'), findsOneWidget);
       expect(find.text('Max. Puls 171'), findsOneWidget);
       expect(find.text('RR-INTERVALLE'), findsOneWidget);
       expect(find.byKey(const Key('summary-rr-curve')), findsOneWidget);
@@ -510,6 +522,7 @@ void main() {
 
       expect(find.text('Ø Puls 138'), findsOneWidget);
       expect(find.text('Max. Puls 165'), findsOneWidget);
+      expect(find.textContaining('Min. Puls'), findsNothing, reason: 'no samples with a heart rate');
       expect(find.text('RR-INTERVALLE'), findsNothing);
       expect(find.byKey(const Key('summary-rr-curve')), findsNothing);
       expect(find.textContaining('RMSSD'), findsNothing);

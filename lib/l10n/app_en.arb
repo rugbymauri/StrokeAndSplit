@@ -143,6 +143,7 @@
   "sessionLap": "Lap {lap}",
   "summaryTitle": "Session finished",
   "sessionAverageHeartRate": "Ø Heart rate",
+  "sessionMinHeartRate": "Min heart rate",
   "sessionMaxHeartRate": "Max heart rate",
   "summaryRrIntervals": "RR intervals",
   "summaryRrCurve": "RR intervals over the session, between {min} and {max} ms",

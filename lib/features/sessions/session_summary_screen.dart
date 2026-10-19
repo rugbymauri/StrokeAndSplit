@@ -114,7 +114,7 @@ class _Summary extends ConsumerWidget {
                     _Laps(laps: laps, course: course, places: places),
                   ],
                   const SizedBox(height: AppSpacing.xl),
-                  _Averages(session: session),
+                  _Averages(session: session, minHeartRate: ref.watch(sessionMinHeartRateProvider(session.id)).value),
                   if (pace.steps.length >= 2) ...[
                     const SizedBox(height: AppSpacing.xl),
                     _Pace(track: pace, averageCs: session.averagePaceCs),
@@ -530,9 +530,12 @@ class _ShareBar extends StatelessWidget {
 
 /// Averages and the number of strokes in one line.
 class _Averages extends StatelessWidget {
-  const _Averages({required this.session});
+  const _Averages({required this.session, this.minHeartRate});
 
   final SessionRow session;
+
+  /// The lowest heart rate, read from the samples; null without one.
+  final int? minHeartRate;
 
   @override
   Widget build(BuildContext context) {
@@ -545,6 +548,7 @@ class _Averages extends StatelessWidget {
       (l10n.sessionStrokes, '${session.strokeCount}'),
       // Only with a heart rate, from the strap or the rower.
       if (session.averageHeartRate case final average?) (l10n.sessionAverageHeartRate, '$average'),
+      if (minHeartRate case final min?) (l10n.sessionMinHeartRate, '$min'),
       if (session.maxHeartRate case final max?) (l10n.sessionMaxHeartRate, '$max'),
     ];
     return _Card(

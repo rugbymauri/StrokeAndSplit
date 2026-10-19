@@ -538,6 +538,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionAverageHeartRate => 'Ø Heart rate';
 
   @override
+  String get sessionMinHeartRate => 'Min heart rate';
+
+  @override
   String get sessionMaxHeartRate => 'Max heart rate';
 
   @override

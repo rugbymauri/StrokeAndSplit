@@ -36,6 +36,11 @@ final sessionRrIntervalsProvider = FutureProvider.family<List<RrIntervalRow>, in
   (ref, id) => ref.watch(sessionRepositoryProvider).rrIntervals(id),
 );
 
+/// The lowest heart rate of a stored session; null without one.
+final sessionMinHeartRateProvider = FutureProvider.family<int?, int>(
+  (ref, id) => ref.watch(sessionRepositoryProvider).minHeartRate(id),
+);
+
 /// The pace of a stored session over its rowed time; empty without samples.
 final sessionPaceTrackProvider = FutureProvider.family<PaceTrack, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).paceTrack(id),

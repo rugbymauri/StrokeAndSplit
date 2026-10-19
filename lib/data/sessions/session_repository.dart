@@ -247,6 +247,17 @@ class SessionRepository {
         ..orderBy([(r) => OrderingTerm.asc(r.tMs), (r) => OrderingTerm.asc(r.rowId)]))
       .get();
 
+  /// The lowest heart rate of a stored session; null without one. Not stored with the session, so older
+  /// sessions show it as well.
+  Future<int?> minHeartRate(int id) async {
+    final lowest = _db.samples.heartRate.min();
+    final row = await (_db.selectOnly(_db.samples)
+          ..addColumns([lowest])
+          ..where(_db.samples.sessionId.equals(id) & _db.samples.heartRate.isBiggerThanValue(0)))
+        .getSingle();
+    return row.read(lowest);
+  }
+
   /// The pace of a stored session in steps of rowed time, without its pauses; empty without samples.
   Future<PaceTrack> paceTrack(int id) async {
     final time = coalesce([_db.samples.activeMs, _db.samples.tMs]);

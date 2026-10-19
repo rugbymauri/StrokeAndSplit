@@ -727,6 +727,10 @@
   "@sessionAverageHeartRate": {
     "description": "Summary: label of the average heart rate in beats per minute"
   },
+  "sessionMinHeartRate": "Min. Puls",
+  "@sessionMinHeartRate": {
+    "description": "Summary: label of the lowest heart rate in beats per minute"
+  },
   "sessionMaxHeartRate": "Max. Puls",
   "@sessionMaxHeartRate": {
     "description": "Summary: label of the highest heart rate in beats per minute"
