@@ -701,6 +701,15 @@
   "@sessionStrokes": {
     "description": "Summary: label of the number of strokes"
   },
+  "summaryPauses": "{count, plural, =1{1 Pause} other{{count} Pausen}}",
+  "@summaryPauses": {
+    "description": "Summary: label of the tile with the total time of the pauses of a session, with their number (Change auto-pause)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sessionLap": "Runde {lap}",
   "@sessionLap": {
     "description": "Summary: a lap of the course",

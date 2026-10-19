@@ -519,6 +519,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sessionStrokes => 'Schläge';
 
   @override
+  String summaryPauses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Pausen',
+      one: '1 Pause',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String sessionLap(int lap) {
     return 'Runde $lap';
   }

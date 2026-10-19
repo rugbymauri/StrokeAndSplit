@@ -20,7 +20,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 4. Zusammenfassung und Ranglisten
 
-- [ ] 4.1 Kachel mit Anzahl und Dauer der Pausen in der Zusammenfassung, nur bei Pausen (Text `summaryPauses` mit Plural). Verifikation: Widget-Test mit und ohne Pausen
+- [x] 4.1 Kachel mit Anzahl und Dauer der Pausen in der Zusammenfassung, nur bei Pausen (Text `summaryPauses` mit Plural). Verifikation: Widget-Test mit und ohne Pausen
 - [ ] 4.2 Hinweis unter den Ranglisten (`rankingPausesHint`) und Beschreibungen der Pace-Texte an D5 anpassen. Verifikation: bestehende Widget-Tests der Ranglisten grün
 
 ## 5. Abschluss

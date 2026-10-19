@@ -139,6 +139,7 @@
   "sessionAverageWatts": "Ø Watts",
   "sessionAverageStrokeRate": "Ø spm",
   "sessionStrokes": "Strokes",
+  "summaryPauses": "{count, plural, =1{1 pause} other{{count} pauses}}",
   "sessionLap": "Lap {lap}",
   "summaryTitle": "Session finished",
   "sessionAverageHeartRate": "Ø Heart rate",

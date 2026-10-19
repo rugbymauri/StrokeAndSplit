@@ -937,6 +937,12 @@ abstract class AppLocalizations {
   /// **'Schläge'**
   String get sessionStrokes;
 
+  /// Summary: label of the tile with the total time of the pauses of a session, with their number (Change auto-pause)
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Pause} other{{count} Pausen}}'**
+  String summaryPauses(int count);
+
   /// Summary: a lap of the course
   ///
   /// In de, this message translates to:
