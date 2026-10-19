@@ -59,7 +59,7 @@ List<StrokeForceCurve> _fixtureCurves() {
 /// The drive length of [curve] as the live display shows it in German.
 String _length(StrokeForceCurve curve) => '${(curve.driveLengthMeters! * 100).round()} cm';
 
-StatusTick _tick({int? heartRate, Duration elapsed = _elapsed}) => StatusTick(
+StatusTick _tick({int? heartRate, int? calories, Duration elapsed = _elapsed}) => StatusTick(
       elapsed: elapsed,
       distanceMeters: 3021.7,
       workoutType: WorkoutType.justRowSplits,
@@ -69,6 +69,7 @@ StatusTick _tick({int? heartRate, Duration elapsed = _elapsed}) => StatusTick(
       watts: 179,
       strokeRate: 24,
       heartRate: heartRate,
+      calories: calories,
     );
 
 class _Recording extends SessionRecorder {
@@ -353,7 +354,7 @@ void main() {
           },
         );
         expect(find.byType(SimulatorControls), simulator ? findsOneWidget : findsNothing);
-        await harness.emit(tester, _tick(heartRate: 151));
+        await harness.emit(tester, _tick(heartRate: 151, calories: 1187));
         await harness.emit(tester, HeartBeatIntervals(elapsed: _elapsed, time: Duration.zero, intervalsMs: [812]));
         if (curves) {
           for (final curve in _fixtureCurves().take(3)) {
@@ -377,6 +378,7 @@ void main() {
             'metric-spm',
             'metric-elapsed',
             'metric-distance',
+            'metric-calories',
             'metric-lap-time',
             'metric-watts',
             'metric-hr',
@@ -410,6 +412,15 @@ void main() {
       expect(find.descendant(of: line, matching: find.text(value)), findsOneWidget, reason: key);
     }
 
+    testWidgets('shows the calories of the rower on a template', (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester, recording: _onCourse());
+      await harness.emit(tester, _tick(calories: 87));
+
+      expect(find.text('Kalorien'), findsOneWidget);
+      expect(tester.widget<Text>(find.byKey(const Key('metric-calories'))).textSpan!.toPlainText(), '87');
+    });
+
     testWidgets('shows lap, zone and rest in the pace box and the bands', (tester) async {
       final harness = _Harness();
       await harness.pump(tester, recording: _onCourse());
@@ -425,6 +436,8 @@ void main() {
       // The time of the session, not that of the rower, as in free rowing.
       expect(tester.widget<Text>(find.byKey(const Key('metric-elapsed'))).textSpan!.toPlainText(), '6:20');
       expect(tester.widget<Text>(find.byKey(const Key('metric-distance'))).textSpan!.toPlainText(), '1\u00A0520 m');
+      // Without calories from the rower there is no tile for them.
+      expect(find.byKey(const Key('metric-calories')), findsNothing);
       expect(find.text('75 %'), findsNothing);
       // The range of the segment is left to the progress frame.
       expect(find.text('200–800 m'), findsNothing);
@@ -868,10 +881,10 @@ void main() {
           (tester) async {
         final harness = _Harness();
         await harness.pump(tester, size: size, recording: _onCourse());
-        await harness.emit(tester, _tick(heartRate: 151));
+        await harness.emit(tester, _tick(heartRate: 151, calories: 1187));
 
         // 22 and 52 before; the two rows of tiles still fit on a narrow phone.
-        for (final key in ['metric-elapsed', 'metric-distance', 'metric-lap-time', 'metric-watts', 'metric-hr']) {
+        for (final key in ['metric-elapsed', 'metric-distance', 'metric-calories', 'metric-lap-time', 'metric-watts', 'metric-hr']) {
           expect(height(tester, key), greaterThan(30), reason: key);
         }
         // 56 before Barlow, whose lower digits leave room for the force curve on a narrow phone as well.
@@ -896,9 +909,9 @@ void main() {
     testWidgets('fits time and distance of the session into the side column in landscape', (tester) async {
       final harness = _Harness();
       await harness.pump(tester, size: const Size(844, 390), recording: _onCourse());
-      await harness.emit(tester, _tick(heartRate: 151));
+      await harness.emit(tester, _tick(heartRate: 151, calories: 1187));
 
-      for (final key in ['metric-elapsed', 'metric-distance', 'metric-lap-time', 'metric-watts', 'metric-hr']) {
+      for (final key in ['metric-elapsed', 'metric-distance', 'metric-calories', 'metric-lap-time', 'metric-watts', 'metric-hr']) {
         expect(height(tester, key), greaterThan(16), reason: key);
       }
     });
