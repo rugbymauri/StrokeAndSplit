@@ -552,6 +552,23 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get summaryPace => 'Pace /500 m';
+
+  @override
+  String get summaryPaceFastest => 'Schnellste';
+
+  @override
+  String get summaryPaceSlowest => 'Langsamste';
+
+  @override
+  String get summaryPaceAverage => 'Ø';
+
+  @override
+  String summaryPaceCurve(String fastest, String slowest, String average) {
+    return 'Verlauf der Pace zwischen $fastest und $slowest, im Durchschnitt $average';
+  }
+
+  @override
   String summaryRmssd(int ms) {
     return 'HRV (RMSSD) $ms ms';
   }

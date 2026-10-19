@@ -979,6 +979,36 @@ abstract class AppLocalizations {
   /// **'Verlauf der RR-Intervalle zwischen {min} und {max} ms'**
   String summaryRrCurve(int min, int max);
 
+  /// Summary: title above the curve of the pace over the session
+  ///
+  /// In de, this message translates to:
+  /// **'Pace /500 m'**
+  String get summaryPace;
+
+  /// Summary: label of the fastest pace of a step of the session
+  ///
+  /// In de, this message translates to:
+  /// **'Schnellste'**
+  String get summaryPaceFastest;
+
+  /// Summary: label of the slowest pace of a step of the session
+  ///
+  /// In de, this message translates to:
+  /// **'Langsamste'**
+  String get summaryPaceSlowest;
+
+  /// Summary: label of the average pace beside the fastest and slowest one, and of its line in the curve
+  ///
+  /// In de, this message translates to:
+  /// **'Ø'**
+  String get summaryPaceAverage;
+
+  /// Summary: screen reader text of the curve of the pace over the session
+  ///
+  /// In de, this message translates to:
+  /// **'Verlauf der Pace zwischen {fastest} und {slowest}, im Durchschnitt {average}'**
+  String summaryPaceCurve(String fastest, String slowest, String average);
+
   /// Summary: heart rate variability of the session as RMSSD in whole milliseconds
   ///
   /// In de, this message translates to:

@@ -8,6 +8,7 @@ import '../../app/design_tokens.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import '../../data/db/database.dart';
+import '../../data/sessions/pace_track.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
 import '../../data/statistics/session_places.dart';
@@ -83,6 +84,7 @@ class _Summary extends ConsumerWidget {
     final laps = versionId == null ? const <LapRow>[] : ref.watch(sessionLapsProvider(session.id)).value ?? const [];
     final places = ref.watch(sessionPlacesProvider(session.id)).value ?? SessionPlaces.none;
     final rr = ref.watch(sessionRrIntervalsProvider(session.id)).value ?? const <RrIntervalRow>[];
+    final pace = ref.watch(sessionPaceTrackProvider(session.id)).value ?? PaceTrack.empty;
 
     return Center(
       child: ConstrainedBox(
@@ -113,6 +115,10 @@ class _Summary extends ConsumerWidget {
                   ],
                   const SizedBox(height: AppSpacing.xl),
                   _Averages(session: session),
+                  if (pace.steps.length >= 2) ...[
+                    const SizedBox(height: AppSpacing.xl),
+                    _Pace(track: pace, averageCs: session.averagePaceCs),
+                  ],
                   if (rr.length >= 2 || session.rmssdMs != null) ...[
                     const SizedBox(height: AppSpacing.xl),
                     _RrIntervals(intervals: rr, rmssdMs: session.rmssdMs),
@@ -562,6 +568,131 @@ class _Averages extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The pace over the session as a curve, the fastest pace at the top, with its fastest, slowest and
+/// average value (ui-design, Task 5.10).
+class _Pace extends StatelessWidget {
+  const _Pace({required this.track, required this.averageCs});
+
+  final PaceTrack track;
+  final int? averageCs;
+
+  static String _format(int? cs) => formatPace(cs == null ? null : Duration(milliseconds: cs * 10));
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final fastest = _format(track.fastestCs);
+    final slowest = _format(track.slowestCs);
+    final average = _format(averageCs);
+    final values = [
+      (l10n.summaryPaceFastest, fastest, const Key('summary-pace-fastest')),
+      (l10n.summaryPaceAverage, average, const Key('summary-pace-average')),
+      (l10n.summaryPaceSlowest, slowest, const Key('summary-pace-slowest')),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.summaryPace.toUpperCase(), style: AppTextStyles.label),
+        const SizedBox(height: AppSpacing.m),
+        _Card(
+          padding: const EdgeInsets.all(AppSpacing.l),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: AppSpacing.l,
+                runSpacing: AppSpacing.xs,
+                children: [
+                  for (final (label, value, key) in values)
+                    Text.rich(
+                      TextSpan(
+                        text: '$label ',
+                        children: [
+                          TextSpan(
+                            text: value,
+                            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      key: key,
+                      style: AppTextStyles.subtitle,
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.m),
+              Text(fastest, style: AppTextStyles.caption),
+              const SizedBox(height: AppSpacing.xs),
+              Semantics(
+                container: true,
+                label: l10n.summaryPaceCurve(fastest, slowest, average),
+                child: SizedBox(
+                  key: const Key('summary-pace-curve'),
+                  height: 120,
+                  child: CustomPaint(painter: PaceCurvePainter(track.steps, averageCs: averageCs)),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(slowest, style: AppTextStyles.caption),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The pace as one line: rowed time across, faster upwards, scaled from the slowest to the fastest step,
+/// with the average as a dashed line.
+class PaceCurvePainter extends CustomPainter {
+  PaceCurvePainter(this.steps, {this.averageCs});
+
+  /// (end of the step in rowed milliseconds, pace in centiseconds), ordered by time.
+  final List<(int, int)> steps;
+  final int? averageCs;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final grid = Paint()
+      ..color = AppColors.line
+      ..strokeWidth = 1;
+    canvas
+      ..drawLine(Offset.zero, Offset(size.width, 0), grid)
+      ..drawLine(Offset(0, size.height), Offset(size.width, size.height), grid);
+    if (steps.length < 2) return;
+    final first = steps.first.$1;
+    final span = math.max(1, steps.last.$1 - first);
+    final fastest = steps.map((s) => s.$2).reduce(math.min);
+    final range = math.max(1, steps.map((s) => s.$2).reduce(math.max) - fastest);
+    double y(int paceCs) => ((paceCs - fastest) / range).clamp(0.0, 1.0) * size.height;
+    if (averageCs case final average?) {
+      final dash = Paint()
+        ..color = AppColors.textMuted
+        ..strokeWidth = 1;
+      for (var x = 0.0; x < size.width; x += 8) {
+        canvas.drawLine(Offset(x, y(average)), Offset(math.min(x + 4, size.width), y(average)), dash);
+      }
+    }
+    final path = Path();
+    for (final (i, (t, pace)) in steps.indexed) {
+      final offset = Offset((t - first) / span * size.width, y(pace));
+      i == 0 ? path.moveTo(offset.dx, offset.dy) : path.lineTo(offset.dx, offset.dy);
+    }
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = AppColors.zoneIn
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(PaceCurvePainter oldDelegate) =>
+      oldDelegate.steps != steps || oldDelegate.averageCs != averageCs;
 }
 
 /// The RR intervals over the session as a curve and the heart rate
