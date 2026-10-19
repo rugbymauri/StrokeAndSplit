@@ -10,7 +10,7 @@ Die App speichert seit `courses` und `zones` jede Runde und jede Fahrt durch ein
   - **Vorlage**: Ein Eintrag ist eine ganze Session mit allen geplanten Runden.
   - **Strecke**: Ein Eintrag ist eine vollständige Runde. Gezählt werden alle Vorlagen, die diese Strecke verwenden.
   - **Zone**: Ein Eintrag ist eine Fahrt durch die Zone. Gezählt werden alle Strecken, in die sie eingebaut ist.
-- **Was zählt**: Auf einer Distanzachse ist es die benötigte Zeit, auf einer Zeitachse sind es die erreichten Meter. Gemessen wird nach Wanduhr inklusive Pausen, wie in `course-rowing`. Zu jedem Eintrag stehen Datum und Pace.
+- **Was zählt**: Auf einer Distanzachse ist es die benötigte Zeit, auf einer Zeitachse sind es die erreichten Meter. Gemessen wird nach Sessionzeit ohne Pausen, wie in `course-rowing` (Change `auto-pause`; Sessions von davor nach Wanduhr). Zu jedem Eintrag stehen Datum und Pace.
 - **Vergleichbar ist, was gleich lang ist.** Eine Strecke oder Zone mit einer anderen Länge bekommt eine eigene Rangliste. Bei Vorlagen müssen Streckenlänge und Rundenzahl übereinstimmen. Vorlagen mit offener Rundenzahl haben keine eigene Rangliste.
 - **Plätze 1–3** stehen an drei Stellen:
   - in der Vorlagenwahl,
