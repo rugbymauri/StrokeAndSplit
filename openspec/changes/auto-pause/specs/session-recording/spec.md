@@ -77,4 +77,4 @@ Die App SHALL jede Pause einer Session mit Beginn und Ende auf der Wanduhr speic
 
 #### Scenario: Import einer Session ohne Stillstand
 - **WHEN** eine Datei aus einer früheren Version importiert wird, in der ohne Unterbrechung gerudert wurde
-- **THEN** ergibt die importierte Session dieselbe Dauer, Distanz und Runden wie vor diesem Change und keine Pausen
+- **THEN** ergibt die importierte Session dieselbe Distanz und dieselben Runden wie vor diesem Change, keine Pausen und eine Dauer, die höchstens um ein Messintervall von der bisherigen abweicht

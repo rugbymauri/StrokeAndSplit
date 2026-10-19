@@ -9,9 +9,9 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 ## 2. Schema und Speicherung
 
 - [x] 2.1 Schema 7 nach D2/D3: `samples.active_ms`, `sessions.pause_count`, `sessions.paused_ms`, Tabelle `pauses`; Migration `from6To7`, `make schema`, `make codegen`, Schema-Kommentar zu `laps.*_wall_ms`. Verifikation: generierter Migrationstest 6 → 7 und `test/data/db` grün
-- [ ] 2.2 `SessionAccumulator` mit `AutoPause`: `progress` mit Sessionzeit, `paused`, `active_ms` pro Sample, `LapTracker` auf der Sessionzeit, abgeschlossene Pausen im Batch, laufende Pause beim `finish` verworfen. Verifikation: Unit-Tests für Samples mit Sessionzeit, Zeitstrecke und Distanzrunde ohne Pause, Zonenanteil ohne Pause, Pausen im Batch
-- [ ] 2.3 `SessionRepository`: Pausen schreiben und löschen, `finish` mit Dauer aus `active_ms` und Pausen-Summen, Wiederherstellung und Ghost über `COALESCE(active_ms, wall_ms)`, Export-Kopf mit `pauseCount`/`pausedMs`. Verifikation: Unit-Tests für Zusammenfassung mit Pausen, Export/Import mit gleichen Pausen, Import von `just_row` und `reset` mit denselben Werten wie zuvor und ohne Pausen, Wiederherstellung einer Session vor Schema 7
-- [ ] 2.4 Bestehende Tests an Sessionzeit und Pausen anpassen (Runden mit Pause, Zeitstrecke, Ghost, Ranglisten, End-to-End mit Simulator). Verifikation: `make test`
+- [x] 2.2 `SessionAccumulator` mit `AutoPause`: `progress` mit Sessionzeit, `paused`, `active_ms` pro Sample, `LapTracker` auf der Sessionzeit, abgeschlossene Pausen im Batch, laufende Pause beim `finish` verworfen. Verifikation: Unit-Tests in `test/data/sessions/session_auto_pause_test.dart` für Sessionzeit in der Pause, Zeitstrecke und Distanzrunde ohne Pause, Zonenanteil ohne Pause, Live-Stand der Runde in der Pause, Pausen im Batch
+- [x] 2.3 `SessionRepository`: Pausen schreiben, lesen und löschen, `finish` mit Dauer aus `active_ms` und Pausen-Summen, Wiederherstellung und Ghost über `COALESCE(active_ms, wall_ms)`, Export-Kopf mit `pauseCount`/`pausedMs`. Verifikation: Unit-Tests für Zusammenfassung mit Pausen, laufende Pause am Ende, Löschen, Export/Import mit gleichen Pausen (`just_row`, `pause`, `reset`), Import von `force_curve` ab dem ersten Schlag ohne Pause und mit Sessionzeit gleich Wanduhr, Ghost auf der Sessionzeit
+- [x] 2.4 Bestehende Tests an Sessionzeit und Pausen anpassen (Runden mit Pause, Wiederherstellung, Zusammenfassung, Start beim ersten Schlag, End-to-End mit Simulator). Verifikation: `flutter test` grün
 
 ## 3. Recorder und Live-Display
 

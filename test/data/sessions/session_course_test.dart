@@ -49,9 +49,9 @@ void main() {
     final (db, _) = await _record('pause');
     final samples = await db.select(db.samples).get();
 
-    final pairs = {for (final s in samples) (s.tMs, s.distanceDm)};
-    expect(pairs, hasLength(samples.length));
-    expect(samples.every((s) => s.wallMs != null), isTrue);
+    final values = {for (final s in samples) (s.tMs, s.distanceDm, s.activeMs)};
+    expect(values, hasLength(samples.length));
+    expect(samples.every((s) => s.wallMs != null && s.activeMs! <= s.wallMs!), isTrue);
     expect(await db.select(db.laps).get(), isEmpty);
   });
 
@@ -70,7 +70,8 @@ void main() {
     final samples = await (db.select(db.samples)..orderBy([(s) => OrderingTerm.asc(s.rowId)])).get();
     final tracker = LapTracker(course);
     for (final s in samples) {
-      tracker.add(TrackPoint(wallMs: s.wallMs!, distanceDm: s.distanceDm, paceCs: s.paceCs, strokeRate: s.strokeRate));
+      tracker.add(
+          TrackPoint(wallMs: s.activeMs!, distanceDm: s.distanceDm, paceCs: s.paceCs, strokeRate: s.strokeRate));
     }
     tracker.finish();
 

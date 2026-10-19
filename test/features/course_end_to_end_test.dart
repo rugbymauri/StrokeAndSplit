@@ -89,9 +89,12 @@ void main() {
     final laps = (await tester.runAsync(() => SessionRepository(db).laps(id)))!;
     expect([for (final l in laps) l.complete], [true, true]);
     expect(laps.first.inZoneShare, lessThan(laps.last.inZoneShare!));
-    // The pause counts in the time of lap 1.
+    // The session pauses and lap 1 leaves the pause out (Change auto-pause).
+    final pause = (await tester.runAsync(() => SessionRepository(db).pauses(id)))!.single;
+    final pausedMs = pause.endWallMs - pause.startWallMs;
+    expect(pausedMs, greaterThan(3000));
     int duration(LapRow lap) => lap.endWallMs - lap.startWallMs;
-    expect(duration(laps.first), greaterThan(duration(laps.last) + 8000));
+    expect(duration(laps.first), lessThan(duration(laps.last) + pausedMs));
 
     final laptop = openTestDatabase();
     final imported = await tester.runAsync(() async {

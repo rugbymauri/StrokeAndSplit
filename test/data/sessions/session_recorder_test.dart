@@ -58,7 +58,14 @@ void main() {
     final session = await setup.session(id);
 
     final distance = ticks.last.distanceMeters - ticks.first.distanceMeters;
-    final duration = ticks.last.elapsed - ticks.first.elapsed;
+    // The session time leaves out the pauses (Change auto-pause).
+    final samples = await setup.db.select(setup.db.samples).get();
+    final duration = Duration(milliseconds: samples.map((s) => s.activeMs!).reduce((a, b) => a > b ? a : b));
+    final pauses = await setup.db.select(setup.db.pauses).get();
+    expect(pauses, isNotEmpty, reason: 'the recording stops now and then');
+    expect(session.pauseCount, pauses.length);
+    expect(session.pausedMs, pauses.fold(0, (sum, p) => sum + p.endWallMs - p.startWallMs));
+    expect(session.durationMs + session.pausedMs, lessThanOrEqualTo(samples.last.wallMs!));
     expect(session.status, SessionStatus.complete);
     expect(session.source, ErgSourceKind.pm5);
     expect(session.deviceName, 'PM5 430000001 Row');

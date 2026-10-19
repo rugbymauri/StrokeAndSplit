@@ -65,7 +65,8 @@ Sessionzeit = Wanduhr minus abgeschlossene Pausen minus laufende Pause. Der Accu
 ### D5: Bestand, Import und Ranglisten
 
 - Gespeicherte Sessions werden nicht neu berechnet: Sie behalten Dauer, Runden und Zonenanteil mit Pausen und zeigen keine Pausen.
-- Import und Replay laufen über denselben Accumulator. Eine Datei ohne Stillstand ergibt dieselben Werte wie bisher; eine ältere Datei mit Stillstand bekommt beim Import Pausen und kürzere Runden.
+- Import und Replay laufen über denselben Accumulator. Eine Datei ohne Stillstand ergibt dieselbe Distanz und dieselben Runden wie bisher und keine Pause; die Dauer ist jetzt die Sessionzeit statt der Monitor-Zeit und weicht höchstens um ein Messintervall ab. Eine ältere Datei mit Stillstand bekommt beim Import Pausen und kürzere Runden. Eine Datei aus einer freien Session, die vor dem ersten Schlag gestartet wurde, bekommt am Anfang eine Pause.
+- Hebt ein spät gemeldeter Schlag eine eben begonnene Pause wieder auf (D1), behalten die Samples dieser Sekunden die stehende Sessionzeit; gespeichert wird keine Pause.
 - Ranglisten mischen damit Runden mit Pausen (alt) und ohne (neu). Der Hinweis unter den Ranglisten sagt künftig, dass Pausen nicht zählen, ausser bei Sessions vor der Auto-Pause.
 
 ## Risks / Trade-offs

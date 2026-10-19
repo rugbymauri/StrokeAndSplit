@@ -5,6 +5,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 import '../courses/course.dart';
 import '../courses/lap_tracker.dart';
 import '../db/database.dart';
+import 'auto_pause.dart';
 
 /// Rows collected since the last write.
 class SessionBatch {
@@ -15,6 +16,7 @@ class SessionBatch {
     this.laps = const [],
     this.lapSegments = const [],
     this.rrIntervals = const [],
+    this.pauses = const [],
   });
 
   final List<SamplesCompanion> samples;
@@ -23,6 +25,7 @@ class SessionBatch {
   final List<LapsCompanion> laps;
   final List<LapSegmentsCompanion> lapSegments;
   final List<RrIntervalsCompanion> rrIntervals;
+  final List<PausesCompanion> pauses;
 
   bool get isEmpty =>
       samples.isEmpty &&
@@ -30,14 +33,16 @@ class SessionBatch {
       rawPackets.isEmpty &&
       laps.isEmpty &&
       lapSegments.isEmpty &&
-      rrIntervals.isEmpty;
+      rrIntervals.isEmpty &&
+      pauses.isEmpty;
 }
 
 /// Turns the notifications of one session into session-relative rows.
 ///
 /// Recording and importing both feed the raw notifications through this,
 /// so an imported session ends up with the same rows as the recorded one.
-/// On a [course] it also follows the laps (Design D2).
+/// On a [course] it also follows the laps (Design D2). It pauses the session
+/// when the rower stops (Change auto-pause, Design D1, D2).
 class SessionAccumulator {
   SessionAccumulator(
     this.sessionId, {
@@ -53,20 +58,27 @@ class SessionAccumulator {
   final ErgProtocol protocol;
   final LapTracker? _tracker;
   final ErgDecoder _decoder;
+  final _pause = AutoPause();
   Duration? _firstPacketTime;
   var _wallMs = 0;
   SessionOffset? _offset;
   var _lastPm5Distance = 0.0;
   var _lastPm5Elapsed = Duration.zero;
-  (int, int)? _lastSample;
+  (int, int, int)? _lastSample;
 
   var _samples = <SamplesCompanion>[];
   var _strokes = <StrokesCompanion>[];
   var _rawPackets = <RawPacketsCompanion>[];
   var _rrIntervals = <RrIntervalsCompanion>[];
 
-  /// Time and distance since the session started.
-  SessionProgress get progress => _offset?.current ?? const SessionProgress(distanceMeters: 0, elapsed: Duration.zero);
+  /// Distance and session time (wall clock without pauses) since the session started.
+  SessionProgress get progress => SessionProgress(
+        distanceMeters: _offset?.current.distanceMeters ?? 0,
+        elapsed: Duration(milliseconds: _pause.activeMs),
+      );
+
+  /// Whether the session is paused because the rower stopped.
+  bool get paused => _pause.paused;
 
   /// The latest status, with the PM5's own time and distance.
   StatusTick? lastTick;
@@ -87,11 +99,14 @@ class SessionAccumulator {
       characteristicId: packet.characteristicId,
       bytes: packet.bytes,
     ));
-    _decoder.decode(packet).forEach(_onEvent);
+    final events = _decoder.decode(packet);
+    _pause.add(_wallMs, events);
+    events.forEach(_onEvent);
   }
 
   /// Handles what the decoder still holds back and closes an unfinished lap;
-  /// call once at the end.
+  /// call once at the end. A running pause is dropped: the session ends where
+  /// it began (Design D3).
   void finish() {
     _decoder.flush().forEach(_onEvent);
     _tracker?.finish();
@@ -108,6 +123,10 @@ class SessionAccumulator {
         for (final segment in tracker?.takeSegments() ?? const <SegmentResult>[]) segmentCompanion(sessionId, segment),
       ],
       rrIntervals: _rrIntervals,
+      pauses: [
+        for (final pause in _pause.takePauses())
+          PausesCompanion.insert(sessionId: sessionId, startWallMs: pause.startWallMs, endWallMs: pause.endWallMs),
+      ],
     );
     _samples = [];
     _strokes = [];
@@ -142,13 +161,16 @@ class SessionAccumulator {
 
     final tMs = progress.elapsed.inMilliseconds;
     final distanceDm = (progress.distanceMeters * 10).round();
+    final activeMs = _pause.activeMs;
     final paceCs = tick.pace == null ? null : tick.pace!.inMilliseconds ~/ 10;
     final tracker = _tracker;
-    tracker?.add(TrackPoint(wallMs: _wallMs, distanceDm: distanceDm, paceCs: paceCs, strokeRate: tick.strokeRate));
+    // The course runs on the session time, so it stands still in a pause.
+    tracker?.add(TrackPoint(wallMs: activeMs, distanceDm: distanceDm, paceCs: paceCs, strokeRate: tick.strokeRate));
     // While paused the PM5 repeats the same values; they add nothing to a
-    // free session, but on a course the zone counts the pause.
-    if (tracker == null && _lastSample == (tMs, distanceDm)) return;
-    _lastSample = (tMs, distanceDm);
+    // free session. On a course every value is kept, so the recovery feeds
+    // the laps the same points (Design D2).
+    if (tracker == null && _lastSample == (tMs, distanceDm, activeMs)) return;
+    _lastSample = (tMs, distanceDm, activeMs);
     _samples.add(SamplesCompanion.insert(
       sessionId: sessionId,
       tMs: tMs,
@@ -159,6 +181,7 @@ class SessionAccumulator {
       heartRate: Value(tick.heartRate),
       calories: Value(tick.calories),
       wallMs: Value(_wallMs),
+      activeMs: Value(activeMs),
     ));
   }
 
@@ -181,7 +204,7 @@ class SessionAccumulator {
     // Strokes carry the PM5 counters; place them relative to the last tick.
     final dt = stroke.elapsed - _lastPm5Elapsed;
     final dd = stroke.distanceMeters - _lastPm5Distance;
-    final progress = this.progress;
+    final progress = _offset!.current;
     _strokes.add(StrokesCompanion.insert(
       sessionId: sessionId,
       tMs: (progress.elapsed + (dt.isNegative ? Duration.zero : dt)).inMilliseconds,

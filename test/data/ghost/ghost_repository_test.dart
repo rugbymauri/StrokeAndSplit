@@ -9,7 +9,9 @@ import 'package:strokesplit/data/templates/session_template.dart';
 import 'package:strokesplit/data/templates/template_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:strokesplit/data/sources/erg_source.dart';
 
 import '../../support/ghost_sessions.dart';
 import '../../support/rowed_sessions.dart';
@@ -99,6 +101,36 @@ void main() {
     final entry = (await rankings.course(template.course.id)).single.entries.single;
 
     expect(await ghosts.track(entry), isNull);
+  });
+
+  test('rebuilds a lap on the session time, without the pause', () async {
+    final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
+          startedAt: DateTime(2026, 10, 18),
+          status: SessionStatus.complete,
+          source: ErgSourceKind.pm5,
+        ));
+    // 100 m in 20 s of rowing with a pause of 30 s after 10 s.
+    await db.batch((b) => b.insertAll(db.samples, [
+          for (final (wall, active, distance) in const [(0, 0, 0), (10000, 10000, 500), (40000, 10000, 500)])
+            SamplesCompanion.insert(
+                sessionId: id, tMs: active, distanceDm: distance, wallMs: Value(wall), activeMs: Value(active)),
+          SamplesCompanion.insert(
+              sessionId: id, tMs: 20000, distanceDm: 1000, wallMs: const Value(50000), activeMs: const Value(20000)),
+        ]));
+    final entry = RankingEntry(
+      sessionId: id,
+      startedAt: DateTime(2026, 10, 18),
+      startWallMs: 0,
+      endWallMs: 20000,
+      startDistanceDm: 0,
+      endDistanceDm: 1000,
+    );
+
+    final track = (await ghosts.track(entry))!;
+
+    expect((track.durationMs, track.distanceDm), (20000, 1000));
+    expect(track.distanceDmAt(10000), 500);
+    expect(track.distanceDmAt(15000), 750);
   });
 
   test('gives no course for an entry whose session is gone', () async {
