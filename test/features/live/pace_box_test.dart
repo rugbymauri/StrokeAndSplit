@@ -50,6 +50,7 @@ Future<void> _pump(
   Size size = const Size(350, 380),
   CourseDefinition course = _seerunde,
   GhostGap? ghostGap,
+  Duration? averagePace,
 }) async {
   await tester.pumpWidget(LocalizedApp(
     locale: locale,
@@ -57,7 +58,13 @@ Future<void> _pump(
       body: Center(
         child: SizedBox.fromSize(
           size: size,
-          child: PaceBox(progress: progress, course: course, pace: pace, ghostGap: ghostGap),
+          child: PaceBox(
+            progress: progress,
+            course: course,
+            pace: pace,
+            averagePace: averagePace,
+            ghostGap: ghostGap,
+          ),
         ),
       ),
     ),
@@ -93,6 +100,14 @@ void main() {
     _expectLine(const Key('pace-box-course'), 'Gesamt', '1 460 / 3 000 m');
     _expectLine(const Key('pace-box-lap'), 'Runde 2 / 3', 'noch 540 m');
     _expectLine(const Key('pace-box-segment'), 'Tempo', 'noch 340 m');
+  });
+
+  testWidgets('shows the average pace of the session, or none before the first metre', (tester) async {
+    await _pump(tester, _at(460), averagePace: const Duration(minutes: 2, seconds: 11));
+    _expectLine(const Key('pace-box-average'), 'Ø Pace', '2:11');
+
+    await _pump(tester, _at(460));
+    _expectLine(const Key('pace-box-average'), 'Ø Pace', '–:––');
   });
 
   testWidgets('asks for a faster pace when too slow, with an arrow and a word', (tester) async {

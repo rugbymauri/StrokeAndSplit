@@ -143,6 +143,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Nachtrag (Nutzer, 2026-10-19, `feature/course-calories`, Task 5.8): Beim Rudern einer Vorlage zeigt eine dritte Kachel neben Zeit und Distanz die Kalorien des Rudergeräts (PM5 0x0033, FTMS Total Energy); ohne Wert keine Kachel. Beim freien Rudern standen sie schon in der Zeile unter den Kacheln.
 - [x] Nachtrag (Nutzer, 2026-10-19, `feature/pace-zone-box`, Task 5.9): Die Pace-Box ist wie die Schlagzahl-Karte ganz in der Zonenfarbe getönt, im Band blau, ausserhalb orange; in einem freien Abschnitt bleibt sie wie bisher.
 - [x] Nachtrag (Nutzer, 2026-10-19, `feature/summary-pace`, Tasks 5.10, 5.11): Die Zusammenfassung zeigt schnellste, durchschnittliche und langsamste Pace mit ihrem Verlauf als Kurve (Schritte gleicher geruderter Zeit, ohne Pausen, Design D10) und neben Ø und Max. Puls den niedrigsten Puls.
+- [x] Nachtrag (Nutzer, 2026-10-19, `feature/live-average-pace`, Task 5.12): Beim Rudern einer Vorlage zeigt die Pace-Box als erste Legendenzeile die Ø Pace der Session; als vierte Kachel wären die Werte auf dem Handy zu klein geworden.
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 

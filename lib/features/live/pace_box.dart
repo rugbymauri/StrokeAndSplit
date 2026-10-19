@@ -26,6 +26,7 @@ class PaceBox extends StatelessWidget {
     required this.progress,
     required this.course,
     required this.pace,
+    this.averagePace,
     this.ghost,
     this.ghostGap,
   });
@@ -35,6 +36,9 @@ class PaceBox extends StatelessWidget {
 
   /// Per 500 m; null while not rowing.
   final Duration? pace;
+
+  /// Per 500 m over the whole session, as in free rowing; null before the first metre.
+  final Duration? averagePace;
   final FrameGhost? ghost;
 
   /// The gap to the ghost of the whole template; null without one, and then
@@ -48,7 +52,7 @@ class PaceBox extends StatelessWidget {
   static const minContentHeight = 260.0;
 
   /// What the content takes besides the pace, generously: label, zone status, divider and
-  /// legend including the ghost line, so [paceFontSizeFor] holds with or without a ghost.
+  /// legend including the average pace and the ghost line, so [paceFontSizeFor] holds with or without a ghost.
   static const _aroundPace = 190.0;
 
   /// At least the font size of the pace in a box of [size], so values next to the
@@ -127,6 +131,13 @@ class PaceBox extends StatelessWidget {
                         ),
                 ),
                 const Padding(padding: EdgeInsets.symmetric(vertical: AppSpacing.s), child: Divider(height: 1)),
+                // No track of its own, so no mark either.
+                _LegendLine(
+                  key: const Key('pace-box-average'),
+                  marker: const SizedBox.shrink(),
+                  label: l10n.metricAveragePace,
+                  value: formatPace(averagePace),
+                ),
                 if (model.course != null)
                   _LegendLine(
                     key: const Key('pace-box-course'),

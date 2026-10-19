@@ -8,6 +8,10 @@ import '../../l10n/l10n.dart';
 
 const _noValue = '–';
 
+/// The average pace per 500 m over [meters] in [elapsed]; null before the first metre.
+Duration? averagePace(double meters, Duration elapsed) =>
+    meters < 1 ? null : Duration(milliseconds: (elapsed.inMilliseconds * 500 / meters).round());
+
 /// Pace per 500 m in whole seconds, e.g. `2:05`.
 String formatPace(Duration? pace) {
   if (pace == null) return '–:––';

@@ -202,8 +202,17 @@ class CourseLiveView extends StatelessWidget {
 
   Widget _dim(Widget child) => Opacity(opacity: outdated ? 0.4 : 1, child: child);
 
-  Widget _paceBox() =>
-      PaceBox(progress: lap, course: course, pace: tick?.pace, ghost: ghost, ghostGap: ghostGap);
+  Widget _paceBox() => PaceBox(
+        progress: lap,
+        course: course,
+        pace: tick?.pace,
+        averagePace: averagePace(
+          session?.distanceMeters ?? tick?.distanceMeters ?? 0,
+          session?.elapsed ?? tick?.elapsed ?? Duration.zero,
+        ),
+        ghost: ghost,
+        ghostGap: ghostGap,
+      );
 
   Widget _strokeRate(double fontSize, {bool landscape = false, Widget Function(Color foreground)? footer}) =>
       StrokeRateCard(
@@ -229,17 +238,19 @@ class CourseLiveView extends StatelessWidget {
   List<Widget> _sessionTiles(BuildContext context, double fontSize) {
     final l10n = context.l10n;
     final calories = tick?.calories;
+    final elapsed = session?.elapsed ?? tick?.elapsed ?? Duration.zero;
+    final distance = session?.distanceMeters ?? tick?.distanceMeters ?? 0;
     return [
       MetricTile(
         label: l10n.metricTime,
-        value: formatElapsed(session?.elapsed ?? tick?.elapsed ?? Duration.zero),
+        value: formatElapsed(elapsed),
         valueKey: const Key('metric-elapsed'),
         fontSize: fontSize,
         compact: true,
       ),
       MetricTile(
         label: l10n.metricDistance,
-        value: formatGrouped((session?.distanceMeters ?? tick?.distanceMeters ?? 0).floor()),
+        value: formatGrouped(distance.floor()),
         unit: 'm',
         valueKey: const Key('metric-distance'),
         fontSize: fontSize,
