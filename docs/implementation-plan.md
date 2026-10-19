@@ -24,6 +24,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 7 | `ghost` | 13/14 | in Umsetzung | – |
 | 8 | `rename-stroke-and-split` | 10/11 | zuletzt | Domain- und Markenrecherche (Nutzer) |
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
+| 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 
 ## Warum diese Reihenfolge
 
@@ -249,6 +250,12 @@ Wunsch des Nutzers nach dem Gerätetest (2026-10-16). Stand 10/11.
 
 - [x] Umgesetzt: Nach der Vorlagenwahl ist die Session „bereit“ (Hinweis, keine Zeit, kein Datenbankeintrag), der erste Schlag (Schlagmeldung oder Distanzanstieg) startet sie; Nullpunkt ist der letzte Messwert davor. Freies Rudern unverändert. Simulator rudert ab Verbindung, Bereit-Zustand dort kaum sichtbar.
 - [ ] Task 4.2 (Nutzer): Gerätetest am PM5.
+
+### 11. `auto-pause`: Session pausiert, wenn man aufhört zu rudern
+
+Ziel: 3 s nach dem fälligen Schlag pausiert die Session; Sessionzeit, Rundenzeit und Zeitstrecken stehen still, bis wieder gerudert wird. Pausen werden gespeichert (Schema 7) und in der Zusammenfassung gezeigt; Ranglisten zählen ohne Pausen.
+
+- [x] Umgesetzt (2026-10-19, `feature/auto-pause`): Pausenerkennung für PM5 und FTMS (Schlag zählt zum Zeitpunkt, an dem er gerudert wurde; Pause endet auch ohne gemeldeten Schlag, sobald die Meter wieder steigen), Schema 7 mit Tabelle `pauses` und Sessionzeit ohne Pausen, Hinweis „Pause“ in der Live-Ansicht, Pausen-Kachel in der Zusammenfassung, Ranglisten ohne Pausen (Change `statistics` angepasst). Entschieden (Nutzer): Schwelle 3 s nach dem fälligen Schlag, freies Rudern startet sofort, Pause am Ende wird verworfen, Ghost steht in der Pause still, alte Runden mit Pausen bleiben in den Ranglisten. Offen: 5.2 Gerätetest.
 
 ## Offene Entscheide
 
