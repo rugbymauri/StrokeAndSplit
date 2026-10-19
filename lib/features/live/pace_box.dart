@@ -68,6 +68,12 @@ class PaceBox extends StatelessWidget {
     final model = ProgressFrameModel.of(progress, course);
     final segment = progress.segment;
     final hint = ZoneHint.pace(l10n, progress.pace);
+    // On a box tinted in the zone colour like the stroke rate card, the label and the pill follow it.
+    final labelColor = switch (hint) {
+      null => LiveTextStyles.label.color,
+      ZoneHint(inZone: true) => AppColors.zoneInText,
+      ZoneHint(inZone: false) => AppColors.zoneOutText,
+    };
     return ProgressFrame(
       model: model,
       pace: progress.pace,
@@ -86,7 +92,7 @@ class PaceBox extends StatelessWidget {
               children: [
                 Text(
                   l10n.metricPace.toUpperCase(),
-                  style: LiveTextStyles.label,
+                  style: LiveTextStyles.label.copyWith(color: labelColor),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -116,6 +122,7 @@ class PaceBox extends StatelessWidget {
                             hint: hint,
                             band: _paceBand(segment),
                             textKey: const Key('pace-box-status'),
+                            filled: true,
                           ),
                         ),
                 ),

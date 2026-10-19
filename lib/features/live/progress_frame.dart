@@ -82,10 +82,19 @@ class ProgressFramePainter extends CustomPainter {
         BandStatus.above || BandStatus.below || BandStatus.missing => AppColors.zoneOut,
       };
 
+  /// The colour of the box for the zone status of the pace: tinted like the stroke rate card in a band,
+  /// plain in a free gap.
+  static Color boxColor(BandStatus? pace) => switch (pace) {
+        null || BandStatus.none => AppColors.surface,
+        BandStatus.inBand => AppColors.zoneInSurface,
+        BandStatus.above || BandStatus.below || BandStatus.missing => AppColors.zoneOutSurface,
+      };
+
   @override
   void paint(Canvas canvas, Size size) {
     final box = Offset.zero & size;
-    canvas.drawRRect(RRect.fromRectAndRadius(box, const Radius.circular(radius)), Paint()..color = AppColors.surface);
+    final background = boxColor(pace);
+    canvas.drawRRect(RRect.fromRectAndRadius(box, const Radius.circular(radius)), Paint()..color = background);
 
     final ghost = this.ghost;
     final tracks = [
@@ -119,26 +128,26 @@ class ProgressFramePainter extends CustomPainter {
     }
     for (var i = 0; i < tracks.length; i++) {
       // Course and lap track mark their start; the segment track is the last one.
-      if (i < tracks.length - 1) _notch(canvas, metrics[i], 0);
+      if (i < tracks.length - 1) _notch(canvas, metrics[i], 0, background);
       for (final boundary in tracks[i].$1.boundaries) {
-        _notch(canvas, metrics[i], boundary);
+        _notch(canvas, metrics[i], boundary, background);
       }
     }
     // The end of a lap stands out as a bright line: at the top of the lap track,
     // and at the end of every lap on the course track.
     final lapTrack = tracks.length - 2;
-    _lapEnd(canvas, metrics[lapTrack], 0);
+    _lapEnd(canvas, metrics[lapTrack], 0, background);
     if (model.course case final course?) {
-      _lapEnd(canvas, metrics[0], 0);
+      _lapEnd(canvas, metrics[0], 0, background);
       for (final boundary in course.boundaries) {
-        _lapEnd(canvas, metrics[0], boundary);
+        _lapEnd(canvas, metrics[0], boundary, background);
       }
     }
     final boats = <List<Offset>>[];
     for (var i = 0; i < tracks.length; i++) {
       final (track, _, filled, _) = tracks[i];
       if (_tangent(metrics[i], track.share) case final tangent?) {
-        _boat(canvas, tangent.position, tangent, filled, length: _boatLength, width: _boatWidth, rim: _boatRim);
+        _boat(canvas, tangent.position, tangent, filled, background, length: _boatLength, width: _boatWidth, rim: _boatRim);
         // What shows of the boat; the rim of a ghost may lie on its rim.
         boats.add(_rhombus(tangent.position, tangent, _boatLength - _boatRim, _boatWidth - _boatRim));
       }
@@ -152,7 +161,7 @@ class ProgressFramePainter extends CustomPainter {
           final position = _ghostPosition(tangent, boats, maxShift: inset + overhang - (_ghostWidth + _ghostRim) / 2);
           // Ghosts further in keep clear of this one as well.
           boats.add(_rhombus(position, tangent, _ghostLength - _ghostRim, _ghostWidth - _ghostRim));
-          _boat(canvas, position, tangent, AppColors.ghost, length: _ghostLength, width: _ghostWidth, rim: _ghostRim);
+          _boat(canvas, position, tangent, AppColors.ghost, background, length: _ghostLength, width: _ghostWidth, rim: _ghostRim);
         }
       }
     }
@@ -230,7 +239,7 @@ class ProgressFramePainter extends CustomPainter {
   }
 
   /// A bright line across the track where a lap ends, in a cut of the colour of the box.
-  static void _lapEnd(Canvas canvas, PathMetric metric, double share) {
+  static void _lapEnd(Canvas canvas, PathMetric metric, double share, Color background) {
     final tangent = metric.getTangentForOffset(share * metric.length);
     if (tangent == null) return;
     final across = Offset(-tangent.vector.dy, tangent.vector.dx) * (trackWidth / 2 + 2);
@@ -240,7 +249,7 @@ class ProgressFramePainter extends CustomPainter {
         tangent.position + across,
         Paint()
           ..strokeWidth = 7
-          ..color = AppColors.surface,
+          ..color = background,
       )
       ..drawLine(
         tangent.position - across,
@@ -253,7 +262,7 @@ class ProgressFramePainter extends CustomPainter {
   }
 
   /// A cut across the track in the colour of the box.
-  static void _notch(Canvas canvas, PathMetric metric, double share) {
+  static void _notch(Canvas canvas, PathMetric metric, double share, Color background) {
     final tangent = metric.getTangentForOffset(share * metric.length);
     if (tangent == null) return;
     final across = Offset(-tangent.vector.dy, tangent.vector.dx) * (trackWidth / 2 + 1);
@@ -262,7 +271,7 @@ class ProgressFramePainter extends CustomPainter {
       tangent.position + across,
       Paint()
         ..strokeWidth = 3
-        ..color = AppColors.surface,
+        ..color = background,
     );
   }
 
@@ -271,7 +280,8 @@ class ProgressFramePainter extends CustomPainter {
     Canvas canvas,
     Offset position,
     Tangent tangent,
-    Color color, {
+    Color color,
+    Color background, {
     required double length,
     required double width,
     required double rim,
@@ -293,7 +303,7 @@ class ProgressFramePainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = rim
           ..strokeJoin = StrokeJoin.miter
-          ..color = AppColors.surface,
+          ..color = background,
       )
       ..restore();
   }
