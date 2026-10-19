@@ -338,6 +338,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bereit – startet mit dem ersten Schlag';
 
   @override
+  String get livePaused => 'Pause';
+
+  @override
   String get liveForceCurve => 'Kraftkurve';
 
   @override

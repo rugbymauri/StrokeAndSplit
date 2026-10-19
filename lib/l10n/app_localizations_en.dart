@@ -335,6 +335,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveReadyForFirstStroke => 'Ready – starts with your first stroke';
 
   @override
+  String get livePaused => 'Paused';
+
+  @override
   String get liveForceCurve => 'Force curve';
 
   @override

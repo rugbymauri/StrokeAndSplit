@@ -25,6 +25,7 @@ import 'live_course.dart';
 import 'live_free.dart';
 import 'live_status.dart';
 import 'progress_frame.dart';
+import 'pause_hint.dart';
 import 'ready_hint.dart';
 
 /// After this long without data the shown values are marked as outdated.
@@ -245,6 +246,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
               const ConnectionNotice(),
               const HeartRateNotice(),
               if (recording?.ready ?? false) const ReadyHint(),
+              if (recording?.paused ?? false) const PauseHint(),
               if (_stale && connected)
                 MaterialBanner(
                   content: Text(context.l10n.liveStale),

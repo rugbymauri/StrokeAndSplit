@@ -85,6 +85,7 @@
   "metricLapTime": "Lap",
   "liveStopShort": "End",
   "liveReadyForFirstStroke": "Ready – starts with your first stroke",
+  "livePaused": "Paused",
   "liveForceCurve": "Force curve",
   "liveForceCurveShort": "Force",
   "liveForceCurveLast": "Last",

@@ -126,6 +126,45 @@ void main() {
     });
   });
 
+  test('pauses when the rower stops and goes on with the next stroke (auto-pause)', () {
+    fakeAsync((async) {
+      final template = _run(async, () async {
+        final course = await CourseRepository(db)
+            .create('Vier Minuten', CourseDefinition.single(axis: CourseAxis.time, length: 240));
+        final templates = TemplateRepository(db);
+        return (await templates.get(await templates.create('Vier Minuten', courseId: course, laps: 1)))!;
+      });
+      _run(async, () async {
+        await source.start();
+        await container.read(sessionRecorderProvider.notifier).start(template: template);
+      });
+      async.elapse(const Duration(seconds: 30));
+      expect(container.read(sessionRecorderProvider)!.paused, isFalse, reason: 'rowing at 22 strokes per minute');
+
+      source.pause();
+      async.elapse(const Duration(seconds: 12));
+      final paused = container.read(sessionRecorderProvider)!;
+      expect(paused.paused, isTrue);
+      async.elapse(const Duration(seconds: 20));
+      final still = container.read(sessionRecorderProvider)!;
+      expect(still.paused, isTrue);
+      expect((still.progress.elapsed, still.lap!.remaining, still.lap!.courseTime),
+          (paused.progress.elapsed, paused.lap!.remaining, paused.lap!.courseTime));
+
+      source.resume();
+      async.elapse(const Duration(seconds: 5));
+      final rowing = container.read(sessionRecorderProvider)!;
+      expect(rowing.paused, isFalse);
+      expect(rowing.progress.elapsed - still.progress.elapsed, lessThanOrEqualTo(const Duration(seconds: 5)));
+
+      final id = _run(async, container.read(sessionRecorderProvider.notifier).stop)!;
+      final session = _run(async, (db.select(db.sessions)..where((s) => s.id.equals(id))).getSingle);
+      expect(session.pauseCount, 1);
+      expect(session.pausedMs, greaterThan(20000));
+      source.stop();
+    });
+  });
+
   test('a session without template has no laps', () {
     fakeAsync((async) {
       _run(async, () async {

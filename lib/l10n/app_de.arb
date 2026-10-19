@@ -435,6 +435,10 @@
   "@liveReadyForFirstStroke": {
     "description": "Live display on a template: notice while the session waits for the first stroke to start"
   },
+  "livePaused": "Pause",
+  "@livePaused": {
+    "description": "Live display: large notice while the session is paused because the rower stopped; it goes on with the next stroke"
+  },
   "liveForceCurve": "Kraftkurve",
   "@liveForceCurve": {
     "description": "Live display: title of the force curve of the last stroke"

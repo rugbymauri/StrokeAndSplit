@@ -613,6 +613,12 @@ abstract class AppLocalizations {
   /// **'Bereit – startet mit dem ersten Schlag'**
   String get liveReadyForFirstStroke;
 
+  /// Live display: large notice while the session is paused because the rower stopped; it goes on with the next stroke
+  ///
+  /// In de, this message translates to:
+  /// **'Pause'**
+  String get livePaused;
+
   /// Live display: title of the force curve of the last stroke
   ///
   /// In de, this message translates to:

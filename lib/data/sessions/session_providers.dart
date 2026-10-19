@@ -38,7 +38,13 @@ final sessionRrIntervalsProvider = FutureProvider.family<List<RrIntervalRow>, in
 /// A session being recorded right now, or with a template one that is ready
 /// and starts with the first stroke.
 class ActiveRecording {
-  const ActiveRecording({required this.sessionId, required this.progress, this.template, this.lap});
+  const ActiveRecording({
+    required this.sessionId,
+    required this.progress,
+    this.template,
+    this.lap,
+    this.paused = false,
+  });
 
   /// Null while the session is ready but not started; nothing is stored yet.
   final int? sessionId;
@@ -51,6 +57,9 @@ class ActiveRecording {
 
   /// Where the session is on the course of [template].
   final LapProgress? lap;
+
+  /// Whether the session is paused because the rower stopped (Change auto-pause, Design D4).
+  final bool paused;
 
   /// Whether the session waits for the first stroke (start-on-first-stroke, Design D1).
   bool get ready => sessionId == null;
@@ -141,13 +150,15 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
           progress: accumulator.progress,
           template: template,
           lap: accumulator.lapProgress,
+          paused: accumulator.paused,
         );
     void add(RawPacket packet) {
       // Stopped after the last lap while the early packets are still added.
       if (_accumulator != accumulator) return;
       accumulator.add(packet);
-      // On a course the rest of a time segment runs on while paused.
-      if (template != null || accumulator.progress != state?.progress) state = current();
+      // On a course the live state follows every value, e.g. the zone status.
+      final changed = accumulator.progress != state?.progress || accumulator.paused != state?.paused;
+      if (template != null || changed) state = current();
       if (accumulator.lapsFinished) unawaited(_finishAfterLastLap());
     }
 

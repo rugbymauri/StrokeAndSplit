@@ -15,8 +15,8 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 3. Recorder und Live-Display
 
-- [ ] 3.1 `ActiveRecording.paused`, Recorder aktualisiert den Zustand bei Wechsel von Pause oder Fortschritt (D4). Verifikation: Unit-Test mit Simulator in Fake-Zeit: Pause nach dem Anhalten, Zeit steht, weiter mit dem nächsten Schlag
-- [ ] 3.2 Text `livePaused` („Pause“ / „Paused“) mit `@`-Beschreibung, `make l10n`; Widget `PauseHint` in `lib/features/live/pause_hint.dart`, in `LiveScreen` mit einer Zeile eingebunden. Verifikation: Widget-Test, Hinweis sichtbar in der Pause und weg nach dem nächsten Schlag; `test/l10n/arb_keys_test.dart`
+- [x] 3.1 `ActiveRecording.paused`, Recorder aktualisiert den Zustand bei Wechsel von Pause oder Fortschritt (D4). Verifikation: Unit-Test mit Simulator in Fake-Zeit: Pause nach dem Anhalten, Zeit steht, weiter mit dem nächsten Schlag
+- [x] 3.2 Text `livePaused` („Pause“ / „Paused“) mit `@`-Beschreibung, `make l10n`; Widget `PauseHint` in `lib/features/live/pause_hint.dart`, in `LiveScreen` mit einer Zeile eingebunden. Verifikation: Widget-Test, Hinweis sichtbar in der Pause und weg nach dem nächsten Schlag; `test/l10n/arb_keys_test.dart`
 
 ## 4. Zusammenfassung und Ranglisten
 
