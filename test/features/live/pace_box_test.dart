@@ -4,6 +4,8 @@ import 'package:strokesplit/app/widgets/ghost_symbol.dart';
 import 'package:strokesplit/data/courses/lap_tracker.dart';
 import 'package:strokesplit/data/ghost/ghost.dart';
 import 'package:strokesplit/features/live/pace_box.dart';
+import 'package:strokesplit/features/live/progress_frame.dart';
+import 'package:strokesplit/features/live/zone_hint.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -117,6 +119,24 @@ void main() {
     expect(find.byKey(const Key('pace-box-status')), findsNothing);
     expect(find.byIcon(Icons.check_circle), findsNothing);
     expect(find.byIcon(Icons.arrow_upward), findsNothing);
+  });
+
+  testWidgets('tints the box in the zone colour and keeps it plain in a free gap', (tester) async {
+    BandStatus? boxPace() => tester.widget<ProgressFrame>(find.byType(ProgressFrame)).pace;
+    Color? labelColor() => tester.widget<Text>(find.text('PACE /500 M')).style?.color;
+
+    await _pump(tester, _at(460));
+    expect(ProgressFramePainter.boxColor(boxPace()), AppColors.zoneInSurface);
+    expect(labelColor(), AppColors.zoneInText);
+    expect(tester.widget<ZonePill>(find.byType(ZonePill)).filled, isTrue);
+
+    await _pump(tester, _at(460, pace: BandStatus.above));
+    expect(ProgressFramePainter.boxColor(boxPace()), AppColors.zoneOutSurface);
+    expect(labelColor(), AppColors.zoneOutText);
+
+    await _pump(tester, _at(100, segment: _free, index: 0, pace: BandStatus.none));
+    expect(ProgressFramePainter.boxColor(boxPace()), AppColors.surface);
+    expect(labelColor(), isNot(anyOf(AppColors.zoneInText, AppColors.zoneOutText)));
   });
 
   testWidgets('names the lap without a total and leaves out the course with an open number of laps', (tester) async {

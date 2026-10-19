@@ -87,6 +87,15 @@ void main() {
     expect(ProgressFramePainter.segmentColor(null), AppColors.textMuted);
   });
 
+  test('tints the box like the stroke rate card in a band and leaves it plain in a free gap', () {
+    expect(ProgressFramePainter.boxColor(BandStatus.inBand), AppColors.zoneInSurface);
+    expect(ProgressFramePainter.boxColor(BandStatus.above), AppColors.zoneOutSurface);
+    expect(ProgressFramePainter.boxColor(BandStatus.below), AppColors.zoneOutSurface);
+    expect(ProgressFramePainter.boxColor(BandStatus.missing), AppColors.zoneOutSurface);
+    expect(ProgressFramePainter.boxColor(BandStatus.none), AppColors.surface);
+    expect(ProgressFramePainter.boxColor(null), AppColors.surface);
+  });
+
   testWidgets('keeps the child inside the tracks', (tester) async {
     await _pump(tester, ProgressFrame(model: _filled(0.46), child: const SizedBox.expand(key: Key('inside'))));
 
