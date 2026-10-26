@@ -170,6 +170,20 @@ void main() {
       expect((tracker.progress.pace, tracker.progress.strokeRate), (BandStatus.missing, BandStatus.missing));
     });
 
+    test('compares the pace in whole seconds as shown', () {
+      // The band of "Tempo" is 2:05–2:10.
+      final tracker = LapTracker(_seerunde)..add(_at(0, 0));
+      for (final (i, (pace, status)) in const [
+        (12450, BandStatus.inBand),
+        (12449, BandStatus.below),
+        (13049, BandStatus.inBand),
+        (13050, BandStatus.above),
+      ].indexed) {
+        tracker.add(_at(100 + i, 300 + i, pace: pace, spm: 21));
+        expect(tracker.progress.pace, status, reason: '$pace');
+      }
+    });
+
     test('a free segment has no zone', () {
       final tracker = LapTracker(_seerunde)..add(_at(10, 40));
 

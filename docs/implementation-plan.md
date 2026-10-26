@@ -145,6 +145,7 @@ Alle Entscheide getroffen: F1 (Puls-Herkunft), F2 (Mittelweg, Design D6) und F12
 - [x] Nachtrag (Nutzer, 2026-10-19, `feature/summary-pace`, Tasks 5.10, 5.11): Die Zusammenfassung zeigt schnellste, durchschnittliche und langsamste Pace mit ihrem Verlauf als Kurve (Schritte gleicher geruderter Zeit, ohne Pausen, Design D10) und neben Ø und Max. Puls den niedrigsten Puls.
 - [x] Nachtrag (Nutzer, 2026-10-19, `feature/live-average-pace`, Task 5.12): Beim Rudern einer Vorlage zeigt die Pace-Box als erste Legendenzeile die Ø Pace der Session; als vierte Kachel wären die Werte auf dem Handy zu klein geworden.
 - [x] Nachtrag (Nutzer, 2026-10-26, `feature/upcoming-zone`, Task 5.13): 10 s vor dem Beginn einer Zone blinken ihr Pace- und Schlagzahl-Band gelb an Stelle des Zonenstatus unter der Pace und auf der Schlagzahl-Karte.
+- [x] Nachtrag (Nutzer, 2026-10-26, `refactor/pace-band-rounding`, Task 5.14): Der Zonenstatus der Pace vergleicht die angezeigte Pace in ganzen Sekunden, damit „2:45“ bei einem Band von 2:45–2:50 an beiden Grenzen in der Zone ist.
 
 ### 4. `force-curve`: Kraftkurve lesen, anzeigen, aufzeichnen
 

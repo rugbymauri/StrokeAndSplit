@@ -314,8 +314,10 @@ class LapTracker {
   static BandStatus _paceStatus(CourseSegment segment, int? paceCs) {
     if (!segment.hasPaceBand) return BandStatus.none;
     if (paceCs == null) return BandStatus.missing;
-    if (paceCs < segment.paceFastCs!) return BandStatus.below;
-    if (paceCs > segment.paceSlowCs!) return BandStatus.above;
+    // The pace as the rower sees it, in whole seconds, so `2:45` is in a band from 2:45 even at 2:44.6.
+    final shownCs = (paceCs / 100).round() * 100;
+    if (shownCs < segment.paceFastCs!) return BandStatus.below;
+    if (shownCs > segment.paceSlowCs!) return BandStatus.above;
     return BandStatus.inBand;
   }
 
