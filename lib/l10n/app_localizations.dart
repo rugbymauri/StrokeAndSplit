@@ -721,6 +721,12 @@ abstract class AppLocalizations {
   /// **'gleichauf'**
   String get paceBoxGhostLevel;
 
+  /// Live display: the band of the zone that starts in a few seconds, e.g. 'Gleich 2:05–2:10' or 'Gleich 20–24 spm'
+  ///
+  /// In de, this message translates to:
+  /// **'Gleich {band}'**
+  String hintUpcoming(String band);
+
   /// Live display: the value is within the zone's band
   ///
   /// In de, this message translates to:

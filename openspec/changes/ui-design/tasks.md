@@ -46,6 +46,7 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 - [x] 5.10 Zusammenfassung: schnellste, durchschnittliche und langsamste Pace und ihr Verlauf als Kurve in Schritten gleicher geruderter Zeit, ohne Pausen (Design D10; Nutzer, 2026-10-19). Verifikation: Unit-Tests der Schritte (gleichmässig, Wechsel, Pause, kurzer letzter Schritt, lange Session), Widget-Tests mit und ohne Samples
 - [x] 5.11 Zusammenfassung: niedrigster Puls neben Ø und Max. Puls, aus den Samples ohne 0 (Design D10; Nutzer, 2026-10-19). Verifikation: Widget-Tests mit Samples und ohne
 - [x] 5.12 Ø Pace der Session beim Rudern einer Vorlage als erste Zeile der Legende in der Pace-Box (Design D3; Nutzer, 2026-10-19). Verifikation: Widget-Tests mit Wert und vor dem ersten Meter, Live-Tests ohne Überlauf in allen Grössen, Pace bleibt der grösste Text
+- [x] 5.13 10 s vor dem Beginn einer Zone blinken ihre Bänder gelb an Stelle des Zonenstatus unter der Pace und auf der Schlagzahl-Karte (Design D3; Nutzer, 2026-10-26). Verifikation: Unit-Tests der Vorschau (Distanz über die aktuelle Pace, Zeit, freier Abschnitt, gleiche Bänder, nächste Runde, letzte Runde), Widget-Tests des Blinkens und mit reduzierter Bewegung, Live-Tests ohne Überlauf in allen Grössen
 
 ## 6. Abschluss
 

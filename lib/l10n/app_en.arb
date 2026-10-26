@@ -103,6 +103,7 @@
   "paceBoxGhostAhead": "{amount} ahead of you",
   "paceBoxGhostBehind": "{amount} behind you",
   "paceBoxGhostLevel": "level",
+  "hintUpcoming": "Next {band}",
   "hintInZone": "In the zone",
   "hintFaster": "Faster",
   "hintSlower": "Slower",

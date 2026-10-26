@@ -406,6 +406,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get paceBoxGhostLevel => 'gleichauf';
 
   @override
+  String hintUpcoming(String band) {
+    return 'Gleich $band';
+  }
+
+  @override
   String get hintInZone => 'In der Zone';
 
   @override

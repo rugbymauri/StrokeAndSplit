@@ -403,6 +403,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paceBoxGhostLevel => 'level';
 
   @override
+  String hintUpcoming(String band) {
+    return 'Next $band';
+  }
+
+  @override
   String get hintInZone => 'In the zone';
 
   @override

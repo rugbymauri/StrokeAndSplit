@@ -6,6 +6,7 @@ import '../../data/courses/lap_tracker.dart';
 import '../../l10n/l10n.dart';
 import 'formatters.dart';
 import 'live_text_styles.dart';
+import 'upcoming_zone.dart';
 import 'zone_hint.dart';
 
 /// The stroke rate while rowing a template, coloured by its zone status and
@@ -19,6 +20,7 @@ class StrokeRateCard extends StatelessWidget {
     required this.fontSize,
     this.landscape = false,
     this.footer,
+    this.upcoming,
   });
 
   final int? strokeRate;
@@ -33,6 +35,9 @@ class StrokeRateCard extends StatelessWidget {
 
   /// Builds what goes below the value in landscape, e.g. the force curve, in the colour of the label.
   final Widget Function(Color foreground)? footer;
+
+  /// The zone that starts in a few seconds; its stroke rate band blinks in place of the zone status.
+  final CourseSegment? upcoming;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +58,16 @@ class StrokeRateCard extends StatelessWidget {
     );
     // In the zone a quiet line; out of it an instruction as a pill like in the pace box, which stands out
     // and keeps its words, on a line of its own below the label (Design D3).
+    final upcoming = this.upcoming;
     final Widget? status = switch (hint) {
+      _ when upcoming != null && upcoming.hasSpmBand => UpcomingPill(
+          key: const Key('stroke-card-upcoming'),
+          text: l10n.hintUpcoming('${upcoming.spmMin}–${upcoming.spmMax} spm'),
+          textKey: const Key('stroke-card-upcoming-band'),
+          // Band and unit belong together, so it shrinks rather than wrapping in a narrow card.
+          scaleDown: true,
+          dense: true,
+        ),
       null => null,
       ZoneHint(inZone: true) => Row(
           mainAxisSize: MainAxisSize.min,
@@ -135,7 +149,8 @@ class StrokeRateCard extends StatelessWidget {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (hint == null || hint.inZone)
+                  // The upcoming band gets a line of its own like an instruction, so it keeps its words.
+                  if ((hint == null || hint.inZone) && status is! UpcomingPill)
                     Row(children: [Expanded(child: label), if (status != null) Flexible(child: status)])
                   else ...[
                     label,
@@ -154,7 +169,10 @@ class StrokeRateCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         label,
-                        if (status != null) ...[SizedBox(height: hint!.inZone ? 2 : AppSpacing.xs), status],
+                        if (status != null) ...[
+                          SizedBox(height: hint != null && hint.inZone && status is! UpcomingPill ? 2 : AppSpacing.xs),
+                          status,
+                        ],
                       ],
                     ),
                   ),

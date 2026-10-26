@@ -96,11 +96,13 @@ ActiveRecording _onCourse({
   CourseSegment segment = _band,
   BandStatus pace = BandStatus.inBand,
   BandStatus strokeRate = BandStatus.inBand,
+  CourseSegment next = const CourseSegment(length: 200),
+  double remaining = 280,
 }) {
   final course = CourseDefinition(
     axis: CourseAxis.distance,
     length: 1000,
-    segments: [const CourseSegment(length: 200), segment.withLength(600), const CourseSegment(length: 200)],
+    segments: [const CourseSegment(length: 200), segment.withLength(600), next.withLength(200)],
   );
   return ActiveRecording(
     sessionId: 1,
@@ -118,7 +120,7 @@ ActiveRecording _onCourse({
       segment: course.segments[1],
       segmentStart: 200,
       segmentEnd: 800,
-      remaining: 280,
+      remaining: remaining,
       pace: pace,
       strokeRate: strokeRate,
       lapInZoneShare: segment.isFree ? null : 0.75,
@@ -928,6 +930,63 @@ void main() {
       // 68 before; the shrunk content kept its full width.
       expect(height(tester, 'pace-box-pace'), greaterThan(90));
       expect(height(tester, 'metric-watts'), greaterThan(40));
+    });
+  });
+
+  // The bands of the next zone blink in yellow below the pace and on the stroke rate card (Design D3).
+  group('upcoming zone', () {
+    setUpAll(loadAppFonts);
+
+    const sprint = CourseSegment(
+      length: 200,
+      paceFastCs: 11500,
+      paceSlowCs: 12000,
+      spmMin: 26,
+      spmMax: 30,
+      zoneId: 2,
+      zoneName: 'Sprint',
+    );
+
+    for (final MapEntry(key: name, value: size) in layouts.entries) {
+      testWidgets('shows its bands in place of the zone status on a $name', (tester) async {
+        final harness = _Harness();
+        // 30 m at 2:05.3 are 7.5 s.
+        await harness.pump(
+          tester,
+          size: size,
+          recording: _onCourse(pace: BandStatus.above, strokeRate: BandStatus.below, next: sprint, remaining: 30),
+        );
+        await harness.emit(tester, _tick(heartRate: 151, calories: 1187));
+
+        expect(tester.widget<Text>(find.byKey(const Key('pace-box-upcoming-band'))).data, 'Gleich 1:55–2:00');
+        expect(tester.widget<Text>(find.byKey(const Key('stroke-card-upcoming-band'))).data, 'Gleich 26–30 spm');
+        expect(find.byKey(const Key('pace-box-status')), findsNothing);
+        expect(find.byKey(const Key('stroke-card-status')), findsNothing);
+        final card = tester.getRect(find.byType(StrokeRateCard));
+        for (final key in const ['pace-box-upcoming', 'stroke-card-upcoming']) {
+          final rect = tester.getRect(find.byKey(Key(key)));
+          expect(rect.bottom, lessThanOrEqualTo(size.height), reason: key);
+          expect(rect.right, lessThanOrEqualTo(size.width), reason: key);
+        }
+        final pill = tester.getRect(find.byKey(const Key('stroke-card-upcoming')));
+        expect(card.contains(pill.topLeft) && card.contains(pill.bottomRight - const Offset(1, 1)), isTrue);
+        expect(
+          tester.renderObject<RenderParagraph>(find.byKey(const Key('stroke-card-upcoming-band'))).didExceedMaxLines,
+          isFalse,
+        );
+        _expectLargestPace(tester, find.byKey(ValueKey(LiveLayout.of(size))), const Key('pace-box-pace'));
+      });
+    }
+
+    testWidgets('waits until the zone is 10 seconds away', (tester) async {
+      final harness = _Harness();
+      // 50 m at 2:05.3 are 12.5 s.
+      await harness.pump(tester, recording: _onCourse(next: sprint, remaining: 50));
+      await harness.emit(tester, _tick(heartRate: 151));
+
+      expect(find.byKey(const Key('pace-box-upcoming')), findsNothing);
+      expect(find.byKey(const Key('stroke-card-upcoming')), findsNothing);
+      expect(find.byKey(const Key('pace-box-status')), findsOneWidget);
     });
   });
 
