@@ -547,6 +547,15 @@
   "@paceBoxGhostLevel": {
     "description": "Pace box: the rower and the ghost are level"
   },
+  "hintUpcoming": "Gleich {band}",
+  "@hintUpcoming": {
+    "description": "Live display: the band of the zone that starts in a few seconds, e.g. 'Gleich 2:05–2:10' or 'Gleich 20–24 spm'",
+    "placeholders": {
+      "band": {
+        "type": "String"
+      }
+    }
+  },
   "hintInZone": "In der Zone",
   "@hintInZone": {
     "description": "Live display: the value is within the zone's band"

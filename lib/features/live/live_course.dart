@@ -16,6 +16,7 @@ import 'metric_tile.dart';
 import 'pace_box.dart';
 import 'progress_frame.dart';
 import 'stroke_rate_card.dart';
+import 'upcoming_zone.dart';
 
 /// The live display while rowing a template (ui-design, Design D2): the pace
 /// box with the progress frame, the stroke rate card, the small tiles of the session and the lap, the
@@ -212,6 +213,7 @@ class CourseLiveView extends StatelessWidget {
         ),
         ghost: ghost,
         ghostGap: ghostGap,
+        upcoming: _upcoming,
       );
 
   Widget _strokeRate(double fontSize, {bool landscape = false, Widget Function(Color foreground)? footer}) =>
@@ -222,7 +224,10 @@ class CourseLiveView extends StatelessWidget {
           fontSize: fontSize,
           landscape: landscape,
           footer: footer,
+          upcoming: _upcoming,
         );
+
+  CourseSegment? get _upcoming => upcomingZone(lap, course, tick?.pace);
 
   Widget _tileRow(List<Widget> tiles) => Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -15,6 +15,7 @@ import 'live_text_styles.dart';
 import 'metric_tile.dart';
 import 'progress_frame.dart';
 import 'progress_frame_model.dart';
+import 'upcoming_zone.dart';
 
 /// The pace while rowing a template, inside the progress frame, with the
 /// zone status of the pace and a legend line for each track (ui-design,
@@ -29,6 +30,7 @@ class PaceBox extends StatelessWidget {
     this.averagePace,
     this.ghost,
     this.ghostGap,
+    this.upcoming,
   });
 
   final LapProgress progress;
@@ -44,6 +46,9 @@ class PaceBox extends StatelessWidget {
   /// The gap to the ghost of the whole template; null without one, and then
   /// the box has no ghost line.
   final GhostGap? ghostGap;
+
+  /// The zone that starts in a few seconds; its pace band blinks in place of the zone status.
+  final CourseSegment? upcoming;
 
   /// Room for the zone status, kept free without one so the pace stays put.
   static const statusHeight = 32.0;
@@ -118,7 +123,15 @@ class PaceBox extends StatelessWidget {
                 ),
                 SizedBox(
                   height: statusHeight,
-                  child: hint == null
+                  child: upcoming != null && upcoming!.hasPaceBand
+                      ? Center(
+                          child: UpcomingPill(
+                            key: const Key('pace-box-upcoming'),
+                            text: l10n.hintUpcoming(_paceBand(upcoming!)!),
+                            textKey: const Key('pace-box-upcoming-band'),
+                          ),
+                        )
+                      : hint == null
                       ? null
                       : Center(
                           child: ZonePill(
