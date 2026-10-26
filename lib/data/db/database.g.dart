@@ -7258,10 +7258,11 @@ class $$TemplatesTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (sessionsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           TemplateRow,
                           $TemplatesTable,
-                          SessionRow
+                          SessionRow,
+                          $SessionsTable
                         >(
                           currentTable: table,
                           referencedTable: $$TemplatesTableReferences
@@ -7272,17 +7273,16 @@ class $$TemplatesTableTableManager
                                 table,
                                 p0,
                               ).sessionsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.templateId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'template_id',
                           typedResults: items,
                         ),
                       if (templateBlocksRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           TemplateRow,
                           $TemplatesTable,
-                          TemplateBlockRow
+                          TemplateBlockRow,
+                          $TemplateBlocksTable
                         >(
                           currentTable: table,
                           referencedTable: $$TemplatesTableReferences
@@ -7293,10 +7293,8 @@ class $$TemplatesTableTableManager
                                 table,
                                 p0,
                               ).templateBlocksRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.templateId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'template_id',
                           typedResults: items,
                         ),
                     ];
@@ -7631,10 +7629,11 @@ class $$CoursesTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (courseVersionsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           CourseRow,
                           $CoursesTable,
-                          CourseVersionRow
+                          CourseVersionRow,
+                          $CourseVersionsTable
                         >(
                           currentTable: table,
                           referencedTable: $$CoursesTableReferences
@@ -7645,17 +7644,16 @@ class $$CoursesTableTableManager
                                 table,
                                 p0,
                               ).courseVersionsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.courseId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'course_id',
                           typedResults: items,
                         ),
                       if (templateBlocksRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           CourseRow,
                           $CoursesTable,
-                          TemplateBlockRow
+                          TemplateBlockRow,
+                          $TemplateBlocksTable
                         >(
                           currentTable: table,
                           referencedTable: $$CoursesTableReferences
@@ -7666,10 +7664,8 @@ class $$CoursesTableTableManager
                                 table,
                                 p0,
                               ).templateBlocksRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.courseId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'course_id',
                           typedResults: items,
                         ),
                     ];
@@ -8138,10 +8134,11 @@ class $$CourseVersionsTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (sessionsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           CourseVersionRow,
                           $CourseVersionsTable,
-                          SessionRow
+                          SessionRow,
+                          $SessionsTable
                         >(
                           currentTable: table,
                           referencedTable: $$CourseVersionsTableReferences
@@ -8152,17 +8149,16 @@ class $$CourseVersionsTableTableManager
                                 table,
                                 p0,
                               ).sessionsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.courseVersionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'course_version_id',
                           typedResults: items,
                         ),
                       if (courseSegmentsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           CourseVersionRow,
                           $CourseVersionsTable,
-                          CourseSegmentRow
+                          CourseSegmentRow,
+                          $CourseSegmentsTable
                         >(
                           currentTable: table,
                           referencedTable: $$CourseVersionsTableReferences
@@ -8173,10 +8169,8 @@ class $$CourseVersionsTableTableManager
                                 table,
                                 p0,
                               ).courseSegmentsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.versionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'version_id',
                           typedResults: items,
                         ),
                     ];
@@ -9455,10 +9449,11 @@ class $$SessionsTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (samplesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           SessionRow,
                           $SessionsTable,
-                          SampleRow
+                          SampleRow,
+                          $SamplesTable
                         >(
                           currentTable: table,
                           referencedTable: $$SessionsTableReferences
@@ -9469,17 +9464,16 @@ class $$SessionsTableTableManager
                                 table,
                                 p0,
                               ).samplesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.sessionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'session_id',
                           typedResults: items,
                         ),
                       if (strokesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           SessionRow,
                           $SessionsTable,
-                          StrokeRow
+                          StrokeRow,
+                          $StrokesTable
                         >(
                           currentTable: table,
                           referencedTable: $$SessionsTableReferences
@@ -9490,17 +9484,16 @@ class $$SessionsTableTableManager
                                 table,
                                 p0,
                               ).strokesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.sessionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'session_id',
                           typedResults: items,
                         ),
                       if (rawPacketsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           SessionRow,
                           $SessionsTable,
-                          RawPacketRow
+                          RawPacketRow,
+                          $RawPacketsTable
                         >(
                           currentTable: table,
                           referencedTable: $$SessionsTableReferences
@@ -9511,34 +9504,32 @@ class $$SessionsTableTableManager
                                 table,
                                 p0,
                               ).rawPacketsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.sessionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'session_id',
                           typedResults: items,
                         ),
                       if (lapsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           SessionRow,
                           $SessionsTable,
-                          LapRow
+                          LapRow,
+                          $LapsTable
                         >(
                           currentTable: table,
                           referencedTable: $$SessionsTableReferences
                               ._lapsRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$SessionsTableReferences(db, table, p0).lapsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.sessionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'session_id',
                           typedResults: items,
                         ),
                       if (lapSegmentsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           SessionRow,
                           $SessionsTable,
-                          LapSegmentRow
+                          LapSegmentRow,
+                          $LapSegmentsTable
                         >(
                           currentTable: table,
                           referencedTable: $$SessionsTableReferences
@@ -9549,17 +9540,16 @@ class $$SessionsTableTableManager
                                 table,
                                 p0,
                               ).lapSegmentsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.sessionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'session_id',
                           typedResults: items,
                         ),
                       if (rrIntervalsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           SessionRow,
                           $SessionsTable,
-                          RrIntervalRow
+                          RrIntervalRow,
+                          $RrIntervalsTable
                         >(
                           currentTable: table,
                           referencedTable: $$SessionsTableReferences
@@ -9570,17 +9560,16 @@ class $$SessionsTableTableManager
                                 table,
                                 p0,
                               ).rrIntervalsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.sessionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'session_id',
                           typedResults: items,
                         ),
                       if (pausesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           SessionRow,
                           $SessionsTable,
-                          PauseRow
+                          PauseRow,
+                          $PausesTable
                         >(
                           currentTable: table,
                           referencedTable: $$SessionsTableReferences
@@ -9591,10 +9580,8 @@ class $$SessionsTableTableManager
                                 table,
                                 p0,
                               ).pausesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.sessionId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'session_id',
                           typedResults: items,
                         ),
                     ];
@@ -11094,10 +11081,11 @@ class $$ZonesTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (courseSegmentsRefs)
-                    await $_getPrefetchedData<
+                    await $_getPrefetchedDataByColumns<
                       ZoneRow,
                       $ZonesTable,
-                      CourseSegmentRow
+                      CourseSegmentRow,
+                      $CourseSegmentsTable
                     >(
                       currentTable: table,
                       referencedTable: $$ZonesTableReferences
@@ -11107,8 +11095,8 @@ class $$ZonesTableTableManager
                         table,
                         p0,
                       ).courseSegmentsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.zoneId == item.id),
+                      currentColumn: 'id',
+                      referencedColumn: 'zone_id',
                       typedResults: items,
                     ),
                 ];
