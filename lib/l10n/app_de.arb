@@ -1558,5 +1558,42 @@
   "healthPrivacyStop": "Du kannst die Übertragung jederzeit ausschalten. Übertragene Einheiten löschst du in Health Connect.",
   "@healthPrivacyStop": {
     "description": "Privacy notice, paragraph 5"
+  },
+  "healthSend": "An Health Connect senden",
+  "@healthSend": {
+    "description": "Menu entry in the session list and button in the summary that sends one session to Health Connect"
+  },
+  "healthSent": "An Health Connect übertragen.",
+  "@healthSent": {
+    "description": "Message after a session was sent to Health Connect"
+  },
+  "healthSentAt": "An Health Connect übertragen am {date}",
+  "@healthSentAt": {
+    "description": "Status in the summary of a session that is in Health Connect; date is date and time of the last successful send",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "healthNotSent": "Nicht an Health Connect übertragen",
+  "@healthNotSent": {
+    "description": "Status in the summary of a session that is not in Health Connect"
+  },
+  "healthFailedPermission": "Stroke & Split darf nicht an Health Connect schreiben.",
+  "@healthFailedPermission": {
+    "description": "Message when sending a session failed because the permission is missing; offered with a button to grant it"
+  },
+  "healthFailedUnavailable": "Health Connect ist nicht verfügbar.",
+  "@healthFailedUnavailable": {
+    "description": "Message when sending a session failed because Health Connect is missing or too old"
+  },
+  "healthFailed": "Übertragung an Health Connect fehlgeschlagen.",
+  "@healthFailed": {
+    "description": "Message when Health Connect refused a session for another reason"
+  },
+  "healthGrantShort": "Erteilen",
+  "@healthGrantShort": {
+    "description": "Short button in the message about a missing Health Connect permission that asks for it again; must stay short to fit next to the message"
   }
 }

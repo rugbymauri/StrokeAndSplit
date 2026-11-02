@@ -1848,6 +1848,54 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Du kannst die Übertragung jederzeit ausschalten. Übertragene Einheiten löschst du in Health Connect.'**
   String get healthPrivacyStop;
+
+  /// Menu entry in the session list and button in the summary that sends one session to Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'An Health Connect senden'**
+  String get healthSend;
+
+  /// Message after a session was sent to Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'An Health Connect übertragen.'**
+  String get healthSent;
+
+  /// Status in the summary of a session that is in Health Connect; date is date and time of the last successful send
+  ///
+  /// In de, this message translates to:
+  /// **'An Health Connect übertragen am {date}'**
+  String healthSentAt(String date);
+
+  /// Status in the summary of a session that is not in Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht an Health Connect übertragen'**
+  String get healthNotSent;
+
+  /// Message when sending a session failed because the permission is missing; offered with a button to grant it
+  ///
+  /// In de, this message translates to:
+  /// **'Stroke & Split darf nicht an Health Connect schreiben.'**
+  String get healthFailedPermission;
+
+  /// Message when sending a session failed because Health Connect is missing or too old
+  ///
+  /// In de, this message translates to:
+  /// **'Health Connect ist nicht verfügbar.'**
+  String get healthFailedUnavailable;
+
+  /// Message when Health Connect refused a session for another reason
+  ///
+  /// In de, this message translates to:
+  /// **'Übertragung an Health Connect fehlgeschlagen.'**
+  String get healthFailed;
+
+  /// Short button in the message about a missing Health Connect permission that asks for it again; must stay short to fit next to the message
+  ///
+  /// In de, this message translates to:
+  /// **'Erteilen'**
+  String get healthGrantShort;
 }
 
 class _AppLocalizationsDelegate

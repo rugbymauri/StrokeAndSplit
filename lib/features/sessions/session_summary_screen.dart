@@ -37,6 +37,13 @@ class SessionSummaryScreen extends ConsumerWidget {
       appBar: AppBar(
         actions: [
           if (session.value case final row?) ...[
+            if (canSendToHealth(ref, row))
+              IconButton(
+                key: const Key('summary-health-send'),
+                tooltip: l10n.healthSend,
+                icon: const Icon(Icons.monitor_heart_outlined),
+                onPressed: () => sendSessionToHealth(context, ref, row),
+              ),
             IconButton(
               tooltip: l10n.actionExport,
               icon: const Icon(Icons.ios_share),
@@ -102,6 +109,18 @@ class _Summary extends ConsumerWidget {
                 ),
                 children: [
                   _Header(session: session, course: course, laps: laps, place: places.session),
+                  if (canSendToHealth(ref, session))
+                    Padding(
+                      padding: const EdgeInsets.only(top: AppSpacing.xs),
+                      child: Text(
+                        switch (session.healthExportedAt) {
+                          final at? => l10n.healthSentAt(formatDateTime(l10n, at)),
+                          null => l10n.healthNotSent,
+                        },
+                        key: const Key('summary-health-status'),
+                        style: AppTextStyles.subtitle,
+                      ),
+                    ),
                   if (session.status == SessionStatus.incomplete)
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.s),

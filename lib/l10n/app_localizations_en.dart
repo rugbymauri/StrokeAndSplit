@@ -1129,4 +1129,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get healthPrivacyStop =>
       'You can switch sending off at any time. Delete sent workouts in Health Connect.';
+
+  @override
+  String get healthSend => 'Send to Health Connect';
+
+  @override
+  String get healthSent => 'Sent to Health Connect.';
+
+  @override
+  String healthSentAt(String date) {
+    return 'Sent to Health Connect on $date';
+  }
+
+  @override
+  String get healthNotSent => 'Not sent to Health Connect';
+
+  @override
+  String get healthFailedPermission =>
+      'Stroke & Split may not write to Health Connect.';
+
+  @override
+  String get healthFailedUnavailable => 'Health Connect is not available.';
+
+  @override
+  String get healthFailed => 'Sending to Health Connect failed.';
+
+  @override
+  String get healthGrantShort => 'Grant';
 }

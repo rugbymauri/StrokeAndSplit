@@ -1130,4 +1130,31 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get healthPrivacyStop =>
       'Du kannst die Übertragung jederzeit ausschalten. Übertragene Einheiten löschst du in Health Connect.';
+
+  @override
+  String get healthSend => 'An Health Connect senden';
+
+  @override
+  String get healthSent => 'An Health Connect übertragen.';
+
+  @override
+  String healthSentAt(String date) {
+    return 'An Health Connect übertragen am $date';
+  }
+
+  @override
+  String get healthNotSent => 'Nicht an Health Connect übertragen';
+
+  @override
+  String get healthFailedPermission =>
+      'Stroke & Split darf nicht an Health Connect schreiben.';
+
+  @override
+  String get healthFailedUnavailable => 'Health Connect ist nicht verfügbar.';
+
+  @override
+  String get healthFailed => 'Übertragung an Health Connect fehlgeschlagen.';
+
+  @override
+  String get healthGrantShort => 'Erteilen';
 }

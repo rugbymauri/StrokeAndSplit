@@ -49,7 +49,7 @@ class SessionsScreen extends ConsumerWidget {
   }
 }
 
-enum _Action { replay, export, delete }
+enum _Action { replay, export, health, delete }
 
 class _SessionTile extends ConsumerWidget {
   const _SessionTile({required this.session});
@@ -78,11 +78,14 @@ class _SessionTile extends ConsumerWidget {
         onSelected: (action) => switch (action) {
           _Action.replay => replaySession(context, ref, session),
           _Action.export => exportSession(context, ref, session),
+          _Action.health => sendSessionToHealth(context, ref, session),
           _Action.delete => deleteSession(context, ref, session),
         },
         itemBuilder: (context) => [
           PopupMenuItem(value: _Action.replay, child: Text(l10n.actionReplay)),
           PopupMenuItem(value: _Action.export, child: Text(l10n.actionExport)),
+          if (canSendToHealth(ref, session))
+            PopupMenuItem(value: _Action.health, child: Text(l10n.healthSend)),
           PopupMenuItem(value: _Action.delete, child: Text(l10n.actionDelete)),
         ],
       ),

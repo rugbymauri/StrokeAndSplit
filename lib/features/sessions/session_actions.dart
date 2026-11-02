@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/platform_providers.dart';
 import '../../data/db/database.dart';
+import '../../data/health/health_export.dart';
+import '../../data/health/health_platform.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/replay_source.dart';
@@ -80,9 +82,41 @@ Future<void> importSession(BuildContext context, WidgetRef ref) async {
   }
 }
 
+/// Whether [session] can be sent to Health Connect: the export is on and it was rowed on a rower.
+bool canSendToHealth(WidgetRef ref, SessionRow session) =>
+    ref.watch(healthExportEnabledProvider) && healthExportable(session.source);
+
+/// Sends [session] to Health Connect, replacing an earlier send, and says how it went (health-connect, D4).
+Future<void> sendSessionToHealth(BuildContext context, WidgetRef ref, SessionRow session) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final l10n = context.l10n;
+  final enabled = ref.read(healthExportEnabledProvider.notifier);
+  final failure = await ref.read(healthExporterProvider).export(session.id);
+  if (failure == null) return _notify(messenger, l10n.healthSent);
+  showHealthFailure(messenger, l10n, failure, grant: enabled.enable);
+}
+
+/// Says why a send to Health Connect failed; without permission it offers [grant].
+void showHealthFailure(
+  ScaffoldMessengerState messenger,
+  AppLocalizations l10n,
+  HealthFailure failure, {
+  required Future<void> Function() grant,
+}) {
+  final message = switch (failure) {
+    HealthFailure.permission => l10n.healthFailedPermission,
+    HealthFailure.unavailable => l10n.healthFailedUnavailable,
+    HealthFailure.failed => l10n.healthFailed,
+  };
+  final action = failure == HealthFailure.permission
+      ? SnackBarAction(label: l10n.healthGrantShort, onPressed: () => grant())
+      : null;
+  _notify(messenger, message, action: action);
+}
+
 /// Shows [message] right away instead of queueing it behind the last one.
-void _notify(ScaffoldMessengerState messenger, String message) {
+void _notify(ScaffoldMessengerState messenger, String message, {SnackBarAction? action}) {
   messenger
     ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(message)));
+    ..showSnackBar(SnackBar(content: Text(message), action: action));
 }
