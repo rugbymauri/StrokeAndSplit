@@ -25,6 +25,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 8 | `rename-stroke-and-split` | 10/11 | zuletzt | Domain- und Markenrecherche (Nutzer) |
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
+| 12 | `health-connect` | 0/13 | geplant | Spike am Gerät (1.2, Nutzer) nach 1.1 |
 
 ## Warum diese Reihenfolge
 
@@ -263,6 +264,14 @@ Ziel: 3 s nach dem fälligen Schlag pausiert die Session; Sessionzeit, Rundenzei
 
 - [x] Umgesetzt (2026-10-19, `feature/auto-pause`): Pausenerkennung für PM5 und FTMS (Schlag zählt zum Zeitpunkt, an dem er gerudert wurde; Pause endet auch ohne gemeldeten Schlag, sobald die Meter wieder steigen), Schema 7 mit Tabelle `pauses` und Sessionzeit ohne Pausen, Hinweis „Pause“ in der Live-Ansicht, Pausen-Kachel in der Zusammenfassung, Ranglisten ohne Pausen (Change `statistics` angepasst). Entschieden (Nutzer): Schwelle 3 s nach dem fälligen Schlag, freies Rudern startet sofort, Pause am Ende wird verworfen, Ghost steht in der Pause still, alte Runden mit Pausen bleiben in den Ranglisten. Offen: 5.2 Gerätetest.
 
+### 12. `health-connect`: Sessions an Health Connect übertragen
+
+Wunsch des Nutzers (2026-11-02): Sessions in Google Fit sehen. Google Fit nimmt keine neuen Apps an und läuft Ende 2026 aus, daher Health Connect unter Android; Fit bzw. Google Health liest daraus.
+
+- [x] Geplant (2026-11-02, `docs/health-connect-proposal`): eigener Kotlin-Kanal zu `connect-client` statt Paket `health` (dieses schreibt Puls nur als Einzelwerte, keine Leistung, Runden, Pausen und kein Ersetzen); Einheit `ROWING_MACHINE` mit Distanz, Kalorien, Puls, Leistung, Geschwindigkeit, Runden und Pausen; automatisch nach jeder Session von PM5/FTMS, nachträglich aus Liste und Zusammenfassung; erneutes Senden ersetzt; Schema 8 (`sessions.health_exported_at`); minSdk 26, `FlutterFragmentActivity`.
+- [ ] Task 1.2 (Nutzer, nach 1.1): Probe-Einheit am Gerät, klärt, ob Rudergerät-Segmente angenommen werden.
+- [ ] Task 6.1 (Nutzer): Gerätetest, auch ob Google Fit bzw. Google Health die Einheit zeigt.
+
 ## Offene Entscheide
 
 | | Frage | Change | Entscheidet sich vor |
@@ -277,7 +286,7 @@ Ziel: 3 s nach dem fälligen Schlag pausiert die Session; Sessionzeit, Rundenzei
 | ~~F8~~ | Schiffchen bei kleinem Abstand: **Ghost rückt nach aussen** (2026-10-16) | ghost | entschieden |
 | ~~F9~~ | Anzeigename: **„Stroke & Split“** (2026-10-16) | rename | entschieden |
 | ~~F10~~ | App-ID: **`ch.strokesplit`** (2026-10-16) | rename | entschieden |
-| F11 | Live-Display beim Übergang in eine Zone vorwarnen, z.B. „Sprint in 50 m“? (offen aus `zones`) | – (neuer Change) | – |
+| ~~F11~~ | Live-Display beim Übergang in eine Zone vorwarnen: **10 s vorher blinken die Bänder der nächsten Zone gelb** (2026-10-26, Task 5.13) | ui-design | entschieden |
 | ~~F12~~ | Schritte der Ruderblatt-Tasten auf der Zeitachse: **Strecke 30 s, Zone und Startposition 10 s** (2026-10-16) | ui-design | entschieden |
 | ~~F13~~ | Rückfallsprache: **keine** (2026-10-16), die Sprache wird in der App gewählt (F14) | translations | entschieden |
 | ~~F14~~ | Sprachwahl: **in der App** (2026-10-16), Start auf Deutsch, Systemsprache wird nicht beachtet | translations | entschieden |
@@ -293,6 +302,9 @@ Manuelle Tests archivierter Changes (Nutzer):
 - [ ] `courses` 7.2: am echten PM5 500 m × 3 mit Pause in Runde 2.
 - [ ] `courses` 7.3: README-Schritte im Simulator (inzwischen inklusive Zonen).
 - iOS und macOS bleiben ungetestet, es gibt keinen Mac.
+
+Vor einer Veröffentlichung im Play Store:
+- [ ] Health-Apps-Erklärung in der Play Console für alle Datentypen von `health-connect` und eine Datenschutzerklärung, die der Datenschutz-Seite der App entspricht.
 
 Nacharbeit:
 - [x] Platzhalter-Test `packages/pm5_protocol/test/pm5_protocol_test.dart` („package loads“) gelöscht.
