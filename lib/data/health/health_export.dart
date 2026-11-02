@@ -72,7 +72,43 @@ class HealthExportEnabled extends Notifier<bool> {
     state = enabled;
     await ref.read(healthExportStoreProvider).write(enabled);
   }
+
+  /// Asks for the permissions and switches the export on once the app may write workouts.
+  Future<HealthEnableResult> enable() async {
+    final platform = ref.read(healthPlatformProvider);
+    try {
+      switch (await platform.status()) {
+        case HealthStatus.unavailable:
+          return HealthEnableResult.unavailable;
+        case HealthStatus.updateRequired:
+          return HealthEnableResult.updateRequired;
+        case HealthStatus.available:
+          final granted = await platform.requestPermissions(HealthKind.values.toSet());
+          if (!granted.contains(HealthKind.exercise)) return HealthEnableResult.denied;
+      }
+    } on HealthException catch (e) {
+      return e.reason == HealthFailure.unavailable ? HealthEnableResult.unavailable : HealthEnableResult.denied;
+    }
+    await set(true);
+    return HealthEnableResult.enabled;
+  }
 }
+
+enum HealthEnableResult { enabled, denied, unavailable, updateRequired }
+
+/// Whether Health Connect is there and what the app may write to it.
+typedef HealthConnectState = ({HealthStatus status, Set<HealthKind> granted});
+
+final healthConnectStateProvider = FutureProvider.autoDispose<HealthConnectState>((ref) async {
+  final platform = ref.watch(healthPlatformProvider);
+  final status = await platform.status();
+  if (status != HealthStatus.available) return (status: status, granted: const <HealthKind>{});
+  try {
+    return (status: status, granted: await platform.grantedPermissions());
+  } on HealthException {
+    return (status: status, granted: const <HealthKind>{});
+  }
+});
 
 /// Whether sessions from [source] go to Health Connect: rowing on a rower, not the simulator or a replay.
 bool healthExportable(ErgSourceKind source) => source == ErgSourceKind.pm5 || source == ErgSourceKind.ftms;

@@ -1486,5 +1486,77 @@
   "healthFreeTitle": "Freies Rudern",
   "@healthFreeTitle": {
     "description": "Title of a session without a template as a workout in Health Connect (and Google Fit)"
+  },
+  "healthConnectTooltip": "Health Connect",
+  "@healthConnectTooltip": {
+    "description": "Tooltip of the app bar button on the sessions screen that opens the Health Connect settings (Android only); Health Connect is the product name of the Android health data store"
+  },
+  "healthConnectIntro": "Überträgt Sessions vom Rudergerät nach dem Rudern an Health Connect. Von dort lesen Apps wie Google Fit sie.",
+  "@healthConnectIntro": {
+    "description": "Explanation at the top of the Health Connect sheet"
+  },
+  "healthConnectSwitch": "An Health Connect übertragen",
+  "@healthConnectSwitch": {
+    "description": "Switch in the Health Connect sheet that turns sending finished sessions on or off"
+  },
+  "healthConnectActive": "Sessions werden nach dem Rudern übertragen.",
+  "@healthConnectActive": {
+    "description": "Status in the Health Connect sheet while sending is on and allowed"
+  },
+  "healthConnectMissing": "Health Connect ist auf diesem Gerät nicht installiert.",
+  "@healthConnectMissing": {
+    "description": "Status in the Health Connect sheet when the device has no Health Connect"
+  },
+  "healthConnectInstall": "Installieren",
+  "@healthConnectInstall": {
+    "description": "Button in the Health Connect sheet that opens the store page of Health Connect"
+  },
+  "healthConnectOutdated": "Health Connect muss aktualisiert werden.",
+  "@healthConnectOutdated": {
+    "description": "Status in the Health Connect sheet when the installed Health Connect is too old"
+  },
+  "healthConnectUpdate": "Aktualisieren",
+  "@healthConnectUpdate": {
+    "description": "Button in the Health Connect sheet that opens the store page to update Health Connect"
+  },
+  "healthConnectPermissionMissing": "Ohne die Berechtigung für Trainingseinheiten kann Stroke & Split nichts an Health Connect übertragen.",
+  "@healthConnectPermissionMissing": {
+    "description": "Status in the Health Connect sheet when the user refused or later withdrew the permission to write workouts"
+  },
+  "healthConnectGrant": "Berechtigung erteilen",
+  "@healthConnectGrant": {
+    "description": "Button that asks Android again for the Health Connect write permissions"
+  },
+  "healthConnectOpen": "Health Connect öffnen",
+  "@healthConnectOpen": {
+    "description": "Entry in the Health Connect sheet that opens Health Connect itself"
+  },
+  "healthConnectOpenHint": "Berechtigungen und übertragene Daten verwalten",
+  "@healthConnectOpenHint": {
+    "description": "Subtitle of the entry that opens Health Connect"
+  },
+  "healthPrivacyTitle": "Datenschutz-Hinweis",
+  "@healthPrivacyTitle": {
+    "description": "Title of the page about what the app writes to Health Connect, and the link to it in the Health Connect sheet"
+  },
+  "healthPrivacyWhat": "Wenn du die Übertragung einschaltest oder eine Session selbst sendest, schreibt Stroke & Split Sessions von deinem Rudergerät an Health Connect: Beginn und Ende, Titel, Distanz, Kalorien, Puls, Leistung, Geschwindigkeit, Runden und Pausen.",
+  "@healthPrivacyWhat": {
+    "description": "Privacy notice, paragraph 1: what is written to Health Connect"
+  },
+  "healthPrivacyKept": "Schlagzahl, Kraftkurve und Rohdaten bleiben in der App.",
+  "@healthPrivacyKept": {
+    "description": "Privacy notice, paragraph 2: what is not written"
+  },
+  "healthPrivacyNoRead": "Stroke & Split liest keine Daten aus Health Connect.",
+  "@healthPrivacyNoRead": {
+    "description": "Privacy notice, paragraph 3"
+  },
+  "healthPrivacyDevice": "Über Stroke & Split verlassen deine Daten das Gerät nicht. Welche anderen Apps sie in Health Connect lesen dürfen, legst du in Health Connect fest.",
+  "@healthPrivacyDevice": {
+    "description": "Privacy notice, paragraph 4"
+  },
+  "healthPrivacyStop": "Du kannst die Übertragung jederzeit ausschalten. Übertragene Einheiten löschst du in Health Connect.",
+  "@healthPrivacyStop": {
+    "description": "Privacy notice, paragraph 5"
   }
 }

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/database.dart';
+import '../../data/health/health_export.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../l10n/l10n.dart';
+import '../health/health_connect_sheet.dart';
 import '../live/formatters.dart';
 import 'session_actions.dart';
 import 'session_summary_screen.dart';
@@ -20,6 +22,13 @@ class SessionsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.sessionsTitle),
         actions: [
+          if (ref.watch(healthExportAvailableProvider))
+            IconButton(
+              key: const Key('health-connect-button'),
+              tooltip: l10n.healthConnectTooltip,
+              icon: const Icon(Icons.monitor_heart_outlined),
+              onPressed: () => showHealthConnectSheet(context),
+            ),
           IconButton(
             tooltip: l10n.actionImport,
             icon: const Icon(Icons.file_open_outlined),
