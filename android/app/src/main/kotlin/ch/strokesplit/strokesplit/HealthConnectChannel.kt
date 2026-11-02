@@ -8,17 +8,29 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ExerciseLap
+import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.PowerRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.records.metadata.Device
+import androidx.health.connect.client.records.metadata.Metadata
+import androidx.health.connect.client.time.TimeRangeFilter
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Length
+import androidx.health.connect.client.units.Power
+import androidx.health.connect.client.units.Velocity
 import androidx.lifecycle.lifecycleScope
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
 import kotlin.reflect.KClass
 
 /** The record types the app writes, by the names Dart uses for them. */
@@ -82,6 +94,10 @@ class HealthConnectChannel(
                 activity.startActivity(Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS))
                 result.success(null)
             }
+            "writeSession" -> withClient(result) { client ->
+                writeSession(client, call.arguments<Map<String, Any?>>()!!)
+                result.success(null)
+            }
             "launchAction" -> result.success(launchAction(activity.intent))
             else -> result.notImplemented()
         }
@@ -114,6 +130,22 @@ class HealthConnectChannel(
         }
     }
 
+    /**
+     * Replaces what an earlier write left of the session with [workout] (Design D2): first the own records of
+     * the granted types in its time are deleted, then all records go in at once. Types without permission
+     * are left out; without the one for workouts nothing is written.
+     */
+    private suspend fun writeSession(client: HealthConnectClient, workout: Map<String, Any?>) {
+        val granted = grantedKinds(client.permissionController.getGrantedPermissions()).toSet()
+        if ("exercise" !in granted) throw SecurityException("Writing workouts is not permitted")
+        val records = SessionRecords(workout).build(granted)
+        val end = instant(workout["end"]).plusSeconds(1)
+        for (kind in granted) {
+            client.deleteRecords(healthKinds.getValue(kind), TimeRangeFilter.between(instant(workout["start"]), end))
+        }
+        client.insertRecords(records)
+    }
+
     private fun openInstall() {
         val uri = Uri.parse("market://details?id=$PROVIDER&url=healthconnect%3A%2F%2Fonboarding")
         activity.startActivity(
@@ -130,5 +162,103 @@ class HealthConnectChannel(
     companion object {
         const val NAME = "ch.strokesplit/health_connect"
         const val PROVIDER = "com.google.android.apps.healthdata"
+    }
+}
+
+private fun instant(value: Any?): Instant = Instant.ofEpochMilli((value as Number).toLong())
+
+private fun offset(at: Instant): ZoneOffset = ZoneId.systemDefault().rules.getOffset(at)
+
+/** The records of a session from the map Dart sends (see `HealthWorkout.toChannel`). */
+private class SessionRecords(private val workout: Map<String, Any?>) {
+    private val id = workout["id"] as String
+    private val version = (workout["version"] as Number).toLong()
+    private val start = instant(workout["start"])
+    private val end = instant(workout["end"])
+
+    private fun metadata(suffix: String) =
+        Metadata.activelyRecorded(Device(type = Device.TYPE_UNKNOWN), "$id-$suffix", version)
+
+    fun build(granted: Set<String>): List<Record> = buildList {
+        add(exercise())
+        if ("distance" in granted) {
+            add(
+                DistanceRecord(
+                    startTime = start, startZoneOffset = offset(start), endTime = end, endZoneOffset = offset(end),
+                    distance = Length.meters((workout["meters"] as Number).toDouble()), metadata = metadata("distance"),
+                ),
+            )
+        }
+        val kilocalories = workout["kilocalories"] as Number?
+        if (kilocalories != null && "calories" in granted) {
+            add(
+                TotalCaloriesBurnedRecord(
+                    startTime = start, startZoneOffset = offset(start), endTime = end, endZoneOffset = offset(end),
+                    energy = Energy.kilocalories(kilocalories.toDouble()), metadata = metadata("calories"),
+                ),
+            )
+        }
+        if ("heartRate" in granted) {
+            series("heartRate") { time, value, parts ->
+                HeartRateRecord(
+                    parts.first, offset(parts.first), parts.second, offset(parts.second),
+                    time.map { (t, v) -> HeartRateRecord.Sample(t, v.toLong()) }, value,
+                )
+            }.let(::addAll)
+        }
+        if ("power" in granted) {
+            series("power") { time, value, parts ->
+                PowerRecord(
+                    parts.first, offset(parts.first), parts.second, offset(parts.second),
+                    time.map { (t, v) -> PowerRecord.Sample(t, Power.watts(v)) }, value,
+                )
+            }.let(::addAll)
+        }
+        if ("speed" in granted) {
+            series("speed") { time, value, parts ->
+                SpeedRecord(
+                    parts.first, offset(parts.first), parts.second, offset(parts.second),
+                    time.map { (t, v) -> SpeedRecord.Sample(t, Velocity.metersPerSecond(v)) }, value,
+                )
+            }.let(::addAll)
+        }
+    }
+
+    private fun exercise(): ExerciseSessionRecord = ExerciseSessionRecord(
+        startTime = start,
+        startZoneOffset = offset(start),
+        endTime = end,
+        endZoneOffset = offset(end),
+        metadata = metadata("exercise"),
+        exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_ROWING_MACHINE,
+        title = workout["title"] as String?,
+        segments = list("segments").map {
+            ExerciseSegment(
+                instant(it[0]),
+                instant(it[1]),
+                if (it[2] == "pause") {
+                    ExerciseSegment.EXERCISE_SEGMENT_TYPE_PAUSE
+                } else {
+                    ExerciseSegment.EXERCISE_SEGMENT_TYPE_ROWING_MACHINE
+                },
+            )
+        },
+        laps = list("laps").map {
+            ExerciseLap(instant(it[0]), instant(it[1]), Length.meters((it[2] as Number).toDouble()))
+        },
+    )
+
+    @Suppress("UNCHECKED_CAST")
+    private fun list(key: String): List<List<Any?>> = workout[key] as List<List<Any?>>? ?: emptyList()
+
+    /** The parts of a series; [record] gets the samples, the metadata and the start and end of a part. */
+    @Suppress("UNCHECKED_CAST")
+    private fun series(
+        kind: String,
+        record: (List<Pair<Instant, Double>>, Metadata, Pair<Instant, Instant>) -> Record,
+    ): List<Record> = (workout[kind] as List<Map<String, Any?>>? ?: emptyList()).map { part ->
+        val samples = (part["samples"] as List<List<Any?>>).map { instant(it[0]) to (it[1] as Number).toDouble() }
+        val suffix = (part["id"] as String).removePrefix("$id-")
+        record(samples, metadata(suffix), instant(part["start"]) to instant(part["end"]))
     }
 }
