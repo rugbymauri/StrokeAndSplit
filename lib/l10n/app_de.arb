@@ -1482,5 +1482,9 @@
   "ghostSymbolLabel": "Ghost",
   "@ghostSymbolLabel": {
     "description": "Screen reader label of the ghost symbol (a small violet rhombus) in the pace box legend and the template choice; the ghost is the best result rowed again for comparison"
+  },
+  "healthFreeTitle": "Freies Rudern",
+  "@healthFreeTitle": {
+    "description": "Title of a session without a template as a workout in Health Connect (and Google Fit)"
   }
 }

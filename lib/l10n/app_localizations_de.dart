@@ -1062,4 +1062,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ghostSymbolLabel => 'Ghost';
+
+  @override
+  String get healthFreeTitle => 'Freies Rudern';
 }

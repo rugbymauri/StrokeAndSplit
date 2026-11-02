@@ -1734,6 +1734,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Ghost'**
   String get ghostSymbolLabel;
+
+  /// Title of a session without a template as a workout in Health Connect (and Google Fit)
+  ///
+  /// In de, this message translates to:
+  /// **'Freies Rudern'**
+  String get healthFreeTitle;
 }
 
 class _AppLocalizationsDelegate

@@ -1064,4 +1064,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ghostSymbolLabel => 'Ghost';
+
+  @override
+  String get healthFreeTitle => 'Free rowing';
 }

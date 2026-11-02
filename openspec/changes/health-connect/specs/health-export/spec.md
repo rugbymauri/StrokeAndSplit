@@ -29,7 +29,7 @@ Auf Plattformen ohne Health Connect SHALL die App weder die Einstellung noch and
 - **THEN** zeigt die App nichts zur Übertragung an Health Connect
 
 ### Requirement: Abgeschlossene Sessions automatisch übertragen
-Ist die Übertragung eingeschaltet, SHALL die App jede abgeschlossene Session von einem Rudergerät (PM5 oder FTMS) nach dem Speichern an Health Connect übertragen, ohne dass der Nutzer etwas tun muss. Sessions aus dem Simulator MUST NOT übertragen werden. Ein Fehler beim Übertragen MUST das Speichern und die Zusammenfassung der Session nicht beeinträchtigen.
+Ist die Übertragung eingeschaltet, SHALL die App jede abgeschlossene Session von einem Rudergerät (PM5 oder FTMS) nach dem Speichern an Health Connect übertragen, ohne dass der Nutzer etwas tun muss. Sessions aus dem Simulator und aus Replays MUST NOT übertragen werden. Ein Fehler beim Übertragen MUST das Speichern und die Zusammenfassung der Session nicht beeinträchtigen.
 
 #### Scenario: Session nach dem Rudern
 - **WHEN** die Übertragung eingeschaltet ist und der Nutzer eine Session am PM5 beendet
@@ -44,7 +44,7 @@ Ist die Übertragung eingeschaltet, SHALL die App jede abgeschlossene Session vo
 - **THEN** wird nichts an Health Connect übertragen
 
 ### Requirement: Session nachträglich übertragen
-Bei eingeschalteter Übertragung SHALL der Nutzer jede gespeicherte Session aus der Session-Liste und der Zusammenfassung an Health Connect übertragen können, auch importierte und schon übertragene Sessions, nicht aber Sessions aus dem Simulator. Wird eine Session erneut übertragen, MUST sie ihre frühere Übertragung in Health Connect ersetzen, statt eine zweite Trainingseinheit anzulegen.
+Bei eingeschalteter Übertragung SHALL der Nutzer jede gespeicherte Session aus der Session-Liste und der Zusammenfassung an Health Connect übertragen können, auch importierte und schon übertragene Sessions, nicht aber Sessions aus dem Simulator oder aus Replays. Wird eine Session erneut übertragen, MUST sie ihre frühere Übertragung in Health Connect ersetzen, statt eine zweite Trainingseinheit anzulegen.
 
 #### Scenario: Ältere Session übertragen
 - **WHEN** der Nutzer eine Session von letzter Woche aus der Liste überträgt

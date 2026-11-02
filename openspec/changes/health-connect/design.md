@@ -106,14 +106,15 @@ Eine Runde, die im Moment einer Pause beginnt, beginnt nach der Pause; eine, die
 ### D4: Wann übertragen wird
 
 **Automatisch:**
-- Ein `HealthExporter` (Riverpod) hört auf `finishedSessionProvider`.
-- Er überträgt, wenn die Übertragung eingeschaltet ist und die Quelle `pm5` oder `ftms` ist. Replays legen keine Sessions an, Sessions aus dem Simulator werden übersprungen.
-- Er läuft ohne `await` im Hintergrund der UI. Ein Fehler erscheint als Snackbar, die Zusammenfassung zeigt den Status, sobald er feststeht.
+- `SessionRecorder.stop()` ruft nach dem Speichern `HealthExporter.sessionFinished` auf. `finishedSessionProvider` reicht nicht: Er meldet nur Sessions, die nach der letzten Runde von selbst enden, nicht die vom Nutzer gestoppten.
+- Der `HealthExporter` (Riverpod) überträgt, wenn die Übertragung eingeschaltet ist und die Quelle `pm5` oder `ftms` ist. Sessions aus dem Simulator und aus Replays (Quelle `replay`) werden übersprungen.
+- Ein Fehler landet in `healthExportFailureProvider`, den die Oberfläche als Snackbar zeigt.
+- Er läuft ohne `await` im Hintergrund der UI. Die Zusammenfassung zeigt den Status, sobald er feststeht.
 - Nach einem Absturz wiederhergestellte Sessions (`recoverInterrupted`) werden nicht automatisch übertragen.
 
 **Nachträglich:**
 - Ein Eintrag „An Health Connect senden“ im Menü der Session-Liste und eine Schaltfläche in der Zusammenfassung.
-- Beide sind nur sichtbar, wenn die Übertragung eingeschaltet ist und die Session nicht aus dem Simulator stammt.
+- Beide sind nur sichtbar, wenn die Übertragung eingeschaltet ist und die Session nicht aus dem Simulator oder einem Replay stammt.
 
 ### D5: Einstellung und Einstieg
 

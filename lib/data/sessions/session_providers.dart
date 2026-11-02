@@ -6,6 +6,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 import '../courses/lap_tracker.dart';
 import '../db/database.dart';
+import '../health/health_export.dart';
 import '../sources/erg_source.dart';
 import '../sources/erg_source_providers.dart';
 import '../templates/session_template.dart';
@@ -214,6 +215,8 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
     await _writes;
     await _repository.finish(id, endedAt: clock.now());
     state = null;
+    // In the background, so the summary does not wait for Health Connect (health-connect, Design D4).
+    unawaited(ref.read(healthExporterProvider).sessionFinished(id));
     return id;
   }
 
