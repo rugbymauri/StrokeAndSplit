@@ -9,7 +9,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 2. Abbildung einer Session
 
-- [ ] 2.1 Modell `HealthWorkout` (Zeitraum, Titel, Distanz, Kalorien, Serien, Runden, Pausen, Segmente, `clientRecordId`-Basis) und reine Funktion `healthWorkoutOf` nach D3 in `lib/data/health/`. Verifikation: Unit-Tests für Wanduhr aus `wallMs` und Rückfall auf `tMs`, Ende ohne `endedAt`, Runden über Pausen auf die Wanduhr umgerechnet, Puls 0 und fehlende Werte ausgelassen, Geschwindigkeit aus der Pace, ein Wert pro Sekunde, Teilung der Serien nach 10 min, keine Kalorien bei 0 oder ohne Wert, Segmente je nach Ergebnis von 1.2
+- [x] 2.1 Modell `HealthWorkout` (Zeitraum, Titel, Distanz, Kalorien, Serien, Runden, Pausen, Segmente, `clientRecordId`-Basis) und reine Funktion `healthWorkoutOf` nach D3 in `lib/data/health/`. Verifikation: Unit-Tests für Wanduhr aus `wallMs` (Rückfall auf `tMs` liefert das Repository, Test in 2.2), Ende ohne `endedAt`, Runden über Pausen auf die Wanduhr umgerechnet, Puls 0 und fehlende Werte ausgelassen, Geschwindigkeit aus der Pace, ein Wert pro Sekunde, Teilung der Serien nach 10 min, keine Kalorien bei 0 oder ohne Wert, Segmente je nach Ergebnis von 1.2
 - [ ] 2.2 `SessionRepository.healthData(id)` liefert, was `healthWorkoutOf` braucht (Samples mit `wallMs`/`tMs`, Puls, Watt, Pace, Kalorien; Runden; Pausen). Verifikation: Repository-Test mit einer aufgezeichneten Session (`just_row`) und einer Vorlage mit Pause
 
 ## 3. Schreiben und Status

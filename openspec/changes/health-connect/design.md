@@ -99,7 +99,9 @@ Die reine Funktion `healthWorkoutOf(session, samples, laps, pauses, title)` lief
 - Pro Sekunde bleibt höchstens ein Wert, der letzte dieser Sekunde. Statusmeldungen kommen mehrmals pro Sekunde, und Health-Apps zeigen Sekundenwerte.
 - Eine Serie wird in Records zu je höchstens 10 Minuten geteilt. So bleibt jeder Record weit unter den Grenzen von Health Connect, auch bei langen Sessions.
 
-**Segmente:** Wenn Health Connect Segmente in einer Trainingseinheit nur lückenlos annimmt, füllen `ROWING_MACHINE`-Segmente die Zeit zwischen den Pausen. Das klärt Task 1.2 am Gerät. Lehnt Health Connect `ROWING_MACHINE`-Segmente in einer Rudergerät-Einheit ab, entfallen die Segmente, und die Pausen gehen verloren. Das wird dann in dieser Datei nachgetragen.
+**Segmente:** Nur bei Pausen: `PAUSE`-Segmente für die Pausen, `ROWING_MACHINE`-Segmente für das Rudern dazwischen, lückenlos über die Einheit. Die Prüfung in `connect-client` 1.1.0 erlaubt beide in einer Rudergerät-Einheit (`PAUSE` gilt für jede Einheit, `ROWING_MACHINE` ist der Rudergerät-Einheit zugeordnet) und verlangt nur, dass Segmente sich nicht überlappen und in der Einheit liegen (Quellen gelesen am 2026-11-02). Ob Health Connect auf dem Gerät gleich prüft, zeigt Task 1.2. Lehnt es die Segmente ab, entfallen sie, und die Pausen gehen verloren.
+
+Eine Runde, die im Moment einer Pause beginnt, beginnt nach der Pause; eine, die dann endet, endet vor ihr. Messwerte nach dem Ende der Session fallen weg.
 
 ### D4: Wann übertragen wird
 
