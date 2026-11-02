@@ -25,7 +25,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 8 | `rename-stroke-and-split` | 10/11 | zuletzt | Domain- und Markenrecherche (Nutzer) |
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
-| 12 | `health-connect` | 0/13 | geplant | Spike am Gerät (1.2, Nutzer) nach 1.1 |
+| 12 | `health-connect` | 1/13 | in Umsetzung (`feature/health-connect`) | Spike am Gerät (1.2, Nutzer) |
 
 ## Warum diese Reihenfolge
 
@@ -269,6 +269,7 @@ Ziel: 3 s nach dem fälligen Schlag pausiert die Session; Sessionzeit, Rundenzei
 Wunsch des Nutzers (2026-11-02): Sessions in Google Fit sehen. Google Fit nimmt keine neuen Apps an und läuft Ende 2026 aus, daher Health Connect unter Android; Fit bzw. Google Health liest daraus.
 
 - [x] Geplant (2026-11-02, `docs/health-connect-proposal`): eigener Kotlin-Kanal zu `connect-client` statt Paket `health` (dieses schreibt Puls nur als Einzelwerte, keine Leistung, Runden, Pausen und kein Ersetzen); Einheit `ROWING_MACHINE` mit Distanz, Kalorien, Puls, Leistung, Geschwindigkeit, Runden und Pausen; automatisch nach jeder Session von PM5/FTMS, nachträglich aus Liste und Zusammenfassung; erneutes Senden ersetzt; Schema 8 (`sessions.health_exported_at`); minSdk 26, `FlutterFragmentActivity`.
+- [x] Umsetzung begonnen (2026-11-02, `feature/health-connect`): Task 1.1 Android-Gerüst mit `connect-client` 1.1.0 (stabil), minSdk 26, `FlutterFragmentActivity`, Kotlin-Kanal; Release-APK baut lokal.
 - [ ] Task 1.2 (Nutzer, nach 1.1): Probe-Einheit am Gerät, klärt, ob Rudergerät-Segmente angenommen werden.
 - [ ] Task 6.1 (Nutzer): Gerätetest, auch ob Google Fit bzw. Google Health die Einheit zeigt.
 

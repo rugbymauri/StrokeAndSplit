@@ -4,7 +4,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 1. Android-Gerüst und Spike
 
-- [ ] 1.1 Gerüst nach D7: `connect-client` im App-Build, minSdk 26, `MainActivity` als `FlutterFragmentActivity`, Manifest mit Schreibberechtigungen, `<queries>`, Rationale-Intent und Activity-Alias; Kotlin-Kanal `ch.strokesplit/health_connect` zunächst mit `status`, `grantedPermissions`, `requestPermissions`, `openInstall` und `launchAction`. Verifikation: `make apk` und `make check` grün, Bluetooth-Verbindung und Dateiauswahl in der App unverändert (bestehende Tests), Job `build-apk` in der Branch-Pipeline grün
+- [x] 1.1 Gerüst nach D7: `connect-client` im App-Build, minSdk 26, `MainActivity` als `FlutterFragmentActivity`, Manifest mit Schreibberechtigungen, `<queries>`, Rationale-Intent und Activity-Alias; Kotlin-Kanal `ch.strokesplit/health_connect` zunächst mit `status`, `grantedPermissions`, `requestPermissions`, `openInstall` und `launchAction`. Verifikation: `make apk` und `make check` grün, Bluetooth-Verbindung und Dateiauswahl in der App unverändert (bestehende Tests); `build-apk` läuft in CI nur für Release-Tags und wird mit dem Probe-Release geprüft
 - [ ] 1.2 (Nutzer, am Gerät) Spike: eine Debug-Schaltfläche schreibt eine Probe-Einheit `ROWING_MACHINE` mit zwei Runden, einem `PAUSE`- und zwei `ROWING_MACHINE`-Segmenten, Puls-, Leistungs- und Geschwindigkeitsserie, danach ein zweites Mal mit gleichen Ids. Verifikation: In Health Connect (Daten und Zugriff) eine Einheit mit allen Werten, keine doppelte; Ergebnis zu Segmenten in D3 nachgetragen, Debug-Schaltfläche wieder entfernt
 
 ## 2. Abbildung einer Session
