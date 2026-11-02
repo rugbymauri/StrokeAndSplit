@@ -80,6 +80,30 @@ void main() {
     expect(workout.segments.where((s) => s.type == HealthSegmentType.pause), isNotEmpty);
   });
 
+  test('remembers when a session was written and forgets it again', () async {
+    final id = await repository.create(startedAt: startedAt, source: ErgSourceKind.pm5);
+    expect((await repository.get(id))!.healthExportedAt, isNull);
+
+    final at = DateTime.utc(2026, 11, 2, 19);
+    await repository.markHealthExported(id, at);
+    expect((await repository.get(id))!.healthExportedAt!.toUtc(), at);
+    await repository.clearHealthExported(id);
+    expect((await repository.get(id))!.healthExportedAt, isNull);
+  });
+
+  test('imports a written session as not written', () async {
+    final id = await repository.create(startedAt: startedAt, source: ErgSourceKind.pm5);
+    final accumulator = SessionAccumulator(id);
+    loadFixture('just_row').packets.forEach(accumulator.add);
+    accumulator.finish();
+    await repository.write(accumulator.takeBatch());
+    await repository.finish(id);
+    await repository.markHealthExported(id, DateTime.utc(2026, 11, 2, 19));
+
+    final imported = await repository.import(await repository.export(id));
+    expect((await repository.get(imported))!.healthExportedAt, isNull);
+  });
+
   test('knows no session that is not stored', () async {
     expect(await repository.healthData(42), isNull);
   });

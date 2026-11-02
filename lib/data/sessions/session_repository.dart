@@ -305,6 +305,14 @@ class SessionRepository {
     );
   }
 
+  /// Records that the session was written to Health Connect [at] that moment (Design D6).
+  Future<void> markHealthExported(int id, DateTime at) => (_db.update(_db.sessions)..where((s) => s.id.equals(id)))
+      .write(SessionsCompanion(healthExportedAt: Value(at)));
+
+  /// Records that the session is not in Health Connect after all, e.g. after a failed write.
+  Future<void> clearHealthExported(int id) => (_db.update(_db.sessions)..where((s) => s.id.equals(id)))
+      .write(const SessionsCompanion(healthExportedAt: Value(null)));
+
   Future<bool> hasRawPackets(int id) async {
     final row = await (_db.select(_db.rawPackets)
           ..where((r) => r.sessionId.equals(id))

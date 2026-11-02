@@ -1183,6 +1183,18 @@ class $SessionsTable extends Sessions
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _healthExportedAtMeta = const VerificationMeta(
+    'healthExportedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> healthExportedAt =
+      GeneratedColumn<DateTime>(
+        'health_exported_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1208,6 +1220,7 @@ class $SessionsTable extends Sessions
     rmssdMs,
     pauseCount,
     pausedMs,
+    healthExportedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1367,6 +1380,15 @@ class $SessionsTable extends Sessions
         pausedMs.isAcceptableOrUnknown(data['paused_ms']!, _pausedMsMeta),
       );
     }
+    if (data.containsKey('health_exported_at')) {
+      context.handle(
+        _healthExportedAtMeta,
+        healthExportedAt.isAcceptableOrUnknown(
+          data['health_exported_at']!,
+          _healthExportedAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1474,6 +1496,10 @@ class $SessionsTable extends Sessions
         DriftSqlType.int,
         data['${effectivePrefix}paused_ms'],
       )!,
+      healthExportedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}health_exported_at'],
+      ),
     );
   }
 
@@ -1523,6 +1549,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
   final int? rmssdMs;
   final int pauseCount;
   final int pausedMs;
+
+  /// When the session was last written to Health Connect (Change health-connect, Design D6); null when it
+  /// was not, and for sessions before schema 8 and imported ones.
+  final DateTime? healthExportedAt;
   const SessionRow({
     required this.id,
     required this.startedAt,
@@ -1547,6 +1577,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     this.rmssdMs,
     required this.pauseCount,
     required this.pausedMs,
+    this.healthExportedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1610,6 +1641,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     }
     map['pause_count'] = Variable<int>(pauseCount);
     map['paused_ms'] = Variable<int>(pausedMs);
+    if (!nullToAbsent || healthExportedAt != null) {
+      map['health_exported_at'] = Variable<DateTime>(healthExportedAt);
+    }
     return map;
   }
 
@@ -1662,6 +1696,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           : Value(rmssdMs),
       pauseCount: Value(pauseCount),
       pausedMs: Value(pausedMs),
+      healthExportedAt: healthExportedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(healthExportedAt),
     );
   }
 
@@ -1702,6 +1739,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       rmssdMs: serializer.fromJson<int?>(json['rmssdMs']),
       pauseCount: serializer.fromJson<int>(json['pauseCount']),
       pausedMs: serializer.fromJson<int>(json['pausedMs']),
+      healthExportedAt: serializer.fromJson<DateTime?>(
+        json['healthExportedAt'],
+      ),
     );
   }
   @override
@@ -1737,6 +1777,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       'rmssdMs': serializer.toJson<int?>(rmssdMs),
       'pauseCount': serializer.toJson<int>(pauseCount),
       'pausedMs': serializer.toJson<int>(pausedMs),
+      'healthExportedAt': serializer.toJson<DateTime?>(healthExportedAt),
     };
   }
 
@@ -1764,6 +1805,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     Value<int?> rmssdMs = const Value.absent(),
     int? pauseCount,
     int? pausedMs,
+    Value<DateTime?> healthExportedAt = const Value.absent(),
   }) => SessionRow(
     id: id ?? this.id,
     startedAt: startedAt ?? this.startedAt,
@@ -1796,6 +1838,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     rmssdMs: rmssdMs.present ? rmssdMs.value : this.rmssdMs,
     pauseCount: pauseCount ?? this.pauseCount,
     pausedMs: pausedMs ?? this.pausedMs,
+    healthExportedAt: healthExportedAt.present
+        ? healthExportedAt.value
+        : this.healthExportedAt,
   );
   SessionRow copyWithCompanion(SessionsCompanion data) {
     return SessionRow(
@@ -1850,6 +1895,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ? data.pauseCount.value
           : this.pauseCount,
       pausedMs: data.pausedMs.present ? data.pausedMs.value : this.pausedMs,
+      healthExportedAt: data.healthExportedAt.present
+          ? data.healthExportedAt.value
+          : this.healthExportedAt,
     );
   }
 
@@ -1878,7 +1926,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ..write('maxHeartRate: $maxHeartRate, ')
           ..write('rmssdMs: $rmssdMs, ')
           ..write('pauseCount: $pauseCount, ')
-          ..write('pausedMs: $pausedMs')
+          ..write('pausedMs: $pausedMs, ')
+          ..write('healthExportedAt: $healthExportedAt')
           ..write(')'))
         .toString();
   }
@@ -1908,6 +1957,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     rmssdMs,
     pauseCount,
     pausedMs,
+    healthExportedAt,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -1935,7 +1985,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           other.maxHeartRate == this.maxHeartRate &&
           other.rmssdMs == this.rmssdMs &&
           other.pauseCount == this.pauseCount &&
-          other.pausedMs == this.pausedMs);
+          other.pausedMs == this.pausedMs &&
+          other.healthExportedAt == this.healthExportedAt);
 }
 
 class SessionsCompanion extends UpdateCompanion<SessionRow> {
@@ -1962,6 +2013,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
   final Value<int?> rmssdMs;
   final Value<int> pauseCount;
   final Value<int> pausedMs;
+  final Value<DateTime?> healthExportedAt;
   const SessionsCompanion({
     this.id = const Value.absent(),
     this.startedAt = const Value.absent(),
@@ -1986,6 +2038,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.rmssdMs = const Value.absent(),
     this.pauseCount = const Value.absent(),
     this.pausedMs = const Value.absent(),
+    this.healthExportedAt = const Value.absent(),
   });
   SessionsCompanion.insert({
     this.id = const Value.absent(),
@@ -2011,6 +2064,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.rmssdMs = const Value.absent(),
     this.pauseCount = const Value.absent(),
     this.pausedMs = const Value.absent(),
+    this.healthExportedAt = const Value.absent(),
   }) : startedAt = Value(startedAt),
        status = Value(status),
        source = Value(source);
@@ -2038,6 +2092,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Expression<int>? rmssdMs,
     Expression<int>? pauseCount,
     Expression<int>? pausedMs,
+    Expression<DateTime>? healthExportedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2063,6 +2118,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       if (rmssdMs != null) 'rmssd_ms': rmssdMs,
       if (pauseCount != null) 'pause_count': pauseCount,
       if (pausedMs != null) 'paused_ms': pausedMs,
+      if (healthExportedAt != null) 'health_exported_at': healthExportedAt,
     });
   }
 
@@ -2090,6 +2146,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Value<int?>? rmssdMs,
     Value<int>? pauseCount,
     Value<int>? pausedMs,
+    Value<DateTime?>? healthExportedAt,
   }) {
     return SessionsCompanion(
       id: id ?? this.id,
@@ -2115,6 +2172,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       rmssdMs: rmssdMs ?? this.rmssdMs,
       pauseCount: pauseCount ?? this.pauseCount,
       pausedMs: pausedMs ?? this.pausedMs,
+      healthExportedAt: healthExportedAt ?? this.healthExportedAt,
     );
   }
 
@@ -2196,6 +2254,9 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     if (pausedMs.present) {
       map['paused_ms'] = Variable<int>(pausedMs.value);
     }
+    if (healthExportedAt.present) {
+      map['health_exported_at'] = Variable<DateTime>(healthExportedAt.value);
+    }
     return map;
   }
 
@@ -2224,7 +2285,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
           ..write('maxHeartRate: $maxHeartRate, ')
           ..write('rmssdMs: $rmssdMs, ')
           ..write('pauseCount: $pauseCount, ')
-          ..write('pausedMs: $pausedMs')
+          ..write('pausedMs: $pausedMs, ')
+          ..write('healthExportedAt: $healthExportedAt')
           ..write(')'))
         .toString();
   }
@@ -8223,6 +8285,7 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   Value<int?> rmssdMs,
   Value<int> pauseCount,
   Value<int> pausedMs,
+  Value<DateTime?> healthExportedAt,
 });
 typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<int> id,
@@ -8248,6 +8311,7 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<int?> rmssdMs,
   Value<int> pauseCount,
   Value<int> pausedMs,
+  Value<DateTime?> healthExportedAt,
 });
 
 final class $$SessionsTableReferences
@@ -8534,6 +8598,11 @@ class $$SessionsTableFilterComposer
 
   ColumnFilters<int> get pausedMs => $composableBuilder(
     column: $table.pausedMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get healthExportedAt => $composableBuilder(
+    column: $table.healthExportedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8873,6 +8942,11 @@ class $$SessionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get healthExportedAt => $composableBuilder(
+    column: $table.healthExportedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$TemplatesTableOrderingComposer get templateId {
     final $$TemplatesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -9015,6 +9089,11 @@ class $$SessionsTableAnnotationComposer
 
   GeneratedColumn<int> get pausedMs =>
       $composableBuilder(column: $table.pausedMs, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get healthExportedAt => $composableBuilder(
+    column: $table.healthExportedAt,
+    builder: (column) => column,
+  );
 
   $$TemplatesTableAnnotationComposer get templateId {
     final $$TemplatesTableAnnotationComposer composer = $composerBuilder(
@@ -9299,6 +9378,7 @@ class $$SessionsTableTableManager
                 Value<int?> rmssdMs = const Value.absent(),
                 Value<int> pauseCount = const Value.absent(),
                 Value<int> pausedMs = const Value.absent(),
+                Value<DateTime?> healthExportedAt = const Value.absent(),
               }) => SessionsCompanion(
                 id: id,
                 startedAt: startedAt,
@@ -9323,6 +9403,7 @@ class $$SessionsTableTableManager
                 rmssdMs: rmssdMs,
                 pauseCount: pauseCount,
                 pausedMs: pausedMs,
+                healthExportedAt: healthExportedAt,
               ),
           createCompanionCallback:
               ({
@@ -9349,6 +9430,7 @@ class $$SessionsTableTableManager
                 Value<int?> rmssdMs = const Value.absent(),
                 Value<int> pauseCount = const Value.absent(),
                 Value<int> pausedMs = const Value.absent(),
+                Value<DateTime?> healthExportedAt = const Value.absent(),
               }) => SessionsCompanion.insert(
                 id: id,
                 startedAt: startedAt,
@@ -9373,6 +9455,7 @@ class $$SessionsTableTableManager
                 rmssdMs: rmssdMs,
                 pauseCount: pauseCount,
                 pausedMs: pausedMs,
+                healthExportedAt: healthExportedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(

@@ -17,6 +17,7 @@ import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
 import 'generated/schema_v5.dart' as v5;
 import 'generated/schema_v6.dart' as v6;
+import 'generated/schema_v7.dart' as v7;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -635,6 +636,30 @@ void main() {
 
       await (db.delete(db.sessions)..where((s) => s.id.equals(id))).go();
       expect(await db.select(db.pauses).get(), isEmpty);
+      await db.close();
+    });
+  });
+
+  group('to version 8', () {
+    test('keeps the sessions of version 7 as not written to Health Connect',
+        () async {
+      final schema = await verifier.schemaAt(7);
+      final old = v7.DatabaseAtV7(schema.newConnection());
+      await old.into(old.sessions).insert(
+            v7.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'pm5',
+              distanceDm: const Value(2500),
+            ),
+          );
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 8);
+
+      final session = (await db.select(db.sessions).get()).single;
+      expect((session.distanceDm, session.healthExportedAt), (2500, null));
       await db.close();
     });
   });
