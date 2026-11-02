@@ -116,6 +116,18 @@ Im Live-Display steht in der Kopfzeile neben der Verbindung des Rudergeräts ein
 
 Die Zusammenfassung zeigt **Ø Puls** und **Max. Puls**, sobald es einen Puls gab, mit Gurt dazu die Kurve der RR-Intervalle und „HRV (RMSSD) 16 ms“ (ab zwei Intervallen, aus den ungefilterten Intervallen). Die Gurt-Pakete werden wie die des Rudergeräts aufgezeichnet, exportiert und beim Import neu ausgewertet.
 
+### Health Connect
+
+Unter Android überträgt die App Sessions an Health Connect. Von dort lesen sie Apps wie Google Fit bzw. Google Health. Die Google-Fit-Schnittstellen laufen Ende 2026 aus, deshalb gibt es keinen direkten Weg zu Google Fit. Unter Linux, iOS und macOS fehlt die Funktion.
+
+1. Unter **Sessions** öffnet das Herz-Symbol oben rechts die Einstellung. **An Health Connect übertragen** einschalten und die Berechtigungen erteilen. Die Übertragung gilt erst als eingeschaltet, wenn Trainingseinheiten geschrieben werden dürfen. Fehlt Health Connect oder ist es zu alt, bietet die App **Installieren** bzw. **Aktualisieren** an. **Health Connect öffnen** führt zu den Berechtigungen und den übertragenen Daten, **Datenschutz-Hinweis** erklärt, was die App schreibt.
+2. Ist die Übertragung eingeschaltet, geht jede Session von einem PM5 oder FTMS-Rudergerät nach dem Rudern im Hintergrund an Health Connect. Sessions aus dem Simulator und aus Replays gehen nie an Health Connect.
+3. **An Health Connect senden** im Menü einer Session und in der Zusammenfassung überträgt eine Session nachträglich, auch eine importierte. Erneutes Senden ersetzt die frühere Übertragung, es entsteht keine zweite Einheit.
+
+In Health Connect erscheint eine Trainingseinheit „Rudergerät“ mit Beginn und Ende, als Titel der Name der Vorlage bzw. „Freies Rudern“, dazu Distanz, Kalorien (sofern das Rudergerät welche meldet), die Verläufe von Puls, Leistung und Geschwindigkeit (ein Wert pro Sekunde), die Runden einer Vorlage mit ihrer Distanz und die Pausen. Schlagzahl, Kraftkurve und Rohdaten bleiben in der App. Die App liest nichts aus Health Connect.
+
+Die Zusammenfassung zeigt „An Health Connect übertragen am …“ bzw. „Nicht an Health Connect übertragen“. Schlägt eine Übertragung fehl, meldet die App den Grund, fehlt die Berechtigung, mit **Erteilen**. Eine automatische Wiederholung gibt es nicht. Der Status gehört zum Gerät: Export und Import nehmen ihn nicht mit, nach einem Update gelten alle bestehenden Sessions als nicht übertragen.
+
 ### Sprache
 
 Die App startet auf Deutsch. Das Sprach-Symbol oben rechts auf „Geräte wählen“ und dem Startbildschirm schaltet zwischen **Deutsch** und **English** um, also schon beim ersten Start. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Vorlagen), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten erscheinen in jeder Sprache gleich (`2:05`, `12:34`).
@@ -132,6 +144,7 @@ lib/
     zones/             Wiederverwendbare Zonen
     templates/         Vorlagen aus Strecke und Rundenzahl
     sessions/          Aufzeichnung, Zusammenfassung, Export/Import
+    health/            Übertragung an Health Connect (Kotlin-Kanal in android/app/src/main/kotlin)
   l10n/                Übersetzungen: app_de.arb (Vorlage), app_en.arb und der erzeugte Code
   features/
     connection/        Geräte wählen, Startbildschirm, Verbindungsanzeige

@@ -27,7 +27,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 5. Dokumentation
 
-- [ ] 5.1 README-Abschnitt „Health Connect“ (Einschalten, was übertragen wird, Grenzen), Implementierungsplan nachführen, Play-Store-Erklärung unter „Offene Punkte“. Verifikation: Durchsicht
+- [x] 5.1 README-Abschnitt „Health Connect“ (Einschalten, was übertragen wird, Grenzen), Implementierungsplan nachführen, Play-Store-Erklärung unter „Offene Punkte“. Verifikation: Durchsicht
 
 ## 6. Gerätetest
 
