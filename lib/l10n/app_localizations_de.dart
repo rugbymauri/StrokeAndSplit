@@ -1062,4 +1062,99 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ghostSymbolLabel => 'Ghost';
+
+  @override
+  String get healthFreeTitle => 'Freies Rudern';
+
+  @override
+  String get healthConnectTooltip => 'Health Connect';
+
+  @override
+  String get healthConnectIntro =>
+      'Überträgt Sessions vom Rudergerät nach dem Rudern an Health Connect. Von dort lesen Apps wie Google Fit sie.';
+
+  @override
+  String get healthConnectSwitch => 'An Health Connect übertragen';
+
+  @override
+  String get healthConnectActive =>
+      'Sessions werden nach dem Rudern übertragen.';
+
+  @override
+  String get healthConnectMissing =>
+      'Health Connect ist auf diesem Gerät nicht installiert.';
+
+  @override
+  String get healthConnectInstall => 'Installieren';
+
+  @override
+  String get healthConnectOutdated =>
+      'Health Connect muss aktualisiert werden.';
+
+  @override
+  String get healthConnectUpdate => 'Aktualisieren';
+
+  @override
+  String get healthConnectPermissionMissing =>
+      'Ohne die Berechtigung für Trainingseinheiten kann Stroke & Split nichts an Health Connect übertragen.';
+
+  @override
+  String get healthConnectGrant => 'Berechtigung erteilen';
+
+  @override
+  String get healthConnectOpen => 'Health Connect öffnen';
+
+  @override
+  String get healthConnectOpenHint =>
+      'Berechtigungen und übertragene Daten verwalten';
+
+  @override
+  String get healthPrivacyTitle => 'Datenschutz-Hinweis';
+
+  @override
+  String get healthPrivacyWhat =>
+      'Wenn du die Übertragung einschaltest oder eine Session selbst sendest, schreibt Stroke & Split Sessions von deinem Rudergerät an Health Connect: Beginn und Ende, Titel, Distanz, Kalorien, Puls, Leistung, Geschwindigkeit, Runden und Pausen.';
+
+  @override
+  String get healthPrivacyKept =>
+      'Schlagzahl, Kraftkurve und Rohdaten bleiben in der App.';
+
+  @override
+  String get healthPrivacyNoRead =>
+      'Stroke & Split liest keine Daten aus Health Connect.';
+
+  @override
+  String get healthPrivacyDevice =>
+      'Über Stroke & Split verlassen deine Daten das Gerät nicht. Welche anderen Apps sie in Health Connect lesen dürfen, legst du in Health Connect fest.';
+
+  @override
+  String get healthPrivacyStop =>
+      'Du kannst die Übertragung jederzeit ausschalten. Übertragene Einheiten löschst du in Health Connect.';
+
+  @override
+  String get healthSend => 'An Health Connect senden';
+
+  @override
+  String get healthSent => 'An Health Connect übertragen.';
+
+  @override
+  String healthSentAt(String date) {
+    return 'An Health Connect übertragen am $date';
+  }
+
+  @override
+  String get healthNotSent => 'Nicht an Health Connect übertragen';
+
+  @override
+  String get healthFailedPermission =>
+      'Stroke & Split darf nicht an Health Connect schreiben.';
+
+  @override
+  String get healthFailedUnavailable => 'Health Connect ist nicht verfügbar.';
+
+  @override
+  String get healthFailed => 'Übertragung an Health Connect fehlgeschlagen.';
+
+  @override
+  String get healthGrantShort => 'Erteilen';
 }

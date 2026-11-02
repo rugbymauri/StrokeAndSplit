@@ -7,6 +7,7 @@ import 'package:drift/drift.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import '../db/database.dart';
+import '../health/health_workout.dart';
 import '../courses/course.dart';
 import '../courses/course_repository.dart';
 import '../courses/lap_tracker.dart';
@@ -268,6 +269,49 @@ class SessionRepository {
         .get();
     return PaceTrack.of([for (final row in rows) (row.read(time)!, row.read(_db.samples.distanceDm)!)]);
   }
+
+  /// What the export to Health Connect needs of a stored session (Change health-connect, Design D3); null
+  /// when there is no such session. Sessions before schema 2 have no wall clock, so their time is the rower's.
+  Future<HealthSessionData?> healthData(int id) async {
+    final session = await get(id);
+    if (session == null) return null;
+    final samples = _db.samples;
+    final wall = coalesce([samples.wallMs, samples.tMs]);
+    final rows = await (_db.selectOnly(samples)
+          ..addColumns([wall, samples.heartRate, samples.watts, samples.paceCs, samples.calories])
+          ..where(samples.sessionId.equals(id))
+          ..orderBy([OrderingTerm.asc(samples.tMs)]))
+        .get();
+    return HealthSessionData(
+      startedAt: session.startedAt,
+      endedAt: session.endedAt,
+      distanceDm: session.distanceDm,
+      templateName: session.templateName,
+      points: [
+        for (final row in rows)
+          HealthPoint(
+            wallMs: row.read(wall)!,
+            heartRate: row.read(samples.heartRate),
+            watts: row.read(samples.watts),
+            paceCs: row.read(samples.paceCs),
+            calories: row.read(samples.calories),
+          ),
+      ],
+      laps: [
+        for (final lap in await laps(id))
+          (startMs: lap.startWallMs, endMs: lap.endWallMs, distanceDm: lap.endDistanceDm - lap.startDistanceDm),
+      ],
+      pauses: [for (final p in await pauses(id)) (startWallMs: p.startWallMs, endWallMs: p.endWallMs)],
+    );
+  }
+
+  /// Records that the session was written to Health Connect [at] that moment (Design D6).
+  Future<void> markHealthExported(int id, DateTime at) => (_db.update(_db.sessions)..where((s) => s.id.equals(id)))
+      .write(SessionsCompanion(healthExportedAt: Value(at)));
+
+  /// Records that the session is not in Health Connect after all, e.g. after a failed write.
+  Future<void> clearHealthExported(int id) => (_db.update(_db.sessions)..where((s) => s.id.equals(id)))
+      .write(const SessionsCompanion(healthExportedAt: Value(null)));
 
   Future<bool> hasRawPackets(int id) async {
     final row = await (_db.select(_db.rawPackets)

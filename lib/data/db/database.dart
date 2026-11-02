@@ -162,6 +162,10 @@ class Sessions extends Table {
   // Pause summary (Change auto-pause, Design D3); sessions before schema 7 have none.
   IntColumn get pauseCount => integer().withDefault(const Constant(0))();
   IntColumn get pausedMs => integer().withDefault(const Constant(0))();
+
+  /// When the session was last written to Health Connect (Change health-connect, Design D6); null when it
+  /// was not, and for sessions before schema 8 and imported ones.
+  DateTimeColumn get healthExportedAt => dateTime().nullable()();
 }
 
 /// Session-relative values per status tick (Design D6/D7).
@@ -307,7 +311,7 @@ class AppDatabase extends _$AppDatabase {
       ));
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -366,6 +370,10 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(schema.sessions, schema.sessions.pausedMs);
             await m.addColumn(schema.samples, schema.samples.activeMs);
             await m.createTable(schema.pauses);
+          },
+          // Health Connect (Change health-connect, Design D6); existing sessions count as not written.
+          from7To8: (m, schema) async {
+            await m.addColumn(schema.sessions, schema.sessions.healthExportedAt);
           },
         ),
         beforeOpen: (details) async {

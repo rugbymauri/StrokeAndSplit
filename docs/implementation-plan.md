@@ -25,7 +25,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 8 | `rename-stroke-and-split` | 10/11 | zuletzt | Domain- und Markenrecherche (Nutzer) |
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
-| 12 | `health-connect` | 0/13 | geplant | Spike am Gerät (1.2, Nutzer) nach 1.1 |
+| 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
 
 ## Warum diese Reihenfolge
 
@@ -269,6 +269,12 @@ Ziel: 3 s nach dem fälligen Schlag pausiert die Session; Sessionzeit, Rundenzei
 Wunsch des Nutzers (2026-11-02): Sessions in Google Fit sehen. Google Fit nimmt keine neuen Apps an und läuft Ende 2026 aus, daher Health Connect unter Android; Fit bzw. Google Health liest daraus.
 
 - [x] Geplant (2026-11-02, `docs/health-connect-proposal`): eigener Kotlin-Kanal zu `connect-client` statt Paket `health` (dieses schreibt Puls nur als Einzelwerte, keine Leistung, Runden, Pausen und kein Ersetzen); Einheit `ROWING_MACHINE` mit Distanz, Kalorien, Puls, Leistung, Geschwindigkeit, Runden und Pausen; automatisch nach jeder Session von PM5/FTMS, nachträglich aus Liste und Zusammenfassung; erneutes Senden ersetzt; Schema 8 (`sessions.health_exported_at`); minSdk 26, `FlutterFragmentActivity`.
+- [x] Umsetzung begonnen (2026-11-02, `feature/health-connect`): Task 1.1 Android-Gerüst mit `connect-client` 1.1.0 (stabil), minSdk 26, `FlutterFragmentActivity`, Kotlin-Kanal; Release-APK baut lokal.
+- [x] Abbildung, Schreiben und Status (2026-11-02, Tasks 2.1–3.3, 4.1): `HealthWorkout` aus den gespeicherten Messwerten, Schema 8, Kotlin-`writeSession` (löscht eigene Records im Zeitraum, dann ein `insertRecords`), `HealthExporter` aus `SessionRecorder.stop()` (nicht `finishedSessionProvider`, der nur selbst endende Sessions meldet), Einstellung `healthConnect`. Replays werden wie der Simulator nicht übertragen. Laut Quellen von `connect-client` 1.1.0 passen `PAUSE`- und `ROWING_MACHINE`-Segmente zur Rudergerät-Einheit.
+- [x] Einstieg (2026-11-02, Task 4.2): Herz-Symbol in der App-Leiste von „Sessions“ (nur Android) öffnet ein Bottom-Sheet mit Schalter, Status (fehlt, veraltet, Berechtigung fehlt, aktiv), Health Connect öffnen und Datenschutz-Hinweis.
+- [x] Senden (2026-11-02, Task 4.3): „An Health Connect senden“ im Menü der Liste und in der Zusammenfassung, Status „Übertragen am …“ / „Nicht übertragen“; Fehler nach dem Rudern meldet die App global per Snackbar, bei fehlender Berechtigung mit „Erteilen“ (ein langes Label lässt die Snackbar bei 390 px überlaufen).
+- [x] Datenschutz-Hinweis (2026-11-02, Task 4.4): eigene Seite, aus dem Bottom-Sheet und von Health Connect geöffnet, beim Start (`launchAction`) und während die App läuft (`onNewIntent`).
+- [x] Dokumentation (2026-11-02, Task 5.1): README-Abschnitt „Health Connect“; Play-Store-Erklärung steht unter „Offene Punkte“.
 - [ ] Task 1.2 (Nutzer, nach 1.1): Probe-Einheit am Gerät, klärt, ob Rudergerät-Segmente angenommen werden.
 - [ ] Task 6.1 (Nutzer): Gerätetest, auch ob Google Fit bzw. Google Health die Einheit zeigt.
 

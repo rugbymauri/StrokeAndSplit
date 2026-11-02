@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/database.dart';
+import '../../data/health/health_export.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../l10n/l10n.dart';
+import '../health/health_connect_sheet.dart';
 import '../live/formatters.dart';
 import 'session_actions.dart';
 import 'session_summary_screen.dart';
@@ -20,6 +22,13 @@ class SessionsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.sessionsTitle),
         actions: [
+          if (ref.watch(healthExportAvailableProvider))
+            IconButton(
+              key: const Key('health-connect-button'),
+              tooltip: l10n.healthConnectTooltip,
+              icon: const Icon(Icons.monitor_heart_outlined),
+              onPressed: () => showHealthConnectSheet(context),
+            ),
           IconButton(
             tooltip: l10n.actionImport,
             icon: const Icon(Icons.file_open_outlined),
@@ -40,7 +49,7 @@ class SessionsScreen extends ConsumerWidget {
   }
 }
 
-enum _Action { replay, export, delete }
+enum _Action { replay, export, health, delete }
 
 class _SessionTile extends ConsumerWidget {
   const _SessionTile({required this.session});
@@ -69,11 +78,14 @@ class _SessionTile extends ConsumerWidget {
         onSelected: (action) => switch (action) {
           _Action.replay => replaySession(context, ref, session),
           _Action.export => exportSession(context, ref, session),
+          _Action.health => sendSessionToHealth(context, ref, session),
           _Action.delete => deleteSession(context, ref, session),
         },
         itemBuilder: (context) => [
           PopupMenuItem(value: _Action.replay, child: Text(l10n.actionReplay)),
           PopupMenuItem(value: _Action.export, child: Text(l10n.actionExport)),
+          if (canSendToHealth(ref, session))
+            PopupMenuItem(value: _Action.health, child: Text(l10n.healthSend)),
           PopupMenuItem(value: _Action.delete, child: Text(l10n.actionDelete)),
         ],
       ),

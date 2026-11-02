@@ -1064,4 +1064,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ghostSymbolLabel => 'Ghost';
+
+  @override
+  String get healthFreeTitle => 'Free rowing';
+
+  @override
+  String get healthConnectTooltip => 'Health Connect';
+
+  @override
+  String get healthConnectIntro =>
+      'Sends sessions from your rower to Health Connect after rowing. Apps like Google Fit read them from there.';
+
+  @override
+  String get healthConnectSwitch => 'Send to Health Connect';
+
+  @override
+  String get healthConnectActive => 'Sessions are sent after rowing.';
+
+  @override
+  String get healthConnectMissing =>
+      'Health Connect is not installed on this device.';
+
+  @override
+  String get healthConnectInstall => 'Install';
+
+  @override
+  String get healthConnectOutdated => 'Health Connect needs an update.';
+
+  @override
+  String get healthConnectUpdate => 'Update';
+
+  @override
+  String get healthConnectPermissionMissing =>
+      'Without permission for workouts, Stroke & Split cannot send anything to Health Connect.';
+
+  @override
+  String get healthConnectGrant => 'Grant permission';
+
+  @override
+  String get healthConnectOpen => 'Open Health Connect';
+
+  @override
+  String get healthConnectOpenHint => 'Manage permissions and sent data';
+
+  @override
+  String get healthPrivacyTitle => 'Privacy notice';
+
+  @override
+  String get healthPrivacyWhat =>
+      'When you switch sending on or send a session yourself, Stroke & Split writes sessions from your rower to Health Connect: start and end, title, distance, calories, heart rate, power, speed, laps and pauses.';
+
+  @override
+  String get healthPrivacyKept =>
+      'Stroke rate, force curve and raw data stay in the app.';
+
+  @override
+  String get healthPrivacyNoRead =>
+      'Stroke & Split reads no data from Health Connect.';
+
+  @override
+  String get healthPrivacyDevice =>
+      'Your data does not leave the device through Stroke & Split. Which other apps may read it in Health Connect is up to you in Health Connect.';
+
+  @override
+  String get healthPrivacyStop =>
+      'You can switch sending off at any time. Delete sent workouts in Health Connect.';
+
+  @override
+  String get healthSend => 'Send to Health Connect';
+
+  @override
+  String get healthSent => 'Sent to Health Connect.';
+
+  @override
+  String healthSentAt(String date) {
+    return 'Sent to Health Connect on $date';
+  }
+
+  @override
+  String get healthNotSent => 'Not sent to Health Connect';
+
+  @override
+  String get healthFailedPermission =>
+      'Stroke & Split may not write to Health Connect.';
+
+  @override
+  String get healthFailedUnavailable => 'Health Connect is not available.';
+
+  @override
+  String get healthFailed => 'Sending to Health Connect failed.';
+
+  @override
+  String get healthGrantShort => 'Grant';
 }

@@ -1734,6 +1734,168 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Ghost'**
   String get ghostSymbolLabel;
+
+  /// Title of a session without a template as a workout in Health Connect (and Google Fit)
+  ///
+  /// In de, this message translates to:
+  /// **'Freies Rudern'**
+  String get healthFreeTitle;
+
+  /// Tooltip of the app bar button on the sessions screen that opens the Health Connect settings (Android only); Health Connect is the product name of the Android health data store
+  ///
+  /// In de, this message translates to:
+  /// **'Health Connect'**
+  String get healthConnectTooltip;
+
+  /// Explanation at the top of the Health Connect sheet
+  ///
+  /// In de, this message translates to:
+  /// **'Überträgt Sessions vom Rudergerät nach dem Rudern an Health Connect. Von dort lesen Apps wie Google Fit sie.'**
+  String get healthConnectIntro;
+
+  /// Switch in the Health Connect sheet that turns sending finished sessions on or off
+  ///
+  /// In de, this message translates to:
+  /// **'An Health Connect übertragen'**
+  String get healthConnectSwitch;
+
+  /// Status in the Health Connect sheet while sending is on and allowed
+  ///
+  /// In de, this message translates to:
+  /// **'Sessions werden nach dem Rudern übertragen.'**
+  String get healthConnectActive;
+
+  /// Status in the Health Connect sheet when the device has no Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'Health Connect ist auf diesem Gerät nicht installiert.'**
+  String get healthConnectMissing;
+
+  /// Button in the Health Connect sheet that opens the store page of Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'Installieren'**
+  String get healthConnectInstall;
+
+  /// Status in the Health Connect sheet when the installed Health Connect is too old
+  ///
+  /// In de, this message translates to:
+  /// **'Health Connect muss aktualisiert werden.'**
+  String get healthConnectOutdated;
+
+  /// Button in the Health Connect sheet that opens the store page to update Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'Aktualisieren'**
+  String get healthConnectUpdate;
+
+  /// Status in the Health Connect sheet when the user refused or later withdrew the permission to write workouts
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne die Berechtigung für Trainingseinheiten kann Stroke & Split nichts an Health Connect übertragen.'**
+  String get healthConnectPermissionMissing;
+
+  /// Button that asks Android again for the Health Connect write permissions
+  ///
+  /// In de, this message translates to:
+  /// **'Berechtigung erteilen'**
+  String get healthConnectGrant;
+
+  /// Entry in the Health Connect sheet that opens Health Connect itself
+  ///
+  /// In de, this message translates to:
+  /// **'Health Connect öffnen'**
+  String get healthConnectOpen;
+
+  /// Subtitle of the entry that opens Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'Berechtigungen und übertragene Daten verwalten'**
+  String get healthConnectOpenHint;
+
+  /// Title of the page about what the app writes to Health Connect, and the link to it in the Health Connect sheet
+  ///
+  /// In de, this message translates to:
+  /// **'Datenschutz-Hinweis'**
+  String get healthPrivacyTitle;
+
+  /// Privacy notice, paragraph 1: what is written to Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'Wenn du die Übertragung einschaltest oder eine Session selbst sendest, schreibt Stroke & Split Sessions von deinem Rudergerät an Health Connect: Beginn und Ende, Titel, Distanz, Kalorien, Puls, Leistung, Geschwindigkeit, Runden und Pausen.'**
+  String get healthPrivacyWhat;
+
+  /// Privacy notice, paragraph 2: what is not written
+  ///
+  /// In de, this message translates to:
+  /// **'Schlagzahl, Kraftkurve und Rohdaten bleiben in der App.'**
+  String get healthPrivacyKept;
+
+  /// Privacy notice, paragraph 3
+  ///
+  /// In de, this message translates to:
+  /// **'Stroke & Split liest keine Daten aus Health Connect.'**
+  String get healthPrivacyNoRead;
+
+  /// Privacy notice, paragraph 4
+  ///
+  /// In de, this message translates to:
+  /// **'Über Stroke & Split verlassen deine Daten das Gerät nicht. Welche anderen Apps sie in Health Connect lesen dürfen, legst du in Health Connect fest.'**
+  String get healthPrivacyDevice;
+
+  /// Privacy notice, paragraph 5
+  ///
+  /// In de, this message translates to:
+  /// **'Du kannst die Übertragung jederzeit ausschalten. Übertragene Einheiten löschst du in Health Connect.'**
+  String get healthPrivacyStop;
+
+  /// Menu entry in the session list and button in the summary that sends one session to Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'An Health Connect senden'**
+  String get healthSend;
+
+  /// Message after a session was sent to Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'An Health Connect übertragen.'**
+  String get healthSent;
+
+  /// Status in the summary of a session that is in Health Connect; date is date and time of the last successful send
+  ///
+  /// In de, this message translates to:
+  /// **'An Health Connect übertragen am {date}'**
+  String healthSentAt(String date);
+
+  /// Status in the summary of a session that is not in Health Connect
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht an Health Connect übertragen'**
+  String get healthNotSent;
+
+  /// Message when sending a session failed because the permission is missing; offered with a button to grant it
+  ///
+  /// In de, this message translates to:
+  /// **'Stroke & Split darf nicht an Health Connect schreiben.'**
+  String get healthFailedPermission;
+
+  /// Message when sending a session failed because Health Connect is missing or too old
+  ///
+  /// In de, this message translates to:
+  /// **'Health Connect ist nicht verfügbar.'**
+  String get healthFailedUnavailable;
+
+  /// Message when Health Connect refused a session for another reason
+  ///
+  /// In de, this message translates to:
+  /// **'Übertragung an Health Connect fehlgeschlagen.'**
+  String get healthFailed;
+
+  /// Short button in the message about a missing Health Connect permission that asks for it again; must stay short to fit next to the message
+  ///
+  /// In de, this message translates to:
+  /// **'Erteilen'**
+  String get healthGrantShort;
 }
 
 class _AppLocalizationsDelegate

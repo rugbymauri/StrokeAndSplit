@@ -99,19 +99,22 @@ Die reine Funktion `healthWorkoutOf(session, samples, laps, pauses, title)` lief
 - Pro Sekunde bleibt höchstens ein Wert, der letzte dieser Sekunde. Statusmeldungen kommen mehrmals pro Sekunde, und Health-Apps zeigen Sekundenwerte.
 - Eine Serie wird in Records zu je höchstens 10 Minuten geteilt. So bleibt jeder Record weit unter den Grenzen von Health Connect, auch bei langen Sessions.
 
-**Segmente:** Wenn Health Connect Segmente in einer Trainingseinheit nur lückenlos annimmt, füllen `ROWING_MACHINE`-Segmente die Zeit zwischen den Pausen. Das klärt Task 1.2 am Gerät. Lehnt Health Connect `ROWING_MACHINE`-Segmente in einer Rudergerät-Einheit ab, entfallen die Segmente, und die Pausen gehen verloren. Das wird dann in dieser Datei nachgetragen.
+**Segmente:** Nur bei Pausen: `PAUSE`-Segmente für die Pausen, `ROWING_MACHINE`-Segmente für das Rudern dazwischen, lückenlos über die Einheit. Die Prüfung in `connect-client` 1.1.0 erlaubt beide in einer Rudergerät-Einheit (`PAUSE` gilt für jede Einheit, `ROWING_MACHINE` ist der Rudergerät-Einheit zugeordnet) und verlangt nur, dass Segmente sich nicht überlappen und in der Einheit liegen (Quellen gelesen am 2026-11-02). Ob Health Connect auf dem Gerät gleich prüft, zeigt Task 1.2. Lehnt es die Segmente ab, entfallen sie, und die Pausen gehen verloren.
+
+Eine Runde, die im Moment einer Pause beginnt, beginnt nach der Pause; eine, die dann endet, endet vor ihr. Messwerte nach dem Ende der Session fallen weg.
 
 ### D4: Wann übertragen wird
 
 **Automatisch:**
-- Ein `HealthExporter` (Riverpod) hört auf `finishedSessionProvider`.
-- Er überträgt, wenn die Übertragung eingeschaltet ist und die Quelle `pm5` oder `ftms` ist. Replays legen keine Sessions an, Sessions aus dem Simulator werden übersprungen.
-- Er läuft ohne `await` im Hintergrund der UI. Ein Fehler erscheint als Snackbar, die Zusammenfassung zeigt den Status, sobald er feststeht.
+- `SessionRecorder.stop()` ruft nach dem Speichern `HealthExporter.sessionFinished` auf. `finishedSessionProvider` reicht nicht: Er meldet nur Sessions, die nach der letzten Runde von selbst enden, nicht die vom Nutzer gestoppten.
+- Der `HealthExporter` (Riverpod) überträgt, wenn die Übertragung eingeschaltet ist und die Quelle `pm5` oder `ftms` ist. Sessions aus dem Simulator und aus Replays (Quelle `replay`) werden übersprungen.
+- Ein Fehler landet in `healthExportFailureProvider`, den die Oberfläche als Snackbar zeigt.
+- Er läuft ohne `await` im Hintergrund der UI. Die Zusammenfassung zeigt den Status, sobald er feststeht.
 - Nach einem Absturz wiederhergestellte Sessions (`recoverInterrupted`) werden nicht automatisch übertragen.
 
 **Nachträglich:**
 - Ein Eintrag „An Health Connect senden“ im Menü der Session-Liste und eine Schaltfläche in der Zusammenfassung.
-- Beide sind nur sichtbar, wenn die Übertragung eingeschaltet ist und die Session nicht aus dem Simulator stammt.
+- Beide sind nur sichtbar, wenn die Übertragung eingeschaltet ist und die Session nicht aus dem Simulator oder einem Replay stammt.
 
 ### D5: Einstellung und Einstieg
 
