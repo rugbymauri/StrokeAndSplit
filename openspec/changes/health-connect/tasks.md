@@ -23,7 +23,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 - [x] 4.1 Store `healthConnect` in `shared_preferences` mit Memory-Fake nach D5, Provider `healthExportAvailableProvider` (Android). Verifikation: Unit-Test, Einstellung überdauert ein neues Öffnen des Stores
 - [x] 4.2 Schaltfläche in der App-Leiste von „Sessions“ und Bottom-Sheet nach D5 (Schalter, Status, Health Connect öffnen, Installation anbieten, Datenschutz-Link); Texte in DE/EN. Verifikation: Widget-Tests: unter Linux keine Schaltfläche, Einschalten mit erteilter Berechtigung, verweigerte Berechtigung lässt aus, Health Connect fehlt mit Installationsangebot
 - [x] 4.3 „An Health Connect senden“ im Menü der Session-Liste und in der Zusammenfassung, Status „Übertragen am …“ bzw. „Nicht übertragen“ in der Zusammenfassung, Snackbar bei Erfolg und Fehler (mit Angebot, die Berechtigung neu zu erteilen). Verifikation: Widget-Tests mit Fake: Eintrag nur bei eingeschalteter Übertragung und nicht für Sessions aus Simulator oder Replay, Status vor und nach der Übertragung, Fehlermeldung
-- [ ] 4.4 Datenschutz-Seite nach Spec „Datenschutz-Hinweis“, geöffnet beim Start mit `launchAction` und über `onNewIntent`. Verifikation: Widget-Test der Seite in DE/EN, Test mit gemocktem Kanal öffnet die Seite beim Start
+- [x] 4.4 Datenschutz-Seite nach Spec „Datenschutz-Hinweis“, geöffnet beim Start mit `launchAction` und über `onNewIntent`. Verifikation: Widget-Test der Seite in DE/EN, Test mit gemocktem Kanal öffnet die Seite beim Start
 
 ## 5. Dokumentation
 
