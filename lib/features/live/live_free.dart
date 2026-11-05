@@ -201,6 +201,8 @@ class FreeLiveView extends StatelessWidget {
           value: formatWhole(tick?.watts),
           valueKey: const Key('metric-watts'),
           fontSize: fontSize,
+          footnote: formatResistanceLevel(l10n, tick?.resistanceLevel),
+          footnoteKey: const Key('metric-resistance'),
         ),
         MetricTile(
           label: l10n.metricTime,

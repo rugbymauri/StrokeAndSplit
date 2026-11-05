@@ -12,7 +12,8 @@ import 'erg_source.dart';
 /// a force curve after every drive, as high as the power asks for (Design D4).
 ///
 /// With [protocol] FTMS it sends one Rower Data record per second like a
-/// typical FTMS rower instead of the PM5 notifications (Design D10).
+/// typical FTMS rower instead of the PM5 notifications (Design D10), with
+/// [ftmsResistanceLevel] as the resistance level of a rower with a brake.
 class SimulatedSource implements ErgSource {
   SimulatedSource({
     this.targetPace = const Duration(minutes: 2, seconds: 10),
@@ -31,6 +32,9 @@ class SimulatedSource implements ErgSource {
 
   /// Time between two Rower Data records in FTMS mode.
   static const ftmsInterval = Duration(seconds: 1);
+
+  /// Resistance level reported in FTMS mode; the PM5 reports none.
+  static const ftmsResistanceLevel = 5;
 
   static const _encoder = Pm5Encoder();
   static const _ftmsEncoder = FtmsEncoder();
@@ -156,6 +160,7 @@ class SimulatedSource implements ErgSource {
             watts: tick.pace == null ? null : wattsForPace(tick.pace!),
             strokeRate: tick.strokeRate,
             calories: tick.calories,
+            resistanceLevel: ftmsResistanceLevel,
           ),
           strokeCount: _completedStrokes,
           at: at,

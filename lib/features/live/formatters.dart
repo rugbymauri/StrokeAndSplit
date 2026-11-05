@@ -43,6 +43,10 @@ String formatGrouped(int value) => value.toString().replaceAllMapped(RegExp(r'\B
 /// Whole numbers like watts or strokes per minute; a dash when unknown.
 String formatWhole(int? value) => value?.toString() ?? _noValue;
 
+/// The resistance level of the rower, e.g. "Stufe 7"; null when it reports none.
+String? formatResistanceLevel(AppLocalizations l10n, int? level) =>
+    level == null ? null : l10n.metricResistanceLevel(level);
+
 /// An RR interval in whole milliseconds, e.g. "812 ms".
 String formatRrInterval(int milliseconds) => '$milliseconds ms';
 

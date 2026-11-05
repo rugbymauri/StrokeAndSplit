@@ -12,6 +12,7 @@ const _tick = StatusTick(
   strokeRate: 24,
   heartRate: 140,
   calories: 17,
+  resistanceLevel: 7,
 );
 
 void main() {
@@ -32,6 +33,10 @@ void main() {
 
     test('keeps the heart rate when none is given', () {
       expect(_tick.copyWith().heartRate, 140);
+    });
+
+    test('keeps the resistance level', () {
+      expect(_tick.copyWith(heartRate: 142).resistanceLevel, 7);
     });
   });
 

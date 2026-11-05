@@ -58,6 +58,19 @@ void main() {
     expect((read.strokeRate, read.strokeCount, read.totalDistance), (22.0, 88, 1000));
     expect((read.pace, read.power, read.totalEnergy), (const Duration(minutes: 2), 203, 50));
     expect(read.elapsedTime, const Duration(minutes: 4));
-    expect(read.heartRate, isNull);
+    expect((read.heartRate, read.resistanceLevel), (null, null));
+  });
+
+  test('writes the resistance level of a status that has one', () {
+    const tick = StatusTick(
+      elapsed: Duration.zero,
+      distanceMeters: 0,
+      workoutType: WorkoutType.unknown,
+      workoutState: WorkoutState.unknown,
+      isRowing: false,
+      resistanceLevel: 7,
+    );
+    final read = RowerData.parse(encoder.encodeStatus(tick, strokeCount: 0, at: Duration.zero).bytes)!;
+    expect(read.resistanceLevel, 7);
   });
 }

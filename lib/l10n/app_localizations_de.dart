@@ -313,6 +313,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get metricWatts => 'Watt';
 
   @override
+  String metricResistanceLevel(int level) {
+    return 'Stufe $level';
+  }
+
+  @override
   String get metricStrokeRate => 'Schlagzahl';
 
   @override

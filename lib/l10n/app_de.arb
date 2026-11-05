@@ -403,6 +403,15 @@
   "@metricWatts": {
     "description": "Live display: label of the power"
   },
+  "metricResistanceLevel": "Stufe {level}",
+  "@metricResistanceLevel": {
+    "description": "Live display: resistance level the rower reports, small below the watts",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
   "metricStrokeRate": "Schlagzahl",
   "@metricStrokeRate": {
     "description": "Live display: label of the stroke rate"

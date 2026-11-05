@@ -35,6 +35,7 @@ class FtmsDecoder implements ErgDecoder {
   Duration? _pace;
   int? _energy;
   int? _heartRate;
+  int? _resistanceLevel;
 
   // State at the end of the previous record.
   int? _previousCount;
@@ -63,6 +64,7 @@ class FtmsDecoder implements ErgDecoder {
     _pace = data.pace ?? _pace;
     _energy = data.totalEnergy ?? _energy;
     _heartRate = data.heartRate ?? _heartRate;
+    _resistanceLevel = data.resistanceLevel ?? _resistanceLevel;
     return data.moreData ? const [] : _onRecord(packet.time);
   }
 
@@ -118,6 +120,7 @@ class FtmsDecoder implements ErgDecoder {
     final strokeRate = _strokeRate?.round();
     final heartRate = _heartRate;
     final energy = _energy;
+    final resistanceLevel = _resistanceLevel;
     events.add(StatusTick(
       elapsed: _elapsed,
       distanceMeters: (distance ?? 0).toDouble(),
@@ -129,6 +132,7 @@ class FtmsDecoder implements ErgDecoder {
       strokeRate: strokeRate != null && strokeRate >= 1 && strokeRate <= 60 ? strokeRate : null,
       heartRate: heartRate != null && heartRate > 0 && heartRate <= 250 ? heartRate : null,
       calories: energy == RowerData.energyNotAvailable ? null : energy,
+      resistanceLevel: resistanceLevel != null && resistanceLevel > 0 ? resistanceLevel : null,
     ));
     return events;
   }
