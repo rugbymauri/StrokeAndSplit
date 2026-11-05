@@ -26,7 +26,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
-| 13 | `resistance-control` | 10/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
+| 13 | `resistance-control` | 11/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
 
 ## Warum diese Reihenfolge
 
@@ -293,6 +293,7 @@ Wunsch des Nutzers (2026-11-05) für den Domyos Woodrower. Der Spike am Gerät z
 - [x] Logik (2026-11-05, Task 4.1): `ResistanceDirector` entscheidet aus Segmentbeginn, gemeldeter Stufe, −/+ und Wiederverbinden, welche Stufe gesendet wird; 3 s nach dem Senden gilt die alte Stufe nicht als Handänderung.
 - [x] Provider (2026-11-05, Task 4.2): `resistanceProvider` verbindet Logik, aktive Quelle, gemeldete Stufe und Segmente der laufenden Session; Stufen gehen nacheinander raus, eine neuere ersetzt eine wartende; Ablehnung zeigt 2 s einen Hinweis. Beginnt eine Session, ist die Stufe des Geräts die Grundstufe.
 - [x] Live-Anzeige (2026-11-05, Task 5.1): Ruderblatt-Tasten an der Stufe unter den Watt, nur bei setzbarer Stufe, an der Grenze gesperrt; „Stufe nicht gesetzt“ für 2 s. Abweichung von D6: Tasten 44 × 47 (kompakter `OarStepper`) statt 48 × 48; ab 120 px Kachelhöhe in der Fussnotenzeile, sonst links und rechts neben dem Wert (kompakte Kachel mit Vorlage, 64 px hoch).
+- [x] Zonen (2026-11-05, Task 5.2): Schalter „Widerstandsstufe“ mit Ruderblatt-Tasten 1–25 (Start 5) im Zoneneditor; „· Stufe 10“ hinter den Bändern in Zonenliste, Zonendetails, Streckeneditor und Vorlagen.
 - [ ] Umsetzung der übrigen Tasks, danach Gerätetest 6.2 (Nutzer).
 
 ## Offene Entscheide

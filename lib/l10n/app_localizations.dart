@@ -1633,6 +1633,36 @@ abstract class AppLocalizations {
   /// **'Höchstens'**
   String get zoneSpmTo;
 
+  /// Zone editor: title and switch of the resistance level that a rower with an adjustable brake is set to in this zone
+  ///
+  /// In de, this message translates to:
+  /// **'Widerstandsstufe'**
+  String get zoneResistance;
+
+  /// Zone editor: label of the resistance level
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe'**
+  String get zoneResistanceLevel;
+
+  /// Zone list, course and template: resistance level of a zone after its bands
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe {level}'**
+  String zoneResistanceLevelShort(int level);
+
+  /// Zone editor: what the resistance level does
+  ///
+  /// In de, this message translates to:
+  /// **'Bei FTMS-Rudergeräten mit verstellbarem Widerstand setzt die App diese Stufe, sobald die Zone beginnt.'**
+  String get zoneResistanceHint;
+
+  /// Oar stepper: size of a step in resistance levels, for screen readers
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Stufe} other{{count} Stufen}}'**
+  String stepLevels(int count);
+
   /// Zone editor: what a zone needs
   ///
   /// In de, this message translates to:

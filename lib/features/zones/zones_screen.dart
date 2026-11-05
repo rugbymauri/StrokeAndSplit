@@ -127,7 +127,7 @@ class _ZoneTile extends StatelessWidget {
         decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
       ),
       title: Text(zone.name, style: AppTextStyles.cardTitle.copyWith(fontSize: 16)),
-      subtitle: Text(zoneSummary(zone), style: AppTextStyles.caption),
+      subtitle: Text(zoneSummary(context.l10n, zone), style: AppTextStyles.caption),
       trailing: Text(
         context.l10n.zoneUsage(usage.courses),
         key: Key('zone-usage-${zone.id}'),

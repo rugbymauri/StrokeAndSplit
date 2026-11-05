@@ -208,7 +208,7 @@ String templateDetails(AppLocalizations l10n, SessionTemplate template) {
 List<String> templateZoneLines(AppLocalizations l10n, Course course) {
   final lines = {
     for (final s in course.definition.segments)
-      if (!s.isFree) '${s.zoneName ?? l10n.segmentZone} ${formatSegmentBands(s)}',
+      if (!s.isFree) '${s.zoneName ?? l10n.segmentZone} ${formatSegmentBands(l10n, s)}',
   };
   return lines.isEmpty ? [l10n.courseZonesSummary(0, '')] : lines.toList();
 }

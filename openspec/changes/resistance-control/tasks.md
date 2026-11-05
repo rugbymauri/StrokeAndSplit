@@ -26,7 +26,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 ## 5. Oberfläche
 
 - [x] 5.1 −/+ an der Stufe in der Watt-Kachel nach D6, frei und mit Vorlage, gesperrt an den Grenzen, Hinweis „Stufe nicht gesetzt“ nach D5. Verifikation: Widget-Tests: Tasten nur mit Steuerung, Tipp auf + sendet Ziel + 1, + bei 15 gesperrt, Gerät ohne setzbare Stufe zeigt nur die Fussnote, Overflow-Test bei 390 px (frei und mit Vorlage) wie in ui-design 5.15, Tasten mindestens 48 × 48 dp
-- [ ] 5.2 Stufe im Zoneneditor (Schalter und `OarStepper` 1–25) und in der Zonenliste („· Stufe 10“), auch in der Segmentbeschreibung der Strecke. Verifikation: Widget-Tests: Zone mit Stufe speichern und in der Liste sehen, Zone nur mit Stufe zeigt „Band fehlt“, Zone ohne Stufe ohne Angabe
+- [x] 5.2 Stufe im Zoneneditor (Schalter und `OarStepper` 1–25) und in der Zonenliste („· Stufe 10“), auch in der Segmentbeschreibung der Strecke. Verifikation: Widget-Tests: Zone mit Stufe speichern und in der Liste sehen, Zone nur mit Stufe zeigt „Band fehlt“, Zone ohne Stufe ohne Angabe
 
 ## 6. Dokumentation und Gerätetest
 

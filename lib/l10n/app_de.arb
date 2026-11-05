@@ -1345,6 +1345,36 @@
   "@zoneSpmTo": {
     "description": "Zone editor: label of the highest stroke rate of the band"
   },
+  "zoneResistance": "Widerstandsstufe",
+  "@zoneResistance": {
+    "description": "Zone editor: title and switch of the resistance level that a rower with an adjustable brake is set to in this zone"
+  },
+  "zoneResistanceLevel": "Stufe",
+  "@zoneResistanceLevel": {
+    "description": "Zone editor: label of the resistance level"
+  },
+  "zoneResistanceLevelShort": "Stufe {level}",
+  "@zoneResistanceLevelShort": {
+    "description": "Zone list, course and template: resistance level of a zone after its bands",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "zoneResistanceHint": "Bei FTMS-Rudergeräten mit verstellbarem Widerstand setzt die App diese Stufe, sobald die Zone beginnt.",
+  "@zoneResistanceHint": {
+    "description": "Zone editor: what the resistance level does"
+  },
+  "stepLevels": "{count, plural, =1{1 Stufe} other{{count} Stufen}}",
+  "@stepLevels": {
+    "description": "Oar stepper: size of a step in resistance levels, for screen readers",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "zoneBandHint": "Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.",
   "@zoneBandHint": {
     "description": "Zone editor: what a zone needs"

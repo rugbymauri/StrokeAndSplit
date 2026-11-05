@@ -39,6 +39,8 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
   late var _hasSpm = _zone?.spmMin != null || _zone?.spmMax != null;
   late var _spmMin = _zone?.spmMin ?? _zone?.spmMax ?? 24;
   late var _spmMax = _zone?.spmMax ?? _spmMin + 2;
+  late var _hasResistance = _zone?.resistanceLevel != null;
+  late var _resistance = _zone?.resistanceLevel ?? _resistanceStart;
 
   /// The courses containing the zone, by name; empty for a new zone.
   var _courses = <String>[];
@@ -78,6 +80,7 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
       paceSlowCs: _hasPace ? _paceSlow : null,
       spmMin: _hasSpm ? _spmMin : null,
       spmMax: _hasSpm ? _spmMax : null,
+      resistanceLevel: _hasResistance ? _resistance : null,
     );
     errors.addAll([for (final e in zoneErrors(zone)) zoneErrorText(context.l10n, e)]);
     return errors.isEmpty ? zone : null;
@@ -271,6 +274,32 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
               ),
               const SizedBox(height: 8),
               Text(l10n.zoneBandHint, style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 12),
+              _BandCard(
+                switchKey: const Key('zone-resistance-band'),
+                title: l10n.zoneResistance,
+                on: _hasResistance,
+                onChanged: (on) => setState(() => _hasResistance = on),
+                fields: [
+                  _Field(
+                    label: l10n.zoneResistanceLevel,
+                    child: OarStepper(
+                      key: const Key('zone-resistance-level'),
+                      value: _resistance,
+                      step: 1,
+                      min: _resistanceLowest,
+                      max: _resistanceHighest,
+                      stepLabel: l10n.stepLevels(1),
+                      label: l10n.zoneResistanceLevel,
+                      size: OarStepperSize.compact,
+                      background: AppColors.bg,
+                      onChanged: (v) => setState(() => _resistance = v),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(l10n.zoneResistanceHint, style: Theme.of(context).textTheme.bodySmall),
               const SizedBox(height: 16),
               FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
             ],
@@ -344,6 +373,12 @@ const _paceGap = 1000;
 const _spmLowest = 10;
 const _spmHighest = 60;
 
+/// Resistance levels; the rower clamps to its own range while rowing
+/// (Change resistance-control, Design D7).
+const _resistanceLowest = 1;
+const _resistanceHighest = 25;
+const _resistanceStart = 5;
+
 /// A [child] with its [label] above.
 class _Field extends StatelessWidget {
   const _Field({required this.label, required this.child});
@@ -364,7 +399,8 @@ class _Field extends StatelessWidget {
   }
 }
 
-/// A band that can be switched off, with its two bounds side by side.
+/// A band that can be switched off, with its bounds side by side; also the
+/// resistance level with a single field.
 class _BandCard extends StatelessWidget {
   const _BandCard({
     required this.switchKey,
@@ -400,9 +436,12 @@ class _BandCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: fields[0]),
-                  const SizedBox(width: 12),
-                  Expanded(child: fields[1]),
+                  for (final (i, field) in fields.indexed) ...[
+                    if (i > 0) const SizedBox(width: 12),
+                    Expanded(child: field),
+                  ],
+                  // A single field takes the width of one of two.
+                  if (fields.length == 1) ...[const SizedBox(width: 12), const Spacer()],
                 ],
               ),
             ],

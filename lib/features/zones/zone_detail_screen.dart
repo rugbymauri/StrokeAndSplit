@@ -59,7 +59,7 @@ class ZoneDetailScreen extends ConsumerWidget {
                       AppSpacing.xxl,
                     ),
                     children: [
-                      Text(zoneSummary(zone), style: AppTextStyles.subtitle),
+                      Text(zoneSummary(context.l10n, zone), style: AppTextStyles.subtitle),
                       const SizedBox(height: AppSpacing.xxl),
                       switch (rankings) {
                         AsyncData(:final value) =>

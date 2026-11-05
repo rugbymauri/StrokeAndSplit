@@ -956,6 +956,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zoneSpmTo => 'At most';
 
   @override
+  String get zoneResistance => 'Resistance level';
+
+  @override
+  String get zoneResistanceLevel => 'Level';
+
+  @override
+  String zoneResistanceLevelShort(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String get zoneResistanceHint =>
+      'On FTMS rowers with an adjustable resistance, the app sets this level as soon as the zone starts.';
+
+  @override
+  String stepLevels(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count levels',
+      one: '1 level',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get zoneBandHint =>
       'At least one band is needed: pace, stroke rate or both.';
 

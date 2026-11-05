@@ -962,6 +962,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String get zoneSpmTo => 'Höchstens';
 
   @override
+  String get zoneResistance => 'Widerstandsstufe';
+
+  @override
+  String get zoneResistanceLevel => 'Stufe';
+
+  @override
+  String zoneResistanceLevelShort(int level) {
+    return 'Stufe $level';
+  }
+
+  @override
+  String get zoneResistanceHint =>
+      'Bei FTMS-Rudergeräten mit verstellbarem Widerstand setzt die App diese Stufe, sobald die Zone beginnt.';
+
+  @override
+  String stepLevels(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Stufen',
+      one: '1 Stufe',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get zoneBandHint =>
       'Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.';
 
