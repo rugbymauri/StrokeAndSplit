@@ -237,15 +237,15 @@ void main() {
 
     /// Records just_row as "Seerunde x3" on the phone, by default on a course
     /// with the zone "Tempo" from 20 to 40 m.
-    Future<(AppDatabase, int)> recordOnPhone({CourseDefinition? definition, bool ftms = false}) async {
+    Future<(AppDatabase, int)> recordOnPhone({CourseDefinition? definition, bool ftms = false, Zone zone = tempo}) async {
       final db = openTestDatabase();
-      final zoneId = await ZoneRepository(db).create(tempo);
+      final zoneId = await ZoneRepository(db).create(zone);
       final course = definition ??
           resolveCourse(
             axis: CourseAxis.distance,
             length: 40,
             placements: [ZonePlacement(zoneId: zoneId, start: 20)],
-            zones: {zoneId: tempo.copyWith(id: zoneId)},
+            zones: {zoneId: zone.copyWith(id: zoneId)},
           ).definition!;
       final courseId = await CourseRepository(db).create('Seerunde', course);
       final templates = TemplateRepository(db);
@@ -303,6 +303,27 @@ void main() {
       expect((await SessionRepository(laptop).laps(imported)).where((l) => l.complete), hasLength(3));
       expect((await SessionRepository(laptop).get(imported))!.protocol, ErgProtocol.ftms);
       expect((await ZoneRepository(laptop).all()).single.sameAs(tempo), isTrue);
+    });
+
+    test('keeps the resistance level of a zone through export and import', () async {
+      const hard = Zone(
+        name: 'Tempo',
+        axis: CourseAxis.distance,
+        length: 20,
+        paceFastCs: 10000,
+        paceSlowCs: 20000,
+        resistanceLevel: 10,
+      );
+      final (phone, recorded) = await recordOnPhone(ftms: true, zone: hard);
+      final laptop = openTestDatabase();
+
+      final bytes = await SessionRepository(phone).export(recorded);
+      final header = jsonDecode(const LineSplitter().convert(utf8.decode(gzip.decode(bytes))).first) as Map;
+      await SessionRepository(laptop).import(bytes);
+
+      expect((header['course'] as Map)['segments'][1]['resistanceLevel'], 10);
+      expect((await ZoneRepository(laptop).all()).single.sameAs(hard), isTrue);
+      expect((await CourseRepository(laptop).all()).single.definition.segments[1].resistanceLevel, 10);
     });
 
     test('reuses a course and its zone with the same name and definition', () async {

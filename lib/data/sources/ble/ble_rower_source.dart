@@ -4,6 +4,7 @@ import 'package:clock/clock.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import '../erg_source.dart';
+import '../resistance_control.dart';
 import 'ble_transport.dart';
 import 'reconnect.dart';
 
@@ -44,6 +45,9 @@ class BleRowerSource implements ErgSource {
 
   @override
   bool get providesForceCurves => protocol == ErgProtocol.pm5;
+
+  @override
+  ResistanceControl? get resistanceControl => _link?.resistanceControl;
 
   @override
   String get name => device.name;

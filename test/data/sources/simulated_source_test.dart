@@ -1,4 +1,5 @@
 import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/resistance_control.dart';
 import 'package:strokesplit/data/sources/simulated_source.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -92,6 +93,10 @@ void main() {
   });
 
   group('force curve', () {
+    test('no resistance control when speaking PM5', () {
+      expect(SimulatedSource(seed: 1).resistanceControl, isNull);
+    });
+
     test('is provided when speaking PM5 and not FTMS', () {
       expect(SimulatedSource(seed: 1).providesForceCurves, isTrue);
       expect(SimulatedSource(seed: 1, protocol: ErgProtocol.ftms).providesForceCurves, isFalse);
@@ -177,6 +182,30 @@ void main() {
         expect(packets.map((p) => p.characteristicId).toSet(), {FtmsIds.rowerData});
         expect(packets, hasLength(inInclusiveRange(9, 10)));
       });
+    });
+
+    test('takes a resistance level and reports it from the next record', () {
+      fakeAsync((async) {
+        final source = SimulatedSource(seed: 1, protocol: ErgProtocol.ftms);
+        final events = _listen(source);
+        source.start();
+        async.elapse(const Duration(seconds: 3));
+        expect(events.whereType<StatusTick>().last.resistanceLevel, SimulatedSource.ftmsResistanceLevel);
+
+        ResistanceResult? result;
+        source.resistanceControl!.setLevel(9).then((r) => result = r);
+        async.elapse(const Duration(seconds: 2));
+
+        expect(source.resistanceControl!.range, const ResistanceRange(min: 1, max: 15));
+        expect(result, ResistanceResult.accepted);
+        expect(events.whereType<StatusTick>().last.resistanceLevel, 9);
+      });
+    });
+
+    test('keeps the level within 1 to 15', () async {
+      final source = SimulatedSource(seed: 1, protocol: ErgProtocol.ftms);
+      await source.resistanceControl!.setLevel(20);
+      expect(source.resistanceLevel, 15);
     });
 
     test('approaches a new target pace and counts the strokes', () {

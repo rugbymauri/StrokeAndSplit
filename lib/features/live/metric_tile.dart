@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../app/design_tokens.dart';
+import '../../app/widgets/oar_stepper.dart';
 import 'live_text_styles.dart';
 
 /// Values in tiles stay at most this share of the pace, so the pace is
@@ -49,6 +50,29 @@ class PaceText extends StatelessWidget {
   }
 }
 
+/// Oar blade buttons around the footnote of a [MetricTile], e.g. to change
+/// the resistance level below the watts (Change resistance-control, D6).
+class TileStepper {
+  const TileStepper({
+    required this.lowerLabel,
+    required this.raiseLabel,
+    this.onLower,
+    this.onRaise,
+    this.lowerKey,
+    this.raiseKey,
+  });
+
+  final String lowerLabel;
+  final String raiseLabel;
+
+  /// Null at the limit, which disables the button.
+  final VoidCallback? onLower;
+  final VoidCallback? onRaise;
+
+  final Key? lowerKey;
+  final Key? raiseKey;
+}
+
 /// A tile with a name above a value, e.g. "Watt 172"; the value shrinks to fit.
 class MetricTile extends StatelessWidget {
   const MetricTile({
@@ -61,6 +85,7 @@ class MetricTile extends StatelessWidget {
     this.icon,
     this.footnote,
     this.footnoteKey,
+    this.stepper,
     this.compact = false,
   });
 
@@ -81,77 +106,152 @@ class MetricTile extends StatelessWidget {
   final String? footnote;
   final Key? footnoteKey;
 
+  /// Buttons beside the footnote; in a low tile they go left and right of
+  /// the whole content instead.
+  final TileStepper? stepper;
+
+  /// Tiles at least this high take the buttons in the footnote line.
+  static const stepperLineMinHeight = 120.0;
+
+  /// Size of the oar blade buttons, at least 44 × 47 to hit while rowing.
+  static const stepperButton = Size(44, 47);
+
   /// Small tiles in a row, as next to the pace box.
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    final unit = this.unit;
-    final icon = this.icon;
-    final footnote = this.footnote;
+    final stepper = this.stepper;
+    final padding = compact
+        ? const EdgeInsets.symmetric(horizontal: AppSpacing.s, vertical: AppSpacing.xs)
+        : const EdgeInsets.symmetric(horizontal: AppSpacing.m, vertical: AppSpacing.s);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(compact ? AppRadii.small : AppRadii.card),
       ),
-      child: Padding(
-        padding: compact
-            ? const EdgeInsets.symmetric(horizontal: AppSpacing.s, vertical: AppSpacing.xs)
-            : const EdgeInsets.symmetric(horizontal: AppSpacing.m, vertical: AppSpacing.s),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                if (icon != null) ...[icon, const SizedBox(width: AppSpacing.xs)],
-                Flexible(
-                  child: Text(
-                    label,
-                    style: compact ? LiveTextStyles.captionCompact : LiveTextStyles.caption,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+      child: stepper == null
+          ? Padding(padding: padding, child: _content(_footnote()))
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxHeight >= stepperLineMinHeight) {
+                  // The buttons reach closer to the edge than the values, so
+                  // the footnote keeps room between them in narrow tiles.
+                  final inset = padding.left - AppSpacing.xs;
+                  return Padding(
+                    padding: padding.copyWith(left: AppSpacing.xs, right: AppSpacing.xs),
+                    child: _content(
+                      Row(
+                        children: [
+                          _button(stepper, up: false),
+                          Expanded(
+                            child: Center(
+                              child: FittedBox(fit: BoxFit.scaleDown, child: _footnote()),
+                            ),
+                          ),
+                          _button(stepper, up: true),
+                        ],
+                      ),
+                      inset: inset,
+                    ),
+                  );
+                }
+                return Row(
+                  children: [
+                    _button(stepper, up: false),
+                    Expanded(
+                      child: Padding(
+                        padding: padding.copyWith(left: AppSpacing.xs, right: AppSpacing.xs),
+                        child: _content(_footnote()),
+                      ),
+                    ),
+                    _button(stepper, up: true),
+                  ],
+                );
+              },
             ),
-            Flexible(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text.rich(
-                  TextSpan(
-                    text: value,
-                    children: [
-                      if (unit != null)
-                        TextSpan(text: ' $unit', style: AppTextStyles.valueUnit.copyWith(fontSize: fontSize * 0.36)),
-                    ],
-                  ),
-                  key: valueKey,
-                  style: AppTextStyles.value.copyWith(
-                    fontSize: fontSize,
-                    height: 1,
-                    color: AppColors.text,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
+    );
+  }
+
+  Widget _button(TileStepper stepper, {required bool up}) => OarBladeButton(
+    key: up ? stepper.raiseKey : stepper.lowerKey,
+    up: up,
+    size: stepperButton,
+    label: up ? stepper.raiseLabel : stepper.lowerLabel,
+    onStep: up ? stepper.onRaise : stepper.onLower,
+  );
+
+  Widget? _footnote() {
+    final footnote = this.footnote;
+    if (footnote == null) return null;
+    return Text(
+      footnote,
+      key: footnoteKey,
+      style: AppTextStyles.caption.copyWith(
+        fontSize: compact ? 11 : 12,
+        height: 1.1,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  /// Label and value above [footer]; [inset] moves them in from the sides.
+  Widget _content(Widget? footer, {double inset = 0}) {
+    final unit = this.unit;
+    final icon = this.icon;
+    final sides = EdgeInsets.symmetric(horizontal: inset);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: sides,
+          child: Row(
+            children: [
+              if (icon != null) ...[icon, const SizedBox(width: AppSpacing.xs)],
+              Flexible(
+                child: Text(
+                  label,
+                  style: compact ? LiveTextStyles.captionCompact : LiveTextStyles.caption,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-            if (footnote != null)
-              Text(
-                footnote,
-                key: footnoteKey,
-                style: AppTextStyles.caption.copyWith(
-                  fontSize: compact ? 11 : 12,
-                  height: 1.1,
+            ],
+          ),
+        ),
+        Flexible(
+          child: Padding(
+            padding: sides,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text.rich(
+                TextSpan(
+                  text: value,
+                  children: [
+                    if (unit != null)
+                      TextSpan(
+                        text: ' $unit',
+                        style: AppTextStyles.valueUnit.copyWith(fontSize: fontSize * 0.36),
+                      ),
+                  ],
+                ),
+                key: valueKey,
+                style: AppTextStyles.value.copyWith(
+                  fontSize: fontSize,
+                  height: 1,
+                  color: AppColors.text,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-          ],
+            ),
+          ),
         ),
-      ),
+        ?footer,
+      ],
     );
   }
 }

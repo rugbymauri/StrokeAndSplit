@@ -140,6 +140,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'The lowest stroke rate is above the highest.';
 
   @override
+  String get zoneErrorResistanceLevelTooLow => 'The level must be at least 1.';
+
+  @override
   String quotedName(String name) {
     return '“$name”';
   }
@@ -314,6 +317,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String metricResistanceLevel(int level) {
     return 'Level $level';
   }
+
+  @override
+  String get metricResistanceRefused => 'Level not set';
+
+  @override
+  String get resistanceLower => 'Lower the level';
+
+  @override
+  String get resistanceRaise => 'Raise the level';
 
   @override
   String get metricStrokeRate => 'Stroke rate';
@@ -942,6 +954,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get zoneSpmTo => 'At most';
+
+  @override
+  String get zoneResistance => 'Resistance level';
+
+  @override
+  String get zoneResistanceLevel => 'Level';
+
+  @override
+  String zoneResistanceLevelShort(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String get zoneResistanceHint =>
+      'On FTMS rowers with an adjustable resistance, the app sets this level as soon as the zone starts.';
+
+  @override
+  String stepLevels(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count levels',
+      one: '1 level',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get zoneBandHint =>

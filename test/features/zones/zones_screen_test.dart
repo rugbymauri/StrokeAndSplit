@@ -118,6 +118,84 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
+  group('resistance level', () {
+    testWidgets('gives the sprint level 10 and lists it', (tester) async {
+      final setup = _Setup();
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Zone anlegen'));
+      await tester.pumpAndSettle();
+      await _name(tester, 'Sprint');
+      await _step(tester, {'pace-fast': 10500, 'pace-slow': 11000});
+      expect(find.byKey(const Key('zone-resistance-level')), findsNothing);
+      await _switch(tester, 'resistance');
+      expect(stepperValue(tester, const Key('zone-resistance-level')), 5);
+      await _step(tester, {'resistance-level': 10});
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+
+      expect(find.text('100 m · 1:45–1:50 · Stufe 10'), findsOneWidget);
+      expect((await tester.runAsync(setup.zones.all))!.single.resistanceLevel, 10);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('a level alone is no band', (tester) async {
+      final setup = _Setup();
+      await setup.pump(tester);
+
+      await tester.tap(find.text('Zone anlegen'));
+      await tester.pumpAndSettle();
+      await _name(tester, 'Stufe 8');
+      await _switch(tester, 'pace');
+      await _switch(tester, 'resistance');
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+
+      expect(find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'), findsOneWidget);
+      expect(await tester.runAsync(setup.zones.all), isEmpty);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('keeps the level when editing and removes it when switched off', (tester) async {
+      final setup = _Setup();
+      await tester.runAsync(() => setup.zones.create(const Zone(
+            name: 'Kraft',
+            axis: CourseAxis.distance,
+            length: 250,
+            spmMin: 18,
+            spmMax: 20,
+            resistanceLevel: 12,
+          )));
+      await setup.pump(tester);
+      expect(find.text('250 m · 18–20 spm · Stufe 12'), findsOneWidget);
+
+      await _openEditor(tester, setup, 'Kraft');
+      expect(stepperValue(tester, const Key('zone-resistance-level')), 12);
+      await _switch(tester, 'resistance');
+      await tester.tap(find.byTooltip('Speichern'));
+      await setup.settle(tester);
+
+      expect((await tester.runAsync(setup.zones.all))!.single.resistanceLevel, isNull);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('lists the level in English', (tester) async {
+      final setup = _Setup();
+      await tester.runAsync(() => setup.zones.create(const Zone(
+            name: 'Kraft',
+            axis: CourseAxis.distance,
+            length: 250,
+            spmMin: 18,
+            spmMax: 20,
+            resistanceLevel: 12,
+          )));
+      await setup.pump(tester, locale: const Locale('en'));
+
+      expect(find.text('250 m · 18–20 spm · Level 12'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+  });
+
   testWidgets('does not save a zone without a band', (tester) async {
     final setup = _Setup();
     await setup.pump(tester);

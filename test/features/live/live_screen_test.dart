@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:strokesplit/app/design_tokens.dart';
 import 'package:strokesplit/app/platform_providers.dart';
+import 'package:strokesplit/app/widgets/oar_stepper.dart';
 import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/courses/lap_tracker.dart';
@@ -9,6 +10,7 @@ import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/data/sources/resistance_control.dart';
 import 'package:strokesplit/data/sources/simulated_source.dart';
 import 'package:strokesplit/data/templates/session_template.dart';
 import 'package:strokesplit/data/templates/template_repository.dart';
@@ -72,6 +74,33 @@ StatusTick _tick({int? heartRate, int? calories, int? resistanceLevel, Duration 
       calories: calories,
       resistanceLevel: resistanceLevel,
     );
+
+class _Refusing implements ResistanceControl {
+  @override
+  ResistanceRange get range => const ResistanceRange(min: 1, max: 15);
+
+  @override
+  Future<ResistanceResult> setLevel(int level) async => ResistanceResult.rejected;
+}
+
+/// A rower that takes every level from 1 to 15 and remembers them.
+class _Levels implements ResistanceControl {
+  final levels = <int>[];
+
+  @override
+  ResistanceRange get range => const ResistanceRange(min: 1, max: 15);
+
+  @override
+  Future<ResistanceResult> setLevel(int level) async {
+    levels.add(level);
+    return ResistanceResult.accepted;
+  }
+}
+
+/// An FTMS rower whose level can be set with [control].
+FakeErgSource _settable(ResistanceControl control) => FakeErgSource(kind: ErgSourceKind.ftms, protocol: ErgProtocol.ftms)
+  ..resistanceControl = control
+  ..connectionState = ErgConnectionState.connected;
 
 class _Recording extends SessionRecorder {
   _Recording(this.recording);
@@ -250,7 +279,70 @@ void main() {
         expect(find.byKey(const Key('metric-resistance')), findsNothing);
         expect(find.textContaining('Stufe'), findsNothing);
       });
+
+      testWidgets('raises and lowers the level with the oar blades${template ? ' on a template' : ''}', (tester) async {
+        final control = _Levels();
+        final harness = _Harness();
+        await harness.pump(tester, recording: template ? _onCourse() : null, source: _settable(control));
+        await harness.emit(tester, _tick(resistanceLevel: 6));
+
+        await tester.tap(find.byKey(const Key('resistance-raise')));
+        await tester.pump();
+        expect(control.levels, [7]);
+        expect(find.text('Stufe 6'), findsOneWidget, reason: 'the level the rower reports');
+        await harness.emit(tester, _tick(resistanceLevel: 7));
+        expect(find.text('Stufe 7'), findsOneWidget);
+
+        await tester.tap(find.byKey(const Key('resistance-lower')));
+        await tester.pump();
+        expect(control.levels, [7, 6]);
+        for (final key in ['resistance-lower', 'resistance-raise']) {
+          final size = tester.getSize(find.byKey(Key(key)));
+          expect(size.width * size.height, greaterThanOrEqualTo(44 * 47), reason: key);
+        }
+      });
+
+      testWidgets('+ is disabled at the highest level${template ? ' on a template' : ''}', (tester) async {
+        final control = _Levels();
+        final harness = _Harness();
+        await harness.pump(tester, recording: template ? _onCourse() : null, source: _settable(control));
+        await harness.emit(tester, _tick(resistanceLevel: 15));
+
+        await tester.tap(find.byKey(const Key('resistance-raise')));
+        await tester.pump();
+        expect(control.levels, isEmpty);
+        expect(tester.widget<OarBladeButton>(find.byKey(const Key('resistance-raise'))).onStep, isNull);
+        expect(tester.widget<OarBladeButton>(find.byKey(const Key('resistance-lower'))).onStep, isNotNull);
+      });
+
+      testWidgets('offers no oar blades for a rower that cannot set its level${template ? ' on a template' : ''}',
+          (tester) async {
+        final harness = _Harness();
+        await harness.pump(
+          tester,
+          recording: template ? _onCourse() : null,
+          source: FakeErgSource(kind: ErgSourceKind.ftms, protocol: ErgProtocol.ftms),
+        );
+        await harness.emit(tester, _tick(resistanceLevel: 6));
+
+        expect(find.text('Stufe 6'), findsOneWidget);
+        expect(find.byKey(const Key('resistance-raise')), findsNothing);
+        expect(find.byKey(const Key('resistance-lower')), findsNothing);
+      });
     }
+
+    testWidgets('says for a moment that the rower refused a level', (tester) async {
+      final control = _Refusing();
+      final harness = _Harness();
+      await harness.pump(tester, source: _settable(control));
+      await harness.emit(tester, _tick(resistanceLevel: 6));
+
+      await tester.tap(find.byKey(const Key('resistance-raise')));
+      await tester.pump();
+      expect(find.text('Stufe nicht gesetzt'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+      expect(find.text('Stufe 6'), findsOneWidget);
+    });
   });
 
   group('RR interval', () {
@@ -378,7 +470,8 @@ void main() {
           source: switch ((simulator, curves)) {
             (true, _) => SimulatedSource(seed: 1, protocol: curves ? ErgProtocol.pm5 : ErgProtocol.ftms),
             (false, true) => null,
-            (false, false) => FakeErgSource(kind: ErgSourceKind.ftms, protocol: ErgProtocol.ftms),
+            // An FTMS rower whose level can be set, with the oar blades at the watts.
+            (false, false) => _settable(_Levels()),
           },
         );
         expect(find.byType(SimulatorControls), simulator ? findsOneWidget : findsNothing);

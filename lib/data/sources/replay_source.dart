@@ -4,6 +4,7 @@ import 'package:clock/clock.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import 'erg_source.dart';
+import 'resistance_control.dart';
 
 /// Plays a recorded session back as if the rowing machine sent it again, at
 /// original speed or faster.
@@ -16,6 +17,9 @@ class ReplaySource implements ErgSource {
 
   /// Playback speed factor, e.g. 10 for ten times as fast.
   final double speed;
+
+  @override
+  ResistanceControl? get resistanceControl => null;
 
   @override
   final String name;

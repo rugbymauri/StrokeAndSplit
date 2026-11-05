@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:strokesplit/app/platform_providers.dart';
 import 'package:strokesplit/data/sources/ble/ble_rower_source.dart';
 import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/resistance_control.dart';
 import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
@@ -22,6 +23,9 @@ const _h10 = FoundHeartRateMonitor(id: 'A0:9E:1A:12:34:56', name: 'Polar H10 1A2
 const _tickr = FoundHeartRateMonitor(id: 'C1:11:22:33:44:55', name: 'TICKR 1234');
 
 class _RowerLink implements RowerLink {
+  @override
+  ResistanceControl? get resistanceControl => null;
+
   final _lost = Completer<void>();
   var disconnected = false;
 

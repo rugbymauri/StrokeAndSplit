@@ -89,6 +89,20 @@ void main() {
     expect((zone.spmMin, zone.spmMax), (null, null));
   });
 
+  test('stores a zone with a resistance level', () async {
+    final id = await zones.create(const Zone(
+      name: 'Kraft',
+      axis: CourseAxis.distance,
+      length: 250,
+      spmMin: 18,
+      spmMax: 20,
+      resistanceLevel: 12,
+    ));
+
+    expect((await zones.get(id))!.resistanceLevel, 12);
+    expect((await zones.get(await zones.create(_sprint)))!.resistanceLevel, isNull);
+  });
+
   test('lists zones by axis and name', () async {
     await zones.create(const Zone(name: 'Vier Minuten', axis: CourseAxis.time, length: 240, spmMin: 20, spmMax: 22));
     await zones.create(_sprint);
@@ -106,6 +120,18 @@ void main() {
         () => zones.create(zone),
         throwsA(isA<ZoneValidationException>().having((e) => e.errors, 'errors', [ZoneError.bandMissing])),
       );
+    });
+
+    test('a zone with only a resistance level', () {
+      const zone = Zone(name: 'Stufe 8', axis: CourseAxis.distance, length: 100, resistanceLevel: 8);
+
+      expect(zoneErrors(zone), [ZoneError.bandMissing]);
+    });
+
+    test('a resistance level below 1', () {
+      const zone = Zone(name: 'Null', axis: CourseAxis.distance, length: 100, spmMin: 20, spmMax: 22, resistanceLevel: 0);
+
+      expect(zoneErrors(zone), [ZoneError.resistanceLevelTooLow]);
     });
 
     test('a stroke rate band the wrong way round', () {
@@ -199,6 +225,27 @@ void main() {
 
       expect((await zones.get(sprint))!.length, 100);
       expect(await placed(interval), ['500–600 Sprint', '1000–1500 Ausdauer 2:30']);
+    });
+
+    test('a resistance level given to a zone applies in every course', () async {
+      await zones.update(Zone(
+        id: sprint,
+        name: _sprint.name,
+        axis: _sprint.axis,
+        length: _sprint.length,
+        paceFastCs: _sprint.paceFastCs,
+        paceSlowCs: _sprint.paceSlowCs,
+        spmMin: _sprint.spmMin,
+        spmMax: _sprint.spmMax,
+        resistanceLevel: 10,
+      ));
+
+      for (final c in await courses.all()) {
+        final levels = {for (final s in c.definition.segments) if (s.zoneId != null) s.zoneName: s.resistanceLevel};
+        expect(levels['Sprint'], 10, reason: c.name);
+      }
+      expect((await courses.get(interval))!.definition.segments.where((s) => s.zoneId == null).map((s) => s.resistanceLevel),
+          everyElement(isNull));
     });
 
     test('a renamed zone shows its new name in the courses', () async {

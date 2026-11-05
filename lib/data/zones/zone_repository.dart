@@ -38,6 +38,7 @@ class ZoneRepository {
           paceSlowCs: Value(zone.paceSlowCs),
           spmMin: Value(zone.spmMin),
           spmMax: Value(zone.spmMax),
+          resistanceLevel: Value(zone.resistanceLevel),
         ));
   }
 
@@ -72,6 +73,7 @@ class ZoneRepository {
       paceSlowCs: segment.paceSlowCs,
       spmMin: segment.spmMin,
       spmMax: segment.spmMax,
+      resistanceLevel: segment.resistanceLevel,
     );
     return zone.copyWith(id: await findOrCreate(zone)).segment;
   }
@@ -141,6 +143,7 @@ class ZoneRepository {
         paceSlowCs: Value(zone.paceSlowCs),
         spmMin: Value(zone.spmMin),
         spmMax: Value(zone.spmMax),
+        resistanceLevel: Value(zone.resistanceLevel),
       ));
       await _relayoutCourses(zone.id, remove: false);
     });
@@ -199,5 +202,6 @@ class ZoneRepository {
         paceSlowCs: row.paceSlowCs,
         spmMin: row.spmMin,
         spmMax: row.spmMax,
+        resistanceLevel: row.resistanceLevel,
       );
 }

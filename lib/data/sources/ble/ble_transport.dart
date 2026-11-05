@@ -1,5 +1,7 @@
 import 'package:erg_protocol/erg_protocol.dart';
 
+import '../resistance_control.dart';
+
 /// Whether Bluetooth can be used right now.
 enum BluetoothReadiness { ready, off, unauthorized, unsupported }
 
@@ -90,6 +92,9 @@ abstract interface class RowerLink {
 
   /// Completes when the connection drops without [disconnect] being called.
   Future<void> get lost;
+
+  /// Sets the resistance level; null when the rower cannot (Change resistance-control, D2).
+  ResistanceControl? get resistanceControl;
 
   Future<void> disconnect();
 }

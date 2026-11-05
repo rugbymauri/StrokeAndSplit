@@ -10,4 +10,5 @@ String zoneErrorText(AppLocalizations l10n, ZoneError error) => switch (error) {
       ZoneError.paceReversed => l10n.zoneErrorPaceReversed,
       ZoneError.spmBoundMissing => l10n.zoneErrorSpmBoundMissing,
       ZoneError.spmReversed => l10n.zoneErrorSpmReversed,
+      ZoneError.resistanceLevelTooLow => l10n.zoneErrorResistanceLevelTooLow,
     };

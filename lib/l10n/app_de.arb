@@ -159,6 +159,10 @@
   "@zoneErrorSpmReversed": {
     "description": "Zone editor: the stroke rate bounds are the wrong way round"
   },
+  "zoneErrorResistanceLevelTooLow": "Die Stufe muss mindestens 1 sein.",
+  "@zoneErrorResistanceLevelTooLow": {
+    "description": "Zone editor: the resistance level of the zone is below 1"
+  },
   "quotedName": "„{name}“",
   "@quotedName": {
     "description": "A name the user gave, in quotes, e.g. in a list of courses",
@@ -411,6 +415,18 @@
         "type": "int"
       }
     }
+  },
+  "metricResistanceRefused": "Stufe nicht gesetzt",
+  "@metricResistanceRefused": {
+    "description": "Live display: shown for a moment below the watts when the rower refused a new resistance level"
+  },
+  "resistanceLower": "Stufe senken",
+  "@resistanceLower": {
+    "description": "Live display: label of the button that lowers the resistance level by one (for screen readers)"
+  },
+  "resistanceRaise": "Stufe erhöhen",
+  "@resistanceRaise": {
+    "description": "Live display: label of the button that raises the resistance level by one (for screen readers)"
   },
   "metricStrokeRate": "Schlagzahl",
   "@metricStrokeRate": {
@@ -1328,6 +1344,36 @@
   "zoneSpmTo": "Höchstens",
   "@zoneSpmTo": {
     "description": "Zone editor: label of the highest stroke rate of the band"
+  },
+  "zoneResistance": "Widerstandsstufe",
+  "@zoneResistance": {
+    "description": "Zone editor: title and switch of the resistance level that a rower with an adjustable brake is set to in this zone"
+  },
+  "zoneResistanceLevel": "Stufe",
+  "@zoneResistanceLevel": {
+    "description": "Zone editor: label of the resistance level"
+  },
+  "zoneResistanceLevelShort": "Stufe {level}",
+  "@zoneResistanceLevelShort": {
+    "description": "Zone list, course and template: resistance level of a zone after its bands",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "zoneResistanceHint": "Bei FTMS-Rudergeräten mit verstellbarem Widerstand setzt die App diese Stufe, sobald die Zone beginnt.",
+  "@zoneResistanceHint": {
+    "description": "Zone editor: what the resistance level does"
+  },
+  "stepLevels": "{count, plural, =1{1 Stufe} other{{count} Stufen}}",
+  "@stepLevels": {
+    "description": "Oar stepper: size of a step in resistance levels, for screen readers",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "zoneBandHint": "Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.",
   "@zoneBandHint": {

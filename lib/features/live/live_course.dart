@@ -13,6 +13,7 @@ import 'formatters.dart';
 import 'live_layout.dart';
 import 'live_status.dart';
 import 'metric_tile.dart';
+import 'watts_tile.dart';
 import 'pace_box.dart';
 import 'progress_frame.dart';
 import 'stroke_rate_card.dart';
@@ -284,15 +285,7 @@ class CourseLiveView extends StatelessWidget {
         fontSize: fontSize,
         compact: true,
       ),
-      MetricTile(
-        label: l10n.metricWatts,
-        value: formatWhole(tick?.watts),
-        valueKey: const Key('metric-watts'),
-        fontSize: fontSize,
-        footnote: formatResistanceLevel(l10n, tick?.resistanceLevel),
-        footnoteKey: const Key('metric-resistance'),
-        compact: true,
-      ),
+      WattsTile(tick: tick, fontSize: fontSize, compact: true),
       if (heartRate != null)
         MetricTile(
           label: l10n.metricHeartRate,

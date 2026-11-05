@@ -314,6 +314,12 @@ abstract class AppLocalizations {
   /// **'Die niedrigste Schlagzahl liegt über der höchsten.'**
   String get zoneErrorSpmReversed;
 
+  /// Zone editor: the resistance level of the zone is below 1
+  ///
+  /// In de, this message translates to:
+  /// **'Die Stufe muss mindestens 1 sein.'**
+  String get zoneErrorResistanceLevelTooLow;
+
   /// A name the user gave, in quotes, e.g. in a list of courses
   ///
   /// In de, this message translates to:
@@ -570,6 +576,24 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Stufe {level}'**
   String metricResistanceLevel(int level);
+
+  /// Live display: shown for a moment below the watts when the rower refused a new resistance level
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe nicht gesetzt'**
+  String get metricResistanceRefused;
+
+  /// Live display: label of the button that lowers the resistance level by one (for screen readers)
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe senken'**
+  String get resistanceLower;
+
+  /// Live display: label of the button that raises the resistance level by one (for screen readers)
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe erhöhen'**
+  String get resistanceRaise;
 
   /// Live display: label of the stroke rate
   ///
@@ -1608,6 +1632,36 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Höchstens'**
   String get zoneSpmTo;
+
+  /// Zone editor: title and switch of the resistance level that a rower with an adjustable brake is set to in this zone
+  ///
+  /// In de, this message translates to:
+  /// **'Widerstandsstufe'**
+  String get zoneResistance;
+
+  /// Zone editor: label of the resistance level
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe'**
+  String get zoneResistanceLevel;
+
+  /// Zone list, course and template: resistance level of a zone after its bands
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe {level}'**
+  String zoneResistanceLevelShort(int level);
+
+  /// Zone editor: what the resistance level does
+  ///
+  /// In de, this message translates to:
+  /// **'Bei FTMS-Rudergeräten mit verstellbarem Widerstand setzt die App diese Stufe, sobald die Zone beginnt.'**
+  String get zoneResistanceHint;
+
+  /// Oar stepper: size of a step in resistance levels, for screen readers
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Stufe} other{{count} Stufen}}'**
+  String stepLevels(int count);
 
   /// Zone editor: what a zone needs
   ///

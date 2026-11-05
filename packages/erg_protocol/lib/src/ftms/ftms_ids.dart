@@ -4,6 +4,7 @@ abstract final class FtmsIds {
   static const service = '1826';
   static const feature = '2acc';
   static const rowerData = '2ad1';
+  static const supportedResistanceLevelRange = '2ad6';
   static const controlPoint = '2ad9';
   static const machineStatus = '2ada';
 

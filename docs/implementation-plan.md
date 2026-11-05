@@ -26,7 +26,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
-| 13 | `resistance-control` | 0/13 | geplant, kann starten | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
+| 13 | `resistance-control` | 12/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
 
 ## Warum diese Reihenfolge
 
@@ -286,7 +286,16 @@ Wunsch des Nutzers (2026-11-02): Sessions in Google Fit sehen. Google Fit nimmt 
 Wunsch des Nutzers (2026-11-05) für den Domyos Woodrower. Der Spike am Gerät zeigt: Stufe setzbar über „Set Target Resistance Level“ als u8 in Zehnteln, Bereich 1–15; die Stufensenkung nach der Pause im Mitschnitt war eine Handänderung des Nutzers.
 
 - [x] Geplant (2026-11-05, `docs/resistance-control-proposal`): −/+ an der Stufe unter den Watt; optionale Stufe pro Zone, als Kopie im Segment (Schema 9); Grundstufe = Stufe beim Start bzw. zuletzt von Hand gesetzte in Segmenten ohne Stufe; Handänderung (App oder Gerät, auch in der Pause) gilt bis zum nächsten Segment; nach Wiederverbinden erneut senden; Rückfall auf s16 bei „ungültiger Wert“; Simulator (FTMS) nimmt die Stufe an.
-- [ ] Umsetzung (13 Tasks), danach Gerätetest 6.2 (Nutzer).
+- [x] Protokoll (2026-11-05, Tasks 1.1–1.2): Features und Stufenbereich lesen, „Set Target Resistance Level“ als u8 oder s16 in Zehnteln, Antworten des Control Points; eine in Zehnteln gemeldete Stufe wird auf ganze Stufen umgerechnet.
+- [x] Verbindung (2026-11-05, Tasks 2.1–2.2): Beim Verbinden liest die App Features und Stufenbereich; nur wenn beide passen, bietet die Quelle eine `ResistanceControl` an. Befehle gehen nacheinander über den Control Point, Antwort innert 2 s; bei `05` erneut Request Control, bei `03` einmal s16 und danach für die Verbindung bei s16. Nach dem Wiederverbinden gilt die Steuerung der neuen Verbindung.
+- [x] Simulator (2026-11-05, Task 2.3): Im FTMS-Modus nimmt er Stufen 1–15 an und meldet sie ab dem nächsten Datensatz, Start bei 5.
+- [x] Datenmodell (2026-11-05, Tasks 3.1–3.2): Schema 9 mit `resistance_level` in `zones` und `course_segments` (`from8To9`); Zone und Segment tragen die Stufe, eine Änderung der Zone gilt in allen Strecken; Stufe unter 1 ist ein Fehler, eine Stufe allein ersetzt kein Band. Kopie der Strecke im `.strokesplit`-Header mit optionalem `resistanceLevel`, der Import legt die Zone mit Stufe an.
+- [x] Logik (2026-11-05, Task 4.1): `ResistanceDirector` entscheidet aus Segmentbeginn, gemeldeter Stufe, −/+ und Wiederverbinden, welche Stufe gesendet wird; 3 s nach dem Senden gilt die alte Stufe nicht als Handänderung.
+- [x] Provider (2026-11-05, Task 4.2): `resistanceProvider` verbindet Logik, aktive Quelle, gemeldete Stufe und Segmente der laufenden Session; Stufen gehen nacheinander raus, eine neuere ersetzt eine wartende; Ablehnung zeigt 2 s einen Hinweis. Beginnt eine Session, ist die Stufe des Geräts die Grundstufe.
+- [x] Live-Anzeige (2026-11-05, Task 5.1): Ruderblatt-Tasten an der Stufe unter den Watt, nur bei setzbarer Stufe, an der Grenze gesperrt; „Stufe nicht gesetzt“ für 2 s. Abweichung von D6: Tasten 44 × 47 (kompakter `OarStepper`) statt 48 × 48; ab 120 px Kachelhöhe in der Fussnotenzeile, sonst links und rechts neben dem Wert (kompakte Kachel mit Vorlage, 64 px hoch).
+- [x] Zonen (2026-11-05, Task 5.2): Schalter „Widerstandsstufe“ mit Ruderblatt-Tasten 1–25 (Start 5) im Zoneneditor; „· Stufe 10“ hinter den Bändern in Zonenliste, Zonendetails, Streckeneditor und Vorlagen.
+- [x] README (2026-11-05, Task 6.1): Setzen der Stufe über die Ruderblatt-Tasten und pro Zone, Grundstufe, Änderung von Hand, Stand der Gerätetests.
+- [ ] Gerätetest 6.2 am Woodrower (Nutzer).
 
 ## Offene Entscheide
 

@@ -446,7 +446,7 @@ class _SectionTile extends StatelessWidget {
         ),
       );
     }
-    final bands = formatSegmentBands(segment);
+    final bands = formatSegmentBands(l10n, segment);
     return Material(
       color: selected ? AppColors.zoneInSurface : Colors.transparent,
       child: InkWell(
@@ -680,7 +680,9 @@ class _ZoneOption extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       leading: Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked),
       title: Text(zone.name),
-      subtitle: Text(enabled ? zoneSummary(zone) : '${zoneSummary(zone)} · ${context.l10n.courseOtherAxis}'),
+      subtitle: Text(
+        enabled ? zoneSummary(context.l10n, zone) : '${zoneSummary(context.l10n, zone)} · ${context.l10n.courseOtherAxis}',
+      ),
       onTap: enabled ? onTap : null,
     );
   }

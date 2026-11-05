@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:strokesplit/app/platform_providers.dart';
 import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/resistance_control.dart';
 
 /// A [BleTransport] whose answers are set by the test.
 class FakeBleTransport implements BleTransport {
@@ -39,6 +40,9 @@ class FakeBleTransport implements BleTransport {
 }
 
 class _IdleLink implements RowerLink {
+  @override
+  ResistanceControl? get resistanceControl => null;
+
   @override
   Stream<(String, List<int>)> get notifications => const Stream.empty();
 

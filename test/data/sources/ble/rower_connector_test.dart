@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:strokesplit/data/sources/ble/ble_transport.dart';
 import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
 import 'package:strokesplit/data/sources/ble/rower_connector.dart';
+import 'package:strokesplit/data/sources/resistance_control.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -46,6 +47,12 @@ class _FakeConnection implements GattConnection {
     onWrite?.call(id, bytes);
   }
 
+  /// Values returned by [read].
+  final values = <String, List<int>>{};
+
+  @override
+  Future<List<int>> read(String id) async => values[id] ?? (throw StateError('no value for $id'));
+
   @override
   Future<void> get lost => Completer<void>().future;
 
@@ -68,13 +75,24 @@ _FakeConnection _pm5Connection(int? ergType, {Set<String> characteristics = _pm5
 
 /// An FTMS rower; [controlResult] is its answer to Request Control, null for
 /// no answer, and without [controlPoint] it has none.
-_FakeConnection _ftmsConnection({bool controlPoint = true, int? controlResult = 0x01, bool rowerData = true}) {
+///
+/// With [resistance] it reports features and level range like the Domyos
+/// Woodrower: level 1 to 15, settable.
+_FakeConnection _ftmsConnection({
+  bool controlPoint = true,
+  int? controlResult = 0x01,
+  bool rowerData = true,
+  bool resistance = false,
+}) {
   final connection = _FakeConnection({
     FtmsIds.feature,
     if (rowerData) FtmsIds.rowerData,
     if (controlPoint) FtmsIds.controlPoint,
     FtmsIds.machineStatus,
+    if (resistance) FtmsIds.supportedResistanceLevelRange,
   });
+  connection.values[FtmsIds.feature] = [0xa6, 0x56, 0x00, 0x00, if (resistance) 0x04 else 0x00, 0x00, 0x00, 0x00];
+  if (resistance) connection.values[FtmsIds.supportedResistanceLevelRange] = [0x0a, 0x00, 0x96, 0x00, 0x0a, 0x00];
   connection.onWrite = (id, bytes) {
     if (id == FtmsIds.controlPoint && controlResult != null) {
       scheduleMicrotask(() => connection.notify(id, [0x80, bytes.first, bytes.first == 0x00 ? controlResult : 0x01]));
@@ -261,6 +279,125 @@ void main() {
         ..notify(FtmsIds.rowerData, [1]);
 
       expect(received, [FtmsIds.rowerData]);
+    });
+  });
+
+  group('FTMS resistance', () {
+    /// Answers Set Target Resistance Level with [results] in turn, everything
+    /// else with success; a null result is no answer.
+    void answer(_FakeConnection connection, List<int?> results) {
+      connection.onWrite = (id, bytes) {
+        if (id != FtmsIds.controlPoint) return;
+        final result = bytes.first == 0x04 ? results.removeAt(0) : 0x01;
+        if (result != null) scheduleMicrotask(() => connection.notify(id, [0x80, bytes.first, result]));
+      };
+    }
+
+    ResistanceResult? setLevel(RowerLink link, int level) {
+      ResistanceResult? result;
+      fakeAsync((async) {
+        link.resistanceControl!.setLevel(level).then((r) => result = r);
+        async.elapse(const Duration(seconds: 10));
+      });
+      return result;
+    }
+
+    test('offers the level range of a Domyos Woodrower', () {
+      final connection = _ftmsConnection(resistance: true);
+      final (link, _, warnings) = _setUp(connection, _ftms);
+
+      expect(link!.resistanceControl!.range, const ResistanceRange(min: 1, max: 15));
+      expect(warnings, isEmpty);
+    });
+
+    test('offers nothing without the target setting', () {
+      final connection = _ftmsConnection(resistance: true);
+      connection.values[FtmsIds.feature] = [0xa6, 0x56, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+      final (link, _, _) = _setUp(connection, _ftms);
+
+      expect(link!.resistanceControl, isNull);
+    });
+
+    test('offers nothing without level range or control point', () {
+      expect(_setUp(_ftmsConnection(), _ftms).$1!.resistanceControl, isNull);
+      expect(_setUp(_ftmsConnection(resistance: true, controlPoint: false), _ftms).$1!.resistanceControl, isNull);
+    });
+
+    test('offers nothing for a range that makes no sense', () {
+      final connection = _ftmsConnection(resistance: true);
+      connection.values[FtmsIds.supportedResistanceLevelRange] = [0x0a, 0x00, 0x96, 0x00, 0x00, 0x00];
+      final (link, _, warnings) = _setUp(connection, _ftms);
+
+      expect(link!.resistanceControl, isNull);
+      expect(warnings.single, contains('range'));
+    });
+
+    test('a PM5 offers nothing', () => expect(_setUp(_pm5Connection(0), _pm5).$1!.resistanceControl, isNull));
+
+    test('sets level 6 as one byte in tenths', () {
+      final connection = _ftmsConnection(resistance: true);
+      final (link, _, _) = _setUp(connection, _ftms);
+      answer(connection, [0x01]);
+
+      expect(setLevel(link!, 6), ResistanceResult.accepted);
+      expect(connection.writes.last, '2ad9:[4, 60]');
+    });
+
+    test('a refusal is reported', () {
+      final connection = _ftmsConnection(resistance: true);
+      final (link, _, _) = _setUp(connection, _ftms);
+      answer(connection, [0x04]);
+
+      expect(setLevel(link!, 6), ResistanceResult.rejected);
+    });
+
+    test('no answer within 2 seconds is reported', () {
+      final connection = _ftmsConnection(resistance: true);
+      final (link, _, _) = _setUp(connection, _ftms);
+      answer(connection, [null]);
+
+      expect(setLevel(link!, 6), ResistanceResult.noAnswer);
+    });
+
+    test('a failed write is no answer', () {
+      final connection = _ftmsConnection(resistance: true);
+      final (link, _, _) = _setUp(connection, _ftms);
+      connection.onWrite = (_, _) => throw StateError('write failed');
+
+      expect(setLevel(link!, 6), ResistanceResult.noAnswer);
+    });
+
+    test('falls back to 16 bits on an invalid parameter and stays there', () {
+      final connection = _ftmsConnection(resistance: true);
+      final (link, _, _) = _setUp(connection, _ftms);
+      answer(connection, [0x03, 0x01, 0x01]);
+
+      expect(setLevel(link!, 6), ResistanceResult.accepted);
+      expect(setLevel(link, 7), ResistanceResult.accepted);
+      expect(connection.writes.skip(2), ['2ad9:[4, 60]', '2ad9:[4, 60, 0]', '2ad9:[4, 70, 0]']);
+    });
+
+    test('requests control again when it was taken', () {
+      final connection = _ftmsConnection(resistance: true);
+      final (link, _, _) = _setUp(connection, _ftms);
+      answer(connection, [0x05, 0x01]);
+
+      expect(setLevel(link!, 6), ResistanceResult.accepted);
+      expect(connection.writes.skip(2), ['2ad9:[4, 60]', '2ad9:[0]', '2ad9:[4, 60]']);
+    });
+
+    test('sends one command after the other', () {
+      final connection = _ftmsConnection(resistance: true);
+      final (link, _, _) = _setUp(connection, _ftms);
+      answer(connection, [0x01, 0x01]);
+      final results = <ResistanceResult>[];
+      fakeAsync((async) {
+        link!.resistanceControl!.setLevel(6).then(results.add);
+        link.resistanceControl!.setLevel(7).then(results.add);
+        async.flushMicrotasks();
+        expect(connection.writes.skip(2), ['2ad9:[4, 60]', '2ad9:[4, 70]']);
+      });
+      expect(results, [ResistanceResult.accepted, ResistanceResult.accepted]);
     });
   });
 

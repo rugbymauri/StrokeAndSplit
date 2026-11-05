@@ -141,6 +141,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die niedrigste Schlagzahl liegt über der höchsten.';
 
   @override
+  String get zoneErrorResistanceLevelTooLow =>
+      'Die Stufe muss mindestens 1 sein.';
+
+  @override
   String quotedName(String name) {
     return '„$name“';
   }
@@ -316,6 +320,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String metricResistanceLevel(int level) {
     return 'Stufe $level';
   }
+
+  @override
+  String get metricResistanceRefused => 'Stufe nicht gesetzt';
+
+  @override
+  String get resistanceLower => 'Stufe senken';
+
+  @override
+  String get resistanceRaise => 'Stufe erhöhen';
 
   @override
   String get metricStrokeRate => 'Schlagzahl';
@@ -947,6 +960,32 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get zoneSpmTo => 'Höchstens';
+
+  @override
+  String get zoneResistance => 'Widerstandsstufe';
+
+  @override
+  String get zoneResistanceLevel => 'Stufe';
+
+  @override
+  String zoneResistanceLevelShort(int level) {
+    return 'Stufe $level';
+  }
+
+  @override
+  String get zoneResistanceHint =>
+      'Bei FTMS-Rudergeräten mit verstellbarem Widerstand setzt die App diese Stufe, sobald die Zone beginnt.';
+
+  @override
+  String stepLevels(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Stufen',
+      one: '1 Stufe',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get zoneBandHint =>
