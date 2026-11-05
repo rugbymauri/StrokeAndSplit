@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/sources/resistance_control.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 /// An [ErgSource] driven by the test.
@@ -17,6 +18,9 @@ class FakeErgSource implements ErgSource {
 
   @override
   final ErgProtocol protocol;
+
+  @override
+  ResistanceControl? resistanceControl;
 
   @override
   final String name;

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:strokesplit/data/sources/ble/ble_transport.dart';
+import 'package:strokesplit/data/sources/resistance_control.dart';
 import 'package:strokesplit/data/sources/ble/ble_rower_source.dart';
 import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
@@ -13,7 +14,18 @@ import '../../../support/fake_heart_rate_transport.dart';
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
 
+class _FakeControl implements ResistanceControl {
+  @override
+  ResistanceRange get range => const ResistanceRange(min: 1, max: 15);
+
+  @override
+  Future<ResistanceResult> setLevel(int level) async => ResistanceResult.accepted;
+}
+
 class _FakeLink implements RowerLink {
+  @override
+  final ResistanceControl? resistanceControl = _FakeControl();
+
   final _notifications = StreamController<(String, List<int>)>.broadcast();
   final _lost = Completer<void>();
   var disconnected = false;
@@ -125,6 +137,27 @@ void main() {
         ErgConnectionState.reconnecting,
         ErgConnectionState.connected,
       ]);
+    });
+  });
+
+  test('offers the resistance control of the current link', () {
+    fakeAsync((async) {
+      expect(source.resistanceControl, isNull);
+      source.start();
+      async.flushMicrotasks();
+      final first = source.resistanceControl;
+      expect(first, same(transport.links.single.resistanceControl));
+
+      transport.reachable = false;
+      transport.links.single.drop();
+      async.elapse(const Duration(seconds: 1));
+      expect(source.resistanceControl, isNull, reason: 'none while reconnecting');
+      transport.reachable = true;
+      async.elapse(const Duration(seconds: 3));
+
+      expect(source.connectionState, ErgConnectionState.connected);
+      expect(source.resistanceControl, same(transport.links.last.resistanceControl));
+      expect(source.resistanceControl, isNot(same(first)));
     });
   });
 

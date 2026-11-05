@@ -5,6 +5,7 @@ import 'package:clock/clock.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import 'erg_source.dart';
+import 'resistance_control.dart';
 
 /// A simulated rower that produces notifications like a real erg in Just
 /// Row: the pace moves towards [targetPace] over a few strokes with a slight
@@ -95,6 +96,9 @@ class SimulatedSource implements ErgSource {
 
   @override
   bool get providesForceCurves => protocol == ErgProtocol.pm5;
+
+  @override
+  ResistanceControl? get resistanceControl => null;
 
   @override
   String get name => 'Simulator';

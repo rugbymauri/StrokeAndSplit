@@ -214,6 +214,9 @@ class _FlutterBluePlusConnection implements GattConnection {
   Future<void> write(String id, List<int> bytes) => _characteristics[id]!.write(bytes);
 
   @override
+  Future<List<int>> read(String id) => _characteristics[id]!.read();
+
+  @override
   Future<void> get lost => _lost.future;
 
   @override

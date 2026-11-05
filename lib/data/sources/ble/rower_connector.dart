@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:erg_protocol/erg_protocol.dart';
 
+import '../resistance_control.dart';
 import 'ble_transport.dart';
 import 'heart_rate_transport.dart';
 
@@ -21,6 +22,9 @@ abstract interface class GattConnection {
   Future<void> subscribe(String id);
 
   Future<void> write(String id, List<int> bytes);
+
+  /// Reads the value of a characteristic.
+  Future<List<int>> read(String id);
 
   /// Completes when the connection drops without [disconnect] being called.
   Future<void> get lost;
@@ -83,8 +87,34 @@ Future<RowerLink> _setUpFtms(
     throw const RowerConnectException(RowerConnectError.noRowerData);
   }
   await connection.subscribe(FtmsIds.rowerData);
-  if (characteristics.contains(FtmsIds.controlPoint)) await _requestStart(connection, controlTimeout, onWarning);
-  return _GattLink(connection, {FtmsIds.rowerData});
+  if (!characteristics.contains(FtmsIds.controlPoint)) return _GattLink(connection, {FtmsIds.rowerData});
+  await _requestStart(connection, controlTimeout, onWarning);
+  final range = await _resistanceRange(connection, onWarning);
+  return _GattLink(
+    connection,
+    {FtmsIds.rowerData},
+    resistanceControl: range == null ? null : FtmsResistanceControl(connection, range, timeout: controlTimeout),
+  );
+}
+
+/// The levels an FTMS rower lets the app set, or null when it cannot (D2):
+/// its features must allow it and its range must make sense.
+Future<ResistanceRange?> _resistanceRange(GattConnection connection, void Function(String message)? onWarning) async {
+  final characteristics = connection.characteristics;
+  if (!characteristics.contains(FtmsIds.feature) ||
+      !characteristics.contains(FtmsIds.supportedResistanceLevelRange)) {
+    return null;
+  }
+  try {
+    final features = FtmsFeatures.parse(await connection.read(FtmsIds.feature));
+    if (features == null || !features.setsResistanceLevel) return null;
+    final range = ResistanceRange.parse(await connection.read(FtmsIds.supportedResistanceLevelRange));
+    if (range == null) onWarning?.call('resistance: no usable level range');
+    return range;
+  } catch (e) {
+    onWarning?.call('resistance: $e');
+    return null;
+  }
 }
 
 /// Sets up a freshly connected heart rate strap: subscribes to the Heart Rate
@@ -158,12 +188,83 @@ Future<List<int>?> _first(
   return result.future;
 }
 
+/// Sets the resistance level over the control point of an FTMS rower, which
+/// stays subscribed after the set-up (Design D2, D3).
+///
+/// Commands go out one after the other, so every answer belongs to the
+/// command before it.
+class FtmsResistanceControl implements ResistanceControl {
+  FtmsResistanceControl(this._connection, this.range, {this.timeout = const Duration(seconds: 2)});
+
+  final GattConnection _connection;
+
+  @override
+  final ResistanceRange range;
+
+  final Duration timeout;
+
+  /// Whether this rower takes the level as 16 bits; learnt from its first
+  /// "invalid parameter".
+  var _wide = false;
+
+  /// Completes when the command on the way is answered; null when none is.
+  Future<void>? _busy;
+
+  @override
+  Future<ResistanceResult> setLevel(int level) async {
+    while (_busy != null) {
+      await _busy;
+    }
+    final done = Completer<void>();
+    _busy = done.future;
+    try {
+      return await _setLevel(level);
+    } finally {
+      _busy = null;
+      done.complete();
+    }
+  }
+
+  Future<ResistanceResult> _setLevel(int level) async {
+    var result = await _send(FtmsControl.setResistanceLevel(level, wide: _wide));
+    if (result == FtmsControl.controlNotPermitted &&
+        await _send([FtmsControl.requestControl]) == FtmsControl.success) {
+      result = await _send(FtmsControl.setResistanceLevel(level, wide: _wide));
+    }
+    if (result == FtmsControl.invalidParameter && !_wide && !FtmsControl.needsWide(level)) {
+      result = await _send(FtmsControl.setResistanceLevel(level, wide: true));
+      if (result == FtmsControl.success) _wide = true;
+    }
+    return switch (result) {
+      FtmsControl.success => ResistanceResult.accepted,
+      null => ResistanceResult.noAnswer,
+      _ => ResistanceResult.rejected,
+    };
+  }
+
+  /// Writes [command] and returns the result of its answer, null without one.
+  Future<int?> _send(List<int> command) async {
+    bool isAnswer(List<int> bytes) => FtmsControlResponse.parse(bytes)?.requestOpCode == command.first;
+    final answer = _first(_connection, FtmsIds.controlPoint, timeout, isAnswer);
+    try {
+      await _connection.write(FtmsIds.controlPoint, command);
+    } catch (_) {
+      return null;
+    }
+    final bytes = await answer;
+    return bytes == null ? null : FtmsControlResponse.parse(bytes)!.result;
+  }
+}
+
 /// Forwards the data of a set-up connection: rowing data or heart rate.
 class _GattLink implements RowerLink, HeartRateLink {
-  _GattLink(this._connection, this._ids);
+  _GattLink(this._connection, this._ids, {this.resistanceControl});
 
   final GattConnection _connection;
   final Set<String> _ids;
+
+  @override
+  final ResistanceControl? resistanceControl;
 
   @override
   Stream<(String, List<int>)> get notifications => _connection.notifications.where((n) => _ids.contains(n.$1));
