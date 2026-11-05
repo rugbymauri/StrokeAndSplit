@@ -26,7 +26,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
-| 13 | `resistance-control` | 8/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
+| 13 | `resistance-control` | 9/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
 
 ## Warum diese Reihenfolge
 
@@ -291,6 +291,7 @@ Wunsch des Nutzers (2026-11-05) für den Domyos Woodrower. Der Spike am Gerät z
 - [x] Simulator (2026-11-05, Task 2.3): Im FTMS-Modus nimmt er Stufen 1–15 an und meldet sie ab dem nächsten Datensatz, Start bei 5.
 - [x] Datenmodell (2026-11-05, Tasks 3.1–3.2): Schema 9 mit `resistance_level` in `zones` und `course_segments` (`from8To9`); Zone und Segment tragen die Stufe, eine Änderung der Zone gilt in allen Strecken; Stufe unter 1 ist ein Fehler, eine Stufe allein ersetzt kein Band. Kopie der Strecke im `.strokesplit`-Header mit optionalem `resistanceLevel`, der Import legt die Zone mit Stufe an.
 - [x] Logik (2026-11-05, Task 4.1): `ResistanceDirector` entscheidet aus Segmentbeginn, gemeldeter Stufe, −/+ und Wiederverbinden, welche Stufe gesendet wird; 3 s nach dem Senden gilt die alte Stufe nicht als Handänderung.
+- [x] Provider (2026-11-05, Task 4.2): `resistanceProvider` verbindet Logik, aktive Quelle, gemeldete Stufe und Segmente der laufenden Session; Stufen gehen nacheinander raus, eine neuere ersetzt eine wartende; Ablehnung zeigt 2 s einen Hinweis. Beginnt eine Session, ist die Stufe des Geräts die Grundstufe.
 - [ ] Umsetzung der übrigen Tasks, danach Gerätetest 6.2 (Nutzer).
 
 ## Offene Entscheide

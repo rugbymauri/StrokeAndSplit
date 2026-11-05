@@ -53,6 +53,12 @@ class ResistanceDirector {
     if (!_segmentHasLevel) _base = whole;
   }
 
+  /// A session starts: its base level is the level the rower has now.
+  void sessionStarted() {
+    _segmentHasLevel = false;
+    _base = target ?? _base;
+  }
+
   /// A segment of the course starts: its level, or the base level.
   int? segmentStarted(CourseSegment segment) {
     final level = segment.resistanceLevel;

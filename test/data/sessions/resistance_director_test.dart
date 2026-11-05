@@ -230,4 +230,17 @@ void main() {
       expect(director.segmentStarted(_sprint), 10);
     });
   });
+
+  test('a new session takes the level the rower has as base level', () {
+    fakeAsync((async) {
+      final director = _director()..reported(4);
+      director.segmentStarted(_sprint);
+      director.reported(10);
+
+      director.sessionStarted();
+
+      expect(director.baseLevel, 10);
+      expect(director.segmentStarted(_warmUp), isNull);
+    });
+  });
 }
