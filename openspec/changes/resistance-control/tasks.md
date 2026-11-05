@@ -20,7 +20,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 4. Logik
 
-- [ ] 4.1 `ResistanceDirector` nach D4 in `lib/data/sessions/`. Verifikation: Unit-Tests zu allen Szenarien von `resistance-control`: Intervall mit Stufen, zurück auf die Grundstufe, neue Runde, freies Rudern sendet nie von selbst, gleiche Stufe zweimal sendet nichts, Klemmen auf den Bereich, Handänderung am Gerät und per −/+ bis zum Segmentende, neue Grundstufe, Pause mit Handänderung, Wiederverbinden sendet erneut, verzögerte Meldung innerhalb von 3 s ist keine Handänderung, drei schnelle Tipps von 6 auf 9, nach Ablehnung kein erneutes Senden bis zum nächsten Segment
+- [x] 4.1 `ResistanceDirector` nach D4 in `lib/data/sessions/`. Verifikation: Unit-Tests zu allen Szenarien von `resistance-control`: Intervall mit Stufen, zurück auf die Grundstufe, neue Runde, freies Rudern sendet nie von selbst, gleiche Stufe zweimal sendet nichts, Klemmen auf den Bereich, Handänderung am Gerät und per −/+ bis zum Segmentende, neue Grundstufe, Pause mit Handänderung, Wiederverbinden sendet erneut, verzögerte Meldung innerhalb von 3 s ist keine Handänderung, drei schnelle Tipps von 6 auf 9, nach Ablehnung kein erneutes Senden bis zum nächsten Segment
 - [ ] 4.2 Provider, der den `ResistanceDirector` mit `lapProgress`, den `StatusTick`s und der Steuerung der aktiven Quelle verbindet und `setLevel` serialisiert (D4), plus Zustand für den Hinweis bei Fehlern (D5). Verifikation: Provider-Test mit Simulator (FTMS) und einer Vorlage mit Sprint auf Stufe 10: im Sprint meldet der Simulator Stufe 10; Test mit einer Steuerung, die ablehnt: Hinweis gesetzt, kein zweiter Versuch
 
 ## 5. Oberfläche
