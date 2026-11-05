@@ -58,8 +58,12 @@ Messwerte und Ereignisse SHALL für alle Datenquellen (echter PM5, FTMS-Ruderger
 - **WHEN** eine aufgezeichnete Session abgespielt wird
 - **THEN** entstehen dieselben Messwerte und Ereignisse wie bei der ursprünglichen Live-Session
 
-#### Scenario: Gleiche Pace, gleiche Leistung
-- **WHEN** ein PM5 und ein FTMS-Rudergerät dieselbe Pace von 2:00 pro 500 m melden
+#### Scenario: Leistung des FTMS-Rudergeräts
+- **WHEN** ein FTMS-Rudergerät beim Rudern eine Pace von 2:00 pro 500 m und eine Leistung von 180 W meldet
+- **THEN** zeigt die App 180 Watt an, wie das Display des Geräts
+
+#### Scenario: FTMS-Rudergerät ohne Leistung
+- **WHEN** ein PM5 und ein FTMS-Rudergerät ohne Leistungsfeld dieselbe Pace von 2:00 pro 500 m melden
 - **THEN** zeigt die App für beide dieselbe Leistung in Watt an
 
 ### Requirement: Fehlerhafte Daten tolerieren

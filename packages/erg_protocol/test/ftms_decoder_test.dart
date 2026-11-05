@@ -18,16 +18,23 @@ class _Rower {
     return result;
   }
 
-  List<RowingEvent> record(int count, int distance,
-          {double rate = 22, Duration? pace, int? heartRate, int? resistanceLevel}) =>
-      send(RowerData(
-        strokeRate: rate,
-        strokeCount: count,
-        totalDistance: distance,
-        pace: pace ?? _Rower.pace,
-        heartRate: heartRate,
-        resistanceLevel: resistanceLevel,
-      ));
+  List<RowingEvent> record(
+    int count,
+    int distance, {
+    double rate = 22,
+    Duration? pace,
+    int? heartRate,
+    int? resistanceLevel,
+  }) => send(
+    RowerData(
+      strokeRate: rate,
+      strokeCount: count,
+      totalDistance: distance,
+      pace: pace ?? _Rower.pace,
+      heartRate: heartRate,
+      resistanceLevel: resistanceLevel,
+    ),
+  );
 
   StatusTick get lastTick => events.whereType<StatusTick>().last;
   List<Stroke> get strokes => events.whereType<Stroke>().toList();
@@ -83,12 +90,47 @@ void main() {
       expect(rower.lastTick.watts, 203);
     });
 
-    test('ignores the power of the device', () {
+    test('shows the power of the device instead of the one of the pace', () {
       final rower = _Rower()
         ..record(0, 0)
-        ..send(const RowerData(
-            strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: Duration(minutes: 2), power: 999));
-      expect(rower.lastTick.watts, 203);
+        ..send(
+          const RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: Duration(minutes: 2), power: 180),
+        );
+      expect(rower.lastTick.watts, 180);
+    });
+
+    test('keeps the power of the device in records without it', () {
+      final rower = _Rower()
+        ..record(0, 0)
+        ..send(
+          const RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: Duration(minutes: 2), power: 180),
+        )
+        ..record(2, 8);
+      expect(rower.lastTick.watts, 180);
+    });
+
+    test('takes the power of the pace when the device reports 0 or more than 2000 W', () {
+      for (final power in [0, 2001]) {
+        final rower = _Rower()
+          ..record(0, 0)
+          ..send(
+            RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: const Duration(minutes: 2), power: power),
+          );
+        expect(rower.lastTick.watts, 203, reason: '$power W');
+      }
+    });
+
+    test('has no power while the rower stands still, even if the device reports one', () {
+      final rower = _Rower()
+        ..record(0, 0)
+        ..send(
+          const RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: Duration(minutes: 2), power: 180),
+        );
+      for (var i = 0; i < 6; i++) {
+        rower.send(const RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, power: 180));
+      }
+      expect(rower.lastTick.isRowing, isFalse);
+      expect(rower.lastTick.watts, isNull);
     });
 
     test('treats a pace of 0 as missing and keeps the other values', () {
@@ -136,24 +178,36 @@ void main() {
 
     test('treats the energy placeholder as missing calories', () {
       final rower = _Rower()
-        ..send(const RowerData(
-          strokeRate: 22,
-          strokeCount: 0,
-          totalDistance: 0,
-          totalEnergy: RowerData.energyNotAvailable,
-          energyPerHour: RowerData.energyNotAvailable,
-          energyPerMinute: 0xFF,
-        ));
+        ..send(
+          const RowerData(
+            strokeRate: 22,
+            strokeCount: 0,
+            totalDistance: 0,
+            totalEnergy: RowerData.energyNotAvailable,
+            energyPerHour: RowerData.energyNotAvailable,
+            energyPerMinute: 0xFF,
+          ),
+        );
       expect(rower.lastTick.calories, isNull);
-      rower.send(const RowerData(
-          strokeRate: 22, strokeCount: 1, totalDistance: 4, totalEnergy: 12, energyPerHour: 0, energyPerMinute: 0));
+      rower.send(
+        const RowerData(
+          strokeRate: 22,
+          strokeCount: 1,
+          totalDistance: 4,
+          totalEnergy: 12,
+          energyPerHour: 0,
+          energyPerMinute: 0,
+        ),
+      );
       expect(rower.lastTick.calories, 12);
     });
 
     test('merges a record split over several notifications', () {
       final rower = _Rower();
-      final first = rower.send(const RowerData(moreData: true, totalDistance: 100, pace: Duration(minutes: 2)),
-          step: Duration.zero);
+      final first = rower.send(
+        const RowerData(moreData: true, totalDistance: 100, pace: Duration(minutes: 2)),
+        step: Duration.zero,
+      );
       expect(first, isEmpty);
       rower.send(const RowerData(strokeRate: 24, strokeCount: 30, heartRate: 150));
       expect(rower.lastTick.distanceMeters, 100);
@@ -163,8 +217,9 @@ void main() {
 
     test('drops a packet shorter than announced and goes on', () {
       final rower = _Rower()..record(0, 0);
-      final dropped = rower.decoder
-          .decode(RawPacket(time: rower.time, characteristicId: FtmsIds.rowerData, bytes: [0x04, 0x00, 44]));
+      final dropped = rower.decoder.decode(
+        RawPacket(time: rower.time, characteristicId: FtmsIds.rowerData, bytes: [0x04, 0x00, 44]),
+      );
       expect(dropped, isEmpty);
       expect(_Rower.warnings.single, contains('shorter'));
       rower.record(1, 4);
@@ -173,8 +228,10 @@ void main() {
 
     test('ignores machine status and control point responses', () {
       final decoder = FtmsDecoder(onWarning: _Rower.warnings.add);
-      expect(decoder.decode(RawPacket(time: Duration.zero, characteristicId: FtmsIds.machineStatus, bytes: [4])),
-          isEmpty);
+      expect(
+        decoder.decode(RawPacket(time: Duration.zero, characteristicId: FtmsIds.machineStatus, bytes: [4])),
+        isEmpty,
+      );
       final response = RawPacket(time: Duration.zero, characteristicId: FtmsIds.controlPoint, bytes: [0x80, 0, 1]);
       expect(decoder.decode(response), isEmpty);
       expect(_Rower.warnings, isEmpty);
