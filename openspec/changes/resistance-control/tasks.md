@@ -4,8 +4,8 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 1. Protokoll
 
-- [ ] 1.1 `ftms_control.dart` in `packages/erg_protocol/lib/src/ftms/` nach D3: Parser für Features (`2acc`: Stufe gemeldet, Stufe setzbar) und Bereich (`2ad6`: min, max, Schritt in Zehnteln → ganze Stufen; unplausibel → null), Kodierung von „Set Target Resistance Level“ als u8 oder s16 in Zehnteln, Dekodierung der Antwort `80 <op> <result>`. Verifikation: Unit-Tests mit den Bytes des Woodrowers (`a6 56 00 00 04 00 00 00`, `0a 00 96 00 0a 00`, `04 3c`, `80 04 01`/`03`/`05`), Maximum über 25,5 kodiert s16, fehlerhafte Pakete
-- [ ] 1.2 Stufe in Zehnteln erkennen (Risiko in design.md): Liegt eine gemeldete Stufe über dem Maximum des Bereichs und durch 10 geteilt darin, rechnet die Steuerung in Zehnteln; der Decoder bleibt unverändert. Verifikation: Unit-Test mit Bereich 1–15 und gemeldeter Stufe 60
+- [x] 1.1 `ftms_control.dart` in `packages/erg_protocol/lib/src/ftms/` nach D3: Parser für Features (`2acc`: Stufe gemeldet, Stufe setzbar) und Bereich (`2ad6`: min, max, Schritt in Zehnteln → ganze Stufen; unplausibel → null), Kodierung von „Set Target Resistance Level“ als u8 oder s16 in Zehnteln, Dekodierung der Antwort `80 <op> <result>`. Verifikation: Unit-Tests mit den Bytes des Woodrowers (`a6 56 00 00 04 00 00 00`, `0a 00 96 00 0a 00`, `04 3c`, `80 04 01`/`03`/`05`), Maximum über 25,5 kodiert s16, fehlerhafte Pakete
+- [x] 1.2 Stufe in Zehnteln erkennen (Risiko in design.md): Liegt eine gemeldete Stufe über dem Maximum des Bereichs und durch 10 geteilt darin, rechnet die Steuerung in Zehnteln; der Decoder bleibt unverändert. Verifikation: Unit-Test mit Bereich 1–15 und gemeldeter Stufe 60
 
 ## 2. Verbindung und Steuerung
 

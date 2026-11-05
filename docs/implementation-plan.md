@@ -26,7 +26,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
-| 13 | `resistance-control` | 0/13 | geplant, kann starten | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
+| 13 | `resistance-control` | 2/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
 
 ## Warum diese Reihenfolge
 
@@ -286,7 +286,8 @@ Wunsch des Nutzers (2026-11-02): Sessions in Google Fit sehen. Google Fit nimmt 
 Wunsch des Nutzers (2026-11-05) für den Domyos Woodrower. Der Spike am Gerät zeigt: Stufe setzbar über „Set Target Resistance Level“ als u8 in Zehnteln, Bereich 1–15; die Stufensenkung nach der Pause im Mitschnitt war eine Handänderung des Nutzers.
 
 - [x] Geplant (2026-11-05, `docs/resistance-control-proposal`): −/+ an der Stufe unter den Watt; optionale Stufe pro Zone, als Kopie im Segment (Schema 9); Grundstufe = Stufe beim Start bzw. zuletzt von Hand gesetzte in Segmenten ohne Stufe; Handänderung (App oder Gerät, auch in der Pause) gilt bis zum nächsten Segment; nach Wiederverbinden erneut senden; Rückfall auf s16 bei „ungültiger Wert“; Simulator (FTMS) nimmt die Stufe an.
-- [ ] Umsetzung (13 Tasks), danach Gerätetest 6.2 (Nutzer).
+- [x] Protokoll (2026-11-05, Tasks 1.1–1.2): Features und Stufenbereich lesen, „Set Target Resistance Level“ als u8 oder s16 in Zehnteln, Antworten des Control Points; eine in Zehnteln gemeldete Stufe wird auf ganze Stufen umgerechnet.
+- [ ] Umsetzung der übrigen Tasks, danach Gerätetest 6.2 (Nutzer).
 
 ## Offene Entscheide
 

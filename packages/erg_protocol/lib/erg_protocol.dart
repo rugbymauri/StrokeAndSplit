@@ -4,6 +4,7 @@ library;
 
 export 'src/erg_decoder.dart';
 export 'src/erg_protocol.dart';
+export 'src/ftms/ftms_control.dart';
 export 'src/ftms/ftms_decoder.dart';
 export 'src/ftms/ftms_encoder.dart';
 export 'src/ftms/ftms_ids.dart';
