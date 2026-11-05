@@ -26,7 +26,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
-| 13 | `resistance-control` | 4/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
+| 13 | `resistance-control` | 5/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
 
 ## Warum diese Reihenfolge
 
@@ -288,6 +288,7 @@ Wunsch des Nutzers (2026-11-05) für den Domyos Woodrower. Der Spike am Gerät z
 - [x] Geplant (2026-11-05, `docs/resistance-control-proposal`): −/+ an der Stufe unter den Watt; optionale Stufe pro Zone, als Kopie im Segment (Schema 9); Grundstufe = Stufe beim Start bzw. zuletzt von Hand gesetzte in Segmenten ohne Stufe; Handänderung (App oder Gerät, auch in der Pause) gilt bis zum nächsten Segment; nach Wiederverbinden erneut senden; Rückfall auf s16 bei „ungültiger Wert“; Simulator (FTMS) nimmt die Stufe an.
 - [x] Protokoll (2026-11-05, Tasks 1.1–1.2): Features und Stufenbereich lesen, „Set Target Resistance Level“ als u8 oder s16 in Zehnteln, Antworten des Control Points; eine in Zehnteln gemeldete Stufe wird auf ganze Stufen umgerechnet.
 - [x] Verbindung (2026-11-05, Tasks 2.1–2.2): Beim Verbinden liest die App Features und Stufenbereich; nur wenn beide passen, bietet die Quelle eine `ResistanceControl` an. Befehle gehen nacheinander über den Control Point, Antwort innert 2 s; bei `05` erneut Request Control, bei `03` einmal s16 und danach für die Verbindung bei s16. Nach dem Wiederverbinden gilt die Steuerung der neuen Verbindung.
+- [x] Simulator (2026-11-05, Task 2.3): Im FTMS-Modus nimmt er Stufen 1–15 an und meldet sie ab dem nächsten Datensatz, Start bei 5.
 - [ ] Umsetzung der übrigen Tasks, danach Gerätetest 6.2 (Nutzer).
 
 ## Offene Entscheide

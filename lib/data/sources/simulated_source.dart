@@ -14,7 +14,9 @@ import 'resistance_control.dart';
 ///
 /// With [protocol] FTMS it sends one Rower Data record per second like a
 /// typical FTMS rower instead of the PM5 notifications (Design D10), with
-/// [ftmsResistanceLevel] as the resistance level of a rower with a brake.
+/// [ftmsResistanceLevel] as the starting resistance level of a rower with a
+/// brake. In that mode the level can be set from 1 to 15 like on a Domyos
+/// Woodrower (Change resistance-control, Design D8).
 class SimulatedSource implements ErgSource {
   SimulatedSource({
     this.targetPace = const Duration(minutes: 2, seconds: 10),
@@ -34,8 +36,12 @@ class SimulatedSource implements ErgSource {
   /// Time between two Rower Data records in FTMS mode.
   static const ftmsInterval = Duration(seconds: 1);
 
-  /// Resistance level reported in FTMS mode; the PM5 reports none.
+  /// Resistance level reported in FTMS mode until another is set; the PM5
+  /// reports none.
   static const ftmsResistanceLevel = 5;
+
+  /// Levels the simulator accepts in FTMS mode.
+  static const ftmsResistanceRange = ResistanceRange(min: 1, max: 15);
 
   static const _encoder = Pm5Encoder();
   static const _ftmsEncoder = FtmsEncoder();
@@ -98,7 +104,12 @@ class SimulatedSource implements ErgSource {
   bool get providesForceCurves => protocol == ErgProtocol.pm5;
 
   @override
-  ResistanceControl? get resistanceControl => null;
+  late final ResistanceControl? resistanceControl =
+      protocol == ErgProtocol.ftms ? _SimulatedResistance(this) : null;
+
+  /// The level reported in FTMS mode.
+  int get resistanceLevel => _resistanceLevel;
+  var _resistanceLevel = ftmsResistanceLevel;
 
   @override
   String get name => 'Simulator';
@@ -164,7 +175,7 @@ class SimulatedSource implements ErgSource {
             watts: tick.pace == null ? null : wattsForPace(tick.pace!),
             strokeRate: tick.strokeRate,
             calories: tick.calories,
-            resistanceLevel: ftmsResistanceLevel,
+            resistanceLevel: _resistanceLevel,
           ),
           strokeCount: _completedStrokes,
           at: at,
@@ -258,4 +269,20 @@ class _SimulatedStroke {
   final Stroke data;
   final List<double> forceCurve;
   var driveEndSent = false;
+}
+
+/// Takes every level in range at once, as a rower that never refuses.
+class _SimulatedResistance implements ResistanceControl {
+  _SimulatedResistance(this._source);
+
+  final SimulatedSource _source;
+
+  @override
+  ResistanceRange get range => SimulatedSource.ftmsResistanceRange;
+
+  @override
+  Future<ResistanceResult> setLevel(int level) async {
+    _source._resistanceLevel = range.clamp(level);
+    return ResistanceResult.accepted;
+  }
 }
