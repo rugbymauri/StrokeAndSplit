@@ -28,11 +28,15 @@ class FtmsDecoder implements ErgDecoder {
   static const _minPace = Duration(minutes: 1);
   static const _maxPace = Duration(minutes: 10);
 
+  /// Device power above this is implausible; a pace of 1:00 is about 1620 W.
+  static const _maxWatts = 2000;
+
   // Last known value of every field used.
   double? _strokeRate;
   int? _strokeCount;
   int? _distance;
   Duration? _pace;
+  int? _power;
   int? _energy;
   int? _heartRate;
   int? _resistanceLevel;
@@ -62,6 +66,7 @@ class FtmsDecoder implements ErgDecoder {
     _strokeCount = data.strokeCount ?? _strokeCount;
     _distance = data.totalDistance ?? _distance;
     _pace = data.pace ?? _pace;
+    _power = data.power ?? _power;
     _energy = data.totalEnergy ?? _energy;
     _heartRate = data.heartRate ?? _heartRate;
     _resistanceLevel = data.resistanceLevel ?? _resistanceLevel;
@@ -83,15 +88,22 @@ class FtmsDecoder implements ErgDecoder {
     final previousCount = _previousCount;
     final previousDistance = _previousDistance;
 
-    final isReset = previousCount != null && count != null && count < previousCount ||
+    final isReset =
+        previousCount != null && count != null && count < previousCount ||
         previousDistance != null && distance != null && distance < previousDistance;
     if (isReset) {
       // Like a new workout on the PM5: time and distance start again from
       // zero, the session carries the progress over.
       _elapsed = Duration.zero;
       _lastProgress = null;
-      events.add(WorkoutStateChanged(
-          elapsed: _elapsed, previous: WorkoutState.unknown, current: WorkoutState.unknown, isReset: true));
+      events.add(
+        WorkoutStateChanged(
+          elapsed: _elapsed,
+          previous: WorkoutState.unknown,
+          current: WorkoutState.unknown,
+          isReset: true,
+        ),
+      );
     } else if (previousCount != null && count != null && count > previousCount ||
         previousDistance != null && distance != null && distance > previousDistance) {
       _lastProgress = time;
@@ -120,20 +132,27 @@ class FtmsDecoder implements ErgDecoder {
     final strokeRate = _strokeRate?.round();
     final heartRate = _heartRate;
     final energy = _energy;
+    final power = _power;
     final resistanceLevel = _resistanceLevel;
-    events.add(StatusTick(
-      elapsed: _elapsed,
-      distanceMeters: (distance ?? 0).toDouble(),
-      workoutType: WorkoutType.unknown,
-      workoutState: WorkoutState.unknown,
-      isRowing: isRowing,
-      pace: pace,
-      watts: pace == null ? null : wattsForPace(pace),
-      strokeRate: strokeRate != null && strokeRate >= 1 && strokeRate <= 60 ? strokeRate : null,
-      heartRate: heartRate != null && heartRate > 0 && heartRate <= 250 ? heartRate : null,
-      calories: energy == RowerData.energyNotAvailable ? null : energy,
-      resistanceLevel: resistanceLevel != null && resistanceLevel > 0 ? resistanceLevel : null,
-    ));
+    events.add(
+      StatusTick(
+        elapsed: _elapsed,
+        distanceMeters: (distance ?? 0).toDouble(),
+        workoutType: WorkoutType.unknown,
+        workoutState: WorkoutState.unknown,
+        isRowing: isRowing,
+        pace: pace,
+        watts: switch (power) {
+          _ when !isRowing => null,
+          final power? when power > 0 && power <= _maxWatts => power,
+          _ => pace == null ? null : wattsForPace(pace),
+        },
+        strokeRate: strokeRate != null && strokeRate >= 1 && strokeRate <= 60 ? strokeRate : null,
+        heartRate: heartRate != null && heartRate > 0 && heartRate <= 250 ? heartRate : null,
+        calories: energy == RowerData.energyNotAvailable ? null : energy,
+        resistanceLevel: resistanceLevel != null && resistanceLevel > 0 ? resistanceLevel : null,
+      ),
+    );
     return events;
   }
 }

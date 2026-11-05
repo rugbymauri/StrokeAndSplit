@@ -23,6 +23,7 @@
 - [x] 3.4 `FtmsDecoder` für Schläge und Reset: ein `Stroke` je Zählerschritt ohne Details, kein Ereignis bei mehr als 10 Schlägen Sprung, Reset bei zurückfallender Distanz oder zurückfallendem Zähler (D8); Tests für 40→42, ersten Datensatz mitten im Rudern, Reset von 1500 m auf 0 m
 - [x] 3.5 `Pm5ErgType` mit den Ski- und Bike-Werten aus der Concept2-Spezifikation und Auswertung von `0x0032` Byte 16 (D6); Unit-Tests für RowErg, SkiErg, BikeErg und unbekannte Werte. Die Ski- und Bike-Werte werden nicht an einem Gerät geprüft (Entscheid des Nutzers, 2026-10-18); bestätigt ist nur RowErg (0) an den Aufnahmen
 - [x] 3.6 Package-README: Abschnitt FTMS mit Byte-Layout von Rower Data, Control Point, eigener Uhr, Plausibilitätsgrenzen und der Erg-Typ-Tabelle; Fixtures-Tabelle ergänzt
+- [x] 3.7 `FtmsDecoder` übernimmt die Leistung des Geräts (Bit 5), solange gerudert wird; ohne Leistung, bei 0 oder über 2000 W aus der Pace (D8 geändert; Nutzer, 2026-11-05). Tests mit Geräteleistung, ohne sie in Folgedatensätzen, 0 und 2001 W, Stillstand
 
 ## 4. Simulator und Test-Rower
 

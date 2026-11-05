@@ -64,6 +64,7 @@ Bei der Umsetzung mitnehmen:
 - Task 5.3/5.4: Die Protokolllogik beim Verbinden (Abtastrate, Abos, Erg-Typ, Control Point) liegt in `setUpRower` über einer dünnen `GattConnection`, damit sie ohne Bluetooth testbar ist. `FlutterBluePlusTransport` verbindet nur noch und sucht die Characteristics der Services `0x0030` und `0x1826`.
 - Task 7.4: Die README-Zeile „nur mit Software-Rower getestet“ stimmt erst nach dem manuellen Test 7.2; bis dahin ist FTMS nur automatisch getestet.
 - Design D8 angepasst: Beim FTMS-Reset beginnt die eigene Uhr wieder bei 0, sonst zählt die Session die Zeit doppelt.
+- [x] Nachtrag (Nutzer, 2026-11-05, `feature/ftms-device-power`, Task 3.7): Bei FTMS-Rudergeräten zeigt die App die Watt des Geräts statt der aus der Pace berechneten, damit sie mit dem Display übereinstimmen (Domyos Woodrower); ohne Geräteleistung wie bisher aus der Pace. Szenario „Gleiche Pace, gleiche Leistung“ gilt nur noch für Geräte ohne Leistungsfeld.
 - [x] Zeile über 120 Zeichen in `lib/features/connection/device_list_screen.dart` (Fehlertext „Suche nach dem PM5“) mit Task 5.5 umgebrochen.
 - Task 5.5: „PM5 suchen“ heisst jetzt überall „Rudergerät suchen“, auch auf dem Startbildschirm und in „Vorlage rudern“. Mit `ui-design` übernehmen.
 

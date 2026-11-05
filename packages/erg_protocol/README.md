@@ -170,7 +170,7 @@ Nach dem Verbinden: Indicate aktivieren, `0x00` (Request Control) schreiben und 
 | Wert | gilt als „nicht vorhanden“ |
 |---|---|
 | Pace | 0, ausserhalb von 1:00 bis 10:00 pro 500 m oder während nicht gerudert wird |
-| Watt | immer aus der Pace mit `wattsForPace` berechnet, die Geräteleistung (Bit 5) wird ignoriert |
+| Watt | die Geräteleistung (Bit 5), solange gerudert wird; fehlt sie, ist sie 0 oder über 2000 W, aus der Pace mit `wattsForPace` berechnet |
 | Schlagzahl | ausserhalb von 1 bis 60 pro Minute |
 | Herzfrequenz | 0 oder über 250 |
 | Kalorien | Platzhalter `0xFFFF` |
