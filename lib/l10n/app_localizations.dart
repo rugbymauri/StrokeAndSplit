@@ -577,6 +577,24 @@ abstract class AppLocalizations {
   /// **'Stufe {level}'**
   String metricResistanceLevel(int level);
 
+  /// Live display: shown for a moment below the watts when the rower refused a new resistance level
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe nicht gesetzt'**
+  String get metricResistanceRefused;
+
+  /// Live display: label of the button that lowers the resistance level by one (for screen readers)
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe senken'**
+  String get resistanceLower;
+
+  /// Live display: label of the button that raises the resistance level by one (for screen readers)
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe erhöhen'**
+  String get resistanceRaise;
+
   /// Live display: label of the stroke rate
   ///
   /// In de, this message translates to:

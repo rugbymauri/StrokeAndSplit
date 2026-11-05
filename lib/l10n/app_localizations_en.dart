@@ -319,6 +319,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get metricResistanceRefused => 'Level not set';
+
+  @override
+  String get resistanceLower => 'Lower the level';
+
+  @override
+  String get resistanceRaise => 'Raise the level';
+
+  @override
   String get metricStrokeRate => 'Stroke rate';
 
   @override

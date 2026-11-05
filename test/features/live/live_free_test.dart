@@ -2,6 +2,7 @@ import 'package:strokesplit/features/live/force_curve.dart';
 import 'package:strokesplit/features/live/live_free.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/localized_app.dart';
@@ -32,13 +33,16 @@ Future<void> _pump(WidgetTester tester, Size size, {ForceCurves? forceCurves}) a
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(LocalizedApp(
-    home: Scaffold(
-      body: FreeLiveView(
-        tick: _tick,
-        session: null,
-        forceCurves: forceCurves,
-        action: FilledButton(onPressed: () {}, child: const Text('Session beenden')),
+  // The watts tile reads the resistance level; without a source there is none.
+  await tester.pumpWidget(ProviderScope(
+    child: LocalizedApp(
+      home: Scaffold(
+        body: FreeLiveView(
+          tick: _tick,
+          session: null,
+          forceCurves: forceCurves,
+          action: FilledButton(onPressed: () {}, child: const Text('Session beenden')),
+        ),
       ),
     ),
   ));

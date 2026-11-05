@@ -11,6 +11,7 @@ import 'live_layout.dart';
 import 'live_status.dart';
 import 'live_text_styles.dart';
 import 'metric_tile.dart';
+import 'watts_tile.dart';
 
 /// The live display without a template (ui-design, Design D2): the pace on
 /// top or on the left, four tiles, a line with further values, the force
@@ -196,14 +197,7 @@ class FreeLiveView extends StatelessWidget {
           valueKey: const Key('metric-spm'),
           fontSize: fontSize,
         ),
-        MetricTile(
-          label: l10n.metricWatts,
-          value: formatWhole(tick?.watts),
-          valueKey: const Key('metric-watts'),
-          fontSize: fontSize,
-          footnote: formatResistanceLevel(l10n, tick?.resistanceLevel),
-          footnoteKey: const Key('metric-resistance'),
-        ),
+        WattsTile(tick: tick, fontSize: fontSize),
         MetricTile(
           label: l10n.metricTime,
           value: formatElapsed(session?.elapsed ?? tick?.elapsed ?? Duration.zero),

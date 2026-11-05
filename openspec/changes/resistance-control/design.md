@@ -76,6 +76,8 @@ Die Fussnote „Stufe 6“ der Watt-Kachel wird zu einer Zeile `− Stufe 6 +` m
 
 An der Bereichsgrenze ist die Taste deaktiviert. Ohne `resistanceControl` bleibt die heutige Fussnote. Die Tasten verwenden die Ruderblatt-Symbole des `OarStepper` in kleiner Form, damit sie zur Designsprache passen.
 
+**Umgesetzt (2026-11-05):** Die Tasten haben die Grösse des kompakten `OarStepper` (44 × 47), nicht 48 × 48, damit sie auch im kleinen Desktop-Fenster (640 × 480) neben „Stufe 15“ passen. Ist die Kachel mindestens 120 px hoch, stehen die Tasten in der Fussnotenzeile. Sonst stehen sie links und rechts neben Wert und Fussnote, über die ganze Kachelhöhe. Das betrifft die kompakte Kachel mit Vorlage im Hochformat, die nur 64 px hoch ist. Unter die Kachel muss nichts.
+
 *Alternative*: Ein Tipp auf die Stufe öffnet einen grossen `OarStepper` als Overlay. Verworfen, weil das zwei Tipps pro Änderung braucht und die Kernwerte verdeckt.
 
 ### D7: Datenmodell, Schema 9

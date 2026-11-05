@@ -96,13 +96,13 @@ class OarStepper extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _OarButton(up: false, size: size.button, label: l10n.oarStepperLess(stepLabel), onStep: decrease),
+              OarBladeButton(up: false, size: size.button, label: l10n.oarStepperLess(stepLabel), onStep: decrease),
               Flexible(
                 child: ExcludeSemantics(
                   child: FittedBox(fit: BoxFit.scaleDown, child: _display()),
                 ),
               ),
-              _OarButton(up: true, size: size.button, label: l10n.oarStepperMore(stepLabel), onStep: increase),
+              OarBladeButton(up: true, size: size.button, label: l10n.oarStepperMore(stepLabel), onStep: increase),
             ],
           ),
         ),
@@ -144,9 +144,10 @@ const _slowInterval = Duration(milliseconds: 150);
 const _fastAfter = Duration(seconds: 1);
 const _fastInterval = Duration(milliseconds: 50);
 
-/// One oar blade button; disabled without [onStep].
-class _OarButton extends StatefulWidget {
-  const _OarButton({required this.up, required this.size, required this.label, required this.onStep});
+/// One oar blade button: up adds, down takes away; disabled without
+/// [onStep]. Holding it repeats the step.
+class OarBladeButton extends StatefulWidget {
+  const OarBladeButton({super.key, required this.up, required this.size, required this.label, required this.onStep});
 
   final bool up;
   final Size size;
@@ -154,17 +155,17 @@ class _OarButton extends StatefulWidget {
   final VoidCallback? onStep;
 
   @override
-  State<_OarButton> createState() => _OarButtonState();
+  State<OarBladeButton> createState() => _OarBladeButtonState();
 }
 
-class _OarButtonState extends State<_OarButton> {
+class _OarBladeButtonState extends State<OarBladeButton> {
   Timer? _timer;
   Duration _held = Duration.zero;
   bool _pressed = false;
   bool _repeated = false;
 
   @override
-  void didUpdateWidget(_OarButton oldWidget) {
+  void didUpdateWidget(OarBladeButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     // The limit was reached while held.
     if (widget.onStep == null) {

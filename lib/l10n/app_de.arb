@@ -416,6 +416,18 @@
       }
     }
   },
+  "metricResistanceRefused": "Stufe nicht gesetzt",
+  "@metricResistanceRefused": {
+    "description": "Live display: shown for a moment below the watts when the rower refused a new resistance level"
+  },
+  "resistanceLower": "Stufe senken",
+  "@resistanceLower": {
+    "description": "Live display: label of the button that lowers the resistance level by one (for screen readers)"
+  },
+  "resistanceRaise": "Stufe erhöhen",
+  "@resistanceRaise": {
+    "description": "Live display: label of the button that raises the resistance level by one (for screen readers)"
+  },
   "metricStrokeRate": "Schlagzahl",
   "@metricStrokeRate": {
     "description": "Live display: label of the stroke rate"
