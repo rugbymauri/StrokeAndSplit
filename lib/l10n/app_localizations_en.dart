@@ -140,6 +140,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'The lowest stroke rate is above the highest.';
 
   @override
+  String get zoneErrorResistanceLevelTooLow => 'The level must be at least 1.';
+
+  @override
   String quotedName(String name) {
     return '“$name”';
   }

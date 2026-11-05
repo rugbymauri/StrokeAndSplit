@@ -67,6 +67,10 @@ class Zones extends Table {
   IntColumn get spmMin => integer().nullable()();
   IntColumn get spmMax => integer().nullable()();
 
+  /// Resistance level set while rowing the zone; null leaves the base level
+  /// (Change resistance-control, Design D7).
+  IntColumn get resistanceLevel => integer().nullable()();
+
   /// Zones are only marked as deleted, as course versions keep their name.
   DateTimeColumn get deletedAt => dateTime().nullable()();
 }
@@ -86,6 +90,9 @@ class CourseSegments extends Table {
   IntColumn get paceSlowCs => integer().nullable()();
   IntColumn get spmMin => integer().nullable()();
   IntColumn get spmMax => integer().nullable()();
+
+  /// Copy of the resistance level of the zone.
+  IntColumn get resistanceLevel => integer().nullable()();
 
   /// The placed zone; null for a free gap and in versions from before zones
   /// that were already rowed.
@@ -311,7 +318,7 @@ class AppDatabase extends _$AppDatabase {
       ));
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -374,6 +381,11 @@ class AppDatabase extends _$AppDatabase {
           // Health Connect (Change health-connect, Design D6); existing sessions count as not written.
           from7To8: (m, schema) async {
             await m.addColumn(schema.sessions, schema.sessions.healthExportedAt);
+          },
+          // Resistance level per zone and its copy in course segments (Change resistance-control, D7).
+          from8To9: (m, schema) async {
+            await m.addColumn(schema.zones, schema.zones.resistanceLevel);
+            await m.addColumn(schema.courseSegments, schema.courseSegments.resistanceLevel);
           },
         ),
         beforeOpen: (details) async {

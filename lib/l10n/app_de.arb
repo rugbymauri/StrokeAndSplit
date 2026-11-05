@@ -159,6 +159,10 @@
   "@zoneErrorSpmReversed": {
     "description": "Zone editor: the stroke rate bounds are the wrong way round"
   },
+  "zoneErrorResistanceLevelTooLow": "Die Stufe muss mindestens 1 sein.",
+  "@zoneErrorResistanceLevelTooLow": {
+    "description": "Zone editor: the resistance level of the zone is below 1"
+  },
   "quotedName": "„{name}“",
   "@quotedName": {
     "description": "A name the user gave, in quotes, e.g. in a list of courses",

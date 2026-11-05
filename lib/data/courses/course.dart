@@ -13,6 +13,7 @@ class CourseSegment {
     this.paceSlowCs,
     this.spmMin,
     this.spmMax,
+    this.resistanceLevel,
     this.zoneId,
     this.zoneName,
   });
@@ -25,6 +26,10 @@ class CourseSegment {
   final int? paceSlowCs;
   final int? spmMin;
   final int? spmMax;
+
+  /// Resistance level of the placed zone; null rows on the base level
+  /// (Change resistance-control). It is no band, so it leaves [isFree] alone.
+  final int? resistanceLevel;
 
   /// The placed zone; null for a free gap and in rowed versions from before
   /// zones, which only keep [zoneName].
@@ -45,6 +50,7 @@ class CourseSegment {
         paceSlowCs: paceSlowCs,
         spmMin: spmMin,
         spmMax: spmMax,
+        resistanceLevel: resistanceLevel,
         zoneId: zoneId,
         zoneName: zoneName,
       );
@@ -56,17 +62,18 @@ class CourseSegment {
       other.paceSlowCs == paceSlowCs &&
       other.spmMin == spmMin &&
       other.spmMax == spmMax &&
+      other.resistanceLevel == resistanceLevel &&
       other.zoneName == zoneName;
 
   @override
   bool operator ==(Object other) => other is CourseSegment && other.zoneId == zoneId && sameAs(other);
 
   @override
-  int get hashCode => Object.hash(length, paceFastCs, paceSlowCs, spmMin, spmMax, zoneId, zoneName);
+  int get hashCode => Object.hash(length, paceFastCs, paceSlowCs, spmMin, spmMax, resistanceLevel, zoneId, zoneName);
 
   @override
   String toString() =>
-      'CourseSegment($length, pace $paceFastCs–$paceSlowCs, spm $spmMin–$spmMax, zone $zoneId $zoneName)';
+      'CourseSegment($length, pace $paceFastCs–$paceSlowCs, spm $spmMin–$spmMax, level $resistanceLevel, zone $zoneId $zoneName)';
 }
 
 /// What a course asks for: its axis, its length and its segments.

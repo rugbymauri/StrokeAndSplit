@@ -15,8 +15,8 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 3. Datenmodell
 
-- [ ] 3.1 Schema 9 nach D7: `zones.resistance_level`, `course_segments.resistance_level`, `from8To9`, `make schema`, `make codegen`; `Zone`, `CourseSegment` (`sameAs`, `withLength`, `segment`, `==`, `hashCode`) und Repositories mit dem Feld. Verifikation: generierter Migrationstest 8 → 9, Repository-Tests: Stufe gespeichert, geladen und beim Ändern der Zone in alle Strecken übernommen, alte Strecken ohne Stufe
-- [ ] 3.2 Kopie der Strecke in der Session und `.strokesplit` mit optionalem `resistanceLevel`. Verifikation: Export/Import-Test mit und ohne Stufe, bestehende Dateien ohne Feld lesbar
+- [x] 3.1 Schema 9 nach D7: `zones.resistance_level`, `course_segments.resistance_level`, `from8To9`, `make schema`, `make codegen`; `Zone`, `CourseSegment` (`sameAs`, `withLength`, `segment`, `==`, `hashCode`) und Repositories mit dem Feld. Verifikation: generierter Migrationstest 8 → 9, Repository-Tests: Stufe gespeichert, geladen und beim Ändern der Zone in alle Strecken übernommen, alte Strecken ohne Stufe
+- [x] 3.2 Kopie der Strecke in der Session und `.strokesplit` mit optionalem `resistanceLevel`. Verifikation: Export/Import-Test mit und ohne Stufe, bestehende Dateien ohne Feld lesbar
 
 ## 4. Logik
 

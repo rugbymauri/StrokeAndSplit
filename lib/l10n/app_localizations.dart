@@ -314,6 +314,12 @@ abstract class AppLocalizations {
   /// **'Die niedrigste Schlagzahl liegt über der höchsten.'**
   String get zoneErrorSpmReversed;
 
+  /// Zone editor: the resistance level of the zone is below 1
+  ///
+  /// In de, this message translates to:
+  /// **'Die Stufe muss mindestens 1 sein.'**
+  String get zoneErrorResistanceLevelTooLow;
+
   /// A name the user gave, in quotes, e.g. in a list of courses
   ///
   /// In de, this message translates to:

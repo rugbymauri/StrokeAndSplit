@@ -3996,6 +3996,17 @@ class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _resistanceLevelMeta = const VerificationMeta(
+    'resistanceLevel',
+  );
+  @override
+  late final GeneratedColumn<int> resistanceLevel = GeneratedColumn<int>(
+    'resistance_level',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _deletedAtMeta = const VerificationMeta(
     'deletedAt',
   );
@@ -4017,6 +4028,7 @@ class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
     paceSlowCs,
     spmMin,
     spmMax,
+    resistanceLevel,
     deletedAt,
   ];
   @override
@@ -4080,6 +4092,15 @@ class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
         spmMax.isAcceptableOrUnknown(data['spm_max']!, _spmMaxMeta),
       );
     }
+    if (data.containsKey('resistance_level')) {
+      context.handle(
+        _resistanceLevelMeta,
+        resistanceLevel.isAcceptableOrUnknown(
+          data['resistance_level']!,
+          _resistanceLevelMeta,
+        ),
+      );
+    }
     if (data.containsKey('deleted_at')) {
       context.handle(
         _deletedAtMeta,
@@ -4129,6 +4150,10 @@ class $ZonesTable extends Zones with TableInfo<$ZonesTable, ZoneRow> {
         DriftSqlType.int,
         data['${effectivePrefix}spm_max'],
       ),
+      resistanceLevel: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}resistance_level'],
+      ),
       deletedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}deleted_at'],
@@ -4157,6 +4182,10 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
   final int? spmMin;
   final int? spmMax;
 
+  /// Resistance level set while rowing the zone; null leaves the base level
+  /// (Change resistance-control, Design D7).
+  final int? resistanceLevel;
+
   /// Zones are only marked as deleted, as course versions keep their name.
   final DateTime? deletedAt;
   const ZoneRow({
@@ -4168,6 +4197,7 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     this.paceSlowCs,
     this.spmMin,
     this.spmMax,
+    this.resistanceLevel,
     this.deletedAt,
   });
   @override
@@ -4190,6 +4220,9 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     }
     if (!nullToAbsent || spmMax != null) {
       map['spm_max'] = Variable<int>(spmMax);
+    }
+    if (!nullToAbsent || resistanceLevel != null) {
+      map['resistance_level'] = Variable<int>(resistanceLevel);
     }
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
@@ -4215,6 +4248,9 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
       spmMax: spmMax == null && nullToAbsent
           ? const Value.absent()
           : Value(spmMax),
+      resistanceLevel: resistanceLevel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(resistanceLevel),
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
@@ -4237,6 +4273,7 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
       paceSlowCs: serializer.fromJson<int?>(json['paceSlowCs']),
       spmMin: serializer.fromJson<int?>(json['spmMin']),
       spmMax: serializer.fromJson<int?>(json['spmMax']),
+      resistanceLevel: serializer.fromJson<int?>(json['resistanceLevel']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
@@ -4254,6 +4291,7 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
       'paceSlowCs': serializer.toJson<int?>(paceSlowCs),
       'spmMin': serializer.toJson<int?>(spmMin),
       'spmMax': serializer.toJson<int?>(spmMax),
+      'resistanceLevel': serializer.toJson<int?>(resistanceLevel),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
@@ -4267,6 +4305,7 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     Value<int?> paceSlowCs = const Value.absent(),
     Value<int?> spmMin = const Value.absent(),
     Value<int?> spmMax = const Value.absent(),
+    Value<int?> resistanceLevel = const Value.absent(),
     Value<DateTime?> deletedAt = const Value.absent(),
   }) => ZoneRow(
     id: id ?? this.id,
@@ -4277,6 +4316,9 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     paceSlowCs: paceSlowCs.present ? paceSlowCs.value : this.paceSlowCs,
     spmMin: spmMin.present ? spmMin.value : this.spmMin,
     spmMax: spmMax.present ? spmMax.value : this.spmMax,
+    resistanceLevel: resistanceLevel.present
+        ? resistanceLevel.value
+        : this.resistanceLevel,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
   );
   ZoneRow copyWithCompanion(ZonesCompanion data) {
@@ -4293,6 +4335,9 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
           : this.paceSlowCs,
       spmMin: data.spmMin.present ? data.spmMin.value : this.spmMin,
       spmMax: data.spmMax.present ? data.spmMax.value : this.spmMax,
+      resistanceLevel: data.resistanceLevel.present
+          ? data.resistanceLevel.value
+          : this.resistanceLevel,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
@@ -4308,6 +4353,7 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
           ..write('paceSlowCs: $paceSlowCs, ')
           ..write('spmMin: $spmMin, ')
           ..write('spmMax: $spmMax, ')
+          ..write('resistanceLevel: $resistanceLevel, ')
           ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
@@ -4323,6 +4369,7 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
     paceSlowCs,
     spmMin,
     spmMax,
+    resistanceLevel,
     deletedAt,
   );
   @override
@@ -4337,6 +4384,7 @@ class ZoneRow extends DataClass implements Insertable<ZoneRow> {
           other.paceSlowCs == this.paceSlowCs &&
           other.spmMin == this.spmMin &&
           other.spmMax == this.spmMax &&
+          other.resistanceLevel == this.resistanceLevel &&
           other.deletedAt == this.deletedAt);
 }
 
@@ -4349,6 +4397,7 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
   final Value<int?> paceSlowCs;
   final Value<int?> spmMin;
   final Value<int?> spmMax;
+  final Value<int?> resistanceLevel;
   final Value<DateTime?> deletedAt;
   const ZonesCompanion({
     this.id = const Value.absent(),
@@ -4359,6 +4408,7 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     this.paceSlowCs = const Value.absent(),
     this.spmMin = const Value.absent(),
     this.spmMax = const Value.absent(),
+    this.resistanceLevel = const Value.absent(),
     this.deletedAt = const Value.absent(),
   });
   ZonesCompanion.insert({
@@ -4370,6 +4420,7 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     this.paceSlowCs = const Value.absent(),
     this.spmMin = const Value.absent(),
     this.spmMax = const Value.absent(),
+    this.resistanceLevel = const Value.absent(),
     this.deletedAt = const Value.absent(),
   }) : name = Value(name),
        axis = Value(axis),
@@ -4383,6 +4434,7 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     Expression<int>? paceSlowCs,
     Expression<int>? spmMin,
     Expression<int>? spmMax,
+    Expression<int>? resistanceLevel,
     Expression<DateTime>? deletedAt,
   }) {
     return RawValuesInsertable({
@@ -4394,6 +4446,7 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
       if (paceSlowCs != null) 'pace_slow_cs': paceSlowCs,
       if (spmMin != null) 'spm_min': spmMin,
       if (spmMax != null) 'spm_max': spmMax,
+      if (resistanceLevel != null) 'resistance_level': resistanceLevel,
       if (deletedAt != null) 'deleted_at': deletedAt,
     });
   }
@@ -4407,6 +4460,7 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     Value<int?>? paceSlowCs,
     Value<int?>? spmMin,
     Value<int?>? spmMax,
+    Value<int?>? resistanceLevel,
     Value<DateTime?>? deletedAt,
   }) {
     return ZonesCompanion(
@@ -4418,6 +4472,7 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
       paceSlowCs: paceSlowCs ?? this.paceSlowCs,
       spmMin: spmMin ?? this.spmMin,
       spmMax: spmMax ?? this.spmMax,
+      resistanceLevel: resistanceLevel ?? this.resistanceLevel,
       deletedAt: deletedAt ?? this.deletedAt,
     );
   }
@@ -4451,6 +4506,9 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
     if (spmMax.present) {
       map['spm_max'] = Variable<int>(spmMax.value);
     }
+    if (resistanceLevel.present) {
+      map['resistance_level'] = Variable<int>(resistanceLevel.value);
+    }
     if (deletedAt.present) {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
@@ -4468,6 +4526,7 @@ class ZonesCompanion extends UpdateCompanion<ZoneRow> {
           ..write('paceSlowCs: $paceSlowCs, ')
           ..write('spmMin: $spmMin, ')
           ..write('spmMax: $spmMax, ')
+          ..write('resistanceLevel: $resistanceLevel, ')
           ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
@@ -4554,6 +4613,17 @@ class $CourseSegmentsTable extends CourseSegments
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _resistanceLevelMeta = const VerificationMeta(
+    'resistanceLevel',
+  );
+  @override
+  late final GeneratedColumn<int> resistanceLevel = GeneratedColumn<int>(
+    'resistance_level',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _zoneIdMeta = const VerificationMeta('zoneId');
   @override
   late final GeneratedColumn<int> zoneId = GeneratedColumn<int>(
@@ -4586,6 +4656,7 @@ class $CourseSegmentsTable extends CourseSegments
     paceSlowCs,
     spmMin,
     spmMax,
+    resistanceLevel,
     zoneId,
     zoneName,
   ];
@@ -4655,6 +4726,15 @@ class $CourseSegmentsTable extends CourseSegments
         spmMax.isAcceptableOrUnknown(data['spm_max']!, _spmMaxMeta),
       );
     }
+    if (data.containsKey('resistance_level')) {
+      context.handle(
+        _resistanceLevelMeta,
+        resistanceLevel.isAcceptableOrUnknown(
+          data['resistance_level']!,
+          _resistanceLevelMeta,
+        ),
+      );
+    }
     if (data.containsKey('zone_id')) {
       context.handle(
         _zoneIdMeta,
@@ -4704,6 +4784,10 @@ class $CourseSegmentsTable extends CourseSegments
         DriftSqlType.int,
         data['${effectivePrefix}spm_max'],
       ),
+      resistanceLevel: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}resistance_level'],
+      ),
       zoneId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}zone_id'],
@@ -4733,6 +4817,9 @@ class CourseSegmentRow extends DataClass
   final int? spmMin;
   final int? spmMax;
 
+  /// Copy of the resistance level of the zone.
+  final int? resistanceLevel;
+
   /// The placed zone; null for a free gap and in versions from before zones
   /// that were already rowed.
   final int? zoneId;
@@ -4747,6 +4834,7 @@ class CourseSegmentRow extends DataClass
     this.paceSlowCs,
     this.spmMin,
     this.spmMax,
+    this.resistanceLevel,
     this.zoneId,
     this.zoneName,
   });
@@ -4767,6 +4855,9 @@ class CourseSegmentRow extends DataClass
     }
     if (!nullToAbsent || spmMax != null) {
       map['spm_max'] = Variable<int>(spmMax);
+    }
+    if (!nullToAbsent || resistanceLevel != null) {
+      map['resistance_level'] = Variable<int>(resistanceLevel);
     }
     if (!nullToAbsent || zoneId != null) {
       map['zone_id'] = Variable<int>(zoneId);
@@ -4794,6 +4885,9 @@ class CourseSegmentRow extends DataClass
       spmMax: spmMax == null && nullToAbsent
           ? const Value.absent()
           : Value(spmMax),
+      resistanceLevel: resistanceLevel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(resistanceLevel),
       zoneId: zoneId == null && nullToAbsent
           ? const Value.absent()
           : Value(zoneId),
@@ -4816,6 +4910,7 @@ class CourseSegmentRow extends DataClass
       paceSlowCs: serializer.fromJson<int?>(json['paceSlowCs']),
       spmMin: serializer.fromJson<int?>(json['spmMin']),
       spmMax: serializer.fromJson<int?>(json['spmMax']),
+      resistanceLevel: serializer.fromJson<int?>(json['resistanceLevel']),
       zoneId: serializer.fromJson<int?>(json['zoneId']),
       zoneName: serializer.fromJson<String?>(json['zoneName']),
     );
@@ -4831,6 +4926,7 @@ class CourseSegmentRow extends DataClass
       'paceSlowCs': serializer.toJson<int?>(paceSlowCs),
       'spmMin': serializer.toJson<int?>(spmMin),
       'spmMax': serializer.toJson<int?>(spmMax),
+      'resistanceLevel': serializer.toJson<int?>(resistanceLevel),
       'zoneId': serializer.toJson<int?>(zoneId),
       'zoneName': serializer.toJson<String?>(zoneName),
     };
@@ -4844,6 +4940,7 @@ class CourseSegmentRow extends DataClass
     Value<int?> paceSlowCs = const Value.absent(),
     Value<int?> spmMin = const Value.absent(),
     Value<int?> spmMax = const Value.absent(),
+    Value<int?> resistanceLevel = const Value.absent(),
     Value<int?> zoneId = const Value.absent(),
     Value<String?> zoneName = const Value.absent(),
   }) => CourseSegmentRow(
@@ -4854,6 +4951,9 @@ class CourseSegmentRow extends DataClass
     paceSlowCs: paceSlowCs.present ? paceSlowCs.value : this.paceSlowCs,
     spmMin: spmMin.present ? spmMin.value : this.spmMin,
     spmMax: spmMax.present ? spmMax.value : this.spmMax,
+    resistanceLevel: resistanceLevel.present
+        ? resistanceLevel.value
+        : this.resistanceLevel,
     zoneId: zoneId.present ? zoneId.value : this.zoneId,
     zoneName: zoneName.present ? zoneName.value : this.zoneName,
   );
@@ -4870,6 +4970,9 @@ class CourseSegmentRow extends DataClass
           : this.paceSlowCs,
       spmMin: data.spmMin.present ? data.spmMin.value : this.spmMin,
       spmMax: data.spmMax.present ? data.spmMax.value : this.spmMax,
+      resistanceLevel: data.resistanceLevel.present
+          ? data.resistanceLevel.value
+          : this.resistanceLevel,
       zoneId: data.zoneId.present ? data.zoneId.value : this.zoneId,
       zoneName: data.zoneName.present ? data.zoneName.value : this.zoneName,
     );
@@ -4885,6 +4988,7 @@ class CourseSegmentRow extends DataClass
           ..write('paceSlowCs: $paceSlowCs, ')
           ..write('spmMin: $spmMin, ')
           ..write('spmMax: $spmMax, ')
+          ..write('resistanceLevel: $resistanceLevel, ')
           ..write('zoneId: $zoneId, ')
           ..write('zoneName: $zoneName')
           ..write(')'))
@@ -4900,6 +5004,7 @@ class CourseSegmentRow extends DataClass
     paceSlowCs,
     spmMin,
     spmMax,
+    resistanceLevel,
     zoneId,
     zoneName,
   );
@@ -4914,6 +5019,7 @@ class CourseSegmentRow extends DataClass
           other.paceSlowCs == this.paceSlowCs &&
           other.spmMin == this.spmMin &&
           other.spmMax == this.spmMax &&
+          other.resistanceLevel == this.resistanceLevel &&
           other.zoneId == this.zoneId &&
           other.zoneName == this.zoneName);
 }
@@ -4926,6 +5032,7 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
   final Value<int?> paceSlowCs;
   final Value<int?> spmMin;
   final Value<int?> spmMax;
+  final Value<int?> resistanceLevel;
   final Value<int?> zoneId;
   final Value<String?> zoneName;
   final Value<int> rowid;
@@ -4937,6 +5044,7 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     this.paceSlowCs = const Value.absent(),
     this.spmMin = const Value.absent(),
     this.spmMax = const Value.absent(),
+    this.resistanceLevel = const Value.absent(),
     this.zoneId = const Value.absent(),
     this.zoneName = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -4949,6 +5057,7 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     this.paceSlowCs = const Value.absent(),
     this.spmMin = const Value.absent(),
     this.spmMax = const Value.absent(),
+    this.resistanceLevel = const Value.absent(),
     this.zoneId = const Value.absent(),
     this.zoneName = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -4963,6 +5072,7 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     Expression<int>? paceSlowCs,
     Expression<int>? spmMin,
     Expression<int>? spmMax,
+    Expression<int>? resistanceLevel,
     Expression<int>? zoneId,
     Expression<String>? zoneName,
     Expression<int>? rowid,
@@ -4975,6 +5085,7 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
       if (paceSlowCs != null) 'pace_slow_cs': paceSlowCs,
       if (spmMin != null) 'spm_min': spmMin,
       if (spmMax != null) 'spm_max': spmMax,
+      if (resistanceLevel != null) 'resistance_level': resistanceLevel,
       if (zoneId != null) 'zone_id': zoneId,
       if (zoneName != null) 'zone_name': zoneName,
       if (rowid != null) 'rowid': rowid,
@@ -4989,6 +5100,7 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     Value<int?>? paceSlowCs,
     Value<int?>? spmMin,
     Value<int?>? spmMax,
+    Value<int?>? resistanceLevel,
     Value<int?>? zoneId,
     Value<String?>? zoneName,
     Value<int>? rowid,
@@ -5001,6 +5113,7 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
       paceSlowCs: paceSlowCs ?? this.paceSlowCs,
       spmMin: spmMin ?? this.spmMin,
       spmMax: spmMax ?? this.spmMax,
+      resistanceLevel: resistanceLevel ?? this.resistanceLevel,
       zoneId: zoneId ?? this.zoneId,
       zoneName: zoneName ?? this.zoneName,
       rowid: rowid ?? this.rowid,
@@ -5031,6 +5144,9 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
     if (spmMax.present) {
       map['spm_max'] = Variable<int>(spmMax.value);
     }
+    if (resistanceLevel.present) {
+      map['resistance_level'] = Variable<int>(resistanceLevel.value);
+    }
     if (zoneId.present) {
       map['zone_id'] = Variable<int>(zoneId.value);
     }
@@ -5053,6 +5169,7 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
           ..write('paceSlowCs: $paceSlowCs, ')
           ..write('spmMin: $spmMin, ')
           ..write('spmMax: $spmMax, ')
+          ..write('resistanceLevel: $resistanceLevel, ')
           ..write('zoneId: $zoneId, ')
           ..write('zoneName: $zoneName, ')
           ..write('rowid: $rowid')
@@ -10838,6 +10955,7 @@ typedef $$ZonesTableCreateCompanionBuilder = ZonesCompanion Function({
   Value<int?> paceSlowCs,
   Value<int?> spmMin,
   Value<int?> spmMax,
+  Value<int?> resistanceLevel,
   Value<DateTime?> deletedAt,
 });
 typedef $$ZonesTableUpdateCompanionBuilder = ZonesCompanion Function({
@@ -10849,6 +10967,7 @@ typedef $$ZonesTableUpdateCompanionBuilder = ZonesCompanion Function({
   Value<int?> paceSlowCs,
   Value<int?> spmMin,
   Value<int?> spmMax,
+  Value<int?> resistanceLevel,
   Value<DateTime?> deletedAt,
 });
 
@@ -10921,6 +11040,11 @@ class $$ZonesTableFilterComposer extends Composer<_$AppDatabase, $ZonesTable> {
 
   ColumnFilters<int> get spmMax => $composableBuilder(
     column: $table.spmMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get resistanceLevel => $composableBuilder(
+    column: $table.resistanceLevel,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11004,6 +11128,11 @@ class $$ZonesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get resistanceLevel => $composableBuilder(
+    column: $table.resistanceLevel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
@@ -11046,6 +11175,11 @@ class $$ZonesTableAnnotationComposer
 
   GeneratedColumn<int> get spmMax =>
       $composableBuilder(column: $table.spmMax, builder: (column) => column);
+
+  GeneratedColumn<int> get resistanceLevel => $composableBuilder(
+    column: $table.resistanceLevel,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
@@ -11112,6 +11246,7 @@ class $$ZonesTableTableManager
                 Value<int?> paceSlowCs = const Value.absent(),
                 Value<int?> spmMin = const Value.absent(),
                 Value<int?> spmMax = const Value.absent(),
+                Value<int?> resistanceLevel = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
               }) => ZonesCompanion(
                 id: id,
@@ -11122,6 +11257,7 @@ class $$ZonesTableTableManager
                 paceSlowCs: paceSlowCs,
                 spmMin: spmMin,
                 spmMax: spmMax,
+                resistanceLevel: resistanceLevel,
                 deletedAt: deletedAt,
               ),
           createCompanionCallback:
@@ -11134,6 +11270,7 @@ class $$ZonesTableTableManager
                 Value<int?> paceSlowCs = const Value.absent(),
                 Value<int?> spmMin = const Value.absent(),
                 Value<int?> spmMax = const Value.absent(),
+                Value<int?> resistanceLevel = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
               }) => ZonesCompanion.insert(
                 id: id,
@@ -11144,6 +11281,7 @@ class $$ZonesTableTableManager
                 paceSlowCs: paceSlowCs,
                 spmMin: spmMin,
                 spmMax: spmMax,
+                resistanceLevel: resistanceLevel,
                 deletedAt: deletedAt,
               ),
           withReferenceMapper: (p0) => p0
@@ -11213,6 +11351,7 @@ typedef $$CourseSegmentsTableCreateCompanionBuilder =
       Value<int?> paceSlowCs,
       Value<int?> spmMin,
       Value<int?> spmMax,
+      Value<int?> resistanceLevel,
       Value<int?> zoneId,
       Value<String?> zoneName,
       Value<int> rowid,
@@ -11226,6 +11365,7 @@ typedef $$CourseSegmentsTableUpdateCompanionBuilder =
       Value<int?> paceSlowCs,
       Value<int?> spmMin,
       Value<int?> spmMax,
+      Value<int?> resistanceLevel,
       Value<int?> zoneId,
       Value<String?> zoneName,
       Value<int> rowid,
@@ -11312,6 +11452,11 @@ class $$CourseSegmentsTableFilterComposer
 
   ColumnFilters<int> get spmMax => $composableBuilder(
     column: $table.spmMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get resistanceLevel => $composableBuilder(
+    column: $table.resistanceLevel,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11406,6 +11551,11 @@ class $$CourseSegmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get resistanceLevel => $composableBuilder(
+    column: $table.resistanceLevel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get zoneName => $composableBuilder(
     column: $table.zoneName,
     builder: (column) => ColumnOrderings(column),
@@ -11488,6 +11638,11 @@ class $$CourseSegmentsTableAnnotationComposer
 
   GeneratedColumn<int> get spmMax =>
       $composableBuilder(column: $table.spmMax, builder: (column) => column);
+
+  GeneratedColumn<int> get resistanceLevel => $composableBuilder(
+    column: $table.resistanceLevel,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get zoneName =>
       $composableBuilder(column: $table.zoneName, builder: (column) => column);
@@ -11576,6 +11731,7 @@ class $$CourseSegmentsTableTableManager
                 Value<int?> paceSlowCs = const Value.absent(),
                 Value<int?> spmMin = const Value.absent(),
                 Value<int?> spmMax = const Value.absent(),
+                Value<int?> resistanceLevel = const Value.absent(),
                 Value<int?> zoneId = const Value.absent(),
                 Value<String?> zoneName = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -11587,6 +11743,7 @@ class $$CourseSegmentsTableTableManager
                 paceSlowCs: paceSlowCs,
                 spmMin: spmMin,
                 spmMax: spmMax,
+                resistanceLevel: resistanceLevel,
                 zoneId: zoneId,
                 zoneName: zoneName,
                 rowid: rowid,
@@ -11600,6 +11757,7 @@ class $$CourseSegmentsTableTableManager
                 Value<int?> paceSlowCs = const Value.absent(),
                 Value<int?> spmMin = const Value.absent(),
                 Value<int?> spmMax = const Value.absent(),
+                Value<int?> resistanceLevel = const Value.absent(),
                 Value<int?> zoneId = const Value.absent(),
                 Value<String?> zoneName = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -11611,6 +11769,7 @@ class $$CourseSegmentsTableTableManager
                 paceSlowCs: paceSlowCs,
                 spmMin: spmMin,
                 spmMax: spmMax,
+                resistanceLevel: resistanceLevel,
                 zoneId: zoneId,
                 zoneName: zoneName,
                 rowid: rowid,

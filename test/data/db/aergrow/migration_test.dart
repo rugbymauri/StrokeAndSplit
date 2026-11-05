@@ -18,6 +18,7 @@ import 'generated/schema_v4.dart' as v4;
 import 'generated/schema_v5.dart' as v5;
 import 'generated/schema_v6.dart' as v6;
 import 'generated/schema_v7.dart' as v7;
+import 'generated/schema_v8.dart' as v8;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -660,6 +661,41 @@ void main() {
 
       final session = (await db.select(db.sessions).get()).single;
       expect((session.distanceDm, session.healthExportedAt), (2500, null));
+      await db.close();
+    });
+  });
+
+  group('to version 9', () {
+    test('keeps zones and course segments of version 8 without resistance level', () async {
+      final schema = await verifier.schemaAt(8);
+      final old = v8.DatabaseAtV8(schema.newConnection());
+      final zone = await old.into(old.zones).insert(
+            v8.ZonesCompanion.insert(name: 'Sprint', axis: 'distance', length: 100, spmMin: const Value(30), spmMax: const Value(34)),
+          );
+      final course = await old.into(old.courses).insert(
+            v8.CoursesCompanion.insert(name: 'Kurz', axis: 'distance'),
+          );
+      final version = await old.into(old.courseVersions).insert(
+            v8.CourseVersionsCompanion.insert(courseId: course, version: 1, length: 100, createdAt: 0),
+          );
+      await old.into(old.courseSegments).insert(v8.CourseSegmentsCompanion.insert(
+            versionId: version,
+            position: 0,
+            length: 100,
+            spmMin: const Value(30),
+            spmMax: const Value(34),
+            zoneId: Value(zone),
+            zoneName: const Value('Sprint'),
+          ));
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 9);
+
+      final zoneRow = (await db.select(db.zones).get()).single;
+      final segment = (await db.select(db.courseSegments).get()).single;
+      expect((zoneRow.name, zoneRow.resistanceLevel), ('Sprint', null));
+      expect((segment.zoneName, segment.resistanceLevel), ('Sprint', null));
       await db.close();
     });
   });

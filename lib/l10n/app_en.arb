@@ -36,6 +36,7 @@
   "zoneErrorPaceReversed": "The fastest pace is slower than the slowest.",
   "zoneErrorSpmBoundMissing": "The stroke rate band is missing a bound.",
   "zoneErrorSpmReversed": "The lowest stroke rate is above the highest.",
+  "zoneErrorResistanceLevelTooLow": "The level must be at least 1.",
   "quotedName": "“{name}”",
   "placementLengthMissing": "The length is missing.",
   "placementZoneMissing": "A placed zone no longer exists.",

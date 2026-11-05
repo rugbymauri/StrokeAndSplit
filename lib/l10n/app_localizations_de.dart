@@ -141,6 +141,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die niedrigste Schlagzahl liegt über der höchsten.';
 
   @override
+  String get zoneErrorResistanceLevelTooLow =>
+      'Die Stufe muss mindestens 1 sein.';
+
+  @override
   String quotedName(String name) {
     return '„$name“';
   }

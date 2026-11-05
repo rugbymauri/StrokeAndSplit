@@ -450,6 +450,7 @@ class SessionRepository {
               'paceSlowCs': ?s.paceSlowCs,
               'spmMin': ?s.spmMin,
               'spmMax': ?s.spmMax,
+              'resistanceLevel': ?s.resistanceLevel,
               if (s.zoneName case final name?)
                 'zone': {
                   'name': name,
@@ -459,6 +460,7 @@ class SessionRepository {
                   'paceSlowCs': ?s.paceSlowCs,
                   'spmMin': ?s.spmMin,
                   'spmMax': ?s.spmMax,
+                  'resistanceLevel': ?s.resistanceLevel,
                 },
             },
         ],
@@ -475,6 +477,7 @@ class SessionRepository {
               paceSlowCs: s['paceSlowCs'] as int?,
               spmMin: s['spmMin'] as int?,
               spmMax: s['spmMax'] as int?,
+              resistanceLevel: s['resistanceLevel'] as int?,
               zoneName: (s['zone'] as Map<String, Object?>?)?['name'] as String?,
             ),
         ],
