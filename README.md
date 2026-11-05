@@ -196,6 +196,8 @@ Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwe
 
 Bei einem FTMS-Gerät liest der Spike die Fitness Machine Features (als Marker im Mitschnitt), schneidet Rower Data (`2ad1`), Machine Status (`2ada`) und die Antworten am Control Point (`2ad9`) mit und sendet wie die App Request Control und Start/Resume. Der Header trägt `"protocol": "ftms"`. Wer ein echtes FTMS-Rudergerät hat, liefert so direkt brauchbare Fixtures.
 
+Zum Widerstand zeigt der Spike im Protokoll, ob das Gerät seine Stufe meldet und ob sie sich setzen lässt (aus den Features), und den Stufenbereich (`2ad6`). Hat das Gerät einen Control Point, erscheint unter den Knöpfen der Bereich **Widerstand** mit der gemeldeten Stufe, **−**/**+** für die Wunschstufe und vier Knöpfe, die „Set Target Resistance Level“ (`04`) in den Kodierungen senden, die Geräte verwenden: `u8 ×10` (FTMS 1.0, Schritte von 0,1), `s16 ×10` (neuere FTMS-Versionen), `u8 Stufe` und `s16 Stufe` (die Stufe ohne Faktor). Die Antwort des Geräts („Erfolg“, „nicht unterstützt“, „ungültiger Wert“ …) und Meldungen des Machine Status stehen im Protokoll, jeder Versuch als Marker im Mitschnitt. **Request Control** fordert die Steuerung erneut an, falls das Gerät mit „Steuerung nicht erlaubt“ antwortet.
+
 ## Software-Rower
 
 Ohne echtes FTMS-Rudergerät lässt sich die FTMS-Anbindung mit einem Software-Rower testen. Er läuft auf dem Linux-PC, meldet sich als `Stroke & Split FTMS` mit dem Fitness Machine Service `0x1826` und spielt eine FTMS-Aufnahme zeitgetreu als Rower-Data-Notifications ab.
