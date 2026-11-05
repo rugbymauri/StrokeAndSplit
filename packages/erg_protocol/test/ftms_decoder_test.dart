@@ -18,13 +18,15 @@ class _Rower {
     return result;
   }
 
-  List<RowingEvent> record(int count, int distance, {double rate = 22, Duration? pace, int? heartRate}) =>
+  List<RowingEvent> record(int count, int distance,
+          {double rate = 22, Duration? pace, int? heartRate, int? resistanceLevel}) =>
       send(RowerData(
         strokeRate: rate,
         strokeCount: count,
         totalDistance: distance,
         pace: pace ?? _Rower.pace,
         heartRate: heartRate,
+        resistanceLevel: resistanceLevel,
       ));
 
   StatusTick get lastTick => events.whereType<StatusTick>().last;
@@ -104,6 +106,27 @@ void main() {
       expect(rower.lastTick.heartRate, isNull);
       rower.record(1, 4, heartRate: 140);
       expect(rower.lastTick.heartRate, 140);
+    });
+
+    test('reports the resistance level of the rower', () {
+      final rower = _Rower()..record(0, 0, resistanceLevel: 7);
+      expect(rower.lastTick.resistanceLevel, 7);
+      rower.record(1, 4, resistanceLevel: 9);
+      expect(rower.lastTick.resistanceLevel, 9);
+    });
+
+    test('keeps the resistance level in records without it', () {
+      final rower = _Rower()
+        ..record(0, 0, resistanceLevel: 7)
+        ..record(1, 4);
+      expect(rower.lastTick.resistanceLevel, 7);
+    });
+
+    test('has no resistance level on a rower that reports none or 0', () {
+      final rower = _Rower()..record(0, 0);
+      expect(rower.lastTick.resistanceLevel, isNull);
+      rower.record(1, 4, resistanceLevel: 0);
+      expect(rower.lastTick.resistanceLevel, isNull);
     });
 
     test('treats a stroke rate of 120 as missing', () {

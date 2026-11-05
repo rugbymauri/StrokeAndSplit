@@ -22,6 +22,7 @@ final class StatusTick extends RowingEvent {
     this.strokeRate,
     this.heartRate,
     this.calories,
+    this.resistanceLevel,
   });
 
   final double distanceMeters;
@@ -45,6 +46,9 @@ final class StatusTick extends RowingEvent {
   final int? heartRate;
   final int? calories;
 
+  /// The resistance level the rower reports, e.g. 7 of 15; null when it reports none, as the PM5.
+  final int? resistanceLevel;
+
   static const _keep = Object();
 
   /// A copy with another [heartRate]; pass null to mark it as missing.
@@ -59,12 +63,13 @@ final class StatusTick extends RowingEvent {
         strokeRate: strokeRate,
         heartRate: identical(heartRate, _keep) ? this.heartRate : heartRate as int?,
         calories: calories,
+        resistanceLevel: resistanceLevel,
       );
 
   @override
   String toString() => 'StatusTick(elapsed: $elapsed, distance: $distanceMeters, type: ${workoutType.name}, '
       'state: ${workoutState.name}, rowing: $isRowing, pace: $pace, watts: $watts, spm: $strokeRate, '
-      'hr: $heartRate, calories: $calories)';
+      'hr: $heartRate, calories: $calories, resistance: $resistanceLevel)';
 }
 
 /// Data of one completed stroke.

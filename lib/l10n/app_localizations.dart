@@ -565,6 +565,12 @@ abstract class AppLocalizations {
   /// **'Watt'**
   String get metricWatts;
 
+  /// Live display: resistance level the rower reports, small below the watts
+  ///
+  /// In de, this message translates to:
+  /// **'Stufe {level}'**
+  String metricResistanceLevel(int level);
+
   /// Live display: label of the stroke rate
   ///
   /// In de, this message translates to:

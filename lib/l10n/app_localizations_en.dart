@@ -311,6 +311,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricWatts => 'Watts';
 
   @override
+  String metricResistanceLevel(int level) {
+    return 'Level $level';
+  }
+
+  @override
   String get metricStrokeRate => 'Stroke rate';
 
   @override

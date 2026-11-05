@@ -48,6 +48,7 @@ Neue und geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.a
 - [x] 5.12 Ø Pace der Session beim Rudern einer Vorlage als erste Zeile der Legende in der Pace-Box (Design D3; Nutzer, 2026-10-19). Verifikation: Widget-Tests mit Wert und vor dem ersten Meter, Live-Tests ohne Überlauf in allen Grössen, Pace bleibt der grösste Text
 - [x] 5.13 10 s vor dem Beginn einer Zone blinken ihre Bänder gelb an Stelle des Zonenstatus unter der Pace und auf der Schlagzahl-Karte (Design D3; Nutzer, 2026-10-26). Verifikation: Unit-Tests der Vorschau (Distanz über die aktuelle Pace, Zeit, freier Abschnitt, gleiche Bänder, nächste Runde, letzte Runde), Widget-Tests des Blinkens und mit reduzierter Bewegung, Live-Tests ohne Überlauf in allen Grössen
 - [x] 5.14 Zonenstatus der Pace mit der Pace in ganzen Sekunden, wie sie angezeigt wird, damit „2:45“ in einem Band ab 2:45 auch bei 2:44,6 in der Zone ist (Design D3; Nutzer, 2026-10-26). Verifikation: Unit-Tests an beiden Grenzen
+- [x] 5.15 Widerstandsstufe eines FTMS-Rudergeräts klein unter den Watt, frei und mit Vorlage, ohne gemeldete Stufe nichts (Design D3; Nutzer, 2026-11-05). Verifikation: Unit-Tests des Decoders (Stufe, fehlend, 0), Widget-Tests mit und ohne Stufe, Live-Tests ohne Überlauf in allen Grössen
 
 ## 6. Abschluss
 

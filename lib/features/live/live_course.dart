@@ -289,6 +289,8 @@ class CourseLiveView extends StatelessWidget {
         value: formatWhole(tick?.watts),
         valueKey: const Key('metric-watts'),
         fontSize: fontSize,
+        footnote: formatResistanceLevel(l10n, tick?.resistanceLevel),
+        footnoteKey: const Key('metric-resistance'),
         compact: true,
       ),
       if (heartRate != null)

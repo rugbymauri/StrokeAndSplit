@@ -12,7 +12,8 @@ class FtmsEncoder {
       RawPacket(time: at, characteristicId: FtmsIds.rowerData, bytes: data.toBytes());
 
   /// One complete record with the fields a typical rower sends: stroke rate
-  /// and count, distance, pace, power, energy and the device's own time.
+  /// and count, distance, pace, power, energy and the device's own time, plus
+  /// the resistance level when [tick] has one.
   RawPacket encodeStatus(StatusTick tick, {required int strokeCount, required Duration at}) => encode(
         RowerData(
           strokeRate: (tick.strokeRate ?? 0).toDouble(),
@@ -24,6 +25,7 @@ class FtmsEncoder {
           energyPerHour: RowerData.energyNotAvailable,
           energyPerMinute: 0xFF,
           elapsedTime: tick.elapsed,
+          resistanceLevel: tick.resistanceLevel,
         ),
         at: at,
       );

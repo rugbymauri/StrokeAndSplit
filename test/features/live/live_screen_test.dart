@@ -59,7 +59,7 @@ List<StrokeForceCurve> _fixtureCurves() {
 /// The drive length of [curve] as the live display shows it in German.
 String _length(StrokeForceCurve curve) => '${(curve.driveLengthMeters! * 100).round()} cm';
 
-StatusTick _tick({int? heartRate, int? calories, Duration elapsed = _elapsed}) => StatusTick(
+StatusTick _tick({int? heartRate, int? calories, int? resistanceLevel, Duration elapsed = _elapsed}) => StatusTick(
       elapsed: elapsed,
       distanceMeters: 3021.7,
       workoutType: WorkoutType.justRowSplits,
@@ -70,6 +70,7 @@ StatusTick _tick({int? heartRate, int? calories, Duration elapsed = _elapsed}) =
       strokeRate: 24,
       heartRate: heartRate,
       calories: calories,
+      resistanceLevel: resistanceLevel,
     );
 
 class _Recording extends SessionRecorder {
@@ -227,6 +228,31 @@ void main() {
     expect(find.textContaining('Puls'), findsNothing);
   });
 
+  group('resistance level', () {
+    for (final template in [false, true]) {
+      testWidgets('shows the level of the rower below the watts${template ? ' on a template' : ''}', (tester) async {
+        final harness = _Harness();
+        await harness.pump(tester, recording: template ? _onCourse() : null);
+        await harness.emit(tester, _tick(resistanceLevel: 7));
+
+        final watts = tester.getRect(find.byKey(const Key('metric-watts')));
+        final level = tester.getRect(find.byKey(const Key('metric-resistance')));
+        expect(find.text('Stufe 7'), findsOneWidget);
+        expect(level.top, greaterThanOrEqualTo(watts.bottom));
+      });
+
+      testWidgets('shows none from a rower without levels${template ? ' on a template' : ''}', (tester) async {
+        final harness = _Harness();
+        await harness.pump(tester, recording: template ? _onCourse() : null);
+        await harness.emit(tester, _tick());
+
+        expect(find.byKey(const Key('metric-watts')), findsOneWidget);
+        expect(find.byKey(const Key('metric-resistance')), findsNothing);
+        expect(find.textContaining('Stufe'), findsNothing);
+      });
+    }
+  });
+
   group('RR interval', () {
     HeartBeatIntervals beats(List<int> intervalsMs) =>
         HeartBeatIntervals(elapsed: _elapsed, time: const Duration(seconds: 754), intervalsMs: intervalsMs);
@@ -356,7 +382,7 @@ void main() {
           },
         );
         expect(find.byType(SimulatorControls), simulator ? findsOneWidget : findsNothing);
-        await harness.emit(tester, _tick(heartRate: 151, calories: 1187));
+        await harness.emit(tester, _tick(heartRate: 151, calories: 1187, resistanceLevel: curves ? null : 15));
         await harness.emit(tester, HeartBeatIntervals(elapsed: _elapsed, time: Duration.zero, intervalsMs: [812]));
         if (curves) {
           for (final curve in _fixtureCurves().take(3)) {
@@ -371,7 +397,7 @@ void main() {
           // Room for a ghost moved out of the outer track (Change ghost, Design D5).
           final box = tester.getRect(find.byType(PaceBox));
           expect(box.top - tester.getRect(view).top, greaterThanOrEqualTo(ProgressFramePainter.overhang));
-          for (final key in const [
+          for (final key in [
             'pace-box-average',
             'pace-box-course',
             'pace-box-lap',
@@ -386,6 +412,7 @@ void main() {
             'metric-watts',
             'metric-hr',
             'metric-rr',
+            if (!curves) 'metric-resistance',
           ]) {
             final rect = tester.getRect(find.byKey(Key(key)));
             expect(rect.bottom, lessThanOrEqualTo(size.height), reason: key);
