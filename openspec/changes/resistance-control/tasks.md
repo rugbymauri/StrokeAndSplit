@@ -30,5 +30,5 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 6. Dokumentation und Gerätetest
 
-- [ ] 6.1 README (Abschnitt FTMS: Stufe setzen, am Woodrower getestet, andere Geräte nach Spezifikation), Implementierungsplan nachführen. Verifikation: Durchsicht
+- [x] 6.1 README (Abschnitt FTMS: Stufe setzen, am Woodrower getestet, andere Geräte nach Spezifikation), Implementierungsplan nachführen. Verifikation: Durchsicht
 - [ ] 6.2 (Nutzer, am Woodrower) Gerätetest: frei mit −/+ verstellen, Vorlage mit Zonen auf verschiedenen Stufen rudern, mitten in einer Zone am Gerät drehen, eine Pause ohne Drehen machen und prüfen, ob der Woodrower die Stufe hält, Verbindung kurz trennen. Verifikation: Stufe am Display des Geräts folgt der App wie in den Specs; Ergebnis der Pause in design.md nachgetragen
