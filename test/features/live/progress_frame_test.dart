@@ -74,6 +74,34 @@ void main() {
   }
 
   testWidgets(
+    'paints half of a time limit on the course track without notches',
+    (tester) async {
+      final model = _filled(0.46);
+      await _pump(
+        tester,
+        ProgressFrame(
+          model: ProgressFrameModel(
+            course: const FrameTrack(share: 0.5, boundaries: []),
+            lap: model.lap,
+            segment: model.segment,
+            courseDone: null,
+            courseLength: null,
+            lapRemaining: model.lapRemaining,
+            segmentRemaining: model.segmentRemaining,
+            timeRemaining: const Duration(minutes: 15),
+          ),
+          pace: BandStatus.inBand,
+        ),
+      );
+
+      await expectLater(
+        find.byKey(_frame),
+        matchesGoldenFile('goldens/progress_frame_time_limit.png'),
+      );
+    },
+  );
+
+  testWidgets(
     'paints the ghosts beside the boats and the pace out of the zone',
     (tester) async {
       await _pump(

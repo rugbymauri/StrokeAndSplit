@@ -144,6 +144,49 @@ void main() {
     expect(frame.segmentRemaining, closeTo(100, 1e-9));
   });
 
+  group('with a time limit', () {
+    test('fills the outer track by the rowing time, without notches', () {
+      // In lap 3 of an open number of laps, after 15 of 30 minutes.
+      final frame = ProgressFrameModel.of(
+        _rowed(_seerunde, 2460),
+        _seerunde,
+        rowed: const Duration(minutes: 15),
+        limit: const Duration(minutes: 30),
+      );
+
+      expect(frame.course!.share, 0.5);
+      expect(frame.course!.boundaries, isEmpty);
+      expect(frame.course!.zones, isEmpty);
+      expect(frame.timeRemaining, const Duration(minutes: 15));
+      expect((frame.courseDone, frame.courseLength), (null, null));
+      expect(frame.lap.share, closeTo(0.46, 0.005));
+      expect(frame.lapRemaining, closeTo(540, 0.001));
+    });
+
+    test('is full and has no time left once the limit is reached', () {
+      final frame = ProgressFrameModel.of(
+        _timed(_intervals, 30),
+        _intervals,
+        rowed: const Duration(minutes: 30, milliseconds: 600),
+        limit: const Duration(minutes: 30),
+      );
+
+      expect(frame.course!.share, 1);
+      expect(frame.timeRemaining, Duration.zero);
+    });
+
+    test('leaves the outer track to the laps without a limit', () {
+      final frame = ProgressFrameModel.of(
+        _rowed(_seerunde, 1460, laps: 3),
+        _seerunde,
+        rowed: const Duration(minutes: 6),
+      );
+
+      expect(frame.course!.share, closeTo(0.49, 0.005));
+      expect(frame.timeRemaining, isNull);
+    });
+  });
+
   test('starts empty', () {
     final frame = ProgressFrameModel.of(
       _rowed(_seerunde, 0, laps: 3),

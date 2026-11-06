@@ -31,6 +31,8 @@ class PaceBox extends StatelessWidget {
     this.ghost,
     this.ghostGap,
     this.upcoming,
+    this.rowed = Duration.zero,
+    this.limit,
   });
 
   final LapProgress progress;
@@ -49,6 +51,12 @@ class PaceBox extends StatelessWidget {
 
   /// The zone that starts in a few seconds; its pace band blinks in place of the zone status.
   final CourseSegment? upcoming;
+
+  /// The rowing time without pauses, measured against [limit].
+  final Duration rowed;
+
+  /// The rowing time after which the session ends; null without one (course-rowing-free, Design D4).
+  final Duration? limit;
 
   /// Room for the zone status, kept free without one so the pace stays put.
   static const statusHeight = 32.0;
@@ -77,7 +85,12 @@ class PaceBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final model = ProgressFrameModel.of(progress, course);
+    final model = ProgressFrameModel.of(
+      progress,
+      course,
+      rowed: rowed,
+      limit: limit,
+    );
     final segment = progress.segment;
     final hint = ZoneHint.pace(l10n, progress.pace);
     // On a box tinted in the zone colour like the stroke rate card, the label and the pill follow it.
@@ -168,7 +181,13 @@ class PaceBox extends StatelessWidget {
                     key: const Key('pace-box-course'),
                     marker: const _Dot(AppColors.text),
                     label: l10n.paceBoxTotal,
-                    value: _done(model.courseDone!, model.courseLength!),
+                    value: switch (model.timeRemaining) {
+                      // Rounded up like the rest of a lap, so it reads 0:00 only at the end.
+                      final left? => l10n.courseRest(
+                        _amount(left.inMilliseconds / 1000, CourseAxis.time),
+                      ),
+                      null => _done(model.courseDone!, model.courseLength!),
+                    },
                   ),
                 _LegendLine(
                   key: const Key('pace-box-lap'),
@@ -240,7 +259,8 @@ class PaceBox extends StatelessWidget {
       : null;
 
   /// What is left, rounded up: metres with grouped thousands, e.g. `1 460 m`, or a time on a time course.
-  String _amount(double left) => course.axis == CourseAxis.distance
+  String _amount(double left, [CourseAxis? axis]) =>
+      (axis ?? course.axis) == CourseAxis.distance
       ? '${formatGrouped(left.ceil())} m'
       : formatElapsed(Duration(seconds: left.ceil()));
 

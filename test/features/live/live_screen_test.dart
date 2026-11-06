@@ -7,6 +7,7 @@ import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/courses/lap_tracker.dart';
 import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
@@ -138,6 +139,7 @@ ActiveRecording _onCourse({
   BandStatus strokeRate = BandStatus.inBand,
   CourseSegment next = const CourseSegment(length: 200),
   double remaining = 280,
+  Duration? limit,
 }) {
   final course = CourseDefinition(
     axis: CourseAxis.distance,
@@ -154,21 +156,33 @@ ActiveRecording _onCourse({
       distanceMeters: 1520,
       elapsed: Duration(minutes: 6, seconds: 20),
     ),
-    plan: SessionTemplate(
-      id: 1,
-      name: 'Seerunde x3',
-      laps: 3,
-      course: Course(
-        id: 1,
-        name: 'Seerunde',
-        versionId: 1,
-        version: 1,
-        definition: course,
-      ),
-    ).toPlan(),
+    plan: limit == null
+        ? SessionTemplate(
+            id: 1,
+            name: 'Seerunde x3',
+            laps: 3,
+            course: Course(
+              id: 1,
+              name: 'Seerunde',
+              versionId: 1,
+              version: 1,
+              definition: course,
+            ),
+          ).toPlan()
+        // Rowed on the course for a total time, without a template (course-rowing-free).
+        : SessionPlan(
+            course: Course(
+              id: 1,
+              name: 'Seerunde',
+              versionId: 1,
+              version: 1,
+              definition: course,
+            ),
+            length: TimeLimit(limit),
+          ),
     lap: LapProgress(
-      lap: 2,
-      plannedLaps: 3,
+      lap: limit == null ? 2 : 3,
+      plannedLaps: limit == null ? 3 : null,
       segmentIndex: 1,
       segment: course.segments[1],
       segmentStart: 200,
@@ -1502,6 +1516,42 @@ void main() {
         );
       },
     );
+
+    for (final size in const [Size(390, 844), Size(844, 390)]) {
+      testWidgets(
+        'shows the rowing time left of a time limit at ${size.width.toInt()} px wide',
+        (tester) async {
+          final harness = _Harness();
+          await harness.pump(
+            tester,
+            size: size,
+            recording: _onCourse(limit: const Duration(minutes: 30)),
+          );
+          await harness.emit(tester, _tick(heartRate: 151, calories: 1187));
+
+          // 30 minutes after 6:20 of rowing time; overflows would fail the test.
+          expect(
+            find.descendant(
+              of: find.byKey(const Key('pace-box-course')),
+              matching: find.text('noch 23:40'),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: find.byKey(const Key('pace-box-lap')),
+              matching: find.text('Runde 3'),
+            ),
+            findsOneWidget,
+          );
+          _expectLargestPace(
+            tester,
+            find.byKey(ValueKey(LiveLayout.of(size))),
+            const Key('pace-box-pace'),
+          );
+        },
+      );
+    }
 
     testWidgets(
       'fits time and distance of the session into the side column in landscape',

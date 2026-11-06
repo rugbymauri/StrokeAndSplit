@@ -23,6 +23,8 @@ class FrameTrack {
 /// What the progress frame around the pace shows (ui-design, Design D3):
 /// the course over all laps, the lap and the current part of the course,
 /// with what is left of each in the unit of the course, metres or seconds.
+/// Rowed for a total time, the outer track is that time instead
+/// (course-rowing-free, Design D4).
 @immutable
 class ProgressFrameModel {
   const ProgressFrameModel({
@@ -33,13 +35,17 @@ class ProgressFrameModel {
     required this.courseLength,
     required this.lapRemaining,
     required this.segmentRemaining,
+    this.timeRemaining,
   });
 
-  /// From the state of the lap tracker on [definition].
+  /// From the state of the lap tracker on [definition]; with a [limit] the
+  /// outer track is the [rowed] time without pauses of that limit.
   factory ProgressFrameModel.of(
     LapProgress progress,
-    CourseDefinition definition,
-  ) {
+    CourseDefinition definition, {
+    Duration rowed = Duration.zero,
+    Duration? limit,
+  }) {
     final length = definition.length;
     final inLap = (progress.segmentEnd - progress.remaining)
         .clamp(0, length)
@@ -61,6 +67,23 @@ class ProgressFrameModel {
           : 1,
       boundaries: const [],
     );
+    if (limit != null) {
+      final left = limit - rowed;
+      return ProgressFrameModel(
+        // The number of laps is open, so the track has no notches.
+        course: FrameTrack(
+          share: _share(rowed.inMilliseconds.toDouble(), limit.inMilliseconds),
+          boundaries: const [],
+        ),
+        lap: lap,
+        segment: segment,
+        courseDone: null,
+        courseLength: null,
+        lapRemaining: length - inLap,
+        segmentRemaining: progress.remaining,
+        timeRemaining: left.isNegative ? Duration.zero : left,
+      );
+    }
     final laps = progress.plannedLaps;
     // With an open number of laps the whole length is unknown.
     if (laps == null) {
@@ -92,17 +115,20 @@ class ProgressFrameModel {
     );
   }
 
-  /// The outer track; null with an open number of laps.
+  /// The outer track; null with an open number of laps and no time limit.
   final FrameTrack? course;
   final FrameTrack lap;
   final FrameTrack segment;
 
-  /// Rowed and planned over all laps; null with an open number of laps.
+  /// Rowed and planned over all laps; null with an open number of laps or a time limit.
   final double? courseDone;
   final int? courseLength;
 
   final double lapRemaining;
   final double segmentRemaining;
+
+  /// The rowing time left up to the time limit; null without one.
+  final Duration? timeRemaining;
 
   static double _share(double part, int whole) =>
       whole > 0 ? (part / whole).clamp(0, 1).toDouble() : 0;
