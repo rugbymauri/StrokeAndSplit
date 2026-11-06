@@ -13,7 +13,7 @@ Setzt `template-screen` in `main` voraus (Ghost-Wahl in der Aufnahme, Ghost-Zeil
 
 ## 3. Ende nach Dauer
 
-- [ ] 3.1 `SessionAccumulator.plannedDuration`, `planFinished`, Recorder beendet über `_finishAfterPlan` (D2). Verifikation: Unit-Tests: Ende beim ersten Datenpunkt mit Ruderzeit ≥ Dauer; 2 min Pause verschieben das Ende um 2 min; Ende mitten in der Runde speichert sie unvollständig; Zeitstrecke 4 min × 30 min ergibt 7 vollständige Runden und eine unvollständige; mit `Laps` und `OpenLength` endet alles wie bisher
+- [x] 3.1 `SessionAccumulator.plannedDuration`, `planFinished`, Recorder beendet über `_finishAfterPlan` (D2). Verifikation: Unit-Tests: Ende beim ersten Datenpunkt mit Ruderzeit ≥ Dauer; 2 min Pause verschieben das Ende um 2 min; Ende mitten in der Runde speichert sie unvollständig; Zeitstrecke 4 min × 30 min ergibt 7 vollständige Runden und eine unvollständige; mit `Laps` und `OpenLength` endet alles wie bisher
 - [ ] 3.2 Ranglisten mit Sessions ohne Vorlage. Verifikation: Ranking-Test: vollständige Runden und Zonenfahrten einer Session ohne Vorlage stehen in den Ranglisten von Strecke und Zone, die unvollständige letzte Runde nicht
 
 ## 4. Live-Display

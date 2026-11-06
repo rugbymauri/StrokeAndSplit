@@ -189,6 +189,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
       protocol: source.protocol,
       course: plan?.course.definition,
       plannedLaps: plan?.plannedLaps,
+      plannedDuration: plan?.plannedDuration,
     );
     ActiveRecording current() => ActiveRecording(
       sessionId: id,
@@ -207,7 +208,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
           accumulator.progress != state?.progress ||
           accumulator.paused != state?.paused;
       if (plan != null || changed) state = current();
-      if (accumulator.lapsFinished) unawaited(_finishAfterLastLap());
+      if (accumulator.planFinished) unawaited(_finishAfterPlan());
     }
 
     state = current();
@@ -226,7 +227,9 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
     _packets ??= source.packets.listen((packet) => _onPacket?.call(packet));
   }
 
-  Future<void> _finishAfterLastLap() async {
+  /// Ends the session after its last lap or its time limit; an unfinished lap
+  /// stays incomplete.
+  Future<void> _finishAfterPlan() async {
     final id = await stop();
     if (id != null) ref.read(finishedSessionProvider.notifier).report(id);
   }

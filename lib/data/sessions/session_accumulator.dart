@@ -49,6 +49,7 @@ class SessionAccumulator {
     this.protocol = ErgProtocol.pm5,
     CourseDefinition? course,
     int? plannedLaps,
+    this.plannedDuration,
   }) : _tracker = course == null
            ? null
            : LapTracker(course, plannedLaps: plannedLaps),
@@ -61,6 +62,10 @@ class SessionAccumulator {
 
   /// Protocol of the raw notifications; picks the decoder.
   final ErgProtocol protocol;
+
+  /// The rowing time without pauses after which the session ends by itself
+  /// (Change course-rowing-free, Design D2); null without a time limit.
+  final Duration? plannedDuration;
   final LapTracker? _tracker;
   final ErgDecoder _decoder;
   final _pause = AutoPause();
@@ -93,6 +98,14 @@ class SessionAccumulator {
 
   /// Whether the last of a fixed number of laps is done.
   bool get lapsFinished => _tracker?.finished ?? false;
+
+  /// Whether the session has reached its end: the last lap, or the first
+  /// data point whose rowing time reaches [plannedDuration].
+  bool get planFinished {
+    final duration = plannedDuration;
+    return lapsFinished ||
+        (duration != null && _pause.activeMs >= duration.inMilliseconds);
+  }
 
   void add(RawPacket packet) {
     final first = _firstPacketTime ??= packet.time;
