@@ -28,7 +28,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
 | 13 | `resistance-control` | 12/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
 | 14 | `template-screen` | 0/9 | geplant, in `main` | nach `ui-design`, `ghost` und `statistics` archivieren |
-| 15 | `course-rowing-free` | – | Proposal | Design, Specs, Tasks; baut auf `template-screen` auf |
+| 15 | `course-rowing-free` | 0/11 | geplant | setzt `template-screen` voraus; erst nach `ghost` und `template-screen` archivieren |
 
 ## Warum diese Reihenfolge
 
@@ -312,7 +312,8 @@ Wunsch des Nutzers (2026-11-06): Ein Tipp auf eine Vorlage öffnet einen eigenen
 Wunsch des Nutzers (2026-11-06): eine Strecke wählen, auf einem weiteren Screen Runden, Gesamtdauer oder offen wählen und starten, ohne dass eine Vorlage gespeichert wird.
 
 - [x] Proposal (2026-11-06). Entschieden (Nutzer): Einstieg über „Rudern“ in der Detailansicht der Strecke; drei sich ausschliessende Optionen, sichtbar nur die Eingabe der gewählten; Dauer nur hier, nicht in Vorlagen; Ende nach effektiver Ruderzeit ohne Pausen, auch mitten in der Runde; Dauer in Schritten von 1 min; geplante Dauer wird gespeichert (Schema 10); Ghost-Schalter auch hier; „Nochmal“ entfällt (in `template-screen`). Vorgaben ohne Rückmeldung: Dauer 1–180 min, Start 30 min; angebrochene Runde zählt nicht; Titel „Strecke · 30 min“.
-- [ ] Offen: Design, Specs und Tasks (`/opsx:continue course-rowing-free`). Zu klären im Design: Zeitstrecken messen Runden nach Wanduhr einschliesslich Pausen (`course-rowing`), die Dauer zählt nur die Ruderzeit.
+- [x] Design, Specs und Tasks (2026-11-06, 11 Tasks). Geklärt: Der `LapTracker` misst Zeitstrecken schon mit der Ruderzeit ohne Pausen (`auto-pause`), Runden und Dauer zählen also gleich. Entscheide im Design: `SessionPlan` statt `SessionTemplate` im Recorder (D1), Ende im Akkumulator beim ersten Datenpunkt über der Dauer (D2), `durationMs` im bestehenden Block `template` des Exports (D3), äusserer Ring nach Zeit ohne Rundengrenzen (D4). Vorgaben ohne Rückmeldung: Start-Option „Runden“ mit 3 Runden.
+- [ ] Umsetzung (`/opsx:apply course-rowing-free`), erst nach `template-screen`.
 
 ## Offene Entscheide
 

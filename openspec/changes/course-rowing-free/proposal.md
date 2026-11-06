@@ -22,14 +22,13 @@ Nicht Teil dieses Changes:
 
 ### New Capabilities
 
-- `course-session-setup`: Eine Strecke direkt rudern: Einstieg aus der Detailansicht, Start-Screen mit Runden, Dauer oder offen, Grenzen und Vorgaben der Eingaben, Start ohne gespeicherte Vorlage.
+- `course-session-setup`: Eine Strecke direkt rudern: Einstieg über „Rudern“ in der Detailansicht der Strecke, Start-Screen mit Runden, Dauer oder offen, Grenzen und Vorgaben der Eingaben, Start ohne gespeicherte Vorlage.
 
 ### Modified Capabilities
 
-- `course-rowing`: Eine Strecke lässt sich auch ohne Vorlage rudern; eine Session kann nach einer Gesamtdauer aus effektiver Ruderzeit enden, auch mitten in einer Runde; der äussere Ring zeigt dann die Zeit. Die Zusammenfassung zeigt bei einer Session ohne Vorlage die Strecke und die geplante Dauer.
-- `session-recording`: Eine Session speichert die geplante Dauer und exportiert und importiert sie.
+- `course-rowing`: Eine Strecke lässt sich auch ohne Vorlage rudern, ihre Runden zählen in den Ranglisten von Strecke und Zone; eine Session kann nach einer Gesamtdauer aus effektiver Ruderzeit enden, auch mitten in einer Runde; der äussere Ring zeigt dann die Zeit. Die Zusammenfassung zeigt bei einer Session ohne Vorlage die Strecke und die geplante Länge.
+- `session-recording`: Eine Session speichert die geplante Dauer und exportiert und importiert sie; die Session-Liste nennt bei einer Session ohne Vorlage Strecke und geplante Länge.
 - `ghost`: Der Ghost-Schalter steht auch auf dem Start-Screen einer Strecke; ohne Vorlage gibt es keinen Ghost der Vorlage. Die Capability entsteht erst mit dem Archivieren von Change `ghost`.
-- `statistics`: Die Detailansicht einer Strecke bietet „Rudern“ an. Die Capability entsteht erst mit dem Archivieren von Change `statistics`.
 
 ## Impact
 
@@ -41,5 +40,5 @@ Nicht Teil dieses Changes:
   - `lib/features/live/`: äusserer Ring und Titel ohne Vorlage. `lib/features/sessions/`: Titel „Strecke · Dauer“.
   - `lib/l10n/*.arb`: Texte für den Start-Screen.
 - **Daten**: Schema 9 → 10. `.strokesplit` bekommt ein optionales Feld für die geplante Dauer.
-- **Andere Changes**: baut auf `template-screen` auf (Ghost-Wahl in der Aufnahme, Aufbau des Start-Screens). Erst nach `ghost`, `statistics` und `template-screen` archivieren.
+- **Andere Changes**: baut auf `template-screen` auf (Ghost-Wahl in der Aufnahme, Aufbau des Start-Screens). Erst nach `ghost` und `template-screen` archivieren, weil das `ghost`-Delta auf dessen Capability zielt und der Ghost-Schalter aus `template-screen` stammt.
 - **Doku**: README-Abschnitte zu Strecken und zum Rudern.
