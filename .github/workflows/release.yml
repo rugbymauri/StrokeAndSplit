@@ -1,0 +1,137 @@
+# GitHub release with a debug-signed universal APK and a Linux AppImage for version tags
+# vX.Y.Z on main. README, section "CI und Releases".
+name: Release
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+
+env:
+  # Binary and file name, the same as in linux/CMakeLists.txt and tool/build_appimage.sh.
+  APP_NAME: strokesplit
+  APPLICATION_ID: ch.strokesplit.strokesplit
+
+jobs:
+  verify-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag is on main
+        run: |
+          git fetch --quiet origin "+refs/heads/main:refs/remotes/origin/main"
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Tag $GITHUB_REF_NAME points to ${GITHUB_SHA::8}, which is not on main. Releases are only made from main."
+            exit 1
+          fi
+      - name: Release does not exist yet
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          status=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/releases/tags/$GITHUB_REF_NAME")
+          case "$status" in
+            404) ;;
+            200) echo "::error::Release $GITHUB_REF_NAME already exists. Published releases are not overwritten, tag a new version instead."; exit 1 ;;
+            *) echo "::error::Could not check whether release $GITHUB_REF_NAME exists (HTTP $status)."; exit 1 ;;
+          esac
+      - id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+  check:
+    uses: ./.github/workflows/check.yml
+
+  build-apk:
+    needs: verify-tag
+    runs-on: ubuntu-latest
+    container: ghcr.io/cirruslabs/flutter:3.44.0
+    env:
+      VERSION: ${{ needs.verify-tag.outputs.version }}
+      ANDROID_DEBUG_KEYSTORE: ${{ secrets.ANDROID_DEBUG_KEYSTORE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-flutter
+      - run: echo "GRADLE_USER_HOME=$PWD/.gradle" >> "$GITHUB_ENV"
+      - uses: actions/cache@v4
+        with:
+          path: .gradle
+          key: gradle-${{ hashFiles('android/**/*.gradle.kts', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-
+      - name: Install the shared debug keystore
+        run: |
+          if [ -z "${ANDROID_DEBUG_KEYSTORE:-}" ]; then
+            echo "::error::Secret ANDROID_DEBUG_KEYSTORE (Base64-encoded debug keystore) is missing. Without it the APK would get a random key and could not update earlier releases. See README, section \"CI und Releases\"."
+            exit 1
+          fi
+          mkdir -p ~/.android
+          # Secrets are text, so the keystore is kept Base64-encoded.
+          printf '%s' "$ANDROID_DEBUG_KEYSTORE" | base64 --decode > ~/.android/debug.keystore
+          keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey > /dev/null
+      - run: make deps
+      - run: make apk BUILD_NAME="$VERSION" BUILD_NUMBER="$GITHUB_RUN_NUMBER"
+      - run: |
+          mkdir -p build/dist
+          cp build/app/outputs/flutter-apk/app-release.apk "build/dist/$APP_NAME-$VERSION-android.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: build/dist/
+          retention-days: 1
+
+  build-appimage:
+    needs: verify-tag
+    runs-on: ubuntu-latest
+    container: ghcr.io/cirruslabs/flutter:3.44.0
+    env:
+      VERSION: ${{ needs.verify-tag.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-flutter
+      - name: Install the Linux build tools
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends clang cmake ninja-build pkg-config libgtk-3-dev file desktop-file-utils > /dev/null
+      - run: make deps
+      - run: make build-linux BUILD_NAME="$VERSION" BUILD_NUMBER="$GITHUB_RUN_NUMBER"
+      - run: make appimage BUILD_NAME="$VERSION"
+      - run: |
+          mkdir -p build/dist
+          cp "build/appimage/$APP_NAME-$VERSION-x86_64.AppImage" build/dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: appimage
+          path: build/dist/
+          retention-days: 1
+
+  release:
+    needs: [verify-tag, check, build-apk, build-appimage]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.verify-tag.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create release ${{ github.ref_name }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "$GITHUB_REF_NAME" \
+            --notes "Stroke & Split $VERSION, built from commit $GITHUB_SHA.
+
+          - Android: universal APK. Signed with the shared debug key of the pipeline, not suitable for the Play Store. Allow installing from unknown sources.
+          - Linux: AppImage for x86_64, needs GTK 3. Make it executable with \`chmod +x\` and start it." \
+            "dist/$APP_NAME-$VERSION-android.apk" "dist/$APP_NAME-$VERSION-x86_64.AppImage"

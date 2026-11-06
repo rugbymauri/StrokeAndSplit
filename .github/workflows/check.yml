@@ -1,0 +1,19 @@
+# `make deps check` (analysis and tests of the app and erg_protocol), called by ci.yml and
+# release.yml.
+name: Check
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container: ghcr.io/cirruslabs/flutter:3.44.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-flutter
+      - run: make deps
+      - run: make check

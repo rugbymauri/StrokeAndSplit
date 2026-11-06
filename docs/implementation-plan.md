@@ -23,7 +23,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 6 | `statistics` | 12/13 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 7 | `ghost` | 13/14 | in Umsetzung | – |
 | 8 | `rename-stroke-and-split` | 10/11 | zuletzt | Domain- und Markenrecherche (Nutzer) |
-| 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt | Nutzer: Keystore-Variable und geschützter Tag `v*` (2.2), Probe-Release `v0.1.0` |
+| 9 | `gitlab-pipeline` | 6/17 | umgesetzt, in `main` gemergt, nach GitHub Actions umgezogen | Nutzer: Secret `ANDROID_DEBUG_KEYSTORE` in GitHub (2.2), Probe-Release `v0.1.0` |
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
 | 13 | `resistance-control` | 12/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
@@ -250,6 +250,7 @@ Vor dem Start:
 - [x] Task 1.1: Einen Image-Tag `3.47.7` gibt es nicht (Liste endet bei `3.44.0` mit Dart 3.12). Die Jobs nutzen `3.44.0` für JDK und Android-SDK und stellen Flutter im `before_script` auf 3.47.7 um (Design D1).
 - [ ] Task 2.2 (Nutzer, in GitLab): Debug-Keystore **Base64-kodiert** als protected File-Variable `ANDROID_DEBUG_KEYSTORE` (GitLab speichert Variablen als Text, Design D5), `v*` als geschützten Tag einrichten. Anleitung im README unter „Einrichtung in GitLab“.
 - [x] Umgesetzt (2026-10-16): `check` in jeder Pipeline, `build-apk`, `build-appimage`, `verify-tag`, `upload`, `release` für Tags `vX.Y.Z`; `make apk`, `make appimage`; Branch-Pipeline 312096 grün. Workflow-Regel für `web`/`api` ergänzt, damit Pipelines von Hand startbar sind. Andere Tags lassen nur `check` laufen.
+- [x] Umzug nach GitHub (2026-11-06): Pipeline als GitHub Actions nachgebaut (`.github/workflows/ci.yml`, `check.yml`, `release.yml`), `.gitlab-ci.yml` entfernt. Gleiche Images und `make`-Ziele; Release-Dateien hängen direkt am GitHub-Release statt in der Package Registry, Versionscode `GITHUB_RUN_NUMBER`, Keystore als Repository-Secret. Ohne geschützte Tags: Das Secret sieht jeder Workflow-Lauf im Repo, Pull Requests aus Forks nicht. Die GitLab-spezifischen Tasks im Change gelten sinngemäss.
 - [ ] Offen: Probe-Release `v0.1.0` nach 2.2 verifiziert 2.3, 3.3 und 4.1–4.5; AppImage-Fenster kurz ansehen (3.2); README-Durchsicht (5.1); danach 5.2.
 
 Später, nicht Teil des Changes: Release-Keystore und Play Store (Schlüsselwechsel am besten zusammen mit der neuen App-ID aus `rename-stroke-and-split`). Eigenes App-Icon statt des Platzhalters: erledigt (2026-10-18, `feature/app-icon`, `make icons`).
