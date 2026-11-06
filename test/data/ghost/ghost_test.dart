@@ -53,7 +53,11 @@ void main() {
       expect(_withPause.distanceDmAt(20000), 1000);
       expect(_withPause.distanceDmAt(25000), 1000);
       expect(_withPause.distanceDmAt(42500), 1500);
-      expect(_withPause.wallMsAt(1000), 20000, reason: 'reached when the pause begins');
+      expect(
+        _withPause.wallMsAt(1000),
+        20000,
+        reason: 'reached when the pause begins',
+      );
       expect(_withPause.wallMsAt(1500), 42500);
       expect(_withPause.durationMs, 55000);
       expect(_withPause.distanceDm, 2000);
@@ -69,11 +73,17 @@ void main() {
     test('rejects no points and points going back', () {
       expect(() => GhostTrack(const []), throwsArgumentError);
       expect(
-        () => GhostTrack(const [GhostPoint(wallMs: 10, distanceDm: 0), GhostPoint(wallMs: 5, distanceDm: 1)]),
+        () => GhostTrack(const [
+          GhostPoint(wallMs: 10, distanceDm: 0),
+          GhostPoint(wallMs: 5, distanceDm: 1),
+        ]),
         throwsArgumentError,
       );
       expect(
-        () => GhostTrack(const [GhostPoint(wallMs: 0, distanceDm: 5), GhostPoint(wallMs: 5, distanceDm: 1)]),
+        () => GhostTrack(const [
+          GhostPoint(wallMs: 0, distanceDm: 5),
+          GhostPoint(wallMs: 5, distanceDm: 1),
+        ]),
         throwsArgumentError,
       );
     });
@@ -87,8 +97,24 @@ void main() {
   });
 
   test('GhostGap compares by axis, amount and side', () {
-    const gap = GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true);
-    expect(gap, const GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true));
-    expect(gap, isNot(const GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: false)));
+    const gap = GhostGap(
+      axis: CourseAxis.distance,
+      amount: 7.6,
+      ghostAhead: true,
+    );
+    expect(
+      gap,
+      const GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true),
+    );
+    expect(
+      gap,
+      isNot(
+        const GhostGap(
+          axis: CourseAxis.distance,
+          amount: 7.6,
+          ghostAhead: false,
+        ),
+      ),
+    );
   });
 }

@@ -30,11 +30,19 @@ void main() {
   group('formatElapsed', () {
     test('shows minutes and seconds below an hour', () {
       expect(formatElapsed(Duration.zero), '0:00');
-      expect(formatElapsed(const Duration(minutes: 12, seconds: 34, milliseconds: 999)), '12:34');
+      expect(
+        formatElapsed(
+          const Duration(minutes: 12, seconds: 34, milliseconds: 999),
+        ),
+        '12:34',
+      );
     });
 
     test('adds hours from one hour on', () {
-      expect(formatElapsed(const Duration(hours: 1, minutes: 2, seconds: 3)), '1:02:03');
+      expect(
+        formatElapsed(const Duration(hours: 1, minutes: 2, seconds: 3)),
+        '1:02:03',
+      );
     });
   });
 
@@ -48,11 +56,14 @@ void main() {
     expect(formatWhole(null), '–');
   });
 
-  test('formatStrokeRate shows one decimal with the decimal mark of the language', () {
-    expect(formatStrokeRate(de, 22.46), '22,5');
-    expect(formatStrokeRate(en, 22.46), '22.5');
-    expect(formatStrokeRate(de, null), '–');
-  });
+  test(
+    'formatStrokeRate shows one decimal with the decimal mark of the language',
+    () {
+      expect(formatStrokeRate(de, 22.46), '22,5');
+      expect(formatStrokeRate(en, 22.46), '22.5');
+      expect(formatStrokeRate(de, null), '–');
+    },
+  );
 
   test('formatDriveLength shows whole centimeters', () {
     expect(formatDriveLength(de, 1.06), '106 cm');
@@ -63,15 +74,27 @@ void main() {
     expect(formatDriveLength(de, 0.995), '100 cm');
   });
 
-  test('formatDriveLength leaves out a missing length instead of showing 0 cm', () {
-    expect(formatDriveLength(de, null), isNull);
-    expect(formatDriveLength(en, 0), isNull);
-  });
+  test(
+    'formatDriveLength leaves out a missing length instead of showing 0 cm',
+    () {
+      expect(formatDriveLength(de, null), isNull);
+      expect(formatDriveLength(en, 0), isNull);
+    },
+  );
 
   test('formatDateTime shows the local date and time in the format of the language', () {
-    expect(formatDateTime(de, DateTime(2026, 10, 15, 18, 30)), '15.10.2026, 18:30');
-    expect(formatDateTime(en, DateTime(2026, 10, 15, 18, 30)), 'Oct 15, 2026, 18:30');
-    expect(formatDateTime(de, DateTime(2026, 10, 5, 8, 7)), '05.10.2026, 08:07');
+    expect(
+      formatDateTime(de, DateTime(2026, 10, 15, 18, 30)),
+      '15.10.2026, 18:30',
+    );
+    expect(
+      formatDateTime(en, DateTime(2026, 10, 15, 18, 30)),
+      'Oct 15, 2026, 18:30',
+    );
+    expect(
+      formatDateTime(de, DateTime(2026, 10, 5, 8, 7)),
+      '05.10.2026, 08:07',
+    );
   });
 
   test('keeps pace and times the same in every language', () {

@@ -3,18 +3,25 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('a new course is one segment over its whole length', () {
-    final course = CourseDefinition.single(axis: CourseAxis.distance, length: 1000);
+    final course = CourseDefinition.single(
+      axis: CourseAxis.distance,
+      length: 1000,
+    );
 
     expect(course.segments, [const CourseSegment(length: 1000)]);
     expect(course.segments.single.isFree, isTrue);
   });
 
   test('knows where its segments end', () {
-    const course = CourseDefinition(axis: CourseAxis.distance, length: 1000, segments: [
-      CourseSegment(length: 200),
-      CourseSegment(length: 600),
-      CourseSegment(length: 200),
-    ]);
+    const course = CourseDefinition(
+      axis: CourseAxis.distance,
+      length: 1000,
+      segments: [
+        CourseSegment(length: 200),
+        CourseSegment(length: 600),
+        CourseSegment(length: 200),
+      ],
+    );
 
     expect(course.segmentStarts, [0, 200, 800]);
     expect(course.segmentEnds, [200, 800, 1000]);

@@ -30,15 +30,20 @@ class _Fixed extends ActiveErgSource {
 
 class _Setup {
   _Setup({bool enabled = true, bool available = true, ErgSource? source})
-      : store = MemoryHealthExportStore(enabled) {
-    container = ProviderContainer(overrides: [
-      databaseProvider.overrideWithValue(db),
-      healthPlatformProvider.overrideWithValue(health),
-      healthExportStoreProvider.overrideWithValue(store),
-      healthExportAvailableProvider.overrideWithValue(available),
-      if (source != null) activeErgSourceProvider.overrideWith(() => _Fixed(source)),
-      recordingFlushIntervalProvider.overrideWithValue(const Duration(milliseconds: 10)),
-    ]);
+    : store = MemoryHealthExportStore(enabled) {
+    container = ProviderContainer(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        healthPlatformProvider.overrideWithValue(health),
+        healthExportStoreProvider.overrideWithValue(store),
+        healthExportAvailableProvider.overrideWithValue(available),
+        if (source != null)
+          activeErgSourceProvider.overrideWith(() => _Fixed(source)),
+        recordingFlushIntervalProvider.overrideWithValue(
+          const Duration(milliseconds: 10),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
   }
 
@@ -52,29 +57,36 @@ class _Setup {
   /// A stored session of 2 000 m from [source], without a template.
   Future<int> session({ErgSourceKind source = ErgSourceKind.pm5}) async {
     final repository = container.read(sessionRepositoryProvider);
-    final id = await repository.create(startedAt: DateTime.utc(2026, 11, 2, 18), source: source);
-    await repository.write(SessionBatch(
-      samples: [
-        SamplesCompanion.insert(
-          sessionId: id,
-          tMs: 1000,
-          distanceDm: 40,
-          wallMs: const Value(1000),
-          watts: const Value(150),
-          paceCs: const Value(12500),
-        ),
-      ],
-      strokes: const [],
-      rawPackets: const [],
-    ));
+    final id = await repository.create(
+      startedAt: DateTime.utc(2026, 11, 2, 18),
+      source: source,
+    );
+    await repository.write(
+      SessionBatch(
+        samples: [
+          SamplesCompanion.insert(
+            sessionId: id,
+            tMs: 1000,
+            distanceDm: 40,
+            wallMs: const Value(1000),
+            watts: const Value(150),
+            paceCs: const Value(12500),
+          ),
+        ],
+        strokes: const [],
+        rawPackets: const [],
+      ),
+    );
     await repository.finish(id, endedAt: DateTime.utc(2026, 11, 2, 18, 8));
-    await (db.update(db.sessions)..where((s) => s.id.equals(id)))
-        .write(const SessionsCompanion(distanceDm: Value(20000)));
+    await (db.update(db.sessions)..where((s) => s.id.equals(id))).write(
+      const SessionsCompanion(distanceDm: Value(20000)),
+    );
     return id;
   }
 
-  Future<DateTime?> exportedAt(int id) async =>
-      (await (db.select(db.sessions)..where((s) => s.id.equals(id))).getSingle()).healthExportedAt;
+  Future<DateTime?> exportedAt(int id) async => (await (db.select(
+    db.sessions,
+  )..where((s) => s.id.equals(id))).getSingle()).healthExportedAt;
 }
 
 void main() {
@@ -93,7 +105,9 @@ void main() {
 
   test('names free rowing in the language of the app', () async {
     final setup = _Setup();
-    await setup.container.read(appLanguageProvider.notifier).choose(AppLanguage.en);
+    await setup.container
+        .read(appLanguageProvider.notifier)
+        .choose(AppLanguage.en);
 
     await setup.exporter.export(await setup.session());
 
@@ -111,22 +125,28 @@ void main() {
     expect(setup.health.workouts, hasLength(1));
   });
 
-  test('a failed write leaves the session not written and gives the reason', () async {
-    final setup = _Setup();
-    final id = await setup.session();
-    await setup.exporter.export(id);
+  test(
+    'a failed write leaves the session not written and gives the reason',
+    () async {
+      final setup = _Setup();
+      final id = await setup.session();
+      await setup.exporter.export(id);
 
-    setup.health.failure = HealthFailure.failed;
-    expect(await setup.exporter.export(id), HealthFailure.failed);
+      setup.health.failure = HealthFailure.failed;
+      expect(await setup.exporter.export(id), HealthFailure.failed);
 
-    expect(await setup.exportedAt(id), isNull);
-  });
+      expect(await setup.exportedAt(id), isNull);
+    },
+  );
 
   test('a missing permission is the reason', () async {
     final setup = _Setup();
     setup.health.granted = {};
 
-    expect(await setup.exporter.export(await setup.session()), HealthFailure.permission);
+    expect(
+      await setup.exporter.export(await setup.session()),
+      HealthFailure.permission,
+    );
   });
 
   group('after a session ended', () {
@@ -144,7 +164,9 @@ void main() {
       test('writes nothing from the ${source.name}', () async {
         final setup = _Setup();
 
-        await setup.exporter.sessionFinished(await setup.session(source: source));
+        await setup.exporter.sessionFinished(
+          await setup.session(source: source),
+        );
 
         expect(setup.health.writes, 0);
       });
@@ -158,13 +180,16 @@ void main() {
       expect(setup.health.writes, 0);
     });
 
-    test('writes nothing without Health Connect, even when switched on before', () async {
-      final setup = _Setup(available: false);
+    test(
+      'writes nothing without Health Connect, even when switched on before',
+      () async {
+        final setup = _Setup(available: false);
 
-      await setup.exporter.sessionFinished(await setup.session());
+        await setup.exporter.sessionFinished(await setup.session());
 
-      expect(setup.health.writes, 0);
-    });
+        expect(setup.health.writes, 0);
+      },
+    );
 
     test('reports a failure', () async {
       final setup = _Setup();
@@ -173,12 +198,19 @@ void main() {
 
       await setup.exporter.sessionFinished(id);
 
-      expect(setup.container.read(healthExportFailureProvider), (sessionId: id, reason: HealthFailure.unavailable));
+      expect(setup.container.read(healthExportFailureProvider), (
+        sessionId: id,
+        reason: HealthFailure.unavailable,
+      ));
       expect(await setup.exportedAt(id), isNull);
     });
 
     test('follows a stop of the recording', () async {
-      final source = FakeErgSource(kind: ErgSourceKind.pm5, name: 'PM5', protocol: ErgProtocol.pm5);
+      final source = FakeErgSource(
+        kind: ErgSourceKind.pm5,
+        name: 'PM5',
+        protocol: ErgProtocol.pm5,
+      );
       final setup = _Setup(source: source);
       final recorder = setup.container.read(sessionRecorderProvider.notifier);
 
@@ -200,14 +232,17 @@ void main() {
       final setup = _Setup(enabled: false);
       expect(setup.container.read(healthExportEnabledProvider), isFalse);
 
-      await setup.container.read(healthExportEnabledProvider.notifier).set(true);
+      await setup.container
+          .read(healthExportEnabledProvider.notifier)
+          .set(true);
 
       expect(setup.container.read(healthExportEnabledProvider), isTrue);
       expect(setup.store.read(), isTrue);
     });
 
     test('outlasts opening the preferences again', () async {
-      SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+      SharedPreferencesAsyncPlatform.instance =
+          InMemorySharedPreferencesAsync.empty();
 
       expect((await PreferencesHealthExportStore.open()).read(), isFalse);
       await (await PreferencesHealthExportStore.open()).write(true);

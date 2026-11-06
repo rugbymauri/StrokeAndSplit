@@ -21,8 +21,10 @@ enum WorkoutType {
 
   final int code;
 
-  static WorkoutType fromCode(int code) =>
-      values.firstWhere((t) => t.code == code, orElse: () => WorkoutType.unknown);
+  static WorkoutType fromCode(int code) => values.firstWhere(
+    (t) => t.code == code,
+    orElse: () => WorkoutType.unknown,
+  );
 }
 
 /// Coarse phase of a workout, derived from [WorkoutState].
@@ -51,6 +53,8 @@ enum WorkoutState {
   final int code;
   final WorkoutPhase phase;
 
-  static WorkoutState fromCode(int code) =>
-      values.firstWhere((s) => s.code == code, orElse: () => WorkoutState.unknown);
+  static WorkoutState fromCode(int code) => values.firstWhere(
+    (s) => s.code == code,
+    orElse: () => WorkoutState.unknown,
+  );
 }

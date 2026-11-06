@@ -31,7 +31,8 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
   late final _name = TextEditingController(text: widget.course?.name);
   late var _axis = widget.course?.axis ?? CourseAxis.distance;
   late var _length = widget.course?.definition.length ?? _defaultLength(_axis);
-  late var _placements = widget.course?.definition.placements ?? const <ZonePlacement>[];
+  late var _placements =
+      widget.course?.definition.placements ?? const <ZonePlacement>[];
   var _errors = <String>[];
 
   /// The segment outlined in the strip while its dialog is open.
@@ -40,7 +41,8 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
   bool get _isNew => widget.course == null;
 
   /// 2000 m or 4:00.
-  static int _defaultLength(CourseAxis axis) => axis == CourseAxis.distance ? 2000 : 240;
+  static int _defaultLength(CourseAxis axis) =>
+      axis == CourseAxis.distance ? 2000 : 240;
 
   @override
   void dispose() {
@@ -50,8 +52,12 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
 
   Map<int, Zone> get _zones => _zonesById(ref.read(zonesProvider).value);
 
-  CourseLayout _layout(Map<int, Zone> zones) =>
-      resolveCourse(axis: _axis, length: _length, placements: _placements, zones: zones);
+  CourseLayout _layout(Map<int, Zone> zones) => resolveCourse(
+    axis: _axis,
+    length: _length,
+    placements: _placements,
+    zones: zones,
+  );
 
   /// Places a zone, or moves the placement at [index] when given.
   Future<void> _place({int? index, int? start}) async {
@@ -60,7 +66,10 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
       builder: (_) => _PlaceZoneDialog(
         axis: _axis,
         length: _length,
-        others: [for (final (i, p) in _placements.indexed) if (i != index) p],
+        others: [
+          for (final (i, p) in _placements.indexed)
+            if (i != index) p,
+        ],
         initial: index == null ? null : _placements[index],
         start: start,
       ),
@@ -69,14 +78,20 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     setState(() {
       _errors = [];
       _placements = [
-        for (final (i, p) in _placements.indexed) if (i != index) p,
+        for (final (i, p) in _placements.indexed)
+          if (i != index) p,
         placement,
       ]..sort((a, b) => a.start.compareTo(b.start));
     });
   }
 
   void _remove(int index) {
-    setState(() => _placements = [for (final (i, p) in _placements.indexed) if (i != index) p]);
+    setState(
+      () => _placements = [
+        for (final (i, p) in _placements.indexed)
+          if (i != index) p,
+      ],
+    );
   }
 
   Future<void> _save() async {
@@ -120,26 +135,41 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     final zones = _zonesById(ref.watch(zonesProvider).value);
     final distance = _axis == CourseAxis.distance;
     final layout = _layout(zones);
-    final rowed = widget.course == null ? 0 : ref.watch(courseRowCountsProvider).value?[widget.course!.id]?.newest;
+    final rowed = widget.course == null
+        ? 0
+        : ref.watch(courseRowCountsProvider).value?[widget.course!.id]?.newest;
     final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_isNew ? l10n.courseNew : l10n.courseEdit),
-        actions: [IconButton(tooltip: l10n.actionSave, icon: const Icon(Icons.check), onPressed: _save)],
+        actions: [
+          IconButton(
+            tooltip: l10n.actionSave,
+            icon: const Icon(Icons.check),
+            onPressed: _save,
+          ),
+        ],
       ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 640),
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.pagePortrait, AppSpacing.l, AppSpacing.pagePortrait, 32),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.pagePortrait,
+              AppSpacing.l,
+              AppSpacing.pagePortrait,
+              32,
+            ),
             children: [
               if (_errors.isNotEmpty) ErrorCard(errors: _errors),
               _Label(l10n.fieldName),
               TextField(
                 key: const Key('course-name'),
                 controller: _name,
-                style: AppTextStyles.cardTitle.copyWith(fontWeight: FontWeight.w400),
+                style: AppTextStyles.cardTitle.copyWith(
+                  fontWeight: FontWeight.w400,
+                ),
               ),
               const SizedBox(height: AppSpacing.l),
               Row(
@@ -156,9 +186,9 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                           // placed zones keep it too.
                           onChanged: _isNew && _placements.isEmpty
                               ? (axis) => setState(() {
-                                    _axis = axis;
-                                    _length = _defaultLength(_axis);
-                                  })
+                                  _axis = axis;
+                                  _length = _defaultLength(_axis);
+                                })
                               : null,
                         ),
                       ],
@@ -175,8 +205,12 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                           value: _length,
                           step: _courseStep(_axis),
                           min: _courseStep(_axis),
-                          stepLabel: distance ? '${_courseStep(_axis)} m' : l10n.stepSeconds(_courseStep(_axis)),
-                          format: distance ? null : (v) => formatCourseLength(_axis, v),
+                          stepLabel: distance
+                              ? '${_courseStep(_axis)} m'
+                              : l10n.stepSeconds(_courseStep(_axis)),
+                          format: distance
+                              ? null
+                              : (v) => formatCourseLength(_axis, v),
                           unit: distance ? 'm' : 'min',
                           label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
                           size: OarStepperSize.compact,
@@ -201,41 +235,59 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                 const SizedBox(height: 6),
                 _Ticks(axis: _axis, length: definition.length),
                 const SizedBox(height: AppSpacing.m),
-                _SectionCard(children: [
-                  for (final (i, segment) in definition.segments.indexed)
-                    _SectionTile(
-                      key: Key('section-$i'),
-                      axis: _axis,
-                      start: definition.segmentStarts[i],
-                      segment: segment,
-                      color: CourseStrip.segmentColors(definition.segments)[i],
-                      selected: i == _selected,
-                      onPlace: segment.zoneId == null ? () => _openSegment(definition, i) : null,
-                      onMove: segment.zoneId == null ? null : () => _openSegment(definition, i),
-                      onRemove: segment.zoneId == null ? null : () => _remove(_indexAt(definition, i)),
-                    ),
-                ]),
-              ] else ...[
-                // The length no longer fits the zones: show them as placed.
-                ErrorCard(errors: [for (final e in layout.errors) placementErrorText(l10n, e)]),
-                _SectionCard(children: [
-                  for (final (i, p) in _placements.indexed)
-                    if (zones[p.zoneId] case final zone?)
+                _SectionCard(
+                  children: [
+                    for (final (i, segment) in definition.segments.indexed)
                       _SectionTile(
                         key: Key('section-$i'),
                         axis: _axis,
-                        start: p.start,
-                        segment: zone.segment,
-                        color: AppColors.zoneIn,
-                        onMove: () => _place(index: i),
-                        onRemove: () => _remove(i),
+                        start: definition.segmentStarts[i],
+                        segment: segment,
+                        color: CourseStrip.segmentColors(
+                          definition.segments,
+                        )[i],
+                        selected: i == _selected,
+                        onPlace: segment.zoneId == null
+                            ? () => _openSegment(definition, i)
+                            : null,
+                        onMove: segment.zoneId == null
+                            ? null
+                            : () => _openSegment(definition, i),
+                        onRemove: segment.zoneId == null
+                            ? null
+                            : () => _remove(_indexAt(definition, i)),
                       ),
-                ]),
+                  ],
+                ),
+              ] else ...[
+                // The length no longer fits the zones: show them as placed.
+                ErrorCard(
+                  errors: [
+                    for (final e in layout.errors) placementErrorText(l10n, e),
+                  ],
+                ),
+                _SectionCard(
+                  children: [
+                    for (final (i, p) in _placements.indexed)
+                      if (zones[p.zoneId] case final zone?)
+                        _SectionTile(
+                          key: Key('section-$i'),
+                          axis: _axis,
+                          start: p.start,
+                          segment: zone.segment,
+                          color: AppColors.zoneIn,
+                          onMove: () => _place(index: i),
+                          onRemove: () => _remove(i),
+                        ),
+                  ],
+                ),
               ],
               const SizedBox(height: AppSpacing.m),
               OutlinedButton.icon(
                 key: const Key('place-zone'),
-                style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
                 onPressed: _place,
                 icon: const Icon(Icons.add),
                 label: Text(l10n.coursePlaceZone),
@@ -309,7 +361,9 @@ class _AxisChoice extends StatelessWidget {
                       fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                       color: selected
                           ? AppColors.text
-                          : AppColors.textMuted.withValues(alpha: enabled ? 1 : 0.35),
+                          : AppColors.textMuted.withValues(
+                              alpha: enabled ? 1 : 0.35,
+                            ),
                     ),
                   ),
                 ),
@@ -321,14 +375,19 @@ class _AxisChoice extends StatelessWidget {
     }
 
     return DecoratedBox(
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppRadii.small)),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.small),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: Row(children: [
-          option(CourseAxis.distance, l10n.axisDistance),
-          const SizedBox(width: 4),
-          option(CourseAxis.time, l10n.axisTime),
-        ]),
+        child: Row(
+          children: [
+            option(CourseAxis.distance, l10n.axisDistance),
+            const SizedBox(width: 4),
+            option(CourseAxis.time, l10n.axisTime),
+          ],
+        ),
       ),
     );
   }
@@ -345,7 +404,9 @@ class _Ticks extends StatelessWidget {
   Widget build(BuildContext context) {
     String label(int quarter) {
       final at = (length * quarter / 4).round();
-      final text = axis == CourseAxis.distance ? '$at' : formatCourseLength(axis, at);
+      final text = axis == CourseAxis.distance
+          ? '$at'
+          : formatCourseLength(axis, at);
       if (quarter < 4) return text;
       return axis == CourseAxis.distance ? '$text m' : '$text min';
     }
@@ -357,7 +418,13 @@ class _Ticks extends StatelessWidget {
           for (var quarter = 0; quarter <= 4; quarter++)
             Align(
               alignment: Alignment(quarter / 2 - 1, 0),
-              child: Text(label(quarter), style: AppTextStyles.caption.copyWith(fontSize: 12, height: 1.2)),
+              child: Text(
+                label(quarter),
+                style: AppTextStyles.caption.copyWith(
+                  fontSize: 12,
+                  height: 1.2,
+                ),
+              ),
             ),
         ],
       ),
@@ -425,15 +492,23 @@ class _SectionTile extends StatelessWidget {
       return ColoredBox(
         color: selected ? AppColors.zoneInSurface : Colors.transparent,
         child: Padding(
-          padding: const EdgeInsets.only(left: AppSpacing.l, right: AppSpacing.xs),
+          padding: const EdgeInsets.only(
+            left: AppSpacing.l,
+            right: AppSpacing.xs,
+          ),
           child: Row(
             children: [
               SizedBox(
                 width: _positionWidth,
-                child: Text(formatCourseRange(axis, start, end), style: AppTextStyles.caption),
+                child: Text(
+                  formatCourseRange(axis, start, end),
+                  style: AppTextStyles.caption,
+                ),
               ),
               const SizedBox(width: AppSpacing.m),
-              Expanded(child: Text(l10n.segmentFree, style: AppTextStyles.caption)),
+              Expanded(
+                child: Text(l10n.segmentFree, style: AppTextStyles.caption),
+              ),
               IconButton(
                 tooltip: l10n.coursePlaceHere,
                 color: AppColors.textMuted,
@@ -452,7 +527,12 @@ class _SectionTile extends StatelessWidget {
       child: InkWell(
         onTap: onMove,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.l, AppSpacing.m, AppSpacing.xs, AppSpacing.m),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.l,
+            AppSpacing.m,
+            AppSpacing.xs,
+            AppSpacing.m,
+          ),
           child: Row(
             children: [
               SizedBox(
@@ -466,7 +546,10 @@ class _SectionTile extends StatelessWidget {
               Container(
                 width: 10,
                 height: 28,
-                decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
               const SizedBox(width: AppSpacing.m),
               Expanded(
@@ -475,9 +558,13 @@ class _SectionTile extends StatelessWidget {
                   children: [
                     Text(
                       '${segment.zoneName ?? l10n.segmentZone} · ${formatCourseLength(axis, segment.length)}',
-                      style: AppTextStyles.body.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: AppTextStyles.body.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    if (bands.isNotEmpty) Text(bands, style: AppTextStyles.caption),
+                    if (bands.isNotEmpty)
+                      Text(bands, style: AppTextStyles.caption),
                   ],
                 ),
               ),
@@ -506,7 +593,10 @@ class _VersionHint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('course-version-hint'),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppSpacing.m),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: AppSpacing.m,
+      ),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.line),
         borderRadius: BorderRadius.circular(AppRadii.small),
@@ -516,7 +606,12 @@ class _VersionHint extends StatelessWidget {
         children: [
           const Icon(Icons.info_outline, size: 18, color: AppColors.textMuted),
           const SizedBox(width: 10),
-          Expanded(child: Text(context.l10n.courseVersionHint(rowed), style: AppTextStyles.caption)),
+          Expanded(
+            child: Text(
+              context.l10n.courseVersionHint(rowed),
+              style: AppTextStyles.caption,
+            ),
+          ),
         ],
       ),
     );
@@ -556,7 +651,9 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
     final zones = _zones;
     return widget.others.fold(0, (end, p) {
       final zone = zones[p.zoneId];
-      return zone == null ? end : (p.start + zone.length > end ? p.start + zone.length : end);
+      return zone == null
+          ? end
+          : (p.start + zone.length > end ? p.start + zone.length : end);
     });
   }
 
@@ -568,9 +665,19 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
     if (zone == null) return (null, null);
     final placement = ZonePlacement(zoneId: zone.id, start: _start);
     final placements = [...widget.others, placement];
-    final layout = resolveCourse(axis: widget.axis, length: widget.length, placements: placements, zones: zones);
-    final error = layout.errors.where((e) => e.placements.contains(placements.length - 1)).firstOrNull;
-    return (placement, error == null ? null : placementErrorText(context.l10n, error));
+    final layout = resolveCourse(
+      axis: widget.axis,
+      length: widget.length,
+      placements: placements,
+      zones: zones,
+    );
+    final error = layout.errors
+        .where((e) => e.placements.contains(placements.length - 1))
+        .firstOrNull;
+    return (
+      placement,
+      error == null ? null : placementErrorText(context.l10n, error),
+    );
   }
 
   Future<void> _createZone() async {
@@ -590,7 +697,9 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
     final step = _startStep(widget.axis);
 
     return AlertDialog(
-      title: Text(widget.initial == null ? l10n.coursePlaceZone : l10n.courseMoveZone),
+      title: Text(
+        widget.initial == null ? l10n.coursePlaceZone : l10n.courseMoveZone,
+      ),
       content: SizedBox(
         width: 480,
         child: ListView(
@@ -617,7 +726,10 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
               ),
             ),
             const SizedBox(height: 8),
-            Text(l10n.courseStart(distance ? 'm' : 'm:ss'), style: AppTextStyles.caption),
+            Text(
+              l10n.courseStart(distance ? 'm' : 'm:ss'),
+              style: AppTextStyles.caption,
+            ),
             const SizedBox(height: 6),
             OarStepper(
               key: const Key('place-start'),
@@ -627,14 +739,18 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
               // The zone has to end with the course.
               max: widget.length - (zone?.length ?? 0),
               stepLabel: distance ? '$step m' : l10n.stepSeconds(step),
-              format: distance ? null : (v) => formatCourseLength(widget.axis, v),
+              format: distance
+                  ? null
+                  : (v) => formatCourseLength(widget.axis, v),
               unit: distance ? 'm' : 'min',
               label: l10n.courseStart(distance ? 'm' : 'm:ss'),
               onChanged: (v) => setState(() => _start = v),
             ),
             const SizedBox(height: 4),
             Text(
-              l10n.courseRange(formatCourseRange(widget.axis, 0, widget.length)),
+              l10n.courseRange(
+                formatCourseRange(widget.axis, 0, widget.length),
+              ),
               style: AppTextStyles.caption,
             ),
             const SizedBox(height: 12),
@@ -642,20 +758,35 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
               Text(
                 l10n.coursePlacedAt(
                   zone.name,
-                  formatCourseRange(widget.axis, placement.start, placement.start + zone.length),
+                  formatCourseRange(
+                    widget.axis,
+                    placement.start,
+                    placement.start + zone.length,
+                  ),
                 ),
                 key: const Key('place-preview'),
               )
             else if (error != null)
-              Text(error, key: const Key('place-error'), style: TextStyle(color: theme.colorScheme.error)),
+              Text(
+                error,
+                key: const Key('place-error'),
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.actionCancel)),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.actionCancel),
+        ),
         FilledButton(
-          onPressed: placement != null && error == null ? () => Navigator.of(context).pop(placement) : null,
-          child: Text(widget.initial == null ? l10n.coursePlace : l10n.courseMove),
+          onPressed: placement != null && error == null
+              ? () => Navigator.of(context).pop(placement)
+              : null,
+          child: Text(
+            widget.initial == null ? l10n.coursePlace : l10n.courseMove,
+          ),
         ),
       ],
     );
@@ -664,7 +795,12 @@ class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
 
 /// A zone to choose; zones of the other axis are shown but cannot be chosen.
 class _ZoneOption extends StatelessWidget {
-  const _ZoneOption({required this.zone, required this.enabled, required this.selected, required this.onTap});
+  const _ZoneOption({
+    required this.zone,
+    required this.enabled,
+    required this.selected,
+    required this.onTap,
+  });
 
   final Zone zone;
   final bool enabled;
@@ -678,10 +814,14 @@ class _ZoneOption extends StatelessWidget {
       enabled: enabled,
       selected: selected,
       contentPadding: EdgeInsets.zero,
-      leading: Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked),
+      leading: Icon(
+        selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+      ),
       title: Text(zone.name),
       subtitle: Text(
-        enabled ? zoneSummary(context.l10n, zone) : '${zoneSummary(context.l10n, zone)} · ${context.l10n.courseOtherAxis}',
+        enabled
+            ? zoneSummary(context.l10n, zone)
+            : '${zoneSummary(context.l10n, zone)} · ${context.l10n.courseOtherAxis}',
       ),
       onTap: enabled ? onTap : null,
     );
@@ -694,5 +834,6 @@ int _courseStep(CourseAxis axis) => axis == CourseAxis.distance ? 100 : 30;
 /// Steps of design D7 for the start of a zone: 50 m or 10 s.
 int _startStep(CourseAxis axis) => axis == CourseAxis.distance ? 50 : 10;
 
-Map<int, Zone> _zonesById(List<ZoneUsage>? usages) =>
-    {for (final u in usages ?? const <ZoneUsage>[]) u.zone.id: u.zone};
+Map<int, Zone> _zonesById(List<ZoneUsage>? usages) => {
+  for (final u in usages ?? const <ZoneUsage>[]) u.zone.id: u.zone,
+};

@@ -18,7 +18,10 @@ class LiveStatus extends StatelessWidget {
         const ConnectionIndicator(),
         // The strap, if any; it also keeps the strap connected while rowing (heart-rate, Design D7).
         const HeartRateIndicator(),
-        const Padding(padding: EdgeInsets.only(left: AppSpacing.s), child: SourceBadge()),
+        const Padding(
+          padding: EdgeInsets.only(left: AppSpacing.s),
+          child: SourceBadge(),
+        ),
       ],
     );
   }

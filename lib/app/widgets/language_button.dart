@@ -11,11 +11,11 @@ class LanguageButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => IconButton(
-        icon: const Icon(Icons.language),
-        tooltip: context.l10n.languageChoice,
-        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-        onPressed: () => _chooseLanguage(context, ref),
-      );
+    icon: const Icon(Icons.language),
+    tooltip: context.l10n.languageChoice,
+    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+    onPressed: () => _chooseLanguage(context, ref),
+  );
 }
 
 Future<void> _chooseLanguage(BuildContext context, WidgetRef ref) async {

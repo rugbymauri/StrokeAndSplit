@@ -21,31 +21,48 @@ const _tick = StatusTick(
 );
 
 final _curves = const ForceCurves()
-    .add(StrokeForceCurve(elapsed: Duration.zero, strokeNumber: 3, forcesNewtons: [0, 30, 80, 120, 130, 100, 50, 0]))
-    .add(StrokeForceCurve(
-      elapsed: Duration.zero,
-      strokeNumber: 4,
-      forcesNewtons: [0, 20, 60, 110, 140, 150, 130, 90, 40, 0],
-      driveLengthMeters: 1.06,
-    ));
+    .add(
+      StrokeForceCurve(
+        elapsed: Duration.zero,
+        strokeNumber: 3,
+        forcesNewtons: [0, 30, 80, 120, 130, 100, 50, 0],
+      ),
+    )
+    .add(
+      StrokeForceCurve(
+        elapsed: Duration.zero,
+        strokeNumber: 4,
+        forcesNewtons: [0, 20, 60, 110, 140, 150, 130, 90, 40, 0],
+        driveLengthMeters: 1.06,
+      ),
+    );
 
-Future<void> _pump(WidgetTester tester, Size size, {ForceCurves? forceCurves}) async {
+Future<void> _pump(
+  WidgetTester tester,
+  Size size, {
+  ForceCurves? forceCurves,
+}) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   // The watts tile reads the resistance level; without a source there is none.
-  await tester.pumpWidget(ProviderScope(
-    child: LocalizedApp(
-      home: Scaffold(
-        body: FreeLiveView(
-          tick: _tick,
-          session: null,
-          forceCurves: forceCurves,
-          action: FilledButton(onPressed: () {}, child: const Text('Session beenden')),
+  await tester.pumpWidget(
+    ProviderScope(
+      child: LocalizedApp(
+        home: Scaffold(
+          body: FreeLiveView(
+            tick: _tick,
+            session: null,
+            forceCurves: forceCurves,
+            action: FilledButton(
+              onPressed: () {},
+              child: const Text('Session beenden'),
+            ),
+          ),
         ),
       ),
     ),
-  ));
+  );
 }
 
 void main() {
@@ -62,13 +79,17 @@ void main() {
     expect(find.text('Kraftkurve'), findsOneWidget);
   });
 
-  testWidgets('leaves out the force curve for a source without one', (tester) async {
+  testWidgets('leaves out the force curve for a source without one', (
+    tester,
+  ) async {
     await _pump(tester, const Size(390, 844));
 
     expect(find.byKey(const Key('force-curve')), findsNothing);
   });
 
-  testWidgets('waits for the first curve with the card in place', (tester) async {
+  testWidgets('waits for the first curve with the card in place', (
+    tester,
+  ) async {
     await _pump(tester, const Size(390, 844), forceCurves: const ForceCurves());
 
     expect(find.byKey(const Key('force-curve')), findsOneWidget);
@@ -76,7 +97,9 @@ void main() {
     expect(find.byKey(const Key('force-curve-length')), findsNothing);
   });
 
-  testWidgets('leaves out the force curve first when space is short', (tester) async {
+  testWidgets('leaves out the force curve first when space is short', (
+    tester,
+  ) async {
     await _pump(tester, const Size(360, 600), forceCurves: _curves);
 
     expect(tester.takeException(), isNull);
@@ -90,18 +113,27 @@ void main() {
     'small desktop window': const Size(640, 480),
   };
   for (final MapEntry(key: name, value: size) in sizes.entries) {
-    testWidgets('fits a $name with the force curve and the pace as the largest text', (tester) async {
-      await _pump(tester, size, forceCurves: _curves);
+    testWidgets(
+      'fits a $name with the force curve and the pace as the largest text',
+      (tester) async {
+        await _pump(tester, size, forceCurves: _curves);
 
-      expect(tester.takeException(), isNull);
-      expect(find.byKey(const Key('force-curve')), findsOneWidget);
-      expect(find.text('106 cm'), findsOneWidget);
-      final pace = tester.getRect(find.byKey(const Key('metric-pace'))).height;
-      for (final text in tester.widgetList<Text>(find.byType(Text))) {
-        if (text.key == const Key('metric-pace')) continue;
-        final reason = text.data ?? text.textSpan?.toPlainText();
-        expect(tester.getRect(find.byWidget(text)).height, lessThan(pace), reason: reason);
-      }
-    });
+        expect(tester.takeException(), isNull);
+        expect(find.byKey(const Key('force-curve')), findsOneWidget);
+        expect(find.text('106 cm'), findsOneWidget);
+        final pace = tester
+            .getRect(find.byKey(const Key('metric-pace')))
+            .height;
+        for (final text in tester.widgetList<Text>(find.byType(Text))) {
+          if (text.key == const Key('metric-pace')) continue;
+          final reason = text.data ?? text.textSpan?.toPlainText();
+          expect(
+            tester.getRect(find.byWidget(text)).height,
+            lessThan(pace),
+            reason: reason,
+          );
+        }
+      },
+    );
   }
 }

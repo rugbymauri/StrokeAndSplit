@@ -10,8 +10,8 @@ import 'resistance_control.dart';
 /// original speed or faster.
 class ReplaySource implements ErgSource {
   ReplaySource(this.recording, {this.speed = 1, String? name})
-      : assert(speed > 0),
-        name = name ?? 'Replay';
+    : assert(speed > 0),
+      name = name ?? 'Replay';
 
   final RawRecording recording;
 
@@ -40,8 +40,11 @@ class ReplaySource implements ErgSource {
 
   /// Only when the recording holds curve packets; older PM5 recordings have none.
   @override
-  late final bool providesForceCurves = protocol == ErgProtocol.pm5 &&
-      recording.packets.any((p) => p.characteristicId == Pm5Characteristics.forceCurve);
+  late final bool providesForceCurves =
+      protocol == ErgProtocol.pm5 &&
+      recording.packets.any(
+        (p) => p.characteristicId == Pm5Characteristics.forceCurve,
+      );
 
   @override
   Stream<RawPacket> get packets => _packets.stream;
@@ -73,19 +76,28 @@ class ReplaySource implements ErgSource {
       _packets.close();
       return;
     }
-    final due = _scaled(packets[_next].time) - clock.now().difference(_startedAt!);
+    final due =
+        _scaled(packets[_next].time) - clock.now().difference(_startedAt!);
     _timer = Timer(due.isNegative ? Duration.zero : due, () {
       final elapsed = clock.now().difference(_startedAt!);
       // Emit everything that is due, so equal timestamps stay together.
-      while (_next < packets.length && _scaled(packets[_next].time) <= elapsed) {
+      while (_next < packets.length &&
+          _scaled(packets[_next].time) <= elapsed) {
         final p = packets[_next++];
-        _packets.add(RawPacket(time: _scaled(p.time), characteristicId: p.characteristicId, bytes: p.bytes));
+        _packets.add(
+          RawPacket(
+            time: _scaled(p.time),
+            characteristicId: p.characteristicId,
+            bytes: p.bytes,
+          ),
+        );
       }
       _scheduleNext();
     });
   }
 
-  Duration _scaled(Duration time) => Duration(microseconds: (time.inMicroseconds / speed).round());
+  Duration _scaled(Duration time) =>
+      Duration(microseconds: (time.inMicroseconds / speed).round());
 
   void _setState(ErgConnectionState state) {
     if (_state == state) return;

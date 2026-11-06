@@ -14,7 +14,8 @@ import 'simulated_source.dart';
 class RowerChoice {
   const RowerChoice.device(FoundRower this.device) : protocol = null;
 
-  const RowerChoice.simulator([ErgProtocol this.protocol = ErgProtocol.pm5]) : device = null;
+  const RowerChoice.simulator([ErgProtocol this.protocol = ErgProtocol.pm5])
+    : device = null;
 
   /// The rower over Bluetooth; null for a simulator.
   final FoundRower? device;
@@ -26,21 +27,26 @@ class RowerChoice {
 
   /// A new source for this choice, not yet started.
   ErgSource createSource(BleTransport transport) => switch (device) {
-        final device? => BleRowerSource(transport: transport, device: device),
-        null => SimulatedSource(protocol: protocol!),
-      };
+    final device? => BleRowerSource(transport: transport, device: device),
+    null => SimulatedSource(protocol: protocol!),
+  };
 
   /// Whether [source] is the rower of this choice.
   bool isUsedBy(ErgSource? source) => switch (source) {
-        BleRowerSource(:final device) => device == this.device,
-        SimulatedSource(:final protocol) => isSimulator && protocol == this.protocol,
-        _ => false,
-      };
+    BleRowerSource(:final device) => device == this.device,
+    SimulatedSource(:final protocol) =>
+      isSimulator && protocol == this.protocol,
+    _ => false,
+  };
 
   String encode() => jsonEncode(switch (device) {
-        final device? => {'id': device.id, 'name': device.name, 'protocol': device.protocol.name},
-        null => {'simulator': protocol!.name},
-      });
+    final device? => {
+      'id': device.id,
+      'name': device.name,
+      'protocol': device.protocol.name,
+    },
+    null => {'simulator': protocol!.name},
+  });
 
   /// The choice stored as [value]; null when there is none or it cannot be read.
   static RowerChoice? decode(String? value) {
@@ -51,7 +57,13 @@ class RowerChoice {
         return RowerChoice.simulator(ErgProtocol.values.byName(simulator));
       }
       final protocol = ErgProtocol.values.byName(map['protocol']! as String);
-      return RowerChoice.device(FoundRower(id: map['id']! as String, name: map['name']! as String, protocol: protocol));
+      return RowerChoice.device(
+        FoundRower(
+          id: map['id']! as String,
+          name: map['name']! as String,
+          protocol: protocol,
+        ),
+      );
     } on Object {
       return null;
     }
@@ -59,7 +71,9 @@ class RowerChoice {
 
   @override
   bool operator ==(Object other) =>
-      other is RowerChoice && other.protocol == protocol && other.device?.id == device?.id;
+      other is RowerChoice &&
+      other.protocol == protocol &&
+      other.device?.id == device?.id;
 
   @override
   int get hashCode => Object.hash(protocol, device?.id);
@@ -82,7 +96,9 @@ class PreferencesRowerChoiceStore implements RowerChoiceStore {
 
   static Future<PreferencesRowerChoiceStore> open() async {
     const options = SharedPreferencesWithCacheOptions(allowList: {_key});
-    return PreferencesRowerChoiceStore._(await SharedPreferencesWithCache.create(cacheOptions: options));
+    return PreferencesRowerChoiceStore._(
+      await SharedPreferencesWithCache.create(cacheOptions: options),
+    );
   }
 
   @override
@@ -107,14 +123,19 @@ class MemoryRowerChoiceStore implements RowerChoiceStore {
 }
 
 /// Where the chosen rower is kept; `main` sets the preferences.
-final rowerChoiceStoreProvider = Provider<RowerChoiceStore>((ref) => MemoryRowerChoiceStore());
+final rowerChoiceStoreProvider = Provider<RowerChoiceStore>(
+  (ref) => MemoryRowerChoiceStore(),
+);
 
 /// The rower chosen last, also across restarts; null before the first choice.
-final chosenRowerProvider = NotifierProvider<ChosenRower, RowerChoice?>(ChosenRower.new);
+final chosenRowerProvider = NotifierProvider<ChosenRower, RowerChoice?>(
+  ChosenRower.new,
+);
 
 class ChosenRower extends Notifier<RowerChoice?> {
   @override
-  RowerChoice? build() => RowerChoice.decode(ref.watch(rowerChoiceStoreProvider).read());
+  RowerChoice? build() =>
+      RowerChoice.decode(ref.watch(rowerChoiceStoreProvider).read());
 
   /// Makes [choice] the rower for rowing and remembers it.
   Future<void> choose(RowerChoice choice) async {

@@ -5,18 +5,40 @@ import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/sessions/resistance_director.dart';
 
 const _warmUp = CourseSegment(length: 500);
-const _sprint = CourseSegment(length: 100, spmMin: 30, spmMax: 34, resistanceLevel: 10, zoneName: 'Sprint');
-const _recovery = CourseSegment(length: 200, spmMin: 18, spmMax: 20, resistanceLevel: 3, zoneName: 'Erholung');
-const _steady = CourseSegment(length: 200, spmMin: 20, spmMax: 22, zoneName: 'Ausdauer');
+const _sprint = CourseSegment(
+  length: 100,
+  spmMin: 30,
+  spmMax: 34,
+  resistanceLevel: 10,
+  zoneName: 'Sprint',
+);
+const _recovery = CourseSegment(
+  length: 200,
+  spmMin: 18,
+  spmMax: 20,
+  resistanceLevel: 3,
+  zoneName: 'Erholung',
+);
+const _steady = CourseSegment(
+  length: 200,
+  spmMin: 20,
+  spmMax: 22,
+  zoneName: 'Ausdauer',
+);
 
-ResistanceDirector _director() => ResistanceDirector(range: const ResistanceRange(min: 1, max: 15));
+ResistanceDirector _director() =>
+    ResistanceDirector(range: const ResistanceRange(min: 1, max: 15));
 
 void main() {
   test('rows an interval on the levels of its zones', () {
     fakeAsync((async) {
       final director = _director()..reported(4);
 
-      expect(director.segmentStarted(_warmUp), isNull, reason: 'warm-up stays on 4');
+      expect(
+        director.segmentStarted(_warmUp),
+        isNull,
+        reason: 'warm-up stays on 4',
+      );
       expect(director.segmentStarted(_sprint), 10);
       director.reported(10);
       expect(director.segmentStarted(_recovery), 3);
@@ -60,20 +82,33 @@ void main() {
     });
   });
 
-  test('sends nothing when the next segment asks for the level the rower has', () {
-    fakeAsync((async) {
-      final director = _director()..reported(10);
+  test(
+    'sends nothing when the next segment asks for the level the rower has',
+    () {
+      fakeAsync((async) {
+        final director = _director()..reported(10);
 
-      expect(director.segmentStarted(_sprint), isNull);
-      expect(director.segmentStarted(_sprint), isNull);
-    });
-  });
+        expect(director.segmentStarted(_sprint), isNull);
+        expect(director.segmentStarted(_sprint), isNull);
+      });
+    },
+  );
 
   test('keeps a level within the range of the rower', () {
     fakeAsync((async) {
       final director = _director()..reported(4);
 
-      expect(director.segmentStarted(const CourseSegment(length: 100, spmMin: 20, spmMax: 22, resistanceLevel: 20)), 15);
+      expect(
+        director.segmentStarted(
+          const CourseSegment(
+            length: 100,
+            spmMin: 20,
+            spmMax: 22,
+            resistanceLevel: 20,
+          ),
+        ),
+        15,
+      );
     });
   });
 
@@ -88,23 +123,30 @@ void main() {
       expect(director.target, 12);
       expect(director.segmentStarted(_recovery), 3);
       director.reported(3);
-      expect(director.segmentStarted(_warmUp), 4, reason: 'the base level stays');
+      expect(
+        director.segmentStarted(_warmUp),
+        4,
+        reason: 'the base level stays',
+      );
     });
   });
 
-  test('a change by hand in a segment without level becomes the base level', () {
-    fakeAsync((async) {
-      final director = _director()..reported(4);
-      director.segmentStarted(_warmUp);
-      async.elapse(const Duration(seconds: 10));
-      director.reported(5);
-      director.segmentStarted(_sprint);
-      director.reported(10);
+  test(
+    'a change by hand in a segment without level becomes the base level',
+    () {
+      fakeAsync((async) {
+        final director = _director()..reported(4);
+        director.segmentStarted(_warmUp);
+        async.elapse(const Duration(seconds: 10));
+        director.reported(5);
+        director.segmentStarted(_sprint);
+        director.reported(10);
 
-      expect(director.segmentStarted(_warmUp), 5);
-      expect(director.baseLevel, 5);
-    });
-  });
+        expect(director.segmentStarted(_warmUp), 5);
+        expect(director.baseLevel, 5);
+      });
+    },
+  );
 
   test('taps on + and − are changes by hand', () {
     fakeAsync((async) {
@@ -127,7 +169,11 @@ void main() {
 
       expect([director.step(1), director.step(1), director.step(1)], [7, 8, 9]);
       director.reported(7);
-      expect(director.target, 9, reason: 'a level on the way is no change by hand');
+      expect(
+        director.target,
+        9,
+        reason: 'a level on the way is no change by hand',
+      );
     });
   });
 
@@ -151,7 +197,11 @@ void main() {
 
       expect(director.target, 3);
       expect(director.reconnected(), 3);
-      expect(director.segmentStarted(_recovery), isNull, reason: 'the rower is on 3 already');
+      expect(
+        director.segmentStarted(_recovery),
+        isNull,
+        reason: 'the rower is on 3 already',
+      );
     });
   });
 

@@ -39,10 +39,12 @@ class SessionsScreen extends ConsumerWidget {
       body: switch (sessions) {
         AsyncData(value: []) => Center(child: Text(l10n.sessionsEmpty)),
         AsyncData(:final value) => ListView.builder(
-            itemCount: value.length,
-            itemBuilder: (context, i) => _SessionTile(session: value[i]),
-          ),
-        AsyncError(:final error) => Center(child: Text(l10n.sessionsLoadFailed('$error'))),
+          itemCount: value.length,
+          itemBuilder: (context, i) => _SessionTile(session: value[i]),
+        ),
+        AsyncError(:final error) => Center(
+          child: Text(l10n.sessionsLoadFailed('$error')),
+        ),
         _ => const Center(child: CircularProgressIndicator()),
       },
     );
@@ -70,9 +72,16 @@ class _SessionTile extends ConsumerWidget {
 
     return ListTile(
       title: Text(formatDateTime(l10n, session.startedAt)),
-      subtitle: Text(session.status == SessionStatus.incomplete ? '$details · ${l10n.sessionIncomplete}' : details),
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => SessionSummaryScreen(sessionId: session.id))),
+      subtitle: Text(
+        session.status == SessionStatus.incomplete
+            ? '$details · ${l10n.sessionIncomplete}'
+            : details,
+      ),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => SessionSummaryScreen(sessionId: session.id),
+        ),
+      ),
       trailing: PopupMenuButton<_Action>(
         tooltip: l10n.actionMore,
         onSelected: (action) => switch (action) {

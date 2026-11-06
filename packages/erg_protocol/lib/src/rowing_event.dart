@@ -53,21 +53,22 @@ final class StatusTick extends RowingEvent {
 
   /// A copy with another [heartRate]; pass null to mark it as missing.
   StatusTick copyWith({Object? heartRate = _keep}) => StatusTick(
-        elapsed: elapsed,
-        distanceMeters: distanceMeters,
-        workoutType: workoutType,
-        workoutState: workoutState,
-        isRowing: isRowing,
-        pace: pace,
-        watts: watts,
-        strokeRate: strokeRate,
-        heartRate: identical(heartRate, _keep) ? this.heartRate : heartRate as int?,
-        calories: calories,
-        resistanceLevel: resistanceLevel,
-      );
+    elapsed: elapsed,
+    distanceMeters: distanceMeters,
+    workoutType: workoutType,
+    workoutState: workoutState,
+    isRowing: isRowing,
+    pace: pace,
+    watts: watts,
+    strokeRate: strokeRate,
+    heartRate: identical(heartRate, _keep) ? this.heartRate : heartRate as int?,
+    calories: calories,
+    resistanceLevel: resistanceLevel,
+  );
 
   @override
-  String toString() => 'StatusTick(elapsed: $elapsed, distance: $distanceMeters, type: ${workoutType.name}, '
+  String toString() =>
+      'StatusTick(elapsed: $elapsed, distance: $distanceMeters, type: ${workoutType.name}, '
       'state: ${workoutState.name}, rowing: $isRowing, pace: $pace, watts: $watts, spm: $strokeRate, '
       'hr: $heartRate, calories: $calories, resistance: $resistanceLevel)';
 }
@@ -99,7 +100,8 @@ final class Stroke extends RowingEvent {
   final int? watts;
 
   @override
-  String toString() => 'Stroke(#$strokeNumber, elapsed: $elapsed, distance: $distanceMeters, '
+  String toString() =>
+      'Stroke(#$strokeNumber, elapsed: $elapsed, distance: $distanceMeters, '
       'driveLength: $driveLengthMeters, drive: $driveTime, recovery: $recoveryTime, '
       'peak: ${peakForceNewtons?.toStringAsFixed(1)} N, avg: ${averageForceNewtons?.toStringAsFixed(1)} N, '
       'watts: $watts)';
@@ -129,10 +131,12 @@ final class StrokeForceCurve extends RowingEvent {
   final double? driveLengthMeters;
 
   /// The largest value of [forcesNewtons], 0 for an empty curve.
-  double get peakNewtons => forcesNewtons.fold(0, (max, f) => f > max ? f : max);
+  double get peakNewtons =>
+      forcesNewtons.fold(0, (max, f) => f > max ? f : max);
 
   @override
-  String toString() => 'StrokeForceCurve(#$strokeNumber, elapsed: $elapsed, points: ${forcesNewtons.length}, '
+  String toString() =>
+      'StrokeForceCurve(#$strokeNumber, elapsed: $elapsed, points: ${forcesNewtons.length}, '
       'peak: ${peakNewtons.toStringAsFixed(1)} N, driveLength: $driveLengthMeters)';
 }
 
@@ -162,8 +166,11 @@ final class WorkoutStateChanged extends RowingEvent {
 /// from the heart rate. [elapsed] is the workout time of the last status tick
 /// before the measurement, as the strap has no workout clock.
 final class HeartBeatIntervals extends RowingEvent {
-  HeartBeatIntervals({required super.elapsed, required this.time, required List<int> intervalsMs})
-      : intervalsMs = List.unmodifiable(intervalsMs);
+  HeartBeatIntervals({
+    required super.elapsed,
+    required this.time,
+    required List<int> intervalsMs,
+  }) : intervalsMs = List.unmodifiable(intervalsMs);
 
   /// Receive time of the measurement, on the time axis of the raw packets.
   final Duration time;
@@ -184,5 +191,6 @@ final class HeartBeatIntervals extends RowingEvent {
   }
 
   @override
-  String toString() => 'HeartBeatIntervals(elapsed: $elapsed, time: ${time.inMilliseconds} ms, rr: $intervalsMs)';
+  String toString() =>
+      'HeartBeatIntervals(elapsed: $elapsed, time: ${time.inMilliseconds} ms, rr: $intervalsMs)';
 }

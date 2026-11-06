@@ -19,11 +19,18 @@ class GhostRepository {
     // Laps run on the session time; sessions before schema 7 only have the
     // wall clock, which was their session time (Change auto-pause, Design D2).
     Expression<int> time(Samples s) => coalesce([s.activeMs, s.wallMs]);
-    final samples = await (_db.select(_db.samples)
-          ..where((s) =>
-              s.sessionId.equals(entry.sessionId) & time(s).isBetweenValues(entry.startWallMs, entry.endWallMs))
-          ..orderBy([(s) => OrderingTerm.asc(time(s)), (s) => OrderingTerm.asc(s.wallMs)]))
-        .get();
+    final samples =
+        await (_db.select(_db.samples)
+              ..where(
+                (s) =>
+                    s.sessionId.equals(entry.sessionId) &
+                    time(s).isBetweenValues(entry.startWallMs, entry.endWallMs),
+              )
+              ..orderBy([
+                (s) => OrderingTerm.asc(time(s)),
+                (s) => OrderingTerm.asc(s.wallMs),
+              ]))
+            .get();
     if (samples.isEmpty) return null;
 
     final durationMs = entry.endWallMs - entry.startWallMs;
@@ -32,8 +39,16 @@ class GhostRepository {
     for (final sample in samples) {
       // The boundaries of the entry lie between two samples; the distance
       // within the entry never goes back, even if a counter wobbles.
-      final rowed = (sample.distanceDm - entry.startDistanceDm).clamp(points.last.distanceDm, distanceDm);
-      points.add(GhostPoint(wallMs: (sample.activeMs ?? sample.wallMs!) - entry.startWallMs, distanceDm: rowed));
+      final rowed = (sample.distanceDm - entry.startDistanceDm).clamp(
+        points.last.distanceDm,
+        distanceDm,
+      );
+      points.add(
+        GhostPoint(
+          wallMs: (sample.activeMs ?? sample.wallMs!) - entry.startWallMs,
+          distanceDm: rowed,
+        ),
+      );
     }
     points.add(GhostPoint(wallMs: durationMs, distanceDm: distanceDm));
     return GhostTrack(points);

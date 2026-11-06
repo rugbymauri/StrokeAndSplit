@@ -10,7 +10,8 @@ import 'package:erg_protocol/erg_protocol.dart';
 /// A stroke rate alone is no movement when the base shows one too: a paused
 /// PM5 keeps showing the rate of the earlier piece.
 class FirstStrokeDetector {
-  FirstStrokeDetector(ErgProtocol protocol) : _decoder = ErgDecoder.forProtocol(protocol);
+  FirstStrokeDetector(ErgProtocol protocol)
+    : _decoder = ErgDecoder.forProtocol(protocol);
 
   final ErgDecoder _decoder;
   StatusTick? _base;
@@ -26,7 +27,9 @@ class FirstStrokeDetector {
   List<RawPacket>? add(RawPacket packet) {
     _since.add(packet);
     for (final event in _decoder.decode(packet)) {
-      if (event is Stroke || event is StatusTick && _moves(event)) return [..._baseGroup, ..._since];
+      if (event is Stroke || event is StatusTick && _moves(event)) {
+        return [..._baseGroup, ..._since];
+      }
       if (event is StatusTick) {
         _base = event;
         _baseGroup = _since;

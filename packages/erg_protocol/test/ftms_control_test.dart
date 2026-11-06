@@ -4,30 +4,70 @@ import 'package:test/test.dart';
 void main() {
   group('features', () {
     test('Domyos Woodrower reports and sets the level', () {
-      final features = FtmsFeatures.parse([0xa6, 0x56, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00])!;
+      final features = FtmsFeatures.parse([
+        0xa6,
+        0x56,
+        0x00,
+        0x00,
+        0x04,
+        0x00,
+        0x00,
+        0x00,
+      ])!;
       expect(features.reportsResistanceLevel, isTrue);
       expect(features.setsResistanceLevel, isTrue);
     });
 
     test('a rower without target settings sets nothing', () {
-      final features = FtmsFeatures.parse([0x26, 0x56, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])!;
+      final features = FtmsFeatures.parse([
+        0x26,
+        0x56,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+      ])!;
       expect(features.reportsResistanceLevel, isFalse);
       expect(features.setsResistanceLevel, isFalse);
     });
 
-    test('too few bytes', () => expect(FtmsFeatures.parse([0xa6, 0x56, 0x00, 0x00]), isNull));
+    test(
+      'too few bytes',
+      () => expect(FtmsFeatures.parse([0xa6, 0x56, 0x00, 0x00]), isNull),
+    );
   });
 
   group('range', () {
     test('Domyos Woodrower: 1 to 15 in steps of 1', () {
-      expect(ResistanceRange.parse([0x0a, 0x00, 0x96, 0x00, 0x0a, 0x00]), const ResistanceRange(min: 1, max: 15));
+      expect(
+        ResistanceRange.parse([0x0a, 0x00, 0x96, 0x00, 0x0a, 0x00]),
+        const ResistanceRange(min: 1, max: 15),
+      );
     });
 
     test('nonsense ranges are dropped', () {
-      expect(ResistanceRange.parse([0x0a, 0x00, 0x96, 0x00, 0x00, 0x00]), isNull, reason: 'step 0');
-      expect(ResistanceRange.parse([0x96, 0x00, 0x0a, 0x00, 0x0a, 0x00]), isNull, reason: 'min above max');
-      expect(ResistanceRange.parse([0xf6, 0xff, 0x96, 0x00, 0x0a, 0x00]), isNull, reason: 'negative');
-      expect(ResistanceRange.parse([0x0a, 0x00, 0x96, 0x00]), isNull, reason: 'too short');
+      expect(
+        ResistanceRange.parse([0x0a, 0x00, 0x96, 0x00, 0x00, 0x00]),
+        isNull,
+        reason: 'step 0',
+      );
+      expect(
+        ResistanceRange.parse([0x96, 0x00, 0x0a, 0x00, 0x0a, 0x00]),
+        isNull,
+        reason: 'min above max',
+      );
+      expect(
+        ResistanceRange.parse([0xf6, 0xff, 0x96, 0x00, 0x0a, 0x00]),
+        isNull,
+        reason: 'negative',
+      );
+      expect(
+        ResistanceRange.parse([0x0a, 0x00, 0x96, 0x00]),
+        isNull,
+        reason: 'too short',
+      );
     });
 
     test('clamps into the range and onto its steps', () {
@@ -48,9 +88,19 @@ void main() {
   });
 
   group('control point', () {
-    test('level 6 is one byte in tenths', () => expect(FtmsControl.setResistanceLevel(6), [0x04, 0x3c]));
+    test(
+      'level 6 is one byte in tenths',
+      () => expect(FtmsControl.setResistanceLevel(6), [0x04, 0x3c]),
+    );
 
-    test('level 6 as 16 bits', () => expect(FtmsControl.setResistanceLevel(6, wide: true), [0x04, 0x3c, 0x00]));
+    test(
+      'level 6 as 16 bits',
+      () => expect(FtmsControl.setResistanceLevel(6, wide: true), [
+        0x04,
+        0x3c,
+        0x00,
+      ]),
+    );
 
     test('a level above 25.5 needs 16 bits', () {
       expect(FtmsControl.needsWide(26), isTrue);
@@ -59,8 +109,14 @@ void main() {
 
     test('answers', () {
       expect(FtmsControlResponse.parse([0x80, 0x04, 0x01])!.succeeded, isTrue);
-      expect(FtmsControlResponse.parse([0x80, 0x04, 0x03])!.result, FtmsControl.invalidParameter);
-      expect(FtmsControlResponse.parse([0x80, 0x00, 0x05])!.requestOpCode, FtmsControl.requestControl);
+      expect(
+        FtmsControlResponse.parse([0x80, 0x04, 0x03])!.result,
+        FtmsControl.invalidParameter,
+      );
+      expect(
+        FtmsControlResponse.parse([0x80, 0x00, 0x05])!.requestOpCode,
+        FtmsControl.requestControl,
+      );
       expect(FtmsControlResponse.parse([0x80, 0x04]), isNull);
       expect(FtmsControlResponse.parse([0x07, 0x3c]), isNull);
     });

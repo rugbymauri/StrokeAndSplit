@@ -43,27 +43,39 @@ class ZonesScreen extends ConsumerWidget {
                   Expanded(
                     child: switch (zones) {
                       AsyncData(value: []) => Center(
-                          child: Text(l10n.zonesEmpty, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
+                        child: Text(
+                          l10n.zonesEmpty,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.subtitle,
                         ),
+                      ),
                       AsyncData(:final value) => ListView(
-                          children: [
-                            for (final axis in CourseAxis.values)
-                              if (value.where((u) => u.zone.axis == axis).toList() case final usages
-                                  when usages.isNotEmpty) ...[
-                                SectionLabel(axis == CourseAxis.distance ? l10n.axisDistance : l10n.axisTime),
-                                _ZoneList(usages: usages),
-                                const SizedBox(height: AppSpacing.l),
-                              ],
-                          ],
-                        ),
-                      AsyncError(:final error) => Center(child: Text(l10n.zonesLoadFailed('$error'))),
+                        children: [
+                          for (final axis in CourseAxis.values)
+                            if (value.where((u) => u.zone.axis == axis).toList()
+                                case final usages when usages.isNotEmpty) ...[
+                              SectionLabel(
+                                axis == CourseAxis.distance
+                                    ? l10n.axisDistance
+                                    : l10n.axisTime,
+                              ),
+                              _ZoneList(usages: usages),
+                              const SizedBox(height: AppSpacing.l),
+                            ],
+                        ],
+                      ),
+                      AsyncError(:final error) => Center(
+                        child: Text(l10n.zonesLoadFailed('$error')),
+                      ),
                       _ => const Center(child: CircularProgressIndicator()),
                     },
                   ),
                   const SizedBox(height: AppSpacing.l),
                   OutlinedButton.icon(
                     key: const Key('zone-create'),
-                    style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                    ),
                     onPressed: () => openZoneEditor(context),
                     icon: const Icon(Icons.add),
                     label: Text(l10n.zoneCreateShort),
@@ -79,9 +91,16 @@ class ZonesScreen extends ConsumerWidget {
 }
 
 /// Opens the editor; returns the id of a newly created zone.
-Future<int?> openZoneEditor(BuildContext context, {Zone? zone, CourseAxis? axis}) {
-  return Navigator.of(context)
-      .push(MaterialPageRoute<int>(builder: (_) => ZoneEditorScreen(zone: zone, axis: axis)));
+Future<int?> openZoneEditor(
+  BuildContext context, {
+  Zone? zone,
+  CourseAxis? axis,
+}) {
+  return Navigator.of(context).push(
+    MaterialPageRoute<int>(
+      builder: (_) => ZoneEditorScreen(zone: zone, axis: axis),
+    ),
+  );
 }
 
 /// The zones of one axis on a card, divided by lines, each with a swatch in
@@ -93,7 +112,9 @@ class _ZoneList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = CourseStrip.segmentColors([for (final u in usages) u.zone.segment]);
+    final colors = CourseStrip.segmentColors([
+      for (final u in usages) u.zone.segment,
+    ]);
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppRadii.cardLarge),
@@ -124,10 +145,19 @@ class _ZoneTile extends StatelessWidget {
       leading: Container(
         width: 10,
         height: 30,
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(3),
+        ),
       ),
-      title: Text(zone.name, style: AppTextStyles.cardTitle.copyWith(fontSize: 16)),
-      subtitle: Text(zoneSummary(context.l10n, zone), style: AppTextStyles.caption),
+      title: Text(
+        zone.name,
+        style: AppTextStyles.cardTitle.copyWith(fontSize: 16),
+      ),
+      subtitle: Text(
+        zoneSummary(context.l10n, zone),
+        style: AppTextStyles.caption,
+      ),
       trailing: Text(
         context.l10n.zoneUsage(usage.courses),
         key: Key('zone-usage-${zone.id}'),

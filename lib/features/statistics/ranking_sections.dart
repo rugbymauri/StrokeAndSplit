@@ -11,7 +11,12 @@ import 'ranking_format.dart';
 /// them with the current length first (Change statistics, Design D6); a
 /// hint instead when nothing was rowed yet.
 class RankingSections extends StatelessWidget {
-  const RankingSections({super.key, required this.rankings, required this.axis, required this.length});
+  const RankingSections({
+    super.key,
+    required this.rankings,
+    required this.axis,
+    required this.length,
+  });
 
   final List<Ranking> rankings;
 
@@ -37,8 +42,12 @@ class RankingSections extends StatelessWidget {
         for (final ranking in rankings) ...[
           SectionLabel(
             ranking.axis == axis && ranking.length == length
-                ? l10n.rankingLengthCurrent(formatCourseLength(ranking.axis, ranking.length))
-                : l10n.rankingLength(formatCourseLength(ranking.axis, ranking.length)),
+                ? l10n.rankingLengthCurrent(
+                    formatCourseLength(ranking.axis, ranking.length),
+                  )
+                : l10n.rankingLength(
+                    formatCourseLength(ranking.axis, ranking.length),
+                  ),
           ),
           _Card(
             key: Key('ranking-${ranking.axis.name}-${ranking.length}'),
@@ -66,16 +75,20 @@ class _Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadii.card),
-        clipBehavior: Clip.antiAlias,
-        child: child,
-      );
+    color: AppColors.surface,
+    borderRadius: BorderRadius.circular(AppRadii.card),
+    clipBehavior: Clip.antiAlias,
+    child: child,
+  );
 }
 
 /// A place with its value, the date and the pace per 500 m.
 class _PlaceRow extends StatelessWidget {
-  const _PlaceRow({required this.place, required this.axis, required this.entry});
+  const _PlaceRow({
+    required this.place,
+    required this.axis,
+    required this.entry,
+  });
 
   final int place;
   final CourseAxis axis;
@@ -87,7 +100,10 @@ class _PlaceRow extends StatelessWidget {
     final first = place == 1;
     return Padding(
       key: Key('place-$place'),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.m),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.l,
+        vertical: AppSpacing.m,
+      ),
       child: Row(
         children: [
           Container(
@@ -97,7 +113,9 @@ class _PlaceRow extends StatelessWidget {
             decoration: BoxDecoration(
               color: first ? AppColors.text : null,
               shape: BoxShape.circle,
-              border: first ? null : Border.all(color: AppColors.line, width: 1.5),
+              border: first
+                  ? null
+                  : Border.all(color: AppColors.line, width: 1.5),
             ),
             child: Text(
               '$place',
@@ -117,13 +135,23 @@ class _PlaceRow extends StatelessWidget {
               children: [
                 Text(
                   formatRankingValue(axis, entry),
-                  style: const TextStyle(fontFamily: AppFonts.display, fontSize: 24, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    fontFamily: AppFonts.display,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                Text(formatRankingDate(l10n, entry), style: AppTextStyles.caption),
+                Text(
+                  formatRankingDate(l10n, entry),
+                  style: AppTextStyles.caption,
+                ),
               ],
             ),
           ),
-          Text(l10n.rankingPace(formatRankingPace(entry)), style: AppTextStyles.subtitle),
+          Text(
+            l10n.rankingPace(formatRankingPace(entry)),
+            style: AppTextStyles.subtitle,
+          ),
         ],
       ),
     );

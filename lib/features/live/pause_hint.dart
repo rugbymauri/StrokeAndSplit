@@ -13,8 +13,16 @@ class PauseHint extends StatelessWidget {
     return Container(
       key: const Key('pause-hint'),
       width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(AppSpacing.l, AppSpacing.s, AppSpacing.l, 0),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.s),
+      margin: const EdgeInsets.fromLTRB(
+        AppSpacing.l,
+        AppSpacing.s,
+        AppSpacing.l,
+        0,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.l,
+        vertical: AppSpacing.s,
+      ),
       decoration: BoxDecoration(
         color: AppColors.zoneOutSurface,
         border: Border.all(color: AppColors.zoneOut),
@@ -23,7 +31,11 @@ class PauseHint extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.pause_circle, color: AppColors.zoneOutText, size: 36),
+          const Icon(
+            Icons.pause_circle,
+            color: AppColors.zoneOutText,
+            size: 36,
+          ),
           const SizedBox(width: AppSpacing.m),
           Flexible(
             child: Text(

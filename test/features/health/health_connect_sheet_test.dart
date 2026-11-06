@@ -15,27 +15,38 @@ import '../../support/localized_app.dart';
 import '../../support/test_database.dart';
 
 class _Setup {
-  _Setup({this.available = true, HealthStatus status = HealthStatus.available, Set<HealthKind>? grants})
-      : health = FakeHealthPlatform(health: status, grants: grants);
+  _Setup({
+    this.available = true,
+    HealthStatus status = HealthStatus.available,
+    Set<HealthKind>? grants,
+  }) : health = FakeHealthPlatform(health: status, grants: grants);
 
   final bool available;
   final FakeHealthPlatform health;
   final store = MemoryHealthExportStore();
   final db = openTestDatabase();
-  late final container = ProviderContainer(overrides: [
-    databaseProvider.overrideWithValue(db),
-    wakelockProvider.overrideWithValue(FakeWakelock()),
-    healthPlatformProvider.overrideWithValue(health),
-    healthExportStoreProvider.overrideWithValue(store),
-    healthExportAvailableProvider.overrideWithValue(available),
-  ]);
+  late final container = ProviderContainer(
+    overrides: [
+      databaseProvider.overrideWithValue(db),
+      wakelockProvider.overrideWithValue(FakeWakelock()),
+      healthPlatformProvider.overrideWithValue(health),
+      healthExportStoreProvider.overrideWithValue(store),
+      healthExportAvailableProvider.overrideWithValue(available),
+    ],
+  );
 
-  Future<void> pump(WidgetTester tester, {Widget home = const SessionsScreen(), Locale? locale}) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    Widget home = const SessionsScreen(),
+    Locale? locale,
+  }) async {
     addTearDown(container.dispose);
-    await tester.pumpWidget(UncontrolledProviderScope(
-      container: container,
-      child: LocalizedApp(home: home, locale: locale ?? const Locale('de')),
-    ));
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: LocalizedApp(home: home, locale: locale ?? const Locale('de')),
+      ),
+    );
     await tester.pump();
   }
 
@@ -53,13 +64,16 @@ class _Setup {
 }
 
 void main() {
-  testWidgets('offers nothing without Health Connect on the platform, as on Linux', (tester) async {
-    final setup = _Setup(available: false);
-    await setup.pump(tester);
+  testWidgets(
+    'offers nothing without Health Connect on the platform, as on Linux',
+    (tester) async {
+      final setup = _Setup(available: false);
+      await setup.pump(tester);
 
-    expect(find.byKey(const Key('health-connect-button')), findsNothing);
-    await disposeWidgetsWithDatabase(tester);
-  });
+      expect(find.byKey(const Key('health-connect-button')), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    },
+  );
 
   testWidgets('switches on once the permissions are granted', (tester) async {
     final setup = _Setup();
@@ -80,7 +94,9 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('stays off when the permission for workouts is refused', (tester) async {
+  testWidgets('stays off when the permission for workouts is refused', (
+    tester,
+  ) async {
     final setup = _Setup(grants: {HealthKind.heartRate});
     await setup.pump(tester);
     await setup.openSheet(tester);
@@ -98,7 +114,9 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('says that Health Connect is missing and offers to install it', (tester) async {
+  testWidgets('says that Health Connect is missing and offers to install it', (
+    tester,
+  ) async {
     final setup = _Setup(status: HealthStatus.unavailable);
     await setup.pump(tester);
     await setup.openSheet(tester);
@@ -146,16 +164,26 @@ void main() {
     await tester.tap(find.text('Datenschutz-Hinweis'));
     await tester.pumpAndSettle();
     expect(find.byType(HealthPrivacyScreen), findsOneWidget);
-    expect(find.text('Stroke & Split liest keine Daten aus Health Connect.'), findsOneWidget);
+    expect(
+      find.text('Stroke & Split liest keine Daten aus Health Connect.'),
+      findsOneWidget,
+    );
     await disposeWidgetsWithDatabase(tester);
   });
 
   testWidgets('the privacy notice reads in English', (tester) async {
     final setup = _Setup();
-    await setup.pump(tester, home: const HealthPrivacyScreen(), locale: const Locale('en'));
+    await setup.pump(
+      tester,
+      home: const HealthPrivacyScreen(),
+      locale: const Locale('en'),
+    );
 
     expect(find.text('Privacy notice'), findsOneWidget);
-    expect(find.text('Stroke & Split reads no data from Health Connect.'), findsOneWidget);
+    expect(
+      find.text('Stroke & Split reads no data from Health Connect.'),
+      findsOneWidget,
+    );
     await disposeWidgetsWithDatabase(tester);
   });
 }

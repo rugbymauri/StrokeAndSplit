@@ -13,8 +13,11 @@ import 'templates_screen.dart';
 
 /// Opens the screen of the template with [templateId].
 Future<void> openTemplate(BuildContext context, int templateId) {
-  return Navigator.of(context)
-      .push(MaterialPageRoute<void>(builder: (_) => TemplateScreen(templateId: templateId)));
+  return Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => TemplateScreen(templateId: templateId),
+    ),
+  );
 }
 
 /// A template with its zones and places 1–3, to start it with or without the
@@ -39,12 +42,19 @@ class _TemplateScreenState extends ConsumerState<TemplateScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     ref.listen(templatesProvider, (_, next) {
-      if (next case AsyncData(:final value) when !value.any((t) => t.id == widget.templateId)) {
+      if (next case AsyncData(:final value)
+          when !value.any((t) => t.id == widget.templateId)) {
         final route = ModalRoute.of(context);
-        if (route != null && route.isActive) Navigator.of(context).removeRoute(route);
+        if (route != null && route.isActive) {
+          Navigator.of(context).removeRoute(route);
+        }
       }
     });
-    final template = ref.watch(templatesProvider).value?.where((t) => t.id == widget.templateId).firstOrNull;
+    final template = ref
+        .watch(templatesProvider)
+        .value
+        ?.where((t) => t.id == widget.templateId)
+        .firstOrNull;
     return Scaffold(
       appBar: AppBar(
         title: Text(template?.name ?? ''),
@@ -54,8 +64,11 @@ class _TemplateScreenState extends ConsumerState<TemplateScreen> {
               key: const Key('template-edit'),
               tooltip: l10n.templateEdit,
               icon: const Icon(Icons.edit_outlined),
-              onPressed: () => Navigator.of(context)
-                  .push(MaterialPageRoute<void>(builder: (_) => TemplateEditorScreen(template: template))),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => TemplateEditorScreen(template: template),
+                ),
+              ),
             ),
         ],
       ),
@@ -77,11 +90,17 @@ class _TemplateScreenState extends ConsumerState<TemplateScreen> {
                             AppSpacing.l,
                           ),
                           children: [
-                            Text(templateDetails(l10n, template), style: AppTextStyles.subtitle),
+                            Text(
+                              templateDetails(l10n, template),
+                              style: AppTextStyles.subtitle,
+                            ),
                             const SizedBox(height: AppSpacing.m),
                             CourseStrip(definition: template.course.definition),
                             const SizedBox(height: AppSpacing.m),
-                            for (final line in templateZoneLines(l10n, template.course))
+                            for (final line in templateZoneLines(
+                              l10n,
+                              template.course,
+                            ))
                               Text(line, style: AppTextStyles.caption),
                             const SizedBox(height: AppSpacing.xxl),
                             TemplatePodium(template: template),
@@ -100,14 +119,26 @@ class _TemplateScreenState extends ConsumerState<TemplateScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _GhostSwitch(value: _ghost, onChanged: (value) => setState(() => _ghost = value)),
+                            _GhostSwitch(
+                              value: _ghost,
+                              onChanged: (value) =>
+                                  setState(() => _ghost = value),
+                            ),
                             const SizedBox(height: AppSpacing.s),
                             SizedBox(
                               height: 56,
                               child: FilledButton(
                                 key: const Key('template-start'),
-                                onPressed: () => startRowing(context, ref, template: template, ghost: _ghost),
-                                child: Text(l10n.templateStart, style: AppTextStyles.cardTitle),
+                                onPressed: () => startRowing(
+                                  context,
+                                  ref,
+                                  template: template,
+                                  ghost: _ghost,
+                                ),
+                                child: Text(
+                                  l10n.templateStart,
+                                  style: AppTextStyles.cardTitle,
+                                ),
                               ),
                             ),
                           ],
@@ -141,9 +172,16 @@ class _GhostSwitch extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 48),
           child: Row(
             children: [
-              const ExcludeSemantics(child: GhostSymbol(rimColor: AppColors.bg)),
+              const ExcludeSemantics(
+                child: GhostSymbol(rimColor: AppColors.bg),
+              ),
               const SizedBox(width: AppSpacing.m),
-              Expanded(child: Text(context.l10n.templateGhost, style: AppTextStyles.body)),
+              Expanded(
+                child: Text(
+                  context.l10n.templateGhost,
+                  style: AppTextStyles.body,
+                ),
+              ),
               Switch(value: value, onChanged: onChanged),
             ],
           ),

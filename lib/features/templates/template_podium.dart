@@ -31,9 +31,11 @@ class TemplatePodium extends ConsumerWidget {
     final course = template.course;
     return switch (rankings) {
       AsyncData(:final value) => switch (_current(value, course, laps)) {
-          final Ranking ranking when ranking.entries.isNotEmpty => _Places(ranking: ranking),
-          _ => _Hint(l10n.templatePodiumEmpty),
-        },
+        final Ranking ranking when ranking.entries.isNotEmpty => _Places(
+          ranking: ranking,
+        ),
+        _ => _Hint(l10n.templatePodiumEmpty),
+      },
       // Places are an extra; while loading or on an error the card stays as it is.
       _ => const SizedBox.shrink(),
     };
@@ -42,7 +44,11 @@ class TemplatePodium extends ConsumerWidget {
   /// The ranking of the course length and number of laps rowed today.
   static Ranking? _current(List<Ranking> rankings, Course course, int laps) {
     for (final r in rankings) {
-      if (r.axis == course.axis && r.length == course.definition.length && r.laps == laps) return r;
+      if (r.axis == course.axis &&
+          r.length == course.definition.length &&
+          r.laps == laps) {
+        return r;
+      }
     }
     return null;
   }
@@ -54,8 +60,11 @@ class _Hint extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) =>
-      Text(text, key: const Key('template-podium-hint'), style: AppTextStyles.caption);
+  Widget build(BuildContext context) => Text(
+    text,
+    key: const Key('template-podium-hint'),
+    style: AppTextStyles.caption,
+  );
 }
 
 class _Places extends StatelessWidget {
@@ -70,9 +79,13 @@ class _Places extends StatelessWidget {
       key: const Key('template-podium'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l10n.templatePodiumTitle.toUpperCase(), style: AppTextStyles.label),
+        Text(
+          l10n.templatePodiumTitle.toUpperCase(),
+          style: AppTextStyles.label,
+        ),
         const SizedBox(height: AppSpacing.xs),
-        for (final (i, entry) in ranking.entries.indexed) _Place(place: i + 1, axis: ranking.axis, entry: entry),
+        for (final (i, entry) in ranking.entries.indexed)
+          _Place(place: i + 1, axis: ranking.axis, entry: entry),
       ],
     );
   }
@@ -91,7 +104,9 @@ class _Place extends StatelessWidget {
     final l10n = context.l10n;
     final paceCs = entry.paceCs;
     final value = switch (axis) {
-      CourseAxis.distance => formatLapTime(Duration(milliseconds: entry.durationMs)),
+      CourseAxis.distance => formatLapTime(
+        Duration(milliseconds: entry.durationMs),
+      ),
       CourseAxis.time => '${formatGrouped(entry.distanceDm ~/ 10)} m',
     };
     return Padding(
@@ -103,16 +118,29 @@ class _Place extends StatelessWidget {
         children: [
           SizedBox(
             width: 20,
-            child: Text('$place', style: AppTextStyles.cardTitle.copyWith(color: AppColors.textMuted)),
+            child: Text(
+              '$place',
+              style: AppTextStyles.cardTitle.copyWith(
+                color: AppColors.textMuted,
+              ),
+            ),
           ),
-          Text(value, style: AppTextStyles.cardTitle.copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
+          Text(
+            value,
+            style: AppTextStyles.cardTitle.copyWith(
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
           // Place 1 is the ghost and carries its symbol; the others keep the columns aligned.
           SizedBox(
             key: place == 1 ? const Key('template-ghost-slot') : null,
             width: templateGhostSlotWidth,
             child: place == 1
                 ? Text.rich(
-                    const WidgetSpan(alignment: PlaceholderAlignment.middle, child: GhostSymbol()),
+                    const WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: GhostSymbol(),
+                    ),
                     style: AppTextStyles.cardTitle,
                     textAlign: TextAlign.center,
                   )
@@ -120,12 +148,19 @@ class _Place extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              l10n.templatePodiumPace(formatPace(paceCs == null ? null : Duration(milliseconds: paceCs * 10))),
+              l10n.templatePodiumPace(
+                formatPace(
+                  paceCs == null ? null : Duration(milliseconds: paceCs * 10),
+                ),
+              ),
               style: AppTextStyles.caption,
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Text(DateFormat.yMd(l10n.localeName).format(entry.rowedAt.toLocal()), style: AppTextStyles.caption),
+          Text(
+            DateFormat.yMd(l10n.localeName).format(entry.rowedAt.toLocal()),
+            style: AppTextStyles.caption,
+          ),
         ],
       ),
     );

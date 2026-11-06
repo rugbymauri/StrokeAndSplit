@@ -68,7 +68,10 @@ class PaceBox extends StatelessWidget {
     final width = math.max(0.0, size.width - inset);
     final height = math.max(0.0, size.height - inset);
     final scale = height < minContentHeight ? height / minContentHeight : 1.0;
-    return paceFontSize(Size(width, math.max(height, minContentHeight) - _aroundPace)) * scale;
+    return paceFontSize(
+          Size(width, math.max(height, minContentHeight) - _aroundPace),
+        ) *
+        scale;
   }
 
   @override
@@ -94,8 +97,12 @@ class PaceBox extends StatelessWidget {
           fit: BoxFit.scaleDown,
           child: SizedBox(
             // Wider by as much as it shrinks, so the shrunk content still fills the width.
-            width: constraints.maxWidth * math.max(1, minContentHeight / constraints.maxHeight),
-            height: constraints.maxHeight < minContentHeight ? minContentHeight : constraints.maxHeight,
+            width:
+                constraints.maxWidth *
+                math.max(1, minContentHeight / constraints.maxHeight),
+            height: constraints.maxHeight < minContentHeight
+                ? minContentHeight
+                : constraints.maxHeight,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -135,7 +142,9 @@ class PaceBox extends StatelessWidget {
                       ? null
                       : Center(
                           child: ZonePill(
-                            key: Key('pace-box-zone-${hint.inZone ? 'in' : 'out'}'),
+                            key: Key(
+                              'pace-box-zone-${hint.inZone ? 'in' : 'out'}',
+                            ),
                             hint: hint,
                             band: _paceBand(segment),
                             textKey: const Key('pace-box-status'),
@@ -143,7 +152,10 @@ class PaceBox extends StatelessWidget {
                           ),
                         ),
                 ),
-                const Padding(padding: EdgeInsets.symmetric(vertical: AppSpacing.s), child: Divider(height: 1)),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.s),
+                  child: Divider(height: 1),
+                ),
                 // No track of its own, so no mark either.
                 _LegendLine(
                   key: const Key('pace-box-average'),
@@ -169,9 +181,13 @@ class PaceBox extends StatelessWidget {
                 ),
                 _LegendLine(
                   key: const Key('pace-box-segment'),
-                  marker: _Dot(ProgressFramePainter.segmentColor(progress.pace)),
+                  marker: _Dot(
+                    ProgressFramePainter.segmentColor(progress.pace),
+                  ),
                   // The zone the rower is in, or a free gap (Change zones, Design D7).
-                  label: segment.isFree ? l10n.segmentFree : segment.zoneName ?? l10n.segmentZone,
+                  label: segment.isFree
+                      ? l10n.segmentFree
+                      : segment.zoneName ?? l10n.segmentZone,
                   value: l10n.courseRest(_amount(model.segmentRemaining)),
                 ),
                 if (ghostGap case final gap?) _ghostLine(l10n, gap),
@@ -187,14 +203,20 @@ class PaceBox extends StatelessWidget {
   /// e.g. `7.6 s vor dir` or `12 m hinter dir` (Change ghost, Design D4).
   static Widget _ghostLine(AppLocalizations l10n, GhostGap gap) {
     final (amount, level) = switch (gap.axis) {
-      CourseAxis.distance => (_seconds(gap.amount), (gap.amount * 10).round() == 0),
-      CourseAxis.time => ('${formatGrouped(gap.amount.round())} m', gap.amount.round() == 0),
+      CourseAxis.distance => (
+        _seconds(gap.amount),
+        (gap.amount * 10).round() == 0,
+      ),
+      CourseAxis.time => (
+        '${formatGrouped(gap.amount.round())} m',
+        gap.amount.round() == 0,
+      ),
     };
     final (value, color, kind) = level
         ? (l10n.paceBoxGhostLevel, AppColors.textMuted, 'level')
         : gap.ghostAhead
-            ? (l10n.paceBoxGhostAhead(amount), AppColors.zoneOut, 'behind')
-            : (l10n.paceBoxGhostBehind(amount), AppColors.zoneIn, 'ahead');
+        ? (l10n.paceBoxGhostAhead(amount), AppColors.zoneOut, 'behind')
+        : (l10n.paceBoxGhostBehind(amount), AppColors.zoneIn, 'ahead');
     return _LegendLine(
       key: Key('pace-box-ghost-$kind'),
       marker: const GhostSymbol(),
@@ -236,9 +258,9 @@ class _Dot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        child: const SizedBox.square(dimension: _LegendLine.markerWidth),
-      );
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    child: const SizedBox.square(dimension: _LegendLine.markerWidth),
+  );
 }
 
 /// One line of the legend: the mark of its track, what it is and how far.
@@ -263,14 +285,19 @@ class _LegendLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
-      child: LayoutBuilder(builder: (context, constraints) => _row(constraints.maxWidth)),
+      child: LayoutBuilder(
+        builder: (context, constraints) => _row(constraints.maxWidth),
+      ),
     );
   }
 
   Widget _row(double width) {
     return Row(
       children: [
-        SizedBox(width: markerWidth, child: Center(child: marker)),
+        SizedBox(
+          width: markerWidth,
+          child: Center(child: marker),
+        ),
         const SizedBox(width: AppSpacing.s),
         Expanded(
           child: Text(
@@ -283,7 +310,9 @@ class _LegendLine extends StatelessWidget {
         const SizedBox(width: AppSpacing.s),
         // The value wins over the label, and shrinks only if it alone is too wide.
         ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: width - markerWidth - AppSpacing.s * 2),
+          constraints: BoxConstraints(
+            maxWidth: width - markerWidth - AppSpacing.s * 2,
+          ),
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(

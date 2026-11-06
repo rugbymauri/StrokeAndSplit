@@ -3,15 +3,21 @@ import 'package:strokesplit/data/statistics/ranking.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// A lap of session [session] rowed in [ms] over [metres].
-RankingEntry _lap(int session, int ms, int metres, {DateTime? on, int startWallMs = 0}) => RankingEntry(
-      sessionId: session,
-      startedAt: on ?? DateTime(2026, 10, 1, 7),
-      lap: 1,
-      startWallMs: startWallMs,
-      endWallMs: startWallMs + ms,
-      startDistanceDm: 0,
-      endDistanceDm: metres * 10,
-    );
+RankingEntry _lap(
+  int session,
+  int ms,
+  int metres, {
+  DateTime? on,
+  int startWallMs = 0,
+}) => RankingEntry(
+  sessionId: session,
+  startedAt: on ?? DateTime(2026, 10, 1, 7),
+  lap: 1,
+  startWallMs: startWallMs,
+  endWallMs: startWallMs + ms,
+  startDistanceDm: 0,
+  endDistanceDm: metres * 10,
+);
 
 void main() {
   test('ranks a distance zone by its time, with date and pace', () {
@@ -21,14 +27,17 @@ void main() {
     final ranked = rankEntries(CourseAxis.distance, [slow, fast]);
 
     expect(ranked, [fast, slow]);
-    expect([for (final e in ranked) (e.startedAt, e.paceCs)], [
-      (DateTime(2026, 10, 5), 9100),
-      (DateTime(2026, 10, 1), 9450),
-    ]);
+    expect(
+      [for (final e in ranked) (e.startedAt, e.paceCs)],
+      [(DateTime(2026, 10, 5), 9100), (DateTime(2026, 10, 1), 9450)],
+    );
   });
 
   test('ranks a time course by its metres', () {
-    final ranked = rankEntries(CourseAxis.time, [_lap(1, 240000, 1012), _lap(2, 240000, 1030)]);
+    final ranked = rankEntries(CourseAxis.time, [
+      _lap(1, 240000, 1012),
+      _lap(2, 240000, 1030),
+    ]);
 
     expect([for (final e in ranked) e.distanceDm ~/ 10], [1030, 1012]);
   });
@@ -45,7 +54,10 @@ void main() {
     final later = _lap(1, 248000, 1000, on: DateTime(2026, 10, 5));
     final earlier = _lap(2, 248000, 1000, on: DateTime(2026, 10, 1));
 
-    expect(rankEntries(CourseAxis.distance, [later, earlier]), [earlier, later]);
+    expect(rankEntries(CourseAxis.distance, [later, earlier]), [
+      earlier,
+      later,
+    ]);
   });
 
   test('puts the earlier lap of a session ahead on a tie', () {
@@ -75,9 +87,11 @@ void main() {
   });
 
   test('keeps the first places', () {
-    final ranking = Ranking(axis: CourseAxis.distance, length: 1000, entries: [
-      for (var i = 0; i < 5; i++) _lap(i, 240000 + i, 1000),
-    ]);
+    final ranking = Ranking(
+      axis: CourseAxis.distance,
+      length: 1000,
+      entries: [for (var i = 0; i < 5; i++) _lap(i, 240000 + i, 1000)],
+    );
 
     expect([for (final e in ranking.top(3).entries) e.sessionId], [0, 1, 2]);
   });

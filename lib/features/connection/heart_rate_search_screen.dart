@@ -16,12 +16,16 @@ import 'option_card.dart';
 /// heart rate straps in range, apart from the rowers. Choosing one pairs it
 /// and leads back.
 class HeartRateSearchScreen extends ConsumerStatefulWidget {
-  const HeartRateSearchScreen({super.key, this.scanTimeout = const Duration(seconds: 15)});
+  const HeartRateSearchScreen({
+    super.key,
+    this.scanTimeout = const Duration(seconds: 15),
+  });
 
   final Duration scanTimeout;
 
   @override
-  ConsumerState<HeartRateSearchScreen> createState() => _HeartRateSearchScreenState();
+  ConsumerState<HeartRateSearchScreen> createState() =>
+      _HeartRateSearchScreenState();
 }
 
 enum _Phase { checking, notReady, failed, scanning, done }
@@ -62,7 +66,9 @@ class _HeartRateSearchScreenState extends ConsumerState<HeartRateSearchScreen> {
     }
     setState(() => _phase = _Phase.scanning);
     await _scan?.cancel();
-    _scan = transport.scanHeartRateMonitors(timeout: widget.scanTimeout).listen(
+    _scan = transport
+        .scanHeartRateMonitors(timeout: widget.scanTimeout)
+        .listen(
           (found) => setState(() => _found = found),
           onError: (Object error) => setState(() {
             if (error is BluetoothNotReadyException) {
@@ -76,7 +82,9 @@ class _HeartRateSearchScreenState extends ConsumerState<HeartRateSearchScreen> {
           onDone: () {
             // Cancelling a finished scan would never complete.
             _scan = null;
-            if (mounted && _phase == _Phase.scanning) setState(() => _phase = _Phase.done);
+            if (mounted && _phase == _Phase.scanning) {
+              setState(() => _phase = _Phase.done);
+            }
           },
         );
   }
@@ -94,7 +102,8 @@ class _HeartRateSearchScreenState extends ConsumerState<HeartRateSearchScreen> {
     final paired = ref.watch(chosenHeartRateMonitorProvider);
     final busy = _phase == _Phase.scanning || _phase == _Phase.checking;
     final message = switch (_phase) {
-      _Phase.notReady when _readiness == BluetoothReadiness.off => l10n.strapBluetoothOff,
+      _Phase.notReady when _readiness == BluetoothReadiness.off =>
+        l10n.strapBluetoothOff,
       _Phase.notReady => bluetoothNotReadyText(l10n, _readiness),
       _Phase.failed => l10n.strapSearchFailed('$_scanError'),
       _Phase.done when _found.isEmpty => l10n.strapSearchNothingFound,
@@ -103,7 +112,12 @@ class _HeartRateSearchScreenState extends ConsumerState<HeartRateSearchScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.strapSearchTitle),
-        bottom: busy ? const PreferredSize(preferredSize: Size.fromHeight(4), child: LinearProgressIndicator()) : null,
+        bottom: busy
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(4),
+                child: LinearProgressIndicator(),
+              )
+            : null,
       ),
       body: SafeArea(
         child: ListView(
@@ -117,16 +131,22 @@ class _HeartRateSearchScreenState extends ConsumerState<HeartRateSearchScreen> {
                   key: Key('strap-${monitor.id}'),
                   icon: Icons.favorite_border,
                   title: monitor.name,
-                  subtitle: monitor == paired ? '${l10n.devicesStrapPaired} · ${monitor.id}' : monitor.id,
+                  subtitle: monitor == paired
+                      ? '${l10n.devicesStrapPaired} · ${monitor.id}'
+                      : monitor.id,
                   selected: monitor == paired,
                   onTap: () => _pair(monitor),
                 ),
               ),
-            if (message != null) ScanMessage(text: message, onRetry: _startScan),
+            if (message != null)
+              ScanMessage(text: message, onRetry: _startScan),
             if (message == null && _phase == _Phase.done)
               Align(
                 alignment: Alignment.centerLeft,
-                child: OutlinedButton(onPressed: _startScan, child: Text(l10n.deviceListRetry)),
+                child: OutlinedButton(
+                  onPressed: _startScan,
+                  child: Text(l10n.deviceListRetry),
+                ),
               ),
           ],
         ),

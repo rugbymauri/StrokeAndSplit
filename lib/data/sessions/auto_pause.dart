@@ -13,7 +13,9 @@ class PauseSpan {
 
   @override
   bool operator ==(Object other) =>
-      other is PauseSpan && other.startWallMs == startWallMs && other.endWallMs == endWallMs;
+      other is PauseSpan &&
+      other.startWallMs == startWallMs &&
+      other.endWallMs == endWallMs;
 
   @override
   int get hashCode => Object.hash(startWallMs, endWallMs);
@@ -74,7 +76,8 @@ class AutoPause {
   /// [overdue] after the next stroke was due. After the first stroke the
   /// rhythm is not known yet and counts as [longestRhythm].
   int get _pauseDueMs {
-    final rhythmMs = _rhythmMs ?? (_strokeSinceResume ? longestRhythm.inMilliseconds : 0);
+    final rhythmMs =
+        _rhythmMs ?? (_strokeSinceResume ? longestRhythm.inMilliseconds : 0);
     return _lastStrokeMs + rhythmMs + overdue.inMilliseconds;
   }
 
@@ -89,7 +92,9 @@ class AutoPause {
           final distance = _distance;
           if (distance != null && event.distanceMeters > distance) {
             final lastRise = _lastRiseMs;
-            if (lastRise == null || wallMs - lastRise > _stillMs) _riseStartMs = wallMs;
+            if (lastRise == null || wallMs - lastRise > _stillMs) {
+              _riseStartMs = wallMs;
+            }
             _lastRiseMs = wallMs;
           }
           if (_rowing == false && event.isRowing) rowingAgain = true;
@@ -115,7 +120,9 @@ class AutoPause {
       final started = _pauseStartMs;
       if (started != null && _pauseDueMs > started) _pauseStartMs = null;
     }
-    if (_pauseStartMs == null && wallMs >= _pauseDueMs) _pauseStartMs = _pauseDueMs;
+    if (_pauseStartMs == null && wallMs >= _pauseDueMs) {
+      _pauseStartMs = _pauseDueMs;
+    }
 
     final pauseStart = _pauseStartMs;
     if (pauseStart != null && rowingAgain && !resumed) {

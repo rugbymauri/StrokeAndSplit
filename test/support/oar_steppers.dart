@@ -3,13 +3,16 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The value of the [OarStepper] with [key].
-int stepperValue(WidgetTester tester, Key key) => tester.widget<OarStepper>(find.byKey(key)).value;
+int stepperValue(WidgetTester tester, Key key) =>
+    tester.widget<OarStepper>(find.byKey(key)).value;
 
 /// Taps the button "more" or "less" of the [OarStepper] with [key] once.
 Future<void> tapStep(WidgetTester tester, Key key, {required bool more}) async {
   final button = find.descendant(
     of: find.byKey(key),
-    matching: find.bySemanticsLabel(RegExp(more ? r' (mehr|more)$' : r' (weniger|less)$')),
+    matching: find.bySemanticsLabel(
+      RegExp(more ? r' (mehr|more)$' : r' (weniger|less)$'),
+    ),
   );
   await tester.ensureVisible(button);
   await tester.tap(button);

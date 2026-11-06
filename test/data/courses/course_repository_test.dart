@@ -7,33 +7,52 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
 
-final _seerunde = CourseDefinition.single(axis: CourseAxis.distance, length: 1000);
+final _seerunde = CourseDefinition.single(
+  axis: CourseAxis.distance,
+  length: 1000,
+);
 
 /// Stores a session rowed on [versionId], with one lap.
 Future<int> _rowSession(AppDatabase db, int versionId) async {
-  final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
-        startedAt: DateTime(2026, 10, 16),
-        status: SessionStatus.complete,
-        source: ErgSourceKind.pm5,
-        courseVersionId: Value(versionId),
-      ));
-  await db.into(db.laps).insert(LapsCompanion.insert(
-        sessionId: id,
-        lapNo: 1,
-        startWallMs: 0,
-        endWallMs: 240000,
-        startDistanceDm: 0,
-        endDistanceDm: 10000,
-        complete: true,
-      ));
+  final id = await db
+      .into(db.sessions)
+      .insert(
+        SessionsCompanion.insert(
+          startedAt: DateTime(2026, 10, 16),
+          status: SessionStatus.complete,
+          source: ErgSourceKind.pm5,
+          courseVersionId: Value(versionId),
+        ),
+      );
+  await db
+      .into(db.laps)
+      .insert(
+        LapsCompanion.insert(
+          sessionId: id,
+          lapNo: 1,
+          startWallMs: 0,
+          endWallMs: 240000,
+          startDistanceDm: 0,
+          endDistanceDm: 10000,
+          complete: true,
+        ),
+      );
   return id;
 }
 
 Future<int> _template(AppDatabase db, String name, int courseId) async {
-  final id = await db.into(db.templates).insert(TemplatesCompanion.insert(name: name, createdAt: DateTime(2026)));
+  final id = await db
+      .into(db.templates)
+      .insert(TemplatesCompanion.insert(name: name, createdAt: DateTime(2026)));
   await db
       .into(db.templateBlocks)
-      .insert(TemplateBlocksCompanion.insert(templateId: id, position: 0, courseId: courseId));
+      .insert(
+        TemplateBlocksCompanion.insert(
+          templateId: id,
+          position: 0,
+          courseId: courseId,
+        ),
+      );
   return id;
 }
 
@@ -47,24 +66,40 @@ void main() {
   });
 
   test('stores distance and time courses and lists them by name', () async {
-    await courses.create('Vier Minuten', CourseDefinition.single(axis: CourseAxis.time, length: 240));
+    await courses.create(
+      'Vier Minuten',
+      CourseDefinition.single(axis: CourseAxis.time, length: 240),
+    );
     await courses.create('Seerunde', _seerunde);
 
     final list = await courses.all();
 
-    expect([for (final c in list) (c.name, formatCourseLength(c.axis, c.definition.length))], [
-      ('Seerunde', '1000 m'),
-      ('Vier Minuten', '4:00'),
-    ]);
+    expect(
+      [
+        for (final c in list)
+          (c.name, formatCourseLength(c.axis, c.definition.length)),
+      ],
+      [('Seerunde', '1000 m'), ('Vier Minuten', '4:00')],
+    );
     expect(list.first.version, 1);
   });
 
   test('stores segments with their bands', () async {
-    const definition = CourseDefinition(axis: CourseAxis.distance, length: 1000, segments: [
-      CourseSegment(length: 200),
-      CourseSegment(length: 600, paceFastCs: 12500, paceSlowCs: 13000, spmMin: 20, spmMax: 22),
-      CourseSegment(length: 200),
-    ]);
+    const definition = CourseDefinition(
+      axis: CourseAxis.distance,
+      length: 1000,
+      segments: [
+        CourseSegment(length: 200),
+        CourseSegment(
+          length: 600,
+          paceFastCs: 12500,
+          paceSlowCs: 13000,
+          spmMin: 20,
+          spmMax: 22,
+        ),
+        CourseSegment(length: 200),
+      ],
+    );
     final id = await courses.create('Seerunde', definition);
 
     expect((await courses.get(id))!.definition, definition);
@@ -82,7 +117,10 @@ void main() {
     final id = await courses.create('Seerunde', _seerunde);
     final before = (await courses.get(id))!;
 
-    await courses.updateDefinition(id, CourseDefinition.single(axis: CourseAxis.distance, length: 1200));
+    await courses.updateDefinition(
+      id,
+      CourseDefinition.single(axis: CourseAxis.distance, length: 1200),
+    );
 
     final after = (await courses.get(id))!;
     expect(after.definition.length, 1200);
@@ -95,7 +133,10 @@ void main() {
     final rowed = (await courses.get(id))!;
     await _rowSession(db, rowed.versionId);
 
-    await courses.updateDefinition(id, CourseDefinition.single(axis: CourseAxis.distance, length: 1200));
+    await courses.updateDefinition(
+      id,
+      CourseDefinition.single(axis: CourseAxis.distance, length: 1200),
+    );
 
     final newest = (await courses.get(id))!;
     expect(newest.version, 2);
@@ -120,7 +161,10 @@ void main() {
     final id = await courses.create('Seerunde', _seerunde);
 
     expect(
-      () => courses.updateDefinition(id, CourseDefinition.single(axis: CourseAxis.time, length: 240)),
+      () => courses.updateDefinition(
+        id,
+        CourseDefinition.single(axis: CourseAxis.time, length: 240),
+      ),
       throwsArgumentError,
     );
   });
@@ -134,44 +178,68 @@ void main() {
 
     expect(await courses.all(), isEmpty);
     expect((await courses.atVersion(rowed.versionId)).name, 'Seerunde');
-    final laps = await (db.select(db.laps)..where((l) => l.sessionId.equals(session))).get();
+    final laps = await (db.select(
+      db.laps,
+    )..where((l) => l.sessionId.equals(session))).get();
     expect(laps.single.endWallMs, 240000);
   });
 
   test('deleting a course deletes the templates using it', () async {
     final id = await courses.create('Seerunde', _seerunde);
-    final other = await courses.create('Sprint', CourseDefinition.single(axis: CourseAxis.distance, length: 500));
+    final other = await courses.create(
+      'Sprint',
+      CourseDefinition.single(axis: CourseAxis.distance, length: 500),
+    );
     await _template(db, 'Seerunde x3', id);
     await _template(db, 'Sprint x5', other);
 
     expect(await courses.templatesUsing(id), ['Seerunde x3']);
     await courses.delete(id);
 
-    expect((await db.select(db.templates).get()).map((t) => t.name), ['Sprint x5']);
+    expect((await db.select(db.templates).get()).map((t) => t.name), [
+      'Sprint x5',
+    ]);
     expect(await db.select(db.templateBlocks).get(), hasLength(1));
   });
 
   test('tells the list about changes', () async {
-    final updates = courses.watchAll().map((list) => list.map((c) => c.name).toList());
-    final expectation = expectLater(updates, emitsInOrder([<String>[], ['Seerunde']]));
+    final updates = courses.watchAll().map(
+      (list) => list.map((c) => c.name).toList(),
+    );
+    final expectation = expectLater(
+      updates,
+      emitsInOrder([
+        <String>[],
+        ['Seerunde'],
+      ]),
+    );
 
     await Future<void>.delayed(Duration.zero);
     await courses.create('Seerunde', _seerunde);
     await expectation;
   });
 
-  test('counts how often a course was rowed, in all versions and in the newest', () async {
-    final id = await courses.create('Seerunde', _seerunde);
-    await courses.create('Vier Minuten', CourseDefinition.single(axis: CourseAxis.time, length: 240));
-    final first = (await courses.get(id))!.versionId;
-    await _rowSession(db, first);
-    await _rowSession(db, first);
-    expect(await courses.rowCounts(), {id: (total: 2, newest: 2)});
+  test(
+    'counts how often a course was rowed, in all versions and in the newest',
+    () async {
+      final id = await courses.create('Seerunde', _seerunde);
+      await courses.create(
+        'Vier Minuten',
+        CourseDefinition.single(axis: CourseAxis.time, length: 240),
+      );
+      final first = (await courses.get(id))!.versionId;
+      await _rowSession(db, first);
+      await _rowSession(db, first);
+      expect(await courses.rowCounts(), {id: (total: 2, newest: 2)});
 
-    await courses.updateDefinition(id, CourseDefinition.single(axis: CourseAxis.distance, length: 1200));
-    expect(await courses.rowCounts(), {id: (total: 2, newest: 0)});
+      await courses.updateDefinition(
+        id,
+        CourseDefinition.single(axis: CourseAxis.distance, length: 1200),
+      );
+      expect(await courses.rowCounts(), {id: (total: 2, newest: 0)});
 
-    await _rowSession(db, (await courses.get(id))!.versionId);
-    expect(await courses.rowCounts(), {id: (total: 3, newest: 1)});
-  });
+      await _rowSession(db, (await courses.get(id))!.versionId);
+      expect(await courses.rowCounts(), {id: (total: 3, newest: 1)});
+    },
+  );
 }

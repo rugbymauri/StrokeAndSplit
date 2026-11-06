@@ -33,7 +33,12 @@ class TemplatesScreen extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 640),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePortrait, 0, AppSpacing.pagePortrait, AppSpacing.s),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.pagePortrait,
+                    0,
+                    AppSpacing.pagePortrait,
+                    AppSpacing.s,
+                  ),
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: AppColors.surface,
@@ -94,24 +99,36 @@ class _TemplatesTab extends ConsumerWidget {
               children: [
                 Expanded(
                   child: switch (templates) {
-                    AsyncData(value: []) when !hasCourses => _NoCourse(onCreate: () => openCourseEditor(context)),
+                    AsyncData(value: []) when !hasCourses => _NoCourse(
+                      onCreate: () => openCourseEditor(context),
+                    ),
                     AsyncData(value: []) => Center(
-                        child: Text(l10n.templatesEmpty, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
+                      child: Text(
+                        l10n.templatesEmpty,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.subtitle,
                       ),
+                    ),
                     AsyncData(:final value) => ListView.separated(
-                        itemCount: value.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 10),
-                        itemBuilder: (context, i) => _TemplateCard(template: value[i]),
-                      ),
-                    AsyncError(:final error) => Center(child: Text(l10n.templatesLoadFailed('$error'))),
+                      itemCount: value.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) =>
+                          _TemplateCard(template: value[i]),
+                    ),
+                    AsyncError(:final error) => Center(
+                      child: Text(l10n.templatesLoadFailed('$error')),
+                    ),
                     _ => const Center(child: CircularProgressIndicator()),
                   },
                 ),
                 const SizedBox(height: AppSpacing.l),
                 OutlinedButton.icon(
                   key: const Key('template-create'),
-                  style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-                  onPressed: () => hasCourses ? _openEditor(context) : _offerCourse(context),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                  onPressed: () =>
+                      hasCourses ? _openEditor(context) : _offerCourse(context),
                   icon: const Icon(Icons.add),
                   label: Text(l10n.templateCreate),
                 ),
@@ -132,8 +149,14 @@ class _TemplatesTab extends ConsumerWidget {
           title: Text(l10n.templateNeedsCourseTitle),
           content: Text(l10n.templateNeedsCourseBody),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.actionCancel)),
-            FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.courseCreate)),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.actionCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.courseCreate),
+            ),
           ],
         );
       },
@@ -143,7 +166,9 @@ class _TemplatesTab extends ConsumerWidget {
 }
 
 Future<void> _openEditor(BuildContext context) {
-  return Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const TemplateEditorScreen()));
+  return Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const TemplateEditorScreen()));
 }
 
 class _NoCourse extends StatelessWidget {
@@ -160,9 +185,17 @@ class _NoCourse extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.templateNeedsCourse, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
+            Text(
+              l10n.templateNeedsCourse,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.subtitle,
+            ),
             const SizedBox(height: 16),
-            FilledButton.icon(onPressed: onCreate, icon: const Icon(Icons.route), label: Text(l10n.courseCreate)),
+            FilledButton.icon(
+              onPressed: onCreate,
+              icon: const Icon(Icons.route),
+              label: Text(l10n.courseCreate),
+            ),
           ],
         ),
       ),
@@ -182,7 +215,8 @@ String templateDetails(AppLocalizations l10n, SessionTemplate template) {
 List<String> templateZoneLines(AppLocalizations l10n, Course course) {
   final lines = {
     for (final s in course.definition.segments)
-      if (!s.isFree) '${s.zoneName ?? l10n.segmentZone} ${formatSegmentBands(l10n, s)}',
+      if (!s.isFree)
+        '${s.zoneName ?? l10n.segmentZone} ${formatSegmentBands(l10n, s)}',
   };
   return lines.isEmpty ? [l10n.courseZonesSummary(0, '')] : lines.toList();
 }
@@ -217,9 +251,15 @@ class _TemplateCard extends StatelessWidget {
                   children: [
                     Text(template.name, style: AppTextStyles.cardTitle),
                     const SizedBox(height: 2),
-                    Text(templateDetails(l10n, template), style: AppTextStyles.subtitle),
+                    Text(
+                      templateDetails(l10n, template),
+                      style: AppTextStyles.subtitle,
+                    ),
                     const SizedBox(height: AppSpacing.m),
-                    CourseStrip(definition: template.course.definition, height: 10),
+                    CourseStrip(
+                      definition: template.course.definition,
+                      height: 10,
+                    ),
                   ],
                 ),
               ),

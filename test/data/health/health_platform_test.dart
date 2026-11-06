@@ -11,13 +11,15 @@ void main() {
 
   setUp(() {
     calls.clear();
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
-      calls.add(call);
-      return answer(call);
-    });
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+          calls.add(call);
+          return answer(call);
+        });
   });
   tearDown(
-    () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, null),
+    () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null),
   );
 
   final start = DateTime.utc(2026, 11, 2, 18, 30);
@@ -30,12 +32,19 @@ void main() {
     meters: 2000.5,
     kilocalories: 120,
     heartRate: [
-      HealthSeries(id: 'strokesplit-1-heartRate-0', samples: [HealthSample(at(1), 140), HealthSample(at(2), 141)]),
+      HealthSeries(
+        id: 'strokesplit-1-heartRate-0',
+        samples: [HealthSample(at(1), 140), HealthSample(at(2), 141)],
+      ),
     ],
     laps: [HealthLap(start: start, end: at(300), meters: 1000)],
     segments: [
       HealthSegment(start: start, end: at(100), type: HealthSegmentType.rowing),
-      HealthSegment(start: at(100), end: at(130), type: HealthSegmentType.pause),
+      HealthSegment(
+        start: at(100),
+        end: at(130),
+        type: HealthSegmentType.pause,
+      ),
     ],
   );
 
@@ -76,28 +85,46 @@ void main() {
   });
 
   test('turns a refusal of the platform into its reason', () async {
-    answer = (_) => throw PlatformException(code: 'permission', message: 'not permitted');
+    answer = (_) =>
+        throw PlatformException(code: 'permission', message: 'not permitted');
     await expectLater(
       ChannelHealthPlatform().write(workout, version: 1),
-      throwsA(isA<HealthException>().having((e) => e.reason, 'reason', HealthFailure.permission)),
+      throwsA(
+        isA<HealthException>().having(
+          (e) => e.reason,
+          'reason',
+          HealthFailure.permission,
+        ),
+      ),
     );
     answer = (_) => throw PlatformException(code: 'odd');
     await expectLater(
       ChannelHealthPlatform().write(workout, version: 1),
-      throwsA(isA<HealthException>().having((e) => e.reason, 'reason', HealthFailure.failed)),
+      throwsA(
+        isA<HealthException>().having(
+          (e) => e.reason,
+          'reason',
+          HealthFailure.failed,
+        ),
+      ),
     );
   });
 
   test('asks for permissions by name and reads the status', () async {
     answer = (call) => switch (call.method) {
-          'status' => 'updateRequired',
-          'requestPermissions' => ['exercise', 'heartRate', 'unknown'],
-          _ => null,
-        };
+      'status' => 'updateRequired',
+      'requestPermissions' => ['exercise', 'heartRate', 'unknown'],
+      _ => null,
+    };
     final platform = ChannelHealthPlatform();
     expect(await platform.status(), HealthStatus.updateRequired);
-    expect(await platform.requestPermissions({HealthKind.exercise, HealthKind.heartRate}),
-        {HealthKind.exercise, HealthKind.heartRate});
+    expect(
+      await platform.requestPermissions({
+        HealthKind.exercise,
+        HealthKind.heartRate,
+      }),
+      {HealthKind.exercise, HealthKind.heartRate},
+    );
     expect(calls.last.arguments, ['exercise', 'heartRate']);
   });
 
@@ -107,11 +134,14 @@ void main() {
     expect(await platform.openedForPrivacy(), isTrue);
 
     final requests = platform.privacyRequests.first;
-    await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.handlePlatformMessage(
-      ChannelHealthPlatform.name,
-      const StandardMethodCodec().encodeMethodCall(const MethodCall('launchAction', 'privacy')),
-      (_) {},
-    );
+    await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
+          ChannelHealthPlatform.name,
+          const StandardMethodCodec().encodeMethodCall(
+            const MethodCall('launchAction', 'privacy'),
+          ),
+          (_) {},
+        );
     await requests;
   });
 }

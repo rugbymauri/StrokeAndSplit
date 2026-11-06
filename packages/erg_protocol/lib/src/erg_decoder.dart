@@ -13,14 +13,13 @@ abstract interface class ErgDecoder {
   /// The decoder for [protocol], wrapped in a [HeartRateDecoder] so the
   /// packets of a directly connected chest strap are understood as well.
   /// [onWarning] receives a message for every packet that had to be dropped.
-  factory ErgDecoder.forProtocol(ErgProtocol protocol, {void Function(String message)? onWarning}) =>
-      HeartRateDecoder(
-        switch (protocol) {
-          ErgProtocol.pm5 => Pm5Decoder(onWarning: onWarning),
-          ErgProtocol.ftms => FtmsDecoder(onWarning: onWarning),
-        },
-        onWarning: onWarning,
-      );
+  factory ErgDecoder.forProtocol(
+    ErgProtocol protocol, {
+    void Function(String message)? onWarning,
+  }) => HeartRateDecoder(switch (protocol) {
+    ErgProtocol.pm5 => Pm5Decoder(onWarning: onWarning),
+    ErgProtocol.ftms => FtmsDecoder(onWarning: onWarning),
+  }, onWarning: onWarning);
 
   List<RowingEvent> decode(RawPacket packet);
 

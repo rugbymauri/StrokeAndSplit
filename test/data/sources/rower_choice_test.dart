@@ -8,7 +8,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ble_transport.dart';
 
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
+const _ftms = FoundRower(
+  id: 'AA:BB:CC:DD:EE:FF',
+  name: 'Stroke & Split FTMS',
+  protocol: ErgProtocol.ftms,
+);
 
 void main() {
   test('a rower and both simulators survive storing', () {
@@ -19,8 +23,12 @@ void main() {
     ]) {
       expect(RowerChoice.decode(choice.encode()), choice);
     }
-    final device = RowerChoice.decode(const RowerChoice.device(_ftms).encode())!.device!;
-    expect((device.name, device.protocol), ('Stroke & Split FTMS', ErgProtocol.ftms));
+    final device = RowerChoice.decode(const RowerChoice.device(_ftms).encode())!
+        .device!;
+    expect(
+      (device.name, device.protocol),
+      ('Stroke & Split FTMS', ErgProtocol.ftms),
+    );
   });
 
   test('nothing stored or something unreadable means no choice', () {
@@ -32,26 +40,39 @@ void main() {
   test('creates the source of the choice and recognises it', () {
     final transport = FakeBleTransport();
     final rower = const RowerChoice.device(_ftms).createSource(transport);
-    final simulator = const RowerChoice.simulator(ErgProtocol.ftms).createSource(transport);
+    final simulator = const RowerChoice.simulator(ErgProtocol.ftms)
+        .createSource(transport);
 
     expect(rower, isA<BleRowerSource>());
     expect((simulator as SimulatedSource).protocol, ErgProtocol.ftms);
     expect(const RowerChoice.device(_ftms).isUsedBy(rower), isTrue);
-    expect(const RowerChoice.simulator(ErgProtocol.ftms).isUsedBy(simulator), isTrue);
+    expect(
+      const RowerChoice.simulator(ErgProtocol.ftms).isUsedBy(simulator),
+      isTrue,
+    );
     expect(const RowerChoice.simulator().isUsedBy(simulator), isFalse);
     expect(const RowerChoice.simulator().isUsedBy(rower), isFalse);
   });
 
   test('remembers the choice in the store', () async {
     final store = MemoryRowerChoiceStore();
-    final container = ProviderContainer(overrides: [rowerChoiceStoreProvider.overrideWithValue(store)]);
+    final container = ProviderContainer(
+      overrides: [rowerChoiceStoreProvider.overrideWithValue(store)],
+    );
     addTearDown(container.dispose);
 
     expect(container.read(chosenRowerProvider), isNull);
-    await container.read(chosenRowerProvider.notifier).choose(const RowerChoice.simulator(ErgProtocol.ftms));
+    await container
+        .read(chosenRowerProvider.notifier)
+        .choose(const RowerChoice.simulator(ErgProtocol.ftms));
 
-    final restarted = ProviderContainer(overrides: [rowerChoiceStoreProvider.overrideWithValue(store)]);
+    final restarted = ProviderContainer(
+      overrides: [rowerChoiceStoreProvider.overrideWithValue(store)],
+    );
     addTearDown(restarted.dispose);
-    expect(restarted.read(chosenRowerProvider), const RowerChoice.simulator(ErgProtocol.ftms));
+    expect(
+      restarted.read(chosenRowerProvider),
+      const RowerChoice.simulator(ErgProtocol.ftms),
+    );
   });
 }

@@ -5,9 +5,12 @@ import 'package:strokesplit/data/health/health_workout.dart';
 
 /// Health Connect in memory: it keeps one workout per id, as the app replaces an earlier write.
 class FakeHealthPlatform implements HealthPlatform {
-  FakeHealthPlatform({this.health = HealthStatus.available, Set<HealthKind>? granted, Set<HealthKind>? grants})
-      : granted = granted ?? {},
-        grants = grants ?? HealthKind.values.toSet();
+  FakeHealthPlatform({
+    this.health = HealthStatus.available,
+    Set<HealthKind>? granted,
+    Set<HealthKind>? grants,
+  }) : granted = granted ?? {},
+       grants = grants ?? HealthKind.values.toSet();
 
   HealthStatus health;
 
@@ -57,7 +60,9 @@ class FakeHealthPlatform implements HealthPlatform {
   Future<void> write(HealthWorkout workout, {required int version}) async {
     writes++;
     if (failure case final failure?) throw HealthException(failure);
-    if (!granted.contains(HealthKind.exercise)) throw const HealthException(HealthFailure.permission);
+    if (!granted.contains(HealthKind.exercise)) {
+      throw const HealthException(HealthFailure.permission);
+    }
     workouts[workout.id] = workout;
   }
 }

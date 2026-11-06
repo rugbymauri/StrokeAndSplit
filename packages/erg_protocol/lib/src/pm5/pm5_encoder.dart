@@ -16,7 +16,9 @@ class Pm5Encoder {
   List<RawPacket> encodeStatus(StatusTick tick, {required Duration at}) {
     final elapsed = _centi(tick.elapsed);
     final paceRaw = tick.pace == null ? 0 : _centi(tick.pace!);
-    final speedRaw = tick.pace == null ? 0 : (500 / tick.pace!.inMilliseconds * 1000 * 1000).round();
+    final speedRaw = tick.pace == null
+        ? 0
+        : (500 / tick.pace!.inMilliseconds * 1000 * 1000).round();
 
     final general = _Bytes(19)
       ..u24(0, elapsed)
@@ -37,40 +39,68 @@ class Pm5Encoder {
       ..u16(6, tick.calories ?? 0);
 
     return [
-      RawPacket(time: at, characteristicId: Pm5Characteristics.generalStatus, bytes: general.bytes),
-      RawPacket(time: at, characteristicId: Pm5Characteristics.additionalStatus, bytes: additional.bytes),
-      RawPacket(time: at, characteristicId: Pm5Characteristics.additionalStatus2, bytes: additional2.bytes),
+      RawPacket(
+        time: at,
+        characteristicId: Pm5Characteristics.generalStatus,
+        bytes: general.bytes,
+      ),
+      RawPacket(
+        time: at,
+        characteristicId: Pm5Characteristics.additionalStatus,
+        bytes: additional.bytes,
+      ),
+      RawPacket(
+        time: at,
+        characteristicId: Pm5Characteristics.additionalStatus2,
+        bytes: additional2.bytes,
+      ),
     ];
   }
 
   /// The notifications at the end of the drive: stroke data and stroke power.
   List<RawPacket> encodeDriveEnd(Stroke stroke, {required Duration at}) => [
-        RawPacket(time: at, characteristicId: Pm5Characteristics.strokeData, bytes: _strokeData(stroke)),
-        RawPacket(
-          time: at,
-          characteristicId: Pm5Characteristics.additionalStrokeData,
-          bytes: (_Bytes(15)
+    RawPacket(
+      time: at,
+      characteristicId: Pm5Characteristics.strokeData,
+      bytes: _strokeData(stroke),
+    ),
+    RawPacket(
+      time: at,
+      characteristicId: Pm5Characteristics.additionalStrokeData,
+      bytes:
+          (_Bytes(15)
                 ..u24(0, _centi(stroke.elapsed))
                 ..u16(3, stroke.watts ?? 0)
                 ..u16(7, stroke.strokeNumber))
               .bytes,
-        ),
-      ];
+    ),
+  ];
 
   /// The notification at the end of the recovery, which completes the stroke.
   RawPacket encodeRecoveryEnd(Stroke stroke, {required Duration at}) =>
-      RawPacket(time: at, characteristicId: Pm5Characteristics.strokeData, bytes: _strokeData(stroke));
+      RawPacket(
+        time: at,
+        characteristicId: Pm5Characteristics.strokeData,
+        bytes: _strokeData(stroke),
+      );
 
   /// The force curve notifications sent right after [encodeDriveEnd]: nine
   /// values in whole pound-force per packet, the last packet shorter.
   ///
   /// Throws an [ArgumentError] for an empty curve or one with more values than
   /// fit into 15 packets.
-  List<RawPacket> encodeForceCurve(List<double> forcesNewtons, {required Duration at}) {
+  List<RawPacket> encodeForceCurve(
+    List<double> forcesNewtons, {
+    required Duration at,
+  }) {
     const perPacket = 9, maxPackets = 15;
-    if (forcesNewtons.isEmpty || forcesNewtons.length > perPacket * maxPackets) {
+    if (forcesNewtons.isEmpty ||
+        forcesNewtons.length > perPacket * maxPackets) {
       throw ArgumentError.value(
-          forcesNewtons.length, 'forcesNewtons', 'must hold 1 to ${perPacket * maxPackets} values');
+        forcesNewtons.length,
+        'forcesNewtons',
+        'must hold 1 to ${perPacket * maxPackets} values',
+      );
     }
     final total = (forcesNewtons.length / perPacket).ceil();
     return [
@@ -78,12 +108,20 @@ class Pm5Encoder {
         RawPacket(
           time: at,
           characteristicId: Pm5Characteristics.forceCurve,
-          bytes: _curvePacket(total, counter, forcesNewtons.skip(counter * perPacket).take(perPacket).toList()),
+          bytes: _curvePacket(
+            total,
+            counter,
+            forcesNewtons.skip(counter * perPacket).take(perPacket).toList(),
+          ),
         ),
     ];
   }
 
-  static Uint8List _curvePacket(int total, int counter, List<double> forcesNewtons) {
+  static Uint8List _curvePacket(
+    int total,
+    int counter,
+    List<double> forcesNewtons,
+  ) {
     final packet = _Bytes(2 + 2 * forcesNewtons.length)
       ..u8(0, total << 4 | forcesNewtons.length)
       ..u8(1, counter);
@@ -93,16 +131,25 @@ class Pm5Encoder {
     return packet.bytes;
   }
 
-  Uint8List _strokeData(Stroke stroke) => (_Bytes(20)
-        ..u24(0, _centi(stroke.elapsed))
-        ..u24(3, (stroke.distanceMeters * 10).round())
-        ..u8(6, ((stroke.driveLengthMeters ?? 0) * 100).round())
-        ..u8(7, _centi(stroke.driveTime ?? Duration.zero))
-        ..u16(8, _centi(stroke.recoveryTime ?? Duration.zero))
-        ..u16(12, ((stroke.peakForceNewtons ?? 0) / newtonsPerPoundForce * 10).round())
-        ..u16(14, ((stroke.averageForceNewtons ?? 0) / newtonsPerPoundForce * 10).round())
-        ..u16(18, stroke.strokeNumber))
-      .bytes;
+  Uint8List _strokeData(Stroke stroke) =>
+      (_Bytes(20)
+            ..u24(0, _centi(stroke.elapsed))
+            ..u24(3, (stroke.distanceMeters * 10).round())
+            ..u8(6, ((stroke.driveLengthMeters ?? 0) * 100).round())
+            ..u8(7, _centi(stroke.driveTime ?? Duration.zero))
+            ..u16(8, _centi(stroke.recoveryTime ?? Duration.zero))
+            ..u16(
+              12,
+              ((stroke.peakForceNewtons ?? 0) / newtonsPerPoundForce * 10)
+                  .round(),
+            )
+            ..u16(
+              14,
+              ((stroke.averageForceNewtons ?? 0) / newtonsPerPoundForce * 10)
+                  .round(),
+            )
+            ..u16(18, stroke.strokeNumber))
+          .bytes;
 
   static int _centi(Duration d) => (d.inMilliseconds / 10).round();
 

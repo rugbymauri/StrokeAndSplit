@@ -11,5 +11,6 @@ extension L10n on BuildContext {
 
 extension QuotedNames on AppLocalizations {
   /// [names] the user gave, each in quotes, separated by commas.
-  String quotedNames(Iterable<String> names) => names.map(quotedName).join(', ');
+  String quotedNames(Iterable<String> names) =>
+      names.map(quotedName).join(', ');
 }

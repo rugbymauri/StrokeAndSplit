@@ -11,7 +11,10 @@ class _Rower {
   var time = Duration.zero;
   final events = <RowingEvent>[];
 
-  List<RowingEvent> send(RowerData data, {Duration step = const Duration(seconds: 1)}) {
+  List<RowingEvent> send(
+    RowerData data, {
+    Duration step = const Duration(seconds: 1),
+  }) {
     final result = decoder.decode(_encoder.encode(data, at: time));
     time += step;
     events.addAll(result);
@@ -94,7 +97,13 @@ void main() {
       final rower = _Rower()
         ..record(0, 0)
         ..send(
-          const RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: Duration(minutes: 2), power: 180),
+          const RowerData(
+            strokeRate: 22,
+            strokeCount: 1,
+            totalDistance: 4,
+            pace: Duration(minutes: 2),
+            power: 180,
+          ),
         );
       expect(rower.lastTick.watts, 180);
     });
@@ -103,7 +112,13 @@ void main() {
       final rower = _Rower()
         ..record(0, 0)
         ..send(
-          const RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: Duration(minutes: 2), power: 180),
+          const RowerData(
+            strokeRate: 22,
+            strokeCount: 1,
+            totalDistance: 4,
+            pace: Duration(minutes: 2),
+            power: 180,
+          ),
         )
         ..record(2, 8);
       expect(rower.lastTick.watts, 180);
@@ -114,7 +129,13 @@ void main() {
         final rower = _Rower()
           ..record(0, 0)
           ..send(
-            RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: const Duration(minutes: 2), power: power),
+            RowerData(
+              strokeRate: 22,
+              strokeCount: 1,
+              totalDistance: 4,
+              pace: const Duration(minutes: 2),
+              power: power,
+            ),
           );
         expect(rower.lastTick.watts, 203, reason: '$power W');
       }
@@ -124,10 +145,23 @@ void main() {
       final rower = _Rower()
         ..record(0, 0)
         ..send(
-          const RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, pace: Duration(minutes: 2), power: 180),
+          const RowerData(
+            strokeRate: 22,
+            strokeCount: 1,
+            totalDistance: 4,
+            pace: Duration(minutes: 2),
+            power: 180,
+          ),
         );
       for (var i = 0; i < 6; i++) {
-        rower.send(const RowerData(strokeRate: 22, strokeCount: 1, totalDistance: 4, power: 180));
+        rower.send(
+          const RowerData(
+            strokeRate: 22,
+            strokeCount: 1,
+            totalDistance: 4,
+            power: 180,
+          ),
+        );
       }
       expect(rower.lastTick.isRowing, isFalse);
       expect(rower.lastTick.watts, isNull);
@@ -205,11 +239,17 @@ void main() {
     test('merges a record split over several notifications', () {
       final rower = _Rower();
       final first = rower.send(
-        const RowerData(moreData: true, totalDistance: 100, pace: Duration(minutes: 2)),
+        const RowerData(
+          moreData: true,
+          totalDistance: 100,
+          pace: Duration(minutes: 2),
+        ),
         step: Duration.zero,
       );
       expect(first, isEmpty);
-      rower.send(const RowerData(strokeRate: 24, strokeCount: 30, heartRate: 150));
+      rower.send(
+        const RowerData(strokeRate: 24, strokeCount: 30, heartRate: 150),
+      );
       expect(rower.lastTick.distanceMeters, 100);
       expect(rower.lastTick.strokeRate, 24);
       expect(rower.lastTick.heartRate, 150);
@@ -218,7 +258,11 @@ void main() {
     test('drops a packet shorter than announced and goes on', () {
       final rower = _Rower()..record(0, 0);
       final dropped = rower.decoder.decode(
-        RawPacket(time: rower.time, characteristicId: FtmsIds.rowerData, bytes: [0x04, 0x00, 44]),
+        RawPacket(
+          time: rower.time,
+          characteristicId: FtmsIds.rowerData,
+          bytes: [0x04, 0x00, 44],
+        ),
       );
       expect(dropped, isEmpty);
       expect(_Rower.warnings.single, contains('shorter'));
@@ -229,10 +273,20 @@ void main() {
     test('ignores machine status and control point responses', () {
       final decoder = FtmsDecoder(onWarning: _Rower.warnings.add);
       expect(
-        decoder.decode(RawPacket(time: Duration.zero, characteristicId: FtmsIds.machineStatus, bytes: [4])),
+        decoder.decode(
+          RawPacket(
+            time: Duration.zero,
+            characteristicId: FtmsIds.machineStatus,
+            bytes: [4],
+          ),
+        ),
         isEmpty,
       );
-      final response = RawPacket(time: Duration.zero, characteristicId: FtmsIds.controlPoint, bytes: [0x80, 0, 1]);
+      final response = RawPacket(
+        time: Duration.zero,
+        characteristicId: FtmsIds.controlPoint,
+        bytes: [0x80, 0, 1],
+      );
       expect(decoder.decode(response), isEmpty);
       expect(_Rower.warnings, isEmpty);
     });
@@ -260,12 +314,15 @@ void main() {
       expect(rower.strokes.map((s) => s.strokeNumber), [41, 42]);
     });
 
-    test('takes over the count of the first record in the middle of rowing', () {
-      final rower = _Rower()..record(250, 2500);
-      expect(rower.strokes, isEmpty);
-      rower.record(251, 2504);
-      expect(rower.strokes.map((s) => s.strokeNumber), [251]);
-    });
+    test(
+      'takes over the count of the first record in the middle of rowing',
+      () {
+        final rower = _Rower()..record(250, 2500);
+        expect(rower.strokes, isEmpty);
+        rower.record(251, 2504);
+        expect(rower.strokes.map((s) => s.strokeNumber), [251]);
+      },
+    );
 
     test('emits no strokes for a jump of more than 10 strokes', () {
       final rower = _Rower()
@@ -286,7 +343,10 @@ void main() {
       final events = rower.record(0, 0);
       final reset = events.whereType<WorkoutStateChanged>().single;
       expect(reset.isReset, isTrue);
-      expect((reset.previous, reset.current), (WorkoutState.unknown, WorkoutState.unknown));
+      expect(
+        (reset.previous, reset.current),
+        (WorkoutState.unknown, WorkoutState.unknown),
+      );
       expect(rower.lastTick.distanceMeters, 0);
       expect(rower.lastTick.elapsed, Duration.zero);
       expect(events.whereType<Stroke>(), isEmpty);
@@ -315,15 +375,27 @@ void main() {
       SessionProgress? progress;
       void track(List<RowingEvent> events) {
         for (final tick in events.whereType<StatusTick>()) {
-          offset ??= SessionOffset.start(deviceDistance: tick.distanceMeters, deviceElapsed: tick.elapsed);
-          progress = offset!.update(deviceDistance: tick.distanceMeters, deviceElapsed: tick.elapsed);
+          offset ??= SessionOffset.start(
+            deviceDistance: tick.distanceMeters,
+            deviceElapsed: tick.elapsed,
+          );
+          progress = offset!.update(
+            deviceDistance: tick.distanceMeters,
+            deviceElapsed: tick.elapsed,
+          );
         }
       }
 
       for (var s = 0; s <= 10; s++) {
         track(rower.record(s, s * 4));
       }
-      expect(progress, const SessionProgress(distanceMeters: 40, elapsed: Duration(seconds: 10)));
+      expect(
+        progress,
+        const SessionProgress(
+          distanceMeters: 40,
+          elapsed: Duration(seconds: 10),
+        ),
+      );
       track(rower.record(0, 0));
       for (var s = 1; s <= 5; s++) {
         track(rower.record(s, s * 4));
@@ -336,7 +408,11 @@ void main() {
   test('is the decoder of the FTMS protocol, with chest strap support', () {
     expect(
       ErgDecoder.forProtocol(ErgProtocol.ftms),
-      isA<HeartRateDecoder>().having((d) => d.inner, 'inner', isA<FtmsDecoder>()),
+      isA<HeartRateDecoder>().having(
+        (d) => d.inner,
+        'inner',
+        isA<FtmsDecoder>(),
+      ),
     );
   });
 }

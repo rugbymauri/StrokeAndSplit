@@ -29,15 +29,23 @@ class _Setup {
   final db = openTestDatabase();
   late final zones = ZoneRepository(db);
   late final courses = CourseRepository(db);
-  late final container = ProviderContainer(overrides: [databaseProvider.overrideWithValue(db)]);
+  late final container = ProviderContainer(
+    overrides: [databaseProvider.overrideWithValue(db)],
+  );
 
-  Future<void> pump(WidgetTester tester, {Locale locale = const Locale('de')}) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    Locale locale = const Locale('de'),
+  }) async {
     addTearDown(container.dispose);
     tester.view.physicalSize = const Size(1000, 2400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      UncontrolledProviderScope(container: container, child: LocalizedApp(locale: locale, home: const ZonesScreen())),
+      UncontrolledProviderScope(
+        container: container,
+        child: LocalizedApp(locale: locale, home: const ZonesScreen()),
+      ),
     );
     await settle(tester);
   }
@@ -45,7 +53,9 @@ class _Setup {
   /// Lets database work finish, which does not run under fake async.
   Future<void> settle(WidgetTester tester) async {
     for (var i = 0; i < 5; i++) {
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
       await tester.pumpAndSettle();
     }
   }
@@ -135,7 +145,10 @@ void main() {
       await setup.settle(tester);
 
       expect(find.text('100 m · 1:45–1:50 · Stufe 10'), findsOneWidget);
-      expect((await tester.runAsync(setup.zones.all))!.single.resistanceLevel, 10);
+      expect(
+        (await tester.runAsync(setup.zones.all))!.single.resistanceLevel,
+        10,
+      );
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -151,44 +164,61 @@ void main() {
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
 
-      expect(find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'), findsOneWidget);
+      expect(
+        find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'),
+        findsOneWidget,
+      );
       expect(await tester.runAsync(setup.zones.all), isEmpty);
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('keeps the level when editing and removes it when switched off', (tester) async {
-      final setup = _Setup();
-      await tester.runAsync(() => setup.zones.create(const Zone(
-            name: 'Kraft',
-            axis: CourseAxis.distance,
-            length: 250,
-            spmMin: 18,
-            spmMax: 20,
-            resistanceLevel: 12,
-          )));
-      await setup.pump(tester);
-      expect(find.text('250 m · 18–20 spm · Stufe 12'), findsOneWidget);
+    testWidgets(
+      'keeps the level when editing and removes it when switched off',
+      (tester) async {
+        final setup = _Setup();
+        await tester.runAsync(
+          () => setup.zones.create(
+            const Zone(
+              name: 'Kraft',
+              axis: CourseAxis.distance,
+              length: 250,
+              spmMin: 18,
+              spmMax: 20,
+              resistanceLevel: 12,
+            ),
+          ),
+        );
+        await setup.pump(tester);
+        expect(find.text('250 m · 18–20 spm · Stufe 12'), findsOneWidget);
 
-      await _openEditor(tester, setup, 'Kraft');
-      expect(stepperValue(tester, const Key('zone-resistance-level')), 12);
-      await _switch(tester, 'resistance');
-      await tester.tap(find.byTooltip('Speichern'));
-      await setup.settle(tester);
+        await _openEditor(tester, setup, 'Kraft');
+        expect(stepperValue(tester, const Key('zone-resistance-level')), 12);
+        await _switch(tester, 'resistance');
+        await tester.tap(find.byTooltip('Speichern'));
+        await setup.settle(tester);
 
-      expect((await tester.runAsync(setup.zones.all))!.single.resistanceLevel, isNull);
-      await disposeWidgetsWithDatabase(tester);
-    });
+        expect(
+          (await tester.runAsync(setup.zones.all))!.single.resistanceLevel,
+          isNull,
+        );
+        await disposeWidgetsWithDatabase(tester);
+      },
+    );
 
     testWidgets('lists the level in English', (tester) async {
       final setup = _Setup();
-      await tester.runAsync(() => setup.zones.create(const Zone(
+      await tester.runAsync(
+        () => setup.zones.create(
+          const Zone(
             name: 'Kraft',
             axis: CourseAxis.distance,
             length: 250,
             spmMin: 18,
             spmMax: 20,
             resistanceLevel: 12,
-          )));
+          ),
+        ),
+      );
       await setup.pump(tester, locale: const Locale('en'));
 
       expect(find.text('250 m · 18–20 spm · Level 12'), findsOneWidget);
@@ -207,18 +237,28 @@ void main() {
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
-    expect(find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'), findsOneWidget);
+    expect(
+      find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'),
+      findsOneWidget,
+    );
     expect(await tester.runAsync(setup.zones.all), isEmpty);
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('says in English what keeps a zone from being saved', (tester) async {
+  testWidgets('says in English what keeps a zone from being saved', (
+    tester,
+  ) async {
     final setup = _Setup();
     addTearDown(setup.container.dispose);
-    await tester.pumpWidget(UncontrolledProviderScope(
-      container: setup.container,
-      child: const LocalizedApp(locale: Locale('en'), home: ZoneEditorScreen()),
-    ));
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: setup.container,
+        child: const LocalizedApp(
+          locale: Locale('en'),
+          home: ZoneEditorScreen(),
+        ),
+      ),
+    );
     expect(find.text('Pace band'), findsOneWidget);
     expect(find.text('Fastest'), findsOneWidget);
     expect(find.bySemanticsLabel('5 seconds more'), findsNWidgets(2));
@@ -227,7 +267,10 @@ void main() {
     await setup.settle(tester);
 
     expect(find.text('The name is missing.'), findsOneWidget);
-    expect(find.text('A band is missing: pace, stroke rate or both.'), findsOneWidget);
+    expect(
+      find.text('A band is missing: pace, stroke rate or both.'),
+      findsOneWidget,
+    );
     expect(await tester.runAsync(setup.zones.all), isEmpty);
     await disposeWidgetsWithDatabase(tester);
   });
@@ -235,7 +278,9 @@ void main() {
   testWidgets('lists the zones in English', (tester) async {
     final setup = _Setup();
     await setup.sprintInTwoCourses(tester);
-    await tester.runAsync(() => setup.zones.create(_sprint.copyWith(name: 'Lang', length: 200)));
+    await tester.runAsync(
+      () => setup.zones.create(_sprint.copyWith(name: 'Lang', length: 200)),
+    );
     await setup.pump(tester, locale: const Locale('en'));
 
     expect(find.text('DISTANCE'), findsOneWidget);
@@ -245,7 +290,9 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('names the courses a change applies to and keeps their axis', (tester) async {
+  testWidgets('names the courses a change applies to and keeps their axis', (
+    tester,
+  ) async {
     final setup = _Setup();
     await setup.sprintInTwoCourses(tester);
     await setup.pump(tester);
@@ -254,7 +301,9 @@ void main() {
     await _openEditor(tester, setup, 'Sprint');
 
     expect(find.text('Steckt in „2 km Intervall“, „Kurz“'), findsOneWidget);
-    final axis = tester.widget<SegmentedButton<CourseAxis>>(find.byType(SegmentedButton<CourseAxis>));
+    final axis = tester.widget<SegmentedButton<CourseAxis>>(
+      find.byType(SegmentedButton<CourseAxis>),
+    );
     expect(axis.onSelectionChanged, isNull);
     await disposeWidgetsWithDatabase(tester);
   });
@@ -269,7 +318,12 @@ void main() {
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
-    expect(find.textContaining('Die Änderung passt nicht in „2 km Intervall“, „Kurz“'), findsOneWidget);
+    expect(
+      find.textContaining(
+        'Die Änderung passt nicht in „2 km Intervall“, „Kurz“',
+      ),
+      findsOneWidget,
+    );
     expect((await tester.runAsync(setup.zones.all))!.single.length, 100);
     await disposeWidgetsWithDatabase(tester);
   });
@@ -283,15 +337,28 @@ void main() {
       return setup;
     }
 
-    testWidgets('makes the fastest pace of the band 5 s slower', (tester) async {
+    testWidgets('makes the fastest pace of the band 5 s slower', (
+      tester,
+    ) async {
       final setup = await openSprint(tester);
       final fastest = find.byKey(const Key('zone-pace-fast'));
-      expect(find.descendant(of: fastest, matching: find.text('1:45')), findsOneWidget);
+      expect(
+        find.descendant(of: fastest, matching: find.text('1:45')),
+        findsOneWidget,
+      );
 
-      await tester.tap(find.descendant(of: fastest, matching: find.bySemanticsLabel('5 Sekunden mehr')));
+      await tester.tap(
+        find.descendant(
+          of: fastest,
+          matching: find.bySemanticsLabel('5 Sekunden mehr'),
+        ),
+      );
       await tester.pump();
 
-      expect(find.descendant(of: fastest, matching: find.text('1:50')), findsOneWidget);
+      expect(
+        find.descendant(of: fastest, matching: find.text('1:50')),
+        findsOneWidget,
+      );
       // The slowest pace moves along.
       expect(stepperValue(tester, const Key('zone-pace-slow')), 11500);
       await tester.tap(find.byTooltip('Speichern'));
@@ -312,17 +379,29 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('steps the stroke rate by one stroke within the band', (tester) async {
+    testWidgets('steps the stroke rate by one stroke within the band', (
+      tester,
+    ) async {
       final setup = await openSprint(tester);
       final lowest = find.byKey(const Key('zone-spm-min'));
 
-      await tester.tap(find.descendant(of: lowest, matching: find.bySemanticsLabel('1 Schlag weniger')));
+      await tester.tap(
+        find.descendant(
+          of: lowest,
+          matching: find.bySemanticsLabel('1 Schlag weniger'),
+        ),
+      );
       await tester.pump();
       expect(stepperValue(tester, const Key('zone-spm-min')), 29);
       await _step(tester, {'spm-min': 34});
 
       expect(tester.widget<OarStepper>(lowest).canIncrease, isFalse);
-      expect(tester.widget<OarStepper>(find.byKey(const Key('zone-spm-max'))).canDecrease, isFalse);
+      expect(
+        tester
+            .widget<OarStepper>(find.byKey(const Key('zone-spm-max')))
+            .canDecrease,
+        isFalse,
+      );
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
       expect(find.text('100 m · 1:45–1:50 · 34–34 spm'), findsOneWidget);
@@ -334,7 +413,8 @@ void main() {
     const fast = Key('zone-pace-fast');
     const slow = Key('zone-pace-slow');
 
-    (int, int) band(WidgetTester tester) => (stepperValue(tester, fast), stepperValue(tester, slow));
+    (int, int) band(WidgetTester tester) =>
+        (stepperValue(tester, fast), stepperValue(tester, slow));
 
     Future<_Setup> openNewZone(WidgetTester tester) async {
       final setup = _Setup();
@@ -348,12 +428,20 @@ void main() {
       await openNewZone(tester);
 
       expect(band(tester), (16500, 17500));
-      expect(find.descendant(of: find.byKey(fast), matching: find.text('2:45')), findsOneWidget);
-      expect(find.descendant(of: find.byKey(slow), matching: find.text('2:55')), findsOneWidget);
+      expect(
+        find.descendant(of: find.byKey(fast), matching: find.text('2:45')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: find.byKey(slow), matching: find.text('2:55')),
+        findsOneWidget,
+      );
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('moves the slowest pace along with the fastest', (tester) async {
+    testWidgets('moves the slowest pace along with the fastest', (
+      tester,
+    ) async {
       final setup = await openNewZone(tester);
 
       await tapStep(tester, fast, more: false);
@@ -370,7 +458,9 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('changes only the slowest pace and keeps the new gap', (tester) async {
+    testWidgets('changes only the slowest pace and keeps the new gap', (
+      tester,
+    ) async {
       await openNewZone(tester);
       await stepTo(tester, fast, 12000);
 
@@ -404,7 +494,9 @@ void main() {
     });
   });
 
-  testWidgets('deletes a zone after confirming the courses it frees', (tester) async {
+  testWidgets('deletes a zone after confirming the courses it frees', (
+    tester,
+  ) async {
     final setup = _Setup();
     await setup.sprintInTwoCourses(tester);
     await setup.pump(tester);
@@ -412,8 +504,18 @@ void main() {
     await _openEditor(tester, setup, 'Sprint');
     await tester.tap(find.byTooltip('Löschen'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('In diesen Strecken wird ihre Stelle frei: „2 km Intervall“, „Kurz“.'), findsOneWidget);
-    await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Löschen')));
+    expect(
+      find.textContaining(
+        'In diesen Strecken wird ihre Stelle frei: „2 km Intervall“, „Kurz“.',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Löschen'),
+      ),
+    );
     await setup.settle(tester);
 
     expect(find.textContaining('Noch keine Zonen angelegt.'), findsOneWidget);

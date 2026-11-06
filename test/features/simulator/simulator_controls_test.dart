@@ -3,15 +3,32 @@ import 'package:strokesplit/features/simulator/simulator_controls.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../../support/localized_app.dart';
 
 void main() {
   late SimulatedSource source;
 
-  setUp(() => source = SimulatedSource(targetPace: const Duration(minutes: 2, seconds: 10), targetStrokeRate: 22));
+  setUp(
+    () => source = SimulatedSource(
+      targetPace: const Duration(minutes: 2, seconds: 10),
+      targetStrokeRate: 22,
+    ),
+  );
 
-  Future<void> pump(WidgetTester tester, {ValueChanged<ErgProtocol>? onProtocolChanged}) => tester.pumpWidget(
-      LocalizedApp(home: Scaffold(body: SimulatorControls(source: source, onProtocolChanged: onProtocolChanged))));
+  Future<void> pump(
+    WidgetTester tester, {
+    ValueChanged<ErgProtocol>? onProtocolChanged,
+  }) => tester.pumpWidget(
+    LocalizedApp(
+      home: Scaffold(
+        body: SimulatorControls(
+          source: source,
+          onProtocolChanged: onProtocolChanged,
+        ),
+      ),
+    ),
+  );
 
   testWidgets('makes the simulator faster and slower', (tester) async {
     await pump(tester);
@@ -59,10 +76,14 @@ void main() {
     expect(chosen, [ErgProtocol.ftms]);
   });
 
-  testWidgets('keeps the protocol while switching is not possible', (tester) async {
+  testWidgets('keeps the protocol while switching is not possible', (
+    tester,
+  ) async {
     await pump(tester);
 
-    final button = tester.widget<SegmentedButton<ErgProtocol>>(find.byKey(const Key('sim-protocol')));
+    final button = tester.widget<SegmentedButton<ErgProtocol>>(
+      find.byKey(const Key('sim-protocol')),
+    );
     expect(button.onSelectionChanged, isNull);
     expect(button.selected, {ErgProtocol.pm5});
   });

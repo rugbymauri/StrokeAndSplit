@@ -6,8 +6,10 @@ import 'dart:typed_data';
 /// announces Energy Expended (skipped), bit 4 RR intervals. The sensor
 /// contact bits are ignored.
 class HeartRateMeasurement {
-  HeartRateMeasurement({required this.heartRate, List<int> intervalsMs = const []})
-      : intervalsMs = List.unmodifiable(intervalsMs);
+  HeartRateMeasurement({
+    required this.heartRate,
+    List<int> intervalsMs = const [],
+  }) : intervalsMs = List.unmodifiable(intervalsMs);
 
   /// Beats per minute as sent by the strap.
   final int heartRate;

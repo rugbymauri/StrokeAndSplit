@@ -22,7 +22,8 @@ abstract final class Pm5Characteristics {
   ];
 
   /// Full 128-bit UUID of a PM5 service or characteristic.
-  static String uuid(String shortId) => 'ce06$shortId-43e5-11e4-916c-0800200c9a66';
+  static String uuid(String shortId) =>
+      'ce06$shortId-43e5-11e4-916c-0800200c9a66';
 
   /// Value for [sampleRate]: one status notification every 250 ms.
   static const sampleRate250ms = 2;

@@ -33,7 +33,8 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
 
   // A new zone starts with a pace band; the other band is filled in for when
   // it is switched on.
-  late var _hasPace = _zone == null || _zone.paceFastCs != null || _zone.paceSlowCs != null;
+  late var _hasPace =
+      _zone == null || _zone.paceFastCs != null || _zone.paceSlowCs != null;
   late var _paceFast = _zone?.paceFastCs ?? _zone?.paceSlowCs ?? 16500;
   late var _paceSlow = _zone?.paceSlowCs ?? _paceFast + _paceGap;
   late var _hasSpm = _zone?.spmMin != null || _zone?.spmMax != null;
@@ -48,7 +49,8 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
 
   bool get _isNew => _zone == null;
 
-  static int _defaultLength(CourseAxis axis) => axis == CourseAxis.distance ? 100 : 60;
+  static int _defaultLength(CourseAxis axis) =>
+      axis == CourseAxis.distance ? 100 : 60;
 
   /// Steps of design D7: 10 m or 10 s.
   static const _lengthStep = 10;
@@ -82,7 +84,9 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
       spmMax: _hasSpm ? _spmMax : null,
       resistanceLevel: _hasResistance ? _resistance : null,
     );
-    errors.addAll([for (final e in zoneErrors(zone)) zoneErrorText(context.l10n, e)]);
+    errors.addAll([
+      for (final e in zoneErrors(zone)) zoneErrorText(context.l10n, e),
+    ]);
     return errors.isEmpty ? zone : null;
   }
 
@@ -104,7 +108,9 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
     } on ZoneConflict catch (conflict) {
       if (!mounted) return;
       final l10n = context.l10n;
-      setState(() => _errors = [l10n.zoneConflict(l10n.quotedNames(conflict.courses))]);
+      setState(
+        () => _errors = [l10n.zoneConflict(l10n.quotedNames(conflict.courses))],
+      );
       return;
     }
     if (mounted) Navigator.of(context).pop();
@@ -118,13 +124,22 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
         final l10n = context.l10n;
         return AlertDialog(
           title: Text(l10n.zoneDeleteTitle),
-          content: Text([
-            l10n.zoneDeleteBody(zone.name),
-            if (_courses.isNotEmpty) l10n.zoneDeleteCourses(l10n.quotedNames(_courses)),
-          ].join('\n\n')),
+          content: Text(
+            [
+              l10n.zoneDeleteBody(zone.name),
+              if (_courses.isNotEmpty)
+                l10n.zoneDeleteCourses(l10n.quotedNames(_courses)),
+            ].join('\n\n'),
+          ),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.actionCancel)),
-            FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.actionDelete)),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.actionCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.actionDelete),
+            ),
           ],
         );
       },
@@ -144,8 +159,16 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
         title: Text(_isNew ? l10n.zoneNew : l10n.zoneEdit),
         actions: [
           if (!_isNew)
-            IconButton(tooltip: l10n.actionDelete, icon: const Icon(Icons.delete_outline), onPressed: _delete),
-          IconButton(tooltip: l10n.actionSave, icon: const Icon(Icons.check), onPressed: _save),
+            IconButton(
+              tooltip: l10n.actionDelete,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: _delete,
+            ),
+          IconButton(
+            tooltip: l10n.actionSave,
+            icon: const Icon(Icons.check),
+            onPressed: _save,
+          ),
         ],
       ),
       body: Center(
@@ -168,7 +191,10 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
               TextField(
                 key: const Key('zone-name'),
                 controller: _name,
-                decoration: InputDecoration(labelText: l10n.fieldName, hintText: l10n.zoneNameHint),
+                decoration: InputDecoration(
+                  labelText: l10n.fieldName,
+                  hintText: l10n.zoneNameHint,
+                ),
               ),
               const SizedBox(height: 16),
               SegmentedButton<CourseAxis>(
@@ -188,9 +214,9 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
                 // A zone in a course keeps the axis of the course.
                 onSelectionChanged: _courses.isEmpty
                     ? (axis) => setState(() {
-                          _axis = axis.single;
-                          _length = _defaultLength(_axis);
-                        })
+                        _axis = axis.single;
+                        _length = _defaultLength(_axis);
+                      })
                     : null,
               ),
               const SizedBox(height: 16),
@@ -201,7 +227,9 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
                   value: _length,
                   step: _lengthStep,
                   min: _lengthStep,
-                  stepLabel: distance ? '$_lengthStep m' : l10n.stepSeconds(_lengthStep),
+                  stepLabel: distance
+                      ? '$_lengthStep m'
+                      : l10n.stepSeconds(_lengthStep),
                   format: distance ? null : (v) => formatCourseLength(_axis, v),
                   unit: distance ? 'm' : 'min',
                   label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
@@ -273,7 +301,10 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              Text(l10n.zoneBandHint, style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                l10n.zoneBandHint,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               const SizedBox(height: 12),
               _BandCard(
                 switchKey: const Key('zone-resistance-band'),
@@ -299,7 +330,10 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              Text(l10n.zoneResistanceHint, style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                l10n.zoneResistanceHint,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               const SizedBox(height: 16),
               FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
             ],
@@ -322,21 +356,20 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
     required int min,
     required int max,
     required void Function(int) onChanged,
-  }) =>
-      OarStepper(
-        key: Key(key),
-        value: value,
-        step: _paceStep,
-        min: min,
-        max: max,
-        stepLabel: context.l10n.stepSeconds(_paceStep ~/ 100),
-        format: formatPaceBound,
-        unit: '/500 m',
-        label: label,
-        size: OarStepperSize.compact,
-        background: AppColors.bg,
-        onChanged: (v) => setState(() => onChanged(v)),
-      );
+  }) => OarStepper(
+    key: Key(key),
+    value: value,
+    step: _paceStep,
+    min: min,
+    max: max,
+    stepLabel: context.l10n.stepSeconds(_paceStep ~/ 100),
+    format: formatPaceBound,
+    unit: '/500 m',
+    label: label,
+    size: OarStepperSize.compact,
+    background: AppColors.bg,
+    onChanged: (v) => setState(() => onChanged(v)),
+  );
 
   Widget _spmStepper({
     required String key,
@@ -345,20 +378,19 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
     required int min,
     required int max,
     required void Function(int) onChanged,
-  }) =>
-      OarStepper(
-        key: Key(key),
-        value: value,
-        step: 1,
-        min: min,
-        max: max,
-        stepLabel: context.l10n.stepStrokes(1),
-        unit: 'spm',
-        label: label,
-        size: OarStepperSize.compact,
-        background: AppColors.bg,
-        onChanged: (v) => setState(() => onChanged(v)),
-      );
+  }) => OarStepper(
+    key: Key(key),
+    value: value,
+    step: 1,
+    min: min,
+    max: max,
+    stepLabel: context.l10n.stepStrokes(1),
+    unit: 'spm',
+    label: label,
+    size: OarStepperSize.compact,
+    background: AppColors.bg,
+    onChanged: (v) => setState(() => onChanged(v)),
+  );
 }
 
 /// Pace in centiseconds per 500 m: steps of 5 s (design D7) between 1:00 and 5:00.
@@ -419,17 +451,29 @@ class _BandCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppRadii.cardLarge)),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.cardLarge),
+      ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MergeSemantics(
-              child: Row(children: [
-                Expanded(child: Text(title, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600))),
-                Switch(key: switchKey, value: on, onChanged: onChanged),
-              ]),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Switch(key: switchKey, value: on, onChanged: onChanged),
+                ],
+              ),
             ),
             if (on) ...[
               const SizedBox(height: 4),
@@ -441,7 +485,10 @@ class _BandCard extends StatelessWidget {
                     Expanded(child: field),
                   ],
                   // A single field takes the width of one of two.
-                  if (fields.length == 1) ...[const SizedBox(width: 12), const Spacer()],
+                  if (fields.length == 1) ...[
+                    const SizedBox(width: 12),
+                    const Spacer(),
+                  ],
                 ],
               ),
             ],

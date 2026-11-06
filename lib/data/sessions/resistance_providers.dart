@@ -12,7 +12,12 @@ import 'session_providers.dart';
 /// The resistance level of the active rower as the live display shows it
 /// (Change resistance-control, Design D4 to D6).
 class ResistanceState {
-  const ResistanceState({this.range, this.level, this.target, this.refused = false});
+  const ResistanceState({
+    this.range,
+    this.level,
+    this.target,
+    this.refused = false,
+  });
 
   /// The levels that can be set; null when the rower cannot set its level.
   final ResistanceRange? range;
@@ -30,7 +35,8 @@ class ResistanceState {
   bool get canLower => canSet && range!.clamp(target! - range!.step) < target!;
   bool get canRaise => canSet && range!.clamp(target! + range!.step) > target!;
 
-  ResistanceState copyWith({int? level, int? target, bool? refused}) => ResistanceState(
+  ResistanceState copyWith({int? level, int? target, bool? refused}) =>
+      ResistanceState(
         range: range,
         level: level ?? this.level,
         target: target ?? this.target,
@@ -38,13 +44,17 @@ class ResistanceState {
       );
 
   @override
-  String toString() => 'ResistanceState($range, level $level, target $target, refused $refused)';
+  String toString() =>
+      'ResistanceState($range, level $level, target $target, refused $refused)';
 }
 
 /// How long the live display shows that a level was refused.
 const resistanceRefusedHintDuration = Duration(seconds: 2);
 
-final resistanceProvider = NotifierProvider<ResistanceController, ResistanceState>(ResistanceController.new);
+final resistanceProvider =
+    NotifierProvider<ResistanceController, ResistanceState>(
+      ResistanceController.new,
+    );
 
 /// Connects the [ResistanceDirector] with the active source, its levels, the
 /// course of the session being recorded and the taps on − and +. Levels go
@@ -73,7 +83,10 @@ class ResistanceController extends Notifier<ResistanceState> {
     final states = source.connectionStates.listen((s) {
       if (s == ErgConnectionState.connected) _attach(source);
     });
-    ref.listen(sessionRecorderProvider, (_, recording) => _onRecording(recording));
+    ref.listen(
+      sessionRecorderProvider,
+      (_, recording) => _onRecording(recording),
+    );
     // A session may already run when the live display asks for the level.
     scheduleMicrotask(() {
       if (ref.mounted) _onRecording(ref.read(sessionRecorderProvider));
@@ -83,7 +96,9 @@ class ResistanceController extends Notifier<ResistanceState> {
       states.cancel();
       _refusedTimer?.cancel();
     });
-    final control = source.connectionState == ErgConnectionState.connected ? source.resistanceControl : null;
+    final control = source.connectionState == ErgConnectionState.connected
+        ? source.resistanceControl
+        : null;
     if (control == null) return const ResistanceState();
     _control = control;
     _director = ResistanceDirector(range: control.range);
@@ -111,7 +126,11 @@ class ResistanceController extends Notifier<ResistanceState> {
       return;
     }
     director.range = control.range;
-    state = ResistanceState(range: control.range, level: state.level, target: director.target);
+    state = ResistanceState(
+      range: control.range,
+      level: state.level,
+      target: director.target,
+    );
     _send(director.reconnected());
   }
 

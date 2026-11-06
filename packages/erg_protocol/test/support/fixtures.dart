@@ -2,13 +2,19 @@ import 'dart:io';
 
 import 'package:erg_protocol/erg_protocol.dart';
 
-RawRecording loadFixture(String name) =>
-    RawRecording.parseLines(File('test/fixtures/$name.jsonl').readAsLinesSync());
+RawRecording loadFixture(String name) => RawRecording.parseLines(
+  File('test/fixtures/$name.jsonl').readAsLinesSync(),
+);
 
-List<RowingEvent> decodeAll(Iterable<RawPacket> packets, {List<String>? warnings}) {
+List<RowingEvent> decodeAll(
+  Iterable<RawPacket> packets, {
+  List<String>? warnings,
+}) {
   final decoder = Pm5Decoder(onWarning: warnings?.add);
   return [for (final p in packets) ...decoder.decode(p), ...decoder.flush()];
 }
 
-int countPackets(RawRecording recording, String characteristicId) =>
-    recording.packets.where((p) => p.characteristicId == characteristicId).length;
+int countPackets(RawRecording recording, String characteristicId) => recording
+    .packets
+    .where((p) => p.characteristicId == characteristicId)
+    .length;

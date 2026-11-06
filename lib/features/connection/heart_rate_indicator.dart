@@ -19,20 +19,24 @@ HeartRateMonitorState? _shownState(WidgetRef ref) {
   return state;
 }
 
-String _phaseLabel(AppLocalizations l10n, HeartRateMonitorPhase phase) => switch (phase) {
+String _phaseLabel(AppLocalizations l10n, HeartRateMonitorPhase phase) =>
+    switch (phase) {
       HeartRateMonitorPhase.connected => l10n.stateConnected,
       HeartRateMonitorPhase.connecting => l10n.stateConnecting,
       HeartRateMonitorPhase.reconnecting => l10n.stateReconnecting,
       HeartRateMonitorPhase.ready => l10n.heartRateStateWaiting,
-      HeartRateMonitorPhase.disconnected || HeartRateMonitorPhase.notPaired => l10n.stateDisconnected,
+      HeartRateMonitorPhase.disconnected ||
+      HeartRateMonitorPhase.notPaired => l10n.stateDisconnected,
     };
 
 Color _phaseColor(HeartRateMonitorPhase phase) => switch (phase) {
-      HeartRateMonitorPhase.connected => AppColors.connected,
-      HeartRateMonitorPhase.connecting || HeartRateMonitorPhase.reconnecting => AppColors.zoneOut,
-      HeartRateMonitorPhase.ready || HeartRateMonitorPhase.disconnected || HeartRateMonitorPhase.notPaired =>
-        AppColors.textMuted,
-    };
+  HeartRateMonitorPhase.connected => AppColors.connected,
+  HeartRateMonitorPhase.connecting ||
+  HeartRateMonitorPhase.reconnecting => AppColors.zoneOut,
+  HeartRateMonitorPhase.ready ||
+  HeartRateMonitorPhase.disconnected ||
+  HeartRateMonitorPhase.notPaired => AppColors.textMuted,
+};
 
 /// The strap's connection state as a small heart with a dot, next to the
 /// rower's `ConnectionIndicator`: green when connected, orange while
@@ -50,7 +54,9 @@ class HeartRateIndicator extends ConsumerWidget {
     final label = l10n.heartRateStateLabel(_phaseLabel(l10n, state.phase));
     final color = _phaseColor(state.phase);
     final filled = switch (state.phase) {
-      HeartRateMonitorPhase.connected || HeartRateMonitorPhase.connecting || HeartRateMonitorPhase.reconnecting => true,
+      HeartRateMonitorPhase.connected ||
+      HeartRateMonitorPhase.connecting ||
+      HeartRateMonitorPhase.reconnecting => true,
       _ => false,
     };
     return Padding(
@@ -97,10 +103,16 @@ class HeartRateNotice extends ConsumerWidget {
     final text = switch (state) {
       HeartRateMonitorState(phase: HeartRateMonitorPhase.reconnecting) =>
         l10n.heartRateStateLabel(l10n.stateReconnecting),
-      HeartRateMonitorState(phase: HeartRateMonitorPhase.disconnected, :final failure) => switch (failure) {
-          HeartRateMonitorFailure.noHeartRateService => l10n.heartRateFailedNoService,
+      HeartRateMonitorState(
+        phase: HeartRateMonitorPhase.disconnected,
+        :final failure,
+      ) =>
+        switch (failure) {
+          HeartRateMonitorFailure.noHeartRateService =>
+            l10n.heartRateFailedNoService,
           HeartRateMonitorFailure.lost => l10n.heartRateFailedLost,
-          HeartRateMonitorFailure.unreachable || null => l10n.heartRateFailedUnreachable,
+          HeartRateMonitorFailure.unreachable ||
+          null => l10n.heartRateFailedUnreachable,
         },
       _ => null,
     };
@@ -108,13 +120,18 @@ class HeartRateNotice extends ConsumerWidget {
     final failed = state.phase == HeartRateMonitorPhase.disconnected;
     return Padding(
       key: const Key('heart-rate-notice'),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.l,
+        vertical: AppSpacing.xs,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Text(
               text,
-              style: AppTextStyles.caption.copyWith(color: failed ? AppColors.zoneOutText : AppColors.zoneOut),
+              style: AppTextStyles.caption.copyWith(
+                color: failed ? AppColors.zoneOutText : AppColors.zoneOut,
+              ),
               maxLines: failed ? 3 : 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -122,7 +139,8 @@ class HeartRateNotice extends ConsumerWidget {
           if (failed) ...[
             const SizedBox(width: AppSpacing.s),
             TextButton(
-              onPressed: () => ref.read(heartRateMonitorProvider.notifier).retry(),
+              onPressed: () =>
+                  ref.read(heartRateMonitorProvider.notifier).retry(),
               child: Text(l10n.heartRateRetry),
             ),
           ],

@@ -57,10 +57,18 @@ class FtmsDecoder implements ErgDecoder {
         // Recorded for analysis, not needed for the metrics.
         return const [];
       default:
-        return _drop(packet, 'unknown characteristic ${packet.characteristicId}');
+        return _drop(
+          packet,
+          'unknown characteristic ${packet.characteristicId}',
+        );
     }
     final data = RowerData.parse(packet.bytes);
-    if (data == null) return _drop(packet, 'shorter than its flags announce (${packet.bytes.length} bytes)');
+    if (data == null) {
+      return _drop(
+        packet,
+        'shorter than its flags announce (${packet.bytes.length} bytes)',
+      );
+    }
 
     _strokeRate = data.strokeRate ?? _strokeRate;
     _strokeCount = data.strokeCount ?? _strokeCount;
@@ -77,7 +85,9 @@ class FtmsDecoder implements ErgDecoder {
   List<RowingEvent> flush() => const [];
 
   List<RowingEvent> _drop(RawPacket packet, String reason) {
-    onWarning?.call('Dropped ${packet.characteristicId} packet at ${packet.time.inMilliseconds} ms: $reason');
+    onWarning?.call(
+      'Dropped ${packet.characteristicId} packet at ${packet.time.inMilliseconds} ms: $reason',
+    );
     return const [];
   }
 
@@ -90,7 +100,9 @@ class FtmsDecoder implements ErgDecoder {
 
     final isReset =
         previousCount != null && count != null && count < previousCount ||
-        previousDistance != null && distance != null && distance < previousDistance;
+        previousDistance != null &&
+            distance != null &&
+            distance < previousDistance;
     if (isReset) {
       // Like a new workout on the PM5: time and distance start again from
       // zero, the session carries the progress over.
@@ -104,31 +116,57 @@ class FtmsDecoder implements ErgDecoder {
           isReset: true,
         ),
       );
-    } else if (previousCount != null && count != null && count > previousCount ||
-        previousDistance != null && distance != null && distance > previousDistance) {
+    } else if (previousCount != null &&
+            count != null &&
+            count > previousCount ||
+        previousDistance != null &&
+            distance != null &&
+            distance > previousDistance) {
       _lastProgress = time;
     }
 
     final lastProgress = _lastProgress;
-    final isRowing = !isReset && lastProgress != null && time - lastProgress <= rowingTimeout;
+    final isRowing =
+        !isReset &&
+        lastProgress != null &&
+        time - lastProgress <= rowingTimeout;
     final previousTime = _previousRecordTime;
-    if (isRowing && previousTime != null && time > previousTime) _elapsed += time - previousTime;
+    if (isRowing && previousTime != null && time > previousTime) {
+      _elapsed += time - previousTime;
+    }
     _previousRecordTime = time;
 
-    if (!isReset && previousCount != null && count != null && count > previousCount) {
+    if (!isReset &&
+        previousCount != null &&
+        count != null &&
+        count > previousCount) {
       if (count - previousCount <= maxStrokeGap) {
         for (var n = previousCount + 1; n <= count; n++) {
-          events.add(Stroke(elapsed: _elapsed, strokeNumber: n, distanceMeters: (distance ?? 0).toDouble()));
+          events.add(
+            Stroke(
+              elapsed: _elapsed,
+              strokeNumber: n,
+              distanceMeters: (distance ?? 0).toDouble(),
+            ),
+          );
         }
       } else {
-        onWarning?.call('Stroke count jumped from $previousCount to $count, no stroke events');
+        onWarning?.call(
+          'Stroke count jumped from $previousCount to $count, no stroke events',
+        );
       }
     }
     _previousCount = count;
     _previousDistance = distance;
 
     final rawPace = _pace;
-    final pace = isRowing && rawPace != null && rawPace >= _minPace && rawPace <= _maxPace ? rawPace : null;
+    final pace =
+        isRowing &&
+            rawPace != null &&
+            rawPace >= _minPace &&
+            rawPace <= _maxPace
+        ? rawPace
+        : null;
     final strokeRate = _strokeRate?.round();
     final heartRate = _heartRate;
     final energy = _energy;
@@ -147,10 +185,16 @@ class FtmsDecoder implements ErgDecoder {
           final power? when power > 0 && power <= _maxWatts => power,
           _ => pace == null ? null : wattsForPace(pace),
         },
-        strokeRate: strokeRate != null && strokeRate >= 1 && strokeRate <= 60 ? strokeRate : null,
-        heartRate: heartRate != null && heartRate > 0 && heartRate <= 250 ? heartRate : null,
+        strokeRate: strokeRate != null && strokeRate >= 1 && strokeRate <= 60
+            ? strokeRate
+            : null,
+        heartRate: heartRate != null && heartRate > 0 && heartRate <= 250
+            ? heartRate
+            : null,
         calories: energy == RowerData.energyNotAvailable ? null : energy,
-        resistanceLevel: resistanceLevel != null && resistanceLevel > 0 ? resistanceLevel : null,
+        resistanceLevel: resistanceLevel != null && resistanceLevel > 0
+            ? resistanceLevel
+            : null,
       ),
     );
     return events;

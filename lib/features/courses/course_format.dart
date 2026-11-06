@@ -16,8 +16,10 @@ String formatPaceBound(int centiseconds) {
 /// `2:05–2:10 · 20–22 spm · Stufe 8`; empty for a free part.
 String formatSegmentBands(AppLocalizations l10n, CourseSegment segment) {
   return [
-    if (segment.hasPaceBand) '${formatPaceBound(segment.paceFastCs!)}–${formatPaceBound(segment.paceSlowCs!)}',
+    if (segment.hasPaceBand)
+      '${formatPaceBound(segment.paceFastCs!)}–${formatPaceBound(segment.paceSlowCs!)}',
     if (segment.hasSpmBand) '${segment.spmMin}–${segment.spmMax} spm',
-    if (segment.resistanceLevel case final level?) l10n.zoneResistanceLevelShort(level),
+    if (segment.resistanceLevel case final level?)
+      l10n.zoneResistanceLevelShort(level),
   ].join(' · ');
 }

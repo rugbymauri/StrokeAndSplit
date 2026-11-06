@@ -13,8 +13,16 @@ class ReadyHint extends StatelessWidget {
     return Container(
       key: const Key('ready-hint'),
       width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(AppSpacing.l, AppSpacing.s, AppSpacing.l, 0),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.m),
+      margin: const EdgeInsets.fromLTRB(
+        AppSpacing.l,
+        AppSpacing.s,
+        AppSpacing.l,
+        0,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.l,
+        vertical: AppSpacing.m,
+      ),
       decoration: BoxDecoration(
         color: AppColors.zoneInSurface,
         border: Border.all(color: AppColors.zoneIn),
@@ -27,7 +35,9 @@ class ReadyHint extends StatelessWidget {
           Expanded(
             child: Text(
               context.l10n.liveReadyForFirstStroke,
-              style: AppTextStyles.primaryButton.copyWith(color: AppColors.zoneInText),
+              style: AppTextStyles.primaryButton.copyWith(
+                color: AppColors.zoneInText,
+              ),
             ),
           ),
         ],

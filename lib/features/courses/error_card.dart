@@ -16,7 +16,10 @@ class ErrorCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [for (final e in errors) Text(e, style: TextStyle(color: colors.onErrorContainer))],
+          children: [
+            for (final e in errors)
+              Text(e, style: TextStyle(color: colors.onErrorContainer)),
+          ],
         ),
       ),
     );

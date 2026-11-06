@@ -24,9 +24,15 @@ class SessionSummaryScreen extends ConsumerWidget {
 
   /// Opens the summary right after rowing; "done" then returns true, so the
   /// live display goes back to the start screen.
-  static Future<bool> showAfterSession(BuildContext context, int sessionId) async =>
-      await Navigator.of(context)
-          .push<bool>(MaterialPageRoute(builder: (_) => SessionSummaryScreen(sessionId: sessionId))) ??
+  static Future<bool> showAfterSession(
+    BuildContext context,
+    int sessionId,
+  ) async =>
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => SessionSummaryScreen(sessionId: sessionId),
+        ),
+      ) ??
       false;
 
   @override
@@ -53,7 +59,9 @@ class SessionSummaryScreen extends ConsumerWidget {
               tooltip: l10n.actionDelete,
               icon: const Icon(Icons.delete_outline),
               onPressed: () async {
-                if (await deleteSession(context, ref, row) && context.mounted) Navigator.of(context).pop();
+                if (await deleteSession(context, ref, row) && context.mounted) {
+                  Navigator.of(context).pop();
+                }
               },
             ),
           ],
@@ -62,7 +70,9 @@ class SessionSummaryScreen extends ConsumerWidget {
       body: switch (session) {
         AsyncData(value: final session?) => _Summary(session: session),
         AsyncData() => Center(child: Text(l10n.sessionGone)),
-        AsyncError(:final error) => Center(child: Text(l10n.sessionLoadFailed('$error'))),
+        AsyncError(:final error) => Center(
+          child: Text(l10n.sessionLoadFailed('$error')),
+        ),
         _ => const Center(child: CircularProgressIndicator()),
       },
     );
@@ -70,11 +80,14 @@ class SessionSummaryScreen extends ConsumerWidget {
 }
 
 /// Name of the source a session was recorded with.
-String sessionSourceLabel(AppLocalizations l10n, SessionRow session) => switch (session.source) {
+String sessionSourceLabel(AppLocalizations l10n, SessionRow session) =>
+    switch (session.source) {
       ErgSourceKind.pm5 => session.deviceName ?? 'PM5',
       ErgSourceKind.ftms => '${session.deviceName ?? l10n.sourceRower} · FTMS',
       ErgSourceKind.simulator =>
-        session.protocol == ErgProtocol.ftms ? l10n.sourceSimulatorFtmsName : l10n.sourceSimulatorName,
+        session.protocol == ErgProtocol.ftms
+            ? l10n.sourceSimulatorFtmsName
+            : l10n.sourceSimulatorName,
       ErgSourceKind.replay => l10n.sourceReplayName,
     };
 
@@ -87,11 +100,21 @@ class _Summary extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final versionId = session.courseVersionId;
-    final course = versionId == null ? null : ref.watch(courseVersionProvider(versionId)).value;
-    final laps = versionId == null ? const <LapRow>[] : ref.watch(sessionLapsProvider(session.id)).value ?? const [];
-    final places = ref.watch(sessionPlacesProvider(session.id)).value ?? SessionPlaces.none;
-    final rr = ref.watch(sessionRrIntervalsProvider(session.id)).value ?? const <RrIntervalRow>[];
-    final pace = ref.watch(sessionPaceTrackProvider(session.id)).value ?? PaceTrack.empty;
+    final course = versionId == null
+        ? null
+        : ref.watch(courseVersionProvider(versionId)).value;
+    final laps = versionId == null
+        ? const <LapRow>[]
+        : ref.watch(sessionLapsProvider(session.id)).value ?? const [];
+    final places =
+        ref.watch(sessionPlacesProvider(session.id)).value ??
+        SessionPlaces.none;
+    final rr =
+        ref.watch(sessionRrIntervalsProvider(session.id)).value ??
+        const <RrIntervalRow>[];
+    final pace =
+        ref.watch(sessionPaceTrackProvider(session.id)).value ??
+        PaceTrack.empty;
 
     return Center(
       child: ConstrainedBox(
@@ -108,13 +131,20 @@ class _Summary extends ConsumerWidget {
                   AppSpacing.xl,
                 ),
                 children: [
-                  _Header(session: session, course: course, laps: laps, place: places.session),
+                  _Header(
+                    session: session,
+                    course: course,
+                    laps: laps,
+                    place: places.session,
+                  ),
                   if (canSendToHealth(ref, session))
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.xs),
                       child: Text(
                         switch (session.healthExportedAt) {
-                          final at? => l10n.healthSentAt(formatDateTime(l10n, at)),
+                          final at? => l10n.healthSentAt(
+                            formatDateTime(l10n, at),
+                          ),
                           null => l10n.healthNotSent,
                         },
                         key: const Key('summary-health-status'),
@@ -124,7 +154,10 @@ class _Summary extends ConsumerWidget {
                   if (session.status == SessionStatus.incomplete)
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.s),
-                      child: Text(l10n.sessionIncompleteNote, style: const TextStyle(color: AppColors.zoneOut)),
+                      child: Text(
+                        l10n.sessionIncompleteNote,
+                        style: const TextStyle(color: AppColors.zoneOut),
+                      ),
                     ),
                   const SizedBox(height: AppSpacing.xl),
                   _Totals(session: session),
@@ -133,7 +166,12 @@ class _Summary extends ConsumerWidget {
                     _Laps(laps: laps, course: course, places: places),
                   ],
                   const SizedBox(height: AppSpacing.xl),
-                  _Averages(session: session, minHeartRate: ref.watch(sessionMinHeartRateProvider(session.id)).value),
+                  _Averages(
+                    session: session,
+                    minHeartRate: ref
+                        .watch(sessionMinHeartRateProvider(session.id))
+                        .value,
+                  ),
                   if (pace.steps.length >= 2) ...[
                     const SizedBox(height: AppSpacing.xl),
                     _Pace(track: pace, averageCs: session.averagePaceCs),
@@ -158,7 +196,10 @@ class _Summary extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(56), shape: _buttonShape),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(56),
+                          shape: _buttonShape,
+                        ),
                         onPressed: () => replaySession(context, ref, session),
                         child: Text(l10n.actionReplay),
                       ),
@@ -166,7 +207,10 @@ class _Summary extends ConsumerWidget {
                     const SizedBox(width: AppSpacing.m),
                     Expanded(
                       child: FilledButton(
-                        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56), shape: _buttonShape),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(56),
+                          shape: _buttonShape,
+                        ),
                         onPressed: () => Navigator.of(context).maybePop(true),
                         child: Text(l10n.actionDone),
                       ),
@@ -182,11 +226,18 @@ class _Summary extends ConsumerWidget {
   }
 }
 
-const _buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(AppRadii.cardLarge)));
+const _buttonShape = RoundedRectangleBorder(
+  borderRadius: BorderRadius.all(Radius.circular(AppRadii.cardLarge)),
+);
 
 /// Date and course, the title, and template and source.
 class _Header extends StatelessWidget {
-  const _Header({required this.session, required this.course, required this.laps, required this.place});
+  const _Header({
+    required this.session,
+    required this.course,
+    required this.laps,
+    required this.place,
+  });
 
   final SessionRow session;
   final Course? course;
@@ -202,7 +253,8 @@ class _Header extends StatelessWidget {
     String? plan;
     if (course != null) {
       final length = formatCourseLength(course.axis, course.definition.length);
-      final lapCount = session.plannedLaps ?? (laps.isEmpty ? null : laps.length);
+      final lapCount =
+          session.plannedLaps ?? (laps.isEmpty ? null : laps.length);
       plan = lapCount == null ? length : '$lapCount × $length';
     }
     final name = course == null ? null : session.templateName ?? course.name;
@@ -219,7 +271,13 @@ class _Header extends StatelessWidget {
           runSpacing: AppSpacing.xs,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text(l10n.summaryTitle, style: AppTextStyles.screenTitle.copyWith(fontSize: 40, height: 1.1)),
+            Text(
+              l10n.summaryTitle,
+              style: AppTextStyles.screenTitle.copyWith(
+                fontSize: 40,
+                height: 1.1,
+              ),
+            ),
             if (place case final place?)
               _PlaceMark(
                 key: const Key('session-place'),
@@ -236,7 +294,10 @@ class _Header extends StatelessWidget {
               Text(name, style: AppTextStyles.subtitle),
               const Text(' · ', style: AppTextStyles.subtitle),
             ],
-            Text(sessionSourceLabel(l10n, session), style: AppTextStyles.subtitle),
+            Text(
+              sessionSourceLabel(l10n, session),
+              style: AppTextStyles.subtitle,
+            ),
           ],
         ),
       ],
@@ -254,8 +315,15 @@ class _Totals extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final tiles = [
-      _Tile(label: l10n.sessionTime, value: formatElapsed(Duration(milliseconds: session.durationMs))),
-      _Tile(label: l10n.sessionDistance, value: '${session.distanceDm ~/ 10}', unit: 'm'),
+      _Tile(
+        label: l10n.sessionTime,
+        value: formatElapsed(Duration(milliseconds: session.durationMs)),
+      ),
+      _Tile(
+        label: l10n.sessionDistance,
+        value: '${session.distanceDm ~/ 10}',
+        unit: 'm',
+      ),
       // Only with pauses (Change auto-pause, Design D3); the time above leaves them out.
       if (session.pauseCount > 0)
         _Tile(
@@ -287,25 +355,36 @@ class _Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _Card(
-        padding: const EdgeInsets.all(AppSpacing.m),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: AppTextStyles.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 2),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: _ValueText(value: value, unit: unit, size: 30),
-            ),
-          ],
+    padding: const EdgeInsets.all(AppSpacing.m),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTextStyles.caption,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-      );
+        const SizedBox(height: 2),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: _ValueText(value: value, unit: unit, size: 30),
+        ),
+      ],
+    ),
+  );
 }
 
 /// A value in Barlow Condensed 700 with its unit in 500.
 class _ValueText extends StatelessWidget {
-  const _ValueText({super.key, required this.value, this.unit, required this.size, this.color = AppColors.text});
+  const _ValueText({
+    super.key,
+    required this.value,
+    this.unit,
+    required this.size,
+    this.color = AppColors.text,
+  });
 
   final String value;
   final String? unit;
@@ -326,7 +405,11 @@ class _ValueText extends StatelessWidget {
       TextSpan(
         text: value,
         children: [
-          if (unit case final unit?) TextSpan(text: ' $unit', style: const TextStyle(fontWeight: FontWeight.w500)),
+          if (unit case final unit?)
+            TextSpan(
+              text: ' $unit',
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
         ],
       ),
       style: style,
@@ -343,12 +426,12 @@ class _Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.all(Radius.circular(AppRadii.card)),
-        ),
-        child: Padding(padding: padding, child: child),
-      );
+    decoration: const BoxDecoration(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.all(Radius.circular(AppRadii.card)),
+    ),
+    child: Padding(padding: padding, child: child),
+  );
 }
 
 /// The laps with a bar for their share in the zone; the best complete lap is
@@ -375,7 +458,8 @@ class _Laps extends StatelessWidget {
             // Fastest lap on a distance course, the longest on a time course.
             final aBetter = byTime
                 ? a.endWallMs - a.startWallMs <= b.endWallMs - b.startWallMs
-                : a.endDistanceDm - a.startDistanceDm >= b.endDistanceDm - b.startDistanceDm;
+                : a.endDistanceDm - a.startDistanceDm >=
+                      b.endDistanceDm - b.startDistanceDm;
             return aBetter ? a : b;
           });
     return Column(
@@ -393,7 +477,8 @@ class _Laps extends StatelessWidget {
                   byTime: byTime,
                   best: identical(lap, best),
                   marks: [
-                    if (places.laps[lap.lapNo] case final place?) l10n.summaryPlace(place),
+                    if (places.laps[lap.lapNo] case final place?)
+                      l10n.summaryPlace(place),
                     for (final (position, segment) in segments.indexed)
                       if (places.zones[(lap.lapNo, position)] case final place?)
                         l10n.summaryZonePlace(segment.zoneName ?? '', place),
@@ -413,7 +498,12 @@ class _Laps extends StatelessWidget {
 }
 
 class _LapRow extends StatelessWidget {
-  const _LapRow({required this.lap, required this.byTime, required this.best, this.marks = const []});
+  const _LapRow({
+    required this.lap,
+    required this.byTime,
+    required this.best,
+    this.marks = const [],
+  });
 
   final LapRow lap;
   final bool byTime;
@@ -425,13 +515,18 @@ class _LapRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final time = formatLapTime(Duration(milliseconds: lap.endWallMs - lap.startWallMs));
+    final time = formatLapTime(
+      Duration(milliseconds: lap.endWallMs - lap.startWallMs),
+    );
     final meters = '${(lap.endDistanceDm - lap.startDistanceDm) ~/ 10}';
     final showTime = lap.complete && byTime;
     final share = lap.inZoneShare;
     return Padding(
       key: best ? const Key('lap-best') : Key('lap-${lap.lapNo}'),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: 14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.l,
+        vertical: 14,
+      ),
       child: Row(
         children: [
           SizedBox(
@@ -447,19 +542,32 @@ class _LapRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (share != null) _ShareBar(share: share, label: l10n.courseInZoneShare((share * 100).round())),
+                if (share != null)
+                  _ShareBar(
+                    share: share,
+                    label: l10n.courseInZoneShare((share * 100).round()),
+                  ),
                 if (!lap.complete)
                   Padding(
-                    padding: EdgeInsets.only(top: share == null ? 0 : AppSpacing.xs),
-                    child: Text('${l10n.sessionIncomplete} · $time', style: AppTextStyles.caption),
+                    padding: EdgeInsets.only(
+                      top: share == null ? 0 : AppSpacing.xs,
+                    ),
+                    child: Text(
+                      '${l10n.sessionIncomplete} · $time',
+                      style: AppTextStyles.caption,
+                    ),
                   ),
                 if (marks.isNotEmpty)
                   Padding(
-                    padding: EdgeInsets.only(top: share == null ? 0 : AppSpacing.s),
+                    padding: EdgeInsets.only(
+                      top: share == null ? 0 : AppSpacing.s,
+                    ),
                     child: Wrap(
                       spacing: AppSpacing.xs,
                       runSpacing: AppSpacing.xs,
-                      children: [for (final mark in marks) _PlaceMark(text: mark)],
+                      children: [
+                        for (final mark in marks) _PlaceMark(text: mark),
+                      ],
                     ),
                   ),
               ],
@@ -484,7 +592,12 @@ class _LapRow extends StatelessWidget {
           SizedBox(
             width: 28,
             child: best
-                ? Icon(Icons.star, size: 18, color: AppColors.text, semanticLabel: l10n.summaryBestLap)
+                ? Icon(
+                    Icons.star,
+                    size: 18,
+                    color: AppColors.text,
+                    semanticLabel: l10n.summaryBestLap,
+                  )
                 : null,
           ),
         ],
@@ -495,7 +608,12 @@ class _LapRow extends StatelessWidget {
 
 /// A place in a ranking, e.g. "Platz 2".
 class _PlaceMark extends StatelessWidget {
-  const _PlaceMark({super.key, required this.text, this.semanticsLabel, this.large = false});
+  const _PlaceMark({
+    super.key,
+    required this.text,
+    this.semanticsLabel,
+    this.large = false,
+  });
 
   final String text;
   final String? semanticsLabel;
@@ -505,20 +623,25 @@ class _PlaceMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-        decoration: const BoxDecoration(
-          color: AppColors.line,
-          borderRadius: BorderRadius.all(Radius.circular(AppRadii.small)),
+    decoration: const BoxDecoration(
+      color: AppColors.line,
+      borderRadius: BorderRadius.all(Radius.circular(AppRadii.small)),
+    ),
+    child: Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: large ? AppSpacing.m : AppSpacing.s,
+        vertical: large ? 6 : 2,
+      ),
+      child: Text(
+        text,
+        semanticsLabel: semanticsLabel,
+        style: (large ? AppTextStyles.button : AppTextStyles.caption).copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w600,
         ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: large ? AppSpacing.m : AppSpacing.s, vertical: large ? 6 : 2),
-          child: Text(
-            text,
-            semanticsLabel: semanticsLabel,
-            style: (large ? AppTextStyles.button : AppTextStyles.caption)
-                .copyWith(color: AppColors.text, fontWeight: FontWeight.w600),
-          ),
-        ),
-      );
+      ),
+    ),
+  );
 }
 
 /// The share of a lap in the zone as a bar.
@@ -530,21 +653,21 @@ class _ShareBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-        label: label,
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(4)),
-          child: Container(
-            height: 8,
-            color: AppColors.line,
-            alignment: Alignment.centerLeft,
-            child: FractionallySizedBox(
-              widthFactor: share.clamp(0.0, 1.0),
-              heightFactor: 1,
-              child: const ColoredBox(color: AppColors.zoneIn),
-            ),
-          ),
+    label: label,
+    child: ClipRRect(
+      borderRadius: const BorderRadius.all(Radius.circular(4)),
+      child: Container(
+        height: 8,
+        color: AppColors.line,
+        alignment: Alignment.centerLeft,
+        child: FractionallySizedBox(
+          widthFactor: share.clamp(0.0, 1.0),
+          heightFactor: 1,
+          child: const ColoredBox(color: AppColors.zoneIn),
         ),
-      );
+      ),
+    ),
+  );
 }
 
 /// Averages and the number of strokes in one line.
@@ -561,17 +684,28 @@ class _Averages extends StatelessWidget {
     final l10n = context.l10n;
     final pace = session.averagePaceCs;
     final values = [
-      (l10n.sessionAveragePace, formatPace(pace == null ? null : Duration(milliseconds: pace * 10))),
-      (l10n.sessionAverageStrokeRate, formatStrokeRate(l10n, session.averageStrokeRate)),
+      (
+        l10n.sessionAveragePace,
+        formatPace(pace == null ? null : Duration(milliseconds: pace * 10)),
+      ),
+      (
+        l10n.sessionAverageStrokeRate,
+        formatStrokeRate(l10n, session.averageStrokeRate),
+      ),
       (l10n.sessionAverageWatts, formatWhole(session.averageWatts)),
       (l10n.sessionStrokes, '${session.strokeCount}'),
       // Only with a heart rate, from the strap or the rower.
-      if (session.averageHeartRate case final average?) (l10n.sessionAverageHeartRate, '$average'),
+      if (session.averageHeartRate case final average?)
+        (l10n.sessionAverageHeartRate, '$average'),
       if (minHeartRate case final min?) (l10n.sessionMinHeartRate, '$min'),
-      if (session.maxHeartRate case final max?) (l10n.sessionMaxHeartRate, '$max'),
+      if (session.maxHeartRate case final max?)
+        (l10n.sessionMaxHeartRate, '$max'),
     ];
     return _Card(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.m),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.l,
+        vertical: AppSpacing.m,
+      ),
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
         spacing: AppSpacing.l,
@@ -582,7 +716,13 @@ class _Averages extends StatelessWidget {
               TextSpan(
                 text: '$label ',
                 children: [
-                  TextSpan(text: value, style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600)),
+                  TextSpan(
+                    text: value,
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
               ),
               style: AppTextStyles.subtitle,
@@ -601,7 +741,8 @@ class _Pace extends StatelessWidget {
   final PaceTrack track;
   final int? averageCs;
 
-  static String _format(int? cs) => formatPace(cs == null ? null : Duration(milliseconds: cs * 10));
+  static String _format(int? cs) =>
+      formatPace(cs == null ? null : Duration(milliseconds: cs * 10));
 
   @override
   Widget build(BuildContext context) {
@@ -636,7 +777,10 @@ class _Pace extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: value,
-                            style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                              color: AppColors.text,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
@@ -654,7 +798,12 @@ class _Pace extends StatelessWidget {
                 child: SizedBox(
                   key: const Key('summary-pace-curve'),
                   height: 120,
-                  child: CustomPaint(painter: PaceCurvePainter(track.steps, averageCs: averageCs)),
+                  child: CustomPaint(
+                    painter: PaceCurvePainter(
+                      track.steps,
+                      averageCs: averageCs,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -688,20 +837,30 @@ class PaceCurvePainter extends CustomPainter {
     final first = steps.first.$1;
     final span = math.max(1, steps.last.$1 - first);
     final fastest = steps.map((s) => s.$2).reduce(math.min);
-    final range = math.max(1, steps.map((s) => s.$2).reduce(math.max) - fastest);
-    double y(int paceCs) => ((paceCs - fastest) / range).clamp(0.0, 1.0) * size.height;
+    final range = math.max(
+      1,
+      steps.map((s) => s.$2).reduce(math.max) - fastest,
+    );
+    double y(int paceCs) =>
+        ((paceCs - fastest) / range).clamp(0.0, 1.0) * size.height;
     if (averageCs case final average?) {
       final dash = Paint()
         ..color = AppColors.textMuted
         ..strokeWidth = 1;
       for (var x = 0.0; x < size.width; x += 8) {
-        canvas.drawLine(Offset(x, y(average)), Offset(math.min(x + 4, size.width), y(average)), dash);
+        canvas.drawLine(
+          Offset(x, y(average)),
+          Offset(math.min(x + 4, size.width), y(average)),
+          dash,
+        );
       }
     }
     final path = Path();
     for (final (i, (t, pace)) in steps.indexed) {
       final offset = Offset((t - first) / span * size.width, y(pace));
-      i == 0 ? path.moveTo(offset.dx, offset.dy) : path.lineTo(offset.dx, offset.dy);
+      i == 0
+          ? path.moveTo(offset.dx, offset.dy)
+          : path.lineTo(offset.dx, offset.dy);
     }
     canvas.drawPath(
       path,
@@ -747,7 +906,10 @@ class _RrIntervals extends StatelessWidget {
                 Text(
                   l10n.summaryRmssd(rmssdMs),
                   key: const Key('summary-rmssd'),
-                  style: AppTextStyles.subtitle.copyWith(color: AppColors.text, fontWeight: FontWeight.w600),
+                  style: AppTextStyles.subtitle.copyWith(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               if (curve) ...[
                 if (rmssdMs != null) const SizedBox(height: AppSpacing.m),
@@ -759,7 +921,11 @@ class _RrIntervals extends StatelessWidget {
                   child: SizedBox(
                     key: const Key('summary-rr-curve'),
                     height: 120,
-                    child: CustomPaint(painter: RrCurvePainter([for (final i in intervals) (i.tMs, i.rrMs)])),
+                    child: CustomPaint(
+                      painter: RrCurvePainter([
+                        for (final i in intervals) (i.tMs, i.rrMs),
+                      ]),
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
@@ -793,11 +959,19 @@ class RrCurvePainter extends CustomPainter {
     final first = points.first.$1;
     final span = math.max(1, points.last.$1 - first);
     final shortest = points.map((p) => p.$2).reduce(math.min);
-    final range = math.max(1, points.map((p) => p.$2).reduce(math.max) - shortest);
+    final range = math.max(
+      1,
+      points.map((p) => p.$2).reduce(math.max) - shortest,
+    );
     final path = Path();
     for (final (i, (t, rr)) in points.indexed) {
-      final offset = Offset((t - first) / span * size.width, size.height - (rr - shortest) / range * size.height);
-      i == 0 ? path.moveTo(offset.dx, offset.dy) : path.lineTo(offset.dx, offset.dy);
+      final offset = Offset(
+        (t - first) / span * size.width,
+        size.height - (rr - shortest) / range * size.height,
+      );
+      i == 0
+          ? path.moveTo(offset.dx, offset.dy)
+          : path.lineTo(offset.dx, offset.dy);
     }
     canvas.drawPath(
       path,
@@ -810,5 +984,6 @@ class RrCurvePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(RrCurvePainter oldDelegate) => oldDelegate.points != points;
+  bool shouldRepaint(RrCurvePainter oldDelegate) =>
+      oldDelegate.points != points;
 }

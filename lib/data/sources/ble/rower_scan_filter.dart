@@ -28,5 +28,9 @@ FoundRower? rowerFromAdvertisement({
     final type = data[1] | data[2] << 8;
     if (type & 1 << FtmsIds.rowerTypeBit == 0) return null;
   }
-  return FoundRower(id: id, name: name.isEmpty ? id : name, protocol: ErgProtocol.ftms);
+  return FoundRower(
+    id: id,
+    name: name.isEmpty ? id : name,
+    protocol: ErgProtocol.ftms,
+  );
 }

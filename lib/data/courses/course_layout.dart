@@ -12,7 +12,8 @@ class ZonePlacement {
   final int start;
 
   @override
-  bool operator ==(Object other) => other is ZonePlacement && other.zoneId == zoneId && other.start == start;
+  bool operator ==(Object other) =>
+      other is ZonePlacement && other.zoneId == zoneId && other.start == start;
 
   @override
   int get hashCode => Object.hash(zoneId, start);
@@ -22,7 +23,14 @@ class ZonePlacement {
 }
 
 /// What keeps a course from being laid out (Design D4 of translations).
-enum PlacementErrorKind { lengthMissing, zoneMissing, axisMismatch, beforeStart, beyondEnd, overlap }
+enum PlacementErrorKind {
+  lengthMissing,
+  zoneMissing,
+  axisMismatch,
+  beforeStart,
+  beyondEnd,
+  overlap,
+}
 
 /// Why a course cannot be laid out; the screens put it into words. Ranges and
 /// lengths come formatted, as in `500–600 m` or `4:00`.
@@ -82,7 +90,8 @@ extension CoursePlacements on CourseDefinition {
     final starts = segmentStarts;
     return [
       for (final (i, s) in segments.indexed)
-        if (s.zoneId != null) ZonePlacement(zoneId: s.zoneId!, start: starts[i]),
+        if (s.zoneId != null)
+          ZonePlacement(zoneId: s.zoneId!, start: starts[i]),
     ];
   }
 }
@@ -96,34 +105,50 @@ CourseLayout resolveCourse({
   required List<ZonePlacement> placements,
   required Map<int, Zone> zones,
 }) {
-  if (length <= 0) return const CourseLayout._(null, [PlacementError(PlacementErrorKind.lengthMissing)]);
+  if (length <= 0) {
+    return const CourseLayout._(null, [
+      PlacementError(PlacementErrorKind.lengthMissing),
+    ]);
+  }
   final errors = <PlacementError>[];
   final valid = <(int, ZonePlacement, Zone)>[];
   for (final (i, p) in placements.indexed) {
     final zone = zones[p.zoneId];
     if (zone == null) {
-      errors.add(PlacementError(PlacementErrorKind.zoneMissing, placements: {i}));
+      errors.add(
+        PlacementError(PlacementErrorKind.zoneMissing, placements: {i}),
+      );
       continue;
     }
     final range = formatCourseRange(axis, p.start, p.start + zone.length);
     if (zone.axis != axis) {
-      errors.add(PlacementError(
-        PlacementErrorKind.axisMismatch,
-        placements: {i},
-        zone: zone.name,
-        zoneAxis: zone.axis,
-        courseAxis: axis,
-      ));
+      errors.add(
+        PlacementError(
+          PlacementErrorKind.axisMismatch,
+          placements: {i},
+          zone: zone.name,
+          zoneAxis: zone.axis,
+          courseAxis: axis,
+        ),
+      );
     } else if (p.start < 0) {
-      errors.add(PlacementError(PlacementErrorKind.beforeStart, placements: {i}, zone: zone.name));
+      errors.add(
+        PlacementError(
+          PlacementErrorKind.beforeStart,
+          placements: {i},
+          zone: zone.name,
+        ),
+      );
     } else if (p.start + zone.length > length) {
-      errors.add(PlacementError(
-        PlacementErrorKind.beyondEnd,
-        placements: {i},
-        zone: zone.name,
-        range: range,
-        courseLength: formatCourseLength(axis, length),
-      ));
+      errors.add(
+        PlacementError(
+          PlacementErrorKind.beyondEnd,
+          placements: {i},
+          zone: zone.name,
+          range: range,
+          courseLength: formatCourseLength(axis, length),
+        ),
+      );
     } else {
       valid.add((i, p, zone));
     }
@@ -132,14 +157,16 @@ CourseLayout resolveCourse({
   for (final (j, (i, p, zone)) in valid.indexed) {
     for (final (k, q, other) in valid.take(j)) {
       if (q.start + other.length <= p.start) continue;
-      errors.add(PlacementError(
-        PlacementErrorKind.overlap,
-        placements: {k, i},
-        zone: zone.name,
-        range: formatCourseRange(axis, p.start, p.start + zone.length),
-        other: other.name,
-        otherRange: formatCourseRange(axis, q.start, q.start + other.length),
-      ));
+      errors.add(
+        PlacementError(
+          PlacementErrorKind.overlap,
+          placements: {k, i},
+          zone: zone.name,
+          range: formatCourseRange(axis, p.start, p.start + zone.length),
+          other: other.name,
+          otherRange: formatCourseRange(axis, q.start, q.start + other.length),
+        ),
+      );
     }
   }
   if (errors.isNotEmpty) return CourseLayout._(null, errors);
@@ -152,5 +179,8 @@ CourseLayout resolveCourse({
     cursor = p.start + zone.length;
   }
   if (cursor < length) segments.add(CourseSegment(length: length - cursor));
-  return CourseLayout._(CourseDefinition(axis: axis, length: length, segments: segments), const []);
+  return CourseLayout._(
+    CourseDefinition(axis: axis, length: length, segments: segments),
+    const [],
+  );
 }

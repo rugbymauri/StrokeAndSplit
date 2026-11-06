@@ -24,7 +24,10 @@ class HealthPrivacyScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           children: [
             for (final text in paragraphs)
-              Padding(padding: const EdgeInsets.only(bottom: 12), child: Text(text)),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(text),
+              ),
           ],
         ),
       ),

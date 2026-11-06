@@ -7,28 +7,66 @@ import '../../l10n/l10n.dart';
 /// How a zone is shown on a value: colour, symbol and a word, so it does
 /// not depend on colour alone.
 class ZoneHint {
-  const ZoneHint({required this.inZone, required this.icon, required this.text});
+  const ZoneHint({
+    required this.inZone,
+    required this.icon,
+    required this.text,
+  });
 
   final bool inZone;
   final IconData icon;
   final String text;
 
   /// For the pace; null without a pace band.
-  static ZoneHint? pace(AppLocalizations l10n, BandStatus? status) => switch (status) {
+  static ZoneHint? pace(AppLocalizations l10n, BandStatus? status) =>
+      switch (status) {
         null || BandStatus.none => null,
-        BandStatus.inBand => ZoneHint(inZone: true, icon: Icons.check_circle, text: l10n.hintInZone),
-        BandStatus.above => ZoneHint(inZone: false, icon: Icons.arrow_upward, text: l10n.hintFaster),
-        BandStatus.below => ZoneHint(inZone: false, icon: Icons.arrow_downward, text: l10n.hintSlower),
-        BandStatus.missing => ZoneHint(inZone: false, icon: Icons.pause, text: l10n.hintNoPace),
+        BandStatus.inBand => ZoneHint(
+          inZone: true,
+          icon: Icons.check_circle,
+          text: l10n.hintInZone,
+        ),
+        BandStatus.above => ZoneHint(
+          inZone: false,
+          icon: Icons.arrow_upward,
+          text: l10n.hintFaster,
+        ),
+        BandStatus.below => ZoneHint(
+          inZone: false,
+          icon: Icons.arrow_downward,
+          text: l10n.hintSlower,
+        ),
+        BandStatus.missing => ZoneHint(
+          inZone: false,
+          icon: Icons.pause,
+          text: l10n.hintNoPace,
+        ),
       };
 
   /// For the stroke rate; null without a stroke rate band.
-  static ZoneHint? strokeRate(AppLocalizations l10n, BandStatus? status) => switch (status) {
+  static ZoneHint? strokeRate(AppLocalizations l10n, BandStatus? status) =>
+      switch (status) {
         null || BandStatus.none => null,
-        BandStatus.inBand => ZoneHint(inZone: true, icon: Icons.check_circle, text: l10n.hintInZone),
-        BandStatus.below => ZoneHint(inZone: false, icon: Icons.arrow_upward, text: l10n.hintMoreStrokes),
-        BandStatus.above => ZoneHint(inZone: false, icon: Icons.arrow_downward, text: l10n.hintFewerStrokes),
-        BandStatus.missing => ZoneHint(inZone: false, icon: Icons.pause, text: l10n.hintNoStrokes),
+        BandStatus.inBand => ZoneHint(
+          inZone: true,
+          icon: Icons.check_circle,
+          text: l10n.hintInZone,
+        ),
+        BandStatus.below => ZoneHint(
+          inZone: false,
+          icon: Icons.arrow_upward,
+          text: l10n.hintMoreStrokes,
+        ),
+        BandStatus.above => ZoneHint(
+          inZone: false,
+          icon: Icons.arrow_downward,
+          text: l10n.hintFewerStrokes,
+        ),
+        BandStatus.missing => ZoneHint(
+          inZone: false,
+          icon: Icons.pause,
+          text: l10n.hintNoStrokes,
+        ),
       };
 }
 
@@ -77,20 +115,32 @@ class ZonePill extends StatelessWidget {
     final text = Text(
       band == null ? hint.text : '${hint.text} · $band',
       key: textKey,
-      style: AppTextStyles.button.copyWith(color: foreground, fontWeight: filled ? FontWeight.w600 : null),
+      style: AppTextStyles.button.copyWith(
+        color: foreground,
+        fontWeight: filled ? FontWeight.w600 : null,
+      ),
       maxLines: maxLines,
       overflow: scaleDown ? null : TextOverflow.ellipsis,
     );
     return DecoratedBox(
-      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(radius)),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(radius),
+      ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: dense ? AppSpacing.s : AppSpacing.m),
+        padding: EdgeInsets.symmetric(
+          horizontal: dense ? AppSpacing.s : AppSpacing.m,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(hint.icon, size: 18, color: foreground),
             SizedBox(width: dense ? AppSpacing.xs : AppSpacing.s),
-            Flexible(child: scaleDown ? FittedBox(fit: BoxFit.scaleDown, child: text) : text),
+            Flexible(
+              child: scaleDown
+                  ? FittedBox(fit: BoxFit.scaleDown, child: text)
+                  : text,
+            ),
           ],
         ),
       ),

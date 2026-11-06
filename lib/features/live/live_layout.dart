@@ -7,7 +7,8 @@ enum LiveLayout {
   landscape;
 
   /// Landscape when wider than high, so a wide laptop window works like a phone on its side.
-  static LiveLayout of(Size size) => size.width > size.height ? landscape : portrait;
+  static LiveLayout of(Size size) =>
+      size.width > size.height ? landscape : portrait;
 }
 
 /// Builds [builder] with the layout for the space it is given.
@@ -17,6 +18,8 @@ class LiveLayoutBuilder extends StatelessWidget {
   final Widget Function(BuildContext context, LiveLayout layout) builder;
 
   @override
-  Widget build(BuildContext context) =>
-      LayoutBuilder(builder: (context, constraints) => builder(context, LiveLayout.of(constraints.biggest)));
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) =>
+        builder(context, LiveLayout.of(constraints.biggest)),
+  );
 }

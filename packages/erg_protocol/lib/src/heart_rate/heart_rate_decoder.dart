@@ -31,7 +31,9 @@ class HeartRateDecoder implements ErgDecoder {
 
   @override
   List<RowingEvent> decode(RawPacket packet) {
-    if (packet.characteristicId == HeartRateIds.measurement) return _onMeasurement(packet);
+    if (packet.characteristicId == HeartRateIds.measurement) {
+      return _onMeasurement(packet);
+    }
     _lastRowerPacketTime = packet.time;
     return _withStrap(inner.decode(packet), packet.time);
   }
@@ -42,8 +44,10 @@ class HeartRateDecoder implements ErgDecoder {
   List<RowingEvent> _onMeasurement(RawPacket packet) {
     final measurement = HeartRateMeasurement.parse(packet.bytes);
     if (measurement == null) {
-      onWarning?.call('Dropped ${packet.characteristicId} packet at ${packet.time.inMilliseconds} ms: '
-          'shorter than its flags announce (${packet.bytes.length} bytes)');
+      onWarning?.call(
+        'Dropped ${packet.characteristicId} packet at ${packet.time.inMilliseconds} ms: '
+        'shorter than its flags announce (${packet.bytes.length} bytes)',
+      );
       return const [];
     }
     // 0 is what straps send without skin contact; it is no heart rate.
@@ -52,7 +56,13 @@ class HeartRateDecoder implements ErgDecoder {
       _strapTime = packet.time;
     }
     if (measurement.intervalsMs.isEmpty) return const [];
-    return [HeartBeatIntervals(elapsed: _lastElapsed, time: packet.time, intervalsMs: measurement.intervalsMs)];
+    return [
+      HeartBeatIntervals(
+        elapsed: _lastElapsed,
+        time: packet.time,
+        intervalsMs: measurement.intervalsMs,
+      ),
+    ];
   }
 
   List<RowingEvent> _withStrap(List<RowingEvent> events, Duration? time) {
@@ -60,15 +70,23 @@ class HeartRateDecoder implements ErgDecoder {
     final strapHeartRate = _strapHeartRate;
     final strapTime = _strapTime;
     final strapIsFresh =
-        strapHeartRate != null && strapTime != null && time != null && time - strapTime <= strapTimeout;
+        strapHeartRate != null &&
+        strapTime != null &&
+        time != null &&
+        time - strapTime <= strapTimeout;
     return [
       for (final event in events)
-        if (event is StatusTick) _onTick(event, strapIsFresh ? strapHeartRate : null) else event,
+        if (event is StatusTick)
+          _onTick(event, strapIsFresh ? strapHeartRate : null)
+        else
+          event,
     ];
   }
 
   StatusTick _onTick(StatusTick tick, int? strapHeartRate) {
     _lastElapsed = tick.elapsed;
-    return strapHeartRate == null ? tick : tick.copyWith(heartRate: strapHeartRate);
+    return strapHeartRate == null
+        ? tick
+        : tick.copyWith(heartRate: strapHeartRate);
   }
 }

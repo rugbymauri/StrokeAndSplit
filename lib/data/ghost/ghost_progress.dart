@@ -4,7 +4,11 @@ import 'ghost.dart';
 
 /// The ghosts of a running template, one per track of the progress frame
 /// (Change ghost, Design D2); null where a track has no ghost.
-typedef LiveGhosts = ({GhostTrack? course, GhostTrack? lap, GhostTrack? segment});
+typedef LiveGhosts = ({
+  GhostTrack? course,
+  GhostTrack? lap,
+  GhostTrack? segment,
+});
 
 /// Where each ghost is on its track, as shares from 0 to 1 like the
 /// `FrameGhost` of the progress frame; null where a track has no ghost.
@@ -17,16 +21,28 @@ typedef GhostShares = ({double? course, double? lap, double? segment});
 /// the lap from the start of the current lap and the one of the zone from the
 /// start of the current segment (Design D2). With an open number of laps the
 /// outer track and with it its ghost is missing.
-GhostShares ghostShares(LapProgress progress, CourseDefinition definition, LiveGhosts ghosts) {
+GhostShares ghostShares(
+  LapProgress progress,
+  CourseDefinition definition,
+  LiveGhosts ghosts,
+) {
   final axis = definition.axis;
   double? share(GhostTrack? ghost, Duration time, int length) =>
-      ghost == null || length <= 0 ? null : (ghost.positionAt(axis, time.inMilliseconds) / length).clamp(0, 1);
+      ghost == null || length <= 0
+      ? null
+      : (ghost.positionAt(axis, time.inMilliseconds) / length).clamp(0, 1);
 
   final laps = progress.plannedLaps;
   return (
-    course: laps == null ? null : share(ghosts.course, progress.courseTime, definition.length * laps),
+    course: laps == null
+        ? null
+        : share(ghosts.course, progress.courseTime, definition.length * laps),
     lap: share(ghosts.lap, progress.lapTime, definition.length),
-    segment: share(ghosts.segment, progress.segmentTime, progress.segmentEnd - progress.segmentStart),
+    segment: share(
+      ghosts.segment,
+      progress.segmentTime,
+      progress.segmentEnd - progress.segmentStart,
+    ),
   );
 }
 
@@ -44,9 +60,17 @@ GhostGap? ghostGap(LapProgress progress, CourseAxis axis, GhostTrack? ghost) {
       final ghostWallMs = ghost.wallMsAt(progress.courseDistanceDm);
       if (ghostWallMs == null) return null;
       final behindMs = wallMs - ghostWallMs;
-      return GhostGap(axis: axis, amount: behindMs.abs() / 1000, ghostAhead: behindMs > 0);
+      return GhostGap(
+        axis: axis,
+        amount: behindMs.abs() / 1000,
+        ghostAhead: behindMs > 0,
+      );
     case CourseAxis.time:
       final aheadDm = ghost.distanceDmAt(wallMs) - progress.courseDistanceDm;
-      return GhostGap(axis: axis, amount: aheadDm.abs() / 10, ghostAhead: aheadDm > 0);
+      return GhostGap(
+        axis: axis,
+        amount: aheadDm.abs() / 10,
+        ghostAhead: aheadDm > 0,
+      );
   }
 }

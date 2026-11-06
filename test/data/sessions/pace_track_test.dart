@@ -2,9 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:strokesplit/data/sessions/pace_track.dart';
 
 /// A point a second from 0 to [seconds], at [dmPerSecond] decimetres a second.
-List<(int, int)> _steady(int seconds, {int dmPerSecond = 40, int fromMs = 0, int fromDm = 0}) => [
-      for (var s = 0; s <= seconds; s++) (fromMs + s * 1000, fromDm + s * dmPerSecond),
-    ];
+List<(int, int)> _steady(
+  int seconds, {
+  int dmPerSecond = 40,
+  int fromMs = 0,
+  int fromDm = 0,
+}) => [
+  for (var s = 0; s <= seconds; s++)
+    (fromMs + s * 1000, fromDm + s * dmPerSecond),
+];
 
 void main() {
   test('splits a steady session into steps of ten seconds at its pace', () {

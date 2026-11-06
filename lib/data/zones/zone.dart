@@ -37,28 +37,28 @@ class Zone {
   final int? resistanceLevel;
 
   Zone copyWith({int? id, String? name, CourseAxis? axis, int? length}) => Zone(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        axis: axis ?? this.axis,
-        length: length ?? this.length,
-        paceFastCs: paceFastCs,
-        paceSlowCs: paceSlowCs,
-        spmMin: spmMin,
-        spmMax: spmMax,
-        resistanceLevel: resistanceLevel,
-      );
+    id: id ?? this.id,
+    name: name ?? this.name,
+    axis: axis ?? this.axis,
+    length: length ?? this.length,
+    paceFastCs: paceFastCs,
+    paceSlowCs: paceSlowCs,
+    spmMin: spmMin,
+    spmMax: spmMax,
+    resistanceLevel: resistanceLevel,
+  );
 
   /// The zone as a part of a course, with a copy of its bands.
   CourseSegment get segment => CourseSegment(
-        length: length,
-        paceFastCs: paceFastCs,
-        paceSlowCs: paceSlowCs,
-        spmMin: spmMin,
-        spmMax: spmMax,
-        resistanceLevel: resistanceLevel,
-        zoneId: id,
-        zoneName: name,
-      );
+    length: length,
+    paceFastCs: paceFastCs,
+    paceSlowCs: paceSlowCs,
+    spmMin: spmMin,
+    spmMax: spmMax,
+    resistanceLevel: resistanceLevel,
+    zoneId: id,
+    zoneName: name,
+  );
 
   /// Whether both describe the same zone apart from the id.
   bool sameAs(Zone other) =>
@@ -72,13 +72,25 @@ class Zone {
       other.resistanceLevel == resistanceLevel;
 
   @override
-  bool operator ==(Object other) => other is Zone && other.id == id && sameAs(other);
+  bool operator ==(Object other) =>
+      other is Zone && other.id == id && sameAs(other);
 
   @override
-  int get hashCode => Object.hash(id, name, axis, length, paceFastCs, paceSlowCs, spmMin, spmMax, resistanceLevel);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    axis,
+    length,
+    paceFastCs,
+    paceSlowCs,
+    spmMin,
+    spmMax,
+    resistanceLevel,
+  );
 
   @override
-  String toString() => 'Zone($id, $name, $length ${axis.name}, pace $paceFastCs–$paceSlowCs, spm $spmMin–$spmMax, level $resistanceLevel)';
+  String toString() =>
+      'Zone($id, $name, $length ${axis.name}, pace $paceFastCs–$paceSlowCs, spm $spmMin–$spmMax, level $resistanceLevel)';
 }
 
 /// A stored zone with the number of courses it is placed in.
@@ -109,7 +121,8 @@ class ZoneValidationException implements Exception {
   final List<ZoneError> errors;
 
   @override
-  String toString() => 'ZoneValidationException(${errors.map((e) => e.name).join(', ')})';
+  String toString() =>
+      'ZoneValidationException(${errors.map((e) => e.name).join(', ')})';
 }
 
 /// What is wrong with [zone]; empty when it can be saved.
@@ -130,6 +143,8 @@ List<ZoneError> zoneErrors(Zone zone) {
   } else if (spmSet && zone.spmMin! > zone.spmMax!) {
     errors.add(ZoneError.spmReversed);
   }
-  if (zone.resistanceLevel case final level? when level < 1) errors.add(ZoneError.resistanceLevelTooLow);
+  if (zone.resistanceLevel case final level? when level < 1) {
+    errors.add(ZoneError.resistanceLevelTooLow);
+  }
   return errors;
 }

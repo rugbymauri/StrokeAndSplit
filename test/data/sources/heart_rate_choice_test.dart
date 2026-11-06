@@ -3,11 +3,16 @@ import 'package:strokesplit/data/sources/heart_rate_choice.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _polar = FoundHeartRateMonitor(id: '11:22:33:44:55:66', name: 'Polar H10 1A2B3C4D');
+const _polar = FoundHeartRateMonitor(
+  id: '11:22:33:44:55:66',
+  name: 'Polar H10 1A2B3C4D',
+);
 const _garmin = FoundHeartRateMonitor(id: '66:55:44:33:22:11', name: 'HRM-Pro');
 
 ProviderContainer _open(HeartRateMonitorStore store) {
-  final container = ProviderContainer(overrides: [heartRateMonitorStoreProvider.overrideWithValue(store)]);
+  final container = ProviderContainer(
+    overrides: [heartRateMonitorStoreProvider.overrideWithValue(store)],
+  );
   addTearDown(container.dispose);
   return container;
 }
@@ -31,12 +36,17 @@ void main() {
     expect(container.read(chosenHeartRateMonitorProvider), isNull);
     await container.read(chosenHeartRateMonitorProvider.notifier).pair(_polar);
 
-    expect(_open(store).read(chosenHeartRateMonitorProvider)?.name, _polar.name);
+    expect(
+      _open(store).read(chosenHeartRateMonitorProvider)?.name,
+      _polar.name,
+    );
   });
 
   test('pairing another strap replaces the one paired before', () async {
     final store = MemoryHeartRateMonitorStore(_polar);
-    await _open(store).read(chosenHeartRateMonitorProvider.notifier).pair(_garmin);
+    await _open(store)
+        .read(chosenHeartRateMonitorProvider.notifier)
+        .pair(_garmin);
 
     expect(_open(store).read(chosenHeartRateMonitorProvider), _garmin);
   });

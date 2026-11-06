@@ -5,7 +5,11 @@ import 'package:strokesplit/data/sources/ble/heart_rate_transport.dart';
 
 /// A [HeartRateTransport] whose answers are set by the test.
 class FakeHeartRateTransport implements HeartRateTransport {
-  FakeHeartRateTransport({this.readinessValue = BluetoothReadiness.ready, this.found = const [], this.connectError});
+  FakeHeartRateTransport({
+    this.readinessValue = BluetoothReadiness.ready,
+    this.found = const [],
+    this.connectError,
+  });
 
   BluetoothReadiness readinessValue;
   List<FoundHeartRateMonitor> found;
@@ -23,13 +27,17 @@ class FakeHeartRateTransport implements HeartRateTransport {
   Future<BluetoothReadiness> readiness() async => readinessValue;
 
   @override
-  Stream<List<FoundHeartRateMonitor>> scanHeartRateMonitors({Duration timeout = const Duration(seconds: 15)}) async* {
+  Stream<List<FoundHeartRateMonitor>> scanHeartRateMonitors({
+    Duration timeout = const Duration(seconds: 15),
+  }) async* {
     if (found.isNotEmpty) yield found;
     await Future<void>.delayed(timeout);
   }
 
   @override
-  Future<HeartRateLink> connectHeartRateMonitor(FoundHeartRateMonitor monitor) async {
+  Future<HeartRateLink> connectHeartRateMonitor(
+    FoundHeartRateMonitor monitor,
+  ) async {
     attempts.add(monitor);
     final error = connectError;
     if (error != null) throw error;
@@ -52,7 +60,8 @@ class FakeHeartRateLink implements HeartRateLink {
   Stream<(String, List<int>)> get notifications => _notifications.stream;
 
   /// Sends a Heart Rate Measurement.
-  void notify(List<int> bytes) => _notifications.add((HeartRateIds.measurement, bytes));
+  void notify(List<int> bytes) =>
+      _notifications.add((HeartRateIds.measurement, bytes));
 
   /// Drops the connection unexpectedly.
   void drop() {

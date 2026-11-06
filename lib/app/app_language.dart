@@ -38,7 +38,9 @@ class PreferencesLanguageStore implements LanguageStore {
 
   static Future<PreferencesLanguageStore> open() async {
     const options = SharedPreferencesWithCacheOptions(allowList: {_key});
-    return PreferencesLanguageStore._(await SharedPreferencesWithCache.create(cacheOptions: options));
+    return PreferencesLanguageStore._(
+      await SharedPreferencesWithCache.create(cacheOptions: options),
+    );
   }
 
   @override
@@ -63,14 +65,19 @@ class MemoryLanguageStore implements LanguageStore {
 }
 
 /// Where the language is kept; `main` sets the preferences.
-final languageStoreProvider = Provider<LanguageStore>((ref) => MemoryLanguageStore());
+final languageStoreProvider = Provider<LanguageStore>(
+  (ref) => MemoryLanguageStore(),
+);
 
 /// The language of the user interface.
-final appLanguageProvider = NotifierProvider<AppLanguageNotifier, AppLanguage>(AppLanguageNotifier.new);
+final appLanguageProvider = NotifierProvider<AppLanguageNotifier, AppLanguage>(
+  AppLanguageNotifier.new,
+);
 
 class AppLanguageNotifier extends Notifier<AppLanguage> {
   @override
-  AppLanguage build() => AppLanguage.parse(ref.watch(languageStoreProvider).read());
+  AppLanguage build() =>
+      AppLanguage.parse(ref.watch(languageStoreProvider).read());
 
   /// Switches the user interface to [language] and remembers it.
   Future<void> choose(AppLanguage language) async {

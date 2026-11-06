@@ -17,29 +17,41 @@ class RawLogWriter {
   int packetCount = 0;
 
   /// [protocol] is `pm5` or `ftms` and names the file, e.g. `ftms-<time>.jsonl`.
-  static Future<RawLogWriter> create(Directory dir, {required String deviceName, String protocol = 'pm5'}) async {
+  static Future<RawLogWriter> create(
+    Directory dir, {
+    required String deviceName,
+    String protocol = 'pm5',
+  }) async {
     final startedAt = DateTime.now();
-    final stamp = startedAt.toIso8601String().replaceAll(':', '-').split('.').first;
+    final stamp = startedAt
+        .toIso8601String()
+        .replaceAll(':', '-')
+        .split('.')
+        .first;
     final file = File('${dir.path}/$protocol-$stamp.jsonl');
     final sink = file.openWrite();
-    sink.writeln(jsonEncode({
-      'format': RawRecording.formatName,
-      'version': 1,
-      'source': protocol,
-      'protocol': protocol,
-      'device': deviceName,
-      'recordedAt': startedAt.toUtc().toIso8601String(),
-    }));
+    sink.writeln(
+      jsonEncode({
+        'format': RawRecording.formatName,
+        'version': 1,
+        'source': protocol,
+        'protocol': protocol,
+        'device': deviceName,
+        'recordedAt': startedAt.toUtc().toIso8601String(),
+      }),
+    );
     return RawLogWriter._(file, sink, Stopwatch()..start());
   }
 
   void packet(String characteristicId, List<int> bytes) {
     packetCount++;
-    _sink.writeln(jsonEncode({
-      't': _clock.elapsedMilliseconds,
-      'c': characteristicId,
-      'b': base64Encode(bytes),
-    }));
+    _sink.writeln(
+      jsonEncode({
+        't': _clock.elapsedMilliseconds,
+        'c': characteristicId,
+        'b': base64Encode(bytes),
+      }),
+    );
   }
 
   void marker(String text) {

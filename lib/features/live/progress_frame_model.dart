@@ -7,7 +7,11 @@ import '../../data/courses/lap_tracker.dart';
 /// notches sit and which parts of it are zones, all as shares from 0 to 1.
 @immutable
 class FrameTrack {
-  const FrameTrack({required this.share, required this.boundaries, this.zones = const []});
+  const FrameTrack({
+    required this.share,
+    required this.boundaries,
+    this.zones = const [],
+  });
 
   final double share;
   final List<double> boundaries;
@@ -32,9 +36,14 @@ class ProgressFrameModel {
   });
 
   /// From the state of the lap tracker on [definition].
-  factory ProgressFrameModel.of(LapProgress progress, CourseDefinition definition) {
+  factory ProgressFrameModel.of(
+    LapProgress progress,
+    CourseDefinition definition,
+  ) {
     final length = definition.length;
-    final inLap = (progress.segmentEnd - progress.remaining).clamp(0, length).toDouble();
+    final inLap = (progress.segmentEnd - progress.remaining)
+        .clamp(0, length)
+        .toDouble();
     final segmentLength = progress.segmentEnd - progress.segmentStart;
     final ends = definition.segmentEnds;
     final lap = FrameTrack(
@@ -42,11 +51,14 @@ class ProgressFrameModel {
       boundaries: [for (final end in ends.take(ends.length - 1)) end / length],
       zones: [
         for (var i = 0; i < definition.segments.length; i++)
-          if (!definition.segments[i].isFree) (definition.segmentStarts[i] / length, ends[i] / length),
+          if (!definition.segments[i].isFree)
+            (definition.segmentStarts[i] / length, ends[i] / length),
       ],
     );
     final segment = FrameTrack(
-      share: segmentLength > 0 ? _share(inLap - progress.segmentStart, segmentLength) : 1,
+      share: segmentLength > 0
+          ? _share(inLap - progress.segmentStart, segmentLength)
+          : 1,
       boundaries: const [],
     );
     final laps = progress.plannedLaps;
@@ -63,9 +75,14 @@ class ProgressFrameModel {
       );
     }
     final total = length * laps;
-    final done = ((progress.lap - 1) * length + inLap).clamp(0, total).toDouble();
+    final done = ((progress.lap - 1) * length + inLap)
+        .clamp(0, total)
+        .toDouble();
     return ProgressFrameModel(
-      course: FrameTrack(share: _share(done, total), boundaries: [for (var i = 1; i < laps; i++) i / laps]),
+      course: FrameTrack(
+        share: _share(done, total),
+        boundaries: [for (var i = 1; i < laps; i++) i / laps],
+      ),
       lap: lap,
       segment: segment,
       courseDone: done,
@@ -87,5 +104,6 @@ class ProgressFrameModel {
   final double lapRemaining;
   final double segmentRemaining;
 
-  static double _share(double part, int whole) => whole > 0 ? (part / whole).clamp(0, 1).toDouble() : 0;
+  static double _share(double part, int whole) =>
+      whole > 0 ? (part / whole).clamp(0, 1).toDouble() : 0;
 }

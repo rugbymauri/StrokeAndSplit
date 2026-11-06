@@ -3,18 +3,25 @@ import 'dart:typed_data';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:test/test.dart';
 
-RowerData? _parse(List<int> bytes) => RowerData.parse(Uint8List.fromList(bytes));
+RowerData? _parse(List<int> bytes) =>
+    RowerData.parse(Uint8List.fromList(bytes));
 
 void main() {
   group('reads each flag on its own', () {
     test('bit 0 clear: stroke rate in half strokes and stroke count', () {
       final data = _parse([0x00, 0x00, 45, 0x2A, 0x01])!;
-      expect((data.moreData, data.strokeRate, data.strokeCount), (false, 22.5, 298));
+      expect(
+        (data.moreData, data.strokeRate, data.strokeCount),
+        (false, 22.5, 298),
+      );
     });
 
     test('bit 0 set: more data follows, without stroke rate and count', () {
       final data = _parse([0x01, 0x00])!;
-      expect((data.moreData, data.strokeRate, data.strokeCount), (true, null, null));
+      expect(
+        (data.moreData, data.strokeRate, data.strokeCount),
+        (true, null, null),
+      );
     });
 
     final cases = <String, (int, List<int>, Object? Function(RowerData))>{
@@ -25,7 +32,11 @@ void main() {
       'instantaneous power': (5, [0xCB, 0x00], (d) => d.power),
       'average power': (6, [0xFE, 0xFF], (d) => d.averagePower),
       'resistance level': (7, [0x05, 0x00], (d) => d.resistanceLevel),
-      'total energy': (8, [0x2C, 0x01, 0xFF, 0xFF, 0xFF], (d) => (d.totalEnergy, d.energyPerHour, d.energyPerMinute)),
+      'total energy': (
+        8,
+        [0x2C, 0x01, 0xFF, 0xFF, 0xFF],
+        (d) => (d.totalEnergy, d.energyPerHour, d.energyPerMinute),
+      ),
       'heart rate': (9, [151], (d) => d.heartRate),
       'metabolic equivalent': (10, [87], (d) => d.metabolicEquivalent),
       'elapsed time': (11, [0x2C, 0x01], (d) => d.elapsedTime),
@@ -45,7 +56,8 @@ void main() {
       'elapsed time': const Duration(seconds: 300),
       'remaining time': const Duration(seconds: 60),
     };
-    for (final MapEntry(key: name, value: (bit, bytes, read)) in cases.entries) {
+    for (final MapEntry(key: name, value: (bit, bytes, read))
+        in cases.entries) {
       test('bit $bit: $name', () {
         final flags = 1 | 1 << bit;
         final data = _parse([flags & 0xFF, flags >> 8, ...bytes])!;
@@ -83,14 +95,26 @@ void main() {
   test('reads the second part of a split record', () {
     const flags = 1 | 1 << 9 | 1 << 11;
     final data = _parse([flags & 0xFF, flags >> 8, 150, 0x0A, 0x00])!;
-    expect((data.moreData, data.heartRate, data.elapsedTime), (true, 150, const Duration(seconds: 10)));
+    expect(
+      (data.moreData, data.heartRate, data.elapsedTime),
+      (true, 150, const Duration(seconds: 10)),
+    );
   });
 
   group('rejects packets shorter than their flags announce', () {
     test('no flags', () => expect(_parse([0x00]), isNull));
-    test('stroke count cut off', () => expect(_parse([0x00, 0x00, 44, 0x01]), isNull));
-    test('distance cut off', () => expect(_parse([0x05, 0x00, 0xE8, 0x03]), isNull));
-    test('energy cut off', () => expect(_parse([0x01, 0x01, 0x32, 0x00, 0xFF]), isNull));
+    test(
+      'stroke count cut off',
+      () => expect(_parse([0x00, 0x00, 44, 0x01]), isNull),
+    );
+    test(
+      'distance cut off',
+      () => expect(_parse([0x05, 0x00, 0xE8, 0x03]), isNull),
+    );
+    test(
+      'energy cut off',
+      () => expect(_parse([0x01, 0x01, 0x32, 0x00, 0xFF]), isNull),
+    );
   });
 
   test('ignores bytes after the announced fields', () {

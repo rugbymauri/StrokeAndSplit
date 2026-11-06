@@ -16,7 +16,10 @@ import '../courses/course.dart';
 ///   change during a pause is a change by hand as well.
 /// - For [grace] after sending, the rower may still report the old level.
 class ResistanceDirector {
-  ResistanceDirector({required this.range, this.grace = const Duration(seconds: 3)});
+  ResistanceDirector({
+    required this.range,
+    this.grace = const Duration(seconds: 3),
+  });
 
   /// The levels of the rower; it changes when the rower reconnects.
   ResistanceRange range;

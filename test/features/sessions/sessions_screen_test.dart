@@ -22,16 +22,26 @@ class _Setup {
   final db = openTestDatabase();
   late final repository = SessionRepository(db);
   final files = FakeSessionFiles();
-  late final container = ProviderContainer(overrides: [
-    databaseProvider.overrideWithValue(db),
-    wakelockProvider.overrideWithValue(FakeWakelock()),
-    sessionFilesProvider.overrideWithValue(files),
-  ]);
+  late final container = ProviderContainer(
+    overrides: [
+      databaseProvider.overrideWithValue(db),
+      wakelockProvider.overrideWithValue(FakeWakelock()),
+      sessionFilesProvider.overrideWithValue(files),
+    ],
+  );
 
   /// Stores a finished session, recorded from [fixture] when given.
-  Future<int> addSession(WidgetTester tester, DateTime startedAt, {String? fixture}) async {
+  Future<int> addSession(
+    WidgetTester tester,
+    DateTime startedAt, {
+    String? fixture,
+  }) async {
     return (await tester.runAsync(() async {
-      final id = await repository.create(startedAt: startedAt, source: ErgSourceKind.pm5, deviceName: 'PM5 Test');
+      final id = await repository.create(
+        startedAt: startedAt,
+        source: ErgSourceKind.pm5,
+        deviceName: 'PM5 Test',
+      );
       if (fixture != null) {
         final accumulator = SessionAccumulator(id);
         loadFixture(fixture).packets.forEach(accumulator.add);
@@ -46,7 +56,10 @@ class _Setup {
   Future<void> pump(WidgetTester tester) async {
     addTearDown(container.dispose);
     await tester.pumpWidget(
-      UncontrolledProviderScope(container: container, child: const LocalizedApp(home: SessionsScreen())),
+      UncontrolledProviderScope(
+        container: container,
+        child: const LocalizedApp(home: SessionsScreen()),
+      ),
     );
     await tester.pump();
   }
@@ -69,11 +82,19 @@ void main() {
   testWidgets('lists the newest session first', (tester) async {
     final setup = _Setup();
     await setup.addSession(tester, DateTime(2026, 10, 14, 7));
-    await setup.addSession(tester, DateTime(2026, 10, 15, 18, 30), fixture: 'just_row');
+    await setup.addSession(
+      tester,
+      DateTime(2026, 10, 15, 18, 30),
+      fixture: 'just_row',
+    );
     await setup.addSession(tester, DateTime(2026, 10, 12, 19));
     await setup.pump(tester);
 
-    final dates = ['15.10.2026, 18:30', '14.10.2026, 07:00', '12.10.2026, 19:00'];
+    final dates = [
+      '15.10.2026, 18:30',
+      '14.10.2026, 07:00',
+      '12.10.2026, 19:00',
+    ];
     final tops = [for (final d in dates) tester.getTopLeft(find.text(d)).dy];
     expect(tops, orderedEquals([...tops]..sort()));
     expect(find.textContaining('/500 m'), findsNWidgets(3));
@@ -82,7 +103,11 @@ void main() {
 
   testWidgets('deletes a session only after confirmation', (tester) async {
     final setup = _Setup();
-    final id = await setup.addSession(tester, DateTime(2026, 10, 15, 18, 30), fixture: 'just_row');
+    final id = await setup.addSession(
+      tester,
+      DateTime(2026, 10, 15, 18, 30),
+      fixture: 'just_row',
+    );
     await setup.pump(tester);
 
     Future<void> chooseDelete() async {
@@ -103,11 +128,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Noch keine Sessions aufgezeichnet.'), findsOneWidget);
 
-    final left = await tester.runAsync(() async => (
-          await setup.repository.get(id),
-          await setup.db.select(setup.db.samples).get(),
-          await setup.db.select(setup.db.rawPackets).get(),
-        ));
+    final left = await tester.runAsync(
+      () async => (
+        await setup.repository.get(id),
+        await setup.db.select(setup.db.samples).get(),
+        await setup.db.select(setup.db.rawPackets).get(),
+      ),
+    );
     expect(left!.$1, isNull);
     expect(left.$2, isEmpty);
     expect(left.$3, isEmpty);
@@ -116,7 +143,11 @@ void main() {
 
   testWidgets('plays a session back in the live display', (tester) async {
     final setup = _Setup();
-    await setup.addSession(tester, DateTime(2026, 10, 15, 18, 30), fixture: 'just_row');
+    await setup.addSession(
+      tester,
+      DateTime(2026, 10, 15, 18, 30),
+      fixture: 'just_row',
+    );
     await setup.pump(tester);
 
     await tester.tap(find.byTooltip('Aktionen'));
@@ -130,23 +161,35 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
     }
 
-    expect(setup.container.read(activeErgSourceProvider)?.kind, ErgSourceKind.replay);
+    expect(
+      setup.container.read(activeErgSourceProvider)?.kind,
+      ErgSourceKind.replay,
+    );
     expect(find.text('REPLAY'), findsOneWidget);
-    final distance = tester.widget<Text>(find.byKey(const Key('metric-distance'))).textSpan!.toPlainText();
+    final distance = tester
+        .widget<Text>(find.byKey(const Key('metric-distance')))
+        .textSpan!
+        .toPlainText();
     expect(int.parse(distance.replaceAll(RegExp(r'\D'), '')), greaterThan(0));
     await setup.tearDown(tester);
   });
 
   testWidgets('exports a session and imports the file again', (tester) async {
     final setup = _Setup();
-    await setup.addSession(tester, DateTime(2026, 10, 15, 18, 30), fixture: 'just_row');
+    await setup.addSession(
+      tester,
+      DateTime(2026, 10, 15, 18, 30),
+      fixture: 'just_row',
+    );
     await setup.pump(tester);
 
     await tester.tap(find.byTooltip('Aktionen'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Exportieren'));
     for (var i = 0; i < 5; i++) {
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
       await tester.pump();
     }
     expect(setup.files.saved.keys, ['strokesplit-2026-10-15-1830.strokesplit']);
@@ -155,7 +198,9 @@ void main() {
     setup.files.toOpen = setup.files.saved.values.single;
     await tester.tap(find.byTooltip('Importieren'));
     for (var i = 0; i < 5; i++) {
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
       await tester.pump();
     }
     expect(find.text('Session importiert.'), findsOneWidget);
@@ -164,21 +209,39 @@ void main() {
     setup.files.toOpen = [1, 2, 3];
     await tester.tap(find.byTooltip('Importieren'));
     for (var i = 0; i < 5; i++) {
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
       await tester.pump();
     }
-    expect(find.textContaining('keine lesbare Stroke & Split-Session'), findsOneWidget);
+    expect(
+      find.textContaining('keine lesbare Stroke & Split-Session'),
+      findsOneWidget,
+    );
     await setup.tearDown(tester);
   });
 
-  testWidgets('names the template of a session, also after it was deleted', (tester) async {
+  testWidgets('names the template of a session, also after it was deleted', (
+    tester,
+  ) async {
     final setup = _Setup();
     await tester.runAsync(() async {
       final courses = CourseRepository(setup.db);
       final templates = TemplateRepository(setup.db);
-      final course = await courses.create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 1000));
-      final kept = await templates.create('Seerunde x3', courseId: course, laps: 3);
-      final deleted = await templates.create('Seerunde offen', courseId: course, laps: null);
+      final course = await courses.create(
+        'Seerunde',
+        CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+      );
+      final kept = await templates.create(
+        'Seerunde x3',
+        courseId: course,
+        laps: 3,
+      );
+      final deleted = await templates.create(
+        'Seerunde offen',
+        courseId: course,
+        laps: null,
+      );
       for (final id in [kept, deleted]) {
         final session = await setup.repository.create(
           startedAt: DateTime(2026, 10, 16, 7),

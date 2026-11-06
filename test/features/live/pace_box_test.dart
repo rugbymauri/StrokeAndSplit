@@ -11,11 +11,21 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/localized_app.dart';
 
-const _tempo = CourseSegment(length: 600, paceFastCs: 12500, paceSlowCs: 13000, zoneId: 1, zoneName: 'Tempo');
+const _tempo = CourseSegment(
+  length: 600,
+  paceFastCs: 12500,
+  paceSlowCs: 13000,
+  zoneId: 1,
+  zoneName: 'Tempo',
+);
 const _free = CourseSegment(length: 200);
 
 /// 1000 m with the zone "Tempo" from 200 to 800 m.
-const _seerunde = CourseDefinition(axis: CourseAxis.distance, length: 1000, segments: [_free, _tempo, _free]);
+const _seerunde = CourseDefinition(
+  axis: CourseAxis.distance,
+  length: 1000,
+  segments: [_free, _tempo, _free],
+);
 
 /// At [inLap] metres of lap 2 of 3 (or of an open number of laps) in [segment] number [index].
 LapProgress _at(
@@ -52,26 +62,29 @@ Future<void> _pump(
   GhostGap? ghostGap,
   Duration? averagePace,
 }) async {
-  await tester.pumpWidget(LocalizedApp(
-    locale: locale,
-    home: Scaffold(
-      body: Center(
-        child: SizedBox.fromSize(
-          size: size,
-          child: PaceBox(
-            progress: progress,
-            course: course,
-            pace: pace,
-            averagePace: averagePace,
-            ghostGap: ghostGap,
+  await tester.pumpWidget(
+    LocalizedApp(
+      locale: locale,
+      home: Scaffold(
+        body: Center(
+          child: SizedBox.fromSize(
+            size: size,
+            child: PaceBox(
+              progress: progress,
+              course: course,
+              pace: pace,
+              averagePace: averagePace,
+              ghostGap: ghostGap,
+            ),
           ),
         ),
       ),
     ),
-  ));
+  );
 }
 
-String _text(WidgetTester tester, Key key) => tester.widget<Text>(find.byKey(key)).data!;
+String _text(WidgetTester tester, Key key) =>
+    tester.widget<Text>(find.byKey(key)).data!;
 
 /// The legend line with [key] shows [label] and [value].
 void _expectLine(Key key, String label, String value) {
@@ -82,45 +95,78 @@ void _expectLine(Key key, String label, String value) {
 
 /// The colour of the value in the legend line with [key].
 Color? _valueColor(WidgetTester tester, Key key, String value) => tester
-    .widget<Text>(find.descendant(of: find.byKey(key), matching: find.text(value)))
+    .widget<Text>(
+      find.descendant(of: find.byKey(key), matching: find.text(value)),
+    )
     .style
     ?.color;
 
-const _course = CourseDefinition(axis: CourseAxis.time, length: 1000, segments: [_free, _tempo, _free]);
+const _course = CourseDefinition(
+  axis: CourseAxis.time,
+  length: 1000,
+  segments: [_free, _tempo, _free],
+);
 
 void main() {
-  testWidgets('shows the pace in the zone with its band, the lap and the zone', (tester) async {
-    await _pump(tester, _at(460));
+  testWidgets(
+    'shows the pace in the zone with its band, the lap and the zone',
+    (tester) async {
+      await _pump(tester, _at(460));
 
-    expect(_text(tester, const Key('pace-box-pace')), '2:07');
-    expect(find.text('PACE /500 M'), findsOneWidget);
-    expect(find.byKey(const Key('pace-box-zone-in')), findsOneWidget);
-    expect(_text(tester, const Key('pace-box-status')), 'In der Zone · 2:05–2:10');
-    expect(find.byIcon(Icons.check_circle), findsOneWidget);
-    _expectLine(const Key('pace-box-course'), 'Gesamt', '1 460 / 3 000 m');
-    _expectLine(const Key('pace-box-lap'), 'Runde 2 / 3', 'noch 540 m');
-    _expectLine(const Key('pace-box-segment'), 'Tempo', 'noch 340 m');
-  });
+      expect(_text(tester, const Key('pace-box-pace')), '2:07');
+      expect(find.text('PACE /500 M'), findsOneWidget);
+      expect(find.byKey(const Key('pace-box-zone-in')), findsOneWidget);
+      expect(
+        _text(tester, const Key('pace-box-status')),
+        'In der Zone · 2:05–2:10',
+      );
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      _expectLine(const Key('pace-box-course'), 'Gesamt', '1 460 / 3 000 m');
+      _expectLine(const Key('pace-box-lap'), 'Runde 2 / 3', 'noch 540 m');
+      _expectLine(const Key('pace-box-segment'), 'Tempo', 'noch 340 m');
+    },
+  );
 
-  testWidgets('shows the average pace of the session, or none before the first metre', (tester) async {
-    await _pump(tester, _at(460), averagePace: const Duration(minutes: 2, seconds: 11));
-    _expectLine(const Key('pace-box-average'), 'Ø Pace', '2:11');
+  testWidgets(
+    'shows the average pace of the session, or none before the first metre',
+    (tester) async {
+      await _pump(
+        tester,
+        _at(460),
+        averagePace: const Duration(minutes: 2, seconds: 11),
+      );
+      _expectLine(const Key('pace-box-average'), 'Ø Pace', '2:11');
 
-    await _pump(tester, _at(460));
-    _expectLine(const Key('pace-box-average'), 'Ø Pace', '–:––');
-  });
+      await _pump(tester, _at(460));
+      _expectLine(const Key('pace-box-average'), 'Ø Pace', '–:––');
+    },
+  );
 
-  testWidgets('asks for a faster pace when too slow, with an arrow and a word', (tester) async {
-    await _pump(tester, _at(460, pace: BandStatus.above), pace: const Duration(minutes: 2, seconds: 13));
+  testWidgets(
+    'asks for a faster pace when too slow, with an arrow and a word',
+    (tester) async {
+      await _pump(
+        tester,
+        _at(460, pace: BandStatus.above),
+        pace: const Duration(minutes: 2, seconds: 13),
+      );
 
-    expect(_text(tester, const Key('pace-box-pace')), '2:13');
-    expect(find.byKey(const Key('pace-box-zone-out')), findsOneWidget);
-    expect(_text(tester, const Key('pace-box-status')), 'Schneller · 2:05–2:10');
-    expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
-  });
+      expect(_text(tester, const Key('pace-box-pace')), '2:13');
+      expect(find.byKey(const Key('pace-box-zone-out')), findsOneWidget);
+      expect(
+        _text(tester, const Key('pace-box-status')),
+        'Schneller · 2:05–2:10',
+      );
+      expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
+    },
+  );
 
   testWidgets('calls a zone without a name "Zone"', (tester) async {
-    const unnamed = CourseSegment(length: 600, paceFastCs: 12500, paceSlowCs: 13000);
+    const unnamed = CourseSegment(
+      length: 600,
+      paceFastCs: 12500,
+      paceSlowCs: 13000,
+    );
 
     await _pump(tester, _at(460, segment: unnamed));
 
@@ -128,7 +174,10 @@ void main() {
   });
 
   testWidgets('shows a free gap without a zone status', (tester) async {
-    await _pump(tester, _at(100, segment: _free, index: 0, pace: BandStatus.none));
+    await _pump(
+      tester,
+      _at(100, segment: _free, index: 0, pace: BandStatus.none),
+    );
 
     _expectLine(const Key('pace-box-segment'), 'frei', 'noch 100 m');
     expect(find.byKey(const Key('pace-box-status')), findsNothing);
@@ -136,33 +185,54 @@ void main() {
     expect(find.byIcon(Icons.arrow_upward), findsNothing);
   });
 
-  testWidgets('tints the box in the zone colour and keeps it plain in a free gap', (tester) async {
-    BandStatus? boxPace() => tester.widget<ProgressFrame>(find.byType(ProgressFrame)).pace;
-    Color? labelColor() => tester.widget<Text>(find.text('PACE /500 M')).style?.color;
+  testWidgets(
+    'tints the box in the zone colour and keeps it plain in a free gap',
+    (tester) async {
+      BandStatus? boxPace() =>
+          tester.widget<ProgressFrame>(find.byType(ProgressFrame)).pace;
+      Color? labelColor() =>
+          tester.widget<Text>(find.text('PACE /500 M')).style?.color;
 
-    await _pump(tester, _at(460));
-    expect(ProgressFramePainter.boxColor(boxPace()), AppColors.zoneInSurface);
-    expect(labelColor(), AppColors.zoneInText);
-    expect(tester.widget<ZonePill>(find.byType(ZonePill)).filled, isTrue);
+      await _pump(tester, _at(460));
+      expect(ProgressFramePainter.boxColor(boxPace()), AppColors.zoneInSurface);
+      expect(labelColor(), AppColors.zoneInText);
+      expect(tester.widget<ZonePill>(find.byType(ZonePill)).filled, isTrue);
 
-    await _pump(tester, _at(460, pace: BandStatus.above));
-    expect(ProgressFramePainter.boxColor(boxPace()), AppColors.zoneOutSurface);
-    expect(labelColor(), AppColors.zoneOutText);
+      await _pump(tester, _at(460, pace: BandStatus.above));
+      expect(
+        ProgressFramePainter.boxColor(boxPace()),
+        AppColors.zoneOutSurface,
+      );
+      expect(labelColor(), AppColors.zoneOutText);
 
-    await _pump(tester, _at(100, segment: _free, index: 0, pace: BandStatus.none));
-    expect(ProgressFramePainter.boxColor(boxPace()), AppColors.surface);
-    expect(labelColor(), isNot(anyOf(AppColors.zoneInText, AppColors.zoneOutText)));
-  });
+      await _pump(
+        tester,
+        _at(100, segment: _free, index: 0, pace: BandStatus.none),
+      );
+      expect(ProgressFramePainter.boxColor(boxPace()), AppColors.surface);
+      expect(
+        labelColor(),
+        isNot(anyOf(AppColors.zoneInText, AppColors.zoneOutText)),
+      );
+    },
+  );
 
-  testWidgets('names the lap without a total and leaves out the course with an open number of laps', (tester) async {
-    await _pump(tester, _at(460, laps: null));
+  testWidgets(
+    'names the lap without a total and leaves out the course with an open number of laps',
+    (tester) async {
+      await _pump(tester, _at(460, laps: null));
 
-    _expectLine(const Key('pace-box-lap'), 'Runde 2', 'noch 540 m');
-    expect(find.byKey(const Key('pace-box-course')), findsNothing);
-  });
+      _expectLine(const Key('pace-box-lap'), 'Runde 2', 'noch 540 m');
+      expect(find.byKey(const Key('pace-box-course')), findsNothing);
+    },
+  );
 
   testWidgets('shows times on a time course', (tester) async {
-    const course = CourseDefinition(axis: CourseAxis.time, length: 1000, segments: [_free, _tempo, _free]);
+    const course = CourseDefinition(
+      axis: CourseAxis.time,
+      length: 1000,
+      segments: [_free, _tempo, _free],
+    );
 
     await _pump(tester, _at(460), course: course);
 
@@ -174,7 +244,10 @@ void main() {
   testWidgets('speaks English', (tester) async {
     await _pump(tester, _at(460), locale: const Locale('en'));
 
-    expect(_text(tester, const Key('pace-box-status')), 'In the zone · 2:05–2:10');
+    expect(
+      _text(tester, const Key('pace-box-status')),
+      'In the zone · 2:05–2:10',
+    );
     _expectLine(const Key('pace-box-course'), 'Total', '1 460 / 3 000 m');
     _expectLine(const Key('pace-box-lap'), 'Lap 2 / 3', '540 m to go');
     _expectLine(const Key('pace-box-segment'), 'Tempo', '340 m to go');
@@ -184,38 +257,86 @@ void main() {
     await _pump(tester, _at(460, pace: BandStatus.missing), pace: null);
 
     expect(_text(tester, const Key('pace-box-pace')), '–:––');
-    expect(_text(tester, const Key('pace-box-status')), 'Keine Pace · 2:05–2:10');
+    expect(
+      _text(tester, const Key('pace-box-status')),
+      'Keine Pace · 2:05–2:10',
+    );
   });
 
-  testWidgets('shows a gap behind the ghost on a distance course in seconds, in orange', (tester) async {
-    await _pump(tester, _at(460),
-        ghostGap: const GhostGap(axis: CourseAxis.distance, amount: 7.62, ghostAhead: true));
+  testWidgets(
+    'shows a gap behind the ghost on a distance course in seconds, in orange',
+    (tester) async {
+      await _pump(
+        tester,
+        _at(460),
+        ghostGap: const GhostGap(
+          axis: CourseAxis.distance,
+          amount: 7.62,
+          ghostAhead: true,
+        ),
+      );
 
-    const key = Key('pace-box-ghost-behind');
-    _expectLine(key, 'Ghost', '7.6 s vor dir');
-    expect(_valueColor(tester, key, '7.6 s vor dir'), AppColors.zoneOut);
-    expect(find.descendant(of: find.byKey(key), matching: find.byType(GhostSymbol)), findsOneWidget);
-  });
+      const key = Key('pace-box-ghost-behind');
+      _expectLine(key, 'Ghost', '7.6 s vor dir');
+      expect(_valueColor(tester, key, '7.6 s vor dir'), AppColors.zoneOut);
+      expect(
+        find.descendant(
+          of: find.byKey(key),
+          matching: find.byType(GhostSymbol),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 
-  testWidgets('shows a lead over the ghost on a time course in metres, in blue', (tester) async {
-    await _pump(tester, _at(460),
-        course: _course, ghostGap: const GhostGap(axis: CourseAxis.time, amount: 12.3, ghostAhead: false));
+  testWidgets(
+    'shows a lead over the ghost on a time course in metres, in blue',
+    (tester) async {
+      await _pump(
+        tester,
+        _at(460),
+        course: _course,
+        ghostGap: const GhostGap(
+          axis: CourseAxis.time,
+          amount: 12.3,
+          ghostAhead: false,
+        ),
+      );
 
-    const key = Key('pace-box-ghost-ahead');
-    _expectLine(key, 'Ghost', '12 m hinter dir');
-    expect(_valueColor(tester, key, '12 m hinter dir'), AppColors.zoneIn);
-  });
+      const key = Key('pace-box-ghost-ahead');
+      _expectLine(key, 'Ghost', '12 m hinter dir');
+      expect(_valueColor(tester, key, '12 m hinter dir'), AppColors.zoneIn);
+    },
+  );
 
-  testWidgets('shows a gap of a minute and more like a lap time', (tester) async {
-    await _pump(tester, _at(460),
-        ghostGap: const GhostGap(axis: CourseAxis.distance, amount: 72.34, ghostAhead: true));
+  testWidgets('shows a gap of a minute and more like a lap time', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      _at(460),
+      ghostGap: const GhostGap(
+        axis: CourseAxis.distance,
+        amount: 72.34,
+        ghostAhead: true,
+      ),
+    );
 
     _expectLine(const Key('pace-box-ghost-behind'), 'Ghost', '1:12.3 vor dir');
   });
 
-  testWidgets('says level instead of a gap that rounds to nothing', (tester) async {
-    await _pump(tester, _at(460),
-        ghostGap: const GhostGap(axis: CourseAxis.distance, amount: 0.04, ghostAhead: true));
+  testWidgets('says level instead of a gap that rounds to nothing', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      _at(460),
+      ghostGap: const GhostGap(
+        axis: CourseAxis.distance,
+        amount: 0.04,
+        ghostAhead: true,
+      ),
+    );
 
     const key = Key('pace-box-ghost-level');
     _expectLine(key, 'Ghost', 'gleichauf');
@@ -223,14 +344,23 @@ void main() {
   });
 
   testWidgets('speaks English about the ghost', (tester) async {
-    await _pump(tester, _at(460),
-        locale: const Locale('en'),
-        ghostGap: const GhostGap(axis: CourseAxis.distance, amount: 2.9, ghostAhead: false));
+    await _pump(
+      tester,
+      _at(460),
+      locale: const Locale('en'),
+      ghostGap: const GhostGap(
+        axis: CourseAxis.distance,
+        amount: 2.9,
+        ghostAhead: false,
+      ),
+    );
 
     _expectLine(const Key('pace-box-ghost-ahead'), 'Ghost', '2.9 s behind you');
   });
 
-  testWidgets('has no ghost line without a ghost of the template', (tester) async {
+  testWidgets('has no ghost line without a ghost of the template', (
+    tester,
+  ) async {
     await _pump(tester, _at(460, laps: null));
 
     expect(find.text('Ghost'), findsNothing);
@@ -243,22 +373,47 @@ void main() {
     (Size(350, 380), null),
     (Size(330, 320), null),
     (Size(300, 280), null),
-    (Size(350, 380), GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true)),
-    (Size(330, 320), GhostGap(axis: CourseAxis.distance, amount: 72.3, ghostAhead: true)),
-    (Size(300, 280), GhostGap(axis: CourseAxis.time, amount: 1234, ghostAhead: false)),
-    (Size(240, 220), GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true)),
+    (
+      Size(350, 380),
+      GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true),
+    ),
+    (
+      Size(330, 320),
+      GhostGap(axis: CourseAxis.distance, amount: 72.3, ghostAhead: true),
+    ),
+    (
+      Size(300, 280),
+      GhostGap(axis: CourseAxis.time, amount: 1234, ghostAhead: false),
+    ),
+    (
+      Size(240, 220),
+      GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true),
+    ),
   ]) {
     testWidgets(
-        'fits ${size.width.toInt()} × ${size.height.toInt()} ${gap == null ? 'without' : 'with'} a ghost '
-        'with the pace as the largest text', (tester) async {
-      await _pump(tester, _at(460, pace: BandStatus.above), size: size, ghostGap: gap);
+      'fits ${size.width.toInt()} × ${size.height.toInt()} ${gap == null ? 'without' : 'with'} a ghost '
+      'with the pace as the largest text',
+      (tester) async {
+        await _pump(
+          tester,
+          _at(460, pace: BandStatus.above),
+          size: size,
+          ghostGap: gap,
+        );
 
-      expect(tester.takeException(), isNull);
-      final pace = tester.getRect(find.byKey(const Key('pace-box-pace'))).height;
-      for (final text in tester.widgetList<Text>(find.byType(Text))) {
-        if (text.key == const Key('pace-box-pace')) continue;
-        expect(tester.getRect(find.byWidget(text)).height, lessThan(pace), reason: text.data);
-      }
-    });
+        expect(tester.takeException(), isNull);
+        final pace = tester
+            .getRect(find.byKey(const Key('pace-box-pace')))
+            .height;
+        for (final text in tester.widgetList<Text>(find.byType(Text))) {
+          if (text.key == const Key('pace-box-pace')) continue;
+          expect(
+            tester.getRect(find.byWidget(text)).height,
+            lessThan(pace),
+            reason: text.data,
+          );
+        }
+      },
+    );
   }
 }

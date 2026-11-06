@@ -188,10 +188,11 @@ void main() {
       );
       expect((zone.spmMin, zone.spmMax), (20, 22));
       Future<List<(int, int?, String?)>> segments(int version) async => [
-        for (final s in await (db.select(db.courseSegments)
-              ..where((s) => s.versionId.equals(version))
-              ..orderBy([(s) => OrderingTerm.asc(s.position)]))
-            .get())
+        for (final s
+            in await (db.select(db.courseSegments)
+                  ..where((s) => s.versionId.equals(version))
+                  ..orderBy([(s) => OrderingTerm.asc(s.position)]))
+                .get())
           (s.length, s.zoneId, s.zoneName),
       ];
       // The zone starts at 200 m in the current version.
@@ -206,29 +207,32 @@ void main() {
         (200, null, null),
       ]);
       final lap = (await db.select(db.laps).get()).single;
-      expect((lap.endWallMs, lap.complete, lap.inZoneShare), (252000, true, 0.75));
+      expect(
+        (lap.endWallMs, lap.complete, lap.inZoneShare),
+        (252000, true, 0.75),
+      );
       await db.close();
     },
   );
 
   group('to version 4', () {
     v1.StrokesCompanion stroke1(int number) => v1.StrokesCompanion.insert(
-          sessionId: 1,
-          tMs: number * 2500,
-          distanceDm: number * 100,
-          strokeNumber: number,
-          driveLengthMeters: 1.38,
-          driveTimeMs: 820,
-          recoveryTimeMs: 1640,
-          peakForceNewtons: 712.5,
-          averageForceNewtons: 431,
-          watts: const Value(203),
-        );
+      sessionId: 1,
+      tMs: number * 2500,
+      distanceDm: number * 100,
+      strokeNumber: number,
+      driveLengthMeters: 1.38,
+      driveTimeMs: 820,
+      recoveryTimeMs: 1640,
+      peakForceNewtons: 712.5,
+      averageForceNewtons: 431,
+      watts: const Value(203),
+    );
 
     Future<void> expectFullStrokes(AppDatabase db) async {
-      final strokes = await (db.select(db.strokes)
-            ..orderBy([(s) => OrderingTerm.asc(s.strokeNumber)]))
-          .get();
+      final strokes = await (db.select(
+        db.strokes,
+      )..orderBy([(s) => OrderingTerm.asc(s.strokeNumber)])).get();
       expect(
         strokes.map(
           (s) => (
@@ -248,34 +252,38 @@ void main() {
       );
     }
 
-    test('keeps the strokes of version 1 with all details as PM5 sessions',
-        () async {
-      final schema = await verifier.schemaAt(1);
-      final old = v1.DatabaseAtV1(schema.newConnection());
-      await old.batch((b) {
-        b.insert(
-          old.sessions,
-          v1.SessionsCompanion.insert(
-            startedAt: 0,
-            status: 'complete',
-            source: 'pm5',
-            deviceName: const Value('PM5 Test'),
-            strokeCount: const Value(2),
-          ),
+    test(
+      'keeps the strokes of version 1 with all details as PM5 sessions',
+      () async {
+        final schema = await verifier.schemaAt(1);
+        final old = v1.DatabaseAtV1(schema.newConnection());
+        await old.batch((b) {
+          b.insert(
+            old.sessions,
+            v1.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'pm5',
+              deviceName: const Value('PM5 Test'),
+              strokeCount: const Value(2),
+            ),
+          );
+          b.insertAll(old.strokes, [stroke1(1), stroke1(2)]);
+        });
+        await old.close();
+
+        final db = AppDatabase(schema.newConnection());
+        await verifier.migrateAndValidate(db, 7);
+
+        final session = (await db.select(db.sessions).get()).single;
+        expect(
+          (session.protocol, session.deviceName, session.strokeCount),
+          (ErgProtocol.pm5, 'PM5 Test', 2),
         );
-        b.insertAll(old.strokes, [stroke1(1), stroke1(2)]);
-      });
-      await old.close();
-
-      final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 7);
-
-      final session = (await db.select(db.sessions).get()).single;
-      expect((session.protocol, session.deviceName, session.strokeCount),
-          (ErgProtocol.pm5, 'PM5 Test', 2));
-      await expectFullStrokes(db);
-      await db.close();
-    });
+        await expectFullStrokes(db);
+        await db.close();
+      },
+    );
 
     test('keeps strokes, laps and courses with zones of version 3', () async {
       final schema = await verifier.schemaAt(3);
@@ -374,10 +382,9 @@ void main() {
       await expectFullStrokes(db);
       final lap = (await db.select(db.laps).get()).single;
       expect((lap.endWallMs, lap.inZoneShare), (252000, 0.75));
-      final segment = (await (db.select(db.courseSegments)
-                ..where((s) => s.position.equals(1)))
-              .get())
-          .single;
+      final segment = (await (db.select(
+        db.courseSegments,
+      )..where((s) => s.position.equals(1))).get()).single;
       expect((segment.zoneId, segment.zoneName), (1, 'Tempo'));
       expect((await db.select(db.zones).get()).single.name, 'Tempo');
       await db.close();
@@ -385,22 +392,33 @@ void main() {
 
     test('stores strokes without details', () async {
       final db = openTestDatabase();
-      final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
-            startedAt: DateTime(2026, 10, 16),
-            status: SessionStatus.complete,
-            source: ErgSourceKind.pm5,
-            protocol: const Value(ErgProtocol.ftms),
-          ));
-      await db.into(db.strokes).insert(StrokesCompanion.insert(
-            sessionId: id,
-            tMs: 2500,
-            distanceDm: 100,
-            strokeNumber: 1,
-          ));
+      final id = await db
+          .into(db.sessions)
+          .insert(
+            SessionsCompanion.insert(
+              startedAt: DateTime(2026, 10, 16),
+              status: SessionStatus.complete,
+              source: ErgSourceKind.pm5,
+              protocol: const Value(ErgProtocol.ftms),
+            ),
+          );
+      await db
+          .into(db.strokes)
+          .insert(
+            StrokesCompanion.insert(
+              sessionId: id,
+              tMs: 2500,
+              distanceDm: 100,
+              strokeNumber: 1,
+            ),
+          );
       final stroke = (await db.select(db.strokes).get()).single;
       expect(stroke.driveLengthMeters, isNull);
       expect(stroke.peakForceNewtons, isNull);
-      expect((await db.select(db.sessions).get()).single.protocol, ErgProtocol.ftms);
+      expect(
+        (await db.select(db.sessions).get()).single.protocol,
+        ErgProtocol.ftms,
+      );
       await db.close();
     });
   });
@@ -430,20 +448,22 @@ void main() {
       final db = AppDatabase(schema.newConnection());
       await verifier.migrateAndValidate(db, 7);
 
-      final sessions = await (db.select(db.sessions)
-            ..orderBy([(s) => OrderingTerm.asc(s.id)]))
-          .get();
-      expect(
-        sessions.map((s) => (s.protocol, s.deviceName, s.imported)),
-        [(ErgProtocol.pm5, 'PM5 Test', false), (ErgProtocol.ftms, null, false)],
-      );
+      final sessions = await (db.select(
+        db.sessions,
+      )..orderBy([(s) => OrderingTerm.asc(s.id)])).get();
+      expect(sessions.map((s) => (s.protocol, s.deviceName, s.imported)), [
+        (ErgProtocol.pm5, 'PM5 Test', false),
+        (ErgProtocol.ftms, null, false),
+      ]);
       await db.close();
     });
 
     test('keeps the sessions of version 1 as not imported', () async {
       final schema = await verifier.schemaAt(1);
       final old = v1.DatabaseAtV1(schema.newConnection());
-      await old.into(old.sessions).insert(
+      await old
+          .into(old.sessions)
+          .insert(
             v1.SessionsCompanion.insert(
               startedAt: 0,
               status: 'complete',
@@ -462,11 +482,15 @@ void main() {
 
     test('marks new sessions as not imported', () async {
       final db = openTestDatabase();
-      await db.into(db.sessions).insert(SessionsCompanion.insert(
-            startedAt: DateTime(2026, 10, 16),
-            status: SessionStatus.complete,
-            source: ErgSourceKind.pm5,
-          ));
+      await db
+          .into(db.sessions)
+          .insert(
+            SessionsCompanion.insert(
+              startedAt: DateTime(2026, 10, 16),
+              status: SessionStatus.complete,
+              source: ErgSourceKind.pm5,
+            ),
+          );
       expect((await db.select(db.sessions).get()).single.imported, isFalse);
       await db.close();
     });
@@ -474,13 +498,11 @@ void main() {
 
   group('to version 6', () {
     Future<void> expectNoPulseSummary(AppDatabase db) async {
-      final sessions = await (db.select(db.sessions)
-            ..orderBy([(s) => OrderingTerm.asc(s.id)]))
-          .get();
+      final sessions = await (db.select(
+        db.sessions,
+      )..orderBy([(s) => OrderingTerm.asc(s.id)])).get();
       expect(
-        sessions.map(
-          (s) => (s.averageHeartRate, s.maxHeartRate, s.rmssdMs),
-        ),
+        sessions.map((s) => (s.averageHeartRate, s.maxHeartRate, s.rmssdMs)),
         everyElement((null, null, null)),
       );
       expect(await db.select(db.rrIntervals).get(), isEmpty);
@@ -522,13 +544,13 @@ void main() {
       final db = AppDatabase(schema.newConnection());
       await verifier.migrateAndValidate(db, 7);
 
-      final sessions = await (db.select(db.sessions)
-            ..orderBy([(s) => OrderingTerm.asc(s.id)]))
-          .get();
-      expect(
-        sessions.map((s) => (s.protocol, s.distanceDm, s.imported)),
-        [(ErgProtocol.pm5, 2500, false), (ErgProtocol.ftms, 0, true)],
-      );
+      final sessions = await (db.select(
+        db.sessions,
+      )..orderBy([(s) => OrderingTerm.asc(s.id)])).get();
+      expect(sessions.map((s) => (s.protocol, s.distanceDm, s.imported)), [
+        (ErgProtocol.pm5, 2500, false),
+        (ErgProtocol.ftms, 0, true),
+      ]);
       expect((await db.select(db.samples).get()).single.heartRate, 142);
       await expectNoPulseSummary(db);
       await db.close();
@@ -537,7 +559,9 @@ void main() {
     test('keeps the sessions of version 1 without pulse summary', () async {
       final schema = await verifier.schemaAt(1);
       final old = v1.DatabaseAtV1(schema.newConnection());
-      await old.into(old.sessions).insert(
+      await old
+          .into(old.sessions)
+          .insert(
             v1.SessionsCompanion.insert(
               startedAt: 0,
               status: 'complete',
@@ -558,15 +582,21 @@ void main() {
 
     test('stores RR intervals and deletes them with their session', () async {
       final db = openTestDatabase();
-      final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
-            startedAt: DateTime(2026, 10, 16),
-            status: SessionStatus.complete,
-            source: ErgSourceKind.pm5,
-          ));
-      await db.batch((b) => b.insertAll(db.rrIntervals, [
-            RrIntervalsCompanion.insert(sessionId: id, tMs: 800, rrMs: 800),
-            RrIntervalsCompanion.insert(sessionId: id, tMs: 1610, rrMs: 810),
-          ]));
+      final id = await db
+          .into(db.sessions)
+          .insert(
+            SessionsCompanion.insert(
+              startedAt: DateTime(2026, 10, 16),
+              status: SessionStatus.complete,
+              source: ErgSourceKind.pm5,
+            ),
+          );
+      await db.batch(
+        (b) => b.insertAll(db.rrIntervals, [
+          RrIntervalsCompanion.insert(sessionId: id, tMs: 800, rrMs: 800),
+          RrIntervalsCompanion.insert(sessionId: id, tMs: 1610, rrMs: 810),
+        ]),
+      );
       expect(
         (await db.select(db.rrIntervals).get()).map((r) => (r.tMs, r.rrMs)),
         [(800, 800), (1610, 810)],
@@ -579,54 +609,66 @@ void main() {
   });
 
   group('to version 7', () {
-    test('keeps the sessions of version 6 with their times and no pauses', () async {
-      final schema = await verifier.schemaAt(6);
-      final old = v6.DatabaseAtV6(schema.newConnection());
-      await old.batch((b) {
-        b.insert(
-          old.sessions,
-          v6.SessionsCompanion.insert(
-            startedAt: 0,
-            status: 'complete',
-            source: 'pm5',
-            durationMs: const Value(90000),
-            distanceDm: const Value(2500),
-          ),
-        );
-        b.insert(
-          old.samples,
-          v6.SamplesCompanion.insert(
-            sessionId: 1,
-            tMs: 60000,
-            distanceDm: 2500,
-            wallMs: const Value(90000),
-          ),
-        );
-      });
-      await old.close();
+    test(
+      'keeps the sessions of version 6 with their times and no pauses',
+      () async {
+        final schema = await verifier.schemaAt(6);
+        final old = v6.DatabaseAtV6(schema.newConnection());
+        await old.batch((b) {
+          b.insert(
+            old.sessions,
+            v6.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'pm5',
+              durationMs: const Value(90000),
+              distanceDm: const Value(2500),
+            ),
+          );
+          b.insert(
+            old.samples,
+            v6.SamplesCompanion.insert(
+              sessionId: 1,
+              tMs: 60000,
+              distanceDm: 2500,
+              wallMs: const Value(90000),
+            ),
+          );
+        });
+        await old.close();
 
-      final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 7);
+        final db = AppDatabase(schema.newConnection());
+        await verifier.migrateAndValidate(db, 7);
 
-      final session = (await db.select(db.sessions).get()).single;
-      expect(
-        (session.durationMs, session.pauseCount, session.pausedMs),
-        (90000, 0, 0),
-      );
-      final sample = (await db.select(db.samples).get()).single;
-      expect((sample.tMs, sample.wallMs, sample.activeMs), (60000, 90000, null));
-      expect(await db.select(db.pauses).get(), isEmpty);
-      await db.close();
-    });
+        final session = (await db.select(db.sessions).get()).single;
+        expect(
+          (session.durationMs, session.pauseCount, session.pausedMs),
+          (90000, 0, 0),
+        );
+        final sample = (await db.select(db.samples).get()).single;
+        expect(
+          (sample.tMs, sample.wallMs, sample.activeMs),
+          (60000, 90000, null),
+        );
+        expect(await db.select(db.pauses).get(), isEmpty);
+        await db.close();
+      },
+    );
 
     test('stores pauses and deletes them with their session', () async {
       final db = openTestDatabase();
-      final id = await db.into(db.sessions).insert(SessionsCompanion.insert(
-            startedAt: DateTime(2026, 10, 18),
-            status: SessionStatus.complete,
-            source: ErgSourceKind.pm5,
-          ));
-      await db.into(db.pauses).insert(
+      final id = await db
+          .into(db.sessions)
+          .insert(
+            SessionsCompanion.insert(
+              startedAt: DateTime(2026, 10, 18),
+              status: SessionStatus.complete,
+              source: ErgSourceKind.pm5,
+            ),
+          );
+      await db
+          .into(db.pauses)
+          .insert(
             PausesCompanion.insert(
               sessionId: id,
               startWallMs: 60000,
@@ -642,61 +684,87 @@ void main() {
   });
 
   group('to version 8', () {
-    test('keeps the sessions of version 7 as not written to Health Connect',
-        () async {
-      final schema = await verifier.schemaAt(7);
-      final old = v7.DatabaseAtV7(schema.newConnection());
-      await old.into(old.sessions).insert(
-            v7.SessionsCompanion.insert(
-              startedAt: 0,
-              status: 'complete',
-              source: 'pm5',
-              distanceDm: const Value(2500),
-            ),
-          );
-      await old.close();
+    test(
+      'keeps the sessions of version 7 as not written to Health Connect',
+      () async {
+        final schema = await verifier.schemaAt(7);
+        final old = v7.DatabaseAtV7(schema.newConnection());
+        await old
+            .into(old.sessions)
+            .insert(
+              v7.SessionsCompanion.insert(
+                startedAt: 0,
+                status: 'complete',
+                source: 'pm5',
+                distanceDm: const Value(2500),
+              ),
+            );
+        await old.close();
 
-      final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 8);
+        final db = AppDatabase(schema.newConnection());
+        await verifier.migrateAndValidate(db, 8);
 
-      final session = (await db.select(db.sessions).get()).single;
-      expect((session.distanceDm, session.healthExportedAt), (2500, null));
-      await db.close();
-    });
+        final session = (await db.select(db.sessions).get()).single;
+        expect((session.distanceDm, session.healthExportedAt), (2500, null));
+        await db.close();
+      },
+    );
   });
 
   group('to version 9', () {
-    test('keeps zones and course segments of version 8 without resistance level', () async {
-      final schema = await verifier.schemaAt(8);
-      final old = v8.DatabaseAtV8(schema.newConnection());
-      final zone = await old.into(old.zones).insert(
-            v8.ZonesCompanion.insert(name: 'Sprint', axis: 'distance', length: 100, spmMin: const Value(30), spmMax: const Value(34)),
-          );
-      final course = await old.into(old.courses).insert(
-            v8.CoursesCompanion.insert(name: 'Kurz', axis: 'distance'),
-          );
-      final version = await old.into(old.courseVersions).insert(
-            v8.CourseVersionsCompanion.insert(courseId: course, version: 1, length: 100, createdAt: 0),
-          );
-      await old.into(old.courseSegments).insert(v8.CourseSegmentsCompanion.insert(
-            versionId: version,
-            position: 0,
-            length: 100,
-            spmMin: const Value(30),
-            spmMax: const Value(34),
-            zoneId: Value(zone),
-            zoneName: const Value('Sprint'),
-          ));
-      await old.close();
+    test(
+      'keeps zones and course segments of version 8 without resistance level',
+      () async {
+        final schema = await verifier.schemaAt(8);
+        final old = v8.DatabaseAtV8(schema.newConnection());
+        final zone = await old
+            .into(old.zones)
+            .insert(
+              v8.ZonesCompanion.insert(
+                name: 'Sprint',
+                axis: 'distance',
+                length: 100,
+                spmMin: const Value(30),
+                spmMax: const Value(34),
+              ),
+            );
+        final course = await old
+            .into(old.courses)
+            .insert(v8.CoursesCompanion.insert(name: 'Kurz', axis: 'distance'));
+        final version = await old
+            .into(old.courseVersions)
+            .insert(
+              v8.CourseVersionsCompanion.insert(
+                courseId: course,
+                version: 1,
+                length: 100,
+                createdAt: 0,
+              ),
+            );
+        await old
+            .into(old.courseSegments)
+            .insert(
+              v8.CourseSegmentsCompanion.insert(
+                versionId: version,
+                position: 0,
+                length: 100,
+                spmMin: const Value(30),
+                spmMax: const Value(34),
+                zoneId: Value(zone),
+                zoneName: const Value('Sprint'),
+              ),
+            );
+        await old.close();
 
-      final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 9);
+        final db = AppDatabase(schema.newConnection());
+        await verifier.migrateAndValidate(db, 9);
 
-      final zoneRow = (await db.select(db.zones).get()).single;
-      final segment = (await db.select(db.courseSegments).get()).single;
-      expect((zoneRow.name, zoneRow.resistanceLevel), ('Sprint', null));
-      expect((segment.zoneName, segment.resistanceLevel), ('Sprint', null));
-      await db.close();
-    });
+        final zoneRow = (await db.select(db.zones).get()).single;
+        final segment = (await db.select(db.courseSegments).get()).single;
+        expect((zoneRow.name, zoneRow.resistanceLevel), ('Sprint', null));
+        expect((segment.zoneName, segment.resistanceLevel), ('Sprint', null));
+        await db.close();
+      },
+    );
   });
 }

@@ -77,13 +77,15 @@ class CourseLiveView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final size = constraints.biggest;
-      return switch (LiveLayout.of(size)) {
-        LiveLayout.portrait => _portrait(context, size),
-        LiveLayout.landscape => _landscape(context, size),
-      };
-    });
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.biggest;
+        return switch (LiveLayout.of(size)) {
+          LiveLayout.portrait => _portrait(context, size),
+          LiveLayout.landscape => _landscape(context, size),
+        };
+      },
+    );
   }
 
   Widget _portrait(BuildContext context, Size size) {
@@ -101,12 +103,17 @@ class CourseLiveView extends StatelessWidget {
     const buttonHeight = 52.0;
     final inner = padding.deflateSize(size);
     // Two rows of tiles, the session above the lap, as five side by side would be too narrow on a phone.
-    final rest = inner.height - strokeHeight - 2 * tilesHeight - buttonHeight - 4 * _gap;
+    final rest =
+        inner.height - strokeHeight - 2 * tilesHeight - buttonHeight - 4 * _gap;
     // The force curve goes first when space is short (Design, Risks): only while the pace box keeps
     // [_minBoxHeightWithCurve], so on a phone of 360 × 740 as well.
-    final curve = forceCurves != null && rest - curveHeight - _gap >= _minBoxHeightWithCurve;
+    final curve =
+        forceCurves != null &&
+        rest - curveHeight - _gap >= _minBoxHeightWithCurve;
     final boxHeight = rest - (curve ? curveHeight + _gap : 0);
-    final cap = PaceBox.paceFontSizeFor(Size(inner.width, boxHeight)) * valueShareOfPace;
+    final cap =
+        PaceBox.paceFontSizeFor(Size(inner.width, boxHeight)) *
+        valueShareOfPace;
     // Lower than with Barlow Condensed, as the wider [AppFonts.liveValue] fills a tile at a smaller size.
     final valueSize = math.min(42.0, cap);
     return Padding(
@@ -117,31 +124,54 @@ class CourseLiveView extends StatelessWidget {
         children: [
           SizedBox(height: boxHeight, child: _dim(_paceBox())),
           const SizedBox(height: _gap),
-          SizedBox(height: strokeHeight, child: _dim(_strokeRate(math.min(64, cap)))),
+          SizedBox(
+            height: strokeHeight,
+            child: _dim(_strokeRate(math.min(64, cap))),
+          ),
           const SizedBox(height: _gap),
-          SizedBox(height: tilesHeight, child: _dim(_tileRow(_sessionTiles(context, valueSize)))),
+          SizedBox(
+            height: tilesHeight,
+            child: _dim(_tileRow(_sessionTiles(context, valueSize))),
+          ),
           const SizedBox(height: _gap),
-          SizedBox(height: tilesHeight, child: _dim(_tileRow(_lapTiles(context, valueSize)))),
+          SizedBox(
+            height: tilesHeight,
+            child: _dim(_tileRow(_lapTiles(context, valueSize))),
+          ),
           if (curve) ...[
             const SizedBox(height: _gap),
-            SizedBox(height: curveHeight, child: forceCurves!.widget(variant: ForceCurveVariant.strip)),
+            SizedBox(
+              height: curveHeight,
+              child: forceCurves!.widget(variant: ForceCurveVariant.strip),
+            ),
           ],
           const Spacer(),
-          SizedBox(height: buttonHeight, child: LiveActionRow(action: action, status: status)),
+          SizedBox(
+            height: buttonHeight,
+            child: LiveActionRow(action: action, status: status),
+          ),
         ],
       ),
     );
   }
 
   Widget _landscape(BuildContext context, Size size) {
-    const padding = EdgeInsets.symmetric(horizontal: AppSpacing.pageLandscape, vertical: AppSpacing.m);
+    const padding = EdgeInsets.symmetric(
+      horizontal: AppSpacing.pageLandscape,
+      vertical: AppSpacing.m,
+    );
     const sideWidth = 128.0;
     const buttonHeight = 44.0;
     const sessionHeight = 64.0;
     final inner = padding.deflateSize(size);
     // Nearly square as in the canvas, but leaving room for the stroke rate.
-    final boxWidth = math.min(inner.height, (inner.width - sideWidth - 2 * AppSpacing.m) * 0.65);
-    final cap = PaceBox.paceFontSizeFor(Size(boxWidth, inner.height)) * valueShareOfPace;
+    final boxWidth = math.min(
+      inner.height,
+      (inner.width - sideWidth - 2 * AppSpacing.m) * 0.65,
+    );
+    final cap =
+        PaceBox.paceFontSizeFor(Size(boxWidth, inner.height)) *
+        valueShareOfPace;
     final curve = forceCurves != null && inner.height >= 260;
     final valueSize = math.min(48.0, cap);
     final tiles = _lapTiles(context, valueSize);
@@ -158,17 +188,25 @@ class CourseLiveView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: _dim(_strokeRate(
-                    math.min(AppTextStyles.value.fontSize!, cap),
-                    landscape: true,
-                    footer: curve
-                        ? (foreground) => forceCurves!.widget(variant: ForceCurveVariant.tinted, foreground: foreground)
-                        : null,
-                  )),
+                  child: _dim(
+                    _strokeRate(
+                      math.min(AppTextStyles.value.fontSize!, cap),
+                      landscape: true,
+                      footer: curve
+                          ? (foreground) => forceCurves!.widget(
+                              variant: ForceCurveVariant.tinted,
+                              foreground: foreground,
+                            )
+                          : null,
+                    ),
+                  ),
                 ),
                 // Below the stroke rate, as five tiles do not fit into the side column on a phone.
                 const SizedBox(height: 6),
-                SizedBox(height: sessionHeight, child: _dim(_tileRow(_sessionTiles(context, valueSize)))),
+                SizedBox(
+                  height: sessionHeight,
+                  child: _dim(_tileRow(_sessionTiles(context, valueSize))),
+                ),
                 // The side column is too narrow for it, so it sits left of the button, in the same row.
                 if (status case final status?) ...[
                   const SizedBox(height: 6),
@@ -202,43 +240,47 @@ class CourseLiveView extends StatelessWidget {
     );
   }
 
-  Widget _dim(Widget child) => Opacity(opacity: outdated ? 0.4 : 1, child: child);
+  Widget _dim(Widget child) =>
+      Opacity(opacity: outdated ? 0.4 : 1, child: child);
 
   Widget _paceBox() => PaceBox(
-        progress: lap,
-        course: course,
-        pace: tick?.pace,
-        averagePace: averagePace(
-          session?.distanceMeters ?? tick?.distanceMeters ?? 0,
-          session?.elapsed ?? tick?.elapsed ?? Duration.zero,
-        ),
-        ghost: ghost,
-        ghostGap: ghostGap,
-        upcoming: _upcoming,
-      );
+    progress: lap,
+    course: course,
+    pace: tick?.pace,
+    averagePace: averagePace(
+      session?.distanceMeters ?? tick?.distanceMeters ?? 0,
+      session?.elapsed ?? tick?.elapsed ?? Duration.zero,
+    ),
+    ghost: ghost,
+    ghostGap: ghostGap,
+    upcoming: _upcoming,
+  );
 
-  Widget _strokeRate(double fontSize, {bool landscape = false, Widget Function(Color foreground)? footer}) =>
-      StrokeRateCard(
-          strokeRate: tick?.strokeRate,
-          status: lap.strokeRate,
-          segment: lap.segment,
-          fontSize: fontSize,
-          landscape: landscape,
-          footer: footer,
-          upcoming: _upcoming,
-        );
+  Widget _strokeRate(
+    double fontSize, {
+    bool landscape = false,
+    Widget Function(Color foreground)? footer,
+  }) => StrokeRateCard(
+    strokeRate: tick?.strokeRate,
+    status: lap.strokeRate,
+    segment: lap.segment,
+    fontSize: fontSize,
+    landscape: landscape,
+    footer: footer,
+    upcoming: _upcoming,
+  );
 
   CourseSegment? get _upcoming => upcomingZone(lap, course, tick?.pace);
 
   Widget _tileRow(List<Widget> tiles) => Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final (i, tile) in tiles.indexed) ...[
-            if (i > 0) const SizedBox(width: AppSpacing.s),
-            Expanded(child: tile),
-          ],
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      for (final (i, tile) in tiles.indexed) ...[
+        if (i > 0) const SizedBox(width: AppSpacing.s),
+        Expanded(child: tile),
+      ],
+    ],
+  );
 
   /// Time and distance of the whole session, as in free rowing, and the calories when the rower sends them.
   List<Widget> _sessionTiles(BuildContext context, double fontSize) {
@@ -293,7 +335,9 @@ class CourseLiveView extends StatelessWidget {
           valueKey: const Key('metric-hr'),
           fontSize: fontSize,
           icon: const HeartIcon(size: 12),
-          footnote: rrIntervalMs == null ? null : formatRrInterval(rrIntervalMs!),
+          footnote: rrIntervalMs == null
+              ? null
+              : formatRrInterval(rrIntervalMs!),
           footnoteKey: const Key('metric-rr'),
           compact: true,
         ),

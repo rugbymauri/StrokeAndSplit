@@ -13,7 +13,8 @@ class FoundHeartRateMonitor {
   final String name;
 
   @override
-  bool operator ==(Object other) => other is FoundHeartRateMonitor && other.id == id;
+  bool operator ==(Object other) =>
+      other is FoundHeartRateMonitor && other.id == id;
 
   @override
   int get hashCode => id.hashCode;
@@ -39,7 +40,8 @@ class HeartRateConnectException implements Exception {
   final String message;
 
   @override
-  String toString() => 'HeartRateConnectException: ${error.name}${message.isEmpty ? '' : ' ($message)'}';
+  String toString() =>
+      'HeartRateConnectException: ${error.name}${message.isEmpty ? '' : ' ($message)'}';
 }
 
 /// Bluetooth access to heart rate straps, independent of the BLE plugin in

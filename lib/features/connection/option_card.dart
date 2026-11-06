@@ -40,7 +40,9 @@ class OptionCard extends StatelessWidget {
         color: highlighted ? AppColors.zoneInSurface : AppColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.card),
-          side: BorderSide(color: highlighted ? AppColors.zoneIn : AppColors.line),
+          side: BorderSide(
+            color: highlighted ? AppColors.zoneIn : AppColors.line,
+          ),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -51,7 +53,11 @@ class OptionCard extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.l),
               child: Row(
                 children: [
-                  Icon(icon, size: 28, color: highlighted ? AppColors.zoneIn : AppColors.textMuted),
+                  Icon(
+                    icon,
+                    size: 28,
+                    color: highlighted ? AppColors.zoneIn : AppColors.textMuted,
+                  ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
@@ -60,17 +66,34 @@ class OptionCard extends StatelessWidget {
                       children: [
                         Text(title, style: AppTextStyles.cardTitle),
                         const SizedBox(height: 2),
-                        Text(subtitle, style: AppTextStyles.subtitle.copyWith(color: subtitleColor)),
-                        if (detail case final detail?) ...[const SizedBox(height: AppSpacing.xs), detail],
+                        Text(
+                          subtitle,
+                          style: AppTextStyles.subtitle.copyWith(
+                            color: subtitleColor,
+                          ),
+                        ),
+                        if (detail case final detail?) ...[
+                          const SizedBox(height: AppSpacing.xs),
+                          detail,
+                        ],
                       ],
                     ),
                   ),
                   const SizedBox(width: AppSpacing.s),
                   ?action,
                   switch (selected) {
-                    true => const Icon(Icons.radio_button_checked, color: AppColors.zoneIn),
-                    false => const Icon(Icons.radio_button_unchecked, color: AppColors.textMuted),
-                    null => const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                    true => const Icon(
+                      Icons.radio_button_checked,
+                      color: AppColors.zoneIn,
+                    ),
+                    false => const Icon(
+                      Icons.radio_button_unchecked,
+                      color: AppColors.textMuted,
+                    ),
+                    null => const Icon(
+                      Icons.chevron_right,
+                      color: AppColors.textMuted,
+                    ),
                   },
                 ],
               ),

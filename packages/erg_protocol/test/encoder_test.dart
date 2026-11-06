@@ -22,7 +22,9 @@ void main() {
       calories: 47,
     );
 
-    final decoded = _decode(_encoder.encodeStatus(tick, at: Duration.zero)).whereType<StatusTick>().single;
+    final decoded = _decode(_encoder.encodeStatus(tick, at: Duration.zero))
+        .whereType<StatusTick>()
+        .single;
 
     expect(decoded.elapsed, tick.elapsed);
     expect(decoded.distanceMeters, tick.distanceMeters);
@@ -45,7 +47,9 @@ void main() {
       isRowing: false,
     );
 
-    final decoded = _decode(_encoder.encodeStatus(tick, at: Duration.zero)).whereType<StatusTick>().single;
+    final decoded = _decode(_encoder.encodeStatus(tick, at: Duration.zero))
+        .whereType<StatusTick>()
+        .single;
 
     expect(decoded.isRowing, isFalse);
     expect(decoded.workoutState, WorkoutState.waitToBegin);
@@ -79,31 +83,49 @@ void main() {
     expect(decoded.recoveryTime, stroke.recoveryTime);
     // Forces travel in 0.1 lbf steps.
     expect(decoded.peakForceNewtons, closeTo(stroke.peakForceNewtons!, 0.45));
-    expect(decoded.averageForceNewtons, closeTo(stroke.averageForceNewtons!, 0.45));
+    expect(
+      decoded.averageForceNewtons,
+      closeTo(stroke.averageForceNewtons!, 0.45),
+    );
     expect(decoded.watts, 211);
   });
 
-  test('round-trips a force curve after the drive end in whole pound-force', () {
-    const stroke = Stroke(elapsed: Duration(seconds: 9), strokeNumber: 4, distanceMeters: 30, driveLengthMeters: 1.06);
-    final forces = [for (var i = 0; i < 60; i++) i * 10.0];
+  test(
+    'round-trips a force curve after the drive end in whole pound-force',
+    () {
+      const stroke = Stroke(
+        elapsed: Duration(seconds: 9),
+        strokeNumber: 4,
+        distanceMeters: 30,
+        driveLengthMeters: 1.06,
+      );
+      final forces = [for (var i = 0; i < 60; i++) i * 10.0];
 
-    final packets = _encoder.encodeForceCurve(forces, at: Duration.zero);
-    final curve = _decode([..._encoder.encodeDriveEnd(stroke, at: Duration.zero), ...packets])
-        .whereType<StrokeForceCurve>()
-        .single;
+      final packets = _encoder.encodeForceCurve(forces, at: Duration.zero);
+      final curve = _decode([
+        ..._encoder.encodeDriveEnd(stroke, at: Duration.zero),
+        ...packets,
+      ]).whereType<StrokeForceCurve>().single;
 
-    expect(packets.map((p) => p.bytes.length), [20, 20, 20, 20, 20, 20, 14]);
-    expect(curve.strokeNumber, 4);
-    expect(curve.driveLengthMeters, 1.06);
-    expect(curve.forcesNewtons, hasLength(60));
-    for (final (i, force) in curve.forcesNewtons.indexed) {
-      expect(force, closeTo(forces[i], newtonsPerPoundForce / 2));
-    }
-  });
+      expect(packets.map((p) => p.bytes.length), [20, 20, 20, 20, 20, 20, 14]);
+      expect(curve.strokeNumber, 4);
+      expect(curve.driveLengthMeters, 1.06);
+      expect(curve.forcesNewtons, hasLength(60));
+      for (final (i, force) in curve.forcesNewtons.indexed) {
+        expect(force, closeTo(forces[i], newtonsPerPoundForce / 2));
+      }
+    },
+  );
 
   test('refuses a force curve that does not fit into 15 packets', () {
-    expect(() => _encoder.encodeForceCurve(List.filled(136, 100), at: Duration.zero), throwsArgumentError);
-    expect(() => _encoder.encodeForceCurve(const [], at: Duration.zero), throwsArgumentError);
+    expect(
+      () => _encoder.encodeForceCurve(List.filled(136, 100), at: Duration.zero),
+      throwsArgumentError,
+    );
+    expect(
+      () => _encoder.encodeForceCurve(const [], at: Duration.zero),
+      throwsArgumentError,
+    );
   });
 
   test('produces packets the size of real PM5 notifications', () {

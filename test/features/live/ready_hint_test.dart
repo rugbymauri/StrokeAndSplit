@@ -32,7 +32,8 @@ class _Fixed extends ActiveErgSource {
 /// (start-on-first-stroke).
 class _Harness {
   final db = openTestDatabase();
-  final source = FakeErgSource()..connectionState = ErgConnectionState.connected;
+  final source = FakeErgSource()
+    ..connectionState = ErgConnectionState.connected;
   final packets = loadFixture('just_row').packets;
 
   /// The packet with the first stroke.
@@ -43,27 +44,38 @@ class _Harness {
 
   late ProviderContainer container;
 
-  Future<void> pump(WidgetTester tester, {Locale locale = const Locale('de')}) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    Locale locale = const Locale('de'),
+  }) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final template = (await tester.runAsync(() async {
-      final course = await CourseRepository(db)
-          .create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 1000));
+      final course = await CourseRepository(db).create(
+        'Seerunde',
+        CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+      );
       final templates = TemplateRepository(db);
-      return templates.get(await templates.create('Seerunde x3', courseId: course, laps: 3));
+      return templates.get(
+        await templates.create('Seerunde x3', courseId: course, laps: 3),
+      );
     }))!;
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        databaseProvider.overrideWithValue(db),
-        activeErgSourceProvider.overrideWith(() => _Fixed(source)),
-        wakelockProvider.overrideWithValue(FakeWakelock()),
-      ],
-      child: LocalizedApp(locale: locale, home: _Home(template)),
-    ));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          activeErgSourceProvider.overrideWith(() => _Fixed(source)),
+          wakelockProvider.overrideWithValue(FakeWakelock()),
+        ],
+        child: LocalizedApp(locale: locale, home: _Home(template)),
+      ),
+    );
     await tester.tap(find.text('Los'));
     await tester.pumpAndSettle();
-    container = ProviderScope.containerOf(tester.element(find.byType(LiveScreen)));
+    container = ProviderScope.containerOf(
+      tester.element(find.byType(LiveScreen)),
+    );
   }
 
   /// Sends [packets] and lets the recorder store what it needs to.
@@ -76,7 +88,9 @@ class _Harness {
   }
 
   Future<void> end(WidgetTester tester) async {
-    await tester.runAsync(() => container.read(sessionRecorderProvider.notifier).stop());
+    await tester.runAsync(
+      () => container.read(sessionRecorderProvider.notifier).stop(),
+    );
     await disposeWidgetsWithDatabase(tester);
   }
 }
@@ -88,32 +102,39 @@ class _Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: TextButton(
-          onPressed: () =>
-              Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => LiveScreen(template: template))),
-          child: const Text('Los'),
-        ),
-      );
+    body: TextButton(
+      onPressed: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => LiveScreen(template: template)),
+      ),
+      child: const Text('Los'),
+    ),
+  );
 }
 
 const _hint = 'Bereit – startet mit dem ersten Schlag';
 
 void main() {
-  testWidgets('shows that the template starts with the first stroke, until it does', (tester) async {
-    final harness = _Harness();
-    await harness.pump(tester);
-    expect(find.text(_hint), findsOneWidget);
+  testWidgets(
+    'shows that the template starts with the first stroke, until it does',
+    (tester) async {
+      final harness = _Harness();
+      await harness.pump(tester);
+      expect(find.text(_hint), findsOneWidget);
 
-    await harness.emit(tester, harness.packets.take(harness.trigger));
-    expect(find.text(_hint), findsOneWidget, reason: 'the rower is idle');
-    expect(harness.container.read(sessionRecorderProvider)!.ready, isTrue);
+      await harness.emit(tester, harness.packets.take(harness.trigger));
+      expect(find.text(_hint), findsOneWidget, reason: 'the rower is idle');
+      expect(harness.container.read(sessionRecorderProvider)!.ready, isTrue);
 
-    await harness.emit(tester, harness.packets.skip(harness.trigger).take(60));
-    expect(find.text(_hint), findsNothing);
-    expect(harness.container.read(sessionRecorderProvider)!.ready, isFalse);
+      await harness.emit(
+        tester,
+        harness.packets.skip(harness.trigger).take(60),
+      );
+      expect(find.text(_hint), findsNothing);
+      expect(harness.container.read(sessionRecorderProvider)!.ready, isFalse);
 
-    await harness.end(tester);
-  });
+      await harness.end(tester);
+    },
+  );
 
   testWidgets('says it in English', (tester) async {
     final harness = _Harness();
@@ -123,7 +144,9 @@ void main() {
     await harness.end(tester);
   });
 
-  testWidgets('going back before the first stroke stores no session', (tester) async {
+  testWidgets('going back before the first stroke stores no session', (
+    tester,
+  ) async {
     final harness = _Harness();
     await harness.pump(tester);
     await harness.emit(tester, harness.packets.take(harness.trigger));
@@ -138,7 +161,10 @@ void main() {
     expect(find.byType(LiveScreen), findsNothing);
     expect(harness.source.stopped, isFalse);
     expect(harness.container.read(sessionRecorderProvider), isNull);
-    expect(await tester.runAsync(harness.db.select(harness.db.sessions).get), isEmpty);
+    expect(
+      await tester.runAsync(harness.db.select(harness.db.sessions).get),
+      isEmpty,
+    );
     await disposeWidgetsWithDatabase(tester);
   });
 }

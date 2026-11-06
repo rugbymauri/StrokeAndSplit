@@ -7,7 +7,9 @@ class SessionProgress {
 
   @override
   bool operator ==(Object other) =>
-      other is SessionProgress && other.distanceMeters == distanceMeters && other.elapsed == elapsed;
+      other is SessionProgress &&
+      other.distanceMeters == distanceMeters &&
+      other.elapsed == elapsed;
 
   @override
   int get hashCode => Object.hash(distanceMeters, elapsed);
@@ -22,11 +24,13 @@ class SessionProgress {
 /// A reset is detected when either counter goes backwards, or signalled
 /// explicitly via [reset].
 class SessionOffset {
-  SessionOffset.start({required double deviceDistance, required Duration deviceElapsed})
-      : _baseDistance = deviceDistance,
-        _baseElapsed = deviceElapsed,
-        _lastDistance = deviceDistance,
-        _lastElapsed = deviceElapsed;
+  SessionOffset.start({
+    required double deviceDistance,
+    required Duration deviceElapsed,
+  }) : _baseDistance = deviceDistance,
+       _baseElapsed = deviceElapsed,
+       _lastDistance = deviceDistance,
+       _lastElapsed = deviceElapsed;
 
   double _carriedDistance = 0;
   Duration _carriedElapsed = Duration.zero;
@@ -35,7 +39,10 @@ class SessionOffset {
   double _lastDistance;
   Duration _lastElapsed;
 
-  SessionProgress update({required double deviceDistance, required Duration deviceElapsed}) {
+  SessionProgress update({
+    required double deviceDistance,
+    required Duration deviceElapsed,
+  }) {
     if (deviceDistance < _lastDistance || deviceElapsed < _lastElapsed) {
       reset();
     }
@@ -56,7 +63,7 @@ class SessionOffset {
   }
 
   SessionProgress get current => SessionProgress(
-        distanceMeters: _carriedDistance + _lastDistance - _baseDistance,
-        elapsed: _carriedElapsed + _lastElapsed - _baseElapsed,
-      );
+    distanceMeters: _carriedDistance + _lastDistance - _baseDistance,
+    elapsed: _carriedElapsed + _lastElapsed - _baseElapsed,
+  );
 }

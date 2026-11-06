@@ -37,10 +37,12 @@ void main() {
   setUp(() {
     db = openTestDatabase();
     source = SimulatedSource(seed: 1);
-    container = ProviderContainer(overrides: [
-      databaseProvider.overrideWithValue(db),
-      activeErgSourceProvider.overrideWith(() => _Fixed(source)),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        activeErgSourceProvider.overrideWith(() => _Fixed(source)),
+      ],
+    );
     addTearDown(container.dispose);
   });
 
@@ -48,14 +50,20 @@ void main() {
     fakeAsync((async) {
       final template = _run(async, () async {
         final courses = CourseRepository(db);
-        final course =
-            await courses.create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 100));
+        final course = await courses.create(
+          'Seerunde',
+          CourseDefinition.single(axis: CourseAxis.distance, length: 100),
+        );
         final templates = TemplateRepository(db);
-        return (await templates.get(await templates.create('Seerunde x3', courseId: course, laps: 3)))!;
+        return (await templates.get(
+          await templates.create('Seerunde x3', courseId: course, laps: 3),
+        ))!;
       });
       final ready = _run(async, () async {
         await source.start();
-        await container.read(sessionRecorderProvider.notifier).start(template: template);
+        await container
+            .read(sessionRecorderProvider.notifier)
+            .start(template: template);
         return container.read(sessionRecorderProvider)!;
       });
       expect((ready.ready, ready.template?.name), (true, 'Seerunde x3'));
@@ -73,129 +81,212 @@ void main() {
       expect(container.read(sessionRecorderProvider), isNull);
       expect(container.read(finishedSessionProvider), started.sessionId);
 
-      final session = _run(async, (db.select(db.sessions)..where((s) => s.id.equals(started.sessionId!))).getSingle);
+      final session = _run(
+        async,
+        (db.select(
+          db.sessions,
+        )..where((s) => s.id.equals(started.sessionId!))).getSingle,
+      );
       final laps = _run(async, db.select(db.laps).get);
       expect(session.status, SessionStatus.complete);
-      expect((session.templateId, session.templateName, session.plannedLaps), (template.id, 'Seerunde x3', 3));
+      expect(
+        (session.templateId, session.templateName, session.plannedLaps),
+        (template.id, 'Seerunde x3', 3),
+      );
       expect(session.courseVersionId, template.course.versionId);
-      expect([for (final l in laps) (l.lapNo, l.complete)], [(1, true), (2, true), (3, true)]);
+      expect(
+        [for (final l in laps) (l.lapNo, l.complete)],
+        [(1, true), (2, true), (3, true)],
+      );
       expect(laps.last.endDistanceDm, 3000);
       source.stop();
     });
   });
 
-  test('a time segment runs from the first stroke, not from choosing the template', () {
-    fakeAsync((async) {
-      final template = _run(async, () async {
-        final course = await CourseRepository(db)
-            .create('Vier Minuten', CourseDefinition.single(axis: CourseAxis.time, length: 240));
-        final templates = TemplateRepository(db);
-        return (await templates.get(await templates.create('Vier Minuten', courseId: course, laps: 1)))!;
+  test(
+    'a time segment runs from the first stroke, not from choosing the template',
+    () {
+      fakeAsync((async) {
+        final template = _run(async, () async {
+          final course = await CourseRepository(db).create(
+            'Vier Minuten',
+            CourseDefinition.single(axis: CourseAxis.time, length: 240),
+          );
+          final templates = TemplateRepository(db);
+          return (await templates.get(
+            await templates.create('Vier Minuten', courseId: course, laps: 1),
+          ))!;
+        });
+        _run(async, () async {
+          // Not rowing yet when the template is chosen.
+          source.pause();
+          await source.start();
+          await container
+              .read(sessionRecorderProvider.notifier)
+              .start(template: template);
+        });
+
+        async.elapse(const Duration(seconds: 30));
+        final ready = container.read(sessionRecorderProvider)!;
+        expect(ready.ready, isTrue);
+        expect(
+          (
+            ready.lap!.segmentTime,
+            ready.lap!.courseTime,
+            ready.progress.elapsed,
+          ),
+          (Duration.zero, Duration.zero, Duration.zero),
+        );
+        expect(_run(async, db.select(db.sessions).get), isEmpty);
+
+        source.resume();
+        async.elapse(const Duration(seconds: 10));
+        final rowing = container.read(sessionRecorderProvider)!;
+        expect(rowing.ready, isFalse);
+        // Counted from the last status before the first stroke, at most one status earlier.
+        expect(
+          rowing.lap!.segmentTime.inMilliseconds,
+          inInclusiveRange(10000, 11000),
+        );
+        expect(rowing.lap!.remaining, inInclusiveRange(229, 230));
+
+        // The segment ends 4 minutes after the first stroke.
+        async.elapse(const Duration(seconds: 229));
+        expect(container.read(sessionRecorderProvider), isNotNull);
+        async.elapse(const Duration(seconds: 2));
+        expect(container.read(sessionRecorderProvider), isNull);
+        source.stop();
       });
-      _run(async, () async {
-        // Not rowing yet when the template is chosen.
+    },
+  );
+
+  test(
+    'pauses when the rower stops and goes on with the next stroke (auto-pause)',
+    () {
+      fakeAsync((async) {
+        final template = _run(async, () async {
+          final course = await CourseRepository(db).create(
+            'Vier Minuten',
+            CourseDefinition.single(axis: CourseAxis.time, length: 240),
+          );
+          final templates = TemplateRepository(db);
+          return (await templates.get(
+            await templates.create('Vier Minuten', courseId: course, laps: 1),
+          ))!;
+        });
+        _run(async, () async {
+          await source.start();
+          await container
+              .read(sessionRecorderProvider.notifier)
+              .start(template: template);
+        });
+        async.elapse(const Duration(seconds: 30));
+        expect(
+          container.read(sessionRecorderProvider)!.paused,
+          isFalse,
+          reason: 'rowing at 22 strokes per minute',
+        );
+
         source.pause();
-        await source.start();
-        await container.read(sessionRecorderProvider.notifier).start(template: template);
+        async.elapse(const Duration(seconds: 12));
+        final paused = container.read(sessionRecorderProvider)!;
+        expect(paused.paused, isTrue);
+        async.elapse(const Duration(seconds: 20));
+        final still = container.read(sessionRecorderProvider)!;
+        expect(still.paused, isTrue);
+        expect(
+          (still.progress.elapsed, still.lap!.remaining, still.lap!.courseTime),
+          (
+            paused.progress.elapsed,
+            paused.lap!.remaining,
+            paused.lap!.courseTime,
+          ),
+        );
+
+        source.resume();
+        async.elapse(const Duration(seconds: 5));
+        final rowing = container.read(sessionRecorderProvider)!;
+        expect(rowing.paused, isFalse);
+        expect(
+          rowing.progress.elapsed - still.progress.elapsed,
+          lessThanOrEqualTo(const Duration(seconds: 5)),
+        );
+
+        final id = _run(
+          async,
+          container.read(sessionRecorderProvider.notifier).stop,
+        )!;
+        final session = _run(
+          async,
+          (db.select(db.sessions)..where((s) => s.id.equals(id))).getSingle,
+        );
+        expect(session.pauseCount, 1);
+        expect(session.pausedMs, greaterThan(20000));
+        source.stop();
       });
+    },
+  );
 
-      async.elapse(const Duration(seconds: 30));
-      final ready = container.read(sessionRecorderProvider)!;
-      expect(ready.ready, isTrue);
-      expect((ready.lap!.segmentTime, ready.lap!.courseTime, ready.progress.elapsed), (
-        Duration.zero,
-        Duration.zero,
-        Duration.zero,
-      ));
-      expect(_run(async, db.select(db.sessions).get), isEmpty);
+  test(
+    'the ghost choice stays fixed from the start to the end (template-screen)',
+    () {
+      fakeAsync((async) {
+        final template = _run(async, () async {
+          final course = await CourseRepository(db).create(
+            'Seerunde',
+            CourseDefinition.single(axis: CourseAxis.distance, length: 100),
+          );
+          final templates = TemplateRepository(db);
+          return (await templates.get(
+            await templates.create('Seerunde x3', courseId: course, laps: 3),
+          ))!;
+        });
+        _run(async, () async {
+          await source.start();
+          await container
+              .read(sessionRecorderProvider.notifier)
+              .start(template: template, ghost: false);
+        });
+        expect(
+          container.read(sessionRecorderProvider)!.ghost,
+          isFalse,
+          reason: 'ready',
+        );
+        async.elapse(const Duration(seconds: 30));
+        final recording = container.read(sessionRecorderProvider)!;
+        expect(
+          (recording.ready, recording.lap!.lap, recording.ghost),
+          (false, 2, false),
+        );
 
-      source.resume();
-      async.elapse(const Duration(seconds: 10));
-      final rowing = container.read(sessionRecorderProvider)!;
-      expect(rowing.ready, isFalse);
-      // Counted from the last status before the first stroke, at most one status earlier.
-      expect(rowing.lap!.segmentTime.inMilliseconds, inInclusiveRange(10000, 11000));
-      expect(rowing.lap!.remaining, inInclusiveRange(229, 230));
+        // The connection drops and comes back.
+        _run(async, source.stop);
+        async.elapse(const Duration(seconds: 5));
+        _run(async, source.start);
+        async.elapse(const Duration(seconds: 10));
+        expect(
+          container.read(sessionRecorderProvider)!.ghost,
+          isFalse,
+          reason: 'after reconnecting',
+        );
+        _run(async, container.read(sessionRecorderProvider.notifier).stop);
 
-      // The segment ends 4 minutes after the first stroke.
-      async.elapse(const Duration(seconds: 229));
-      expect(container.read(sessionRecorderProvider), isNotNull);
-      async.elapse(const Duration(seconds: 2));
-      expect(container.read(sessionRecorderProvider), isNull);
-      source.stop();
-    });
-  });
-
-  test('pauses when the rower stops and goes on with the next stroke (auto-pause)', () {
-    fakeAsync((async) {
-      final template = _run(async, () async {
-        final course = await CourseRepository(db)
-            .create('Vier Minuten', CourseDefinition.single(axis: CourseAxis.time, length: 240));
-        final templates = TemplateRepository(db);
-        return (await templates.get(await templates.create('Vier Minuten', courseId: course, laps: 1)))!;
+        _run(
+          async,
+          () => container
+              .read(sessionRecorderProvider.notifier)
+              .start(template: template),
+        );
+        expect(
+          container.read(sessionRecorderProvider)!.ghost,
+          isTrue,
+          reason: 'on by default',
+        );
+        _run(async, container.read(sessionRecorderProvider.notifier).stop);
+        source.stop();
       });
-      _run(async, () async {
-        await source.start();
-        await container.read(sessionRecorderProvider.notifier).start(template: template);
-      });
-      async.elapse(const Duration(seconds: 30));
-      expect(container.read(sessionRecorderProvider)!.paused, isFalse, reason: 'rowing at 22 strokes per minute');
-
-      source.pause();
-      async.elapse(const Duration(seconds: 12));
-      final paused = container.read(sessionRecorderProvider)!;
-      expect(paused.paused, isTrue);
-      async.elapse(const Duration(seconds: 20));
-      final still = container.read(sessionRecorderProvider)!;
-      expect(still.paused, isTrue);
-      expect((still.progress.elapsed, still.lap!.remaining, still.lap!.courseTime),
-          (paused.progress.elapsed, paused.lap!.remaining, paused.lap!.courseTime));
-
-      source.resume();
-      async.elapse(const Duration(seconds: 5));
-      final rowing = container.read(sessionRecorderProvider)!;
-      expect(rowing.paused, isFalse);
-      expect(rowing.progress.elapsed - still.progress.elapsed, lessThanOrEqualTo(const Duration(seconds: 5)));
-
-      final id = _run(async, container.read(sessionRecorderProvider.notifier).stop)!;
-      final session = _run(async, (db.select(db.sessions)..where((s) => s.id.equals(id))).getSingle);
-      expect(session.pauseCount, 1);
-      expect(session.pausedMs, greaterThan(20000));
-      source.stop();
-    });
-  });
-
-  test('the ghost choice stays fixed from the start to the end (template-screen)', () {
-    fakeAsync((async) {
-      final template = _run(async, () async {
-        final course = await CourseRepository(db)
-            .create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 100));
-        final templates = TemplateRepository(db);
-        return (await templates.get(await templates.create('Seerunde x3', courseId: course, laps: 3)))!;
-      });
-      _run(async, () async {
-        await source.start();
-        await container.read(sessionRecorderProvider.notifier).start(template: template, ghost: false);
-      });
-      expect(container.read(sessionRecorderProvider)!.ghost, isFalse, reason: 'ready');
-      async.elapse(const Duration(seconds: 30));
-      final recording = container.read(sessionRecorderProvider)!;
-      expect((recording.ready, recording.lap!.lap, recording.ghost), (false, 2, false));
-
-      // The connection drops and comes back.
-      _run(async, source.stop);
-      async.elapse(const Duration(seconds: 5));
-      _run(async, source.start);
-      async.elapse(const Duration(seconds: 10));
-      expect(container.read(sessionRecorderProvider)!.ghost, isFalse, reason: 'after reconnecting');
-      _run(async, container.read(sessionRecorderProvider.notifier).stop);
-
-      _run(async, () => container.read(sessionRecorderProvider.notifier).start(template: template));
-      expect(container.read(sessionRecorderProvider)!.ghost, isTrue, reason: 'on by default');
-      _run(async, container.read(sessionRecorderProvider.notifier).stop);
-      source.stop();
-    });
-  });
+    },
+  );
 
   test('a session without template has no laps', () {
     fakeAsync((async) {

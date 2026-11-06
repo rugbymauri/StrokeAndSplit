@@ -6,7 +6,13 @@ import 'resistance_control.dart';
 /// data is never mistaken for a live erg.
 enum ErgSourceKind { pm5, ftms, simulator, replay }
 
-enum ErgConnectionState { disconnected, scanning, connecting, connected, reconnecting }
+enum ErgConnectionState {
+  disconnected,
+  scanning,
+  connecting,
+  connected,
+  reconnecting,
+}
 
 /// A source of rowing notifications: a real PM5, an FTMS rower, the
 /// simulator or a replay.

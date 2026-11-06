@@ -17,6 +17,9 @@ FoundHeartRateMonitor? heartRateMonitorFromAdvertisement({
 }) {
   if (!serviceIds.contains(HeartRateIds.service)) return null;
   if (name.contains('PM5')) return null;
-  if (serviceIds.contains(FtmsIds.service) || serviceData.containsKey(FtmsIds.service)) return null;
+  if (serviceIds.contains(FtmsIds.service) ||
+      serviceData.containsKey(FtmsIds.service)) {
+    return null;
+  }
   return FoundHeartRateMonitor(id: id, name: name.isEmpty ? id : name);
 }

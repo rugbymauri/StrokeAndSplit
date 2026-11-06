@@ -22,15 +22,23 @@ class HeartRateEncoder {
   }) {
     final useWide = wide || heartRate > 0xFF;
     final bytes = BytesBuilder()
-      ..addByte((useWide ? HeartRateMeasurement.wideHeartRateFlag : 0) |
-          (energyExpended != null ? HeartRateMeasurement.energyExpendedFlag : 0) |
-          (intervalsMs.isNotEmpty ? HeartRateMeasurement.intervalsFlag : 0));
+      ..addByte(
+        (useWide ? HeartRateMeasurement.wideHeartRateFlag : 0) |
+            (energyExpended != null
+                ? HeartRateMeasurement.energyExpendedFlag
+                : 0) |
+            (intervalsMs.isNotEmpty ? HeartRateMeasurement.intervalsFlag : 0),
+      );
     useWide ? _u16(bytes, heartRate) : bytes.addByte(heartRate);
     if (energyExpended != null) _u16(bytes, energyExpended);
     for (final interval in intervalsMs) {
       _u16(bytes, (interval * 1024 / 1000).round());
     }
-    return RawPacket(time: at, characteristicId: HeartRateIds.measurement, bytes: bytes.takeBytes());
+    return RawPacket(
+      time: at,
+      characteristicId: HeartRateIds.measurement,
+      bytes: bytes.takeBytes(),
+    );
   }
 
   static void _u16(BytesBuilder bytes, int value) => bytes
