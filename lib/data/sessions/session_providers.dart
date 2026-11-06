@@ -54,6 +54,7 @@ class ActiveRecording {
     required this.sessionId,
     required this.progress,
     this.template,
+    this.ghost = true,
     this.lap,
     this.paused = false,
   });
@@ -66,6 +67,10 @@ class ActiveRecording {
 
   /// What is rowed; null for a free session.
   final SessionTemplate? template;
+
+  /// Whether the ghosts of [template] run; fixed when the session starts
+  /// (template-screen, Design D4). Without a template it has no meaning.
+  final bool ghost;
 
   /// Where the session is on the course of [template].
   final LapProgress? lap;
@@ -118,17 +123,19 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
   /// Starts a session with the active source; time and distance count from
   /// zero, whatever the PM5 shows at the moment. With a [template] the
   /// session is only ready: it starts with the first stroke, follows its
-  /// course and ends by itself after the last lap.
-  Future<void> start({SessionTemplate? template}) async {
+  /// course and ends by itself after the last lap. Without [ghost] no ghost
+  /// runs in this session.
+  Future<void> start({SessionTemplate? template, bool ghost = true}) async {
     if (state != null) return;
     final source = ref.read(activeErgSourceProvider);
     if (source == null) throw StateError('No data source');
-    if (template == null) return _begin(source, null, const []);
+    if (template == null) return _begin(source, null, ghost, const []);
 
     state = ActiveRecording(
       sessionId: null,
       progress: const SessionProgress(distanceMeters: 0, elapsed: Duration.zero),
       template: template,
+      ghost: ghost,
       lap: LapTracker(template.course.definition, plannedLaps: template.laps).progress,
     );
     final detector = FirstStrokeDetector(source.protocol);
@@ -137,13 +144,13 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
       // Packets that arrive while the session is created are added to the early ones.
       if (early case final early?) return early.add(packet);
       final first = early = detector.add(packet);
-      if (first != null) _beginning = _begin(source, template, first);
+      if (first != null) _beginning = _begin(source, template, ghost, first);
     });
   }
 
   /// Creates the session and records [source] into it, starting with [early]
   /// packets: the base of the first stroke and what followed (Design D2).
-  Future<void> _begin(ErgSource source, SessionTemplate? template, List<RawPacket> early) async {
+  Future<void> _begin(ErgSource source, SessionTemplate? template, bool ghost, List<RawPacket> early) async {
     final id = await _repository.create(
       startedAt: clock.now(),
       source: source.kind,
@@ -161,6 +168,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
           sessionId: id,
           progress: accumulator.progress,
           template: template,
+          ghost: ghost,
           lap: accumulator.lapProgress,
           paused: accumulator.paused,
         );

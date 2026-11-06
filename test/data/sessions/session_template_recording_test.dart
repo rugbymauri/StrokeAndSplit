@@ -165,6 +165,38 @@ void main() {
     });
   });
 
+  test('the ghost choice stays fixed from the start to the end (template-screen)', () {
+    fakeAsync((async) {
+      final template = _run(async, () async {
+        final course = await CourseRepository(db)
+            .create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 100));
+        final templates = TemplateRepository(db);
+        return (await templates.get(await templates.create('Seerunde x3', courseId: course, laps: 3)))!;
+      });
+      _run(async, () async {
+        await source.start();
+        await container.read(sessionRecorderProvider.notifier).start(template: template, ghost: false);
+      });
+      expect(container.read(sessionRecorderProvider)!.ghost, isFalse, reason: 'ready');
+      async.elapse(const Duration(seconds: 30));
+      final recording = container.read(sessionRecorderProvider)!;
+      expect((recording.ready, recording.lap!.lap, recording.ghost), (false, 2, false));
+
+      // The connection drops and comes back.
+      _run(async, source.stop);
+      async.elapse(const Duration(seconds: 5));
+      _run(async, source.start);
+      async.elapse(const Duration(seconds: 10));
+      expect(container.read(sessionRecorderProvider)!.ghost, isFalse, reason: 'after reconnecting');
+      _run(async, container.read(sessionRecorderProvider.notifier).stop);
+
+      _run(async, () => container.read(sessionRecorderProvider.notifier).start(template: template));
+      expect(container.read(sessionRecorderProvider)!.ghost, isTrue, reason: 'on by default');
+      _run(async, container.read(sessionRecorderProvider.notifier).stop);
+      source.stop();
+    });
+  });
+
   test('a session without template has no laps', () {
     fakeAsync((async) {
       _run(async, () async {

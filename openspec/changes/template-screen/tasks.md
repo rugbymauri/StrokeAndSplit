@@ -4,7 +4,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 1. Ghost-Wahl in der Aufnahme
 
-- [ ] 1.1 `ActiveRecording.ghost` und `start(template:, ghost:)` nach D4, Standard an; ohne Vorlage ohne Bedeutung. Verifikation: Unit-Test im Recorder: Start mit `ghost: false` hält das Flag über Ticks, Runden und Wiederverbinden, Start ohne Angabe hat es an
+- [x] 1.1 `ActiveRecording.ghost` und `start(template:, ghost:)` nach D4, Standard an; ohne Vorlage ohne Bedeutung. Verifikation: Unit-Test im Recorder: Start mit `ghost: false` hält das Flag über Ticks, Runden und Wiederverbinden, Start ohne Angabe hat es an
 - [ ] 1.2 `LiveScreen(ghost:)` und `startRowing(..., ghost:)` reichen die Wahl an den Start durch; `_courseView` beobachtet `liveGhostsProvider` nur mit Ghost und übergibt sonst `ghost: null`, `ghostGap: null` (D4). Verifikation: Test in `live_screen_test.dart` (Gruppe „with ghosts“): mit Ghost wie bisher Schiffchen und Abstandszeile, ohne Ghost bei denselben Bestleistungen keines von beiden auf allen drei Spuren, kein Schalter im Live-Display
 
 ## 2. Vorlagen-Screen
