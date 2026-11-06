@@ -233,6 +233,7 @@ Die Pipeline läuft mit GitHub Actions (`.github/workflows/`) in Docker-Images v
 | Push auf `main` | `ci.yml`: `check`, `generated`, `build` |
 | Tag `vX.Y.Z` | `release.yml`: `verify-tag` und `check`, `build` (APK und AppImage), dann `release` |
 | von Hand gestartet („Run workflow“, `gh workflow run ci.yml --ref <branch>`) | `ci.yml`: `check`, `generated`, `build`, auf jedem Branch |
+| Pull Request | `commitlint.yml`: Commit-Messages nach Conventional Commits (`commitlint.config.mjs`) |
 | Pull Request oder Push auf `main`, der `.github/` ändert | `lint-workflows.yml`: `actionlint` (Syntax und Ausdrücke) und `zizmor` (Sicherheit, Konfiguration in `.github/zizmor.yml`) |
 
 Ein Branch ohne Pull Request bekommt keine Pipeline, andere Tags ebenfalls nicht.
@@ -254,6 +255,8 @@ git push origin v1.2.0
 ```
 
 `verify-tag` bricht ab, wenn der Commit nicht auf `main` liegt oder es das Release schon gibt. Ein Release wird nie überschrieben, ein fehlerhaftes Release in GitHub löschen und mit einer neuen Version taggen. Der Versionsname der Pakete kommt aus dem Tag (`1.2.0`), der Android-Versionscode ist die Laufnummer des Release-Workflows (`GITHUB_RUN_NUMBER`) und steigt damit mit jedem Release. `pubspec.yaml` bleibt unverändert. Das Release enthält `strokesplit-1.2.0-android.apk` und `strokesplit-1.2.0-x86_64.AppImage` als Dateien.
+
+Weil die Release-Notes aus den Commits entstehen, prüft `commitlint.yml` in jedem Pull Request deren Messages: `type(scope): subject` mit den Typen von Conventional Commits, Betreff klein geschrieben, höchstens 100 Zeichen. Lokal: `npx -p @commitlint/cli -p @commitlint/config-conventional commitlint --from main`. Dependabot schreibt seine Commits ebenfalls in diesem Format (`chore(deps): …`, `ci(deps): …`).
 
 Die Release-Notes listen unter „Changes“ die Commits seit dem letzten Versions-Tag vom Typ `feat`, `fix`, `perf` und `revert`, erzeugt von git-cliff (Konfiguration in `cliff.toml`). Vorschau auf das nächste Release: `uvx git-cliff --unreleased`.
 
