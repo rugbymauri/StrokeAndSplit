@@ -2,7 +2,7 @@
 
 ## Context
 
-- `TemplatesScreen` (`lib/features/templates/templates_screen.dart`) hat drei Tabs. Im Tab „Vorlagen“ hält `_TemplatesTabState._opened` die eine aufgeklappte Karte. `_TemplateCard` zeigt aufgeklappt Zonenbänder, `TemplatePodium`, das Bearbeiten-Symbol und „Starten“ (`template-start`). `selectedTemplateId` aus „Nochmal“ klappt eine Karte auf und scrollt sie ins Bild. Deshalb ist die Liste eine nicht-lazy `SingleChildScrollView`.
+- `TemplatesScreen` (`lib/features/templates/templates_screen.dart`) hat drei Tabs. Im Tab „Vorlagen“ hält `_TemplatesTabState._opened` die eine aufgeklappte Karte. `_TemplateCard` zeigt aufgeklappt Zonenbänder, `TemplatePodium`, das Bearbeiten-Symbol und „Starten“ (`template-start`). `selectedTemplateId` aus der Kachel „Nochmal“ auf dem Startbildschirm (`_RowAgain`, `rowAgainProvider` in `lib/features/connection/start_screen.dart`) klappt eine Karte auf und scrollt sie ins Bild. Deshalb ist die Liste eine nicht-lazy `SingleChildScrollView`.
 - Gestartet wird über `startRowing(context, ref, template:)` in `lib/features/connection/rower_connection.dart`: verbinden, dann `LiveScreen(template:)`. `LiveScreen` startet die Aufnahme mit `sessionRecorderProvider.notifier.start(template:)`.
 - Das Live-Display liest die Vorlage aus `ActiveRecording.template` (`lib/data/sessions/session_providers.dart`). `_courseView` beobachtet `liveGhostsProvider` und reicht `FrameGhost` und `ghostGap` an `CourseLiveView` weiter. Beide sind dort schon optional.
 - Der Editor (`TemplateEditorScreen`) speichert oder löscht und schliesst sich danach mit `pop()`. `templatesProvider` liefert die Liste neu.
@@ -52,11 +52,13 @@ Zonen, Details und Podium scrollen, Schalter und „Starten“ stehen fest unten
 
 `_TemplateCard` verliert `opened`, `scrollIntoView` und den Auswahlrahmen. Sie zeigt Name, `templateDetails` und den Segmentbalken, dazu einen Chevron rechts als Hinweis, dass ein Screen folgt. Ein Tipp ruft `openTemplate(context, id)` auf, das den Screen pusht. `_TemplatesTab` wird ein `ConsumerWidget`, die Liste darf wieder lazy (`ListView.separated`) sein, weil nichts mehr ins Bild gescrollt werden muss.
 
-### D3: „Nochmal“ öffnet den Screen über der Liste
+### D3: „Nochmal“ entfällt
 
-`TemplatesScreen(selectedTemplateId:)` bleibt die Einstiegsstelle von „Nochmal“. Statt aufzuklappen, pusht `_TemplatesTab` nach dem ersten Frame (`addPostFrameCallback`) einmal den Screen dieser Vorlage. Der Navigator-Stapel ist dann Start → Liste → Vorlage, „Zurück“ führt zur Liste (Spec „Nochmal öffnet die Vorlage“). Dass der Screen nur einmal gepusht wird, sichert ein Flag im State, damit ein Rebuild der Liste ihn nicht erneut öffnet.
+Die Kachel „Nochmal“ kommt vom Startbildschirm weg, mit `_RowAgain`, `rowAgainProvider` und den Texten `startAgain` und `startAgainDaysAgo`. `TemplatesScreen` verliert `selectedTemplateId`, die Liste muss nichts mehr vorauswählen oder ins Bild scrollen. Der Startbildschirm zeigt danach Gerätezeile, „Rudern“, „Frei rudern“ und „Sessions“. Der Abstand über „Sessions“ (heute nach der Kachel) wird der übliche zwischen den Buttons.
 
-*Alternative*: Start → Vorlage direkt, ohne Liste. Vom Nutzer verworfen (Entscheidung b), „Zurück“ soll zur Liste führen.
+Entscheid des Nutzers (2026-11-06). Damit entfällt auch die Frage, was die Kachel nach einer Session ohne Vorlage zeigen soll (Change `course-rowing-free`).
+
+*Alternative*: „Nochmal“ öffnet die Liste und darüber den Vorlagen-Screen. Vorher so geplant, vom Nutzer durch das Entfernen ersetzt.
 
 ### D4: Ghost-Wahl in der Aufnahme
 
@@ -72,8 +74,7 @@ Der Schalter ist lokaler State des Screens (`var _ghost = true`). Er wird bei je
 
 ## Risks / Trade-offs
 
-- [Ein Tipp mehr bis zum Start] → Vorher: aufklappen und „Starten“, jetzt: öffnen und „Starten“, gleich viele Tipps. Nur „Nochmal“ führt zusätzlich über die Liste, so gewünscht.
+- [Ein Tipp mehr bis zum Start] → Aus der Liste: vorher aufklappen und „Starten“, jetzt öffnen und „Starten“, gleich viele Tipps. Wer bisher „Nochmal“ nutzte, braucht über „Rudern“ einen Tipp mehr; so gewünscht.
 - [Viele Tests greifen auf die aufgeklappte Karte zu] → Ein gemeinsamer Helfer in den Tests öffnet den Screen einer Vorlage. Die Tests zu Podium und Start ziehen in `template_screen_test.dart` um, ohne ihren Inhalt zu ändern.
-- [Doppeltes Pushen bei „Nochmal“] → Flag im State (D3) und ein Test, dass „Zurück“ zur Liste führt und nicht auf einen zweiten Vorlagen-Screen.
-- [Deltas auf Capabilities, die es noch nicht gibt] → `ghost` und `statistics` liegen erst als Changes vor. Dieser Change wird nach ihnen archiviert. Sonst lehnt das Archivieren das MODIFIED-Delta von `statistics` ab.
-- [Abgelöste Entscheidungen in `ui-design` und `statistics`] → In beiden Changes einen Vermerk setzen, dass die aufgeklappte Karte und „Nochmal mit aufgeklappter Vorlage“ durch diesen Change ersetzt sind.
+- [Deltas auf Anforderungen, die es noch nicht gibt] → `ghost` und `statistics` liegen erst als Changes vor, die Verbindungs-Anforderung von `erg-connection` erst im Change `ui-design`. Dieser Change wird nach allen dreien archiviert. Sonst lehnt das Archivieren die MODIFIED-Deltas ab.
+- [Abgelöste Entscheidungen in `ui-design` und `statistics`] → In beiden Changes einen Vermerk setzen, dass die aufgeklappte Karte und die Kachel „Nochmal“ durch diesen Change ersetzt sind.

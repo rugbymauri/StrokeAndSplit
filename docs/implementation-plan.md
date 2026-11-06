@@ -27,7 +27,8 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
 | 13 | `resistance-control` | 12/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
-| 14 | `template-screen` | 0/9 | geplant (`feature/template-screen`) | nach `ghost` und `statistics` archivieren |
+| 14 | `template-screen` | 0/9 | geplant, in `main` | nach `ui-design`, `ghost` und `statistics` archivieren |
+| 15 | `course-rowing-free` | 0/11 | geplant | setzt `template-screen` voraus; erst nach `ghost` und `template-screen` archivieren |
 
 ## Warum diese Reihenfolge
 
@@ -304,6 +305,15 @@ Wunsch des Nutzers (2026-11-05) für den Domyos Woodrower. Der Spike am Gerät z
 Wunsch des Nutzers (2026-11-06): Ein Tipp auf eine Vorlage öffnet einen eigenen Screen statt die Karte aufzuklappen; dort lässt sich der Ghost vor dem Start abschalten.
 
 - [x] Geplant (2026-11-06, `feature/template-screen`). Entschieden (Nutzer): Ghost aus heisst alle drei Spuren und keine Abstandszeile; nur vor dem Start wählbar, nicht während der Fahrt; nicht gespeichert, jeder Start beginnt mit Ghost an; „Nochmal“ öffnet die Liste und darüber gleich den Vorlagen-Screen, Zurück führt zur Liste. Vorgabe ohne Widerspruch: Schalter über „Starten“, sichtbar auch ohne Bestleistung. Löst die aufklappbaren Karten aus `ui-design` (D6, Task 4.1) und die Plätze in der aufgeklappten Vorlage aus `statistics` ab.
+- [x] Geändert (Nutzer, 2026-11-06): Die Kachel „Nochmal“ entfällt ganz, statt Liste und Vorlagen-Screen zu öffnen (D3, Task 3.2). Neues Delta `erg-connection` ohne „Nochmal“; deshalb erst nach `ui-design`, `ghost` und `statistics` archivieren.
+
+### 15. `course-rowing-free`: Strecke ohne Vorlage rudern, mit Runden, Dauer oder offen
+
+Wunsch des Nutzers (2026-11-06): eine Strecke wählen, auf einem weiteren Screen Runden, Gesamtdauer oder offen wählen und starten, ohne dass eine Vorlage gespeichert wird.
+
+- [x] Proposal (2026-11-06). Entschieden (Nutzer): Einstieg über „Rudern“ in der Detailansicht der Strecke; drei sich ausschliessende Optionen, sichtbar nur die Eingabe der gewählten; Dauer nur hier, nicht in Vorlagen; Ende nach effektiver Ruderzeit ohne Pausen, auch mitten in der Runde; Dauer in Schritten von 1 min; geplante Dauer wird gespeichert (Schema 10); Ghost-Schalter auch hier; „Nochmal“ entfällt (in `template-screen`). Vorgaben ohne Rückmeldung: Dauer 1–180 min, Start 30 min; angebrochene Runde zählt nicht; Titel „Strecke · 30 min“.
+- [x] Design, Specs und Tasks (2026-11-06, 11 Tasks). Geklärt: Der `LapTracker` misst Zeitstrecken schon mit der Ruderzeit ohne Pausen (`auto-pause`), Runden und Dauer zählen also gleich. Entscheide im Design: `SessionPlan` statt `SessionTemplate` im Recorder (D1), Ende im Akkumulator beim ersten Datenpunkt über der Dauer (D2), `durationMs` im bestehenden Block `template` des Exports (D3), äusserer Ring nach Zeit ohne Rundengrenzen (D4). Vorgaben ohne Rückmeldung: Start-Option „Runden“ mit 3 Runden.
+- [ ] Umsetzung (`/opsx:apply course-rowing-free`), erst nach `template-screen`.
 
 ## Offene Entscheide
 

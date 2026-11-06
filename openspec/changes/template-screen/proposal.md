@@ -8,7 +8,7 @@ Wer gegen den Ghost rudert, vergleicht sich mit seiner Bestleistung. Für eine l
 
 - **Vorlagen-Screen**: Ein Tipp auf eine Vorlage in der Liste öffnet einen eigenen Screen statt die Karte aufzuklappen. Er zeigt Name, Segmentbalken, Zonenbänder, die Plätze 1–3, den Ghost-Schalter und „Starten“. Bearbeiten erreicht man von dort. **BREAKING** für die Bedienung: Karten klappen nicht mehr auf.
 - **Kompakte Liste**: Die Vorlagenkarten zeigen nur noch Name, Details und Segmentbalken. Es gibt keine geöffnete oder ausgewählte Karte mehr.
-- **„Nochmal“**: Die Kachel auf dem Startbildschirm öffnet die Vorlagenliste und darüber gleich den Vorlagen-Screen der Vorlage. „Zurück“ führt zur Liste.
+- **„Nochmal“ entfällt**: Die Kachel auf dem Startbildschirm wird entfernt. Vorlagen erreicht man über „Rudern“. **BREAKING** für die Bedienung.
 - **Ghost abschaltbar**: Auf dem Vorlagen-Screen schaltet ein Schalter den Ghost für die Session ab, die man von dort startet. Aus heisst: kein Ghost-Schiffchen auf einer der drei Spuren und keine Abstandszeile in der Pace-Box. Der Schalter steht bei jedem Öffnen des Screens auf an. Die Wahl wird nicht gespeichert.
 - **Kein Umschalten während der Fahrt**: Ob ein Ghost läuft, steht mit dem Start fest. Das Live-Display bekommt keinen Schalter.
 
@@ -27,18 +27,20 @@ Keine.
 
 ### Modified Capabilities
 
-- `session-templates`: Eine Vorlage wird auf einem eigenen Screen angesehen und gestartet. „Nochmal“ führt dorthin.
+- `session-templates`: Eine Vorlage wird auf einem eigenen Screen angesehen und gestartet.
+- `erg-connection`: „Nochmal“ fällt aus der Anforderung, eine bestehende Verbindung weiter zu nutzen. Die Anforderung entsteht erst mit dem Archivieren von Change `ui-design`.
 - `ghost`: Der Ghost lässt sich vor dem Start einer Vorlage für diese Session abschalten. Die Capability entsteht erst mit dem Archivieren von Change `ghost`.
 - `statistics`: Die Plätze 1–3 einer Vorlage stehen auf dem Vorlagen-Screen statt in der aufgeklappten Karte. Die Capability entsteht erst mit dem Archivieren von Change `statistics`.
 
 ## Impact
 
 - **Code**:
-  - `lib/features/templates/templates_screen.dart`: Karten ohne Aufklappen, Tipp öffnet den neuen Screen, `selectedTemplateId` öffnet ihn gleich nach dem Aufbau.
+  - `lib/features/templates/templates_screen.dart`: Karten ohne Aufklappen, Tipp öffnet den neuen Screen, `selectedTemplateId` entfällt.
+  - `lib/features/connection/start_screen.dart`: Kachel „Nochmal“ und `rowAgainProvider` entfallen, ebenso die Texte `startAgain` und `startAgainDaysAgo`.
   - Neu `lib/features/templates/template_screen.dart`: Zonen, `TemplatePodium`, Ghost-Schalter, „Starten“, Bearbeiten.
   - `lib/features/connection/rower_connection.dart` (`startRowing`) und `lib/features/live/live_screen.dart`: ein Flag, ob der Ghost läuft. Ohne Ghost fallen `FrameGhost` und `ghostGap` weg.
   - `lib/l10n/*.arb`: Texte für den Schalter und den Screen.
-- **Tests**: `test/features/templates/templates_screen_test.dart` zieht teilweise in einen Test des neuen Screens um. Neue Tests für den Schalter und das Live-Display ohne Ghost.
+- **Tests**: `test/features/templates/templates_screen_test.dart` zieht teilweise in einen Test des neuen Screens um. Die Gruppe „Nochmal“ in `start_screen_test.dart` entfällt. Neue Tests für den Schalter und das Live-Display ohne Ghost.
 - **Daten**: keine. Kein neues Schema, nichts in den SharedPreferences.
-- **Andere Changes**: `ui-design` (D6, Task 4.1: aufklappbare Karten, „Nochmal“ mit aufgeklappter Vorlage) und `statistics` (Plätze in der aufgeklappten Vorlage) werden in diesem Punkt abgelöst. `ghost` und `statistics` müssen vor diesem Change archiviert werden, weil seine Deltas ihre Capabilities ändern.
-- **Doku**: README-Abschnitte zu Vorlagen und Ghost.
+- **Andere Changes**: `ui-design` (D6, Task 4.1: aufklappbare Karten und die Kachel „Nochmal“) und `statistics` (Plätze in der aufgeklappten Vorlage) werden in diesem Punkt abgelöst. `ui-design`, `ghost` und `statistics` müssen vor diesem Change archiviert werden, weil seine Deltas ihre Capabilities ändern.
+- **Doku**: README-Abschnitte zu Startbildschirm, Vorlagen und Ghost.
