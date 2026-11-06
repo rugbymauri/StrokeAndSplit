@@ -30,20 +30,39 @@ class _Fixed extends ActiveErgSource {
 void main() {
   test('gives a new first place once a session ends', () async {
     final db = openTestDatabase();
-    final source = FakeErgSource(kind: ErgSourceKind.ftms, protocol: ErgProtocol.ftms);
-    final container = ProviderContainer(overrides: [
-      databaseProvider.overrideWithValue(db),
-      activeErgSourceProvider.overrideWith(() => _Fixed(source)),
-      recordingFlushIntervalProvider.overrideWithValue(const Duration(milliseconds: 10)),
-    ]);
+    final source = FakeErgSource(
+      kind: ErgSourceKind.ftms,
+      protocol: ErgProtocol.ftms,
+    );
+    final container = ProviderContainer(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        activeErgSourceProvider.overrideWith(() => _Fixed(source)),
+        recordingFlushIntervalProvider.overrideWithValue(
+          const Duration(milliseconds: 10),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
-    final course =
-        await CourseRepository(db).create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 100));
+    final course = await CourseRepository(db).create(
+      'Seerunde',
+      CourseDefinition.single(axis: CourseAxis.distance, length: 100),
+    );
     final templates = TemplateRepository(db);
-    final template = (await templates.get(await templates.create('Seerunde x1', courseId: course, laps: 1)))!;
-    await storeRowedSession(db, template: template, laps: [RowedLap.single(30000, 100)]);
+    final template = (await templates.get(
+      await templates.create('Seerunde x1', courseId: course, laps: 1),
+    ))!;
+    await storeRowedSession(
+      db,
+      template: template,
+      laps: [RowedLap.single(30000, 100)],
+    );
     final seen = <List<Ranking>>[];
-    container.listen(courseRankingsProvider(course), (_, next) => seen.addAll([?next.value]), fireImmediately: true);
+    container.listen(
+      courseRankingsProvider(course),
+      (_, next) => seen.addAll([?next.value]),
+      fireImmediately: true,
+    );
     await pumpEventQueue();
     expect(seen.last.single.entries.single.durationMs, 30000);
 
@@ -59,23 +78,35 @@ void main() {
     expect((first.sessionId, first.durationMs), (id, 25000));
     expect(seen.last.single.entries, hasLength(2));
     container.listen(templateRankingsProvider(template.id), (_, _) {});
-    final rankings = await container.read(templateRankingsProvider(template.id).future);
+    final rankings = await container.read(
+      templateRankingsProvider(template.id).future,
+    );
     expect(rankings.single.entries.first.sessionId, id);
   });
 
   test('keeps places 1 to 3', () async {
     final db = openTestDatabase();
-    final container = ProviderContainer(overrides: [databaseProvider.overrideWithValue(db)]);
+    final container = ProviderContainer(
+      overrides: [databaseProvider.overrideWithValue(db)],
+    );
     addTearDown(container.dispose);
-    final course =
-        await CourseRepository(db).create('Seerunde', CourseDefinition.single(axis: CourseAxis.distance, length: 1000));
+    final course = await CourseRepository(db).create(
+      'Seerunde',
+      CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+    );
     final versionId = (await CourseRepository(db).get(course))!.versionId;
-    await storeRowedSession(db, courseVersionId: versionId, laps: [
-      for (var i = 0; i < 5; i++) RowedLap.single(250000 - i * 1000, 1000),
-    ]);
+    await storeRowedSession(
+      db,
+      courseVersionId: versionId,
+      laps: [
+        for (var i = 0; i < 5; i++) RowedLap.single(250000 - i * 1000, 1000),
+      ],
+    );
 
     container.listen(courseRankingsProvider(course), (_, _) {});
-    final rankings = await container.read(courseRankingsProvider(course).future);
+    final rankings = await container.read(
+      courseRankingsProvider(course).future,
+    );
 
     expect([for (final e in rankings.single.entries) e.lap], [5, 4, 3]);
   });
@@ -83,26 +114,56 @@ void main() {
   test('ranks 200 sessions of 3 laps with 2 zones quickly', () async {
     final db = openTestDatabase();
     final zones = ZoneRepository(db);
-    const sprint = Zone(name: 'Sprint', axis: CourseAxis.distance, length: 100, paceFastCs: 9000, paceSlowCs: 10000);
-    const tempo = Zone(name: 'Tempo', axis: CourseAxis.distance, length: 200, paceFastCs: 11000, paceSlowCs: 12000);
+    const sprint = Zone(
+      name: 'Sprint',
+      axis: CourseAxis.distance,
+      length: 100,
+      paceFastCs: 9000,
+      paceSlowCs: 10000,
+    );
+    const tempo = Zone(
+      name: 'Tempo',
+      axis: CourseAxis.distance,
+      length: 200,
+      paceFastCs: 11000,
+      paceSlowCs: 12000,
+    );
     final sprintId = await zones.create(sprint);
     final tempoId = await zones.create(tempo);
     final course = await CourseRepository(db).create(
       'Seerunde',
-      CourseDefinition(axis: CourseAxis.distance, length: 1000, segments: [
-        sprint.copyWith(id: sprintId).segment,
-        const CourseSegment(length: 300),
-        tempo.copyWith(id: tempoId).segment,
-        const CourseSegment(length: 400),
-      ]),
+      CourseDefinition(
+        axis: CourseAxis.distance,
+        length: 1000,
+        segments: [
+          sprint.copyWith(id: sprintId).segment,
+          const CourseSegment(length: 300),
+          tempo.copyWith(id: tempoId).segment,
+          const CourseSegment(length: 400),
+        ],
+      ),
     );
     final templates = TemplateRepository(db);
-    final templateId = await templates.create('Seerunde x3', courseId: course, laps: 3);
+    final templateId = await templates.create(
+      'Seerunde x3',
+      courseId: course,
+      laps: 3,
+    );
     final template = (await templates.get(templateId))!;
     for (var i = 0; i < 200; i++) {
-      final lap = RowedLap([(18000 + i, 100), (70000, 300), (44000 + i, 200), (100000 - i, 400)]);
+      final lap = RowedLap([
+        (18000 + i, 100),
+        (70000, 300),
+        (44000 + i, 200),
+        (100000 - i, 400),
+      ]);
       final startedAt = DateTime(2026, 1, 1).add(Duration(hours: i));
-      await storeRowedSession(db, template: template, startedAt: startedAt, laps: [lap, lap, lap]);
+      await storeRowedSession(
+        db,
+        template: template,
+        startedAt: startedAt,
+        laps: [lap, lap, lap],
+      );
     }
     final rankings = RankingRepository(db);
 
@@ -115,7 +176,10 @@ void main() {
     ];
     watch.stop();
 
-    expect([for (final r in results) r.single.entries.length], [200, 600, 600, 600]);
+    expect(
+      [for (final r in results) r.single.entries.length],
+      [200, 600, 600, 600],
+    );
     // About 20–70 ms for all four on a laptop (Task 1.6); the bound leaves room for slow machines.
     expect(watch.elapsed, lessThan(const Duration(milliseconds: 500)));
   });

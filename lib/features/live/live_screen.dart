@@ -64,7 +64,11 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   void initState() {
     super.initState();
     _wakelock = ref.read(wakelockProvider);
-    ref.listenManual(rowingEventsProvider, (_, events) => _listen(events), fireImmediately: true);
+    ref.listenManual(
+      rowingEventsProvider,
+      (_, events) => _listen(events),
+      fireImmediately: true,
+    );
     ref.listenManual(ergConnectionStateProvider, (_, state) {
       _updateWakelock(state.value);
       if (state.value == ErgConnectionState.connected) _startTemplate();
@@ -79,14 +83,20 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     if (template == null || _templateStarted) return;
     _templateStarted = true;
     // Not within the listener that reports the connection.
-    Future.microtask(() => ref.read(sessionRecorderProvider.notifier).start(template: template, ghost: widget.ghost));
+    Future.microtask(
+      () => ref
+          .read(sessionRecorderProvider.notifier)
+          .start(template: template, ghost: widget.ghost),
+    );
   }
 
   /// The session ended by itself after its last lap.
   Future<void> _showFinished(int id) async {
     ref.read(finishedSessionProvider.notifier).clear();
     if (!mounted) return;
-    if (await SessionSummaryScreen.showAfterSession(context, id)) await _leaveToStart();
+    if (await SessionSummaryScreen.showAfterSession(context, id)) {
+      await _leaveToStart();
+    }
   }
 
   void _listen(Stream<RowingEvent> events) {
@@ -131,7 +141,9 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   }
 
   void _updateWakelock(ErgConnectionState? state) {
-    final on = state == ErgConnectionState.connected || state == ErgConnectionState.reconnecting;
+    final on =
+        state == ErgConnectionState.connected ||
+        state == ErgConnectionState.reconnecting;
     if (on == _wakelockOn) return;
     _wakelockOn = on;
     on ? _wakelock?.enable() : _wakelock?.disable();
@@ -153,10 +165,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     _leaving = true;
     // A running session is kept; it ends here like with the end session button. A ready one stores nothing.
     await ref.read(sessionRecorderProvider.notifier).stop();
-    final replay = ref.read(activeErgSourceProvider)?.kind == ErgSourceKind.replay;
+    final replay =
+        ref.read(activeErgSourceProvider)?.kind == ErgSourceKind.replay;
     await _endReplay();
     if (!mounted) return;
-    replay ? Navigator.of(context).pop() : Navigator.of(context).popUntil((route) => route.isFirst);
+    replay
+        ? Navigator.of(context).pop()
+        : Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   /// A replay is no connection to keep; it ends with the live display.
@@ -165,12 +180,15 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     await ref.read(activeErgSourceProvider.notifier).clear();
   }
 
-  Future<void> _startSession() => ref.read(sessionRecorderProvider.notifier).start();
+  Future<void> _startSession() =>
+      ref.read(sessionRecorderProvider.notifier).start();
 
   Future<void> _stopSession() async {
     final id = await ref.read(sessionRecorderProvider.notifier).stop();
     if (id == null || !mounted) return;
-    if (await SessionSummaryScreen.showAfterSession(context, id)) await _leaveToStart();
+    if (await SessionSummaryScreen.showAfterSession(context, id)) {
+      await _leaveToStart();
+    }
   }
 
   /// "Done" in the summary: back to the start screen, the rower stays connected.
@@ -181,21 +199,29 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 
   /// Starts a session, or ends the running one; [short] for the narrow column next to the pace box.
   /// The label shrinks rather than wraps where the status beside the button leaves little room.
-  Widget _sessionButton(ActiveRecording? recording, bool connected, {bool short = false}) => recording == null
+  Widget _sessionButton(
+    ActiveRecording? recording,
+    bool connected, {
+    bool short = false,
+  }) => recording == null
       ? FilledButton.icon(
           onPressed: connected ? _startSession : null,
           icon: const Icon(Icons.fiber_manual_record),
           label: _label(context.l10n.liveStartSession),
         )
       : short
-          ? FilledButton.tonal(onPressed: _stopSession, child: Text(context.l10n.liveStopShort, maxLines: 1))
-          : FilledButton.tonalIcon(
-              onPressed: _stopSession,
-              icon: const Icon(Icons.stop),
-              label: _label(context.l10n.liveStopSession),
-            );
+      ? FilledButton.tonal(
+          onPressed: _stopSession,
+          child: Text(context.l10n.liveStopShort, maxLines: 1),
+        )
+      : FilledButton.tonalIcon(
+          onPressed: _stopSession,
+          icon: const Icon(Icons.stop),
+          label: _label(context.l10n.liveStopSession),
+        );
 
-  static Widget _label(String text) => FittedBox(fit: BoxFit.scaleDown, child: Text(text, maxLines: 1));
+  static Widget _label(String text) =>
+      FittedBox(fit: BoxFit.scaleDown, child: Text(text, maxLines: 1));
 
   /// Connection, strap and source, beside the session button in place of a title bar.
   Widget _status() => const LiveStatus();
@@ -211,8 +237,12 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     ForceCurves? forceCurves, {
     required bool ghost,
   }) {
-    final ghosts = ghost ? ref.watch(liveGhostsProvider(liveGhostsKey(template, lap))) : null;
-    final shares = ghosts == null ? null : ghostShares(lap, template.course.definition, ghosts);
+    final ghosts = ghost
+        ? ref.watch(liveGhostsProvider(liveGhostsKey(template, lap)))
+        : null;
+    final shares = ghosts == null
+        ? null
+        : ghostShares(lap, template.course.definition, ghosts);
     return CourseLiveView(
       tick: _tick,
       rrIntervalMs: _rrIntervalMs,
@@ -224,8 +254,14 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
       // On a time course the ghost stands where the rower is; the box shows the gap in metres instead.
       ghost: shares == null || template.course.axis == CourseAxis.time
           ? null
-          : FrameGhost(course: shares.course, lap: shares.lap, segment: shares.segment),
-      ghostGap: ghosts == null ? null : ghostGap(lap, template.course.axis, ghosts.course),
+          : FrameGhost(
+              course: shares.course,
+              lap: shares.lap,
+              segment: shares.segment,
+            ),
+      ghostGap: ghosts == null
+          ? null
+          : ghostGap(lap, template.course.axis, ghosts.course),
       action: _sessionButton(recording, connected),
       shortAction: _sessionButton(recording, connected, short: true),
       status: _status(),
@@ -235,33 +271,44 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   @override
   Widget build(BuildContext context) {
     final source = ref.watch(activeErgSourceProvider);
-    final connected = ref.watch(ergConnectionStateProvider).value == ErgConnectionState.connected;
+    final connected =
+        ref.watch(ergConnectionStateProvider).value ==
+        ErgConnectionState.connected;
     final recording = ref.watch(sessionRecorderProvider);
-    final forceCurves = source != null && source.providesForceCurves ? _forceCurves : null;
+    final forceCurves = source != null && source.providesForceCurves
+        ? _forceCurves
+        : null;
     return PopScope(
       canPop: false,
       // Going back leads to the start screen and keeps the rower connected.
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _leave();
       },
-      child: _escapeLeaves(Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              const ConnectionNotice(),
-              const HeartRateNotice(),
-              if (recording?.ready ?? false) const ReadyHint(),
-              if (recording?.paused ?? false) const PauseHint(),
-              if (_stale && connected)
-                MaterialBanner(
-                  content: Text(context.l10n.liveStale),
-                  actions: [const SizedBox.shrink()],
-                ),
-              Expanded(
-                child: switch ((recording?.lap, recording?.template)) {
-                  (final lap?, final template?) =>
-                    _courseView(template, lap, recording, connected, forceCurves, ghost: recording!.ghost),
-                  _ => FreeLiveView(
+      child: _escapeLeaves(
+        Scaffold(
+          body: SafeArea(
+            child: Column(
+              children: [
+                const ConnectionNotice(),
+                const HeartRateNotice(),
+                if (recording?.ready ?? false) const ReadyHint(),
+                if (recording?.paused ?? false) const PauseHint(),
+                if (_stale && connected)
+                  MaterialBanner(
+                    content: Text(context.l10n.liveStale),
+                    actions: [const SizedBox.shrink()],
+                  ),
+                Expanded(
+                  child: switch ((recording?.lap, recording?.template)) {
+                    (final lap?, final template?) => _courseView(
+                      template,
+                      lap,
+                      recording,
+                      connected,
+                      forceCurves,
+                      ghost: recording!.ghost,
+                    ),
+                    _ => FreeLiveView(
                       tick: _tick,
                       rrIntervalMs: _rrIntervalMs,
                       session: recording?.progress,
@@ -270,25 +317,28 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                       action: _sessionButton(recording, connected),
                       status: _status(),
                     ),
-                },
-              ),
-              if (source is SimulatedSource)
-                SimulatorControls(
-                  source: source,
-                  onProtocolChanged: recording == null
-                      ? (protocol) => ref.read(activeErgSourceProvider.notifier).use(source.withProtocol(protocol))
-                      : null,
+                  },
                 ),
-            ],
+                if (source is SimulatedSource)
+                  SimulatorControls(
+                    source: source,
+                    onProtocolChanged: recording == null
+                        ? (protocol) => ref
+                              .read(activeErgSourceProvider.notifier)
+                              .use(source.withProtocol(protocol))
+                        : null,
+                  ),
+              ],
+            ),
           ),
         ),
-      )),
+      ),
     );
   }
 
   /// The Linux desktop has no back gesture; Esc does the same as going back.
   Widget _escapeLeaves(Widget child) => CallbackShortcuts(
-        bindings: {const SingleActivator(LogicalKeyboardKey.escape): _leave},
-        child: Focus(autofocus: true, child: child),
-      );
+    bindings: {const SingleActivator(LogicalKeyboardKey.escape): _leave},
+    child: Focus(autofocus: true, child: child),
+  );
 }

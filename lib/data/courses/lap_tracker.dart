@@ -2,7 +2,12 @@ import 'course.dart';
 
 /// One measurement of a session on a course.
 class TrackPoint {
-  const TrackPoint({required this.wallMs, required this.distanceDm, this.paceCs, this.strokeRate});
+  const TrackPoint({
+    required this.wallMs,
+    required this.distanceDm,
+    this.paceCs,
+    this.strokeRate,
+  });
 
   /// Wall-clock time since the session started; keeps running in pauses.
   final int wallMs;
@@ -135,9 +140,14 @@ class LapTracker {
     int startLap = 1,
     int startWallMs = 0,
     int startDistanceDm = 0,
-  })  : _lap = startLap,
-        _scale = course.axis == CourseAxis.distance ? 10 : 1000,
-        _previous = _Point(startWallMs.toDouble(), startDistanceDm.toDouble(), null, null) {
+  }) : _lap = startLap,
+       _scale = course.axis == CourseAxis.distance ? 10 : 1000,
+       _previous = _Point(
+         startWallMs.toDouble(),
+         startDistanceDm.toDouble(),
+         null,
+         null,
+       ) {
     _start = _previous;
     _ends = [for (final end in course.segmentEnds) end * _scale];
     _lapStart = _position(_previous);
@@ -173,15 +183,24 @@ class LapTracker {
 
   void add(TrackPoint point) {
     if (_finished) return;
-    final p = _Point(point.wallMs.toDouble(), point.distanceDm.toDouble(), point.paceCs, point.strokeRate);
+    final p = _Point(
+      point.wallMs.toDouble(),
+      point.distanceDm.toDouble(),
+      point.paceCs,
+      point.strokeRate,
+    );
     var q = _previous;
     final position = _position(p);
     // Each boundary between the two points on its own, e.g. after a long gap.
     while (position >= _boundary && _position(q) < _boundary) {
       final f = (_boundary - _position(q)) / (position - _position(q));
       // The boundary keeps the values of the earlier point.
-      final b = _Point(q.wallMs + f * (p.wallMs - q.wallMs), q.distanceDm + f * (p.distanceDm - q.distanceDm),
-          q.paceCs, q.strokeRate);
+      final b = _Point(
+        q.wallMs + f * (p.wallMs - q.wallMs),
+        q.distanceDm + f * (p.distanceDm - q.distanceDm),
+        q.paceCs,
+        q.strokeRate,
+      );
       _count(q, b);
       _closeSegment(b, complete: true);
       if (_finished) {
@@ -213,10 +232,15 @@ class LapTracker {
       segment: segment,
       segmentStart: start,
       segmentEnd: start + segment.length,
-      remaining: ((_boundary - _position(_previous)) / _scale).clamp(0, double.infinity),
+      remaining: ((_boundary - _position(_previous)) / _scale).clamp(
+        0,
+        double.infinity,
+      ),
       pace: _paceStatus(segment, _previous.paceCs),
       strokeRate: _spmStatus(segment, _previous.strokeRate),
-      lapInZoneShare: lapInZone > 0 ? (_lapInZoneMs + _segmentInZoneMs) / lapInZone : null,
+      lapInZoneShare: lapInZone > 0
+          ? (_lapInZoneMs + _segmentInZoneMs) / lapInZone
+          : null,
       lapTime: _since(_lapStartPoint),
       courseTime: _since(_start),
       segmentTime: _since(_segmentStartPoint),
@@ -238,11 +262,13 @@ class LapTracker {
     return segments;
   }
 
-  Duration _since(_Point start) => Duration(milliseconds: (_previous.wallMs - start.wallMs).round());
+  Duration _since(_Point start) =>
+      Duration(milliseconds: (_previous.wallMs - start.wallMs).round());
 
   double get _boundary => _lapStart + _ends[_segment];
 
-  double _position(_Point p) => course.axis == CourseAxis.distance ? p.distanceDm : p.wallMs;
+  double _position(_Point p) =>
+      course.axis == CourseAxis.distance ? p.distanceDm : p.wallMs;
 
   void _startLap(_Point at) {
     _lapStartPoint = at;
@@ -280,13 +306,17 @@ class LapTracker {
 
   void _emitSegment(_Point at) {
     final start = _segmentStartPoint;
-    _segments.add(SegmentResult(
-      lap: _lap,
-      position: _segment,
-      durationMs: at.wallMs.round() - start.wallMs.round(),
-      distanceDm: at.distanceDm.round() - start.distanceDm.round(),
-      inZoneShare: _segmentBandMs > 0 ? _segmentInZoneMs / _segmentBandMs : null,
-    ));
+    _segments.add(
+      SegmentResult(
+        lap: _lap,
+        position: _segment,
+        durationMs: at.wallMs.round() - start.wallMs.round(),
+        distanceDm: at.distanceDm.round() - start.distanceDm.round(),
+        inZoneShare: _segmentBandMs > 0
+            ? _segmentInZoneMs / _segmentBandMs
+            : null,
+      ),
+    );
     _lapInZoneMs += _segmentInZoneMs;
     _lapBandMs += _segmentBandMs;
     _segmentInZoneMs = 0;
@@ -295,20 +325,23 @@ class LapTracker {
 
   void _emitLap(_Point at, {required bool complete}) {
     final start = _lapStartPoint;
-    _laps.add(LapResult(
-      lap: _lap,
-      startWallMs: start.wallMs.round(),
-      endWallMs: at.wallMs.round(),
-      startDistanceDm: start.distanceDm.round(),
-      endDistanceDm: at.distanceDm.round(),
-      complete: complete,
-      inZoneShare: _lapBandMs > 0 ? _lapInZoneMs / _lapBandMs : null,
-    ));
+    _laps.add(
+      LapResult(
+        lap: _lap,
+        startWallMs: start.wallMs.round(),
+        endWallMs: at.wallMs.round(),
+        startDistanceDm: start.distanceDm.round(),
+        endDistanceDm: at.distanceDm.round(),
+        complete: complete,
+        inZoneShare: _lapBandMs > 0 ? _lapInZoneMs / _lapBandMs : null,
+      ),
+    );
   }
 
   static bool _inZone(CourseSegment segment, _Point p) {
     bool ok(BandStatus s) => s == BandStatus.none || s == BandStatus.inBand;
-    return ok(_paceStatus(segment, p.paceCs)) && ok(_spmStatus(segment, p.strokeRate));
+    return ok(_paceStatus(segment, p.paceCs)) &&
+        ok(_spmStatus(segment, p.strokeRate));
   }
 
   static BandStatus _paceStatus(CourseSegment segment, int? paceCs) {

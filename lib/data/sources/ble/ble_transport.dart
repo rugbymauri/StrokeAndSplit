@@ -7,7 +7,11 @@ enum BluetoothReadiness { ready, off, unauthorized, unsupported }
 
 /// A rower found during a scan: a PM5 or an FTMS rower.
 class FoundRower {
-  const FoundRower({required this.id, required this.name, this.protocol = ErgProtocol.pm5});
+  const FoundRower({
+    required this.id,
+    required this.name,
+    this.protocol = ErgProtocol.pm5,
+  });
 
   /// Platform device id (MAC address on Android and Linux).
   final String id;
@@ -63,12 +67,15 @@ class RowerConnectException implements Exception {
 
   /// The device was reached but is no rower, e.g. a PM5 on a SkiErg.
   bool get notARower => switch (error) {
-        RowerConnectError.skiErg || RowerConnectError.bikeErg || RowerConnectError.noRowerData => true,
-        RowerConnectError.failed || RowerConnectError.noRowingService => false,
-      };
+    RowerConnectError.skiErg ||
+    RowerConnectError.bikeErg ||
+    RowerConnectError.noRowerData => true,
+    RowerConnectError.failed || RowerConnectError.noRowingService => false,
+  };
 
   @override
-  String toString() => 'RowerConnectException: ${error.name}${message.isEmpty ? '' : ' ($message)'}';
+  String toString() =>
+      'RowerConnectException: ${error.name}${message.isEmpty ? '' : ' ($message)'}';
 }
 
 /// Bluetooth access to rowers, independent of the BLE plugin in use.

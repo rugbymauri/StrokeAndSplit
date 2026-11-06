@@ -42,8 +42,12 @@ ThemeData appTheme() {
     scrim: Colors.black,
   );
   final base = ThemeData(colorScheme: colors, fontFamily: AppFonts.text);
-  const cardShape = RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(AppRadii.card)));
-  const smallShape = RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(AppRadii.small)));
+  const cardShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(AppRadii.card)),
+  );
+  const smallShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(AppRadii.small)),
+  );
   const fieldBorder = OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(AppRadii.small)),
     borderSide: BorderSide(color: AppColors.line),
@@ -62,10 +66,16 @@ ThemeData appTheme() {
       // Icons in the app bar, e.g. the language choice (design D8).
       actionsIconTheme: const IconThemeData(color: AppColors.textMuted),
     ),
-    cardTheme: const CardThemeData(color: AppColors.surface, elevation: 0, shape: cardShape),
+    cardTheme: const CardThemeData(
+      color: AppColors.surface,
+      elevation: 0,
+      shape: cardShape,
+    ),
     dialogTheme: const DialogThemeData(
       backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(AppRadii.cardLarge))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(AppRadii.cardLarge)),
+      ),
     ),
     dividerTheme: const DividerThemeData(color: AppColors.line, space: 1),
     listTileTheme: const ListTileThemeData(iconColor: AppColors.textMuted),
@@ -96,7 +106,10 @@ ThemeData appTheme() {
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(foregroundColor: AppColors.zoneIn, shape: smallShape),
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.zoneIn,
+        shape: smallShape,
+      ),
     ),
     inputDecorationTheme: const InputDecorationTheme(
       filled: true,
@@ -112,23 +125,34 @@ ThemeData appTheme() {
     tabBarTheme: TabBarThemeData(
       labelColor: AppColors.text,
       unselectedLabelColor: AppColors.textMuted,
-      labelStyle: AppTextStyles.button.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
+      labelStyle: AppTextStyles.button.copyWith(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
       unselectedLabelStyle: AppTextStyles.button.copyWith(fontSize: 15),
-      indicator: BoxDecoration(color: AppColors.line, borderRadius: BorderRadius.circular(AppRadii.small - 3)),
+      indicator: BoxDecoration(
+        color: AppColors.line,
+        borderRadius: BorderRadius.circular(AppRadii.small - 3),
+      ),
       indicatorSize: TabBarIndicatorSize.tab,
       dividerHeight: 0,
       overlayColor: const WidgetStatePropertyAll(Colors.transparent),
       splashBorderRadius: BorderRadius.circular(AppRadii.small - 3),
     ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.text, linearTrackColor: AppColors.track),
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+      color: AppColors.text,
+      linearTrackColor: AppColors.track,
+    ),
   );
 }
 
 /// Barlow Condensed for the large styles that show values, IBM Plex Sans (from
 /// the base) for the rest.
 TextTheme _textTheme(TextTheme base) {
-  TextStyle? display(TextStyle? style) =>
-      style?.copyWith(fontFamily: AppFonts.display, fontWeight: FontWeight.w700);
+  TextStyle? display(TextStyle? style) => style?.copyWith(
+    fontFamily: AppFonts.display,
+    fontWeight: FontWeight.w700,
+  );
   return base.copyWith(
     displayLarge: display(base.displayLarge),
     displayMedium: display(base.displayMedium),

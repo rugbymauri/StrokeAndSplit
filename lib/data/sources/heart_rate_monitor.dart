@@ -42,7 +42,8 @@ enum HeartRateMonitorFailure {
 class HeartRateMonitorState {
   const HeartRateMonitorState._(this.phase, this.monitor, [this.failure]);
 
-  const HeartRateMonitorState.notPaired() : this._(HeartRateMonitorPhase.notPaired, null);
+  const HeartRateMonitorState.notPaired()
+    : this._(HeartRateMonitorPhase.notPaired, null);
 
   /// The paired strap; null when none is paired.
   final FoundHeartRateMonitor? monitor;
@@ -54,13 +55,17 @@ class HeartRateMonitorState {
 
   @override
   bool operator ==(Object other) =>
-      other is HeartRateMonitorState && other.phase == phase && other.monitor == monitor && other.failure == failure;
+      other is HeartRateMonitorState &&
+      other.phase == phase &&
+      other.monitor == monitor &&
+      other.failure == failure;
 
   @override
   int get hashCode => Object.hash(phase, monitor, failure);
 
   @override
-  String toString() => 'HeartRateMonitorState(${phase.name}, ${monitor?.name}${failure == null ? '' : ', $failure'})';
+  String toString() =>
+      'HeartRateMonitorState(${phase.name}, ${monitor?.name}${failure == null ? '' : ', $failure'})';
 }
 
 /// The paired strap and its connection.
@@ -71,7 +76,9 @@ class HeartRateMonitorState {
 /// changes or the strap is forgotten. A failing strap never touches the
 /// rower.
 final heartRateMonitorProvider =
-    NotifierProvider<HeartRateMonitorNotifier, HeartRateMonitorState>(HeartRateMonitorNotifier.new);
+    NotifierProvider<HeartRateMonitorNotifier, HeartRateMonitorState>(
+      HeartRateMonitorNotifier.new,
+    );
 
 class HeartRateMonitorNotifier extends Notifier<HeartRateMonitorState> {
   HeartRateMonitorNotifier({
@@ -90,7 +97,9 @@ class HeartRateMonitorNotifier extends Notifier<HeartRateMonitorState> {
     final monitor = ref.watch(chosenHeartRateMonitorProvider);
     if (monitor == null) return const HeartRateMonitorState.notPaired();
     final source = ref.watch(activeErgSourceProvider);
-    if (source is! BleRowerSource) return HeartRateMonitorState._(HeartRateMonitorPhase.ready, monitor);
+    if (source is! BleRowerSource) {
+      return HeartRateMonitorState._(HeartRateMonitorPhase.ready, monitor);
+    }
 
     final connection = _StrapConnection(
       transport: ref.watch(heartRateTransportProvider),
@@ -98,7 +107,8 @@ class HeartRateMonitorNotifier extends Notifier<HeartRateMonitorState> {
       source: source,
       reconnectWindow: reconnectWindow,
       retryDelay: retryDelay,
-      emit: (phase, [failure]) => state = HeartRateMonitorState._(phase, monitor, failure),
+      emit: (phase, [failure]) =>
+          state = HeartRateMonitorState._(phase, monitor, failure),
     );
     _connection = connection;
     ref.onDispose(connection.close);
@@ -129,7 +139,11 @@ class _StrapConnection {
   final BleRowerSource source;
   final Duration reconnectWindow;
   final Duration retryDelay;
-  final void Function(HeartRateMonitorPhase phase, [HeartRateMonitorFailure? failure]) _emit;
+  final void Function(
+    HeartRateMonitorPhase phase, [
+    HeartRateMonitorFailure? failure,
+  ])
+  _emit;
 
   var _phase = HeartRateMonitorPhase.ready;
   HeartRateLink? _link;
@@ -151,7 +165,9 @@ class _StrapConnection {
         if (_phase == HeartRateMonitorPhase.ready) unawaited(_connect());
       case ErgConnectionState.reconnecting:
         break;
-      case ErgConnectionState.disconnected || ErgConnectionState.scanning || ErgConnectionState.connecting:
+      case ErgConnectionState.disconnected ||
+          ErgConnectionState.scanning ||
+          ErgConnectionState.connecting:
         _drop();
         _set(HeartRateMonitorPhase.ready);
     }
@@ -177,7 +193,9 @@ class _StrapConnection {
       debugPrint('heart rate: $e');
       if (attempt != _attempt) return;
       _set(HeartRateMonitorPhase.disconnected, switch (e) {
-        HeartRateConnectException(error: HeartRateConnectError.noHeartRateService) =>
+        HeartRateConnectException(
+          error: HeartRateConnectError.noHeartRateService,
+        ) =>
           HeartRateMonitorFailure.noHeartRateService,
         _ => HeartRateMonitorFailure.unreachable,
       });
@@ -190,7 +208,9 @@ class _StrapConnection {
     _set(HeartRateMonitorPhase.connected);
     final attempt = _attempt;
     link.lost.then((_) {
-      if (attempt == _attempt && identical(_link, link)) unawaited(_reconnect());
+      if (attempt == _attempt && identical(_link, link)) {
+        unawaited(_reconnect());
+      }
     });
   }
 

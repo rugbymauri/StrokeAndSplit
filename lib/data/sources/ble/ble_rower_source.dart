@@ -36,9 +36,9 @@ class BleRowerSource implements ErgSource {
 
   @override
   ErgSourceKind get kind => switch (protocol) {
-        ErgProtocol.pm5 => ErgSourceKind.pm5,
-        ErgProtocol.ftms => ErgSourceKind.ftms,
-      };
+    ErgProtocol.pm5 => ErgSourceKind.pm5,
+    ErgProtocol.ftms => ErgSourceKind.ftms,
+  };
 
   @override
   ErgProtocol get protocol => device.protocol;
@@ -102,7 +102,13 @@ class BleRowerSource implements ErgSource {
 
   void _forward((String, List<int>) notification) {
     final (id, bytes) = notification;
-    _packets.add(RawPacket(time: clock.now().difference(_startedAt!), characteristicId: id, bytes: bytes));
+    _packets.add(
+      RawPacket(
+        time: clock.now().difference(_startedAt!),
+        characteristicId: id,
+        bytes: bytes,
+      ),
+    );
   }
 
   void _attach(RowerLink link) {

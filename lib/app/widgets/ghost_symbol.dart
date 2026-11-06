@@ -23,10 +23,13 @@ class GhostSymbol extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-        label: context.l10n.ghostSymbolLabel,
-        image: true,
-        child: CustomPaint(size: const Size(width, height), painter: _GhostSymbolPainter(rimColor)),
-      );
+    label: context.l10n.ghostSymbolLabel,
+    image: true,
+    child: CustomPaint(
+      size: const Size(width, height),
+      painter: _GhostSymbolPainter(rimColor),
+    ),
+  );
 }
 
 class _GhostSymbolPainter extends CustomPainter {
@@ -55,5 +58,6 @@ class _GhostSymbolPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_GhostSymbolPainter oldDelegate) => oldDelegate.rimColor != rimColor;
+  bool shouldRepaint(_GhostSymbolPainter oldDelegate) =>
+      oldDelegate.rimColor != rimColor;
 }

@@ -8,7 +8,13 @@ void main() {
     final de = lookupAppLocalizations(const Locale('de'));
     final en = lookupAppLocalizations(const Locale('en'));
 
-    expect([formatLaps(de, 1), formatLaps(de, 3), formatLaps(de, null)], ['1 Runde', '3 Runden', 'offen']);
-    expect([formatLaps(en, 1), formatLaps(en, 3), formatLaps(en, null)], ['1 lap', '3 laps', 'open']);
+    expect(
+      [formatLaps(de, 1), formatLaps(de, 3), formatLaps(de, null)],
+      ['1 Runde', '3 Runden', 'offen'],
+    );
+    expect(
+      [formatLaps(en, 1), formatLaps(en, 3), formatLaps(en, null)],
+      ['1 lap', '3 laps', 'open'],
+    );
   });
 }

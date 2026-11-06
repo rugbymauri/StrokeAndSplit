@@ -74,10 +74,20 @@ abstract final class AppFonts {
 /// from the surrounding text.
 abstract final class AppTextStyles {
   /// The pace, always the largest value.
-  static const pace = TextStyle(fontFamily: AppFonts.liveValue, fontSize: 128, fontWeight: FontWeight.w700, height: 1);
+  static const pace = TextStyle(
+    fontFamily: AppFonts.liveValue,
+    fontSize: 128,
+    fontWeight: FontWeight.w700,
+    height: 1,
+  );
 
   /// A value in a tile, e.g. stroke rate or watts, at most; it shrinks to fit its tile.
-  static const value = TextStyle(fontFamily: AppFonts.liveValue, fontSize: 112, fontWeight: FontWeight.w700, height: 1);
+  static const value = TextStyle(
+    fontFamily: AppFonts.liveValue,
+    fontSize: 112,
+    fontWeight: FontWeight.w700,
+    height: 1,
+  );
 
   /// The unit after a [value], e.g. "spm".
   static const valueUnit = TextStyle(
@@ -96,7 +106,11 @@ abstract final class AppTextStyles {
   );
 
   /// The title of a screen.
-  static const screenTitle = TextStyle(fontFamily: AppFonts.display, fontSize: 30, fontWeight: FontWeight.w700);
+  static const screenTitle = TextStyle(
+    fontFamily: AppFonts.display,
+    fontSize: 30,
+    fontWeight: FontWeight.w700,
+  );
 
   /// A label above values or a section; the text itself is written in capitals.
   static const label = TextStyle(
@@ -108,21 +122,41 @@ abstract final class AppTextStyles {
   );
 
   /// The name of a tile above its value, and small notes.
-  static const caption = TextStyle(fontFamily: AppFonts.text, fontSize: 13, color: AppColors.textMuted);
+  static const caption = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 13,
+    color: AppColors.textMuted,
+  );
 
   /// The title of a card or list entry.
-  static const cardTitle = TextStyle(fontFamily: AppFonts.text, fontSize: 17, fontWeight: FontWeight.w600);
+  static const cardTitle = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 17,
+    fontWeight: FontWeight.w600,
+  );
 
   static const body = TextStyle(fontFamily: AppFonts.text, fontSize: 15);
 
   /// The line below a [cardTitle].
-  static const subtitle = TextStyle(fontFamily: AppFonts.text, fontSize: 14, color: AppColors.textMuted);
+  static const subtitle = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 14,
+    color: AppColors.textMuted,
+  );
 
   /// A secondary button, e.g. "Frei rudern".
-  static const button = TextStyle(fontFamily: AppFonts.text, fontSize: 16, fontWeight: FontWeight.w500);
+  static const button = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+  );
 
   /// The primary button, e.g. "Session beenden".
-  static const primaryButton = TextStyle(fontFamily: AppFonts.text, fontSize: 18, fontWeight: FontWeight.w600);
+  static const primaryButton = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+  );
 }
 
 /// Corner radii (design D1).

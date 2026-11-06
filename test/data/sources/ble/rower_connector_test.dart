@@ -9,7 +9,11 @@ import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
+const _ftms = FoundRower(
+  id: 'AA:BB:CC:DD:EE:FF',
+  name: 'Stroke & Split FTMS',
+  protocol: ErgProtocol.ftms,
+);
 
 class _FakeConnection implements GattConnection {
   _FakeConnection(this.characteristics);
@@ -17,8 +21,11 @@ class _FakeConnection implements GattConnection {
   @override
   final Set<String> characteristics;
 
-  final _notifications = StreamController<(String, List<int>)>.broadcast(sync: true);
+  final _notifications = StreamController<(String, List<int>)>.broadcast(
+    sync: true,
+  );
   final subscribed = <String>[];
+
   /// Writes as `id:bytes`, e.g. `2ad9:[0]`.
   final writes = <String>[];
   var disconnected = false;
@@ -51,7 +58,8 @@ class _FakeConnection implements GattConnection {
   final values = <String, List<int>>{};
 
   @override
-  Future<List<int>> read(String id) async => values[id] ?? (throw StateError('no value for $id'));
+  Future<List<int>> read(String id) async =>
+      values[id] ?? (throw StateError('no value for $id'));
 
   @override
   Future<void> get lost => Completer<void>().future;
@@ -60,14 +68,27 @@ class _FakeConnection implements GattConnection {
   Future<void> disconnect() async => disconnected = true;
 }
 
-const _pm5Characteristics = {'0031', '0032', '0033', '0034', '0035', '0036', '003d'};
+const _pm5Characteristics = {
+  '0031',
+  '0032',
+  '0033',
+  '0034',
+  '0035',
+  '0036',
+  '003d',
+};
 
 /// A PM5 that sends its first Additional Status with [ergType], or none.
-_FakeConnection _pm5Connection(int? ergType, {Set<String> characteristics = _pm5Characteristics}) {
+_FakeConnection _pm5Connection(
+  int? ergType, {
+  Set<String> characteristics = _pm5Characteristics,
+}) {
   final connection = _FakeConnection(characteristics);
   connection.onSubscribe = (id) {
     if (id == Pm5Characteristics.additionalStatus && ergType != null) {
-      scheduleMicrotask(() => connection.notify(id, [...List.filled(16, 0), ergType]));
+      scheduleMicrotask(
+        () => connection.notify(id, [...List.filled(16, 0), ergType]),
+      );
     }
   };
   return connection;
@@ -91,24 +112,54 @@ _FakeConnection _ftmsConnection({
     FtmsIds.machineStatus,
     if (resistance) FtmsIds.supportedResistanceLevelRange,
   });
-  connection.values[FtmsIds.feature] = [0xa6, 0x56, 0x00, 0x00, if (resistance) 0x04 else 0x00, 0x00, 0x00, 0x00];
-  if (resistance) connection.values[FtmsIds.supportedResistanceLevelRange] = [0x0a, 0x00, 0x96, 0x00, 0x0a, 0x00];
+  connection.values[FtmsIds.feature] = [
+    0xa6,
+    0x56,
+    0x00,
+    0x00,
+    if (resistance) 0x04 else 0x00,
+    0x00,
+    0x00,
+    0x00,
+  ];
+  if (resistance) {
+    connection.values[FtmsIds.supportedResistanceLevelRange] = [
+      0x0a,
+      0x00,
+      0x96,
+      0x00,
+      0x0a,
+      0x00,
+    ];
+  }
   connection.onWrite = (id, bytes) {
     if (id == FtmsIds.controlPoint && controlResult != null) {
-      scheduleMicrotask(() => connection.notify(id, [0x80, bytes.first, bytes.first == 0x00 ? controlResult : 0x01]));
+      scheduleMicrotask(
+        () => connection.notify(id, [
+          0x80,
+          bytes.first,
+          bytes.first == 0x00 ? controlResult : 0x01,
+        ]),
+      );
     }
   };
   return connection;
 }
 
 /// Sets up [connection] and returns the link or the error.
-(RowerLink?, Object?, List<String>) _setUp(_FakeConnection connection, FoundRower rower) {
+(RowerLink?, Object?, List<String>) _setUp(
+  _FakeConnection connection,
+  FoundRower rower,
+) {
   RowerLink? link;
   Object? error;
   final warnings = <String>[];
   fakeAsync((async) {
-    setUpRower(connection, rower, onWarning: warnings.add)
-        .then<void>((l) => link = l, onError: (Object e) => error = e);
+    setUpRower(
+      connection,
+      rower,
+      onWarning: warnings.add,
+    ).then<void>((l) => link = l, onError: (Object e) => error = e);
     async.elapse(const Duration(seconds: 5));
   });
   return (link, error, warnings);
@@ -122,7 +173,9 @@ void main() {
 
       expect(error, isNull);
       expect(link, isNotNull);
-      expect(connection.writes, ['${Pm5Characteristics.sampleRate}:[${Pm5Characteristics.sampleRate250ms}]']);
+      expect(connection.writes, [
+        '${Pm5Characteristics.sampleRate}:[${Pm5Characteristics.sampleRate250ms}]',
+      ]);
       expect(connection.subscribed, Pm5Characteristics.subscribed);
       expect(connection.disconnected, isFalse);
     });
@@ -136,7 +189,14 @@ void main() {
         final (link, error, _) = _setUp(connection, _pm5);
 
         expect(link, isNull);
-        expect(error, isA<RowerConnectException>().having((e) => e.error, 'error', expected));
+        expect(
+          error,
+          isA<RowerConnectException>().having(
+            (e) => e.error,
+            'error',
+            expected,
+          ),
+        );
         expect((error! as RowerConnectException).notARower, isTrue);
         expect(connection.disconnected, isTrue);
       });
@@ -165,7 +225,14 @@ void main() {
       final connection = _FakeConnection({});
       final (_, error, _) = _setUp(connection, _pm5);
 
-      expect(error, isA<RowerConnectException>().having((e) => e.error, 'error', RowerConnectError.noRowingService));
+      expect(
+        error,
+        isA<RowerConnectException>().having(
+          (e) => e.error,
+          'error',
+          RowerConnectError.noRowingService,
+        ),
+      );
       expect((error! as RowerConnectException).notARower, isFalse);
       expect(connection.disconnected, isTrue);
     });
@@ -185,14 +252,23 @@ void main() {
       expect(received, ['0031', '0035', '003d']);
     });
 
-    test('connects to a PM5 without force curve and subscribes to the rest', () {
-      final connection = _pm5Connection(0, characteristics: _pm5Characteristics.difference({'003d'}));
-      final (link, error, _) = _setUp(connection, _pm5);
+    test(
+      'connects to a PM5 without force curve and subscribes to the rest',
+      () {
+        final connection = _pm5Connection(
+          0,
+          characteristics: _pm5Characteristics.difference({'003d'}),
+        );
+        final (link, error, _) = _setUp(connection, _pm5);
 
-      expect(error, isNull);
-      expect(link, isNotNull);
-      expect(connection.subscribed, Pm5Characteristics.subscribed.where((id) => id != '003d'));
-    });
+        expect(error, isNull);
+        expect(link, isNotNull);
+        expect(
+          connection.subscribed,
+          Pm5Characteristics.subscribed.where((id) => id != '003d'),
+        );
+      },
+    );
   });
 
   group('FTMS', () {
@@ -240,7 +316,8 @@ void main() {
     });
 
     test('stays connected when writing to the control point fails', () {
-      final connection = _ftmsConnection()..onWrite = (_, _) => throw StateError('write failed');
+      final connection = _ftmsConnection()
+        ..onWrite = (_, _) => throw StateError('write failed');
       final (link, _, warnings) = _setUp(connection, _ftms);
 
       expect(link, isNotNull);
@@ -251,7 +328,14 @@ void main() {
       final connection = _ftmsConnection(rowerData: false);
       final (_, error, _) = _setUp(connection, _ftms);
 
-      expect(error, isA<RowerConnectException>().having((e) => e.error, 'error', RowerConnectError.noRowerData));
+      expect(
+        error,
+        isA<RowerConnectException>().having(
+          (e) => e.error,
+          'error',
+          RowerConnectError.noRowerData,
+        ),
+      );
       expect((error! as RowerConnectException).notARower, isTrue);
       expect(connection.disconnected, isTrue);
     });
@@ -265,7 +349,10 @@ void main() {
       });
 
       expect(connection.disconnected, isTrue);
-      expect(connection.writes, isNot(anyOf(contains('2ad9:[1]'), contains('2ad9:[8]'))));
+      expect(
+        connection.writes,
+        isNot(anyOf(contains('2ad9:[1]'), contains('2ad9:[8]'))),
+      );
     });
 
     test('forwards only the rower data', () {
@@ -289,7 +376,11 @@ void main() {
       connection.onWrite = (id, bytes) {
         if (id != FtmsIds.controlPoint) return;
         final result = bytes.first == 0x04 ? results.removeAt(0) : 0x01;
-        if (result != null) scheduleMicrotask(() => connection.notify(id, [0x80, bytes.first, result]));
+        if (result != null) {
+          scheduleMicrotask(
+            () => connection.notify(id, [0x80, bytes.first, result]),
+          );
+        }
       };
     }
 
@@ -306,13 +397,25 @@ void main() {
       final connection = _ftmsConnection(resistance: true);
       final (link, _, warnings) = _setUp(connection, _ftms);
 
-      expect(link!.resistanceControl!.range, const ResistanceRange(min: 1, max: 15));
+      expect(
+        link!.resistanceControl!.range,
+        const ResistanceRange(min: 1, max: 15),
+      );
       expect(warnings, isEmpty);
     });
 
     test('offers nothing without the target setting', () {
       final connection = _ftmsConnection(resistance: true);
-      connection.values[FtmsIds.feature] = [0xa6, 0x56, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+      connection.values[FtmsIds.feature] = [
+        0xa6,
+        0x56,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+      ];
       final (link, _, _) = _setUp(connection, _ftms);
 
       expect(link!.resistanceControl, isNull);
@@ -320,19 +423,36 @@ void main() {
 
     test('offers nothing without level range or control point', () {
       expect(_setUp(_ftmsConnection(), _ftms).$1!.resistanceControl, isNull);
-      expect(_setUp(_ftmsConnection(resistance: true, controlPoint: false), _ftms).$1!.resistanceControl, isNull);
+      expect(
+        _setUp(
+          _ftmsConnection(resistance: true, controlPoint: false),
+          _ftms,
+        ).$1!.resistanceControl,
+        isNull,
+      );
     });
 
     test('offers nothing for a range that makes no sense', () {
       final connection = _ftmsConnection(resistance: true);
-      connection.values[FtmsIds.supportedResistanceLevelRange] = [0x0a, 0x00, 0x96, 0x00, 0x00, 0x00];
+      connection.values[FtmsIds.supportedResistanceLevelRange] = [
+        0x0a,
+        0x00,
+        0x96,
+        0x00,
+        0x00,
+        0x00,
+      ];
       final (link, _, warnings) = _setUp(connection, _ftms);
 
       expect(link!.resistanceControl, isNull);
       expect(warnings.single, contains('range'));
     });
 
-    test('a PM5 offers nothing', () => expect(_setUp(_pm5Connection(0), _pm5).$1!.resistanceControl, isNull));
+    test(
+      'a PM5 offers nothing',
+      () =>
+          expect(_setUp(_pm5Connection(0), _pm5).$1!.resistanceControl, isNull),
+    );
 
     test('sets level 6 as one byte in tenths', () {
       final connection = _ftmsConnection(resistance: true);
@@ -374,7 +494,11 @@ void main() {
 
       expect(setLevel(link!, 6), ResistanceResult.accepted);
       expect(setLevel(link, 7), ResistanceResult.accepted);
-      expect(connection.writes.skip(2), ['2ad9:[4, 60]', '2ad9:[4, 60, 0]', '2ad9:[4, 70, 0]']);
+      expect(connection.writes.skip(2), [
+        '2ad9:[4, 60]',
+        '2ad9:[4, 60, 0]',
+        '2ad9:[4, 70, 0]',
+      ]);
     });
 
     test('requests control again when it was taken', () {
@@ -383,7 +507,11 @@ void main() {
       answer(connection, [0x05, 0x01]);
 
       expect(setLevel(link!, 6), ResistanceResult.accepted);
-      expect(connection.writes.skip(2), ['2ad9:[4, 60]', '2ad9:[0]', '2ad9:[4, 60]']);
+      expect(connection.writes.skip(2), [
+        '2ad9:[4, 60]',
+        '2ad9:[0]',
+        '2ad9:[4, 60]',
+      ]);
     });
 
     test('sends one command after the other', () {
@@ -406,7 +534,8 @@ void main() {
       HeartRateLink? link;
       Object? error;
       fakeAsync((async) {
-        setUpHeartRateMonitor(connection).then<void>((l) => link = l, onError: (Object e) => error = e);
+        setUpHeartRateMonitor(connection)
+            .then<void>((l) => link = l, onError: (Object e) => error = e);
         async.flushMicrotasks();
       });
       return (link, error);
@@ -443,7 +572,11 @@ void main() {
       expect(link, isNull);
       expect(
         error,
-        isA<HeartRateConnectException>().having((e) => e.error, 'error', HeartRateConnectError.noHeartRateService),
+        isA<HeartRateConnectException>().having(
+          (e) => e.error,
+          'error',
+          HeartRateConnectError.noHeartRateService,
+        ),
       );
       expect(connection.disconnected, isTrue);
     });
@@ -453,7 +586,14 @@ void main() {
         ..onSubscribe = (_) => throw StateError('gatt error');
       final (_, error) = setUpStrap(connection);
 
-      expect(error, isA<HeartRateConnectException>().having((e) => e.error, 'error', HeartRateConnectError.failed));
+      expect(
+        error,
+        isA<HeartRateConnectException>().having(
+          (e) => e.error,
+          'error',
+          HeartRateConnectError.failed,
+        ),
+      );
       expect(connection.disconnected, isTrue);
     });
   });

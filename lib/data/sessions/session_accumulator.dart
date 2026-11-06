@@ -49,8 +49,13 @@ class SessionAccumulator {
     this.protocol = ErgProtocol.pm5,
     CourseDefinition? course,
     int? plannedLaps,
-  })  : _tracker = course == null ? null : LapTracker(course, plannedLaps: plannedLaps),
-        _decoder = ErgDecoder.forProtocol(protocol, onWarning: (message) => debugPrint('${protocol.name}: $message'));
+  }) : _tracker = course == null
+           ? null
+           : LapTracker(course, plannedLaps: plannedLaps),
+       _decoder = ErgDecoder.forProtocol(
+         protocol,
+         onWarning: (message) => debugPrint('${protocol.name}: $message'),
+       );
 
   final int sessionId;
 
@@ -73,9 +78,9 @@ class SessionAccumulator {
 
   /// Distance and session time (wall clock without pauses) since the session started.
   SessionProgress get progress => SessionProgress(
-        distanceMeters: _offset?.current.distanceMeters ?? 0,
-        elapsed: Duration(milliseconds: _pause.activeMs),
-      );
+    distanceMeters: _offset?.current.distanceMeters ?? 0,
+    elapsed: Duration(milliseconds: _pause.activeMs),
+  );
 
   /// Whether the session is paused because the rower stopped.
   bool get paused => _pause.paused;
@@ -93,12 +98,14 @@ class SessionAccumulator {
     final first = _firstPacketTime ??= packet.time;
     // The arrival times keep running while the PM5 pauses its clock (Design D1).
     _wallMs = (packet.time - first).inMilliseconds;
-    _rawPackets.add(RawPacketsCompanion.insert(
-      sessionId: sessionId,
-      tMs: _wallMs,
-      characteristicId: packet.characteristicId,
-      bytes: packet.bytes,
-    ));
+    _rawPackets.add(
+      RawPacketsCompanion.insert(
+        sessionId: sessionId,
+        tMs: _wallMs,
+        characteristicId: packet.characteristicId,
+        bytes: packet.bytes,
+      ),
+    );
     final events = _decoder.decode(packet);
     _pause.add(_wallMs, events);
     events.forEach(_onEvent);
@@ -118,14 +125,23 @@ class SessionAccumulator {
       samples: _samples,
       strokes: _strokes,
       rawPackets: _rawPackets,
-      laps: [for (final lap in tracker?.takeLaps() ?? const <LapResult>[]) lapCompanion(sessionId, lap)],
+      laps: [
+        for (final lap in tracker?.takeLaps() ?? const <LapResult>[])
+          lapCompanion(sessionId, lap),
+      ],
       lapSegments: [
-        for (final segment in tracker?.takeSegments() ?? const <SegmentResult>[]) segmentCompanion(sessionId, segment),
+        for (final segment
+            in tracker?.takeSegments() ?? const <SegmentResult>[])
+          segmentCompanion(sessionId, segment),
       ],
       rrIntervals: _rrIntervals,
       pauses: [
         for (final pause in _pause.takePauses())
-          PausesCompanion.insert(sessionId: sessionId, startWallMs: pause.startWallMs, endWallMs: pause.endWallMs),
+          PausesCompanion.insert(
+            sessionId: sessionId,
+            startWallMs: pause.startWallMs,
+            endWallMs: pause.endWallMs,
+          ),
       ],
     );
     _samples = [];
@@ -154,8 +170,14 @@ class SessionAccumulator {
 
   void _onTick(StatusTick tick) {
     lastTick = tick;
-    final offset = _offset ??= SessionOffset.start(deviceDistance: tick.distanceMeters, deviceElapsed: tick.elapsed);
-    final progress = offset.update(deviceDistance: tick.distanceMeters, deviceElapsed: tick.elapsed);
+    final offset = _offset ??= SessionOffset.start(
+      deviceDistance: tick.distanceMeters,
+      deviceElapsed: tick.elapsed,
+    );
+    final progress = offset.update(
+      deviceDistance: tick.distanceMeters,
+      deviceElapsed: tick.elapsed,
+    );
     _lastPm5Distance = tick.distanceMeters;
     _lastPm5Elapsed = tick.elapsed;
 
@@ -165,24 +187,33 @@ class SessionAccumulator {
     final paceCs = tick.pace == null ? null : tick.pace!.inMilliseconds ~/ 10;
     final tracker = _tracker;
     // The course runs on the session time, so it stands still in a pause.
-    tracker?.add(TrackPoint(wallMs: activeMs, distanceDm: distanceDm, paceCs: paceCs, strokeRate: tick.strokeRate));
+    tracker?.add(
+      TrackPoint(
+        wallMs: activeMs,
+        distanceDm: distanceDm,
+        paceCs: paceCs,
+        strokeRate: tick.strokeRate,
+      ),
+    );
     // While paused the PM5 repeats the same values; they add nothing to a
     // free session. On a course every value is kept, so the recovery feeds
     // the laps the same points (Design D2).
     if (tracker == null && _lastSample == (tMs, distanceDm, activeMs)) return;
     _lastSample = (tMs, distanceDm, activeMs);
-    _samples.add(SamplesCompanion.insert(
-      sessionId: sessionId,
-      tMs: tMs,
-      distanceDm: distanceDm,
-      paceCs: Value(paceCs),
-      watts: Value(tick.watts),
-      strokeRate: Value(tick.strokeRate),
-      heartRate: Value(tick.heartRate),
-      calories: Value(tick.calories),
-      wallMs: Value(_wallMs),
-      activeMs: Value(activeMs),
-    ));
+    _samples.add(
+      SamplesCompanion.insert(
+        sessionId: sessionId,
+        tMs: tMs,
+        distanceDm: distanceDm,
+        paceCs: Value(paceCs),
+        watts: Value(tick.watts),
+        strokeRate: Value(tick.strokeRate),
+        heartRate: Value(tick.heartRate),
+        calories: Value(tick.calories),
+        wallMs: Value(_wallMs),
+        activeMs: Value(activeMs),
+      ),
+    );
   }
 
   /// Stores each interval at the time it ended (Design D4), on the wall-clock
@@ -191,11 +222,13 @@ class SessionAccumulator {
   void _onHeartBeats(HeartBeatIntervals beats) {
     final first = _firstPacketTime!;
     for (final (i, end) in beats.intervalEnds.indexed) {
-      _rrIntervals.add(RrIntervalsCompanion.insert(
-        sessionId: sessionId,
-        tMs: (end - first).inMilliseconds,
-        rrMs: beats.intervalsMs[i],
-      ));
+      _rrIntervals.add(
+        RrIntervalsCompanion.insert(
+          sessionId: sessionId,
+          tMs: (end - first).inMilliseconds,
+          rrMs: beats.intervalsMs[i],
+        ),
+      );
     }
   }
 
@@ -205,22 +238,27 @@ class SessionAccumulator {
     final dt = stroke.elapsed - _lastPm5Elapsed;
     final dd = stroke.distanceMeters - _lastPm5Distance;
     final progress = _offset!.current;
-    _strokes.add(StrokesCompanion.insert(
-      sessionId: sessionId,
-      tMs: (progress.elapsed + (dt.isNegative ? Duration.zero : dt)).inMilliseconds,
-      distanceDm: ((progress.distanceMeters + (dd < 0 ? 0 : dd)) * 10).round(),
-      strokeNumber: stroke.strokeNumber,
-      driveLengthMeters: Value(stroke.driveLengthMeters),
-      driveTimeMs: Value(stroke.driveTime?.inMilliseconds),
-      recoveryTimeMs: Value(stroke.recoveryTime?.inMilliseconds),
-      peakForceNewtons: Value(stroke.peakForceNewtons),
-      averageForceNewtons: Value(stroke.averageForceNewtons),
-      watts: Value(stroke.watts),
-    ));
+    _strokes.add(
+      StrokesCompanion.insert(
+        sessionId: sessionId,
+        tMs: (progress.elapsed + (dt.isNegative ? Duration.zero : dt))
+            .inMilliseconds,
+        distanceDm: ((progress.distanceMeters + (dd < 0 ? 0 : dd)) * 10)
+            .round(),
+        strokeNumber: stroke.strokeNumber,
+        driveLengthMeters: Value(stroke.driveLengthMeters),
+        driveTimeMs: Value(stroke.driveTime?.inMilliseconds),
+        recoveryTimeMs: Value(stroke.recoveryTime?.inMilliseconds),
+        peakForceNewtons: Value(stroke.peakForceNewtons),
+        averageForceNewtons: Value(stroke.averageForceNewtons),
+        watts: Value(stroke.watts),
+      ),
+    );
   }
 }
 
-LapsCompanion lapCompanion(int sessionId, LapResult lap) => LapsCompanion.insert(
+LapsCompanion lapCompanion(int sessionId, LapResult lap) =>
+    LapsCompanion.insert(
       sessionId: sessionId,
       lapNo: lap.lap,
       startWallMs: lap.startWallMs,
@@ -231,7 +269,8 @@ LapsCompanion lapCompanion(int sessionId, LapResult lap) => LapsCompanion.insert
       inZoneShare: Value(lap.inZoneShare),
     );
 
-LapSegmentsCompanion segmentCompanion(int sessionId, SegmentResult segment) => LapSegmentsCompanion.insert(
+LapSegmentsCompanion segmentCompanion(int sessionId, SegmentResult segment) =>
+    LapSegmentsCompanion.insert(
       sessionId: sessionId,
       lapNo: segment.lap,
       position: segment.position,

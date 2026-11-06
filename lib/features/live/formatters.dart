@@ -9,8 +9,9 @@ import '../../l10n/l10n.dart';
 const _noValue = '–';
 
 /// The average pace per 500 m over [meters] in [elapsed]; null before the first metre.
-Duration? averagePace(double meters, Duration elapsed) =>
-    meters < 1 ? null : Duration(milliseconds: (elapsed.inMilliseconds * 500 / meters).round());
+Duration? averagePace(double meters, Duration elapsed) => meters < 1
+    ? null
+    : Duration(milliseconds: (elapsed.inMilliseconds * 500 / meters).round());
 
 /// Pace per 500 m in whole seconds, e.g. `2:05`.
 String formatPace(Duration? pace) {
@@ -25,7 +26,9 @@ String formatElapsed(Duration elapsed) {
   final hours = totalSeconds ~/ 3600;
   final minutes = totalSeconds % 3600 ~/ 60;
   final seconds = totalSeconds % 60;
-  return hours > 0 ? '$hours:${_two(minutes)}:${_two(seconds)}' : '$minutes:${_two(seconds)}';
+  return hours > 0
+      ? '$hours:${_two(minutes)}:${_two(seconds)}'
+      : '$minutes:${_two(seconds)}';
 }
 
 /// A lap time with tenths, e.g. `3:59.4` or `1:02:03.4`.
@@ -38,7 +41,10 @@ String formatLapTime(Duration time) {
 String formatDistance(double meters) => meters.floor().toString();
 
 /// Whole numbers with thousands separated by a no-break space, as in the canvas, e.g. `3 021`.
-String formatGrouped(int value) => value.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+$)'), (_) => '\u00A0');
+String formatGrouped(int value) => value.toString().replaceAllMapped(
+  RegExp(r'\B(?=(\d{3})+$)'),
+  (_) => '\u00A0',
+);
 
 /// Whole numbers like watts or strokes per minute; a dash when unknown.
 String formatWhole(int? value) => value?.toString() ?? _noValue;
@@ -52,12 +58,16 @@ String formatRrInterval(int milliseconds) => '$milliseconds ms';
 
 /// Average stroke rate with one decimal, e.g. `22,5` in German, `22.5` in English.
 String formatStrokeRate(AppLocalizations l10n, double? strokeRate) =>
-    strokeRate == null ? _noValue : NumberFormat('0.0', l10n.localeName).format(strokeRate);
+    strokeRate == null
+    ? _noValue
+    : NumberFormat('0.0', l10n.localeName).format(strokeRate);
 
 /// A drive length in whole centimeters, e.g. `106 cm`;
 /// null without a length or for 0, so that nothing is shown instead of "0 cm".
 String? formatDriveLength(AppLocalizations l10n, double? meters) =>
-    meters == null || meters <= 0 ? null : '${NumberFormat('0', l10n.localeName).format(meters * 100)} cm';
+    meters == null || meters <= 0
+    ? null
+    : '${NumberFormat('0', l10n.localeName).format(meters * 100)} cm';
 
 /// Local date and time, e.g. `15.10.2026, 18:30` in German, `Oct 15, 2026, 18:30` in English.
 String formatDateTime(AppLocalizations l10n, DateTime time) =>

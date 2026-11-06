@@ -92,17 +92,29 @@ class OarStepper extends StatelessWidget {
           border: large ? null : Border.all(color: AppColors.line),
         ),
         child: Padding(
-          padding: large ? const EdgeInsets.symmetric(horizontal: 16, vertical: 6) : const EdgeInsets.all(4),
+          padding: large
+              ? const EdgeInsets.symmetric(horizontal: 16, vertical: 6)
+              : const EdgeInsets.all(4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              OarBladeButton(up: false, size: size.button, label: l10n.oarStepperLess(stepLabel), onStep: decrease),
+              OarBladeButton(
+                up: false,
+                size: size.button,
+                label: l10n.oarStepperLess(stepLabel),
+                onStep: decrease,
+              ),
               Flexible(
                 child: ExcludeSemantics(
                   child: FittedBox(fit: BoxFit.scaleDown, child: _display()),
                 ),
               ),
-              OarBladeButton(up: true, size: size.button, label: l10n.oarStepperMore(stepLabel), onStep: increase),
+              OarBladeButton(
+                up: true,
+                size: size.button,
+                label: l10n.oarStepperMore(stepLabel),
+                onStep: increase,
+              ),
             ],
           ),
         ),
@@ -123,18 +135,25 @@ class OarStepper extends StatelessWidget {
     );
     final unit = this.unit;
     if (unit == null) return value;
-    final unitText = Text(unit, style: TextStyle(fontSize: size.unitFontSize, height: 1, color: AppColors.textMuted));
+    final unitText = Text(
+      unit,
+      style: TextStyle(
+        fontSize: size.unitFontSize,
+        height: 1,
+        color: AppColors.textMuted,
+      ),
+    );
     return switch (size) {
       OarStepperSize.large => Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [value, const SizedBox(width: 6), unitText],
-        ),
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [value, const SizedBox(width: 6), unitText],
+      ),
       OarStepperSize.compact => Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [value, const SizedBox(height: 2), unitText],
-        ),
+        mainAxisSize: MainAxisSize.min,
+        children: [value, const SizedBox(height: 2), unitText],
+      ),
     };
   }
 }
@@ -147,7 +166,13 @@ const _fastInterval = Duration(milliseconds: 50);
 /// One oar blade button: up adds, down takes away; disabled without
 /// [onStep]. Holding it repeats the step.
 class OarBladeButton extends StatefulWidget {
-  const OarBladeButton({super.key, required this.up, required this.size, required this.label, required this.onStep});
+  const OarBladeButton({
+    super.key,
+    required this.up,
+    required this.size,
+    required this.label,
+    required this.onStep,
+  });
 
   final bool up;
   final Size size;
@@ -232,7 +257,10 @@ class _OarBladeButtonState extends State<OarBladeButton> {
           opacity: enabled ? 1 : 0.35,
           child: RotatedBox(
             quarterTurns: widget.up ? 0 : 2,
-            child: CustomPaint(size: widget.size, painter: _OarBladePainter(pressed: _pressed && enabled)),
+            child: CustomPaint(
+              size: widget.size,
+              painter: _OarBladePainter(pressed: _pressed && enabled),
+            ),
           ),
         ),
       ),
@@ -269,7 +297,10 @@ class _OarBladePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.scale(size.width / 56, size.height / 60);
-    canvas.drawPath(_blade, Paint()..color = pressed ? _bladePressed : AppColors.line);
+    canvas.drawPath(
+      _blade,
+      Paint()..color = pressed ? _bladePressed : AppColors.line,
+    );
     canvas.drawPath(
       _blade,
       Paint()
@@ -290,5 +321,6 @@ class _OarBladePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_OarBladePainter oldDelegate) => oldDelegate.pressed != pressed;
+  bool shouldRepaint(_OarBladePainter oldDelegate) =>
+      oldDelegate.pressed != pressed;
 }

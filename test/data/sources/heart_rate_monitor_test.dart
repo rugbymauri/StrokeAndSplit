@@ -18,9 +18,19 @@ import '../../support/fake_erg_source.dart';
 import '../../support/fake_heart_rate_transport.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
-const _h10 = FoundHeartRateMonitor(id: 'A0:9E:1A:12:34:56', name: 'Polar H10 1A2B3C4D');
-const _tickr = FoundHeartRateMonitor(id: 'C1:11:22:33:44:55', name: 'TICKR 1234');
+const _ftms = FoundRower(
+  id: 'AA:BB:CC:DD:EE:FF',
+  name: 'Stroke & Split FTMS',
+  protocol: ErgProtocol.ftms,
+);
+const _h10 = FoundHeartRateMonitor(
+  id: 'A0:9E:1A:12:34:56',
+  name: 'Polar H10 1A2B3C4D',
+);
+const _tickr = FoundHeartRateMonitor(
+  id: 'C1:11:22:33:44:55',
+  name: 'TICKR 1234',
+);
 
 class _RowerLink implements RowerLink {
   @override
@@ -59,10 +69,14 @@ class _RowerTransport implements BleTransport {
   Future<BluetoothReadiness> readiness() async => BluetoothReadiness.ready;
 
   @override
-  Stream<List<FoundRower>> scan({Duration timeout = Duration.zero}) => const Stream.empty();
+  Stream<List<FoundRower>> scan({Duration timeout = Duration.zero}) =>
+      const Stream.empty();
 }
 
-const _busy = HeartRateConnectException(HeartRateConnectError.failed, message: 'busy');
+const _busy = HeartRateConnectException(
+  HeartRateConnectError.failed,
+  message: 'busy',
+);
 
 void main() {
   late _RowerTransport rowers;
@@ -73,7 +87,9 @@ void main() {
   setUp(() {
     rowers = _RowerTransport();
     straps = FakeHeartRateTransport();
-    container = ProviderContainer(overrides: [heartRateTransportProvider.overrideWithValue(straps)]);
+    container = ProviderContainer(
+      overrides: [heartRateTransportProvider.overrideWithValue(straps)],
+    );
     addTearDown(container.dispose);
     states = [];
   });
@@ -83,7 +99,11 @@ void main() {
 
   /// Watches the strap like the screens do, so the provider stays alive.
   void watch(FakeAsync async) {
-    container.listen(heartRateMonitorProvider, (_, next) => states.add(next), fireImmediately: true);
+    container.listen(
+      heartRateMonitorProvider,
+      (_, next) => states.add(next),
+      fireImmediately: true,
+    );
     async.elapse(Duration.zero);
   }
 
@@ -114,32 +134,38 @@ void main() {
       watch(async);
       pair(async, _h10);
 
-      expect((state().phase, state().monitor), (HeartRateMonitorPhase.ready, _h10));
+      expect(
+        (state().phase, state().monitor),
+        (HeartRateMonitorPhase.ready, _h10),
+      );
       expect(straps.attempts, isEmpty);
     });
   });
 
   for (final device in [_pm5, _ftms]) {
-    test('connects the strap once the ${device.protocol.name} rower is connected and feeds it in', () {
-      fakeAsync((async) {
-        pair(async, _h10);
-        watch(async);
-        final source = row(async, device);
-        final packets = <RawPacket>[];
-        source.packets.listen(packets.add);
+    test(
+      'connects the strap once the ${device.protocol.name} rower is connected and feeds it in',
+      () {
+        fakeAsync((async) {
+          pair(async, _h10);
+          watch(async);
+          final source = row(async, device);
+          final packets = <RawPacket>[];
+          source.packets.listen(packets.add);
 
-        straps.links.single.notify([0x00, 72]);
-        async.elapse(Duration.zero);
+          straps.links.single.notify([0x00, 72]);
+          async.elapse(Duration.zero);
 
-        expect(phases(), [
-          HeartRateMonitorPhase.ready,
-          HeartRateMonitorPhase.connecting,
-          HeartRateMonitorPhase.connected,
-        ]);
-        expect(straps.attempts, [_h10]);
-        expect(packets.single.characteristicId, HeartRateIds.measurement);
-      });
-    });
+          expect(phases(), [
+            HeartRateMonitorPhase.ready,
+            HeartRateMonitorPhase.connecting,
+            HeartRateMonitorPhase.connected,
+          ]);
+          expect(straps.attempts, [_h10]);
+          expect(packets.single.characteristicId, HeartRateIds.measurement);
+        });
+      },
+    );
   }
 
   test('connects a strap paired while the rower is already connected', () {
@@ -157,7 +183,9 @@ void main() {
       fakeAsync((async) {
         pair(async, _h10);
         watch(async);
-        container.read(activeErgSourceProvider.notifier).use(FakeErgSource(kind: kind));
+        container
+            .read(activeErgSourceProvider.notifier)
+            .use(FakeErgSource(kind: kind));
         async.elapse(const Duration(seconds: 5));
 
         expect(state().phase, HeartRateMonitorPhase.ready);
@@ -179,13 +207,19 @@ void main() {
       expect(rowers.links.single.disconnected, isFalse);
 
       async.elapse(const Duration(minutes: 1));
-      expect(straps.attempts, hasLength(1), reason: 'a failed strap is only tried again on request');
+      expect(
+        straps.attempts,
+        hasLength(1),
+        reason: 'a failed strap is only tried again on request',
+      );
     });
   });
 
   test('reports a device without heart rate service', () {
     fakeAsync((async) {
-      straps.connectError = const HeartRateConnectException(HeartRateConnectError.noHeartRateService);
+      straps.connectError = const HeartRateConnectException(
+        HeartRateConnectError.noHeartRateService,
+      );
       pair(async, _h10);
       watch(async);
       row(async);
@@ -205,7 +239,14 @@ void main() {
       container.read(heartRateMonitorProvider.notifier).retry();
       async.elapse(Duration.zero);
 
-      expect(state(), isA<HeartRateMonitorState>().having((s) => s.failure, 'failure', isNull));
+      expect(
+        state(),
+        isA<HeartRateMonitorState>().having(
+          (s) => s.failure,
+          'failure',
+          isNull,
+        ),
+      );
       expect(state().phase, HeartRateMonitorPhase.connected);
       expect(straps.attempts, hasLength(2));
     });
@@ -304,7 +345,9 @@ void main() {
       first.packets.listen(packets.add);
       final strap = straps.links.single;
 
-      container.read(activeErgSourceProvider.notifier).use(FakeErgSource(kind: ErgSourceKind.simulator));
+      container
+          .read(activeErgSourceProvider.notifier)
+          .use(FakeErgSource(kind: ErgSourceKind.simulator));
       async.elapse(Duration.zero);
       strap.notify([0x00, 72]);
       async.elapse(Duration.zero);
@@ -339,7 +382,10 @@ void main() {
 
       expect(straps.links.first.disconnected, isTrue);
       expect(straps.links.last.monitor, _tickr);
-      expect((state().phase, state().monitor), (HeartRateMonitorPhase.connected, _tickr));
+      expect(
+        (state().phase, state().monitor),
+        (HeartRateMonitorPhase.connected, _tickr),
+      );
     });
   });
 

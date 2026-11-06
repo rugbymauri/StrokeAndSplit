@@ -32,7 +32,9 @@ class _StrokeSplitAppState extends ConsumerState<StrokeSplitApp> {
     final health = ref.read(healthPlatformProvider);
     _privacyRequests = health.privacyRequests.listen((_) => _showPrivacy());
     health.openedForPrivacy().then((opened) {
-      if (opened) WidgetsBinding.instance.addPostFrameCallback((_) => _showPrivacy());
+      if (opened) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _showPrivacy());
+      }
     }, onError: (Object _) {});
   }
 
@@ -42,8 +44,9 @@ class _StrokeSplitAppState extends ConsumerState<StrokeSplitApp> {
     super.dispose();
   }
 
-  void _showPrivacy() =>
-      _navigator.currentState?.push(MaterialPageRoute<void>(builder: (_) => const HealthPrivacyScreen()));
+  void _showPrivacy() => _navigator.currentState?.push(
+    MaterialPageRoute<void>(builder: (_) => const HealthPrivacyScreen()),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +59,12 @@ class _StrokeSplitAppState extends ConsumerState<StrokeSplitApp> {
       if (failure == null || messenger == null) return;
       ref.read(healthExportFailureProvider.notifier).clear();
       final l10n = lookupAppLocalizations(ref.read(appLanguageProvider).locale);
-      showHealthFailure(messenger, l10n, failure.reason, grant: ref.read(healthExportEnabledProvider.notifier).enable);
+      showHealthFailure(
+        messenger,
+        l10n,
+        failure.reason,
+        grant: ref.read(healthExportEnabledProvider.notifier).enable,
+      );
     });
     return MaterialApp(
       scaffoldMessengerKey: _messenger,

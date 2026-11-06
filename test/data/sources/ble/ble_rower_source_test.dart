@@ -12,14 +12,19 @@ import 'package:erg_protocol/erg_protocol.dart';
 import '../../../support/fake_heart_rate_transport.dart';
 
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
-const _ftms = FoundRower(id: 'AA:BB:CC:DD:EE:FF', name: 'Stroke & Split FTMS', protocol: ErgProtocol.ftms);
+const _ftms = FoundRower(
+  id: 'AA:BB:CC:DD:EE:FF',
+  name: 'Stroke & Split FTMS',
+  protocol: ErgProtocol.ftms,
+);
 
 class _FakeControl implements ResistanceControl {
   @override
   ResistanceRange get range => const ResistanceRange(min: 1, max: 15);
 
   @override
-  Future<ResistanceResult> setLevel(int level) async => ResistanceResult.accepted;
+  Future<ResistanceResult> setLevel(int level) async =>
+      ResistanceResult.accepted;
 }
 
 class _FakeLink implements RowerLink {
@@ -53,7 +58,12 @@ class _FakeTransport implements BleTransport {
   @override
   Future<RowerLink> connect(FoundRower device) async {
     connectAttempts++;
-    if (!reachable) throw const RowerConnectException(RowerConnectError.failed, message: 'not reachable');
+    if (!reachable) {
+      throw const RowerConnectException(
+        RowerConnectError.failed,
+        message: 'not reachable',
+      );
+    }
     final link = _FakeLink();
     links.add(link);
     return link;
@@ -63,7 +73,8 @@ class _FakeTransport implements BleTransport {
   Future<BluetoothReadiness> readiness() async => BluetoothReadiness.ready;
 
   @override
-  Stream<List<FoundRower>> scan({Duration timeout = Duration.zero}) => const Stream.empty();
+  Stream<List<FoundRower>> scan({Duration timeout = Duration.zero}) =>
+      const Stream.empty();
 }
 
 void main() {
@@ -83,7 +94,10 @@ void main() {
       source.start();
       async.flushMicrotasks();
 
-      expect(states, [ErgConnectionState.connecting, ErgConnectionState.connected]);
+      expect(states, [
+        ErgConnectionState.connecting,
+        ErgConnectionState.connected,
+      ]);
       expect(source.name, 'PM5 430000001 Row');
       expect(source.kind, ErgSourceKind.pm5);
     });
@@ -97,7 +111,10 @@ void main() {
       async.flushMicrotasks();
 
       expect(error, isA<RowerConnectException>());
-      expect(states, [ErgConnectionState.connecting, ErgConnectionState.disconnected]);
+      expect(states, [
+        ErgConnectionState.connecting,
+        ErgConnectionState.disconnected,
+      ]);
     });
   });
 
@@ -151,12 +168,19 @@ void main() {
       transport.reachable = false;
       transport.links.single.drop();
       async.elapse(const Duration(seconds: 1));
-      expect(source.resistanceControl, isNull, reason: 'none while reconnecting');
+      expect(
+        source.resistanceControl,
+        isNull,
+        reason: 'none while reconnecting',
+      );
       transport.reachable = true;
       async.elapse(const Duration(seconds: 3));
 
       expect(source.connectionState, ErgConnectionState.connected);
-      expect(source.resistanceControl, same(transport.links.last.resistanceControl));
+      expect(
+        source.resistanceControl,
+        same(transport.links.last.resistanceControl),
+      );
       expect(source.resistanceControl, isNot(same(first)));
     });
   });
@@ -242,7 +266,10 @@ void main() {
     });
 
     test('is an FTMS source', () {
-      expect((ftms.kind, ftms.protocol, ftms.name), (ErgSourceKind.ftms, ErgProtocol.ftms, 'Stroke & Split FTMS'));
+      expect(
+        (ftms.kind, ftms.protocol, ftms.name),
+        (ErgSourceKind.ftms, ErgProtocol.ftms, 'Stroke & Split FTMS'),
+      );
     });
 
     test('reconnects without user action after a short drop', () {
@@ -286,43 +313,59 @@ void main() {
   });
 
   group('with a heart rate strap', () {
-    const strap = FoundHeartRateMonitor(id: 'A0:9E:1A:12:34:56', name: 'Polar H10 1A2B3C4D');
+    const strap = FoundHeartRateMonitor(
+      id: 'A0:9E:1A:12:34:56',
+      name: 'Polar H10 1A2B3C4D',
+    );
     late FakeHeartRateTransport straps;
 
     setUp(() => straps = FakeHeartRateTransport());
 
     /// Starts [rower], attaches a strap after 1 s and returns its link and
     /// the packets of the source.
-    (FakeHeartRateLink, List<RawPacket>) startWithStrap(FakeAsync async, BleRowerSource rower) {
+    (FakeHeartRateLink, List<RawPacket>) startWithStrap(
+      FakeAsync async,
+      BleRowerSource rower,
+    ) {
       final packets = <RawPacket>[];
       rower.packets.listen(packets.add);
       rower.start();
       async.elapse(const Duration(seconds: 1));
-      straps.connectHeartRateMonitor(strap).then((link) => rower.attachHeartRate(link.notifications));
+      straps
+          .connectHeartRateMonitor(strap)
+          .then((link) => rower.attachHeartRate(link.notifications));
       async.flushMicrotasks();
       return (straps.links.single, packets);
     }
 
     for (final device in [_pm5, _ftms]) {
-      test('puts strap packets on the time line of the ${device.protocol.name} rower', () {
-        fakeAsync((async) {
-          final rower = BleRowerSource(transport: transport, device: device);
-          final (strapLink, packets) = startWithStrap(async, rower);
-          final rowerId = device.protocol == ErgProtocol.pm5 ? '0031' : '2ad1';
+      test(
+        'puts strap packets on the time line of the ${device.protocol.name} rower',
+        () {
+          fakeAsync((async) {
+            final rower = BleRowerSource(transport: transport, device: device);
+            final (strapLink, packets) = startWithStrap(async, rower);
+            final rowerId = device.protocol == ErgProtocol.pm5
+                ? '0031'
+                : '2ad1';
 
-          async.elapse(const Duration(milliseconds: 500));
-          transport.links.single.notify(rowerId, [1]);
-          async.elapse(const Duration(milliseconds: 250));
-          strapLink.notify([0x00, 72]);
-          async.flushMicrotasks();
+            async.elapse(const Duration(milliseconds: 500));
+            transport.links.single.notify(rowerId, [1]);
+            async.elapse(const Duration(milliseconds: 250));
+            strapLink.notify([0x00, 72]);
+            async.flushMicrotasks();
 
-          expect([for (final p in packets) (p.characteristicId, p.time)], [
-            (rowerId, const Duration(milliseconds: 1500)),
-            ('2a37', const Duration(milliseconds: 1750)),
-          ]);
-          expect(packets.last.bytes, [0x00, 72]);
-        });
-      });
+            expect(
+              [for (final p in packets) (p.characteristicId, p.time)],
+              [
+                (rowerId, const Duration(milliseconds: 1500)),
+                ('2a37', const Duration(milliseconds: 1750)),
+              ],
+            );
+            expect(packets.last.bytes, [0x00, 72]);
+          });
+        },
+      );
     }
 
     test('keeps the strap while the rower reconnects', () {
@@ -340,10 +383,13 @@ void main() {
 
         expect(source.connectionState, ErgConnectionState.connected);
         expect(transport.links, hasLength(2));
-        expect([for (final p in packets) (p.characteristicId, p.bytes[1], p.time)], [
-          ('2a37', 70, const Duration(seconds: 3)),
-          ('2a37', 71, const Duration(seconds: 6)),
-        ]);
+        expect(
+          [for (final p in packets) (p.characteristicId, p.bytes[1], p.time)],
+          [
+            ('2a37', 70, const Duration(seconds: 3)),
+            ('2a37', 71, const Duration(seconds: 6)),
+          ],
+        );
         expect(strapLink.disconnected, isFalse);
       });
     });
@@ -363,7 +409,9 @@ void main() {
     test('forwards only the strap attached last', () {
       fakeAsync((async) {
         final (first, packets) = startWithStrap(async, source);
-        straps.connectHeartRateMonitor(strap).then((link) => source.attachHeartRate(link.notifications));
+        straps
+            .connectHeartRateMonitor(strap)
+            .then((link) => source.attachHeartRate(link.notifications));
         async.flushMicrotasks();
 
         first.notify([0x00, 60]);

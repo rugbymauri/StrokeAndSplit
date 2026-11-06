@@ -14,8 +14,16 @@ abstract final class LiveTextStyles {
   );
 
   /// The name of a tile above its value, e.g. "Watt", or the title of the force curve.
-  static const caption = TextStyle(fontFamily: AppFonts.text, fontSize: 11, color: AppColors.textMuted);
+  static const caption = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 11,
+    color: AppColors.textMuted,
+  );
 
   /// The name of a small tile in a row of four.
-  static const captionCompact = TextStyle(fontFamily: AppFonts.text, fontSize: 10, color: AppColors.textMuted);
+  static const captionCompact = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 10,
+    color: AppColors.textMuted,
+  );
 }

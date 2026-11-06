@@ -13,7 +13,9 @@ const fontLicenses = {
 void registerFontLicenses() {
   LicenseRegistry.addLicense(() async* {
     for (final MapEntry(key: family, value: asset) in fontLicenses.entries) {
-      yield LicenseEntryWithLineBreaks([family], await rootBundle.loadString(asset));
+      yield LicenseEntryWithLineBreaks([
+        family,
+      ], await rootBundle.loadString(asset));
     }
   });
 }

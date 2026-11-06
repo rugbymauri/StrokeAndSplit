@@ -22,8 +22,7 @@ BluetoothReadiness? readinessForScanError(Object error) {
     PlatformException(:final message) => message,
     FlutterBluePlusException(:final description) => description,
     _ => null,
-  }
-      ?.toLowerCase();
+  }?.toLowerCase();
   if (message == null) return null;
   if (message.contains('permission')) return BluetoothReadiness.unauthorized;
   if (message.contains('must be turned on')) return BluetoothReadiness.off;
@@ -40,10 +39,15 @@ class FlutterBluePlusTransport implements BleTransport, HeartRateTransport {
 
   @override
   Future<BluetoothReadiness> readiness() async {
-    if (!await FlutterBluePlus.isSupported) return BluetoothReadiness.unsupported;
+    if (!await FlutterBluePlus.isSupported) {
+      return BluetoothReadiness.unsupported;
+    }
     final state = await FlutterBluePlus.adapterState
         .firstWhere((s) => s != BluetoothAdapterState.unknown)
-        .timeout(const Duration(seconds: 3), onTimeout: () => BluetoothAdapterState.unknown);
+        .timeout(
+          const Duration(seconds: 3),
+          onTimeout: () => BluetoothAdapterState.unknown,
+        );
     return switch (state) {
       BluetoothAdapterState.on => BluetoothReadiness.ready,
       BluetoothAdapterState.unauthorized => BluetoothReadiness.unauthorized,
@@ -53,24 +57,27 @@ class FlutterBluePlusTransport implements BleTransport, HeartRateTransport {
   }
 
   @override
-  Stream<List<FoundRower>> scan({Duration timeout = const Duration(seconds: 15)}) => _scan(
-        timeout: timeout,
-        // No platform filter: Android cannot combine the PM5 keyword with the
-        // FTMS service, and Linux ignores filters; [rowerFromAdvertisement]
-        // filters on all platforms.
-        withServices: const [],
-        cachedServices: [_rowingService, _ftmsService],
-        recognise: rowerFromAdvertisement,
-      );
+  Stream<List<FoundRower>> scan({
+    Duration timeout = const Duration(seconds: 15),
+  }) => _scan(
+    timeout: timeout,
+    // No platform filter: Android cannot combine the PM5 keyword with the
+    // FTMS service, and Linux ignores filters; [rowerFromAdvertisement]
+    // filters on all platforms.
+    withServices: const [],
+    cachedServices: [_rowingService, _ftmsService],
+    recognise: rowerFromAdvertisement,
+  );
 
   @override
-  Stream<List<FoundHeartRateMonitor>> scanHeartRateMonitors({Duration timeout = const Duration(seconds: 15)}) =>
-      _scan(
-        timeout: timeout,
-        withServices: [_heartRateService],
-        cachedServices: [_heartRateService],
-        recognise: heartRateMonitorFromAdvertisement,
-      );
+  Stream<List<FoundHeartRateMonitor>> scanHeartRateMonitors({
+    Duration timeout = const Duration(seconds: 15),
+  }) => _scan(
+    timeout: timeout,
+    withServices: [_heartRateService],
+    cachedServices: [_heartRateService],
+    recognise: heartRateMonitorFromAdvertisement,
+  );
 
   /// Scans for the devices [recognise] accepts and emits the growing list.
   Stream<List<T>> _scan<T extends Object>({
@@ -82,10 +89,13 @@ class FlutterBluePlusTransport implements BleTransport, HeartRateTransport {
       required String name,
       Iterable<String> serviceIds,
       Map<String, List<int>> serviceData,
-    }) recognise,
+    })
+    recognise,
   }) async* {
     final readiness = await this.readiness();
-    if (readiness != BluetoothReadiness.ready) throw BluetoothNotReadyException(readiness);
+    if (readiness != BluetoothReadiness.ready) {
+      throw BluetoothNotReadyException(readiness);
+    }
 
     final found = <T>{};
     final updates = StreamController<List<T>>();
@@ -95,16 +105,32 @@ class FlutterBluePlusTransport implements BleTransport, HeartRateTransport {
       if (found.length != before) updates.add(found.toList());
     }
 
-    final results = FlutterBluePlus.scanResults.listen((results) => add(results.map((r) => recognise(
-          id: r.device.remoteId.str,
-          name: r.device.platformName.isNotEmpty ? r.device.platformName : r.advertisementData.advName,
-          serviceIds: [for (final uuid in r.advertisementData.serviceUuids) uuid.str.toLowerCase()],
-          serviceData: {
-            for (final MapEntry(:key, :value) in r.advertisementData.serviceData.entries) key.str.toLowerCase(): value,
-          },
-        ))));
+    final results = FlutterBluePlus.scanResults.listen(
+      (results) => add(
+        results.map(
+          (r) => recognise(
+            id: r.device.remoteId.str,
+            name: r.device.platformName.isNotEmpty
+                ? r.device.platformName
+                : r.advertisementData.advName,
+            serviceIds: [
+              for (final uuid in r.advertisementData.serviceUuids)
+                uuid.str.toLowerCase(),
+            ],
+            serviceData: {
+              for (final MapEntry(:key, :value)
+                  in r.advertisementData.serviceData.entries)
+                key.str.toLowerCase(): value,
+            },
+          ),
+        ),
+      ),
+    );
     try {
-      await FlutterBluePlus.startScan(withServices: withServices, timeout: timeout);
+      await FlutterBluePlus.startScan(
+        withServices: withServices,
+        timeout: timeout,
+      );
     } on Exception catch (e) {
       await results.cancel();
       final readiness = readinessForScanError(e);
@@ -117,17 +143,27 @@ class FlutterBluePlusTransport implements BleTransport, HeartRateTransport {
     // and a strap by the service it was asked for.
     if (Platform.isLinux) {
       final cached = await FlutterBluePlus.systemDevices(cachedServices);
-      add(cached.map((d) => recognise(
+      add(
+        cached.map(
+          (d) => recognise(
             id: d.remoteId.str,
             name: d.platformName,
-            serviceIds: [for (final uuid in withServices) uuid.str.toLowerCase()],
-          )));
+            serviceIds: [
+              for (final uuid in withServices) uuid.str.toLowerCase(),
+            ],
+          ),
+        ),
+      );
     }
 
-    unawaited(FlutterBluePlus.isScanning.firstWhere((scanning) => !scanning).then((_) async {
-      await results.cancel();
-      await updates.close();
-    }));
+    unawaited(
+      FlutterBluePlus.isScanning.firstWhere((scanning) => !scanning).then((
+        _,
+      ) async {
+        await results.cancel();
+        await updates.close();
+      }),
+    );
     yield* updates.stream;
   }
 
@@ -139,16 +175,25 @@ class FlutterBluePlusTransport implements BleTransport, HeartRateTransport {
     } catch (e) {
       throw RowerConnectException(RowerConnectError.failed, message: '$e');
     }
-    return setUpRower(connection, found, onWarning: (message) => debugPrint('${found.protocol.name}: $message'));
+    return setUpRower(
+      connection,
+      found,
+      onWarning: (message) => debugPrint('${found.protocol.name}: $message'),
+    );
   }
 
   @override
-  Future<HeartRateLink> connectHeartRateMonitor(FoundHeartRateMonitor monitor) async {
+  Future<HeartRateLink> connectHeartRateMonitor(
+    FoundHeartRateMonitor monitor,
+  ) async {
     final GattConnection connection;
     try {
       connection = await _open(monitor.id, {_heartRateService});
     } catch (e) {
-      throw HeartRateConnectException(HeartRateConnectError.failed, message: '$e');
+      throw HeartRateConnectException(
+        HeartRateConnectError.failed,
+        message: '$e',
+      );
     }
     return setUpHeartRateMonitor(connection);
   }
@@ -159,7 +204,10 @@ class FlutterBluePlusTransport implements BleTransport, HeartRateTransport {
     final device = BluetoothDevice.fromId(id);
     try {
       await FlutterBluePlus.stopScan();
-      await device.connect(license: License.nonprofit, timeout: const Duration(seconds: 10));
+      await device.connect(
+        license: License.nonprofit,
+        timeout: const Duration(seconds: 10),
+      );
       final discovered = await device.discoverServices();
       return _FlutterBluePlusConnection(device, {
         for (final service in discovered)
@@ -175,14 +223,18 @@ class FlutterBluePlusTransport implements BleTransport, HeartRateTransport {
   /// `0031` for a PM5 characteristic, `2ad1` for a standard one.
   static String _shortId(Guid uuid) {
     final full = uuid.str128;
-    return full.startsWith('ce06') ? full.substring(4, 8) : uuid.str.toLowerCase();
+    return full.startsWith('ce06')
+        ? full.substring(4, 8)
+        : uuid.str.toLowerCase();
   }
 }
 
 class _FlutterBluePlusConnection implements GattConnection {
   _FlutterBluePlusConnection(this._device, this._characteristics) {
     _connection = _device.connectionState.listen((state) {
-      if (state == BluetoothConnectionState.disconnected && !_disconnecting && !_lost.isCompleted) {
+      if (state == BluetoothConnectionState.disconnected &&
+          !_disconnecting &&
+          !_lost.isCompleted) {
         _cleanUp();
         _lost.complete();
       }
@@ -206,12 +258,15 @@ class _FlutterBluePlusConnection implements GattConnection {
   @override
   Future<void> subscribe(String id) async {
     final c = _characteristics[id]!;
-    _subscriptions.add(c.onValueReceived.listen((bytes) => _notifications.add((id, bytes))));
+    _subscriptions.add(
+      c.onValueReceived.listen((bytes) => _notifications.add((id, bytes))),
+    );
     await c.setNotifyValue(true);
   }
 
   @override
-  Future<void> write(String id, List<int> bytes) => _characteristics[id]!.write(bytes);
+  Future<void> write(String id, List<int> bytes) =>
+      _characteristics[id]!.write(bytes);
 
   @override
   Future<List<int>> read(String id) => _characteristics[id]!.read();

@@ -24,8 +24,8 @@ class SimulatedSource implements ErgSource {
     int? seed,
     this.tickInterval = const Duration(milliseconds: 250),
     this.protocol = ErgProtocol.pm5,
-  })  : _currentPace = targetPace,
-        _random = math.Random(seed);
+  }) : _currentPace = targetPace,
+       _random = math.Random(seed);
 
   /// Time between two status notifications, like the PM5 sample rate.
   final Duration tickInterval;
@@ -83,11 +83,11 @@ class SimulatedSource implements ErgSource {
 
   /// A new simulator with the same targets that speaks [protocol].
   SimulatedSource withProtocol(ErgProtocol protocol) => SimulatedSource(
-        targetPace: targetPace,
-        targetStrokeRate: targetStrokeRate,
-        tickInterval: tickInterval,
-        protocol: protocol,
-      );
+    targetPace: targetPace,
+    targetStrokeRate: targetStrokeRate,
+    tickInterval: tickInterval,
+    protocol: protocol,
+  );
 
   /// Stops rowing; the clock and the distance stand still like on a PM5.
   void pause() {
@@ -104,8 +104,9 @@ class SimulatedSource implements ErgSource {
   bool get providesForceCurves => protocol == ErgProtocol.pm5;
 
   @override
-  late final ResistanceControl? resistanceControl =
-      protocol == ErgProtocol.ftms ? _SimulatedResistance(this) : null;
+  late final ResistanceControl? resistanceControl = protocol == ErgProtocol.ftms
+      ? _SimulatedResistance(this)
+      : null;
 
   /// The level reported in FTMS mode.
   int get resistanceLevel => _resistanceLevel;
@@ -164,22 +165,24 @@ class SimulatedSource implements ErgSource {
         final last = _lastFtmsRecord;
         if (last != null && at - last < ftmsInterval) return;
         _lastFtmsRecord = at;
-        _packets.add(_ftmsEncoder.encodeStatus(
-          StatusTick(
-            elapsed: tick.elapsed,
-            distanceMeters: tick.distanceMeters,
-            workoutType: tick.workoutType,
-            workoutState: tick.workoutState,
-            isRowing: tick.isRowing,
-            pace: tick.pace,
-            watts: tick.pace == null ? null : wattsForPace(tick.pace!),
-            strokeRate: tick.strokeRate,
-            calories: tick.calories,
-            resistanceLevel: _resistanceLevel,
+        _packets.add(
+          _ftmsEncoder.encodeStatus(
+            StatusTick(
+              elapsed: tick.elapsed,
+              distanceMeters: tick.distanceMeters,
+              workoutType: tick.workoutType,
+              workoutState: tick.workoutState,
+              isRowing: tick.isRowing,
+              pace: tick.pace,
+              watts: tick.pace == null ? null : wattsForPace(tick.pace!),
+              strokeRate: tick.strokeRate,
+              calories: tick.calories,
+              resistanceLevel: _resistanceLevel,
+            ),
+            strokeCount: _completedStrokes,
+            at: at,
           ),
-          strokeCount: _completedStrokes,
-          at: at,
-        ));
+        );
     }
   }
 
@@ -194,11 +197,15 @@ class SimulatedSource implements ErgSource {
       stroke.driveEndSent = true;
       if (protocol == ErgProtocol.pm5) {
         _encoder.encodeDriveEnd(stroke.data, at: at).forEach(_packets.add);
-        _encoder.encodeForceCurve(stroke.forceCurve, at: at).forEach(_packets.add);
+        _encoder
+            .encodeForceCurve(stroke.forceCurve, at: at)
+            .forEach(_packets.add);
       }
     }
     if (_elapsed >= stroke.start + stroke.drive + stroke.recovery) {
-      if (protocol == ErgProtocol.pm5) _packets.add(_encoder.encodeRecoveryEnd(stroke.data, at: at));
+      if (protocol == ErgProtocol.pm5) {
+        _packets.add(_encoder.encodeRecoveryEnd(stroke.data, at: at));
+      }
       _completedStrokes++;
       _stroke = null;
     }
@@ -206,14 +213,20 @@ class SimulatedSource implements ErgSource {
 
   _SimulatedStroke _nextStroke() {
     // Move a third of the way towards the target per stroke, ±2 % variation.
-    final towardsTarget = _seconds(_currentPace) + (_seconds(targetPace) - _seconds(_currentPace)) / 3;
+    final towardsTarget =
+        _seconds(_currentPace) +
+        (_seconds(targetPace) - _seconds(_currentPace)) / 3;
     final variation = 1 + (_random.nextDouble() * 2 - 1) * 0.02;
-    _currentPace = Duration(microseconds: (towardsTarget * variation * 1e6).round());
+    _currentPace = Duration(
+      microseconds: (towardsTarget * variation * 1e6).round(),
+    );
 
     final interval = 60 / targetStrokeRate;
     final watts = wattsForPace(_currentPace);
     final driveSeconds = interval * _driveShare;
-    final driveLength = _driveLengthMeters + (_random.nextDouble() * 2 - 1) * _driveLengthSpread;
+    final driveLength =
+        _driveLengthMeters +
+        (_random.nextDouble() * 2 - 1) * _driveLengthSpread;
     // The work of one stroke is the average force over the drive length.
     final averageForce = watts * interval / driveLength;
     final peakForce = averageForce * 1.6;
@@ -242,9 +255,15 @@ class SimulatedSource implements ErgSource {
   /// A hump that rises quickly, peaks before the middle of the drive and
   /// falls to 0, with the peak a little earlier or later from stroke to stroke.
   List<double> _forceCurve(double peakForce, double driveSeconds) {
-    final points = (driveSeconds * _curvePointsPerSecond).round().clamp(10, 135);
+    final points = (driveSeconds * _curvePointsPerSecond).round().clamp(
+      10,
+      135,
+    );
     final skew = 0.75 + _random.nextDouble() * 0.2;
-    final shape = [for (var i = 1; i <= points; i++) math.pow(math.sin(math.pi * math.pow(i / points, skew)), 1.5)];
+    final shape = [
+      for (var i = 1; i <= points; i++)
+        math.pow(math.sin(math.pi * math.pow(i / points, skew)), 1.5),
+    ];
     final highest = shape.reduce(math.max);
     return [for (final s in shape) peakForce * s / highest];
   }
@@ -255,13 +274,21 @@ class SimulatedSource implements ErgSource {
     _states.add(state);
   }
 
-  static double _seconds(Duration d) => d.inMicroseconds / Duration.microsecondsPerSecond;
+  static double _seconds(Duration d) =>
+      d.inMicroseconds / Duration.microsecondsPerSecond;
 
-  static Duration _duration(double seconds) => Duration(microseconds: (seconds * 1e6).round());
+  static Duration _duration(double seconds) =>
+      Duration(microseconds: (seconds * 1e6).round());
 }
 
 class _SimulatedStroke {
-  _SimulatedStroke(this.start, this.drive, this.recovery, this.data, this.forceCurve);
+  _SimulatedStroke(
+    this.start,
+    this.drive,
+    this.recovery,
+    this.data,
+    this.forceCurve,
+  );
 
   final Duration start;
   final Duration drive;

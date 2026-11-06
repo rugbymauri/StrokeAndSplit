@@ -79,7 +79,8 @@ class Zones extends Table {
 /// bands, and the free gaps between them.
 @DataClassName('CourseSegmentRow')
 class CourseSegments extends Table {
-  IntColumn get versionId => integer().references(CourseVersions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get versionId =>
+      integer().references(CourseVersions, #id, onDelete: KeyAction.cascade)();
   IntColumn get position => integer()();
 
   /// In the unit of the course length.
@@ -115,7 +116,8 @@ class Templates extends Table {
 /// The parts of a template; the app uses exactly one for now.
 @DataClassName('TemplateBlockRow')
 class TemplateBlocks extends Table {
-  IntColumn get templateId => integer().references(Templates, #id, onDelete: KeyAction.cascade)();
+  IntColumn get templateId =>
+      integer().references(Templates, #id, onDelete: KeyAction.cascade)();
   IntColumn get position => integer()();
   IntColumn get courseId => integer().references(Courses, #id)();
 
@@ -136,7 +138,8 @@ class Sessions extends Table {
   TextColumn get deviceName => text().nullable()();
 
   /// Protocol of the raw packets; sessions before schema 4 are PM5 sessions.
-  TextColumn get protocol => textEnum<ErgProtocol>().withDefault(const Constant('pm5'))();
+  TextColumn get protocol =>
+      textEnum<ErgProtocol>().withDefault(const Constant('pm5'))();
 
   // Summary, derived from samples and strokes when the session ends.
   IntColumn get durationMs => integer().withDefault(const Constant(0))();
@@ -147,11 +150,16 @@ class Sessions extends Table {
   IntColumn get strokeCount => integer().withDefault(const Constant(0))();
 
   // Set when the session was started from a template (Design D4).
-  IntColumn get templateId => integer().nullable().references(Templates, #id, onDelete: KeyAction.setNull)();
+  IntColumn get templateId => integer().nullable().references(
+    Templates,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
 
   /// The template name at the time, kept when the template is deleted.
   TextColumn get templateName => text().nullable()();
-  IntColumn get courseVersionId => integer().nullable().references(CourseVersions, #id)();
+  IntColumn get courseVersionId =>
+      integer().nullable().references(CourseVersions, #id)();
 
   /// Null for an open number of laps.
   IntColumn get plannedLaps => integer().nullable()();
@@ -179,7 +187,8 @@ class Sessions extends Table {
 @DataClassName('SampleRow')
 @TableIndex(name: 'samples_session_time', columns: {#sessionId, #tMs})
 class Samples extends Table {
-  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sessionId =>
+      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
   IntColumn get tMs => integer()();
   IntColumn get distanceDm => integer()();
   IntColumn get paceCs => integer().nullable()();
@@ -201,7 +210,8 @@ class Samples extends Table {
 @DataClassName('StrokeRow')
 @TableIndex(name: 'strokes_session_time', columns: {#sessionId, #tMs})
 class Strokes extends Table {
-  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sessionId =>
+      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
   IntColumn get tMs => integer()();
   IntColumn get distanceDm => integer()();
   IntColumn get strokeNumber => integer()();
@@ -220,7 +230,8 @@ class Strokes extends Table {
 @DataClassName('RawPacketRow')
 @TableIndex(name: 'raw_packets_session_time', columns: {#sessionId, #tMs})
 class RawPackets extends Table {
-  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sessionId =>
+      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
   IntColumn get tMs => integer()();
   TextColumn get characteristicId => text()();
   BlobColumn get bytes => blob()();
@@ -231,7 +242,8 @@ class RawPackets extends Table {
 @DataClassName('RrIntervalRow')
 @TableIndex(name: 'rr_intervals_session_time', columns: {#sessionId, #tMs})
 class RrIntervals extends Table {
-  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sessionId =>
+      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
   IntColumn get tMs => integer()();
   IntColumn get rrMs => integer()();
 }
@@ -241,7 +253,8 @@ class RrIntervals extends Table {
 /// sessions before schema 7 did not know, so for them it is the wall clock.
 @DataClassName('LapRow')
 class Laps extends Table {
-  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sessionId =>
+      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
 
   /// Starting at 1.
   IntColumn get lapNo => integer()();
@@ -264,7 +277,8 @@ class Laps extends Table {
 /// wall-clock axis of its samples and raw notifications.
 @DataClassName('PauseRow')
 class Pauses extends Table {
-  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sessionId =>
+      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
   IntColumn get startWallMs => integer()();
   IntColumn get endWallMs => integer()();
 
@@ -274,7 +288,8 @@ class Pauses extends Table {
 
 @DataClassName('LapSegmentRow')
 class LapSegments extends Table {
-  IntColumn get sessionId => integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sessionId =>
+      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
   IntColumn get lapNo => integer()();
   IntColumn get position => integer()();
   IntColumn get durationMs => integer()();
@@ -308,110 +323,125 @@ class AppDatabase extends _$AppDatabase {
 
   /// The database file on the device, taking over the one from before the
   /// rename (Design D2).
-  factory AppDatabase.local() => AppDatabase(driftDatabase(
-        name: databaseName,
-        native: DriftNativeOptions(databaseDirectory: () async {
+  factory AppDatabase.local() => AppDatabase(
+    driftDatabase(
+      name: databaseName,
+      native: DriftNativeOptions(
+        databaseDirectory: () async {
           final directory = await getApplicationDocumentsDirectory();
           await adoptLegacyDatabase(directory);
           return directory;
-        }),
-      ));
+        },
+      ),
+    ),
+  );
 
   @override
   int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onUpgrade: stepByStep(
-          // Courses and templates; only additions, old sessions stay as they are.
-          from1To2: (m, schema) async {
-            for (final table in [
-              schema.courses,
-              schema.courseVersions,
-              schema.courseSegments,
-              schema.templates,
-              schema.templateBlocks,
-              schema.laps,
-              schema.lapSegments,
-            ]) {
-              await m.createTable(table);
-            }
-            await m.createIndex(schema.courseVersionsCourse);
-            await m.addColumn(schema.sessions, schema.sessions.templateId);
-            await m.addColumn(schema.sessions, schema.sessions.templateName);
-            await m.addColumn(schema.sessions, schema.sessions.courseVersionId);
-            await m.addColumn(schema.sessions, schema.sessions.plannedLaps);
-            await m.addColumn(schema.samples, schema.samples.wallMs);
-          },
-          // Reusable zones; segments with bands become zones (Change zones, Design D5).
-          from2To3: (m, schema) async {
-            await m.createTable(schema.zones);
-            await m.addColumn(schema.courseSegments, schema.courseSegments.zoneId);
-            await m.addColumn(schema.courseSegments, schema.courseSegments.zoneName);
-            await migrateSegmentsToZones(m.database);
-          },
-          // FTMS rowers (Change device-types, Design D9): SQLite cannot drop NOT NULL in place,
-          // so the strokes table is rebuilt with its rows; old sessions are PM5 sessions.
-          from3To4: (m, schema) async {
-            await m.alterTable(TableMigration(schema.strokes));
-            await m.addColumn(schema.sessions, schema.sessions.protocol);
-          },
-          // Imported sessions leave the rankings (Change statistics, Design D3);
-          // existing sessions count as recorded on this device.
-          from4To5: (m, schema) async {
-            await m.addColumn(schema.sessions, schema.sessions.imported);
-          },
-          // Heart rate straps (Change heart-rate, Design D5); existing sessions
-          // keep no pulse summary.
-          from5To6: (m, schema) async {
-            await m.addColumn(schema.sessions, schema.sessions.averageHeartRate);
-            await m.addColumn(schema.sessions, schema.sessions.maxHeartRate);
-            await m.addColumn(schema.sessions, schema.sessions.rmssdMs);
-            await m.createTable(schema.rrIntervals);
-            await m.createIndex(schema.rrIntervalsSessionTime);
-          },
-          // Auto-pause (Change auto-pause, Design D3); existing sessions keep
-          // their times and have no pauses.
-          from6To7: (m, schema) async {
-            await m.addColumn(schema.sessions, schema.sessions.pauseCount);
-            await m.addColumn(schema.sessions, schema.sessions.pausedMs);
-            await m.addColumn(schema.samples, schema.samples.activeMs);
-            await m.createTable(schema.pauses);
-          },
-          // Health Connect (Change health-connect, Design D6); existing sessions count as not written.
-          from7To8: (m, schema) async {
-            await m.addColumn(schema.sessions, schema.sessions.healthExportedAt);
-          },
-          // Resistance level per zone and its copy in course segments (Change resistance-control, D7).
-          from8To9: (m, schema) async {
-            await m.addColumn(schema.zones, schema.zones.resistanceLevel);
-            await m.addColumn(schema.courseSegments, schema.courseSegments.resistanceLevel);
-          },
-        ),
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-      );
+    onUpgrade: stepByStep(
+      // Courses and templates; only additions, old sessions stay as they are.
+      from1To2: (m, schema) async {
+        for (final table in [
+          schema.courses,
+          schema.courseVersions,
+          schema.courseSegments,
+          schema.templates,
+          schema.templateBlocks,
+          schema.laps,
+          schema.lapSegments,
+        ]) {
+          await m.createTable(table);
+        }
+        await m.createIndex(schema.courseVersionsCourse);
+        await m.addColumn(schema.sessions, schema.sessions.templateId);
+        await m.addColumn(schema.sessions, schema.sessions.templateName);
+        await m.addColumn(schema.sessions, schema.sessions.courseVersionId);
+        await m.addColumn(schema.sessions, schema.sessions.plannedLaps);
+        await m.addColumn(schema.samples, schema.samples.wallMs);
+      },
+      // Reusable zones; segments with bands become zones (Change zones, Design D5).
+      from2To3: (m, schema) async {
+        await m.createTable(schema.zones);
+        await m.addColumn(schema.courseSegments, schema.courseSegments.zoneId);
+        await m.addColumn(
+          schema.courseSegments,
+          schema.courseSegments.zoneName,
+        );
+        await migrateSegmentsToZones(m.database);
+      },
+      // FTMS rowers (Change device-types, Design D9): SQLite cannot drop NOT NULL in place,
+      // so the strokes table is rebuilt with its rows; old sessions are PM5 sessions.
+      from3To4: (m, schema) async {
+        await m.alterTable(TableMigration(schema.strokes));
+        await m.addColumn(schema.sessions, schema.sessions.protocol);
+      },
+      // Imported sessions leave the rankings (Change statistics, Design D3);
+      // existing sessions count as recorded on this device.
+      from4To5: (m, schema) async {
+        await m.addColumn(schema.sessions, schema.sessions.imported);
+      },
+      // Heart rate straps (Change heart-rate, Design D5); existing sessions
+      // keep no pulse summary.
+      from5To6: (m, schema) async {
+        await m.addColumn(schema.sessions, schema.sessions.averageHeartRate);
+        await m.addColumn(schema.sessions, schema.sessions.maxHeartRate);
+        await m.addColumn(schema.sessions, schema.sessions.rmssdMs);
+        await m.createTable(schema.rrIntervals);
+        await m.createIndex(schema.rrIntervalsSessionTime);
+      },
+      // Auto-pause (Change auto-pause, Design D3); existing sessions keep
+      // their times and have no pauses.
+      from6To7: (m, schema) async {
+        await m.addColumn(schema.sessions, schema.sessions.pauseCount);
+        await m.addColumn(schema.sessions, schema.sessions.pausedMs);
+        await m.addColumn(schema.samples, schema.samples.activeMs);
+        await m.createTable(schema.pauses);
+      },
+      // Health Connect (Change health-connect, Design D6); existing sessions count as not written.
+      from7To8: (m, schema) async {
+        await m.addColumn(schema.sessions, schema.sessions.healthExportedAt);
+      },
+      // Resistance level per zone and its copy in course segments (Change resistance-control, D7).
+      from8To9: (m, schema) async {
+        await m.addColumn(schema.zones, schema.zones.resistanceLevel);
+        await m.addColumn(
+          schema.courseSegments,
+          schema.courseSegments.resistanceLevel,
+        );
+      },
+    ),
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 }
 
 /// Turns every segment with a band into a zone named after its course and
 /// position. Segments of the newest version of a course are placed zones;
 /// older versions only keep the name, as they no longer change.
 Future<void> migrateSegmentsToZones(GeneratedDatabase db) async {
-  final courses = await db.customSelect('SELECT id, name, axis FROM courses').get();
+  final courses = await db
+      .customSelect('SELECT id, name, axis FROM courses')
+      .get();
   for (final course in courses) {
     final courseId = course.read<int>('id');
     final versions = await db
-        .customSelect('SELECT id FROM course_versions WHERE course_id = ? ORDER BY version DESC',
-            variables: [Variable.withInt(courseId)])
+        .customSelect(
+          'SELECT id FROM course_versions WHERE course_id = ? ORDER BY version DESC',
+          variables: [Variable.withInt(courseId)],
+        )
         .get();
     for (final (i, version) in versions.indexed) {
       final versionId = version.read<int>('id');
       final segments = await db
           .customSelect(
-              'SELECT position, length, pace_fast_cs, pace_slow_cs, spm_min, spm_max FROM course_segments '
-              'WHERE version_id = ? AND (pace_fast_cs IS NOT NULL OR spm_min IS NOT NULL) ORDER BY position',
-              variables: [Variable.withInt(versionId)])
+            'SELECT position, length, pace_fast_cs, pace_slow_cs, spm_min, spm_max FROM course_segments '
+            'WHERE version_id = ? AND (pace_fast_cs IS NOT NULL OR spm_min IS NOT NULL) ORDER BY position',
+            variables: [Variable.withInt(versionId)],
+          )
           .get();
       for (final segment in segments) {
         final position = segment.read<int>('position');

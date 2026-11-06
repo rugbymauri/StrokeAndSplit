@@ -8,11 +8,16 @@ void main() {
   final ticks = decodeAll(recording.packets).whereType<StatusTick>().toList();
 
   test('emits one status tick per general status notification', () {
-    expect(ticks, hasLength(countPackets(recording, Pm5Characteristics.generalStatus)));
+    expect(
+      ticks,
+      hasLength(countPackets(recording, Pm5Characteristics.generalStatus)),
+    );
   });
 
   test('decodes the metrics of a rowing moment', () {
-    final tick = ticks.firstWhere((t) => t.elapsed == const Duration(milliseconds: 5580));
+    final tick = ticks.firstWhere(
+      (t) => t.elapsed == const Duration(milliseconds: 5580),
+    );
 
     expect(tick.distanceMeters, 11.8);
     expect(tick.workoutType, WorkoutType.justRowSplits);

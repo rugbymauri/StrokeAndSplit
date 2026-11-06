@@ -11,8 +11,11 @@ import 'course_strip.dart';
 import 'courses_screen.dart';
 
 Future<void> openCourseDetail(BuildContext context, Course course) {
-  return Navigator.of(context)
-      .push(MaterialPageRoute<void>(builder: (_) => CourseDetailScreen(courseId: course.id)));
+  return Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => CourseDetailScreen(courseId: course.id),
+    ),
+  );
 }
 
 /// A course with places 1–3 per length and the way to edit it (Change
@@ -26,12 +29,19 @@ class CourseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     ref.listen(coursesProvider, (_, next) {
-      if (next case AsyncData(:final value) when !value.any((c) => c.id == courseId)) {
+      if (next case AsyncData(:final value)
+          when !value.any((c) => c.id == courseId)) {
         final route = ModalRoute.of(context);
-        if (route != null && route.isActive) Navigator.of(context).removeRoute(route);
+        if (route != null && route.isActive) {
+          Navigator.of(context).removeRoute(route);
+        }
       }
     });
-    final course = ref.watch(coursesProvider).value?.where((c) => c.id == courseId).firstOrNull;
+    final course = ref
+        .watch(coursesProvider)
+        .value
+        ?.where((c) => c.id == courseId)
+        .firstOrNull;
     final rankings = ref.watch(courseRankingsProvider(courseId));
     return Scaffold(
       appBar: AppBar(
@@ -62,15 +72,20 @@ class CourseDetailScreen extends ConsumerWidget {
                     children: [
                       CourseStrip(definition: course.definition),
                       const SizedBox(height: 10),
-                      Text(courseSummary(l10n, course), style: AppTextStyles.caption),
+                      Text(
+                        courseSummary(l10n, course),
+                        style: AppTextStyles.caption,
+                      ),
                       const SizedBox(height: AppSpacing.xxl),
                       switch (rankings) {
                         AsyncData(:final value) => RankingSections(
-                            rankings: value,
-                            axis: course.axis,
-                            length: course.definition.length,
-                          ),
-                        AsyncError(:final error) => Text(l10n.rankingLoadFailed('$error')),
+                          rankings: value,
+                          axis: course.axis,
+                          length: course.definition.length,
+                        ),
+                        AsyncError(:final error) => Text(
+                          l10n.rankingLoadFailed('$error'),
+                        ),
                         _ => const Center(child: CircularProgressIndicator()),
                       },
                     ],

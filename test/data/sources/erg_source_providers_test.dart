@@ -14,8 +14,10 @@ class _SourceLabel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final source = ref.watch(activeErgSourceProvider);
-    return Text(source == null ? 'keine Quelle' : '${source.kind.name}: ${source.name}',
-        textDirection: TextDirection.ltr);
+    return Text(
+      source == null ? 'keine Quelle' : '${source.kind.name}: ${source.name}',
+      textDirection: TextDirection.ltr,
+    );
   }
 }
 
@@ -29,14 +31,21 @@ class _FixedSource extends ActiveErgSource {
 }
 
 void main() {
-  testWidgets('widgets see the source selected by a provider override', (tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        activeErgSourceProvider
-            .overrideWith(() => _FixedSource(FakeErgSource(kind: ErgSourceKind.simulator, name: 'Sim'))),
-      ],
-      child: const _SourceLabel(),
-    ));
+  testWidgets('widgets see the source selected by a provider override', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          activeErgSourceProvider.overrideWith(
+            () => _FixedSource(
+              FakeErgSource(kind: ErgSourceKind.simulator, name: 'Sim'),
+            ),
+          ),
+        ],
+        child: const _SourceLabel(),
+      ),
+    );
 
     expect(find.text('simulator: Sim'), findsOneWidget);
   });
@@ -47,7 +56,12 @@ void main() {
     final first = FakeErgSource(name: 'eins');
     final second = FakeErgSource(kind: ErgSourceKind.replay, name: 'zwei');
 
-    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const _SourceLabel()));
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _SourceLabel(),
+      ),
+    );
     expect(find.text('keine Quelle'), findsOneWidget);
 
     await container.read(activeErgSourceProvider.notifier).use(first);
@@ -75,16 +89,25 @@ void main() {
       isRowing: true,
       pace: Duration(minutes: 2),
     );
-    const Pm5Encoder().encodeStatus(tick, at: Duration.zero).forEach(source.emit);
+    const Pm5Encoder()
+        .encodeStatus(tick, at: Duration.zero)
+        .forEach(source.emit);
     await Future<void>.delayed(Duration.zero);
 
-    expect(events.whereType<StatusTick>().single.pace, const Duration(minutes: 2));
+    expect(
+      events.whereType<StatusTick>().single.pace,
+      const Duration(minutes: 2),
+    );
   });
 
   test('decodes the packets of an FTMS source with the FTMS decoder', () async {
     final container = ProviderContainer();
     addTearDown(container.dispose);
-    final source = FakeErgSource(kind: ErgSourceKind.ftms, name: 'Rower 42', protocol: ErgProtocol.ftms);
+    final source = FakeErgSource(
+      kind: ErgSourceKind.ftms,
+      name: 'Rower 42',
+      protocol: ErgProtocol.ftms,
+    );
     await container.read(activeErgSourceProvider.notifier).use(source);
 
     final events = <RowingEvent>[];

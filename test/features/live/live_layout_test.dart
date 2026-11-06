@@ -7,19 +7,30 @@ Future<LiveLayout> _layoutAt(WidgetTester tester, Size size) async {
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   late LiveLayout chosen;
-  await tester.pumpWidget(LiveLayoutBuilder(builder: (context, layout) {
-    chosen = layout;
-    return const SizedBox.expand();
-  }));
+  await tester.pumpWidget(
+    LiveLayoutBuilder(
+      builder: (context, layout) {
+        chosen = layout;
+        return const SizedBox.expand();
+      },
+    ),
+  );
   return chosen;
 }
 
 void main() {
-  testWidgets('uses the landscape layout in a laptop window of 1200 × 700', (tester) async {
-    expect(await _layoutAt(tester, const Size(1200, 700)), LiveLayout.landscape);
+  testWidgets('uses the landscape layout in a laptop window of 1200 × 700', (
+    tester,
+  ) async {
+    expect(
+      await _layoutAt(tester, const Size(1200, 700)),
+      LiveLayout.landscape,
+    );
   });
 
-  testWidgets('uses the portrait layout on a phone of 390 × 844', (tester) async {
+  testWidgets('uses the portrait layout on a phone of 390 × 844', (
+    tester,
+  ) async {
     expect(await _layoutAt(tester, const Size(390, 844)), LiveLayout.portrait);
   });
 

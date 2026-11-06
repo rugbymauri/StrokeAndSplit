@@ -11,7 +11,9 @@ import 'zone_format.dart';
 import 'zones_screen.dart';
 
 Future<void> openZoneDetail(BuildContext context, Zone zone) {
-  return Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ZoneDetailScreen(zoneId: zone.id)));
+  return Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => ZoneDetailScreen(zoneId: zone.id)),
+  );
 }
 
 /// A zone with places 1–3 per length and the way to edit it (Change
@@ -25,12 +27,20 @@ class ZoneDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     ref.listen(zonesProvider, (_, next) {
-      if (next case AsyncData(:final value) when !value.any((u) => u.zone.id == zoneId)) {
+      if (next case AsyncData(:final value)
+          when !value.any((u) => u.zone.id == zoneId)) {
         final route = ModalRoute.of(context);
-        if (route != null && route.isActive) Navigator.of(context).removeRoute(route);
+        if (route != null && route.isActive) {
+          Navigator.of(context).removeRoute(route);
+        }
       }
     });
-    final zone = ref.watch(zonesProvider).value?.map((u) => u.zone).where((z) => z.id == zoneId).firstOrNull;
+    final zone = ref
+        .watch(zonesProvider)
+        .value
+        ?.map((u) => u.zone)
+        .where((z) => z.id == zoneId)
+        .firstOrNull;
     final rankings = ref.watch(zoneRankingsProvider(zoneId));
     return Scaffold(
       appBar: AppBar(
@@ -59,12 +69,20 @@ class ZoneDetailScreen extends ConsumerWidget {
                       AppSpacing.xxl,
                     ),
                     children: [
-                      Text(zoneSummary(context.l10n, zone), style: AppTextStyles.subtitle),
+                      Text(
+                        zoneSummary(context.l10n, zone),
+                        style: AppTextStyles.subtitle,
+                      ),
                       const SizedBox(height: AppSpacing.xxl),
                       switch (rankings) {
-                        AsyncData(:final value) =>
-                          RankingSections(rankings: value, axis: zone.axis, length: zone.length),
-                        AsyncError(:final error) => Text(l10n.rankingLoadFailed('$error')),
+                        AsyncData(:final value) => RankingSections(
+                          rankings: value,
+                          axis: zone.axis,
+                          length: zone.length,
+                        ),
+                        AsyncError(:final error) => Text(
+                          l10n.rankingLoadFailed('$error'),
+                        ),
                         _ => const Center(child: CircularProgressIndicator()),
                       },
                     ],

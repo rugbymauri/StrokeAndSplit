@@ -3,7 +3,10 @@ import 'dart:typed_data';
 /// What a Fitness Machine Feature (`0x2ACC`) says about the resistance level
 /// (FTMS 1.0, 4.3).
 class FtmsFeatures {
-  const FtmsFeatures({required this.reportsResistanceLevel, required this.setsResistanceLevel});
+  const FtmsFeatures({
+    required this.reportsResistanceLevel,
+    required this.setsResistanceLevel,
+  });
 
   /// Machine feature bit 7: the level is part of the measurements.
   final bool reportsResistanceLevel;
@@ -24,7 +27,8 @@ class FtmsFeatures {
   }
 
   @override
-  String toString() => 'FtmsFeatures(reports: $reportsResistanceLevel, sets: $setsResistanceLevel)';
+  String toString() =>
+      'FtmsFeatures(reports: $reportsResistanceLevel, sets: $setsResistanceLevel)';
 }
 
 /// The resistance levels a rower accepts, in whole levels (Change
@@ -63,14 +67,21 @@ class ResistanceRange {
   /// A reported level as a whole level: some rowers report tenths, e.g. 60
   /// for level 6 (Design, Risks). Levels inside the range stay as they are.
   int wholeLevel(int reported) {
-    if (reported > max && reported % 10 == 0 && reported ~/ 10 >= min && reported ~/ 10 <= max) {
+    if (reported > max &&
+        reported % 10 == 0 &&
+        reported ~/ 10 >= min &&
+        reported ~/ 10 <= max) {
       return reported ~/ 10;
     }
     return reported;
   }
 
   @override
-  bool operator ==(Object other) => other is ResistanceRange && other.min == min && other.max == max && other.step == step;
+  bool operator ==(Object other) =>
+      other is ResistanceRange &&
+      other.min == min &&
+      other.max == max &&
+      other.step == step;
 
   @override
   int get hashCode => Object.hash(min, max, step);

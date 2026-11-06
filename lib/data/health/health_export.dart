@@ -29,7 +29,9 @@ class PreferencesHealthExportStore implements HealthExportStore {
 
   static Future<PreferencesHealthExportStore> open() async {
     const options = SharedPreferencesWithCacheOptions(allowList: {_key});
-    return PreferencesHealthExportStore._(await SharedPreferencesWithCache.create(cacheOptions: options));
+    return PreferencesHealthExportStore._(
+      await SharedPreferencesWithCache.create(cacheOptions: options),
+    );
   }
 
   @override
@@ -53,20 +55,30 @@ class MemoryHealthExportStore implements HealthExportStore {
 }
 
 /// Where the choice is kept; `main` sets the preferences.
-final healthExportStoreProvider = Provider<HealthExportStore>((ref) => MemoryHealthExportStore());
+final healthExportStoreProvider = Provider<HealthExportStore>(
+  (ref) => MemoryHealthExportStore(),
+);
 
 /// Health Connect; replaced by a fake in tests.
-final healthPlatformProvider = Provider<HealthPlatform>((ref) => ChannelHealthPlatform());
+final healthPlatformProvider = Provider<HealthPlatform>(
+  (ref) => ChannelHealthPlatform(),
+);
 
 /// Whether the platform has Health Connect, which is only Android.
-final healthExportAvailableProvider = Provider<bool>((ref) => !kIsWeb && Platform.isAndroid);
+final healthExportAvailableProvider = Provider<bool>(
+  (ref) => !kIsWeb && Platform.isAndroid,
+);
 
 /// Whether finished sessions are written to Health Connect.
-final healthExportEnabledProvider = NotifierProvider<HealthExportEnabled, bool>(HealthExportEnabled.new);
+final healthExportEnabledProvider = NotifierProvider<HealthExportEnabled, bool>(
+  HealthExportEnabled.new,
+);
 
 class HealthExportEnabled extends Notifier<bool> {
   @override
-  bool build() => ref.watch(healthExportAvailableProvider) && ref.watch(healthExportStoreProvider).read();
+  bool build() =>
+      ref.watch(healthExportAvailableProvider) &&
+      ref.watch(healthExportStoreProvider).read();
 
   Future<void> set(bool enabled) async {
     state = enabled;
@@ -83,11 +95,17 @@ class HealthExportEnabled extends Notifier<bool> {
         case HealthStatus.updateRequired:
           return HealthEnableResult.updateRequired;
         case HealthStatus.available:
-          final granted = await platform.requestPermissions(HealthKind.values.toSet());
-          if (!granted.contains(HealthKind.exercise)) return HealthEnableResult.denied;
+          final granted = await platform.requestPermissions(
+            HealthKind.values.toSet(),
+          );
+          if (!granted.contains(HealthKind.exercise)) {
+            return HealthEnableResult.denied;
+          }
       }
     } on HealthException catch (e) {
-      return e.reason == HealthFailure.unavailable ? HealthEnableResult.unavailable : HealthEnableResult.denied;
+      return e.reason == HealthFailure.unavailable
+          ? HealthEnableResult.unavailable
+          : HealthEnableResult.denied;
     }
     await set(true);
     return HealthEnableResult.enabled;
@@ -99,32 +117,38 @@ enum HealthEnableResult { enabled, denied, unavailable, updateRequired }
 /// Whether Health Connect is there and what the app may write to it.
 typedef HealthConnectState = ({HealthStatus status, Set<HealthKind> granted});
 
-final healthConnectStateProvider = FutureProvider.autoDispose<HealthConnectState>((ref) async {
-  final platform = ref.watch(healthPlatformProvider);
-  final status = await platform.status();
-  if (status != HealthStatus.available) return (status: status, granted: const <HealthKind>{});
-  try {
-    return (status: status, granted: await platform.grantedPermissions());
-  } on HealthException {
-    return (status: status, granted: const <HealthKind>{});
-  }
-});
+final healthConnectStateProvider =
+    FutureProvider.autoDispose<HealthConnectState>((ref) async {
+      final platform = ref.watch(healthPlatformProvider);
+      final status = await platform.status();
+      if (status != HealthStatus.available) {
+        return (status: status, granted: const <HealthKind>{});
+      }
+      try {
+        return (status: status, granted: await platform.grantedPermissions());
+      } on HealthException {
+        return (status: status, granted: const <HealthKind>{});
+      }
+    });
 
 /// Whether sessions from [source] go to Health Connect: rowing on a rower, not the simulator or a replay.
-bool healthExportable(ErgSourceKind source) => source == ErgSourceKind.pm5 || source == ErgSourceKind.ftms;
+bool healthExportable(ErgSourceKind source) =>
+    source == ErgSourceKind.pm5 || source == ErgSourceKind.ftms;
 
 /// A write after a session ended that failed, until the user has seen it.
 typedef HealthExportFailure = ({int sessionId, HealthFailure reason});
 
-final healthExportFailureProvider = NotifierProvider<HealthExportFailures, HealthExportFailure?>(
-  HealthExportFailures.new,
-);
+final healthExportFailureProvider =
+    NotifierProvider<HealthExportFailures, HealthExportFailure?>(
+      HealthExportFailures.new,
+    );
 
 class HealthExportFailures extends Notifier<HealthExportFailure?> {
   @override
   HealthExportFailure? build() => null;
 
-  void report(int sessionId, HealthFailure reason) => state = (sessionId: sessionId, reason: reason);
+  void report(int sessionId, HealthFailure reason) =>
+      state = (sessionId: sessionId, reason: reason);
 
   void clear() => state = null;
 }
@@ -145,7 +169,9 @@ class HealthExporter {
     final texts = lookupAppLocalizations(_ref.read(appLanguageProvider).locale);
     final workout = healthWorkoutOf(data, freeTitle: texts.healthFreeTitle);
     try {
-      await _ref.read(healthPlatformProvider).write(workout, version: clock.now().millisecondsSinceEpoch);
+      await _ref
+          .read(healthPlatformProvider)
+          .write(workout, version: clock.now().millisecondsSinceEpoch);
     } on Object catch (e) {
       await repository.clearHealthExported(id);
       return e is HealthException ? e.reason : HealthFailure.failed;
@@ -161,6 +187,8 @@ class HealthExporter {
     final session = await _ref.read(sessionRepositoryProvider).get(id);
     if (session == null || !healthExportable(session.source)) return;
     final failure = await export(id);
-    if (failure != null) _ref.read(healthExportFailureProvider.notifier).report(id, failure);
+    if (failure != null) {
+      _ref.read(healthExportFailureProvider.notifier).report(id, failure);
+    }
   }
 }

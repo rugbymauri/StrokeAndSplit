@@ -7,7 +7,11 @@ import '../live/formatters.dart';
 
 /// Target pace, stroke rate, pause and protocol for the simulated rower.
 class SimulatorControls extends StatefulWidget {
-  const SimulatorControls({super.key, required this.source, this.onProtocolChanged});
+  const SimulatorControls({
+    super.key,
+    required this.source,
+    this.onProtocolChanged,
+  });
 
   final SimulatedSource source;
 
@@ -38,7 +42,8 @@ class _SimulatorControlsState extends State<SimulatorControls> {
     setState(() => _source.targetStrokeRate = strokeRate);
   }
 
-  void _togglePause() => setState(() => _source.isPaused ? _source.resume() : _source.pause());
+  void _togglePause() =>
+      setState(() => _source.isPaused ? _source.resume() : _source.pause());
 
   @override
   Widget build(BuildContext context) {
@@ -116,9 +121,17 @@ class _Stepper extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text('$label '),
-        IconButton(onPressed: onDecrease, tooltip: decreaseTooltip, icon: const Icon(Icons.remove)),
+        IconButton(
+          onPressed: onDecrease,
+          tooltip: decreaseTooltip,
+          icon: const Icon(Icons.remove),
+        ),
         Text(value, style: Theme.of(context).textTheme.titleMedium),
-        IconButton(onPressed: onIncrease, tooltip: increaseTooltip, icon: const Icon(Icons.add)),
+        IconButton(
+          onPressed: onIncrease,
+          tooltip: increaseTooltip,
+          icon: const Icon(Icons.add),
+        ),
       ],
     );
   }

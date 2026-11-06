@@ -53,12 +53,21 @@ class Pm5Decoder implements ErgDecoder {
 
     final minLength = _minLength[id];
     if (minLength == null) return _drop(packet, 'unknown characteristic $id');
-    if (bytes.length < minLength) return _drop(packet, '$id has ${bytes.length} bytes, expected $minLength');
+    if (bytes.length < minLength) {
+      return _drop(
+        packet,
+        '$id has ${bytes.length} bytes, expected $minLength',
+      );
+    }
 
     return switch (id) {
       Pm5Characteristics.generalStatus => _onStatusPart(_General.parse(bytes)),
-      Pm5Characteristics.additionalStatus => _onStatusPart(_Additional.parse(bytes)),
-      Pm5Characteristics.additionalStatus2 => _onStatusPart(_Additional2.parse(bytes)),
+      Pm5Characteristics.additionalStatus => _onStatusPart(
+        _Additional.parse(bytes),
+      ),
+      Pm5Characteristics.additionalStatus2 => _onStatusPart(
+        _Additional2.parse(bytes),
+      ),
       Pm5Characteristics.strokeData => _onStrokeData(_StrokePart.parse(bytes)),
       Pm5Characteristics.forceCurve => _onForceCurve(packet, bytes),
       _ => _onAdditionalStrokeData(bytes),
@@ -73,7 +82,9 @@ class Pm5Decoder implements ErgDecoder {
   }
 
   List<RowingEvent> _drop(RawPacket packet, String reason) {
-    onWarning?.call('Dropped ${packet.characteristicId} packet at ${packet.time.inMilliseconds} ms: $reason');
+    onWarning?.call(
+      'Dropped ${packet.characteristicId} packet at ${packet.time.inMilliseconds} ms: $reason',
+    );
     return const [];
   }
 
@@ -87,7 +98,8 @@ class Pm5Decoder implements ErgDecoder {
       _Additional2() => _additional2 != null,
     };
     final groupElapsed = (_general ?? _additional ?? _additional2)?.elapsedRaw;
-    final belongsToNext = slotTaken || groupElapsed != null && groupElapsed != part.elapsedRaw;
+    final belongsToNext =
+        slotTaken || groupElapsed != null && groupElapsed != part.elapsedRaw;
 
     final events = belongsToNext ? _flushStatus() : <RowingEvent>[];
     switch (part) {
@@ -117,10 +129,18 @@ class Pm5Decoder implements ErgDecoder {
     final previous = _previousGeneral;
     final elapsed = Duration(milliseconds: general.elapsedRaw * 10);
     if (previous == null) {
-      events.add(WorkoutStateChanged(
-          elapsed: elapsed, previous: WorkoutState.unknown, current: general.state, isReset: false));
+      events.add(
+        WorkoutStateChanged(
+          elapsed: elapsed,
+          previous: WorkoutState.unknown,
+          current: general.state,
+          isReset: false,
+        ),
+      );
     } else {
-      final isReset = general.elapsedRaw < previous.elapsedRaw || general.distanceRaw < previous.distanceRaw;
+      final isReset =
+          general.elapsedRaw < previous.elapsedRaw ||
+          general.distanceRaw < previous.distanceRaw;
       if (isReset) {
         _pendingStroke = null;
         _lastEmittedStroke = null;
@@ -129,8 +149,14 @@ class Pm5Decoder implements ErgDecoder {
         _curve = null;
       }
       if (isReset || general.state != previous.state) {
-        events.add(WorkoutStateChanged(
-            elapsed: elapsed, previous: previous.state, current: general.state, isReset: isReset));
+        events.add(
+          WorkoutStateChanged(
+            elapsed: elapsed,
+            previous: previous.state,
+            current: general.state,
+            isReset: isReset,
+          ),
+        );
       }
     }
     _previousGeneral = general;
@@ -138,21 +164,26 @@ class Pm5Decoder implements ErgDecoder {
     // When the rower stops, the closing stroke notification may never come.
     if (!general.isRowing) events.addAll(_flushStroke());
 
-    final pace = general.isRowing && additional != null && additional.paceRaw > 0
+    final pace =
+        general.isRowing && additional != null && additional.paceRaw > 0
         ? Duration(milliseconds: additional.paceRaw * 10)
         : null;
-    events.add(StatusTick(
-      elapsed: elapsed,
-      distanceMeters: general.distanceRaw / 10,
-      workoutType: general.type,
-      workoutState: general.state,
-      isRowing: general.isRowing,
-      pace: pace,
-      watts: pace == null ? null : wattsForPace(pace),
-      strokeRate: additional?.strokeRate,
-      heartRate: additional == null || additional.heartRate == 255 ? null : additional.heartRate,
-      calories: additional2?.calories,
-    ));
+    events.add(
+      StatusTick(
+        elapsed: elapsed,
+        distanceMeters: general.distanceRaw / 10,
+        workoutType: general.type,
+        workoutState: general.state,
+        isRowing: general.isRowing,
+        pace: pace,
+        watts: pace == null ? null : wattsForPace(pace),
+        strokeRate: additional?.strokeRate,
+        heartRate: additional == null || additional.heartRate == 255
+            ? null
+            : additional.heartRate,
+        calories: additional2?.calories,
+      ),
+    );
     return events;
   }
 
@@ -186,11 +217,20 @@ class Pm5Decoder implements ErgDecoder {
     final total = bytes[0] >> 4;
     final valueCount = bytes[0] & 0x0f;
     final counter = bytes[1];
-    if (total == 0 || valueCount == 0 || valueCount > _maxCurveValues || counter >= total) {
-      return _drop(packet, 'invalid force curve header ${bytes[0]}/${bytes[1]}');
+    if (total == 0 ||
+        valueCount == 0 ||
+        valueCount > _maxCurveValues ||
+        counter >= total) {
+      return _drop(
+        packet,
+        'invalid force curve header ${bytes[0]}/${bytes[1]}',
+      );
     }
     if (bytes.length < 2 + 2 * valueCount) {
-      return _drop(packet, 'force curve packet with ${bytes.length} bytes for $valueCount values');
+      return _drop(
+        packet,
+        'force curve packet with ${bytes.length} bytes for $valueCount values',
+      );
     }
 
     if (counter == 0) {
@@ -198,15 +238,25 @@ class Pm5Decoder implements ErgDecoder {
       if (open != null) _warnIncomplete(open, 'the next curve began');
       _curve = null;
       final stroke = _lastStrokeData;
-      if (stroke == null) return _drop(packet, 'force curve without preceding stroke data');
+      if (stroke == null) {
+        return _drop(packet, 'force curve without preceding stroke data');
+      }
       _curve = _CurveParts(stroke, total);
     }
     final curve = _curve;
-    if (curve == null) return _drop(packet, 'force curve packet $counter without its first packet');
+    if (curve == null) {
+      return _drop(
+        packet,
+        'force curve packet $counter without its first packet',
+      );
+    }
     if (curve.total != total || curve.nextCounter != counter) {
       _curve = null;
-      return _drop(packet, 'force curve of stroke ${curve.stroke.count} is incomplete, expected packet '
-          '${curve.nextCounter} of ${curve.total}, got $counter of $total');
+      return _drop(
+        packet,
+        'force curve of stroke ${curve.stroke.count} is incomplete, expected packet '
+        '${curve.nextCounter} of ${curve.total}, got $counter of $total',
+      );
     }
 
     for (var i = 0; i < valueCount; i++) {
@@ -221,8 +271,12 @@ class Pm5Decoder implements ErgDecoder {
       StrokeForceCurve(
         elapsed: Duration(milliseconds: stroke.elapsedRaw * 10),
         strokeNumber: stroke.count,
-        forcesNewtons: [for (final f in curve.forcesLbf) f * newtonsPerPoundForce],
-        driveLengthMeters: stroke.driveLengthRaw == 0 ? null : stroke.driveLengthRaw / 100,
+        forcesNewtons: [
+          for (final f in curve.forcesLbf) f * newtonsPerPoundForce,
+        ],
+        driveLengthMeters: stroke.driveLengthRaw == 0
+            ? null
+            : stroke.driveLengthRaw / 100,
       ),
     ];
   }
@@ -230,8 +284,9 @@ class Pm5Decoder implements ErgDecoder {
   static const _maxCurveValues = 9;
 
   void _warnIncomplete(_CurveParts curve, String reason) => onWarning?.call(
-      'Discarded incomplete force curve of stroke ${curve.stroke.count} after ${curve.nextCounter} of '
-      '${curve.total} packets: $reason');
+    'Discarded incomplete force curve of stroke ${curve.stroke.count} after ${curve.nextCounter} of '
+    '${curve.total} packets: $reason',
+  );
 
   List<RowingEvent> _onAdditionalStrokeData(Uint8List bytes) {
     _strokePower = (_u16(bytes, 7), _u16(bytes, 3));
@@ -241,7 +296,9 @@ class Pm5Decoder implements ErgDecoder {
   List<RowingEvent> _flushStroke() {
     final pending = _pendingStroke;
     _pendingStroke = null;
-    return pending == null ? [] : [_toStroke(pending, recoveryRaw: pending.recoveryRaw)];
+    return pending == null
+        ? []
+        : [_toStroke(pending, recoveryRaw: pending.recoveryRaw)];
   }
 
   Stroke _toStroke(_StrokePart part, {required int recoveryRaw}) {
@@ -262,7 +319,8 @@ class Pm5Decoder implements ErgDecoder {
 }
 
 int _u16(Uint8List b, int offset) => b[offset] | b[offset + 1] << 8;
-int _u24(Uint8List b, int offset) => b[offset] | b[offset + 1] << 8 | b[offset + 2] << 16;
+int _u24(Uint8List b, int offset) =>
+    b[offset] | b[offset + 1] << 8 | b[offset + 2] << 16;
 
 sealed class _StatusPart {
   const _StatusPart(this.elapsedRaw);
@@ -271,15 +329,21 @@ sealed class _StatusPart {
 }
 
 final class _General extends _StatusPart {
-  const _General(super.elapsedRaw, this.distanceRaw, this.type, this.state, this.isRowing);
+  const _General(
+    super.elapsedRaw,
+    this.distanceRaw,
+    this.type,
+    this.state,
+    this.isRowing,
+  );
 
   factory _General.parse(Uint8List b) => _General(
-        _u24(b, 0),
-        _u24(b, 3),
-        WorkoutType.fromCode(b[6]),
-        WorkoutState.fromCode(b[8]),
-        b[9] == 1,
-      );
+    _u24(b, 0),
+    _u24(b, 3),
+    WorkoutType.fromCode(b[6]),
+    WorkoutState.fromCode(b[8]),
+    b[9] == 1,
+  );
 
   final int distanceRaw;
   final WorkoutType type;
@@ -288,9 +352,15 @@ final class _General extends _StatusPart {
 }
 
 final class _Additional extends _StatusPart {
-  const _Additional(super.elapsedRaw, this.strokeRate, this.heartRate, this.paceRaw);
+  const _Additional(
+    super.elapsedRaw,
+    this.strokeRate,
+    this.heartRate,
+    this.paceRaw,
+  );
 
-  factory _Additional.parse(Uint8List b) => _Additional(_u24(b, 0), b[5], b[6], _u16(b, 7));
+  factory _Additional.parse(Uint8List b) =>
+      _Additional(_u24(b, 0), b[5], b[6], _u16(b, 7));
 
   final int strokeRate;
   final int heartRate;
@@ -300,7 +370,8 @@ final class _Additional extends _StatusPart {
 final class _Additional2 extends _StatusPart {
   const _Additional2(super.elapsedRaw, this.calories);
 
-  factory _Additional2.parse(Uint8List b) => _Additional2(_u24(b, 0), _u16(b, 6));
+  factory _Additional2.parse(Uint8List b) =>
+      _Additional2(_u24(b, 0), _u16(b, 6));
 
   final int calories;
 }
@@ -318,15 +389,15 @@ class _StrokePart {
   });
 
   factory _StrokePart.parse(Uint8List b) => _StrokePart(
-        elapsedRaw: _u24(b, 0),
-        distanceRaw: _u24(b, 3),
-        driveLengthRaw: b[6],
-        driveTimeRaw: b[7],
-        recoveryRaw: _u16(b, 8),
-        peakForceRaw: _u16(b, 12),
-        averageForceRaw: _u16(b, 14),
-        count: _u16(b, 18),
-      );
+    elapsedRaw: _u24(b, 0),
+    distanceRaw: _u24(b, 3),
+    driveLengthRaw: b[6],
+    driveTimeRaw: b[7],
+    recoveryRaw: _u16(b, 8),
+    peakForceRaw: _u16(b, 12),
+    averageForceRaw: _u16(b, 14),
+    count: _u16(b, 18),
+  );
 
   final int elapsedRaw;
   final int distanceRaw;

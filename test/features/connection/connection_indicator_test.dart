@@ -26,19 +26,35 @@ Future<void> _pump(
   String name = 'PM5 430000001 Row',
   ErgProtocol protocol = ErgProtocol.pm5,
 }) {
-  return tester.pumpWidget(ProviderScope(
-    overrides: [
-      activeErgSourceProvider.overrideWith(() => _Fixed(FakeErgSource(kind: kind, name: name, protocol: protocol))),
-      ergConnectionStateProvider.overrideWithValue(AsyncData(state)),
-    ],
-    child: const LocalizedApp(
-      home: Scaffold(body: Column(children: [ConnectionIndicator(), ConnectionNotice(), SourceBadge()])),
+  return tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        activeErgSourceProvider.overrideWith(
+          () =>
+              _Fixed(FakeErgSource(kind: kind, name: name, protocol: protocol)),
+        ),
+        ergConnectionStateProvider.overrideWithValue(AsyncData(state)),
+      ],
+      child: const LocalizedApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              ConnectionIndicator(),
+              ConnectionNotice(),
+              SourceBadge(),
+            ],
+          ),
+        ),
+      ),
     ),
-  ));
+  );
 }
 
 BoxDecoration _dot(WidgetTester tester) =>
-    tester.widget<Container>(find.byKey(const Key('connection-dot'))).decoration! as BoxDecoration;
+    tester
+            .widget<Container>(find.byKey(const Key('connection-dot')))
+            .decoration!
+        as BoxDecoration;
 
 void main() {
   const labels = {
@@ -50,7 +66,9 @@ void main() {
   };
 
   for (final MapEntry(key: state, value: label) in labels.entries) {
-    testWidgets('reads the state ${state.name} to screen readers', (tester) async {
+    testWidgets('reads the state ${state.name} to screen readers', (
+      tester,
+    ) async {
       final semantics = tester.ensureSemantics();
       await _pump(tester, kind: ErgSourceKind.pm5, state: state);
 
@@ -59,8 +77,14 @@ void main() {
     });
   }
 
-  testWidgets('shows a connected erg as a filled green dot without text', (tester) async {
-    await _pump(tester, kind: ErgSourceKind.pm5, state: ErgConnectionState.connected);
+  testWidgets('shows a connected erg as a filled green dot without text', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      kind: ErgSourceKind.pm5,
+      state: ErgConnectionState.connected,
+    );
 
     expect(_dot(tester).color, AppColors.connected);
     expect(find.byKey(const Key('connection-notice')), findsNothing);
@@ -72,7 +96,9 @@ void main() {
     ErgConnectionState.scanning,
     ErgConnectionState.reconnecting,
   ]) {
-    testWidgets('shows the state ${state.name} as an orange dot and as text', (tester) async {
+    testWidgets('shows the state ${state.name} as an orange dot and as text', (
+      tester,
+    ) async {
       await _pump(tester, kind: ErgSourceKind.pm5, state: state);
 
       expect(_dot(tester).color, AppColors.zoneOut);
@@ -80,28 +106,49 @@ void main() {
     });
   }
 
-  testWidgets('shows a disconnected erg as an empty grey ring and as text', (tester) async {
-    await _pump(tester, kind: ErgSourceKind.pm5, state: ErgConnectionState.disconnected);
+  testWidgets('shows a disconnected erg as an empty grey ring and as text', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      kind: ErgSourceKind.pm5,
+      state: ErgConnectionState.disconnected,
+    );
 
     expect(_dot(tester).color, isNull);
-    expect(_dot(tester).border, Border.all(color: AppColors.textMuted, width: 2));
+    expect(
+      _dot(tester).border,
+      Border.all(color: AppColors.textMuted, width: 2),
+    );
     expect(find.text('Getrennt'), findsOneWidget);
   });
 
   testWidgets('leaves out the name of a real erg', (tester) async {
-    await _pump(tester, kind: ErgSourceKind.pm5, state: ErgConnectionState.connected);
+    await _pump(
+      tester,
+      kind: ErgSourceKind.pm5,
+      state: ErgConnectionState.connected,
+    );
 
     expect(find.text('PM5 430000001 Row'), findsNothing);
   });
 
   testWidgets('marks simulated data clearly', (tester) async {
-    await _pump(tester, kind: ErgSourceKind.simulator, state: ErgConnectionState.connected);
+    await _pump(
+      tester,
+      kind: ErgSourceKind.simulator,
+      state: ErgConnectionState.connected,
+    );
 
     expect(find.text('SIMULATOR'), findsOneWidget);
   });
 
   testWidgets('marks replayed data clearly', (tester) async {
-    await _pump(tester, kind: ErgSourceKind.replay, state: ErgConnectionState.connected);
+    await _pump(
+      tester,
+      kind: ErgSourceKind.replay,
+      state: ErgConnectionState.connected,
+    );
 
     expect(find.text('REPLAY'), findsOneWidget);
   });

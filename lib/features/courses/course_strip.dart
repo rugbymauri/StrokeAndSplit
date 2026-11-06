@@ -61,8 +61,14 @@ class CourseStrip extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       alignment: Alignment.centerLeft,
                       decoration: BoxDecoration(color: colors[i]),
-                      foregroundDecoration:
-                          i == selected ? BoxDecoration(border: Border.all(color: AppColors.text, width: 2)) : null,
+                      foregroundDecoration: i == selected
+                          ? BoxDecoration(
+                              border: Border.all(
+                                color: AppColors.text,
+                                width: 2,
+                              ),
+                            )
+                          : null,
                       child: showNames && !s.isFree
                           ? Text(
                               s.zoneName ?? context.l10n.segmentZone,
@@ -82,7 +88,9 @@ class CourseStrip extends StatelessWidget {
   }
 
   static Color _textOn(Color background) =>
-      ThemeData.estimateBrightnessForColor(background) == Brightness.light ? AppColors.bg : AppColors.text;
+      ThemeData.estimateBrightnessForColor(background) == Brightness.light
+      ? AppColors.bg
+      : AppColors.text;
 
   /// The smallest step in shade between two distinct pace bands, as a share
   /// of the range from [fastestPace] to [slowestPace].
@@ -110,8 +118,7 @@ class CourseStrip extends StatelessWidget {
     final paces = {
       for (final s in segments)
         if (s.hasPaceBand) _paceSum(s),
-    }.toList()
-      ..sort();
+    }.toList()..sort();
     if (paces.length < 2) return {};
     final range = paces.last - paces.first;
     final step = math.min(minShadeStep, 1 / (paces.length - 1));
@@ -119,7 +126,9 @@ class CourseStrip extends StatelessWidget {
     for (final pace in paces.skip(1)) {
       shades.add(math.max((pace - paces.first) / range, shades.last + step));
     }
-    return {for (final (i, pace) in paces.indexed) pace: shades[i] / shades.last};
+    return {
+      for (final (i, pace) in paces.indexed) pace: shades[i] / shades.last,
+    };
   }
 
   static int _paceSum(CourseSegment s) => s.paceFastCs! + s.paceSlowCs!;

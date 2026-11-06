@@ -13,7 +13,10 @@ void main() {
         .map((p) => p.bytes[18] | p.bytes[19] << 8)
         .toSet();
 
-    expect(strokes.map((s) => s.strokeNumber), orderedEquals(strokeNumbers.toList()..sort()));
+    expect(
+      strokes.map((s) => s.strokeNumber),
+      orderedEquals(strokeNumbers.toList()..sort()),
+    );
   });
 
   test('numbers strokes consecutively', () {
@@ -56,9 +59,17 @@ void main() {
     );
     final decoder = Pm5Decoder();
 
-    final atDriveEnd = [for (final p in encoder.encodeDriveEnd(stroke, at: Duration.zero)) ...decoder.decode(p)];
-    final atStop = [for (final p in encoder.encodeStatus(idle, at: Duration.zero)) ...decoder.decode(p)];
-    final lateClosing = decoder.decode(encoder.encodeRecoveryEnd(stroke, at: Duration.zero));
+    final atDriveEnd = [
+      for (final p in encoder.encodeDriveEnd(stroke, at: Duration.zero))
+        ...decoder.decode(p),
+    ];
+    final atStop = [
+      for (final p in encoder.encodeStatus(idle, at: Duration.zero))
+        ...decoder.decode(p),
+    ];
+    final lateClosing = decoder.decode(
+      encoder.encodeRecoveryEnd(stroke, at: Duration.zero),
+    );
 
     expect(atDriveEnd, isEmpty);
     expect(atStop.whereType<Stroke>().single.strokeNumber, 5);

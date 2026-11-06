@@ -10,7 +10,8 @@ Duration _s(num seconds) => Duration(milliseconds: (seconds * 1000).round());
 /// Feeds rower and strap packets into the decoder [ErgDecoder.forProtocol]
 /// builds, on one time axis.
 class _Session {
-  _Session(this.protocol) : decoder = ErgDecoder.forProtocol(protocol, onWarning: warnings.add);
+  _Session(this.protocol)
+    : decoder = ErgDecoder.forProtocol(protocol, onWarning: warnings.add);
 
   final ErgProtocol protocol;
   final ErgDecoder decoder;
@@ -40,25 +41,31 @@ class _Session {
     final packets = switch (protocol) {
       ErgProtocol.pm5 => _pm5.encodeStatus(tick, at: at),
       ErgProtocol.ftms => [
-          _ftms.encode(
-            RowerData(
-              strokeRate: 24,
-              strokeCount: ++_strokes,
-              totalDistance: tick.distanceMeters.floor(),
-              pace: tick.pace,
-              heartRate: heartRate,
-            ),
-            at: at,
+        _ftms.encode(
+          RowerData(
+            strokeRate: 24,
+            strokeCount: ++_strokes,
+            totalDistance: tick.distanceMeters.floor(),
+            pace: tick.pace,
+            heartRate: heartRate,
           ),
-        ],
+          at: at,
+        ),
+      ],
     };
     return _feed(packets).whereType<StatusTick>().single;
   }
 
-  List<RowingEvent> strap(Duration at, int heartRate, {List<int> intervalsMs = const []}) =>
-      _feed([_strap.encode(heartRate: heartRate, intervalsMs: intervalsMs, at: at)]);
+  List<RowingEvent> strap(
+    Duration at,
+    int heartRate, {
+    List<int> intervalsMs = const [],
+  }) => _feed([
+    _strap.encode(heartRate: heartRate, intervalsMs: intervalsMs, at: at),
+  ]);
 
-  List<HeartBeatIntervals> get intervals => events.whereType<HeartBeatIntervals>().toList();
+  List<HeartBeatIntervals> get intervals =>
+      events.whereType<HeartBeatIntervals>().toList();
 }
 
 void main() {
@@ -77,20 +84,29 @@ void main() {
         final session = _Session(protocol)
           ..strap(_s(10), 142)
           ..rower(_s(11), heartRate: rowerHeartRate);
-        expect(session.rower(_s(14), heartRate: rowerHeartRate).heartRate, rowerHeartRate);
+        expect(
+          session.rower(_s(14), heartRate: rowerHeartRate).heartRate,
+          rowerHeartRate,
+        );
       });
 
-      test('reports no heart rate once the strap is silent and the rower has none', () {
-        final session = _Session(protocol)
-          ..strap(_s(10), 142)
-          ..rower(_s(11));
-        expect(session.rower(_s(14)).heartRate, isNull);
-      });
+      test(
+        'reports no heart rate once the strap is silent and the rower has none',
+        () {
+          final session = _Session(protocol)
+            ..strap(_s(10), 142)
+            ..rower(_s(11));
+          expect(session.rower(_s(14)).heartRate, isNull);
+        },
+      );
 
       test('keeps the strap for exactly 3 s', () {
         final session = _Session(protocol)..strap(_s(10), 142);
         expect(session.rower(_s(13), heartRate: rowerHeartRate).heartRate, 142);
-        expect(session.rower(_s(13.001), heartRate: rowerHeartRate).heartRate, rowerHeartRate);
+        expect(
+          session.rower(_s(13.001), heartRate: rowerHeartRate).heartRate,
+          rowerHeartRate,
+        );
       });
 
       test('measures the age on the packet times', () {
@@ -106,7 +122,10 @@ void main() {
           ..strap(_s(10), 142)
           ..strap(_s(11), 0);
         expect(session.rower(_s(12), heartRate: rowerHeartRate).heartRate, 142);
-        expect(session.rower(_s(13.5), heartRate: rowerHeartRate).heartRate, rowerHeartRate);
+        expect(
+          session.rower(_s(13.5), heartRate: rowerHeartRate).heartRate,
+          rowerHeartRate,
+        );
       });
 
       test('leaves every other metric to the rower', () {
@@ -123,25 +142,32 @@ void main() {
 
     group('${protocol.name}: RR intervals', () {
       test('emits the intervals of a measurement in their order', () {
-        final session = _Session(protocol)..rower(_s(10), heartRate: rowerHeartRate);
+        final session = _Session(protocol)
+          ..rower(_s(10), heartRate: rowerHeartRate);
         final events = session.strap(_s(10.4), 142, intervalsMs: [812, 790]);
 
         final intervals = events.single as HeartBeatIntervals;
         expect(intervals.intervalsMs, [812, 790]);
         expect(intervals.time, _s(10.4));
-        expect(intervals.elapsed, session.events.whereType<StatusTick>().last.elapsed);
+        expect(
+          intervals.elapsed,
+          session.events.whereType<StatusTick>().last.elapsed,
+        );
       });
 
-      test('emits one event per measurement with intervals and none without', () {
-        final session = _Session(protocol)
-          ..strap(_s(1), 70, intervalsMs: [850])
-          ..strap(_s(2), 71)
-          ..strap(_s(3), 72, intervalsMs: [840, 845]);
-        expect(session.intervals.map((e) => e.intervalsMs), [
-          [850],
-          [840, 845],
-        ]);
-      });
+      test(
+        'emits one event per measurement with intervals and none without',
+        () {
+          final session = _Session(protocol)
+            ..strap(_s(1), 70, intervalsMs: [850])
+            ..strap(_s(2), 71)
+            ..strap(_s(3), 72, intervalsMs: [840, 845]);
+          expect(session.intervals.map((e) => e.intervalsMs), [
+            [850],
+            [840, 845],
+          ]);
+        },
+      );
 
       test('emits none when the heart rate comes from the rower only', () {
         final session = _Session(protocol);
@@ -157,9 +183,18 @@ void main() {
         final session = _Session(protocol)
           ..strap(_s(10), 142)
           ..rower(_s(10), heartRate: rowerHeartRate);
-        final cut = _strap.encode(heartRate: 150, intervalsMs: [812], at: _s(13));
+        final cut = _strap.encode(
+          heartRate: 150,
+          intervalsMs: [812],
+          at: _s(13),
+        );
         final events = session.decoder.decode(
-            RawPacket(time: cut.time, characteristicId: cut.characteristicId, bytes: cut.bytes.sublist(0, 3)));
+          RawPacket(
+            time: cut.time,
+            characteristicId: cut.characteristicId,
+            bytes: cut.bytes.sublist(0, 3),
+          ),
+        );
 
         expect(events, isEmpty);
         expect(_Session.warnings.single, contains('2a37'));
@@ -189,12 +224,16 @@ void main() {
         ..strap(_s(1), 142)
         ..rower(_s(1), heartRate: 0);
       expect(session.rower(_s(5), heartRate: 0).heartRate, isNull);
-      expect(_Session(ErgProtocol.ftms).rower(_s(1), heartRate: 0).heartRate, isNull);
+      expect(
+        _Session(ErgProtocol.ftms).rower(_s(1), heartRate: 0).heartRate,
+        isNull,
+      );
     });
   });
 
   test('a strap packet never reaches the rower decoder', () {
-    final session = _Session(ErgProtocol.pm5)..strap(_s(1), 142, intervalsMs: [800]);
+    final session = _Session(ErgProtocol.pm5)
+      ..strap(_s(1), 142, intervalsMs: [800]);
     expect(_Session.warnings, isEmpty);
     expect(session.events.single, isA<HeartBeatIntervals>());
   });

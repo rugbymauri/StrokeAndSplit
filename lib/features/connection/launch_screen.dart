@@ -15,7 +15,10 @@ import 'start_screen.dart';
 /// The first screen: skips "Geräte wählen" when the rower chosen last is a
 /// simulator or is found and connected within [searchTimeout] (Design D6).
 class LaunchScreen extends ConsumerStatefulWidget {
-  const LaunchScreen({super.key, this.searchTimeout = const Duration(seconds: 10)});
+  const LaunchScreen({
+    super.key,
+    this.searchTimeout = const Duration(seconds: 10),
+  });
 
   final Duration searchTimeout;
 
@@ -52,18 +55,20 @@ class _LaunchScreenState extends ConsumerState<LaunchScreen> {
     final transport = ref.read(bleTransportProvider);
     final ready = await transport.readiness() == BluetoothReadiness.ready;
     if (!ready || _found.isCompleted) return _finish(_Outcome.choose);
-    _scan = transport.scan(timeout: widget.searchTimeout).listen(
-      (rowers) {
-        final match = rowers.where((r) => r == wanted).firstOrNull;
-        if (match != null) _settle(match);
-      },
-      onError: (Object _) => _settle(null),
-      onDone: () {
-        // Cancelling a finished scan would never complete.
-        _scan = null;
-        _settle(null);
-      },
-    );
+    _scan = transport
+        .scan(timeout: widget.searchTimeout)
+        .listen(
+          (rowers) {
+            final match = rowers.where((r) => r == wanted).firstOrNull;
+            if (match != null) _settle(match);
+          },
+          onError: (Object _) => _settle(null),
+          onDone: () {
+            // Cancelling a finished scan would never complete.
+            _scan = null;
+            _settle(null);
+          },
+        );
     final rower = await _found.future;
     await _scan?.cancel();
     if (rower == null || !mounted) return _finish(_Outcome.choose);
@@ -81,18 +86,20 @@ class _LaunchScreenState extends ConsumerState<LaunchScreen> {
   }
 
   void _finish(_Outcome outcome) {
-    if (mounted && _outcome == _Outcome.searching) setState(() => _outcome = outcome);
+    if (mounted && _outcome == _Outcome.searching) {
+      setState(() => _outcome = outcome);
+    }
   }
 
   @override
   Widget build(BuildContext context) => switch (_outcome) {
-        _Outcome.start => const StartScreen(),
-        _Outcome.choose => const ChooseDevicesScreen(),
-        _Outcome.searching => _Searching(
-            name: _choice!.device!.name,
-            onChoose: () => _settle(null),
-          ),
-      };
+    _Outcome.start => const StartScreen(),
+    _Outcome.choose => const ChooseDevicesScreen(),
+    _Outcome.searching => _Searching(
+      name: _choice!.device!.name,
+      onChoose: () => _settle(null),
+    ),
+  };
 }
 
 class _Searching extends StatelessWidget {
@@ -113,7 +120,11 @@ class _Searching extends StatelessWidget {
             children: [
               const CircularProgressIndicator(),
               const SizedBox(height: AppSpacing.xxl),
-              Text(l10n.launchSearching(name), style: AppTextStyles.body, textAlign: TextAlign.center),
+              Text(
+                l10n.launchSearching(name),
+                style: AppTextStyles.body,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: AppSpacing.l),
               TextButton(onPressed: onChoose, child: Text(l10n.devicesTitle)),
             ],

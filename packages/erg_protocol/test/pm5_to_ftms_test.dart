@@ -8,8 +8,13 @@ void main() {
   final ftms = loadFixture('ftms_just_row');
 
   ({double distance, int strokes}) result(RawRecording recording) {
-    final decoder = ErgDecoder.forProtocol(ErgProtocol.parse(recording.metadata['protocol']));
-    final events = [for (final p in recording.packets) ...decoder.decode(p), ...decoder.flush()];
+    final decoder = ErgDecoder.forProtocol(
+      ErgProtocol.parse(recording.metadata['protocol']),
+    );
+    final events = [
+      for (final p in recording.packets) ...decoder.decode(p),
+      ...decoder.flush(),
+    ];
     return (
       distance: events.whereType<StatusTick>().last.distanceMeters,
       strokes: events.whereType<Stroke>().last.strokeNumber,
@@ -20,16 +25,20 @@ void main() {
     final converted = pm5ToFtms(pm5);
     // The fixture keeps the format and device name from before the rename.
     Map<String, Object?> renamed(Map<String, Object?> metadata) =>
-        {...metadata}..removeWhere((key, _) => key == 'format' || key == 'device');
+        {...metadata}
+          ..removeWhere((key, _) => key == 'format' || key == 'device');
     expect(renamed(ftms.metadata), renamed(converted.metadata));
     expect(converted.metadata['device'], 'Stroke & Split FTMS');
     expect(ftms.toLines().skip(1), converted.toLines().skip(1));
   });
 
-  test('an FTMS rower rowing like the PM5 ends with the same distance and strokes', () {
-    final (original, converted) = (result(pm5), result(ftms));
-    expect(ftms.metadata['protocol'], 'ftms');
-    expect(converted.distance, closeTo(original.distance, 1));
-    expect(converted.strokes, original.strokes);
-  });
+  test(
+    'an FTMS rower rowing like the PM5 ends with the same distance and strokes',
+    () {
+      final (original, converted) = (result(pm5), result(ftms));
+      expect(ftms.metadata['protocol'], 'ftms');
+      expect(converted.distance, closeTo(original.distance, 1));
+      expect(converted.strokes, original.strokes);
+    },
+  );
 }

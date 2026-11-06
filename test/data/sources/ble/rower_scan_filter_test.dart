@@ -7,8 +7,17 @@ void main() {
   const rower = [0x01, 0x10, 0x00];
   const bike = [0x01, 0x20, 0x00];
 
-  (String, ErgProtocol)? found(String name, {List<String> services = const [], Map<String, List<int>>? data}) {
-    final rower = rowerFromAdvertisement(id: id, name: name, serviceIds: services, serviceData: data ?? const {});
+  (String, ErgProtocol)? found(
+    String name, {
+    List<String> services = const [],
+    Map<String, List<int>>? data,
+  }) {
+    final rower = rowerFromAdvertisement(
+      id: id,
+      name: name,
+      serviceIds: services,
+      serviceData: data ?? const {},
+    );
     return rower == null ? null : (rower.name, rower.protocol);
   }
 
@@ -30,19 +39,39 @@ void main() {
   });
 
   test('lists an FTMS rower', () {
-    expect(found('Stroke & Split FTMS', services: ['1826'], data: {'1826': rower}),
-        ('Stroke & Split FTMS', ErgProtocol.ftms));
+    expect(
+      found('Stroke & Split FTMS', services: ['1826'], data: {'1826': rower}),
+      ('Stroke & Split FTMS', ErgProtocol.ftms),
+    );
     expect(found('Rower', data: {'1826': rower}), ('Rower', ErgProtocol.ftms));
   });
 
   test('drops an FTMS machine that says it is no rower', () {
-    expect(found('Indoor Bike', services: ['1826'], data: {'1826': bike}), isNull);
+    expect(
+      found('Indoor Bike', services: ['1826'], data: {'1826': bike}),
+      isNull,
+    );
   });
 
-  test('lists an FTMS machine without service data and checks it when connecting', () {
-    expect(found('Rower 42', services: ['1826']), ('Rower 42', ErgProtocol.ftms));
-    expect(found('Rower 42', services: ['1826'], data: {'1826': [0x01]}), ('Rower 42', ErgProtocol.ftms));
-  });
+  test(
+    'lists an FTMS machine without service data and checks it when connecting',
+    () {
+      expect(found('Rower 42', services: ['1826']), (
+        'Rower 42',
+        ErgProtocol.ftms,
+      ));
+      expect(
+        found(
+          'Rower 42',
+          services: ['1826'],
+          data: {
+            '1826': [0x01],
+          },
+        ),
+        ('Rower 42', ErgProtocol.ftms),
+      );
+    },
+  );
 
   test('names an FTMS rower without name by its id', () {
     expect(found('', services: ['1826']), (id, ErgProtocol.ftms));

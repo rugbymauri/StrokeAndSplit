@@ -67,18 +67,22 @@ class SessionRepository {
     int? plannedLaps,
     bool imported = false,
   }) {
-    return _db.into(_db.sessions).insert(SessionsCompanion.insert(
-          startedAt: startedAt,
-          status: SessionStatus.recording,
-          source: source,
-          protocol: Value(protocol),
-          deviceName: Value(deviceName),
-          templateId: Value(templateId),
-          templateName: Value(templateName),
-          courseVersionId: Value(courseVersionId),
-          plannedLaps: Value(plannedLaps),
-          imported: Value(imported),
-        ));
+    return _db
+        .into(_db.sessions)
+        .insert(
+          SessionsCompanion.insert(
+            startedAt: startedAt,
+            status: SessionStatus.recording,
+            source: source,
+            protocol: Value(protocol),
+            deviceName: Value(deviceName),
+            templateId: Value(templateId),
+            templateName: Value(templateName),
+            courseVersionId: Value(courseVersionId),
+            plannedLaps: Value(plannedLaps),
+            imported: Value(imported),
+          ),
+        );
   }
 
   /// Writes all rows of [batch] in one transaction.
@@ -92,69 +96,101 @@ class SessionRepository {
       b.insertAll(_db.pauses, batch.pauses);
       // Replaced, as the recovery finishes a lap that may be partly stored.
       b.insertAll(_db.laps, batch.laps, mode: InsertMode.insertOrReplace);
-      b.insertAll(_db.lapSegments, batch.lapSegments, mode: InsertMode.insertOrReplace);
+      b.insertAll(
+        _db.lapSegments,
+        batch.lapSegments,
+        mode: InsertMode.insertOrReplace,
+      );
     });
   }
 
   /// Computes the summary from the stored rows and closes the session.
-  Future<void> finish(int id, {SessionStatus status = SessionStatus.complete, DateTime? endedAt}) async {
+  Future<void> finish(
+    int id, {
+    SessionStatus status = SessionStatus.complete,
+    DateTime? endedAt,
+  }) async {
     final samples = _db.samples;
-    final values = await (_db.selectOnly(samples)
-          ..addColumns([
-            samples.tMs.max(),
-            samples.activeMs.max(),
-            samples.distanceDm.max(),
-            samples.watts.avg(),
-            samples.heartRate.avg(),
-            samples.heartRate.max(),
-          ])
-          ..where(samples.sessionId.equals(id)))
-        .getSingle();
-    final strokeCount = await (_db.selectOnly(_db.strokes)
-          ..addColumns([countAll()])
-          ..where(_db.strokes.sessionId.equals(id)))
-        .map((row) => row.read(countAll())!)
-        .getSingle();
+    final values =
+        await (_db.selectOnly(samples)
+              ..addColumns([
+                samples.tMs.max(),
+                samples.activeMs.max(),
+                samples.distanceDm.max(),
+                samples.watts.avg(),
+                samples.heartRate.avg(),
+                samples.heartRate.max(),
+              ])
+              ..where(samples.sessionId.equals(id)))
+            .getSingle();
+    final strokeCount =
+        await (_db.selectOnly(_db.strokes)
+              ..addColumns([countAll()])
+              ..where(_db.strokes.sessionId.equals(id)))
+            .map((row) => row.read(countAll())!)
+            .getSingle();
 
     // The session time without pauses; sessions before schema 7 only have the monitor's time.
-    final durationMs = values.read(samples.activeMs.max()) ?? values.read(samples.tMs.max()) ?? 0;
+    final durationMs =
+        values.read(samples.activeMs.max()) ??
+        values.read(samples.tMs.max()) ??
+        0;
     final pauses = _db.pauses;
-    final pauseValues = await (_db.selectOnly(pauses)
-          ..addColumns([countAll(), (pauses.endWallMs - pauses.startWallMs).sum()])
-          ..where(pauses.sessionId.equals(id)))
-        .getSingle();
+    final pauseValues =
+        await (_db.selectOnly(pauses)
+              ..addColumns([
+                countAll(),
+                (pauses.endWallMs - pauses.startWallMs).sum(),
+              ])
+              ..where(pauses.sessionId.equals(id)))
+            .getSingle();
     final distanceDm = values.read(samples.distanceDm.max()) ?? 0;
     final averageWatts = values.read(samples.watts.avg());
     final averageHeartRate = values.read(samples.heartRate.avg());
-    final rr = await (_db.selectOnly(_db.rrIntervals)
-          ..addColumns([_db.rrIntervals.rrMs])
-          ..where(_db.rrIntervals.sessionId.equals(id))
-          ..orderBy([OrderingTerm.asc(_db.rrIntervals.tMs), OrderingTerm.asc(_db.rrIntervals.rowId)]))
-        .map((row) => row.read(_db.rrIntervals.rrMs)!)
-        .get();
-    await (_db.update(_db.sessions)..where((s) => s.id.equals(id))).write(SessionsCompanion(
-      status: Value(status),
-      endedAt: Value(endedAt),
-      durationMs: Value(durationMs),
-      distanceDm: Value(distanceDm),
-      // Pace per 500 m in centiseconds: duration / distance * 500 m.
-      averagePaceCs: Value(distanceDm > 0 ? (durationMs / 10 * 5000 / distanceDm).round() : null),
-      averageWatts: Value(averageWatts?.round()),
-      averageStrokeRate: Value(durationMs > 0 && strokeCount > 0 ? strokeCount * 60000 / durationMs : null),
-      strokeCount: Value(strokeCount),
-      averageHeartRate: Value(averageHeartRate?.round()),
-      maxHeartRate: Value(values.read(samples.heartRate.max())),
-      rmssdMs: Value(rmssd(rr)),
-      pauseCount: Value(pauseValues.read(countAll())!),
-      pausedMs: Value(pauseValues.read((pauses.endWallMs - pauses.startWallMs).sum()) ?? 0),
-    ));
+    final rr =
+        await (_db.selectOnly(_db.rrIntervals)
+              ..addColumns([_db.rrIntervals.rrMs])
+              ..where(_db.rrIntervals.sessionId.equals(id))
+              ..orderBy([
+                OrderingTerm.asc(_db.rrIntervals.tMs),
+                OrderingTerm.asc(_db.rrIntervals.rowId),
+              ]))
+            .map((row) => row.read(_db.rrIntervals.rrMs)!)
+            .get();
+    await (_db.update(_db.sessions)..where((s) => s.id.equals(id))).write(
+      SessionsCompanion(
+        status: Value(status),
+        endedAt: Value(endedAt),
+        durationMs: Value(durationMs),
+        distanceDm: Value(distanceDm),
+        // Pace per 500 m in centiseconds: duration / distance * 500 m.
+        averagePaceCs: Value(
+          distanceDm > 0 ? (durationMs / 10 * 5000 / distanceDm).round() : null,
+        ),
+        averageWatts: Value(averageWatts?.round()),
+        averageStrokeRate: Value(
+          durationMs > 0 && strokeCount > 0
+              ? strokeCount * 60000 / durationMs
+              : null,
+        ),
+        strokeCount: Value(strokeCount),
+        averageHeartRate: Value(averageHeartRate?.round()),
+        maxHeartRate: Value(values.read(samples.heartRate.max())),
+        rmssdMs: Value(rmssd(rr)),
+        pauseCount: Value(pauseValues.read(countAll())!),
+        pausedMs: Value(
+          pauseValues.read((pauses.endWallMs - pauses.startWallMs).sum()) ?? 0,
+        ),
+      ),
+    );
   }
 
   /// Closes sessions that were still recording when the app ended and marks
   /// them as incomplete. Returns how many there were.
   Future<int> recoverInterrupted() async {
-    final interrupted =
-        await (_db.select(_db.sessions)..where((s) => s.status.equalsValue(SessionStatus.recording))).get();
+    final interrupted = await (_db.select(
+      _db.sessions,
+    )..where((s) => s.status.equalsValue(SessionStatus.recording))).get();
     for (final session in interrupted) {
       if (session.courseVersionId != null) await _finishLastLap(session);
       await finish(session.id, status: SessionStatus.incomplete);
@@ -165,12 +201,16 @@ class SessionRepository {
   /// Finishes the lap that was running when the app ended from the stored
   /// samples (Design D5); the finished laps are stored already.
   Future<void> _finishLastLap(SessionRow session) async {
-    final course = await CourseRepository(_db).atVersion(session.courseVersionId!);
-    final last = await (_db.select(_db.laps)
-          ..where((l) => l.sessionId.equals(session.id) & l.complete.equals(true))
-          ..orderBy([(l) => OrderingTerm.desc(l.lapNo)])
-          ..limit(1))
-        .getSingleOrNull();
+    final course = await CourseRepository(_db)
+        .atVersion(session.courseVersionId!);
+    final last =
+        await (_db.select(_db.laps)
+              ..where(
+                (l) => l.sessionId.equals(session.id) & l.complete.equals(true),
+              )
+              ..orderBy([(l) => OrderingTerm.desc(l.lapNo)])
+              ..limit(1))
+            .getSingleOrNull();
     final lap = (last?.lapNo ?? 0) + 1;
     if (session.plannedLaps != null && lap > session.plannedLaps!) return;
 
@@ -182,43 +222,74 @@ class SessionRepository {
       startDistanceDm: last?.endDistanceDm ?? 0,
     );
     // The laps run on the session time; sessions before schema 7 only have the wall clock (auto-pause, Design D2).
-    final samples = await (_db.select(_db.samples)
-          ..where((s) =>
-              s.sessionId.equals(session.id) &
-              coalesce([s.activeMs, s.wallMs]).isBiggerOrEqualValue(last?.endWallMs ?? 0))
-          ..orderBy([(s) => OrderingTerm.asc(s.rowId)]))
-        .get();
+    final samples =
+        await (_db.select(_db.samples)
+              ..where(
+                (s) =>
+                    s.sessionId.equals(session.id) &
+                    coalesce([s.activeMs, s.wallMs])
+                        .isBiggerOrEqualValue(last?.endWallMs ?? 0),
+              )
+              ..orderBy([(s) => OrderingTerm.asc(s.rowId)]))
+            .get();
     for (final s in samples) {
-      tracker.add(TrackPoint(
-          wallMs: s.activeMs ?? s.wallMs!, distanceDm: s.distanceDm, paceCs: s.paceCs, strokeRate: s.strokeRate));
+      tracker.add(
+        TrackPoint(
+          wallMs: s.activeMs ?? s.wallMs!,
+          distanceDm: s.distanceDm,
+          paceCs: s.paceCs,
+          strokeRate: s.strokeRate,
+        ),
+      );
     }
     tracker.finish();
-    await write(SessionBatch(
-      samples: const [],
-      strokes: const [],
-      rawPackets: const [],
-      laps: [for (final l in tracker.takeLaps()) lapCompanion(session.id, l)],
-      lapSegments: [for (final s in tracker.takeSegments()) segmentCompanion(session.id, s)],
-    ));
+    await write(
+      SessionBatch(
+        samples: const [],
+        strokes: const [],
+        rawPackets: const [],
+        laps: [for (final l in tracker.takeLaps()) lapCompanion(session.id, l)],
+        lapSegments: [
+          for (final s in tracker.takeSegments())
+            segmentCompanion(session.id, s),
+        ],
+      ),
+    );
   }
 
   /// All sessions, newest first.
   Stream<List<SessionRow>> watchAll() {
-    return (_db.select(_db.sessions)..orderBy([(s) => OrderingTerm.desc(s.startedAt)])).watch();
+    return (_db.select(
+      _db.sessions,
+    )..orderBy([(s) => OrderingTerm.desc(s.startedAt)])).watch();
   }
 
-  Stream<SessionRow?> watch(int id) => (_db.select(_db.sessions)..where((s) => s.id.equals(id))).watchSingleOrNull();
+  Stream<SessionRow?> watch(int id) => (_db.select(
+    _db.sessions,
+  )..where((s) => s.id.equals(id))).watchSingleOrNull();
 
-  Future<SessionRow?> get(int id) => (_db.select(_db.sessions)..where((s) => s.id.equals(id))).getSingleOrNull();
+  Future<SessionRow?> get(int id) => (_db.select(
+    _db.sessions,
+  )..where((s) => s.id.equals(id))).getSingleOrNull();
 
   Future<void> delete(int id) {
     return _db.transaction(() async {
-      await (_db.delete(_db.samples)..where((r) => r.sessionId.equals(id))).go();
-      await (_db.delete(_db.strokes)..where((r) => r.sessionId.equals(id))).go();
-      await (_db.delete(_db.rawPackets)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(
+        _db.samples,
+      )..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(
+        _db.strokes,
+      )..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(
+        _db.rawPackets,
+      )..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.laps)..where((r) => r.sessionId.equals(id))).go();
-      await (_db.delete(_db.lapSegments)..where((r) => r.sessionId.equals(id))).go();
-      await (_db.delete(_db.rrIntervals)..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(
+        _db.lapSegments,
+      )..where((r) => r.sessionId.equals(id))).go();
+      await (_db.delete(
+        _db.rrIntervals,
+      )..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.pauses)..where((r) => r.sessionId.equals(id))).go();
       await (_db.delete(_db.sessions)..where((s) => s.id.equals(id))).go();
     });
@@ -236,38 +307,51 @@ class SessionRepository {
   }
 
   /// The pauses of a session in order (Change auto-pause, Design D3).
-  Future<List<PauseRow>> pauses(int id) => (_db.select(_db.pauses)
-        ..where((p) => p.sessionId.equals(id))
-        ..orderBy([(p) => OrderingTerm.asc(p.startWallMs)]))
-      .get();
+  Future<List<PauseRow>> pauses(int id) =>
+      (_db.select(_db.pauses)
+            ..where((p) => p.sessionId.equals(id))
+            ..orderBy([(p) => OrderingTerm.asc(p.startWallMs)]))
+          .get();
 
   /// The RR intervals of a session in the order of their end times, on the
   /// session's wall-clock axis.
-  Future<List<RrIntervalRow>> rrIntervals(int id) => (_db.select(_db.rrIntervals)
-        ..where((r) => r.sessionId.equals(id))
-        ..orderBy([(r) => OrderingTerm.asc(r.tMs), (r) => OrderingTerm.asc(r.rowId)]))
-      .get();
+  Future<List<RrIntervalRow>> rrIntervals(int id) =>
+      (_db.select(_db.rrIntervals)
+            ..where((r) => r.sessionId.equals(id))
+            ..orderBy([
+              (r) => OrderingTerm.asc(r.tMs),
+              (r) => OrderingTerm.asc(r.rowId),
+            ]))
+          .get();
 
   /// The lowest heart rate of a stored session; null without one. Not stored with the session, so older
   /// sessions show it as well.
   Future<int?> minHeartRate(int id) async {
     final lowest = _db.samples.heartRate.min();
-    final row = await (_db.selectOnly(_db.samples)
-          ..addColumns([lowest])
-          ..where(_db.samples.sessionId.equals(id) & _db.samples.heartRate.isBiggerThanValue(0)))
-        .getSingle();
+    final row =
+        await (_db.selectOnly(_db.samples)
+              ..addColumns([lowest])
+              ..where(
+                _db.samples.sessionId.equals(id) &
+                    _db.samples.heartRate.isBiggerThanValue(0),
+              ))
+            .getSingle();
     return row.read(lowest);
   }
 
   /// The pace of a stored session in steps of rowed time, without its pauses; empty without samples.
   Future<PaceTrack> paceTrack(int id) async {
     final time = coalesce([_db.samples.activeMs, _db.samples.tMs]);
-    final rows = await (_db.selectOnly(_db.samples)
-          ..addColumns([time, _db.samples.distanceDm])
-          ..where(_db.samples.sessionId.equals(id))
-          ..orderBy([OrderingTerm.asc(_db.samples.tMs)]))
-        .get();
-    return PaceTrack.of([for (final row in rows) (row.read(time)!, row.read(_db.samples.distanceDm)!)]);
+    final rows =
+        await (_db.selectOnly(_db.samples)
+              ..addColumns([time, _db.samples.distanceDm])
+              ..where(_db.samples.sessionId.equals(id))
+              ..orderBy([OrderingTerm.asc(_db.samples.tMs)]))
+            .get();
+    return PaceTrack.of([
+      for (final row in rows)
+        (row.read(time)!, row.read(_db.samples.distanceDm)!),
+    ]);
   }
 
   /// What the export to Health Connect needs of a stored session (Change health-connect, Design D3); null
@@ -277,11 +361,18 @@ class SessionRepository {
     if (session == null) return null;
     final samples = _db.samples;
     final wall = coalesce([samples.wallMs, samples.tMs]);
-    final rows = await (_db.selectOnly(samples)
-          ..addColumns([wall, samples.heartRate, samples.watts, samples.paceCs, samples.calories])
-          ..where(samples.sessionId.equals(id))
-          ..orderBy([OrderingTerm.asc(samples.tMs)]))
-        .get();
+    final rows =
+        await (_db.selectOnly(samples)
+              ..addColumns([
+                wall,
+                samples.heartRate,
+                samples.watts,
+                samples.paceCs,
+                samples.calories,
+              ])
+              ..where(samples.sessionId.equals(id))
+              ..orderBy([OrderingTerm.asc(samples.tMs)]))
+            .get();
     return HealthSessionData(
       startedAt: session.startedAt,
       endedAt: session.endedAt,
@@ -299,25 +390,37 @@ class SessionRepository {
       ],
       laps: [
         for (final lap in await laps(id))
-          (startMs: lap.startWallMs, endMs: lap.endWallMs, distanceDm: lap.endDistanceDm - lap.startDistanceDm),
+          (
+            startMs: lap.startWallMs,
+            endMs: lap.endWallMs,
+            distanceDm: lap.endDistanceDm - lap.startDistanceDm,
+          ),
       ],
-      pauses: [for (final p in await pauses(id)) (startWallMs: p.startWallMs, endWallMs: p.endWallMs)],
+      pauses: [
+        for (final p in await pauses(id))
+          (startWallMs: p.startWallMs, endWallMs: p.endWallMs),
+      ],
     );
   }
 
   /// Records that the session was written to Health Connect [at] that moment (Design D6).
-  Future<void> markHealthExported(int id, DateTime at) => (_db.update(_db.sessions)..where((s) => s.id.equals(id)))
-      .write(SessionsCompanion(healthExportedAt: Value(at)));
+  Future<void> markHealthExported(int id, DateTime at) =>
+      (_db.update(_db.sessions)..where((s) => s.id.equals(id))).write(
+        SessionsCompanion(healthExportedAt: Value(at)),
+      );
 
   /// Records that the session is not in Health Connect after all, e.g. after a failed write.
-  Future<void> clearHealthExported(int id) => (_db.update(_db.sessions)..where((s) => s.id.equals(id)))
-      .write(const SessionsCompanion(healthExportedAt: Value(null)));
+  Future<void> clearHealthExported(int id) =>
+      (_db.update(_db.sessions)..where((s) => s.id.equals(id))).write(
+        const SessionsCompanion(healthExportedAt: Value(null)),
+      );
 
   Future<bool> hasRawPackets(int id) async {
-    final row = await (_db.select(_db.rawPackets)
-          ..where((r) => r.sessionId.equals(id))
-          ..limit(1))
-        .getSingleOrNull();
+    final row =
+        await (_db.select(_db.rawPackets)
+              ..where((r) => r.sessionId.equals(id))
+              ..limit(1))
+            .getSingleOrNull();
     return row != null;
   }
 
@@ -325,10 +428,14 @@ class SessionRepository {
   Future<RawRecording> rawRecording(int id) async {
     final session = await get(id);
     if (session == null) throw StateError('No session $id');
-    final rows = await (_db.select(_db.rawPackets)
-          ..where((r) => r.sessionId.equals(id))
-          ..orderBy([(r) => OrderingTerm.asc(r.tMs), (r) => OrderingTerm.asc(r.rowId)]))
-        .get();
+    final rows =
+        await (_db.select(_db.rawPackets)
+              ..where((r) => r.sessionId.equals(id))
+              ..orderBy([
+                (r) => OrderingTerm.asc(r.tMs),
+                (r) => OrderingTerm.asc(r.rowId),
+              ]))
+            .get();
     return RawRecording(
       metadata: {
         'format': RawRecording.formatName,
@@ -340,7 +447,11 @@ class SessionRepository {
       },
       packets: [
         for (final r in rows)
-          RawPacket(time: Duration(milliseconds: r.tMs), characteristicId: r.characteristicId, bytes: r.bytes),
+          RawPacket(
+            time: Duration(milliseconds: r.tMs),
+            characteristicId: r.characteristicId,
+            bytes: r.bytes,
+          ),
       ],
     );
   }
@@ -352,7 +463,9 @@ class SessionRepository {
     final session = (await get(id))!;
     final recording = await rawRecording(id);
     final versionId = session.courseVersionId;
-    final course = versionId == null ? null : await CourseRepository(_db).atVersion(versionId);
+    final course = versionId == null
+        ? null
+        : await CourseRepository(_db).atVersion(versionId);
     final metadata = {
       ...recording.metadata,
       if (course != null) ...{
@@ -375,7 +488,10 @@ class SessionRepository {
         'pausedMs': session.pausedMs,
       },
     };
-    final lines = RawRecording(metadata: metadata, packets: recording.packets).toLines();
+    final lines = RawRecording(
+      metadata: metadata,
+      packets: recording.packets,
+    ).toLines();
     return gzip.encode(utf8.encode('${lines.join('\n')}\n'));
   }
 
@@ -388,24 +504,35 @@ class SessionRepository {
   Future<int> import(List<int> bytes) async {
     final isGzip = bytes.length > 2 && bytes[0] == 0x1f && bytes[1] == 0x8b;
     final text = utf8.decode(isGzip ? gzip.decode(bytes) : bytes);
-    final recording = RawRecording.parseLines(const LineSplitter().convert(text));
+    final recording = RawRecording.parseLines(
+      const LineSplitter().convert(text),
+    );
     final metadata = recording.metadata;
     final session = metadata['session'] as Map<String, Object?>? ?? const {};
     final template = metadata['template'] as Map<String, Object?>?;
     final course = switch (metadata['course']) {
-      final Map<String, Object?> json => (name: json['name']! as String, definition: _courseDefinition(json)),
+      final Map<String, Object?> json => (
+        name: json['name']! as String,
+        definition: _courseDefinition(json),
+      ),
       _ => null,
     };
 
     // Files from before FTMS support name no protocol and are PM5 recordings.
     final protocol = ErgProtocol.parse(metadata['protocol']);
     final id = await _insert(
-      startedAt: DateTime.tryParse(metadata['recordedAt'] as String? ?? '') ?? clock.now(),
-      source: ErgSourceKind.values.asNameMap()[metadata['source']] ?? ErgSourceKind.pm5,
+      startedAt:
+          DateTime.tryParse(metadata['recordedAt'] as String? ?? '') ??
+          clock.now(),
+      source:
+          ErgSourceKind.values.asNameMap()[metadata['source']] ??
+          ErgSourceKind.pm5,
       protocol: protocol,
       deviceName: metadata['device'] as String?,
       templateName: template?['name'] as String?,
-      courseVersionId: course == null ? null : await _importCourse(course.name, course.definition),
+      courseVersionId: course == null
+          ? null
+          : await _importCourse(course.name, course.definition),
       plannedLaps: template?['laps'] as int?,
       imported: true,
     );
@@ -420,7 +547,9 @@ class SessionRepository {
     await write(accumulator.takeBatch());
     await finish(
       id,
-      status: session['status'] == SessionStatus.incomplete.name ? SessionStatus.incomplete : SessionStatus.complete,
+      status: session['status'] == SessionStatus.incomplete.name
+          ? SessionStatus.incomplete
+          : SessionStatus.complete,
       endedAt: DateTime.tryParse(session['endedAt'] as String? ?? ''),
     );
     return id;
@@ -439,47 +568,49 @@ class SessionRepository {
   }
 
   static Map<String, Object?> _courseJson(Course course) => {
-        'name': course.name,
-        'axis': course.axis.name,
-        'length': course.definition.length,
-        'segments': [
-          for (final s in course.definition.segments)
-            {
+    'name': course.name,
+    'axis': course.axis.name,
+    'length': course.definition.length,
+    'segments': [
+      for (final s in course.definition.segments)
+        {
+          'length': s.length,
+          'paceFastCs': ?s.paceFastCs,
+          'paceSlowCs': ?s.paceSlowCs,
+          'spmMin': ?s.spmMin,
+          'spmMax': ?s.spmMax,
+          'resistanceLevel': ?s.resistanceLevel,
+          if (s.zoneName case final name?)
+            'zone': {
+              'name': name,
+              'axis': course.axis.name,
               'length': s.length,
               'paceFastCs': ?s.paceFastCs,
               'paceSlowCs': ?s.paceSlowCs,
               'spmMin': ?s.spmMin,
               'spmMax': ?s.spmMax,
               'resistanceLevel': ?s.resistanceLevel,
-              if (s.zoneName case final name?)
-                'zone': {
-                  'name': name,
-                  'axis': course.axis.name,
-                  'length': s.length,
-                  'paceFastCs': ?s.paceFastCs,
-                  'paceSlowCs': ?s.paceSlowCs,
-                  'spmMin': ?s.spmMin,
-                  'spmMax': ?s.spmMax,
-                  'resistanceLevel': ?s.resistanceLevel,
-                },
             },
-        ],
-      };
+        },
+    ],
+  };
 
-  static CourseDefinition _courseDefinition(Map<String, Object?> json) => CourseDefinition(
-        axis: CourseAxis.values.byName(json['axis']! as String),
-        length: json['length']! as int,
-        segments: [
-          for (final s in (json['segments']! as List).cast<Map<String, Object?>>())
-            CourseSegment(
-              length: s['length']! as int,
-              paceFastCs: s['paceFastCs'] as int?,
-              paceSlowCs: s['paceSlowCs'] as int?,
-              spmMin: s['spmMin'] as int?,
-              spmMax: s['spmMax'] as int?,
-              resistanceLevel: s['resistanceLevel'] as int?,
-              zoneName: (s['zone'] as Map<String, Object?>?)?['name'] as String?,
-            ),
-        ],
-      );
+  static CourseDefinition _courseDefinition(
+    Map<String, Object?> json,
+  ) => CourseDefinition(
+    axis: CourseAxis.values.byName(json['axis']! as String),
+    length: json['length']! as int,
+    segments: [
+      for (final s in (json['segments']! as List).cast<Map<String, Object?>>())
+        CourseSegment(
+          length: s['length']! as int,
+          paceFastCs: s['paceFastCs'] as int?,
+          paceSlowCs: s['paceSlowCs'] as int?,
+          spmMin: s['spmMin'] as int?,
+          spmMax: s['spmMax'] as int?,
+          resistanceLevel: s['resistanceLevel'] as int?,
+          zoneName: (s['zone'] as Map<String, Object?>?)?['name'] as String?,
+        ),
+    ],
+  );
 }

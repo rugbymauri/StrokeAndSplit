@@ -7,7 +7,9 @@ import 'package:erg_protocol/erg_protocol.dart';
 import 'erg_source.dart';
 
 /// The data source currently in use, or null when none is selected.
-final activeErgSourceProvider = NotifierProvider<ActiveErgSource, ErgSource?>(ActiveErgSource.new);
+final activeErgSourceProvider = NotifierProvider<ActiveErgSource, ErgSource?>(
+  ActiveErgSource.new,
+);
 
 class ActiveErgSource extends Notifier<ErgSource?> {
   @override
@@ -52,7 +54,9 @@ final rowingEventsProvider = Provider<Stream<RowingEvent>>((ref) {
 });
 
 /// Connection state of the active source.
-final ergConnectionStateProvider = StreamProvider<ErgConnectionState>((ref) async* {
+final ergConnectionStateProvider = StreamProvider<ErgConnectionState>((
+  ref,
+) async* {
   final source = ref.watch(activeErgSourceProvider);
   if (source == null) {
     yield ErgConnectionState.disconnected;

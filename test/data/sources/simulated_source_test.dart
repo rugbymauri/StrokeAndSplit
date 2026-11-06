@@ -7,7 +7,10 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 /// Runs [source] in fake time and collects the decoded events.
 List<RowingEvent> _listen(SimulatedSource source) {
-  final decoder = ErgDecoder.forProtocol(source.protocol, onWarning: (w) => fail(w));
+  final decoder = ErgDecoder.forProtocol(
+    source.protocol,
+    onWarning: (w) => fail(w),
+  );
   final events = <RowingEvent>[];
   source.packets.listen((p) => events.addAll(decoder.decode(p)));
   return events;
@@ -27,13 +30,19 @@ void main() {
       expect(source.connectionState, ErgConnectionState.connected);
       expect(events.whereType<StatusTick>(), hasLength(40));
       expect(events.whereType<Stroke>().length, inInclusiveRange(3, 4));
-      expect(events.whereType<StatusTick>().last.distanceMeters, closeTo(10 * 500 / 130, 1));
+      expect(
+        events.whereType<StatusTick>().last.distanceMeters,
+        closeTo(10 * 500 / 130, 1),
+      );
     });
   });
 
   test('approaches a new target pace within a few strokes', () {
     fakeAsync((async) {
-      final source = SimulatedSource(targetPace: const Duration(minutes: 2, seconds: 10), seed: 7);
+      final source = SimulatedSource(
+        targetPace: const Duration(minutes: 2, seconds: 10),
+        seed: 7,
+      );
       final events = _listen(source);
       source.start();
       async.elapse(const Duration(seconds: 20));
@@ -42,11 +51,19 @@ void main() {
       final strokesBefore = events.whereType<Stroke>().length;
       async.elapse(const Duration(seconds: 20));
 
-      final strokesAfter = events.whereType<Stroke>().skip(strokesBefore).toList();
-      final fifth = events.whereType<StatusTick>().lastWhere((t) => t.elapsed <= strokesAfter[4].elapsed);
+      final strokesAfter = events
+          .whereType<Stroke>()
+          .skip(strokesBefore)
+          .toList();
+      final fifth = events.whereType<StatusTick>().lastWhere(
+        (t) => t.elapsed <= strokesAfter[4].elapsed,
+      );
       expect(_paceSeconds(fifth.pace!), closeTo(110, 110 * 0.06));
       // ±2 % variation per stroke plus what is left of the approach.
-      expect(_paceSeconds(events.whereType<StatusTick>().last.pace!), closeTo(110, 110 * 0.04));
+      expect(
+        _paceSeconds(events.whereType<StatusTick>().last.pace!),
+        closeTo(110, 110 * 0.04),
+      );
     });
   });
 
@@ -72,7 +89,10 @@ void main() {
 
       source.resume();
       async.elapse(const Duration(seconds: 10));
-      expect(events.whereType<StatusTick>().last.distanceMeters, greaterThan(atPause.distanceMeters));
+      expect(
+        events.whereType<StatusTick>().last.distanceMeters,
+        greaterThan(atPause.distanceMeters),
+      );
     });
   });
 
@@ -99,7 +119,13 @@ void main() {
 
     test('is provided when speaking PM5 and not FTMS', () {
       expect(SimulatedSource(seed: 1).providesForceCurves, isTrue);
-      expect(SimulatedSource(seed: 1, protocol: ErgProtocol.ftms).providesForceCurves, isFalse);
+      expect(
+        SimulatedSource(
+          seed: 1,
+          protocol: ErgProtocol.ftms,
+        ).providesForceCurves,
+        isFalse,
+      );
     });
 
     /// The force curves of 30 s of rowing at [pace].
@@ -116,7 +142,8 @@ void main() {
     }
 
     double meanPeak(List<StrokeForceCurve> curves) =>
-        curves.map((c) => c.peakNewtons).reduce((a, b) => a + b) / curves.length;
+        curves.map((c) => c.peakNewtons).reduce((a, b) => a + b) /
+        curves.length;
 
     test('comes once per stroke with the peak force and drive length of the stroke', () {
       fakeAsync((async) {
@@ -125,13 +152,19 @@ void main() {
         source.start();
         async.elapse(const Duration(seconds: 20));
 
-        final curves = {for (final c in events.whereType<StrokeForceCurve>()) c.strokeNumber: c};
+        final curves = {
+          for (final c in events.whereType<StrokeForceCurve>())
+            c.strokeNumber: c,
+        };
         final strokes = events.whereType<Stroke>().toList();
         expect(strokes, isNotEmpty);
         for (final stroke in strokes) {
           final curve = curves[stroke.strokeNumber]!;
           // Curve values travel in whole pound-force, the peak force in tenths.
-          expect(curve.peakNewtons, closeTo(stroke.peakForceNewtons!, newtonsPerPoundForce));
+          expect(
+            curve.peakNewtons,
+            closeTo(stroke.peakForceNewtons!, newtonsPerPoundForce),
+          );
           expect(curve.driveLengthMeters, stroke.driveLengthMeters);
           expect(curve.forcesNewtons.length, inInclusiveRange(30, 70));
         }
@@ -139,10 +172,15 @@ void main() {
     });
 
     test('carries a drive length between 0.8 and 1.3 m that varies from stroke to stroke', () {
-      final lengths = curvesAt(const Duration(minutes: 2, seconds: 10)).map((c) => c.driveLengthMeters).toList();
+      final lengths = curvesAt(const Duration(minutes: 2, seconds: 10))
+          .map((c) => c.driveLengthMeters)
+          .toList();
 
       expect(lengths, hasLength(greaterThan(5)));
-      expect(lengths, everyElement(allOf(isNotNull, inInclusiveRange(0.8, 1.3))));
+      expect(
+        lengths,
+        everyElement(allOf(isNotNull, inInclusiveRange(0.8, 1.3))),
+      );
       expect(lengths.toSet().length, greaterThan(1));
     });
 
@@ -179,7 +217,9 @@ void main() {
         async.elapse(const Duration(seconds: 10));
 
         expect(source.protocol, ErgProtocol.ftms);
-        expect(packets.map((p) => p.characteristicId).toSet(), {FtmsIds.rowerData});
+        expect(packets.map((p) => p.characteristicId).toSet(), {
+          FtmsIds.rowerData,
+        });
         expect(packets, hasLength(inInclusiveRange(9, 10)));
       });
     });
@@ -190,13 +230,19 @@ void main() {
         final events = _listen(source);
         source.start();
         async.elapse(const Duration(seconds: 3));
-        expect(events.whereType<StatusTick>().last.resistanceLevel, SimulatedSource.ftmsResistanceLevel);
+        expect(
+          events.whereType<StatusTick>().last.resistanceLevel,
+          SimulatedSource.ftmsResistanceLevel,
+        );
 
         ResistanceResult? result;
         source.resistanceControl!.setLevel(9).then((r) => result = r);
         async.elapse(const Duration(seconds: 2));
 
-        expect(source.resistanceControl!.range, const ResistanceRange(min: 1, max: 15));
+        expect(
+          source.resistanceControl!.range,
+          const ResistanceRange(min: 1, max: 15),
+        );
         expect(result, ResistanceResult.accepted);
         expect(events.whereType<StatusTick>().last.resistanceLevel, 9);
       });
@@ -222,7 +268,10 @@ void main() {
         // 22 strokes per minute over 50 s; strokes end on a 250 ms tick, so
         // the simulator rows a little slower, like in PM5 mode.
         expect(events.whereType<Stroke>().length, inInclusiveRange(15, 19));
-        expect(events.whereType<Stroke>().every((s) => s.driveTime == null), isTrue);
+        expect(
+          events.whereType<Stroke>().every((s) => s.driveTime == null),
+          isTrue,
+        );
         expect(last.distanceMeters, greaterThan(150));
       });
     });
@@ -242,7 +291,10 @@ void main() {
 
         expect(duringPause.isRowing, isFalse);
         expect(duringPause.pace, isNull);
-        expect(events.whereType<StatusTick>().last.elapsed, duringPause.elapsed);
+        expect(
+          events.whereType<StatusTick>().last.elapsed,
+          duringPause.elapsed,
+        );
         expect(events.whereType<Stroke>().length, strokesAtPause);
 
         source.resume();

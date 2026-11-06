@@ -22,7 +22,8 @@ CourseSegment? upcomingZone(
   final CourseSegment next;
   if (progress.segmentIndex < segments.length - 1) {
     next = segments[progress.segmentIndex + 1];
-  } else if (progress.plannedLaps == null || progress.lap < progress.plannedLaps!) {
+  } else if (progress.plannedLaps == null ||
+      progress.lap < progress.plannedLaps!) {
     next = segments.first;
   } else {
     return null;
@@ -40,7 +41,10 @@ CourseSegment? upcomingZone(
 }
 
 bool _sameBands(CourseSegment a, CourseSegment b) =>
-    a.paceFastCs == b.paceFastCs && a.paceSlowCs == b.paceSlowCs && a.spmMin == b.spmMin && a.spmMax == b.spmMax;
+    a.paceFastCs == b.paceFastCs &&
+    a.paceSlowCs == b.paceSlowCs &&
+    a.spmMin == b.spmMin &&
+    a.spmMax == b.spmMax;
 
 /// The band of the next zone as a blinking yellow pill, e.g. `» Gleich 2:05–2:10`, below the pace and on
 /// the stroke rate card. It stays lit when the platform asks for less motion.
@@ -67,8 +71,12 @@ class UpcomingPill extends StatefulWidget {
   State<UpcomingPill> createState() => _UpcomingPillState();
 }
 
-class _UpcomingPillState extends State<UpcomingPill> with SingleTickerProviderStateMixin {
-  late final _blink = AnimationController(vsync: this, duration: UpcomingPill.period);
+class _UpcomingPillState extends State<UpcomingPill>
+    with SingleTickerProviderStateMixin {
+  late final _blink = AnimationController(
+    vsync: this,
+    duration: UpcomingPill.period,
+  );
 
   @override
   void didChangeDependencies() {
@@ -91,20 +99,32 @@ class _UpcomingPillState extends State<UpcomingPill> with SingleTickerProviderSt
     final text = Text(
       widget.text,
       key: widget.textKey,
-      style: AppTextStyles.button.copyWith(color: AppColors.bg, fontWeight: FontWeight.w600),
+      style: AppTextStyles.button.copyWith(
+        color: AppColors.bg,
+        fontWeight: FontWeight.w600,
+      ),
       maxLines: 1,
       overflow: widget.scaleDown ? null : TextOverflow.ellipsis,
     );
     final pill = DecoratedBox(
-      decoration: BoxDecoration(color: AppColors.upcoming, borderRadius: BorderRadius.circular(ZonePill.radius)),
+      decoration: BoxDecoration(
+        color: AppColors.upcoming,
+        borderRadius: BorderRadius.circular(ZonePill.radius),
+      ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: widget.dense ? AppSpacing.s : AppSpacing.m),
+        padding: EdgeInsets.symmetric(
+          horizontal: widget.dense ? AppSpacing.s : AppSpacing.m,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.double_arrow, size: 18, color: AppColors.bg),
             SizedBox(width: widget.dense ? AppSpacing.xs : AppSpacing.s),
-            Flexible(child: widget.scaleDown ? FittedBox(fit: BoxFit.scaleDown, child: text) : text),
+            Flexible(
+              child: widget.scaleDown
+                  ? FittedBox(fit: BoxFit.scaleDown, child: text)
+                  : text,
+            ),
           ],
         ),
       ),
@@ -112,7 +132,8 @@ class _UpcomingPillState extends State<UpcomingPill> with SingleTickerProviderSt
     return AnimatedBuilder(
       animation: _blink,
       // Dimmed rather than gone, so the band can be read at any moment.
-      builder: (context, child) => Opacity(opacity: _blink.value < 0.65 ? 1 : 0.3, child: child),
+      builder: (context, child) =>
+          Opacity(opacity: _blink.value < 0.65 ? 1 : 0.3, child: child),
       child: pill,
     );
   }

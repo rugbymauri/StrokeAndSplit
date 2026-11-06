@@ -24,7 +24,9 @@ class FakeBleTransport implements BleTransport {
   Future<BluetoothReadiness> readiness() async => readinessValue;
 
   @override
-  Stream<List<FoundRower>> scan({Duration timeout = const Duration(seconds: 15)}) async* {
+  Stream<List<FoundRower>> scan({
+    Duration timeout = const Duration(seconds: 15),
+  }) async* {
     final error = scanError;
     if (error != null) throw error;
     if (found.isNotEmpty) yield found;

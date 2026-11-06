@@ -13,10 +13,12 @@ import 'support/fake_heart_rate_transport.dart';
 
 void main() {
   testWidgets('the app starts on "Geräte wählen"', (tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [bleTransportProvider.overrideWithValue(FakeBleTransport())],
-      child: const StrokeSplitApp(),
-    ));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [bleTransportProvider.overrideWithValue(FakeBleTransport())],
+        child: const StrokeSplitApp(),
+      ),
+    );
     await tester.pump();
 
     expect(find.text('Geräte wählen'), findsOneWidget);
@@ -24,24 +26,44 @@ void main() {
     await tester.pump(const Duration(seconds: 15));
   });
 
-  testWidgets('connects the paired strap as soon as the rower is connected, before the live display', (tester) async {
-    const h10 = FoundHeartRateMonitor(id: 'A0:9E:1A:12:34:56', name: 'Polar H10 1A2B3C4D');
-    final rowers = FakeBleTransport();
-    final straps = FakeHeartRateTransport();
-    final container = ProviderContainer(overrides: [
-      bleTransportProvider.overrideWithValue(rowers),
-      heartRateTransportProvider.overrideWithValue(straps),
-      heartRateMonitorStoreProvider.overrideWithValue(MemoryHeartRateMonitorStore(h10)),
-    ]);
-    addTearDown(container.dispose);
-    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const StrokeSplitApp()));
+  testWidgets(
+    'connects the paired strap as soon as the rower is connected, before the live display',
+    (tester) async {
+      const h10 = FoundHeartRateMonitor(
+        id: 'A0:9E:1A:12:34:56',
+        name: 'Polar H10 1A2B3C4D',
+      );
+      final rowers = FakeBleTransport();
+      final straps = FakeHeartRateTransport();
+      final container = ProviderContainer(
+        overrides: [
+          bleTransportProvider.overrideWithValue(rowers),
+          heartRateTransportProvider.overrideWithValue(straps),
+          heartRateMonitorStoreProvider.overrideWithValue(
+            MemoryHeartRateMonitorStore(h10),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const StrokeSplitApp(),
+        ),
+      );
 
-    await container
-        .read(activeErgSourceProvider.notifier)
-        .use(BleRowerSource(transport: rowers, device: const FoundRower(id: 'CE:A5', name: 'PM5 430000001 Row')));
-    await tester.pump();
+      await container
+          .read(activeErgSourceProvider.notifier)
+          .use(
+            BleRowerSource(
+              transport: rowers,
+              device: const FoundRower(id: 'CE:A5', name: 'PM5 430000001 Row'),
+            ),
+          );
+      await tester.pump();
 
-    expect(straps.attempts, [h10]);
-    await tester.pump(const Duration(seconds: 15));
-  });
+      expect(straps.attempts, [h10]);
+      await tester.pump(const Duration(seconds: 15));
+    },
+  );
 }

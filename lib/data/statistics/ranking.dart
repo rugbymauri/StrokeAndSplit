@@ -20,8 +20,8 @@ class RankingEntry {
     required this.endDistanceDm,
     int? durationMs,
     int? distanceDm,
-  })  : durationMs = durationMs ?? endWallMs - startWallMs,
-        distanceDm = distanceDm ?? endDistanceDm - startDistanceDm;
+  }) : durationMs = durationMs ?? endWallMs - startWallMs,
+       distanceDm = distanceDm ?? endDistanceDm - startDistanceDm;
 
   final int sessionId;
 
@@ -46,7 +46,8 @@ class RankingEntry {
 
   /// Pace per 500 m in centiseconds, pauses included (Design D4); null
   /// without distance.
-  int? get paceCs => distanceDm > 0 ? (durationMs / 10 * 5000 / distanceDm).round() : null;
+  int? get paceCs =>
+      distanceDm > 0 ? (durationMs / 10 * 5000 / distanceDm).round() : null;
 
   /// When the entry began; the earlier one is ahead on a tie.
   DateTime get rowedAt => startedAt.add(Duration(milliseconds: startWallMs));
@@ -66,11 +67,22 @@ class RankingEntry {
       other.distanceDm == distanceDm;
 
   @override
-  int get hashCode => Object.hash(sessionId, startedAt, lap, position, startWallMs, endWallMs, startDistanceDm,
-      endDistanceDm, durationMs, distanceDm);
+  int get hashCode => Object.hash(
+    sessionId,
+    startedAt,
+    lap,
+    position,
+    startWallMs,
+    endWallMs,
+    startDistanceDm,
+    endDistanceDm,
+    durationMs,
+    distanceDm,
+  );
 
   @override
-  String toString() => 'RankingEntry(session $sessionId, lap $lap, position $position, '
+  String toString() =>
+      'RankingEntry(session $sessionId, lap $lap, position $position, '
       '$durationMs ms, $distanceDm dm)';
 }
 
@@ -78,7 +90,12 @@ class RankingEntry {
 /// (Design D2).
 @immutable
 class Ranking {
-  const Ranking({required this.axis, required this.length, this.laps, required this.entries});
+  const Ranking({
+    required this.axis,
+    required this.length,
+    this.laps,
+    required this.entries,
+  });
 
   /// The axis of the course: time is ranked on a distance axis, metres on a
   /// time axis.
@@ -93,7 +110,12 @@ class Ranking {
   final List<RankingEntry> entries;
 
   /// The first [count] places.
-  Ranking top(int count) => Ranking(axis: axis, length: length, laps: laps, entries: entries.take(count).toList());
+  Ranking top(int count) => Ranking(
+    axis: axis,
+    length: length,
+    laps: laps,
+    entries: entries.take(count).toList(),
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -112,16 +134,18 @@ class Ranking {
 
 /// [entries] best first: less time on a distance axis, more metres on a time
 /// axis, the earlier entry ahead on a tie (Design D3).
-List<RankingEntry> rankEntries(CourseAxis axis, Iterable<RankingEntry> entries) {
+List<RankingEntry> rankEntries(
+  CourseAxis axis,
+  Iterable<RankingEntry> entries,
+) {
   int value(RankingEntry e) => switch (axis) {
-        CourseAxis.distance => e.durationMs,
-        CourseAxis.time => -e.distanceDm,
-      };
-  return entries.toList()
-    ..sort((a, b) {
-      final byValue = value(a).compareTo(value(b));
-      if (byValue != 0) return byValue;
-      final byTime = a.rowedAt.compareTo(b.rowedAt);
-      return byTime != 0 ? byTime : a.sessionId.compareTo(b.sessionId);
-    });
+    CourseAxis.distance => e.durationMs,
+    CourseAxis.time => -e.distanceDm,
+  };
+  return entries.toList()..sort((a, b) {
+    final byValue = value(a).compareTo(value(b));
+    if (byValue != 0) return byValue;
+    final byTime = a.rowedAt.compareTo(b.rowedAt);
+    return byTime != 0 ? byTime : a.sessionId.compareTo(b.sessionId);
+  });
 }

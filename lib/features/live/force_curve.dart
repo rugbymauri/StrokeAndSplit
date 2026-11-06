@@ -36,7 +36,9 @@ abstract final class ForceScale {
 
   /// [atLeast], or the next step above it that holds [peakNewtons]; never lower than [atLeast].
   static double fitting(double peakNewtons, {double atLeast = baseNewtons}) =>
-      peakNewtons <= atLeast ? atLeast : (peakNewtons / stepNewtons).ceil() * stepNewtons;
+      peakNewtons <= atLeast
+      ? atLeast
+      : (peakNewtons / stepNewtons).ceil() * stepNewtons;
 }
 
 /// The curves the live display shows: those of the last and of the previous stroke, with the
@@ -45,7 +47,11 @@ abstract final class ForceScale {
 /// A layout gets null instead for a source without force curves and then leaves the card out. A new
 /// source starts over with new [ForceCurves].
 class ForceCurves {
-  const ForceCurves({this.last, this.previous, this.scaleNewtons = ForceScale.baseNewtons});
+  const ForceCurves({
+    this.last,
+    this.previous,
+    this.scaleNewtons = ForceScale.baseNewtons,
+  });
 
   /// The latest curve; null before the first one.
   final StrokeForceCurve? last;
@@ -64,22 +70,28 @@ class ForceCurves {
     final restarted = last != null && curve.strokeNumber < last.strokeNumber;
     return ForceCurves(
       last: curve,
-      previous: last != null && last.strokeNumber < curve.strokeNumber ? last : null,
-      scaleNewtons:
-          ForceScale.fitting(curve.peakNewtons, atLeast: restarted ? ForceScale.baseNewtons : scaleNewtons),
+      previous: last != null && last.strokeNumber < curve.strokeNumber
+          ? last
+          : null,
+      scaleNewtons: ForceScale.fitting(
+        curve.peakNewtons,
+        atLeast: restarted ? ForceScale.baseNewtons : scaleNewtons,
+      ),
     );
   }
 
   /// The card for these curves in [variant], drawn in [foreground] where that applies.
-  ForceCurve widget({ForceCurveVariant variant = ForceCurveVariant.card, Color foreground = AppColors.textMuted}) =>
-      ForceCurve(
-        last: last?.forcesNewtons,
-        previous: previous?.forcesNewtons,
-        driveLengthMeters: last?.driveLengthMeters,
-        scaleNewtons: scaleNewtons,
-        variant: variant,
-        foreground: foreground,
-      );
+  ForceCurve widget({
+    ForceCurveVariant variant = ForceCurveVariant.card,
+    Color foreground = AppColors.textMuted,
+  }) => ForceCurve(
+    last: last?.forcesNewtons,
+    previous: previous?.forcesNewtons,
+    driveLengthMeters: last?.driveLengthMeters,
+    scaleNewtons: scaleNewtons,
+    variant: variant,
+    foreground: foreground,
+  );
 }
 
 /// The force curves of the last and the previous stroke (force-curve, Design D2 and D3), with the
@@ -116,76 +128,108 @@ class ForceCurve extends StatelessWidget {
   final Color foreground;
 
   /// Whether [forces] can be drawn.
-  static bool hasData(List<double>? forces) => forces != null && forces.length > 1 && forces.any((f) => f > 0);
+  static bool hasData(List<double>? forces) =>
+      forces != null && forces.length > 1 && forces.any((f) => f > 0);
 
   bool get _waiting => !hasData(last);
 
-  static double _peak(List<double>? forces) => forces == null ? 0 : forces.fold(0, math.max);
+  static double _peak(List<double>? forces) =>
+      forces == null ? 0 : forces.fold(0, math.max);
 
   /// [scaleNewtons], or wider if a shown curve does not fit on it; never the peak itself.
-  double get _scale => ForceScale.fitting(math.max(_peak(last), _peak(previous)), atLeast: scaleNewtons);
+  double get _scale => ForceScale.fitting(
+    math.max(_peak(last), _peak(previous)),
+    atLeast: scaleNewtons,
+  );
 
   @override
   Widget build(BuildContext context) {
     final curve = _curve(context);
     return switch (variant) {
       ForceCurveVariant.card => _framed(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.m),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _cardHeader(context),
-              const SizedBox(height: AppSpacing.s),
-              Expanded(child: curve),
-            ],
-          ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.l,
+          vertical: AppSpacing.m,
         ),
-      ForceCurveVariant.strip => _framed(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppSpacing.s),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(child: Text(context.l10n.liveForceCurveShort, style: _title, maxLines: 1)),
-              const SizedBox(width: AppSpacing.m),
-              Expanded(child: _withNote(context, curve)),
-            ],
-          ),
-        ),
-      ForceCurveVariant.inline => KeyedSubtree(key: const Key('force-curve'), child: _withNote(context, curve)),
-      ForceCurveVariant.tinted => Column(
-          key: const Key('force-curve'),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    context.l10n.liveForceCurve,
-                    style: _title.copyWith(color: foreground),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (_note(context) case final note?)
-                  Expanded(child: Align(alignment: Alignment.centerRight, child: note)),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xs),
+            _cardHeader(context),
+            const SizedBox(height: AppSpacing.s),
             Expanded(child: curve),
           ],
         ),
+      ),
+      ForceCurveVariant.strip => _framed(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.s,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Text(
+                context.l10n.liveForceCurveShort,
+                style: _title,
+                maxLines: 1,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.m),
+            Expanded(child: _withNote(context, curve)),
+          ],
+        ),
+      ),
+      ForceCurveVariant.inline => KeyedSubtree(
+        key: const Key('force-curve'),
+        child: _withNote(context, curve),
+      ),
+      ForceCurveVariant.tinted => Column(
+        key: const Key('force-curve'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  context.l10n.liveForceCurve,
+                  style: _title.copyWith(color: foreground),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (_note(context) case final note?)
+                Expanded(
+                  child: Align(alignment: Alignment.centerRight, child: note),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Expanded(child: curve),
+        ],
+      ),
     };
   }
 
-  static const _small = TextStyle(fontFamily: AppFonts.text, fontSize: 12, color: AppColors.textMuted);
+  static const _small = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 12,
+    color: AppColors.textMuted,
+  );
 
   /// The labels of the guide lines, smaller than any other text of the card.
-  static const _axis = TextStyle(fontFamily: AppFonts.text, fontSize: 10, height: 1, color: AppColors.textMuted);
+  static const _axis = TextStyle(
+    fontFamily: AppFonts.text,
+    fontSize: 10,
+    height: 1,
+    color: AppColors.textMuted,
+  );
 
   /// The title, small like the names of the tiles.
   static const _title = LiveTextStyles.caption;
 
-  Widget _framed({required EdgeInsets padding, required Widget child}) => DecoratedBox(
+  Widget _framed({required EdgeInsets padding, required Widget child}) =>
+      DecoratedBox(
         key: const Key('force-curve'),
         decoration: BoxDecoration(
           color: AppColors.surface,
@@ -196,10 +240,22 @@ class ForceCurve extends StatelessWidget {
       );
 
   Widget _curve(BuildContext context) {
-    if (_waiting) return const CustomPaint(size: Size.infinite, painter: _BaselinePainter());
+    if (_waiting) {
+      return const CustomPaint(
+        size: Size.infinite,
+        painter: _BaselinePainter(),
+      );
+    }
     final tinted = variant == ForceCurveVariant.tinted;
     final scale = _scale;
-    final grid = [for (var f = ForceScale.gridNewtons; f <= scale; f += ForceScale.gridNewtons) f];
+    final grid = [
+      for (
+        var f = ForceScale.gridNewtons;
+        f <= scale;
+        f += ForceScale.gridNewtons
+      )
+        f,
+    ];
     final plot = CustomPaint(
       key: const Key('force-curve-plot'),
       size: Size.infinite,
@@ -211,59 +267,87 @@ class ForceCurve extends StatelessWidget {
         gridColor: tinted ? foreground.withValues(alpha: 0.3) : AppColors.line,
         color: tinted ? AppColors.text : AppColors.zoneIn,
         fillOpacity: tinted ? 0.12 : 0.16,
-        previousColor: tinted ? foreground.withValues(alpha: 0.45) : AppColors.previousCurve,
+        previousColor: tinted
+            ? foreground.withValues(alpha: 0.45)
+            : AppColors.previousCurve,
       ),
     );
     // The narrow strip has no room for labels beside the drive length; its lines alone show the scale.
     if (variant == ForceCurveVariant.strip) return plot;
-    final style = _axis.copyWith(color: tinted ? foreground.withValues(alpha: 0.8) : AppColors.textMuted);
-    return LayoutBuilder(builder: (context, constraints) {
-      final area = _CurvePainter.areaOf(constraints.biggest);
-      if (area.height * ForceScale.gridNewtons / scale < _axis.fontSize! + 4) return plot;
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          // Below each line at the left, where the curve starts low; behind the curve.
-          for (final force in grid)
-            Positioned(
-              left: 0,
-              top: _CurvePainter.yOf(force, scale, area) + 2,
-              child: Text(
-                context.l10n.liveForceNewtons(force.round()),
-                key: Key('force-curve-axis-${force.round()}'),
-                style: style,
-                maxLines: 1,
+    final style = _axis.copyWith(
+      color: tinted ? foreground.withValues(alpha: 0.8) : AppColors.textMuted,
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final area = _CurvePainter.areaOf(constraints.biggest);
+        if (area.height * ForceScale.gridNewtons / scale <
+            _axis.fontSize! + 4) {
+          return plot;
+        }
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            // Below each line at the left, where the curve starts low; behind the curve.
+            for (final force in grid)
+              Positioned(
+                left: 0,
+                top: _CurvePainter.yOf(force, scale, area) + 2,
+                child: Text(
+                  context.l10n.liveForceNewtons(force.round()),
+                  key: Key('force-curve-axis-${force.round()}'),
+                  style: style,
+                  maxLines: 1,
+                ),
               ),
-            ),
-          plot,
-        ],
-      );
-    });
+            plot,
+          ],
+        );
+      },
+    );
   }
 
   /// The peak force of the last stroke, e.g. "612 N"; null while waiting.
-  String? _peakText(BuildContext context) => _waiting ? null : context.l10n.liveForceNewtons(_peak(last).round());
+  String? _peakText(BuildContext context) =>
+      _waiting ? null : context.l10n.liveForceNewtons(_peak(last).round());
 
   /// Title on the left; on the right the waiting note or the legend.
   Widget _cardHeader(BuildContext context) {
     final l10n = context.l10n;
     final right = _waiting
-        ? Text(l10n.liveForceCurveWaiting, key: const Key('force-curve-waiting'), style: AppTextStyles.caption)
+        ? Text(
+            l10n.liveForceCurveWaiting,
+            key: const Key('force-curve-waiting'),
+            style: AppTextStyles.caption,
+          )
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (_peakText(context) case final peak?) ...[
-                Text(peak, key: const Key('force-curve-peak'), style: AppTextStyles.caption),
+                Text(
+                  peak,
+                  key: const Key('force-curve-peak'),
+                  style: AppTextStyles.caption,
+                ),
                 const SizedBox(width: AppSpacing.m),
               ],
               if (_length(context) case final length?) ...[
-                Text(length, key: const Key('force-curve-length'), style: AppTextStyles.caption),
+                Text(
+                  length,
+                  key: const Key('force-curve-length'),
+                  style: AppTextStyles.caption,
+                ),
                 const SizedBox(width: AppSpacing.m),
               ],
-              _LegendEntry(color: AppColors.zoneIn, text: l10n.liveForceCurveLast),
+              _LegendEntry(
+                color: AppColors.zoneIn,
+                text: l10n.liveForceCurveLast,
+              ),
               if (hasData(previous)) ...[
                 const SizedBox(width: AppSpacing.m),
-                _LegendEntry(color: AppColors.previousCurve, text: l10n.liveForceCurvePrevious),
+                _LegendEntry(
+                  color: AppColors.previousCurve,
+                  text: l10n.liveForceCurvePrevious,
+                ),
               ],
             ],
           );
@@ -295,7 +379,10 @@ class ForceCurve extends StatelessWidget {
     if (note == null) return curve;
     return Stack(
       fit: StackFit.expand,
-      children: [curve, Align(alignment: Alignment.topRight, child: note)],
+      children: [
+        curve,
+        Align(alignment: Alignment.topRight, child: note),
+      ],
     );
   }
 
@@ -307,12 +394,16 @@ class ForceCurve extends StatelessWidget {
       return Text(
         context.l10n.liveForceCurveWaiting,
         key: const Key('force-curve-waiting'),
-        style: _small.copyWith(color: tinted ? foreground : AppColors.textMuted),
+        style: _small.copyWith(
+          color: tinted ? foreground : AppColors.textMuted,
+        ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       );
     }
-    final style = _small.copyWith(color: tinted ? AppColors.text : AppColors.textMuted);
+    final style = _small.copyWith(
+      color: tinted ? AppColors.text : AppColors.textMuted,
+    );
     final length = _length(context);
     // Shrinks in a narrow place rather than overflowing.
     return FittedBox(
@@ -320,17 +411,28 @@ class ForceCurve extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(_peakText(context)!, key: const Key('force-curve-peak'), style: style, maxLines: 1),
+          Text(
+            _peakText(context)!,
+            key: const Key('force-curve-peak'),
+            style: style,
+            maxLines: 1,
+          ),
           if (length != null) ...[
             const SizedBox(width: AppSpacing.s),
-            Text(length, key: const Key('force-curve-length'), style: style, maxLines: 1),
+            Text(
+              length,
+              key: const Key('force-curve-length'),
+              style: style,
+              maxLines: 1,
+            ),
           ],
         ],
       ),
     );
   }
 
-  String? _length(BuildContext context) => formatDriveLength(context.l10n, driveLengthMeters);
+  String? _length(BuildContext context) =>
+      formatDriveLength(context.l10n, driveLengthMeters);
 }
 
 class _LegendEntry extends StatelessWidget {
@@ -341,17 +443,20 @@ class _LegendEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 14,
-            height: 4,
-            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
-          ),
-          const SizedBox(width: 6),
-          Text(text, style: LiveTextStyles.caption),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        width: 14,
+        height: 4,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+      const SizedBox(width: 6),
+      Text(text, style: LiveTextStyles.caption),
+    ],
+  );
 }
 
 /// The last stroke as a line with an area, the previous one as a thinner line behind it, both
@@ -382,10 +487,12 @@ class _CurvePainter extends CustomPainter {
 
   /// Where the curves go in [size]: room for half the line at the top, so a peak at the top of the
   /// scale is not cut off.
-  static Rect areaOf(Size size) => Rect.fromLTRB(0, _lastWidth / 2, size.width, size.height);
+  static Rect areaOf(Size size) =>
+      Rect.fromLTRB(0, _lastWidth / 2, size.width, size.height);
 
   /// The height of [force] in [area] on a scale up to [scale].
-  static double yOf(double force, double scale, Rect area) => area.bottom - area.height * force.clamp(0, scale) / scale;
+  static double yOf(double force, double scale, Rect area) =>
+      area.bottom - area.height * force.clamp(0, scale) / scale;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -400,14 +507,20 @@ class _CurvePainter extends CustomPainter {
       canvas.drawLine(Offset(area.left, y), Offset(area.right, y), gridPaint);
     }
     if (previous != null) {
-      canvas.drawPath(_line(previous, scaleNewtons, area), _stroke(previousColor, _previousWidth));
+      canvas.drawPath(
+        _line(previous, scaleNewtons, area),
+        _stroke(previousColor, _previousWidth),
+      );
     }
     final line = _line(last, scaleNewtons, area);
     final fill = Path.from(line)
       ..lineTo(area.right, area.bottom)
       ..lineTo(area.left, area.bottom)
       ..close();
-    canvas.drawPath(fill, Paint()..color = color.withValues(alpha: fillOpacity));
+    canvas.drawPath(
+      fill,
+      Paint()..color = color.withValues(alpha: fillOpacity),
+    );
     canvas.drawPath(line, _stroke(color, _lastWidth));
   }
 
@@ -415,7 +528,10 @@ class _CurvePainter extends CustomPainter {
   static Path _line(List<double> forces, double scale, Rect area) {
     final points = [
       for (final (index, force) in _runs(forces))
-        Offset(area.left + area.width * index / (forces.length - 1), yOf(force, scale, area)),
+        Offset(
+          area.left + area.width * index / (forces.length - 1),
+          yOf(force, scale, area),
+        ),
     ];
     final path = Path()..moveTo(points.first.dx, points.first.dy);
     for (var i = 1; i < points.length - 1; i++) {
@@ -436,13 +552,15 @@ class _CurvePainter extends CustomPainter {
       final index = start == 0
           ? 0.0
           : end == forces.length - 1
-              ? end.toDouble()
-              : (start + end) / 2;
+          ? end.toDouble()
+          : (start + end) / 2;
       runs.add((index, forces[start]));
       start = i;
     }
     // A curve of a single run still needs two points for a line.
-    if (runs.length == 1) runs.add(((forces.length - 1).toDouble(), forces.last));
+    if (runs.length == 1) {
+      runs.add(((forces.length - 1).toDouble(), forces.last));
+    }
     return runs;
   }
 
@@ -478,7 +596,11 @@ class _BaselinePainter extends CustomPainter {
       ..strokeWidth = _width;
     final y = size.height - _width / 2;
     for (var x = 0.0; x < size.width; x += 2 * _dash) {
-      canvas.drawLine(Offset(x, y), Offset(math.min(x + _dash, size.width), y), paint);
+      canvas.drawLine(
+        Offset(x, y),
+        Offset(math.min(x + _dash, size.width), y),
+        paint,
+      );
     }
   }
 

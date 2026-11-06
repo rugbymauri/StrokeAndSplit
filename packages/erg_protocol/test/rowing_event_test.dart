@@ -21,14 +21,20 @@ void main() {
       final copy = _tick.copyWith(heartRate: 142);
 
       expect(copy.heartRate, 142);
-      expect(copy.toString(), _tick.toString().replaceFirst('hr: 140', 'hr: 142'));
+      expect(
+        copy.toString(),
+        _tick.toString().replaceFirst('hr: 140', 'hr: 142'),
+      );
     });
 
     test('marks the heart rate as missing with null', () {
       final copy = _tick.copyWith(heartRate: null);
 
       expect(copy.heartRate, isNull);
-      expect(copy.toString(), _tick.toString().replaceFirst('hr: 140', 'hr: null'));
+      expect(
+        copy.toString(),
+        _tick.toString().replaceFirst('hr: 140', 'hr: null'),
+      );
     });
 
     test('keeps the heart rate when none is given', () {
@@ -48,12 +54,19 @@ void main() {
         intervalsMs: [812, 790],
       );
 
-      expect(event.intervalEnds, [const Duration(milliseconds: 11210), const Duration(seconds: 12)]);
+      expect(event.intervalEnds, [
+        const Duration(milliseconds: 11210),
+        const Duration(seconds: 12),
+      ]);
     });
 
     test('keeps its own copy of the intervals', () {
       final intervals = [800];
-      final event = HeartBeatIntervals(elapsed: Duration.zero, time: Duration.zero, intervalsMs: intervals);
+      final event = HeartBeatIntervals(
+        elapsed: Duration.zero,
+        time: Duration.zero,
+        intervalsMs: intervals,
+      );
       intervals.add(900);
 
       expect(event.intervalsMs, [800]);

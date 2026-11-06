@@ -10,13 +10,17 @@ FoundHeartRateMonitor? decodeHeartRateMonitor(String? value) {
   if (value == null) return null;
   try {
     final map = jsonDecode(value) as Map<String, Object?>;
-    return FoundHeartRateMonitor(id: map['id']! as String, name: map['name']! as String);
+    return FoundHeartRateMonitor(
+      id: map['id']! as String,
+      name: map['name']! as String,
+    );
   } on Object {
     return null;
   }
 }
 
-String encodeHeartRateMonitor(FoundHeartRateMonitor monitor) => jsonEncode({'id': monitor.id, 'name': monitor.name});
+String encodeHeartRateMonitor(FoundHeartRateMonitor monitor) =>
+    jsonEncode({'id': monitor.id, 'name': monitor.name});
 
 /// Where the paired heart rate strap is kept (heart-rate, Design D6).
 abstract interface class HeartRateMonitorStore {
@@ -37,7 +41,9 @@ class PreferencesHeartRateMonitorStore implements HeartRateMonitorStore {
 
   static Future<PreferencesHeartRateMonitorStore> open() async {
     const options = SharedPreferencesWithCacheOptions(allowList: {_key});
-    return PreferencesHeartRateMonitorStore._(await SharedPreferencesWithCache.create(cacheOptions: options));
+    return PreferencesHeartRateMonitorStore._(
+      await SharedPreferencesWithCache.create(cacheOptions: options),
+    );
   }
 
   @override
@@ -54,7 +60,7 @@ class PreferencesHeartRateMonitorStore implements HeartRateMonitorStore {
 /// opened the preferences.
 class MemoryHeartRateMonitorStore implements HeartRateMonitorStore {
   MemoryHeartRateMonitorStore([FoundHeartRateMonitor? monitor])
-      : _value = monitor == null ? null : encodeHeartRateMonitor(monitor);
+    : _value = monitor == null ? null : encodeHeartRateMonitor(monitor);
 
   String? _value;
 
@@ -69,20 +75,27 @@ class MemoryHeartRateMonitorStore implements HeartRateMonitorStore {
 }
 
 /// Where the paired strap is kept; `main` sets the preferences.
-final heartRateMonitorStoreProvider = Provider<HeartRateMonitorStore>((ref) => MemoryHeartRateMonitorStore());
+final heartRateMonitorStoreProvider = Provider<HeartRateMonitorStore>(
+  (ref) => MemoryHeartRateMonitorStore(),
+);
 
 /// The paired heart rate strap, also across restarts; null when none is paired.
 final chosenHeartRateMonitorProvider =
-    NotifierProvider<ChosenHeartRateMonitor, FoundHeartRateMonitor?>(ChosenHeartRateMonitor.new);
+    NotifierProvider<ChosenHeartRateMonitor, FoundHeartRateMonitor?>(
+      ChosenHeartRateMonitor.new,
+    );
 
 class ChosenHeartRateMonitor extends Notifier<FoundHeartRateMonitor?> {
   @override
-  FoundHeartRateMonitor? build() => decodeHeartRateMonitor(ref.watch(heartRateMonitorStoreProvider).read());
+  FoundHeartRateMonitor? build() =>
+      decodeHeartRateMonitor(ref.watch(heartRateMonitorStoreProvider).read());
 
   /// Pairs [monitor], replacing a strap paired before, and remembers it.
   Future<void> pair(FoundHeartRateMonitor monitor) async {
     state = monitor;
-    await ref.read(heartRateMonitorStoreProvider).write(encodeHeartRateMonitor(monitor));
+    await ref
+        .read(heartRateMonitorStoreProvider)
+        .write(encodeHeartRateMonitor(monitor));
   }
 
   /// Forgets the paired strap.

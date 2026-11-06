@@ -20,13 +20,24 @@ class _Fixed extends ActiveErgSource {
 }
 
 class _Setup {
-  _Setup({ErgSourceKind kind = ErgSourceKind.pm5, String name = 'PM5 430000001 Row', ErgProtocol? protocol})
-      : source = FakeErgSource(kind: kind, name: name, protocol: protocol ?? ErgProtocol.pm5) {
-    container = ProviderContainer(overrides: [
-      databaseProvider.overrideWithValue(db),
-      activeErgSourceProvider.overrideWith(() => _Fixed(source)),
-      recordingFlushIntervalProvider.overrideWithValue(const Duration(milliseconds: 10)),
-    ]);
+  _Setup({
+    ErgSourceKind kind = ErgSourceKind.pm5,
+    String name = 'PM5 430000001 Row',
+    ErgProtocol? protocol,
+  }) : source = FakeErgSource(
+         kind: kind,
+         name: name,
+         protocol: protocol ?? ErgProtocol.pm5,
+       ) {
+    container = ProviderContainer(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        activeErgSourceProvider.overrideWith(() => _Fixed(source)),
+        recordingFlushIntervalProvider.overrideWithValue(
+          const Duration(milliseconds: 10),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
   }
 
@@ -34,7 +45,8 @@ class _Setup {
   final FakeErgSource source;
   late final ProviderContainer container;
 
-  SessionRecorder get recorder => container.read(sessionRecorderProvider.notifier);
+  SessionRecorder get recorder =>
+      container.read(sessionRecorderProvider.notifier);
 
   Future<void> emitAll(Iterable<RawPacket> packets) async {
     for (final p in packets) {
@@ -43,7 +55,8 @@ class _Setup {
     await pumpEventQueue();
   }
 
-  Future<SessionRow> session(int id) => (db.select(db.sessions)..where((s) => s.id.equals(id))).getSingle();
+  Future<SessionRow> session(int id) =>
+      (db.select(db.sessions)..where((s) => s.id.equals(id))).getSingle();
 }
 
 void main() {
@@ -60,23 +73,42 @@ void main() {
     final distance = ticks.last.distanceMeters - ticks.first.distanceMeters;
     // The session time leaves out the pauses (Change auto-pause).
     final samples = await setup.db.select(setup.db.samples).get();
-    final duration = Duration(milliseconds: samples.map((s) => s.activeMs!).reduce((a, b) => a > b ? a : b));
+    final duration = Duration(
+      milliseconds: samples
+          .map((s) => s.activeMs!)
+          .reduce((a, b) => a > b ? a : b),
+    );
     final pauses = await setup.db.select(setup.db.pauses).get();
     expect(pauses, isNotEmpty, reason: 'the recording stops now and then');
     expect(session.pauseCount, pauses.length);
-    expect(session.pausedMs, pauses.fold(0, (sum, p) => sum + p.endWallMs - p.startWallMs));
-    expect(session.durationMs + session.pausedMs, lessThanOrEqualTo(samples.last.wallMs!));
+    expect(
+      session.pausedMs,
+      pauses.fold(0, (sum, p) => sum + p.endWallMs - p.startWallMs),
+    );
+    expect(
+      session.durationMs + session.pausedMs,
+      lessThanOrEqualTo(samples.last.wallMs!),
+    );
     expect(session.status, SessionStatus.complete);
     expect(session.source, ErgSourceKind.pm5);
     expect(session.deviceName, 'PM5 430000001 Row');
     expect(session.endedAt, isNotNull);
     expect(session.distanceDm, (distance * 10).round());
     expect(session.durationMs, duration.inMilliseconds);
-    expect(session.averagePaceCs, (duration.inMilliseconds / 10 * 500 / distance).round());
+    expect(
+      session.averagePaceCs,
+      (duration.inMilliseconds / 10 * 500 / distance).round(),
+    );
     expect(session.strokeCount, greaterThan(0));
-    expect(session.averageStrokeRate, closeTo(session.strokeCount * 60000 / session.durationMs, 0.001));
+    expect(
+      session.averageStrokeRate,
+      closeTo(session.strokeCount * 60000 / session.durationMs, 0.001),
+    );
     expect(session.averageWatts, isNotNull);
-    expect(await setup.db.select(setup.db.rawPackets).get(), hasLength(packets.length));
+    expect(
+      await setup.db.select(setup.db.rawPackets).get(),
+      hasLength(packets.length),
+    );
     expect(setup.container.read(sessionRecorderProvider), isNull);
   });
 
@@ -86,7 +118,11 @@ void main() {
     final ticks = decodeTicks(packets);
     final half = packets.length ~/ 2;
     final pm5AtStart = decodeTicks(packets.take(half)).last.distanceMeters;
-    expect(pm5AtStart, greaterThan(50), reason: 'the fixture is rowed in its first half');
+    expect(
+      pm5AtStart,
+      greaterThan(50),
+      reason: 'the fixture is rowed in its first half',
+    );
 
     await setup.recorder.start();
     await setup.emitAll(packets.skip(half));
@@ -95,7 +131,10 @@ void main() {
 
     expect(first.tMs, 0);
     expect(first.distanceDm, 0);
-    expect((await setup.session(id)).distanceDm, closeTo((ticks.last.distanceMeters - pm5AtStart) * 10, 30));
+    expect(
+      (await setup.session(id)).distanceDm,
+      closeTo((ticks.last.distanceMeters - pm5AtStart) * 10, 30),
+    );
   });
 
   test('keeps counting when the PM5 is reset during the session', () async {
@@ -121,15 +160,26 @@ void main() {
     await setup.emitAll(packets);
     final id = (await setup.recorder.stop())!;
 
-    final distances = [for (final s in await setup.db.select(setup.db.samples).get()) s.distanceDm];
+    final distances = [
+      for (final s in await setup.db.select(setup.db.samples).get())
+        s.distanceDm,
+    ];
     for (var i = 1; i < distances.length; i++) {
-      expect(distances[i], greaterThanOrEqualTo(distances[i - 1]), reason: 'sample $i');
+      expect(
+        distances[i],
+        greaterThanOrEqualTo(distances[i - 1]),
+        reason: 'sample $i',
+      );
     }
     expect((await setup.session(id)).distanceDm, (rowed * 10).round());
   });
 
   group('with an FTMS rower', () {
-    _Setup ftms() => _Setup(kind: ErgSourceKind.ftms, name: 'Rower 42', protocol: ErgProtocol.ftms);
+    _Setup ftms() => _Setup(
+      kind: ErgSourceKind.ftms,
+      name: 'Rower 42',
+      protocol: ErgProtocol.ftms,
+    );
 
     test('stores the session as FTMS with strokes without details', () async {
       final setup = ftms();
@@ -148,14 +198,21 @@ void main() {
       expect(session.durationMs, 300000);
       final strokes = await setup.db.select(setup.db.strokes).get();
       expect(strokes, hasLength(120));
-      expect(strokes.every((s) => s.driveLengthMeters == null && s.peakForceNewtons == null), isTrue);
+      expect(
+        strokes.every(
+          (s) => s.driveLengthMeters == null && s.peakForceNewtons == null,
+        ),
+        isTrue,
+      );
     });
 
     test('counts from zero although the rower already shows 800 m', () async {
       final setup = ftms();
 
       await setup.recorder.start();
-      await setup.emitAll(ftmsRowing(seconds: 30, startDistance: 800, startStrokes: 300));
+      await setup.emitAll(
+        ftmsRowing(seconds: 30, startDistance: 800, startStrokes: 300),
+      );
       final id = (await setup.recorder.stop())!;
 
       final first = (await setup.db.select(setup.db.samples).get()).first;
@@ -171,14 +228,25 @@ void main() {
       // The rower jumps back to 0 m and is rowed on for 10 s.
       final after = [
         for (final p in ftmsRowing(seconds: 10))
-          RawPacket(time: p.time + const Duration(seconds: 301), characteristicId: p.characteristicId, bytes: p.bytes),
+          RawPacket(
+            time: p.time + const Duration(seconds: 301),
+            characteristicId: p.characteristicId,
+            bytes: p.bytes,
+          ),
       ];
       await setup.emitAll(after);
       final id = (await setup.recorder.stop())!;
 
-      final distances = [for (final s in await setup.db.select(setup.db.samples).get()) s.distanceDm];
+      final distances = [
+        for (final s in await setup.db.select(setup.db.samples).get())
+          s.distanceDm,
+      ];
       for (var i = 1; i < distances.length; i++) {
-        expect(distances[i], greaterThanOrEqualTo(distances[i - 1]), reason: 'sample $i');
+        expect(
+          distances[i],
+          greaterThanOrEqualTo(distances[i - 1]),
+          reason: 'sample $i',
+        );
       }
       expect((await setup.session(id)).distanceDm, 12400);
     });
@@ -204,6 +272,9 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 50));
 
     expect(await setup.db.select(setup.db.samples).get(), isNotEmpty);
-    expect((await setup.db.select(setup.db.sessions).getSingle()).status, SessionStatus.recording);
+    expect(
+      (await setup.db.select(setup.db.sessions).getSingle()).status,
+      SessionStatus.recording,
+    );
   });
 }

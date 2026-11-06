@@ -28,11 +28,15 @@ class _Fixed extends ActiveErgSource {
 /// A template session with [source] (start-on-first-stroke).
 class _Setup {
   _Setup(this.db, this.source) {
-    container = ProviderContainer(overrides: [
-      databaseProvider.overrideWithValue(db),
-      activeErgSourceProvider.overrideWith(() => _Fixed(source)),
-      recordingFlushIntervalProvider.overrideWithValue(const Duration(milliseconds: 10)),
-    ]);
+    container = ProviderContainer(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        activeErgSourceProvider.overrideWith(() => _Fixed(source)),
+        recordingFlushIntervalProvider.overrideWithValue(
+          const Duration(milliseconds: 10),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
   }
 
@@ -40,7 +44,8 @@ class _Setup {
   final ErgSource source;
   late final ProviderContainer container;
 
-  SessionRecorder get recorder => container.read(sessionRecorderProvider.notifier);
+  SessionRecorder get recorder =>
+      container.read(sessionRecorderProvider.notifier);
   ActiveRecording? get recording => container.read(sessionRecorderProvider);
 
   Future<void> emitAll(Iterable<RawPacket> packets) async {
@@ -53,10 +58,14 @@ class _Setup {
 
 /// An open 10 km course, long enough for every fixture.
 Future<SessionTemplate> _template(AppDatabase db) async {
-  final course =
-      await CourseRepository(db).create('Lang', CourseDefinition.single(axis: CourseAxis.distance, length: 10000));
+  final course = await CourseRepository(db).create(
+    'Lang',
+    CourseDefinition.single(axis: CourseAxis.distance, length: 10000),
+  );
   final templates = TemplateRepository(db);
-  return (await templates.get(await templates.create('Lang', courseId: course, laps: null)))!;
+  return (await templates.get(
+    await templates.create('Lang', courseId: course, laps: null),
+  ))!;
 }
 
 /// The index of the first packet a session gets from [packets] and of the first movement.
@@ -74,46 +83,72 @@ void main() {
     ('just_row', ErgProtocol.pm5, ErgSourceKind.pm5),
     ('ftms_just_row', ErgProtocol.ftms, ErgSourceKind.ftms),
   ]) {
-    test('$fixture: is ready until the first stroke, then counts from the last status before it', () async {
-      final db = openTestDatabase();
-      final setup = _Setup(db, FakeErgSource(kind: kind, protocol: protocol));
-      final template = await _template(db);
-      final packets = loadFixture(fixture).packets;
-      final (first, trigger) = _start(packets, protocol);
-      final decoder = ErgDecoder.forProtocol(protocol);
-      final ticks = [for (final p in packets) ...decoder.decode(p), ...decoder.flush()].whereType<StatusTick>();
+    test(
+      '$fixture: is ready until the first stroke, then counts from the last status before it',
+      () async {
+        final db = openTestDatabase();
+        final setup = _Setup(db, FakeErgSource(kind: kind, protocol: protocol));
+        final template = await _template(db);
+        final packets = loadFixture(fixture).packets;
+        final (first, trigger) = _start(packets, protocol);
+        final decoder = ErgDecoder.forProtocol(protocol);
+        final ticks = [
+          for (final p in packets) ...decoder.decode(p),
+          ...decoder.flush(),
+        ].whereType<StatusTick>();
 
-      await setup.recorder.start(template: template);
-      await setup.emitAll(packets.take(trigger));
+        await setup.recorder.start(template: template);
+        await setup.emitAll(packets.take(trigger));
 
-      final ready = setup.recording!;
-      expect((ready.ready, ready.sessionId, ready.template?.name), (true, null, 'Lang'));
-      expect(ready.progress.elapsed, Duration.zero);
-      expect((ready.lap!.lap, ready.lap!.courseTime, ready.lap!.courseDistanceDm), (1, Duration.zero, 0));
-      expect(await db.select(db.sessions).get(), isEmpty, reason: 'nothing is stored before the first stroke');
+        final ready = setup.recording!;
+        expect(
+          (ready.ready, ready.sessionId, ready.template?.name),
+          (true, null, 'Lang'),
+        );
+        expect(ready.progress.elapsed, Duration.zero);
+        expect(
+          (ready.lap!.lap, ready.lap!.courseTime, ready.lap!.courseDistanceDm),
+          (1, Duration.zero, 0),
+        );
+        expect(
+          await db.select(db.sessions).get(),
+          isEmpty,
+          reason: 'nothing is stored before the first stroke',
+        );
 
-      await setup.emitAll(packets.skip(trigger));
-      expect(setup.recording!.ready, isFalse);
-      expect(setup.recording!.progress.distanceMeters, greaterThan(0));
-      final id = (await setup.recorder.stop())!;
+        await setup.emitAll(packets.skip(trigger));
+        expect(setup.recording!.ready, isFalse);
+        expect(setup.recording!.progress.distanceMeters, greaterThan(0));
+        final id = (await setup.recorder.stop())!;
 
-      final session = (await db.select(db.sessions).get()).single;
-      expect(session.id, id);
-      final samples = await db.select(db.samples).get();
-      expect((samples.first.tMs, samples.first.distanceDm), (0, 0));
-      expect(samples.first.wallMs, lessThan(10), reason: 'the last of the packets of the base status');
-      // The rower starts at 0 m and 0:00 itself, so the session has all of it.
-      expect(session.distanceDm, (ticks.last.distanceMeters * 10).round());
-      // The session time leaves out the pauses of the recording (Change auto-pause).
-      final activeMs = samples.map((s) => s.activeMs!).reduce((a, b) => a > b ? a : b);
-      expect(session.durationMs, activeMs);
-      expect(activeMs, lessThan(samples.last.wallMs!));
-      final raw = await db.select(db.rawPackets).get();
-      expect(raw, hasLength(packets.length - first), reason: 'raw packets from the base on');
-      expect(raw.first.tMs, 0);
-      final lap = (await db.select(db.laps).get()).single;
-      expect((lap.startWallMs, lap.startDistanceDm), (0, 0));
-    });
+        final session = (await db.select(db.sessions).get()).single;
+        expect(session.id, id);
+        final samples = await db.select(db.samples).get();
+        expect((samples.first.tMs, samples.first.distanceDm), (0, 0));
+        expect(
+          samples.first.wallMs,
+          lessThan(10),
+          reason: 'the last of the packets of the base status',
+        );
+        // The rower starts at 0 m and 0:00 itself, so the session has all of it.
+        expect(session.distanceDm, (ticks.last.distanceMeters * 10).round());
+        // The session time leaves out the pauses of the recording (Change auto-pause).
+        final activeMs = samples
+            .map((s) => s.activeMs!)
+            .reduce((a, b) => a > b ? a : b);
+        expect(session.durationMs, activeMs);
+        expect(activeMs, lessThan(samples.last.wallMs!));
+        final raw = await db.select(db.rawPackets).get();
+        expect(
+          raw,
+          hasLength(packets.length - first),
+          reason: 'raw packets from the base on',
+        );
+        expect(raw.first.tMs, 0);
+        final lap = (await db.select(db.laps).get()).single;
+        expect((lap.startWallMs, lap.startDistanceDm), (0, 0));
+      },
+    );
   }
 
   test('nothing is stored when ended before the first stroke', () async {
@@ -128,7 +163,11 @@ void main() {
 
     expect(setup.recording, isNull);
     await setup.emitAll(packets.skip(trigger));
-    expect(setup.recording, isNull, reason: 'the stroke after ending starts nothing');
+    expect(
+      setup.recording,
+      isNull,
+      reason: 'the stroke after ending starts nothing',
+    );
     expect(await db.select(db.sessions).get(), isEmpty);
     expect(await db.select(db.rawPackets).get(), isEmpty);
   });
@@ -158,7 +197,10 @@ void main() {
     final id = await setup.recorder.stop();
 
     expect(id, isNotNull);
-    expect((await db.select(db.sessions).getSingle()).status, SessionStatus.complete);
+    expect(
+      (await db.select(db.sessions).getSingle()).status,
+      SessionStatus.complete,
+    );
   });
 
   test('import and replay give the same values as the recording', () async {
@@ -171,13 +213,17 @@ void main() {
     final repository = setup.container.read(sessionRepositoryProvider);
 
     Future<List<(int, int, int?)>> samples(int session) async => [
-          for (final s in await (db.select(db.samples)..where((s) => s.sessionId.equals(session))).get())
-            (s.tMs, s.distanceDm, s.wallMs),
-        ];
+      for (final s in await (db.select(
+        db.samples,
+      )..where((s) => s.sessionId.equals(session))).get())
+        (s.tMs, s.distanceDm, s.wallMs),
+    ];
     Future<List<(int, int, int, bool)>> laps(int session) async => [
-          for (final l in await (db.select(db.laps)..where((l) => l.sessionId.equals(session))).get())
-            (l.startWallMs, l.startDistanceDm, l.endDistanceDm, l.complete),
-        ];
+      for (final l in await (db.select(
+        db.laps,
+      )..where((l) => l.sessionId.equals(session))).get())
+        (l.startWallMs, l.startDistanceDm, l.endDistanceDm, l.complete),
+    ];
 
     final imported = await repository.import(await repository.export(id));
     expect(await samples(imported), await samples(id));

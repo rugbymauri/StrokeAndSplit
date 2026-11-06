@@ -16,7 +16,8 @@ import '../../support/template_setup.dart';
 import '../../support/test_database.dart';
 
 void main() {
-  Finder onScreen(Finder finder) => find.descendant(of: find.byType(TemplateScreen), matching: finder);
+  Finder onScreen(Finder finder) =>
+      find.descendant(of: find.byType(TemplateScreen), matching: finder);
 
   /// Rows on with the simulator until the live display has started.
   Future<void> start(WidgetTester tester) async {
@@ -32,7 +33,9 @@ void main() {
   }
 
   group('the screen of a template', () {
-    testWidgets('shows course, laps and zones and goes back to the list', (tester) async {
+    testWidgets('shows course, laps and zones and goes back to the list', (
+      tester,
+    ) async {
       final setup = TemplateSetup();
       final course = await setup.addCourseWithZone(tester, 'Seerunde');
       await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
@@ -41,8 +44,14 @@ void main() {
       await setup.openTemplate(tester, 'Seerunde x3');
 
       expect(onScreen(find.text('Seerunde x3')), findsOneWidget);
-      expect(onScreen(find.text('Seerunde · 1000 m · 3 Runden')), findsOneWidget);
-      expect(onScreen(find.text('Tempo 2:05–2:10 · 20–22 spm')), findsOneWidget);
+      expect(
+        onScreen(find.text('Seerunde · 1000 m · 3 Runden')),
+        findsOneWidget,
+      );
+      expect(
+        onScreen(find.text('Tempo 2:05–2:10 · 20–22 spm')),
+        findsOneWidget,
+      );
       expect(onScreen(find.text('Starten')), findsOneWidget);
       expect(onScreen(find.byTooltip('Vorlage bearbeiten')), findsOneWidget);
 
@@ -55,7 +64,9 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('says that a course without zones is rowed freely', (tester) async {
+    testWidgets('says that a course without zones is rowed freely', (
+      tester,
+    ) async {
       final setup = TemplateSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
       await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
@@ -67,7 +78,9 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('shows the new name after renaming in the editor', (tester) async {
+    testWidgets('shows the new name after renaming in the editor', (
+      tester,
+    ) async {
       final setup = TemplateSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
       await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
@@ -76,7 +89,10 @@ void main() {
       await setup.openTemplate(tester, 'Seerunde x3');
       await tester.tap(find.byTooltip('Vorlage bearbeiten'));
       await setup.settle(tester);
-      await tester.enterText(find.byKey(const Key('template-name')), 'Seerunde dreimal');
+      await tester.enterText(
+        find.byKey(const Key('template-name')),
+        'Seerunde dreimal',
+      );
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
 
@@ -86,33 +102,49 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('goes back to the list when the template is deleted in its editor', (tester) async {
-      final setup = TemplateSetup();
-      final course = await setup.addCourse(tester, 'Seerunde');
-      await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
-      await setup.pump(tester);
+    testWidgets(
+      'goes back to the list when the template is deleted in its editor',
+      (tester) async {
+        final setup = TemplateSetup();
+        final course = await setup.addCourse(tester, 'Seerunde');
+        await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+        await setup.pump(tester);
 
-      await setup.openTemplate(tester, 'Seerunde x3');
-      await tester.tap(find.byTooltip('Vorlage bearbeiten'));
-      await setup.settle(tester);
-      await tester.tap(find.byTooltip('Löschen'));
-      await tester.pumpAndSettle();
-      expect(find.text('Vorlage löschen?'), findsOneWidget);
-      await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Löschen')));
-      await setup.settle(tester);
+        await setup.openTemplate(tester, 'Seerunde x3');
+        await tester.tap(find.byTooltip('Vorlage bearbeiten'));
+        await setup.settle(tester);
+        await tester.tap(find.byTooltip('Löschen'));
+        await tester.pumpAndSettle();
+        expect(find.text('Vorlage löschen?'), findsOneWidget);
+        await tester.tap(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.text('Löschen'),
+          ),
+        );
+        await setup.settle(tester);
 
-      expect(find.byType(TemplateScreen), findsNothing);
-      expect(find.byType(TemplatesScreen), findsOneWidget);
-      expect(find.text('Seerunde x3'), findsNothing);
-      expect(find.text('Noch keine Vorlagen angelegt.'), findsOneWidget);
-      await disposeWidgetsWithDatabase(tester);
-    });
+        expect(find.byType(TemplateScreen), findsNothing);
+        expect(find.byType(TemplatesScreen), findsOneWidget);
+        expect(find.text('Seerunde x3'), findsNothing);
+        expect(find.text('Noch keine Vorlagen angelegt.'), findsOneWidget);
+        await disposeWidgetsWithDatabase(tester);
+      },
+    );
 
     testWidgets('shows the template in English', (tester) async {
       final setup = TemplateSetup();
       final course = await setup.addCourseWithZone(tester, 'Seerunde');
-      final id = await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
-      await setup.pump(tester, home: TemplateScreen(templateId: id), locale: const Locale('en'));
+      final id = await setup.addTemplate(
+        tester,
+        'Seerunde x3',
+        courseId: course,
+      );
+      await setup.pump(
+        tester,
+        home: TemplateScreen(templateId: id),
+        locale: const Locale('en'),
+      );
 
       expect(find.text('Seerunde · 1000 m · 3 laps'), findsOneWidget);
       expect(find.text('Tempo 2:05–2:10 · 20–22 spm'), findsOneWidget);
@@ -126,69 +158,111 @@ void main() {
       'portrait': Size(390, 844),
       'landscape': Size(844, 390),
     }.entries) {
-      testWidgets('fits without overflow and keeps "Starten" in view, $name', (tester) async {
+      testWidgets('fits without overflow and keeps "Starten" in view, $name', (
+        tester,
+      ) async {
         tester.view.physicalSize = size;
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
         final setup = TemplateSetup();
         final course = await setup.addCourseWithZone(tester, 'Seerunde');
-        final id = await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+        final id = await setup.addTemplate(
+          tester,
+          'Seerunde x3',
+          courseId: course,
+        );
         await tester.runAsync(() async {
           final x3 = (await setup.templates.get(id))!;
           for (final day in [1, 2, 3]) {
-            await storeRowedSession(setup.db, template: x3, startedAt: DateTime(2026, 10, day, 7), laps: [
-              for (var i = 0; i < 3; i++) RowedLap.single(250000 - day * 1000, 1000),
-            ]);
+            await storeRowedSession(
+              setup.db,
+              template: x3,
+              startedAt: DateTime(2026, 10, day, 7),
+              laps: [
+                for (var i = 0; i < 3; i++)
+                  RowedLap.single(250000 - day * 1000, 1000),
+              ],
+            );
           }
         });
         await setup.pump(tester, home: TemplateScreen(templateId: id));
 
         expect(tester.takeException(), isNull);
-        expect(find.byKey(const Key('template-start')).hitTestable(), findsOneWidget);
-        expect(find.byKey(const Key('template-ghost')).hitTestable(), findsOneWidget);
+        expect(
+          find.byKey(const Key('template-start')).hitTestable(),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('template-ghost')).hitTestable(),
+          findsOneWidget,
+        );
         await disposeWidgetsWithDatabase(tester);
       });
     }
   });
 
   group('starting', () {
-    testWidgets('starts the template with the chosen FTMS simulator', (tester) async {
-      final setup = TemplateSetup(rower: const RowerChoice.simulator(ErgProtocol.ftms));
+    testWidgets('starts the template with the chosen FTMS simulator', (
+      tester,
+    ) async {
+      final setup = TemplateSetup(
+        rower: const RowerChoice.simulator(ErgProtocol.ftms),
+      );
       final course = await setup.addCourseWithZone(tester, 'Seerunde');
       await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
-      await setup.addTemplate(tester, 'Seerunde offen', courseId: course, laps: null);
+      await setup.addTemplate(
+        tester,
+        'Seerunde offen',
+        courseId: course,
+        laps: null,
+      );
       await setup.pump(tester);
 
       await setup.openTemplate(tester, 'Seerunde x3');
       await start(tester);
 
       final source = setup.container.read(activeErgSourceProvider);
-      expect((source?.kind, source?.protocol), (ErgSourceKind.simulator, ErgProtocol.ftms));
-      expect(setup.container.read(sessionRecorderProvider)?.template?.name, 'Seerunde x3');
+      expect(
+        (source?.kind, source?.protocol),
+        (ErgSourceKind.simulator, ErgProtocol.ftms),
+      );
+      expect(
+        setup.container.read(sessionRecorderProvider)?.template?.name,
+        'Seerunde x3',
+      );
       expect(find.text('Runde 1 / 3'), findsOneWidget);
 
       await stopRowing(setup);
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('starts with the chosen simulator without asking for the source', (tester) async {
-      final setup = TemplateSetup();
-      final id = await setup.addCourse(tester, 'Seerunde');
-      await setup.addTemplate(tester, 'Seerunde x3', courseId: id);
-      await setup.pump(tester);
+    testWidgets(
+      'starts with the chosen simulator without asking for the source',
+      (tester) async {
+        final setup = TemplateSetup();
+        final id = await setup.addCourse(tester, 'Seerunde');
+        await setup.addTemplate(tester, 'Seerunde x3', courseId: id);
+        await setup.pump(tester);
 
-      await setup.openTemplate(tester, 'Seerunde x3');
-      await start(tester);
+        await setup.openTemplate(tester, 'Seerunde x3');
+        await start(tester);
 
-      expect(find.byType(SimpleDialog), findsNothing);
-      expect(setup.container.read(activeErgSourceProvider)?.kind, ErgSourceKind.simulator);
-      expect(find.text('Runde 1 / 3'), findsOneWidget);
-      expect(find.text('Beenden'), findsOneWidget);
-      expect(setup.container.read(sessionRecorderProvider)?.template?.name, 'Seerunde x3');
+        expect(find.byType(SimpleDialog), findsNothing);
+        expect(
+          setup.container.read(activeErgSourceProvider)?.kind,
+          ErgSourceKind.simulator,
+        );
+        expect(find.text('Runde 1 / 3'), findsOneWidget);
+        expect(find.text('Beenden'), findsOneWidget);
+        expect(
+          setup.container.read(sessionRecorderProvider)?.template?.name,
+          'Seerunde x3',
+        );
 
-      await stopRowing(setup);
-      await disposeWidgetsWithDatabase(tester);
-    });
+        await stopRowing(setup);
+        await disposeWidgetsWithDatabase(tester);
+      },
+    );
 
     testWidgets('shows the summary when the last lap is done', (tester) async {
       final setup = TemplateSetup();
@@ -215,10 +289,16 @@ void main() {
   });
 
   group('the ghost switch', () {
-    Switch ghostSwitch(WidgetTester tester) =>
-        tester.widget<Switch>(find.descendant(of: find.byKey(const Key('template-ghost')), matching: find.byType(Switch)));
+    Switch ghostSwitch(WidgetTester tester) => tester.widget<Switch>(
+      find.descendant(
+        of: find.byKey(const Key('template-ghost')),
+        matching: find.byType(Switch),
+      ),
+    );
 
-    testWidgets('is on when the screen opens, also without a best result', (tester) async {
+    testWidgets('is on when the screen opens, also without a best result', (
+      tester,
+    ) async {
       final setup = TemplateSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
       await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
@@ -227,104 +307,162 @@ void main() {
       await setup.openTemplate(tester, 'Seerunde x3');
 
       expect(onScreen(find.text('Gegen den Ghost rudern')), findsOneWidget);
-      expect(find.descendant(of: find.byKey(const Key('template-ghost')), matching: find.byType(GhostSymbol)),
-          findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('template-ghost')),
+          matching: find.byType(GhostSymbol),
+        ),
+        findsOneWidget,
+      );
       expect(ghostSwitch(tester).value, isTrue);
-      expect(tester.getSize(find.byKey(const Key('template-ghost'))).height, greaterThanOrEqualTo(48));
+      expect(
+        tester.getSize(find.byKey(const Key('template-ghost'))).height,
+        greaterThanOrEqualTo(48),
+      );
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('starts without ghost when turned off and is on again when the screen opens again', (tester) async {
-      final setup = TemplateSetup();
-      final course = await setup.addCourse(tester, 'Seerunde');
-      await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
-      await setup.pump(tester);
+    testWidgets(
+      'starts without ghost when turned off and is on again when the screen opens again',
+      (tester) async {
+        final setup = TemplateSetup();
+        final course = await setup.addCourse(tester, 'Seerunde');
+        await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
+        await setup.pump(tester);
 
-      await setup.openTemplate(tester, 'Seerunde x3');
-      // A tap anywhere on the row switches.
-      await tester.tap(find.text('Gegen den Ghost rudern'));
-      await tester.pump();
-      expect(ghostSwitch(tester).value, isFalse);
-      await start(tester);
+        await setup.openTemplate(tester, 'Seerunde x3');
+        // A tap anywhere on the row switches.
+        await tester.tap(find.text('Gegen den Ghost rudern'));
+        await tester.pump();
+        expect(ghostSwitch(tester).value, isFalse);
+        await start(tester);
 
-      final recording = setup.container.read(sessionRecorderProvider);
-      expect((recording?.template?.name, recording?.ghost), ('Seerunde x3', false));
-      await stopRowing(setup);
+        final recording = setup.container.read(sessionRecorderProvider);
+        expect(
+          (recording?.template?.name, recording?.ghost),
+          ('Seerunde x3', false),
+        );
+        await stopRowing(setup);
 
-      // Back on the start screen of the test: the list.
-      final navigator = tester.state<NavigatorState>(find.byType(Navigator).first);
-      navigator.popUntil((route) => route.isFirst);
-      await setup.settle(tester);
-      await setup.openTemplate(tester, 'Seerunde x3');
-      expect(ghostSwitch(tester).value, isTrue);
+        // Back on the start screen of the test: the list.
+        final navigator = tester.state<NavigatorState>(
+          find.byType(Navigator).first,
+        );
+        navigator.popUntil((route) => route.isFirst);
+        await setup.settle(tester);
+        await setup.openTemplate(tester, 'Seerunde x3');
+        expect(ghostSwitch(tester).value, isTrue);
 
-      await start(tester);
-      expect(setup.container.read(sessionRecorderProvider)?.ghost, isTrue);
-      await stopRowing(setup);
-      await disposeWidgetsWithDatabase(tester);
-    });
+        await start(tester);
+        expect(setup.container.read(sessionRecorderProvider)?.ghost, isTrue);
+        await stopRowing(setup);
+        await disposeWidgetsWithDatabase(tester);
+      },
+    );
   });
 
   group('places of a template', () {
-    Finder inPlace(int place, String text) =>
-        find.descendant(of: find.byKey(Key('template-place-$place')), matching: find.text(text));
-    Finder inPodium(Finder finder) => find.descendant(of: find.byType(TemplatePodium), matching: finder);
+    Finder inPlace(int place, String text) => find.descendant(
+      of: find.byKey(Key('template-place-$place')),
+      matching: find.text(text),
+    );
+    Finder inPodium(Finder finder) =>
+        find.descendant(of: find.byType(TemplatePodium), matching: finder);
 
-    testWidgets('shows places 1 and 2 with time, pace and date after two sessions', (tester) async {
+    testWidgets(
+      'shows places 1 and 2 with time, pace and date after two sessions',
+      (tester) async {
+        final setup = TemplateSetup();
+        final course = await setup.addCourse(tester, 'Seerunde');
+        final id = await setup.addTemplate(
+          tester,
+          'Seerunde x3',
+          courseId: course,
+        );
+        await tester.runAsync(() async {
+          final x3 = (await setup.templates.get(id))!;
+          await storeRowedSession(
+            setup.db,
+            template: x3,
+            startedAt: DateTime(2026, 10, 1, 7),
+            laps: [for (var i = 0; i < 3; i++) RowedLap.single(250000, 1000)],
+          );
+          await storeRowedSession(
+            setup.db,
+            template: x3,
+            startedAt: DateTime(2026, 10, 3, 7),
+            laps: [for (var i = 0; i < 3; i++) RowedLap.single(248000, 1000)],
+          );
+        });
+        await setup.pump(tester);
+
+        expect(find.byKey(const Key('template-podium')), findsNothing);
+        await setup.openTemplate(tester, 'Seerunde x3');
+
+        expect(onScreen(find.text('BESTLEISTUNGEN')), findsOneWidget);
+        expect(inPlace(1, '12:24.0'), findsOneWidget);
+        expect(inPlace(1, '2:04 /500 m'), findsOneWidget);
+        expect(inPlace(1, '3.10.2026'), findsOneWidget);
+        expect(inPlace(2, '12:30.0'), findsOneWidget);
+        expect(inPlace(2, '2:05 /500 m'), findsOneWidget);
+        expect(inPlace(2, '1.10.2026'), findsOneWidget);
+        expect(find.byKey(const Key('template-place-3')), findsNothing);
+        expect(find.byKey(const Key('template-podium-hint')), findsNothing);
+        // Only place 1 carries the ghost symbol.
+        final ghostSlot = find.byKey(const Key('template-ghost-slot'));
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('template-place-1')),
+            matching: ghostSlot,
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(of: ghostSlot, matching: find.byType(GhostSymbol)),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('template-place-2')),
+            matching: find.byType(GhostSymbol),
+          ),
+          findsNothing,
+        );
+        expect(inPodium(find.byType(GhostSymbol)), findsOneWidget);
+        await disposeWidgetsWithDatabase(tester);
+      },
+    );
+
+    testWidgets('shows the ghost symbol only at place 1 of three', (
+      tester,
+    ) async {
       final setup = TemplateSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
-      final id = await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
-      await tester.runAsync(() async {
-        final x3 = (await setup.templates.get(id))!;
-        await storeRowedSession(setup.db, template: x3, startedAt: DateTime(2026, 10, 1, 7), laps: [
-          for (var i = 0; i < 3; i++) RowedLap.single(250000, 1000),
-        ]);
-        await storeRowedSession(setup.db, template: x3, startedAt: DateTime(2026, 10, 3, 7), laps: [
-          for (var i = 0; i < 3; i++) RowedLap.single(248000, 1000),
-        ]);
-      });
-      await setup.pump(tester);
-
-      expect(find.byKey(const Key('template-podium')), findsNothing);
-      await setup.openTemplate(tester, 'Seerunde x3');
-
-      expect(onScreen(find.text('BESTLEISTUNGEN')), findsOneWidget);
-      expect(inPlace(1, '12:24.0'), findsOneWidget);
-      expect(inPlace(1, '2:04 /500 m'), findsOneWidget);
-      expect(inPlace(1, '3.10.2026'), findsOneWidget);
-      expect(inPlace(2, '12:30.0'), findsOneWidget);
-      expect(inPlace(2, '2:05 /500 m'), findsOneWidget);
-      expect(inPlace(2, '1.10.2026'), findsOneWidget);
-      expect(find.byKey(const Key('template-place-3')), findsNothing);
-      expect(find.byKey(const Key('template-podium-hint')), findsNothing);
-      // Only place 1 carries the ghost symbol.
-      final ghostSlot = find.byKey(const Key('template-ghost-slot'));
-      expect(find.descendant(of: find.byKey(const Key('template-place-1')), matching: ghostSlot), findsOneWidget);
-      expect(find.descendant(of: ghostSlot, matching: find.byType(GhostSymbol)), findsOneWidget);
-      expect(find.descendant(of: find.byKey(const Key('template-place-2')), matching: find.byType(GhostSymbol)),
-          findsNothing);
-      expect(inPodium(find.byType(GhostSymbol)), findsOneWidget);
-      await disposeWidgetsWithDatabase(tester);
-    });
-
-    testWidgets('shows the ghost symbol only at place 1 of three', (tester) async {
-      final setup = TemplateSetup();
-      final course = await setup.addCourse(tester, 'Seerunde');
-      final id = await setup.addTemplate(tester, 'Seerunde x1', courseId: course, laps: 1);
+      final id = await setup.addTemplate(
+        tester,
+        'Seerunde x1',
+        courseId: course,
+        laps: 1,
+      );
       await tester.runAsync(() async {
         final x1 = (await setup.templates.get(id))!;
         for (final (day, ms) in [(1, 250000), (2, 246000), (3, 248000)]) {
-          await storeRowedSession(setup.db, template: x1, startedAt: DateTime(2026, 10, day, 7), laps: [
-            RowedLap.single(ms, 1000),
-          ]);
+          await storeRowedSession(
+            setup.db,
+            template: x1,
+            startedAt: DateTime(2026, 10, day, 7),
+            laps: [RowedLap.single(ms, 1000)],
+          );
         }
       });
       await setup.pump(tester);
 
       await setup.openTemplate(tester, 'Seerunde x1');
 
-      Finder ghostIn(int place) =>
-          find.descendant(of: find.byKey(Key('template-place-$place')), matching: find.byType(GhostSymbol));
+      Finder ghostIn(int place) => find.descendant(
+        of: find.byKey(Key('template-place-$place')),
+        matching: find.byType(GhostSymbol),
+      );
       expect(ghostIn(1), findsOneWidget);
       expect(ghostIn(2), findsNothing);
       expect(ghostIn(3), findsNothing);
@@ -332,7 +470,9 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('says that a template never rowed has no best time yet', (tester) async {
+    testWidgets('says that a template never rowed has no best time yet', (
+      tester,
+    ) async {
       final setup = TemplateSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
       await setup.addTemplate(tester, 'Seerunde x3', courseId: course);
@@ -341,7 +481,11 @@ void main() {
       await setup.openTemplate(tester, 'Seerunde x3');
 
       expect(
-        onScreen(find.text('Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.')),
+        onScreen(
+          find.text(
+            'Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.',
+          ),
+        ),
         findsOneWidget,
       );
       expect(find.byKey(const Key('template-podium')), findsNothing);
@@ -352,29 +496,51 @@ void main() {
     testWidgets('shows no places for an open number of laps', (tester) async {
       final setup = TemplateSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
-      final id = await setup.addTemplate(tester, 'Seerunde offen', courseId: course, laps: null);
+      final id = await setup.addTemplate(
+        tester,
+        'Seerunde offen',
+        courseId: course,
+        laps: null,
+      );
       await tester.runAsync(() async {
         final open = (await setup.templates.get(id))!;
-        await storeRowedSession(setup.db, template: open, laps: [RowedLap.single(250000, 1000)]);
+        await storeRowedSession(
+          setup.db,
+          template: open,
+          laps: [RowedLap.single(250000, 1000)],
+        );
       });
       await setup.pump(tester);
 
       await setup.openTemplate(tester, 'Seerunde offen');
 
-      expect(onScreen(find.text('Bei offener Rundenzahl gibt es keine Bestzeit.')), findsOneWidget);
+      expect(
+        onScreen(find.text('Bei offener Rundenzahl gibt es keine Bestzeit.')),
+        findsOneWidget,
+      );
       expect(find.byKey(const Key('template-podium')), findsNothing);
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('shows the hint when only a simulated session was rowed', (tester) async {
+    testWidgets('shows the hint when only a simulated session was rowed', (
+      tester,
+    ) async {
       final setup = TemplateSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
-      final id = await setup.addTemplate(tester, 'Seerunde x1', courseId: course, laps: 1);
+      final id = await setup.addTemplate(
+        tester,
+        'Seerunde x1',
+        courseId: course,
+        laps: 1,
+      );
       await tester.runAsync(() async {
         final x1 = (await setup.templates.get(id))!;
-        await storeRowedSession(setup.db, template: x1, source: ErgSourceKind.simulator, laps: [
-          RowedLap.single(250000, 1000),
-        ]);
+        await storeRowedSession(
+          setup.db,
+          template: x1,
+          source: ErgSourceKind.simulator,
+          laps: [RowedLap.single(250000, 1000)],
+        );
       });
       await setup.pump(tester);
 
@@ -387,12 +553,20 @@ void main() {
     testWidgets('shows the places in English', (tester) async {
       final setup = TemplateSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
-      final id = await setup.addTemplate(tester, 'Seerunde x1', courseId: course, laps: 1);
+      final id = await setup.addTemplate(
+        tester,
+        'Seerunde x1',
+        courseId: course,
+        laps: 1,
+      );
       await tester.runAsync(() async {
         final x1 = (await setup.templates.get(id))!;
-        await storeRowedSession(setup.db, template: x1, startedAt: DateTime(2026, 10, 3, 7), laps: [
-          RowedLap.single(250000, 1000),
-        ]);
+        await storeRowedSession(
+          setup.db,
+          template: x1,
+          startedAt: DateTime(2026, 10, 3, 7),
+          laps: [RowedLap.single(250000, 1000)],
+        );
       });
       await setup.pump(tester, locale: const Locale('en'));
 

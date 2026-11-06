@@ -17,13 +17,16 @@ const _companionSuffixes = ['-wal', '-shm', '-journal'];
 /// The main file is renamed last, so an interrupted takeover is completed on
 /// the next start.
 Future<bool> adoptLegacyDatabase(Directory directory) async {
-  File file(String name, [String suffix = '']) => File('${directory.path}${Platform.pathSeparator}$name.sqlite$suffix');
+  File file(String name, [String suffix = '']) =>
+      File('${directory.path}${Platform.pathSeparator}$name.sqlite$suffix');
 
   final legacy = file(legacyDatabaseName);
   if (await file(databaseName).exists() || !await legacy.exists()) return false;
   for (final suffix in _companionSuffixes) {
     final companion = file(legacyDatabaseName, suffix);
-    if (await companion.exists()) await companion.rename(file(databaseName, suffix).path);
+    if (await companion.exists()) {
+      await companion.rename(file(databaseName, suffix).path);
+    }
   }
   await legacy.rename(file(databaseName).path);
   return true;

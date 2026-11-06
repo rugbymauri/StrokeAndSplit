@@ -10,16 +10,26 @@ Uint8List _additionalStatus(int code) => Uint8List(17)..[16] = code;
 void main() {
   test('recognises the RowErg of the recorded PM5', () {
     final recording = loadFixture('just_row');
-    final status = recording.packets.firstWhere((p) => p.characteristicId == Pm5Characteristics.additionalStatus);
+    final status = recording.packets.firstWhere(
+      (p) => p.characteristicId == Pm5Characteristics.additionalStatus,
+    );
     expect(Pm5ErgType.fromAdditionalStatus(status.bytes), Pm5ErgKind.rowErg);
   });
 
   test('recognises SkiErg and BikeErg codes', () {
     for (final code in [128, 143, 225]) {
-      expect(Pm5ErgType.fromAdditionalStatus(_additionalStatus(code)), Pm5ErgKind.skiErg, reason: '$code');
+      expect(
+        Pm5ErgType.fromAdditionalStatus(_additionalStatus(code)),
+        Pm5ErgKind.skiErg,
+        reason: '$code',
+      );
     }
     for (final code in [192, 193, 194, 207, 226]) {
-      expect(Pm5ErgType.fromAdditionalStatus(_additionalStatus(code)), Pm5ErgKind.bikeErg, reason: '$code');
+      expect(
+        Pm5ErgType.fromAdditionalStatus(_additionalStatus(code)),
+        Pm5ErgKind.bikeErg,
+        reason: '$code',
+      );
     }
   });
 

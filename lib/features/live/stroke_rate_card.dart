@@ -46,10 +46,20 @@ class StrokeRateCard extends StatelessWidget {
     final (background, border, foreground) = switch (hint) {
       // A quiet frame without a band, so the card stands out against the background like the pace box.
       null => (AppColors.surface, AppColors.trackZone, AppColors.textMuted),
-      ZoneHint(inZone: true) => (AppColors.zoneInSurface, AppColors.zoneIn, AppColors.zoneInText),
-      ZoneHint(inZone: false) => (AppColors.zoneOutSurface, AppColors.zoneOut, AppColors.zoneOutText),
+      ZoneHint(inZone: true) => (
+        AppColors.zoneInSurface,
+        AppColors.zoneIn,
+        AppColors.zoneInText,
+      ),
+      ZoneHint(inZone: false) => (
+        AppColors.zoneOutSurface,
+        AppColors.zoneOut,
+        AppColors.zoneOutText,
+      ),
     };
-    final band = segment.hasSpmBand ? '${segment.spmMin}–${segment.spmMax} spm' : null;
+    final band = segment.hasSpmBand
+        ? '${segment.spmMin}–${segment.spmMax} spm'
+        : null;
     final label = Text(
       l10n.metricStrokeRate.toUpperCase(),
       style: LiveTextStyles.label.copyWith(color: foreground),
@@ -61,58 +71,64 @@ class StrokeRateCard extends StatelessWidget {
     final upcoming = this.upcoming;
     final Widget? status = switch (hint) {
       _ when upcoming != null && upcoming.hasSpmBand => UpcomingPill(
-          key: const Key('stroke-card-upcoming'),
-          text: l10n.hintUpcoming('${upcoming.spmMin}–${upcoming.spmMax} spm'),
-          textKey: const Key('stroke-card-upcoming-band'),
-          // Band and unit belong together, so it shrinks rather than wrapping in a narrow card.
-          scaleDown: true,
-          dense: true,
-        ),
+        key: const Key('stroke-card-upcoming'),
+        text: l10n.hintUpcoming('${upcoming.spmMin}–${upcoming.spmMax} spm'),
+        textKey: const Key('stroke-card-upcoming-band'),
+        // Band and unit belong together, so it shrinks rather than wrapping in a narrow card.
+        scaleDown: true,
+        dense: true,
+      ),
       null => null,
       ZoneHint(inZone: true) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(hint.icon, size: 14, color: foreground),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                band == null || landscape ? hint.text : '${hint.text} · $band',
-                key: const Key('stroke-card-status'),
-                style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, color: foreground),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(hint.icon, size: 14, color: foreground),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              band == null || landscape ? hint.text : '${hint.text} · $band',
+              key: const Key('stroke-card-status'),
+              style: AppTextStyles.caption.copyWith(
+                fontWeight: FontWeight.w600,
+                color: foreground,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
       ZoneHint(inZone: false) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ZonePill(
-              key: const Key('stroke-card-pill'),
-              hint: hint,
-              textKey: const Key('stroke-card-status'),
-              filled: true,
-              // Below the label there is no room for a second line in portrait, while the landscape
-              // card can be too narrow for one.
-              scaleDown: !landscape,
-              maxLines: landscape ? 2 : 1,
-              dense: true,
-            ),
-            // The pill is too narrow for the band beside the word; in landscape it is beside the value.
-            if (band != null && !landscape) ...[
-              const SizedBox(height: 2),
-              Text(
-                band,
-                key: const Key('stroke-card-band'),
-                style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600, color: foreground),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ZonePill(
+            key: const Key('stroke-card-pill'),
+            hint: hint,
+            textKey: const Key('stroke-card-status'),
+            filled: true,
+            // Below the label there is no room for a second line in portrait, while the landscape
+            // card can be too narrow for one.
+            scaleDown: !landscape,
+            maxLines: landscape ? 2 : 1,
+            dense: true,
+          ),
+          // The pill is too narrow for the band beside the word; in landscape it is beside the value.
+          if (band != null && !landscape) ...[
+            const SizedBox(height: 2),
+            Text(
+              band,
+              key: const Key('stroke-card-band'),
+              style: AppTextStyles.caption.copyWith(
+                fontWeight: FontWeight.w600,
+                color: foreground,
               ),
-            ],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
-        ),
+        ],
+      ),
     };
     final value = FittedBox(
       fit: BoxFit.scaleDown,
@@ -123,7 +139,10 @@ class StrokeRateCard extends StatelessWidget {
             TextSpan(
               text: landscape && band != null ? ' $band' : ' spm',
               // In proportion to the value; the band in landscape is longer, so a little smaller.
-              style: AppTextStyles.caption.copyWith(fontSize: fontSize * (landscape ? 0.3 : 0.36), color: foreground),
+              style: AppTextStyles.caption.copyWith(
+                fontSize: fontSize * (landscape ? 0.3 : 0.36),
+                color: foreground,
+              ),
             ),
           ],
         ),
@@ -137,28 +156,41 @@ class StrokeRateCard extends StatelessWidget {
     );
     final footer = this.footer;
     return DecoratedBox(
-      key: hint == null ? null : Key('stroke-card-zone-${hint.inZone ? 'in' : 'out'}'),
+      key: hint == null
+          ? null
+          : Key('stroke-card-zone-${hint.inZone ? 'in' : 'out'}'),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(landscape ? AppRadii.cardLarge : AppRadii.card),
+        borderRadius: BorderRadius.circular(
+          landscape ? AppRadii.cardLarge : AppRadii.card,
+        ),
         border: Border.all(color: border, width: 2),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppSpacing.s),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.s,
+        ),
         child: landscape
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // The upcoming band gets a line of its own like an instruction, so it keeps its words.
                   if ((hint == null || hint.inZone) && status is! UpcomingPill)
-                    Row(children: [Expanded(child: label), if (status != null) Flexible(child: status)])
+                    Row(
+                      children: [
+                        Expanded(child: label),
+                        if (status != null) Flexible(child: status),
+                      ],
+                    )
                   else ...[
                     label,
                     const SizedBox(height: 6),
                     status!,
                   ],
                   Flexible(flex: 2, child: Center(child: value)),
-                  if (footer != null) Expanded(flex: 3, child: footer(foreground)),
+                  if (footer != null)
+                    Expanded(flex: 3, child: footer(foreground)),
                 ],
               )
             : Row(
@@ -170,7 +202,14 @@ class StrokeRateCard extends StatelessWidget {
                       children: [
                         label,
                         if (status != null) ...[
-                          SizedBox(height: hint != null && hint.inZone && status is! UpcomingPill ? 2 : AppSpacing.xs),
+                          SizedBox(
+                            height:
+                                hint != null &&
+                                    hint.inZone &&
+                                    status is! UpcomingPill
+                                ? 2
+                                : AppSpacing.xs,
+                          ),
                           status,
                         ],
                       ],

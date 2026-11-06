@@ -3,7 +3,8 @@ import 'dart:typed_data';
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:test/test.dart';
 
-HeartRateMeasurement? _parse(List<int> bytes) => HeartRateMeasurement.parse(Uint8List.fromList(bytes));
+HeartRateMeasurement? _parse(List<int> bytes) =>
+    HeartRateMeasurement.parse(Uint8List.fromList(bytes));
 
 void main() {
   group('parse', () {
@@ -72,7 +73,10 @@ void main() {
     const encoder = HeartRateEncoder();
 
     test('writes a Heart Rate Measurement of the strap', () {
-      final packet = encoder.encode(heartRate: 142, at: const Duration(seconds: 3));
+      final packet = encoder.encode(
+        heartRate: 142,
+        at: const Duration(seconds: 3),
+      );
       expect(packet.characteristicId, HeartRateIds.measurement);
       expect(packet.time, const Duration(seconds: 3));
       expect(packet.bytes, [0x00, 142]);
@@ -87,7 +91,12 @@ void main() {
     ]) {
       test('round trips $name', () {
         final packet = encoder.encode(
-            heartRate: heartRate, wide: wide, energyExpended: energy, intervalsMs: intervals, at: Duration.zero);
+          heartRate: heartRate,
+          wide: wide,
+          energyExpended: energy,
+          intervalsMs: intervals,
+          at: Duration.zero,
+        );
         final m = HeartRateMeasurement.parse(packet.bytes)!;
         expect(m.heartRate, heartRate);
         expect(m.intervalsMs, intervals);
@@ -98,7 +107,11 @@ void main() {
       final intervals = [for (var ms = 250; ms <= 2000; ms++) ms];
       for (var i = 0; i < intervals.length; i += 8) {
         final chunk = intervals.sublist(i, (i + 8).clamp(0, intervals.length));
-        final packet = encoder.encode(heartRate: 60, intervalsMs: chunk, at: Duration.zero);
+        final packet = encoder.encode(
+          heartRate: 60,
+          intervalsMs: chunk,
+          at: Duration.zero,
+        );
         expect(HeartRateMeasurement.parse(packet.bytes)!.intervalsMs, chunk);
       }
     });

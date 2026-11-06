@@ -16,12 +16,18 @@ import 'session_accumulator.dart';
 import 'session_repository.dart';
 
 /// The local database; opened in `main` and overridden there.
-final databaseProvider = Provider<AppDatabase>((ref) => throw UnimplementedError('Open the database in main'));
+final databaseProvider = Provider<AppDatabase>(
+  (ref) => throw UnimplementedError('Open the database in main'),
+);
 
-final sessionRepositoryProvider = Provider<SessionRepository>((ref) => SessionRepository(ref.watch(databaseProvider)));
+final sessionRepositoryProvider = Provider<SessionRepository>(
+  (ref) => SessionRepository(ref.watch(databaseProvider)),
+);
 
 /// All stored sessions, newest first.
-final sessionsProvider = StreamProvider<List<SessionRow>>((ref) => ref.watch(sessionRepositoryProvider).watchAll());
+final sessionsProvider = StreamProvider<List<SessionRow>>(
+  (ref) => ref.watch(sessionRepositoryProvider).watchAll(),
+);
 
 final sessionProvider = StreamProvider.family<SessionRow?, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).watch(id),
@@ -33,9 +39,10 @@ final sessionLapsProvider = StreamProvider.family<List<LapRow>, int>(
 );
 
 /// The RR intervals of a stored session, oldest first; empty without a strap.
-final sessionRrIntervalsProvider = FutureProvider.family<List<RrIntervalRow>, int>(
-  (ref, id) => ref.watch(sessionRepositoryProvider).rrIntervals(id),
-);
+final sessionRrIntervalsProvider =
+    FutureProvider.family<List<RrIntervalRow>, int>(
+      (ref, id) => ref.watch(sessionRepositoryProvider).rrIntervals(id),
+    );
 
 /// The lowest heart rate of a stored session; null without one.
 final sessionMinHeartRateProvider = FutureProvider.family<int?, int>(
@@ -84,7 +91,9 @@ class ActiveRecording {
 
 /// A session that ended by itself after its last lap, until the live
 /// display has shown its summary.
-final finishedSessionProvider = NotifierProvider<FinishedSession, int?>(FinishedSession.new);
+final finishedSessionProvider = NotifierProvider<FinishedSession, int?>(
+  FinishedSession.new,
+);
 
 class FinishedSession extends Notifier<int?> {
   @override
@@ -97,9 +106,12 @@ class FinishedSession extends Notifier<int?> {
 
 /// How often buffered rows are written; at most this much is lost when the
 /// app ends unexpectedly.
-final recordingFlushIntervalProvider = Provider((ref) => const Duration(seconds: 2));
+final recordingFlushIntervalProvider = Provider(
+  (ref) => const Duration(seconds: 2),
+);
 
-final sessionRecorderProvider = NotifierProvider<SessionRecorder, ActiveRecording?>(SessionRecorder.new);
+final sessionRecorderProvider =
+    NotifierProvider<SessionRecorder, ActiveRecording?>(SessionRecorder.new);
 
 /// Records the active source into a session until it is stopped.
 class SessionRecorder extends Notifier<ActiveRecording?> {
@@ -133,10 +145,16 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
 
     state = ActiveRecording(
       sessionId: null,
-      progress: const SessionProgress(distanceMeters: 0, elapsed: Duration.zero),
+      progress: const SessionProgress(
+        distanceMeters: 0,
+        elapsed: Duration.zero,
+      ),
       template: template,
       ghost: ghost,
-      lap: LapTracker(template.course.definition, plannedLaps: template.laps).progress,
+      lap: LapTracker(
+        template.course.definition,
+        plannedLaps: template.laps,
+      ).progress,
     );
     final detector = FirstStrokeDetector(source.protocol);
     List<RawPacket>? early;
@@ -150,12 +168,20 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
 
   /// Creates the session and records [source] into it, starting with [early]
   /// packets: the base of the first stroke and what followed (Design D2).
-  Future<void> _begin(ErgSource source, SessionTemplate? template, bool ghost, List<RawPacket> early) async {
+  Future<void> _begin(
+    ErgSource source,
+    SessionTemplate? template,
+    bool ghost,
+    List<RawPacket> early,
+  ) async {
     final id = await _repository.create(
       startedAt: clock.now(),
       source: source.kind,
       protocol: source.protocol,
-      deviceName: source.kind == ErgSourceKind.pm5 || source.kind == ErgSourceKind.ftms ? source.name : null,
+      deviceName:
+          source.kind == ErgSourceKind.pm5 || source.kind == ErgSourceKind.ftms
+          ? source.name
+          : null,
       template: template,
     );
     final accumulator = _accumulator = SessionAccumulator(
@@ -165,26 +191,31 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
       plannedLaps: template?.laps,
     );
     ActiveRecording current() => ActiveRecording(
-          sessionId: id,
-          progress: accumulator.progress,
-          template: template,
-          ghost: ghost,
-          lap: accumulator.lapProgress,
-          paused: accumulator.paused,
-        );
+      sessionId: id,
+      progress: accumulator.progress,
+      template: template,
+      ghost: ghost,
+      lap: accumulator.lapProgress,
+      paused: accumulator.paused,
+    );
     void add(RawPacket packet) {
       // Stopped after the last lap while the early packets are still added.
       if (_accumulator != accumulator) return;
       accumulator.add(packet);
       // On a course the live state follows every value, e.g. the zone status.
-      final changed = accumulator.progress != state?.progress || accumulator.paused != state?.paused;
+      final changed =
+          accumulator.progress != state?.progress ||
+          accumulator.paused != state?.paused;
       if (template != null || changed) state = current();
       if (accumulator.lapsFinished) unawaited(_finishAfterLastLap());
     }
 
     state = current();
     _listen(source, add);
-    _flushTimer = Timer.periodic(ref.read(recordingFlushIntervalProvider), (_) => _flush());
+    _flushTimer = Timer.periodic(
+      ref.read(recordingFlushIntervalProvider),
+      (_) => _flush(),
+    );
     early.forEach(add);
   }
 

@@ -91,8 +91,10 @@ class RowerData {
     void u16(int v) => out.add([v & 0xFF, v >> 8 & 0xFF]);
     void u24(int v) => out.add([v & 0xFF, v >> 8 & 0xFF, v >> 16 & 0xFF]);
 
-    final hasEnergy = totalEnergy != null || energyPerHour != null || energyPerMinute != null;
-    final flags = (moreData ? 1 : 0) |
+    final hasEnergy =
+        totalEnergy != null || energyPerHour != null || energyPerMinute != null;
+    final flags =
+        (moreData ? 1 : 0) |
         (averageStrokeRate != null ? 1 << 1 : 0) |
         (totalDistance != null ? 1 << 2 : 0) |
         (pace != null ? 1 << 3 : 0) |
@@ -151,7 +153,9 @@ class _Reader {
   }
 
   int _take(int length) {
-    if (_offset + length > _bytes.length) throw RangeError('Rower Data ends at ${_bytes.length} bytes');
+    if (_offset + length > _bytes.length) {
+      throw RangeError('Rower Data ends at ${_bytes.length} bytes');
+    }
     final offset = _offset;
     _offset += length;
     return offset;

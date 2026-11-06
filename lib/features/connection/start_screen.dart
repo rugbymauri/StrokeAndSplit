@@ -27,9 +27,7 @@ class StartScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final navigator = Navigator.of(context);
     return Scaffold(
-      appBar: AppBar(
-        actions: const [LanguageButton()],
-      ),
+      appBar: AppBar(actions: const [LanguageButton()]),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -44,28 +42,47 @@ class StartScreen extends ConsumerWidget {
               children: [
                 Text(l10n.appTitle, style: AppTextStyles.appTitle),
                 const SizedBox(height: AppSpacing.xs),
-                Text(l10n.startTagline, style: AppTextStyles.body.copyWith(color: AppColors.textMuted)),
+                Text(
+                  l10n.startTagline,
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textMuted,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.xxl),
                 const _DeviceRow(),
                 const SizedBox(height: AppSpacing.xxl),
                 SizedBox(
                   height: 56,
                   child: FilledButton(
-                    onPressed: () => navigator.push(MaterialPageRoute<void>(builder: (_) => const TemplatesScreen())),
-                    child: Text(l10n.startRow, style: AppTextStyles.primaryButton),
+                    onPressed: () => navigator.push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const TemplatesScreen(),
+                      ),
+                    ),
+                    child: Text(
+                      l10n.startRow,
+                      style: AppTextStyles.primaryButton,
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.m),
                 SizedBox(
                   height: 52,
-                  child: OutlinedButton(onPressed: () => startRowing(context, ref), child: Text(l10n.startRowFree)),
+                  child: OutlinedButton(
+                    onPressed: () => startRowing(context, ref),
+                    child: Text(l10n.startRowFree),
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.m),
                 SizedBox(
                   height: 48,
                   child: OutlinedButton.icon(
                     key: const Key('start-sessions'),
-                    onPressed: () => navigator.push(MaterialPageRoute<void>(builder: (_) => const SessionsScreen())),
+                    onPressed: () => navigator.push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const SessionsScreen(),
+                      ),
+                    ),
                     icon: const Icon(Icons.history),
                     label: Text(l10n.startSessions),
                   ),
@@ -89,17 +106,31 @@ class _DeviceRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final choice = ref.watch(chosenRowerProvider);
-    final state = ref.watch(ergConnectionStateProvider).value ?? ErgConnectionState.disconnected;
+    final state =
+        ref.watch(ergConnectionStateProvider).value ??
+        ErgConnectionState.disconnected;
     // The connection stays after rowing until it is ended here or another rower is chosen.
-    final active = choice != null &&
+    final active =
+        choice != null &&
         choice.isUsedBy(ref.watch(activeErgSourceProvider)) &&
         state != ErgConnectionState.disconnected;
     final (icon, title, subtitle) = switch (choice) {
       null => (Icons.bluetooth_searching, l10n.startNoRower, l10n.devicesTitle),
-      RowerChoice(:final device?) => (Icons.rowing, device.name, l10n.startConnectsLater),
-      RowerChoice(protocol: ErgProtocol.ftms) =>
-        (Icons.smart_toy_outlined, l10n.sourceSimulatorFtmsName, l10n.startSimulatorFtmsHint),
-      RowerChoice() => (Icons.smart_toy_outlined, l10n.sourceSimulatorName, l10n.startSimulatorHint),
+      RowerChoice(:final device?) => (
+        Icons.rowing,
+        device.name,
+        l10n.startConnectsLater,
+      ),
+      RowerChoice(protocol: ErgProtocol.ftms) => (
+        Icons.smart_toy_outlined,
+        l10n.sourceSimulatorFtmsName,
+        l10n.startSimulatorFtmsHint,
+      ),
+      RowerChoice() => (
+        Icons.smart_toy_outlined,
+        l10n.sourceSimulatorName,
+        l10n.startSimulatorHint,
+      ),
     };
     final strap = ref.watch(chosenHeartRateMonitorProvider);
     return OptionCard(
@@ -115,19 +146,31 @@ class _DeviceRow extends ConsumerWidget {
               children: [
                 const HeartIcon(size: 14),
                 const SizedBox(width: AppSpacing.xs),
-                Flexible(child: Text(strap.name, style: AppTextStyles.subtitle, overflow: TextOverflow.ellipsis)),
+                Flexible(
+                  child: Text(
+                    strap.name,
+                    style: AppTextStyles.subtitle,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
       action: active
           ? TextButton.icon(
               key: const Key('device-row-disconnect'),
-              onPressed: () => ref.read(activeErgSourceProvider.notifier).clear(),
-              style: TextButton.styleFrom(minimumSize: const Size(48, 48), textStyle: AppTextStyles.button),
+              onPressed: () =>
+                  ref.read(activeErgSourceProvider.notifier).clear(),
+              style: TextButton.styleFrom(
+                minimumSize: const Size(48, 48),
+                textStyle: AppTextStyles.button,
+              ),
               icon: const Icon(Icons.link_off),
               label: Text(l10n.startDisconnect),
             )
           : null,
-      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ChooseDevicesScreen())),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const ChooseDevicesScreen()),
+      ),
     );
   }
 }

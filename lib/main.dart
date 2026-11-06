@@ -22,14 +22,16 @@ Future<void> main() async {
   final rower = await PreferencesRowerChoiceStore.open();
   final heartRateMonitor = await PreferencesHeartRateMonitorStore.open();
   final healthExport = await PreferencesHealthExportStore.open();
-  runApp(ProviderScope(
-    overrides: [
-      databaseProvider.overrideWithValue(db),
-      languageStoreProvider.overrideWithValue(languages),
-      rowerChoiceStoreProvider.overrideWithValue(rower),
-      heartRateMonitorStoreProvider.overrideWithValue(heartRateMonitor),
-      healthExportStoreProvider.overrideWithValue(healthExport),
-    ],
-    child: const StrokeSplitApp(),
-  ));
+  runApp(
+    ProviderScope(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        languageStoreProvider.overrideWithValue(languages),
+        rowerChoiceStoreProvider.overrideWithValue(rower),
+        heartRateMonitorStoreProvider.overrideWithValue(heartRateMonitor),
+        healthExportStoreProvider.overrideWithValue(healthExport),
+      ],
+      child: const StrokeSplitApp(),
+    ),
+  );
 }

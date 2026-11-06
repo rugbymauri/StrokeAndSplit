@@ -13,32 +13,55 @@ import '../live/formatters.dart';
 import '../live/live_screen.dart';
 
 /// Plays [session] back from its raw notifications in the live display.
-Future<void> replaySession(BuildContext context, WidgetRef ref, SessionRow session) async {
-  final recording = await ref.read(sessionRepositoryProvider).rawRecording(session.id);
+Future<void> replaySession(
+  BuildContext context,
+  WidgetRef ref,
+  SessionRow session,
+) async {
+  final recording = await ref
+      .read(sessionRepositoryProvider)
+      .rawRecording(session.id);
   if (!context.mounted) return;
   if (recording.packets.isEmpty) {
     _notify(ScaffoldMessenger.of(context), context.l10n.replayNoData);
     return;
   }
-  final name = context.l10n.replayName(formatDateTime(context.l10n, session.startedAt));
-  await ref.read(activeErgSourceProvider.notifier).use(ReplaySource(recording, name: name));
+  final name = context.l10n.replayName(
+    formatDateTime(context.l10n, session.startedAt),
+  );
+  await ref
+      .read(activeErgSourceProvider.notifier)
+      .use(ReplaySource(recording, name: name));
   if (!context.mounted) return;
-  await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LiveScreen()));
+  await Navigator.of(context)
+      .push(MaterialPageRoute<void>(builder: (_) => const LiveScreen()));
 }
 
 /// Asks for confirmation and deletes [session] with all its data.
 /// Returns whether it was deleted.
-Future<bool> deleteSession(BuildContext context, WidgetRef ref, SessionRow session) async {
+Future<bool> deleteSession(
+  BuildContext context,
+  WidgetRef ref,
+  SessionRow session,
+) async {
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (context) {
       final l10n = context.l10n;
       return AlertDialog(
         title: Text(l10n.sessionDeleteTitle),
-        content: Text(l10n.sessionDeleteBody(formatDateTime(l10n, session.startedAt))),
+        content: Text(
+          l10n.sessionDeleteBody(formatDateTime(l10n, session.startedAt)),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.actionCancel)),
-          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.actionDelete)),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.actionDelete),
+          ),
         ],
       );
     },
@@ -56,12 +79,18 @@ String sessionFileName(SessionRow session) {
 }
 
 /// Exports [session] with its raw data as a `.strokesplit` file.
-Future<void> exportSession(BuildContext context, WidgetRef ref, SessionRow session) async {
+Future<void> exportSession(
+  BuildContext context,
+  WidgetRef ref,
+  SessionRow session,
+) async {
   final messenger = ScaffoldMessenger.of(context);
   final l10n = context.l10n;
   try {
     final bytes = await ref.read(sessionRepositoryProvider).export(session.id);
-    final saved = await ref.read(sessionFilesProvider).save(sessionFileName(session), bytes);
+    final saved = await ref
+        .read(sessionFilesProvider)
+        .save(sessionFileName(session), bytes);
     if (saved) _notify(messenger, l10n.sessionExported);
   } on Exception catch (e) {
     _notify(messenger, l10n.sessionExportFailed('$e'));
@@ -87,7 +116,11 @@ bool canSendToHealth(WidgetRef ref, SessionRow session) =>
     ref.watch(healthExportEnabledProvider) && healthExportable(session.source);
 
 /// Sends [session] to Health Connect, replacing an earlier send, and says how it went (health-connect, D4).
-Future<void> sendSessionToHealth(BuildContext context, WidgetRef ref, SessionRow session) async {
+Future<void> sendSessionToHealth(
+  BuildContext context,
+  WidgetRef ref,
+  SessionRow session,
+) async {
   final messenger = ScaffoldMessenger.of(context);
   final l10n = context.l10n;
   final enabled = ref.read(healthExportEnabledProvider.notifier);
@@ -115,7 +148,11 @@ void showHealthFailure(
 }
 
 /// Shows [message] right away instead of queueing it behind the last one.
-void _notify(ScaffoldMessengerState messenger, String message, {SnackBarAction? action}) {
+void _notify(
+  ScaffoldMessengerState messenger,
+  String message, {
+  SnackBarAction? action,
+}) {
   messenger
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(message), action: action));

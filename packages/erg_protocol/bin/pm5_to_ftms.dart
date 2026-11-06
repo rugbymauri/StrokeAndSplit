@@ -7,7 +7,9 @@ import 'package:erg_protocol/erg_protocol.dart';
 /// (`.jsonl`, `.strokesplit` or the older `.aergrow`) into an FTMS recording in the raw format.
 void main(List<String> args) {
   if (args.length != 2) {
-    stderr.writeln('Usage: dart run erg_protocol:pm5_to_ftms <pm5 recording> <ftms recording>');
+    stderr.writeln(
+      'Usage: dart run erg_protocol:pm5_to_ftms <pm5 recording> <ftms recording>',
+    );
     exitCode = 64;
     return;
   }
@@ -22,5 +24,7 @@ void main(List<String> args) {
   }
   final ftms = pm5ToFtms(pm5);
   File(args[1]).writeAsStringSync('${ftms.toLines().join('\n')}\n');
-  stdout.writeln('${ftms.packets.length} Rower Data records written to ${args[1]}');
+  stdout.writeln(
+    '${ftms.packets.length} Rower Data records written to ${args[1]}',
+  );
 }

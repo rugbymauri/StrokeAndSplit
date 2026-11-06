@@ -30,16 +30,20 @@ class ZoneRepository {
   /// for a zone with [zoneErrors].
   Future<int> create(Zone zone) {
     _check(zone);
-    return _db.into(_db.zones).insert(ZonesCompanion.insert(
-          name: zone.name.trim(),
-          axis: zone.axis,
-          length: zone.length,
-          paceFastCs: Value(zone.paceFastCs),
-          paceSlowCs: Value(zone.paceSlowCs),
-          spmMin: Value(zone.spmMin),
-          spmMax: Value(zone.spmMax),
-          resistanceLevel: Value(zone.resistanceLevel),
-        ));
+    return _db
+        .into(_db.zones)
+        .insert(
+          ZonesCompanion.insert(
+            name: zone.name.trim(),
+            axis: zone.axis,
+            length: zone.length,
+            paceFastCs: Value(zone.paceFastCs),
+            paceSlowCs: Value(zone.paceSlowCs),
+            spmMin: Value(zone.spmMin),
+            spmMax: Value(zone.spmMax),
+            resistanceLevel: Value(zone.resistanceLevel),
+          ),
+        );
   }
 
   /// The id of a zone that is not deleted and equals [zone] apart from the
@@ -54,17 +58,28 @@ class ZoneRepository {
   /// [definition] with every segment that has a band placed from a stored
   /// zone of the same name and bands (Design D6); segments without a zone
   /// name are named after [course] and their position (Design D5).
-  Future<CourseDefinition> placeZones(String course, CourseDefinition definition) async {
-    return CourseDefinition(axis: definition.axis, length: definition.length, segments: [
-      for (final (i, s) in definition.segments.indexed)
-        if (s.isFree)
-          s
-        else
-          await _placed(s, s.zoneName ?? '$course ${i + 1}', definition.axis),
-    ]);
+  Future<CourseDefinition> placeZones(
+    String course,
+    CourseDefinition definition,
+  ) async {
+    return CourseDefinition(
+      axis: definition.axis,
+      length: definition.length,
+      segments: [
+        for (final (i, s) in definition.segments.indexed)
+          if (s.isFree)
+            s
+          else
+            await _placed(s, s.zoneName ?? '$course ${i + 1}', definition.axis),
+      ],
+    );
   }
 
-  Future<CourseSegment> _placed(CourseSegment segment, String name, CourseAxis axis) async {
+  Future<CourseSegment> _placed(
+    CourseSegment segment,
+    String name,
+    CourseAxis axis,
+  ) async {
     final zone = Zone(
       name: name,
       axis: axis,
@@ -80,10 +95,14 @@ class ZoneRepository {
 
   /// All zones that are not deleted, by axis and name.
   Future<List<Zone>> all() async {
-    final rows = await (_db.select(_db.zones)
-          ..where((z) => z.deletedAt.isNull())
-          ..orderBy([(z) => OrderingTerm.asc(z.axis), (z) => OrderingTerm.asc(z.name.collate(Collate.noCase))]))
-        .get();
+    final rows =
+        await (_db.select(_db.zones)
+              ..where((z) => z.deletedAt.isNull())
+              ..orderBy([
+                (z) => OrderingTerm.asc(z.axis),
+                (z) => OrderingTerm.asc(z.name.collate(Collate.noCase)),
+              ]))
+            .get();
     return [for (final row in rows) _zone(row)];
   }
 
@@ -100,28 +119,41 @@ class ZoneRepository {
           GROUP BY cs.zone_id''').get())
         row.read<int>('zone'): row.read<int>('courses'),
     };
-    return [for (final zone in await all()) ZoneUsage(zone, counts[zone.id] ?? 0)];
+    return [
+      for (final zone in await all()) ZoneUsage(zone, counts[zone.id] ?? 0),
+    ];
   }
 
-  Stream<List<ZoneUsage>> watchAllWithUsage() =>
-      _db.watchTables([_db.zones, _db.courses, _db.courseVersions, _db.courseSegments], allWithUsage);
+  Stream<List<ZoneUsage>> watchAllWithUsage() => _db.watchTables([
+    _db.zones,
+    _db.courses,
+    _db.courseVersions,
+    _db.courseSegments,
+  ], allWithUsage);
 
   /// The zone, also when it is deleted.
   Future<Zone?> get(int id) async {
-    final row = await (_db.select(_db.zones)..where((z) => z.id.equals(id))).getSingleOrNull();
+    final row = await (_db.select(
+      _db.zones,
+    )..where((z) => z.id.equals(id))).getSingleOrNull();
     return row == null ? null : _zone(row);
   }
 
   /// Names of the courses whose current version contains the zone, by name.
   Future<List<String>> coursesUsing(int id) async {
-    final rows = await _db.customSelect('''
+    final rows = await _db
+        .customSelect(
+          '''
         SELECT DISTINCT c.name AS name
         FROM course_segments cs
         JOIN course_versions v ON v.id = cs.version_id
         JOIN courses c ON c.id = v.course_id
         WHERE c.deleted_at IS NULL AND cs.zone_id = ?
           AND v.version = (SELECT MAX(version) FROM course_versions WHERE course_id = c.id)
-        ORDER BY c.name COLLATE NOCASE''', variables: [Variable.withInt(id)]).get();
+        ORDER BY c.name COLLATE NOCASE''',
+          variables: [Variable.withInt(id)],
+        )
+        .get();
     return [for (final row in rows) row.read<String>('name')];
   }
 
@@ -135,16 +167,18 @@ class ZoneRepository {
       if (zone.axis != old.axis && (await coursesUsing(zone.id)).isNotEmpty) {
         throw ArgumentError('The axis of a zone in a course cannot change');
       }
-      await (_db.update(_db.zones)..where((z) => z.id.equals(zone.id))).write(ZonesCompanion(
-        name: Value(zone.name.trim()),
-        axis: Value(zone.axis),
-        length: Value(zone.length),
-        paceFastCs: Value(zone.paceFastCs),
-        paceSlowCs: Value(zone.paceSlowCs),
-        spmMin: Value(zone.spmMin),
-        spmMax: Value(zone.spmMax),
-        resistanceLevel: Value(zone.resistanceLevel),
-      ));
+      await (_db.update(_db.zones)..where((z) => z.id.equals(zone.id))).write(
+        ZonesCompanion(
+          name: Value(zone.name.trim()),
+          axis: Value(zone.axis),
+          length: Value(zone.length),
+          paceFastCs: Value(zone.paceFastCs),
+          paceSlowCs: Value(zone.paceSlowCs),
+          spmMin: Value(zone.spmMin),
+          spmMax: Value(zone.spmMax),
+          resistanceLevel: Value(zone.resistanceLevel),
+        ),
+      );
       await _relayoutCourses(zone.id, remove: false);
     });
   }
@@ -153,8 +187,9 @@ class ZoneRepository {
   /// which become free there (Design D4); sessions keep the name.
   Future<void> delete(int id) {
     return _db.transaction(() async {
-      await (_db.update(_db.zones)..where((z) => z.id.equals(id)))
-          .write(ZonesCompanion(deletedAt: Value(clock.now())));
+      await (_db.update(_db.zones)..where((z) => z.id.equals(id))).write(
+        ZonesCompanion(deletedAt: Value(clock.now())),
+      );
       await _relayoutCourses(id, remove: true);
     });
   }
@@ -173,7 +208,10 @@ class ZoneRepository {
       final layout = resolveCourse(
         axis: course.axis,
         length: course.definition.length,
-        placements: [for (final p in placements) if (!remove || p.zoneId != id) p],
+        placements: [
+          for (final p in placements)
+            if (!remove || p.zoneId != id) p,
+        ],
         zones: zones,
       );
       if (layout.isValid) {
@@ -194,14 +232,14 @@ class ZoneRepository {
   }
 
   static Zone _zone(ZoneRow row) => Zone(
-        id: row.id,
-        name: row.name,
-        axis: row.axis,
-        length: row.length,
-        paceFastCs: row.paceFastCs,
-        paceSlowCs: row.paceSlowCs,
-        spmMin: row.spmMin,
-        spmMax: row.spmMax,
-        resistanceLevel: row.resistanceLevel,
-      );
+    id: row.id,
+    name: row.name,
+    axis: row.axis,
+    length: row.length,
+    paceFastCs: row.paceFastCs,
+    paceSlowCs: row.paceSlowCs,
+    spmMin: row.spmMin,
+    spmMax: row.spmMax,
+    resistanceLevel: row.resistanceLevel,
+  );
 }

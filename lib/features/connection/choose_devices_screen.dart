@@ -22,12 +22,16 @@ import 'start_screen.dart';
 /// "Weiter" connects the rower and leads to the start screen; it does not
 /// wait for a strap.
 class ChooseDevicesScreen extends ConsumerStatefulWidget {
-  const ChooseDevicesScreen({super.key, this.scanTimeout = const Duration(seconds: 15)});
+  const ChooseDevicesScreen({
+    super.key,
+    this.scanTimeout = const Duration(seconds: 15),
+  });
 
   final Duration scanTimeout;
 
   @override
-  ConsumerState<ChooseDevicesScreen> createState() => _ChooseDevicesScreenState();
+  ConsumerState<ChooseDevicesScreen> createState() =>
+      _ChooseDevicesScreenState();
 }
 
 enum _Phase { checking, notReady, failed, scanning, done }
@@ -72,7 +76,9 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
     }
     setState(() => _phase = _Phase.scanning);
     await _scan?.cancel();
-    _scan = transport.scan(timeout: widget.scanTimeout).listen(
+    _scan = transport
+        .scan(timeout: widget.scanTimeout)
+        .listen(
           (found) => setState(() => _found = found),
           onError: (Object error) => setState(() {
             if (error is BluetoothNotReadyException) {
@@ -86,7 +92,9 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
           onDone: () {
             // Cancelling a finished scan would never complete.
             _scan = null;
-            if (mounted && _phase == _Phase.scanning) setState(() => _phase = _Phase.done);
+            if (mounted && _phase == _Phase.scanning) {
+              setState(() => _phase = _Phase.done);
+            }
           },
         );
   }
@@ -118,7 +126,9 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
     if (navigator.canPop()) {
       navigator.pop();
     } else {
-      await navigator.pushReplacement(MaterialPageRoute<void>(builder: (_) => const StartScreen()));
+      await navigator.pushReplacement(
+        MaterialPageRoute<void>(builder: (_) => const StartScreen()),
+      );
     }
   }
 
@@ -126,7 +136,8 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final selected = _selected;
-    final busy = _connecting || _phase == _Phase.scanning || _phase == _Phase.checking;
+    final busy =
+        _connecting || _phase == _Phase.scanning || _phase == _Phase.checking;
     final missing = selected?.device;
     final message = switch (_phase) {
       _Phase.notReady => bluetoothNotReadyText(l10n, _readiness),
@@ -135,23 +146,34 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
       _ => null,
     };
 
-    Widget option(RowerChoice choice, IconData icon, String title, String subtitle, {Key? key}) => Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.m),
-          child: OptionCard(
-            key: key,
-            icon: icon,
-            title: title,
-            subtitle: subtitle,
-            selected: choice == selected,
-            onTap: _connecting ? null : () => setState(() => _selected = choice),
-          ),
-        );
+    Widget option(
+      RowerChoice choice,
+      IconData icon,
+      String title,
+      String subtitle, {
+      Key? key,
+    }) => Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.m),
+      child: OptionCard(
+        key: key,
+        icon: icon,
+        title: title,
+        subtitle: subtitle,
+        selected: choice == selected,
+        onTap: _connecting ? null : () => setState(() => _selected = choice),
+      ),
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.devicesTitle),
         actions: const [LanguageButton()],
-        bottom: busy ? const PreferredSize(preferredSize: Size.fromHeight(4), child: LinearProgressIndicator()) : null,
+        bottom: busy
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(4),
+                child: LinearProgressIndicator(),
+              )
+            : null,
       ),
       body: SafeArea(
         child: Column(
@@ -179,7 +201,11 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
                           : '${_kind(missing.protocol)} · ${l10n.devicesNotFound}',
                       key: Key('rower-${missing.id}'),
                     ),
-                  if (message != null) ScanMessage(text: message, onRetry: _connecting ? null : _startScan),
+                  if (message != null)
+                    ScanMessage(
+                      text: message,
+                      onRetry: _connecting ? null : _startScan,
+                    ),
                   if (message == null && _phase == _Phase.done)
                     Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.m),
@@ -203,7 +229,10 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
                     key: const Key('rower-simulator-ftms'),
                   ),
                   const SizedBox(height: AppSpacing.l),
-                  _StrapSection(scanTimeout: widget.scanTimeout, enabled: !_connecting),
+                  _StrapSection(
+                    scanTimeout: widget.scanTimeout,
+                    enabled: !_connecting,
+                  ),
                 ],
               ),
             ),
@@ -218,8 +247,12 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
                 width: double.infinity,
                 height: 56,
                 child: FilledButton(
-                  onPressed: selected == null || _connecting ? null : () => _continue(selected),
-                  child: Text(_connecting ? l10n.stateConnecting : l10n.devicesNext),
+                  onPressed: selected == null || _connecting
+                      ? null
+                      : () => _continue(selected),
+                  child: Text(
+                    _connecting ? l10n.stateConnecting : l10n.devicesNext,
+                  ),
                 ),
               ),
             ),
@@ -230,18 +263,21 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
   }
 
   static String _kind(ErgProtocol protocol) => switch (protocol) {
-        ErgProtocol.pm5 => 'Concept2 PM5',
-        ErgProtocol.ftms => 'FTMS',
-      };
+    ErgProtocol.pm5 => 'Concept2 PM5',
+    ErgProtocol.ftms => 'FTMS',
+  };
 }
 
 /// Why Bluetooth cannot be used for a scan.
-String bluetoothNotReadyText(AppLocalizations l10n, BluetoothReadiness readiness) => switch (readiness) {
-      BluetoothReadiness.off => l10n.bluetoothOff,
-      BluetoothReadiness.unauthorized => l10n.bluetoothUnauthorized(l10n.appTitle),
-      BluetoothReadiness.unsupported => l10n.bluetoothUnsupported,
-      BluetoothReadiness.ready => '',
-    };
+String bluetoothNotReadyText(
+  AppLocalizations l10n,
+  BluetoothReadiness readiness,
+) => switch (readiness) {
+  BluetoothReadiness.off => l10n.bluetoothOff,
+  BluetoothReadiness.unauthorized => l10n.bluetoothUnauthorized(l10n.appTitle),
+  BluetoothReadiness.unsupported => l10n.bluetoothUnsupported,
+  BluetoothReadiness.ready => '',
+};
 
 /// The paired heart rate strap or "Kein Gurt", with the actions to pair,
 /// change and forget it (heart-rate, Design D8).
@@ -256,8 +292,10 @@ class _StrapSection extends ConsumerWidget {
     final l10n = context.l10n;
     final paired = ref.watch(chosenHeartRateMonitorProvider);
     void search() => Navigator.of(context).push(
-          MaterialPageRoute<void>(builder: (_) => HeartRateSearchScreen(scanTimeout: scanTimeout)),
-        );
+      MaterialPageRoute<void>(
+        builder: (_) => HeartRateSearchScreen(scanTimeout: scanTimeout),
+      ),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -266,7 +304,9 @@ class _StrapSection extends ConsumerWidget {
           key: const Key('strap'),
           icon: paired == null ? Icons.favorite_border : Icons.favorite,
           title: paired?.name ?? l10n.devicesNoStrap,
-          subtitle: paired == null ? l10n.devicesNoStrapHint : '${l10n.devicesStrapPaired} · ${paired.id}',
+          subtitle: paired == null
+              ? l10n.devicesNoStrapHint
+              : '${l10n.devicesStrapPaired} · ${paired.id}',
           onTap: enabled ? search : null,
         ),
         const SizedBox(height: AppSpacing.m),
@@ -277,12 +317,20 @@ class _StrapSection extends ConsumerWidget {
             OutlinedButton(
               key: const Key('strap-search'),
               onPressed: enabled ? search : null,
-              child: Text(paired == null ? l10n.devicesStrapPair : l10n.devicesStrapChange),
+              child: Text(
+                paired == null
+                    ? l10n.devicesStrapPair
+                    : l10n.devicesStrapChange,
+              ),
             ),
             if (paired != null)
               TextButton(
                 key: const Key('strap-forget'),
-                onPressed: enabled ? () => ref.read(chosenHeartRateMonitorProvider.notifier).forget() : null,
+                onPressed: enabled
+                    ? () => ref
+                          .read(chosenHeartRateMonitorProvider.notifier)
+                          .forget()
+                    : null,
                 child: Text(l10n.devicesStrapForget),
               ),
           ],
@@ -306,9 +354,15 @@ class ScanMessage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(text, style: AppTextStyles.body.copyWith(color: AppColors.textMuted)),
+          Text(
+            text,
+            style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+          ),
           const SizedBox(height: AppSpacing.m),
-          OutlinedButton(onPressed: onRetry, child: Text(context.l10n.deviceListRetry)),
+          OutlinedButton(
+            onPressed: onRetry,
+            child: Text(context.l10n.deviceListRetry),
+          ),
         ],
       ),
     );

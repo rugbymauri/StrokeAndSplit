@@ -8,18 +8,29 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// The app uses the dark theme built from the tokens of design D1.
 void main() {
-  testWidgets('the app uses the dark theme with the colours and fonts of D1', (tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [rowerChoiceStoreProvider.overrideWithValue(MemoryRowerChoiceStore(const RowerChoice.simulator()))],
-      child: const StrokeSplitApp(),
-    ));
+  testWidgets('the app uses the dark theme with the colours and fonts of D1', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          rowerChoiceStoreProvider.overrideWithValue(
+            MemoryRowerChoiceStore(const RowerChoice.simulator()),
+          ),
+        ],
+        child: const StrokeSplitApp(),
+      ),
+    );
 
     final theme = Theme.of(tester.element(find.byType(StartScreen)));
     expect(theme.brightness, Brightness.dark);
     expect(theme.useMaterial3, isTrue);
     expect(theme.scaffoldBackgroundColor, AppColors.bg);
     expect(theme.colorScheme.primary, AppColors.zoneIn);
-    expect(theme.filledButtonTheme.style?.backgroundColor?.resolve({}), AppColors.zoneIn);
+    expect(
+      theme.filledButtonTheme.style?.backgroundColor?.resolve({}),
+      AppColors.zoneIn,
+    );
     expect(theme.colorScheme.onSurface, AppColors.text);
     expect(theme.colorScheme.onSurfaceVariant, AppColors.textMuted);
     expect(theme.colorScheme.error, AppColors.zoneOut);

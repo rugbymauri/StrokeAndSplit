@@ -17,7 +17,8 @@ import '../data/sources/ble/ble_transport.dart';
 import '../data/sources/ble/rower_scan_filter.dart';
 import 'raw_log_writer.dart';
 
-Guid _pm5Uuid(String shortId) => Guid('ce06$shortId-43e5-11e4-916c-0800200c9a66');
+Guid _pm5Uuid(String shortId) =>
+    Guid('ce06$shortId-43e5-11e4-916c-0800200c9a66');
 
 final _rowingService = _pm5Uuid('0030');
 final _sampleRate = _pm5Uuid('0034');
@@ -30,7 +31,11 @@ final _ftmsService = Guid(FtmsIds.service);
 
 /// Recorded FTMS characteristics: rower data, machine status and the answers
 /// on the control point (Design D12).
-const _ftmsIds = [FtmsIds.rowerData, FtmsIds.machineStatus, FtmsIds.controlPoint];
+const _ftmsIds = [
+  FtmsIds.rowerData,
+  FtmsIds.machineStatus,
+  FtmsIds.controlPoint,
+];
 
 /// Supported Resistance Level Range: minimum and maximum (s16) and increment
 /// (u16), each in steps of 0.1.
@@ -95,9 +100,16 @@ class _SpikeScreenState extends State<SpikeScreen> {
           final data = r.advertisementData;
           return rowerFromAdvertisement(
             id: r.device.remoteId.str,
-            name: r.device.platformName.isNotEmpty ? r.device.platformName : data.advName,
-            serviceIds: [for (final uuid in data.serviceUuids) uuid.str.toLowerCase()],
-            serviceData: {for (final MapEntry(:key, :value) in data.serviceData.entries) key.str.toLowerCase(): value},
+            name: r.device.platformName.isNotEmpty
+                ? r.device.platformName
+                : data.advName,
+            serviceIds: [
+              for (final uuid in data.serviceUuids) uuid.str.toLowerCase(),
+            ],
+            serviceData: {
+              for (final MapEntry(:key, :value) in data.serviceData.entries)
+                key.str.toLowerCase(): value,
+            },
           );
         }),
       ),
@@ -108,7 +120,14 @@ class _SpikeScreenState extends State<SpikeScreen> {
       // already in the BlueZ cache would never show up in the scan results.
       if (Platform.isLinux) {
         final cached = await FlutterBluePlus.systemDevices([]);
-        _addFound(cached.map((d) => rowerFromAdvertisement(id: d.remoteId.str, name: d.platformName)));
+        _addFound(
+          cached.map(
+            (d) => rowerFromAdvertisement(
+              id: d.remoteId.str,
+              name: d.platformName,
+            ),
+          ),
+        );
       }
     } catch (e) {
       _say('Scan fehlgeschlagen: $e');
@@ -143,9 +162,14 @@ class _SpikeScreenState extends State<SpikeScreen> {
     }
   }
 
-  Future<void> _recordPm5(List<BluetoothService> services, RawLogWriter writer) async {
+  Future<void> _recordPm5(
+    List<BluetoothService> services,
+    RawLogWriter writer,
+  ) async {
     final rowing = services.firstWhere((s) => s.uuid == _rowingService);
-    final rate = rowing.characteristics.where((c) => c.uuid == _sampleRate).firstOrNull;
+    final rate = rowing.characteristics
+        .where((c) => c.uuid == _sampleRate)
+        .firstOrNull;
     if (rate != null) {
       await rate.write([_sampleRate250ms]);
       _say('Sample Rate auf 250 ms gesetzt');
@@ -154,11 +178,18 @@ class _SpikeScreenState extends State<SpikeScreen> {
     }
     _recordedIds = _subscribedIds;
     for (final id in _subscribedIds) {
-      await _record(rowing.characteristics.where((c) => c.uuid == _pm5Uuid(id)).firstOrNull, id, writer);
+      await _record(
+        rowing.characteristics.where((c) => c.uuid == _pm5Uuid(id)).firstOrNull,
+        id,
+        writer,
+      );
     }
   }
 
-  Future<void> _recordFtms(List<BluetoothService> services, RawLogWriter writer) async {
+  Future<void> _recordFtms(
+    List<BluetoothService> services,
+    RawLogWriter writer,
+  ) async {
     final ftms = services.firstWhere((s) => s.uuid == _ftmsService);
     BluetoothCharacteristic? characteristic(String id) =>
         ftms.characteristics.where((c) => c.uuid == Guid(id)).firstOrNull;
@@ -238,17 +269,27 @@ class _SpikeScreenState extends State<SpikeScreen> {
   void _onPacket(String id, List<int> bytes) {
     switch (id) {
       case FtmsIds.rowerData:
-        final level = RowerData.parse(Uint8List.fromList(bytes))?.resistanceLevel;
-        if (level != null && level != _reportedLevel) setState(() => _reportedLevel = level);
-      case FtmsIds.controlPoint when bytes.length >= 3 && bytes[0] == _responseCode:
+        final level = RowerData.parse(Uint8List.fromList(bytes))
+            ?.resistanceLevel;
+        if (level != null && level != _reportedLevel) {
+          setState(() => _reportedLevel = level);
+        }
+      case FtmsIds.controlPoint
+          when bytes.length >= 3 && bytes[0] == _responseCode:
         final result = _resultNames[bytes[2]] ?? 'Code ${bytes[2]}';
-        _say('Antwort auf 0x${bytes[1].toRadixString(16).padLeft(2, '0')}: $result (${_hex(bytes)})');
+        _say(
+          'Antwort auf 0x${bytes[1].toRadixString(16).padLeft(2, '0')}: $result (${_hex(bytes)})',
+        );
       case FtmsIds.machineStatus:
         _say('Machine Status: ${_hex(bytes)}');
     }
   }
 
-  Future<void> _record(BluetoothCharacteristic? characteristic, String id, RawLogWriter writer) async {
+  Future<void> _record(
+    BluetoothCharacteristic? characteristic,
+    String id,
+    RawLogWriter writer,
+  ) async {
     if (characteristic == null) {
       _say('Characteristic $id fehlt');
       return;
@@ -266,7 +307,8 @@ class _SpikeScreenState extends State<SpikeScreen> {
     await characteristic.setNotifyValue(true);
   }
 
-  static String _hex(List<int> bytes) => bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
+  static String _hex(List<int> bytes) =>
+      bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
   static int _u16(List<int> b, int i) => b[i] | b[i + 1] << 8;
   static int _s16(List<int> b, int i) => _u16(b, i).toSigned(16);
   static int _u32(List<int> b, int i) => _u16(b, i) | _u16(b, i + 2) << 16;
@@ -279,7 +321,9 @@ class _SpikeScreenState extends State<SpikeScreen> {
     _subscriptions.clear();
     await _writer?.close();
     await _device?.disconnect();
-    _say('Gestoppt. ${_writer?.packetCount ?? 0} Pakete in ${_writer?.file.path}');
+    _say(
+      'Gestoppt. ${_writer?.packetCount ?? 0} Pakete in ${_writer?.file.path}',
+    );
     setState(() {
       _device = null;
       _writer = null;
@@ -315,17 +359,36 @@ class _SpikeScreenState extends State<SpikeScreen> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              if (!recording) FilledButton(onPressed: _scan, child: const Text('Rudergerät suchen')),
-              if (recording) FilledButton(onPressed: _stop, child: const Text('Stopp & trennen')),
-              for (final m in ['Start Rudern', 'Stopp Rudern', 'Weiter', 'PM5 Reset', 'Notiz'])
-                OutlinedButton(onPressed: recording ? () => _mark(m) : null, child: Text(m)),
+              if (!recording)
+                FilledButton(
+                  onPressed: _scan,
+                  child: const Text('Rudergerät suchen'),
+                ),
+              if (recording)
+                FilledButton(
+                  onPressed: _stop,
+                  child: const Text('Stopp & trennen'),
+                ),
+              for (final m in [
+                'Start Rudern',
+                'Stopp Rudern',
+                'Weiter',
+                'PM5 Reset',
+                'Notiz',
+              ])
+                OutlinedButton(
+                  onPressed: recording ? () => _mark(m) : null,
+                  child: Text(m),
+                ),
             ],
           ),
           if (!recording)
             for (final rower in _found.values)
               ListTile(
                 title: Text(rower.name),
-                subtitle: Text('${rower.protocol.name.toUpperCase()} · ${rower.id}'),
+                subtitle: Text(
+                  '${rower.protocol.name.toUpperCase()} · ${rower.id}',
+                ),
                 onTap: () => _connect(rower),
               ),
           if (recording && _controlPoint != null) ..._resistanceControls(),
@@ -334,7 +397,10 @@ class _SpikeScreenState extends State<SpikeScreen> {
               ListTile(
                 dense: true,
                 title: Text('0x$id: ${_counts[id] ?? 0} Pakete'),
-                subtitle: Text(_lastHex[id] ?? '–', style: const TextStyle(fontFamily: 'monospace')),
+                subtitle: Text(
+                  _lastHex[id] ?? '–',
+                  style: const TextStyle(fontFamily: 'monospace'),
+                ),
               ),
           const Divider(),
           for (final line in _log) Text(line),
@@ -345,12 +411,21 @@ class _SpikeScreenState extends State<SpikeScreen> {
 
   List<Widget> _resistanceControls() => [
     const Divider(),
-    Text('Widerstand (gemeldet: ${_reportedLevel ?? '–'})', style: Theme.of(context).textTheme.titleMedium),
+    Text(
+      'Widerstand (gemeldet: ${_reportedLevel ?? '–'})',
+      style: Theme.of(context).textTheme.titleMedium,
+    ),
     Row(
       children: [
-        IconButton(onPressed: _level > 1 ? () => setState(() => _level--) : null, icon: const Icon(Icons.remove)),
+        IconButton(
+          onPressed: _level > 1 ? () => setState(() => _level--) : null,
+          icon: const Icon(Icons.remove),
+        ),
         Text('Stufe $_level'),
-        IconButton(onPressed: () => setState(() => _level++), icon: const Icon(Icons.add)),
+        IconButton(
+          onPressed: () => setState(() => _level++),
+          icon: const Icon(Icons.add),
+        ),
         const SizedBox(width: 8),
         OutlinedButton(
           onPressed: () => _send('Request Control', [_requestControl]),

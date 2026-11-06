@@ -4,11 +4,22 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const id = 'A0:9E:1A:12:34:56';
 
-  String? found(String name, {List<String> services = const [], Map<String, List<int>> data = const {}}) =>
-      heartRateMonitorFromAdvertisement(id: id, name: name, serviceIds: services, serviceData: data)?.name;
+  String? found(
+    String name, {
+    List<String> services = const [],
+    Map<String, List<int>> data = const {},
+  }) => heartRateMonitorFromAdvertisement(
+    id: id,
+    name: name,
+    serviceIds: services,
+    serviceData: data,
+  )?.name;
 
   test('lists a device offering the heart rate service', () {
-    expect(found('Polar H10 1A2B3C4D', services: ['180d']), 'Polar H10 1A2B3C4D');
+    expect(
+      found('Polar H10 1A2B3C4D', services: ['180d']),
+      'Polar H10 1A2B3C4D',
+    );
   });
 
   test('names a strap without name by its id', () {
@@ -23,6 +34,15 @@ void main() {
   test('never lists a rower, even one offering the heart rate service', () {
     expect(found('PM5 430000001 Row', services: ['180d']), isNull);
     expect(found('Stroke & Split FTMS', services: ['1826', '180d']), isNull);
-    expect(found('Bike', services: ['180d'], data: {'1826': [0x01, 0x20, 0x00]}), isNull);
+    expect(
+      found(
+        'Bike',
+        services: ['180d'],
+        data: {
+          '1826': [0x01, 0x20, 0x00],
+        },
+      ),
+      isNull,
+    );
   });
 }

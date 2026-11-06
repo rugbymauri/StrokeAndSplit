@@ -45,15 +45,15 @@ class CourseSegment {
   bool get isFree => !hasPaceBand && !hasSpmBand;
 
   CourseSegment withLength(int length) => CourseSegment(
-        length: length,
-        paceFastCs: paceFastCs,
-        paceSlowCs: paceSlowCs,
-        spmMin: spmMin,
-        spmMax: spmMax,
-        resistanceLevel: resistanceLevel,
-        zoneId: zoneId,
-        zoneName: zoneName,
-      );
+    length: length,
+    paceFastCs: paceFastCs,
+    paceSlowCs: paceSlowCs,
+    spmMin: spmMin,
+    spmMax: spmMax,
+    resistanceLevel: resistanceLevel,
+    zoneId: zoneId,
+    zoneName: zoneName,
+  );
 
   /// Whether both row the same, whichever zone they were placed from.
   bool sameAs(CourseSegment other) =>
@@ -66,10 +66,20 @@ class CourseSegment {
       other.zoneName == zoneName;
 
   @override
-  bool operator ==(Object other) => other is CourseSegment && other.zoneId == zoneId && sameAs(other);
+  bool operator ==(Object other) =>
+      other is CourseSegment && other.zoneId == zoneId && sameAs(other);
 
   @override
-  int get hashCode => Object.hash(length, paceFastCs, paceSlowCs, spmMin, spmMax, resistanceLevel, zoneId, zoneName);
+  int get hashCode => Object.hash(
+    length,
+    paceFastCs,
+    paceSlowCs,
+    spmMin,
+    spmMax,
+    resistanceLevel,
+    zoneId,
+    zoneName,
+  );
 
   @override
   String toString() =>
@@ -79,11 +89,19 @@ class CourseSegment {
 /// What a course asks for: its axis, its length and its segments.
 @immutable
 class CourseDefinition {
-  const CourseDefinition({required this.axis, required this.length, required this.segments});
+  const CourseDefinition({
+    required this.axis,
+    required this.length,
+    required this.segments,
+  });
 
   /// A new course starts with a single segment over its whole length.
   CourseDefinition.single({required CourseAxis axis, required int length})
-      : this(axis: axis, length: length, segments: [CourseSegment(length: length)]);
+    : this(
+        axis: axis,
+        length: length,
+        segments: [CourseSegment(length: length)],
+      );
 
   final CourseAxis axis;
 
@@ -100,9 +118,7 @@ class CourseDefinition {
   /// Where each segment starts, from the start of the course.
   List<int> get segmentStarts {
     var start = 0;
-    return [
-      for (final s in segments) (start += s.length) - s.length,
-    ];
+    return [for (final s in segments) (start += s.length) - s.length];
   }
 
   /// Whether both row the same, whichever zones they were placed from.
@@ -110,11 +126,15 @@ class CourseDefinition {
       other.axis == axis &&
       other.length == length &&
       other.segments.length == segments.length &&
-      [for (final (i, s) in segments.indexed) s.sameAs(other.segments[i])].every((same) => same);
+      [for (final (i, s) in segments.indexed) s.sameAs(other.segments[i])]
+          .every((same) => same);
 
   @override
   bool operator ==(Object other) =>
-      other is CourseDefinition && other.axis == axis && other.length == length && listEquals(other.segments, segments);
+      other is CourseDefinition &&
+      other.axis == axis &&
+      other.length == length &&
+      listEquals(other.segments, segments);
 
   @override
   int get hashCode => Object.hash(axis, length, Object.hashAll(segments));
@@ -142,12 +162,14 @@ class Course {
 
 /// A course length as entered: `1000 m` or `4:00`.
 String formatCourseLength(CourseAxis axis, int length) => switch (axis) {
-      CourseAxis.distance => '$length m',
-      CourseAxis.time => '${length ~/ 60}:${(length % 60).toString().padLeft(2, '0')}',
-    };
+  CourseAxis.distance => '$length m',
+  CourseAxis.time =>
+    '${length ~/ 60}:${(length % 60).toString().padLeft(2, '0')}',
+};
 
 /// A range on a course: `500–600 m` or `1:00–2:00`.
 String formatCourseRange(CourseAxis axis, int start, int end) => switch (axis) {
-      CourseAxis.distance => '$start–$end m',
-      CourseAxis.time => '${formatCourseLength(axis, start)}–${formatCourseLength(axis, end)}',
-    };
+  CourseAxis.distance => '$start–$end m',
+  CourseAxis.time =>
+    '${formatCourseLength(axis, start)}–${formatCourseLength(axis, end)}',
+};

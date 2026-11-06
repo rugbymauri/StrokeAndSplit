@@ -18,7 +18,8 @@ class TemplateEditorScreen extends ConsumerStatefulWidget {
   final SessionTemplate? template;
 
   @override
-  ConsumerState<TemplateEditorScreen> createState() => _TemplateEditorScreenState();
+  ConsumerState<TemplateEditorScreen> createState() =>
+      _TemplateEditorScreenState();
 }
 
 /// More laps than anyone rows in one session.
@@ -54,7 +55,12 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
     if (template == null) {
       await repository.create(name, courseId: _courseId!, laps: laps);
     } else {
-      await repository.update(template.id, name: name, courseId: _courseId!, laps: laps);
+      await repository.update(
+        template.id,
+        name: name,
+        courseId: _courseId!,
+        laps: laps,
+      );
     }
     if (mounted) Navigator.of(context).pop();
   }
@@ -69,8 +75,14 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
           title: Text(l10n.templateDeleteTitle),
           content: Text(l10n.templateDeleteBody(template.name)),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.actionCancel)),
-            FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.actionDelete)),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.actionCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.actionDelete),
+            ),
           ],
         );
       },
@@ -88,11 +100,21 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
     final course = courses.where((c) => c.id == _courseId).firstOrNull;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.template == null ? l10n.templateNew : l10n.templateEdit),
+        title: Text(
+          widget.template == null ? l10n.templateNew : l10n.templateEdit,
+        ),
         actions: [
           if (widget.template != null)
-            IconButton(tooltip: l10n.actionDelete, icon: const Icon(Icons.delete_outline), onPressed: _delete),
-          IconButton(tooltip: l10n.actionSave, icon: const Icon(Icons.check), onPressed: _save),
+            IconButton(
+              tooltip: l10n.actionDelete,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: _delete,
+            ),
+          IconButton(
+            tooltip: l10n.actionSave,
+            icon: const Icon(Icons.check),
+            onPressed: _save,
+          ),
         ],
       ),
       body: Center(
@@ -114,11 +136,16 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
               const SizedBox(height: 16),
               DropdownButtonFormField<int>(
                 key: const Key('template-course'),
-                initialValue: courses.any((c) => c.id == _courseId) ? _courseId : null,
+                initialValue: courses.any((c) => c.id == _courseId)
+                    ? _courseId
+                    : null,
                 decoration: InputDecoration(labelText: l10n.templateCourse),
                 items: [
                   for (final c in courses)
-                    DropdownMenuItem(value: c.id, child: Text('${c.name} · ${courseSummary(l10n, c)}')),
+                    DropdownMenuItem(
+                      value: c.id,
+                      child: Text('${c.name} · ${courseSummary(l10n, c)}'),
+                    ),
                 ],
                 onChanged: (id) => setState(() => _courseId = id),
               ),
@@ -129,7 +156,10 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
               const SizedBox(height: 24),
               Text(l10n.templateLaps.toUpperCase(), style: AppTextStyles.label),
               const SizedBox(height: 10),
-              _LapsChoice(open: _open, onChanged: (open) => setState(() => _open = open)),
+              _LapsChoice(
+                open: _open,
+                onChanged: (open) => setState(() => _open = open),
+              ),
               if (!_open) ...[
                 const SizedBox(height: 10),
                 OarStepper(
@@ -200,14 +230,19 @@ class _LapsChoice extends StatelessWidget {
     }
 
     return DecoratedBox(
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppRadii.small)),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.small),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: Row(children: [
-          option(false, l10n.templateFixedLaps),
-          const SizedBox(width: 4),
-          option(true, l10n.templateOpenLaps),
-        ]),
+        child: Row(
+          children: [
+            option(false, l10n.templateFixedLaps),
+            const SizedBox(width: 4),
+            option(true, l10n.templateOpenLaps),
+          ],
+        ),
       ),
     );
   }
@@ -226,7 +261,10 @@ class _Result extends StatelessWidget {
     final lap = course.definition.length;
     final laps = this.laps;
     return DecoratedBox(
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(AppRadii.small)),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.small),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Column(
@@ -239,14 +277,23 @@ class _Result extends StatelessWidget {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  formatCourseLength(course.axis, laps == null ? lap : lap * laps),
+                  formatCourseLength(
+                    course.axis,
+                    laps == null ? lap : lap * laps,
+                  ),
                   key: const Key('template-result'),
-                  style: const TextStyle(fontFamily: AppFonts.display, fontSize: 32, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    fontFamily: AppFonts.display,
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    laps == null ? l10n.templateResultOpen : '$laps × ${formatCourseLength(course.axis, lap)}',
+                    laps == null
+                        ? l10n.templateResultOpen
+                        : '$laps × ${formatCourseLength(course.axis, lap)}',
                     key: const Key('template-result-detail'),
                     textAlign: TextAlign.end,
                     style: AppTextStyles.subtitle,

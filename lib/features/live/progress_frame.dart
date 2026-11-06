@@ -21,7 +21,13 @@ class FrameGhost {
 /// The box around the pace whose border shows the progress as up to three
 /// tracks (ui-design, Design D3). [child] sits inside the tracks.
 class ProgressFrame extends StatelessWidget {
-  const ProgressFrame({super.key, required this.model, this.pace, this.ghost, this.child});
+  const ProgressFrame({
+    super.key,
+    required this.model,
+    this.pace,
+    this.ghost,
+    this.child,
+  });
 
   final ProgressFrameModel model;
 
@@ -67,43 +73,55 @@ class ProgressFramePainter extends CustomPainter {
 
   /// How far the ghost moves out across its track to clear a boat beside it:
   /// its rim lies on the boat's rim, so both stay whole (ghost, Design D5).
-  static const ghostShift = _boatWidth / 2 - _boatRim / 2 + _ghostWidth / 2 + _ghostRim / 2;
+  static const ghostShift =
+      _boatWidth / 2 - _boatRim / 2 + _ghostWidth / 2 + _ghostRim / 2;
 
   /// How far a ghost moved out of the outer track sticks out of the box, rim included.
-  static const overhang = ghostShift + (_ghostWidth + _ghostRim) / 2 - trackWidth / 2;
+  static const overhang =
+      ghostShift + (_ghostWidth + _ghostRim) / 2 - trackWidth / 2;
 
   /// From the outer edge to the inner edge of the innermost track.
-  static double frameWidth(int tracks) => tracks * trackWidth + (tracks - 1) * trackGap;
+  static double frameWidth(int tracks) =>
+      tracks * trackWidth + (tracks - 1) * trackGap;
 
   /// The colour of the segment track for the zone status of the pace.
   static Color segmentColor(BandStatus? pace) => switch (pace) {
-        null || BandStatus.none => AppColors.textMuted,
-        BandStatus.inBand => AppColors.zoneIn,
-        BandStatus.above || BandStatus.below || BandStatus.missing => AppColors.zoneOut,
-      };
+    null || BandStatus.none => AppColors.textMuted,
+    BandStatus.inBand => AppColors.zoneIn,
+    BandStatus.above ||
+    BandStatus.below ||
+    BandStatus.missing => AppColors.zoneOut,
+  };
 
   /// The colour of the box for the zone status of the pace: tinted like the stroke rate card in a band,
   /// plain in a free gap.
   static Color boxColor(BandStatus? pace) => switch (pace) {
-        null || BandStatus.none => AppColors.surface,
-        BandStatus.inBand => AppColors.zoneInSurface,
-        BandStatus.above || BandStatus.below || BandStatus.missing => AppColors.zoneOutSurface,
-      };
+    null || BandStatus.none => AppColors.surface,
+    BandStatus.inBand => AppColors.zoneInSurface,
+    BandStatus.above ||
+    BandStatus.below ||
+    BandStatus.missing => AppColors.zoneOutSurface,
+  };
 
   @override
   void paint(Canvas canvas, Size size) {
     final box = Offset.zero & size;
     final background = boxColor(pace);
-    canvas.drawRRect(RRect.fromRectAndRadius(box, const Radius.circular(radius)), Paint()..color = background);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(box, const Radius.circular(radius)),
+      Paint()..color = background,
+    );
 
     final ghost = this.ghost;
     final tracks = [
-      if (model.course case final course?) (course, AppColors.track, AppColors.text, ghost?.course),
+      if (model.course case final course?)
+        (course, AppColors.track, AppColors.text, ghost?.course),
       (model.lap, AppColors.track, AppColors.textMuted, ghost?.lap),
       (model.segment, AppColors.trackInner, segmentColor(pace), ghost?.segment),
     ];
     final metrics = [
-      for (var i = 0; i < tracks.length; i++) _outline(box, trackWidth / 2 + i * (trackWidth + trackGap)),
+      for (var i = 0; i < tracks.length; i++)
+        _outline(box, trackWidth / 2 + i * (trackWidth + trackGap)),
     ];
     final stroke = Paint()
       ..style = PaintingStyle.stroke
@@ -112,15 +130,29 @@ class ProgressFramePainter extends CustomPainter {
     for (var i = 0; i < tracks.length; i++) {
       final (track, empty, filled, _) = tracks[i];
       final metric = metrics[i];
-      canvas.drawPath(metric.extractPath(0, metric.length), stroke..color = empty);
-      if (track.share > 0) canvas.drawPath(metric.extractPath(0, track.share * metric.length), stroke..color = filled);
+      canvas.drawPath(
+        metric.extractPath(0, metric.length),
+        stroke..color = empty,
+      );
+      if (track.share > 0) {
+        canvas.drawPath(
+          metric.extractPath(0, track.share * metric.length),
+          stroke..color = filled,
+        );
+      }
       // Zones stand out brighter than the free parts, empty and filled.
       for (final (start, end) in track.zones) {
-        canvas.drawPath(metric.extractPath(start * metric.length, end * metric.length), stroke..color = AppColors.trackZone);
+        canvas.drawPath(
+          metric.extractPath(start * metric.length, end * metric.length),
+          stroke..color = AppColors.trackZone,
+        );
         final filledEnd = end < track.share ? end : track.share;
         if (filledEnd > start) {
           canvas.drawPath(
-            metric.extractPath(start * metric.length, filledEnd * metric.length),
+            metric.extractPath(
+              start * metric.length,
+              filledEnd * metric.length,
+            ),
             stroke..color = AppColors.text,
           );
         }
@@ -147,9 +179,25 @@ class ProgressFramePainter extends CustomPainter {
     for (var i = 0; i < tracks.length; i++) {
       final (track, _, filled, _) = tracks[i];
       if (_tangent(metrics[i], track.share) case final tangent?) {
-        _boat(canvas, tangent.position, tangent, filled, background, length: _boatLength, width: _boatWidth, rim: _boatRim);
+        _boat(
+          canvas,
+          tangent.position,
+          tangent,
+          filled,
+          background,
+          length: _boatLength,
+          width: _boatWidth,
+          rim: _boatRim,
+        );
         // What shows of the boat; the rim of a ghost may lie on its rim.
-        boats.add(_rhombus(tangent.position, tangent, _boatLength - _boatRim, _boatWidth - _boatRim));
+        boats.add(
+          _rhombus(
+            tangent.position,
+            tangent,
+            _boatLength - _boatRim,
+            _boatWidth - _boatRim,
+          ),
+        );
       }
     }
     // A ghost moves out of the way instead of covering a boat (ghost, Design D5).
@@ -158,10 +206,30 @@ class ProgressFramePainter extends CustomPainter {
         if (_tangent(metrics[i], share) case final tangent?) {
           // Out to [overhang] beyond the box at most.
           final inset = trackWidth / 2 + i * (trackWidth + trackGap);
-          final position = _ghostPosition(tangent, boats, maxShift: inset + overhang - (_ghostWidth + _ghostRim) / 2);
+          final position = _ghostPosition(
+            tangent,
+            boats,
+            maxShift: inset + overhang - (_ghostWidth + _ghostRim) / 2,
+          );
           // Ghosts further in keep clear of this one as well.
-          boats.add(_rhombus(position, tangent, _ghostLength - _ghostRim, _ghostWidth - _ghostRim));
-          _boat(canvas, position, tangent, AppColors.ghost, background, length: _ghostLength, width: _ghostWidth, rim: _ghostRim);
+          boats.add(
+            _rhombus(
+              position,
+              tangent,
+              _ghostLength - _ghostRim,
+              _ghostWidth - _ghostRim,
+            ),
+          );
+          _boat(
+            canvas,
+            position,
+            tangent,
+            AppColors.ghost,
+            background,
+            length: _ghostLength,
+            width: _ghostWidth,
+            rim: _ghostRim,
+          );
         }
       }
     }
@@ -170,7 +238,11 @@ class ProgressFramePainter extends CustomPainter {
   /// Where the ghost at [tangent] clears all [boats], including ghosts already placed:
   /// on the centre line of its track, or moved out across it by at least [ghostShift],
   /// but at most [maxShift].
-  static Offset _ghostPosition(Tangent tangent, List<List<Offset>> boats, {required double maxShift}) {
+  static Offset _ghostPosition(
+    Tangent tangent,
+    List<List<Offset>> boats, {
+    required double maxShift,
+  }) {
     final out = Offset(tangent.vector.dy, -tangent.vector.dx);
     bool clear(double shift) {
       final ghost = _rhombus(
@@ -194,7 +266,12 @@ class ProgressFramePainter extends CustomPainter {
       metric.getTangentForOffset(share.clamp(0, 1) * metric.length);
 
   /// The corners of a rhombus around [centre], pointing along [tangent].
-  static List<Offset> _rhombus(Offset centre, Tangent tangent, double length, double width) {
+  static List<Offset> _rhombus(
+    Offset centre,
+    Tangent tangent,
+    double length,
+    double width,
+  ) {
     final along = tangent.vector * (length / 2);
     final across = Offset(-tangent.vector.dy, tangent.vector.dx) * (width / 2);
     return [centre - along, centre - across, centre + along, centre + across];
@@ -239,10 +316,16 @@ class ProgressFramePainter extends CustomPainter {
   }
 
   /// A bright line across the track where a lap ends, in a cut of the colour of the box.
-  static void _lapEnd(Canvas canvas, PathMetric metric, double share, Color background) {
+  static void _lapEnd(
+    Canvas canvas,
+    PathMetric metric,
+    double share,
+    Color background,
+  ) {
     final tangent = metric.getTangentForOffset(share * metric.length);
     if (tangent == null) return;
-    final across = Offset(-tangent.vector.dy, tangent.vector.dx) * (trackWidth / 2 + 2);
+    final across =
+        Offset(-tangent.vector.dy, tangent.vector.dx) * (trackWidth / 2 + 2);
     canvas
       ..drawLine(
         tangent.position - across,
@@ -262,10 +345,16 @@ class ProgressFramePainter extends CustomPainter {
   }
 
   /// A cut across the track in the colour of the box.
-  static void _notch(Canvas canvas, PathMetric metric, double share, Color background) {
+  static void _notch(
+    Canvas canvas,
+    PathMetric metric,
+    double share,
+    Color background,
+  ) {
     final tangent = metric.getTangentForOffset(share * metric.length);
     if (tangent == null) return;
-    final across = Offset(-tangent.vector.dy, tangent.vector.dx) * (trackWidth / 2 + 1);
+    final across =
+        Offset(-tangent.vector.dy, tangent.vector.dx) * (trackWidth / 2 + 1);
     canvas.drawLine(
       tangent.position - across,
       tangent.position + across,
@@ -310,5 +399,7 @@ class ProgressFramePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(ProgressFramePainter oldDelegate) =>
-      oldDelegate.model != model || oldDelegate.pace != pace || oldDelegate.ghost != ghost;
+      oldDelegate.model != model ||
+      oldDelegate.pace != pace ||
+      oldDelegate.ghost != ghost;
 }

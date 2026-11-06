@@ -8,7 +8,10 @@ import 'ftms_encoder.dart';
 /// PM5's stroke count, distance, pace, power, energy and time (Design D11).
 ///
 /// Used for the software rower under `tool/ftms_rower/` and as test fixture.
-RawRecording pm5ToFtms(RawRecording pm5, {Duration interval = const Duration(seconds: 1)}) {
+RawRecording pm5ToFtms(
+  RawRecording pm5, {
+  Duration interval = const Duration(seconds: 1),
+}) {
   const encoder = FtmsEncoder();
   final decoder = Pm5Decoder();
 
@@ -32,7 +35,9 @@ RawRecording pm5ToFtms(RawRecording pm5, {Duration interval = const Duration(sec
             lastRecord = packet.time;
             records.add((at: packet.time, tick: event, strokes: strokes));
           }
-        case WorkoutStateChanged() || HeartBeatIntervals() || StrokeForceCurve():
+        case WorkoutStateChanged() ||
+            HeartBeatIntervals() ||
+            StrokeForceCurve():
           break;
       }
     }
@@ -52,6 +57,9 @@ RawRecording pm5ToFtms(RawRecording pm5, {Duration interval = const Duration(sec
       'recordedAt': ?pm5.metadata['recordedAt'],
       'convertedFrom': ?pm5.metadata['device'],
     },
-    packets: [for (final r in records) encoder.encodeStatus(r.tick, strokeCount: r.strokes, at: r.at)],
+    packets: [
+      for (final r in records)
+        encoder.encodeStatus(r.tick, strokeCount: r.strokes, at: r.at),
+    ],
   );
 }
