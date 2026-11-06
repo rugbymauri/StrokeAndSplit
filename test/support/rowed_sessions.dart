@@ -23,6 +23,7 @@ Future<int> storeRowedSession(
   int? courseVersionId,
   SessionTemplate? template,
   int? plannedLaps,
+  Duration? plannedDuration,
   DateTime? startedAt,
   ErgSourceKind source = ErgSourceKind.pm5,
   required List<RowedLap> laps,
@@ -38,6 +39,7 @@ Future<int> storeRowedSession(
           templateName: Value(template?.name),
           courseVersionId: Value(courseVersionId ?? template!.course.versionId),
           plannedLaps: Value(template == null ? plannedLaps : template.laps),
+          plannedDurationMs: Value(plannedDuration?.inMilliseconds),
         ),
       );
   var wallMs = 0;
