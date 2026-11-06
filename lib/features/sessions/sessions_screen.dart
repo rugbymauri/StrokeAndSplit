@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/courses/course_providers.dart';
 import '../../data/db/database.dart';
 import '../../data/health/health_export.dart';
 import '../../data/sessions/session_providers.dart';
 import '../../l10n/l10n.dart';
 import '../health/health_connect_sheet.dart';
 import '../live/formatters.dart';
+import 'plan_label.dart';
 import 'session_actions.dart';
 import 'session_summary_screen.dart';
 
@@ -62,8 +64,13 @@ class _SessionTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pace = session.averagePaceCs;
     final l10n = context.l10n;
+    final versionId = session.courseVersionId;
+    // Without a template the course names the session (course-rowing-free, Design D7).
+    final courseName = session.templateName != null || versionId == null
+        ? null
+        : ref.watch(courseVersionProvider(versionId)).value?.name;
     final details = [
-      ?session.templateName,
+      ?sessionName(l10n, session, courseName),
       '${session.distanceDm ~/ 10} m',
       formatElapsed(Duration(milliseconds: session.durationMs)),
       '${formatPace(pace == null ? null : Duration(milliseconds: pace * 10))} /500 m',

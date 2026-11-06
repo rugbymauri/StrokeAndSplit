@@ -381,6 +381,11 @@ class SessionRepository {
       endedAt: session.endedAt,
       distanceDm: session.distanceDm,
       templateName: session.templateName,
+      courseName: switch (session.courseVersionId) {
+        final versionId? when session.templateName == null =>
+          (await CourseRepository(_db).atVersion(versionId)).name,
+        _ => null,
+      },
       points: [
         for (final row in rows)
           HealthPoint(

@@ -2,6 +2,7 @@ import 'package:strokesplit/app/platform_providers.dart';
 import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/sessions/session_accumulator.dart';
+import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
@@ -260,4 +261,44 @@ void main() {
     expect(find.textContaining('Seerunde'), findsNWidgets(2));
     await setup.tearDown(tester);
   });
+
+  testWidgets(
+    'names a course rowed without a template by the course and its planned length',
+    (tester) async {
+      final setup = _Setup();
+      await tester.runAsync(() async {
+        final courses = CourseRepository(setup.db);
+        final course = (await courses.get(
+          await courses.create(
+            'Seerunde',
+            CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+          ),
+        ))!;
+        for (final (day, length) in const [
+          (14, TimeLimit(Duration(minutes: 30))),
+          (15, LapCount(3)),
+          (16, OpenLength()),
+        ]) {
+          final session = await setup.repository.create(
+            startedAt: DateTime(2026, 10, day, 7),
+            source: ErgSourceKind.pm5,
+            plan: SessionPlan(course: course, length: length),
+          );
+          await setup.repository.finish(session);
+        }
+      });
+      await setup.pump(tester);
+      for (var i = 0; i < 3; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 10)),
+        );
+        await tester.pump();
+      }
+
+      expect(find.textContaining('Seerunde · 30 min · '), findsOneWidget);
+      expect(find.textContaining('Seerunde · 3 Runden · '), findsOneWidget);
+      expect(find.textContaining('Seerunde · offen · '), findsOneWidget);
+      await setup.tearDown(tester);
+    },
+  );
 }

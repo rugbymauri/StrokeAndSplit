@@ -14,6 +14,7 @@ import '../../data/sources/erg_source.dart';
 import '../../data/statistics/session_places.dart';
 import '../../l10n/l10n.dart';
 import '../live/formatters.dart';
+import 'plan_label.dart';
 import 'session_actions.dart';
 
 /// The summary of one stored session (screen "Zusammenfassung" of the canvas).
@@ -257,7 +258,9 @@ class _Header extends StatelessWidget {
           session.plannedLaps ?? (laps.isEmpty ? null : laps.length);
       plan = lapCount == null ? length : '$lapCount × $length';
     }
-    final name = course == null ? null : session.templateName ?? course.name;
+    final name = course == null
+        ? null
+        : sessionName(l10n, session, course.name);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

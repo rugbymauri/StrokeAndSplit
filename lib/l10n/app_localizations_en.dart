@@ -1216,4 +1216,12 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String planMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get planOpen => 'open';
 }

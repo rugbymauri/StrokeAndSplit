@@ -314,5 +314,7 @@
   "courseStartOpen": "Open",
   "courseStartOpenHint": "You row until you end the session.",
   "courseStartStart": "Start",
-  "stepMinutes": "{minutes, plural, =1{1 minute} other{{minutes} minutes}}"
+  "stepMinutes": "{minutes, plural, =1{1 minute} other{{minutes} minutes}}",
+  "planMinutes": "{minutes} min",
+  "planOpen": "open"
 }
