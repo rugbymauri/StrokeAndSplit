@@ -23,7 +23,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Tag is on main
@@ -59,10 +59,10 @@ jobs:
       VERSION: ${{ needs.verify-tag.outputs.version }}
       ANDROID_DEBUG_KEYSTORE: ${{ secrets.ANDROID_DEBUG_KEYSTORE }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-flutter
       - run: echo "GRADLE_USER_HOME=$PWD/.gradle" >> "$GITHUB_ENV"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .gradle
           key: gradle-${{ hashFiles('android/**/*.gradle.kts', 'android/gradle/wrapper/gradle-wrapper.properties') }}
@@ -82,7 +82,7 @@ jobs:
       - run: |
           mkdir -p build/dist
           cp build/app/outputs/flutter-apk/app-release.apk "build/dist/$APP_NAME-$VERSION-android.apk"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: apk
           path: build/dist/
@@ -95,7 +95,7 @@ jobs:
     env:
       VERSION: ${{ needs.verify-tag.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-flutter
       - name: Install the Linux build tools
         run: |
@@ -107,7 +107,7 @@ jobs:
       - run: |
           mkdir -p build/dist
           cp "build/appimage/$APP_NAME-$VERSION-x86_64.AppImage" build/dist/
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: appimage
           path: build/dist/
@@ -122,7 +122,7 @@ jobs:
       VERSION: ${{ needs.verify-tag.outputs.version }}
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
