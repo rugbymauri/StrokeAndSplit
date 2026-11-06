@@ -27,6 +27,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
 | 13 | `resistance-control` | 12/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
+| 14 | `template-screen` | 0/9 | geplant (`feature/template-screen`) | nach `ghost` und `statistics` archivieren |
 
 ## Warum diese Reihenfolge
 
@@ -297,6 +298,12 @@ Wunsch des Nutzers (2026-11-05) für den Domyos Woodrower. Der Spike am Gerät z
 - [x] Zonen (2026-11-05, Task 5.2): Schalter „Widerstandsstufe“ mit Ruderblatt-Tasten 1–25 (Start 5) im Zoneneditor; „· Stufe 10“ hinter den Bändern in Zonenliste, Zonendetails, Streckeneditor und Vorlagen.
 - [x] README (2026-11-05, Task 6.1): Setzen der Stufe über die Ruderblatt-Tasten und pro Zone, Grundstufe, Änderung von Hand, Stand der Gerätetests.
 - [ ] Gerätetest 6.2 am Woodrower (Nutzer).
+
+### 14. `template-screen`: Vorlage auf eigenem Screen, Ghost abschaltbar
+
+Wunsch des Nutzers (2026-11-06): Ein Tipp auf eine Vorlage öffnet einen eigenen Screen statt die Karte aufzuklappen; dort lässt sich der Ghost vor dem Start abschalten.
+
+- [x] Geplant (2026-11-06, `feature/template-screen`). Entschieden (Nutzer): Ghost aus heisst alle drei Spuren und keine Abstandszeile; nur vor dem Start wählbar, nicht während der Fahrt; nicht gespeichert, jeder Start beginnt mit Ghost an; „Nochmal“ öffnet die Liste und darüber gleich den Vorlagen-Screen, Zurück führt zur Liste. Vorgabe ohne Widerspruch: Schalter über „Starten“, sichtbar auch ohne Bestleistung. Löst die aufklappbaren Karten aus `ui-design` (D6, Task 4.1) und die Plätze in der aufgeklappten Vorlage aus `statistics` ab.
 
 ## Offene Entscheide
 
