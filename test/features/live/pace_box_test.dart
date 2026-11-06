@@ -34,11 +34,12 @@ LapProgress _at(
   int index = 1,
   BandStatus pace = BandStatus.inBand,
   int? laps = 3,
+  int lap = 2,
 }) {
   final start = _seerunde.segmentStarts[index];
   final end = _seerunde.segmentEnds[index];
   return LapProgress(
-    lap: 2,
+    lap: lap,
     plannedLaps: laps,
     segmentIndex: index,
     segment: segment,
@@ -61,6 +62,8 @@ Future<void> _pump(
   CourseDefinition course = _seerunde,
   GhostGap? ghostGap,
   Duration? averagePace,
+  Duration rowed = Duration.zero,
+  Duration? limit,
 }) async {
   await tester.pumpWidget(
     LocalizedApp(
@@ -75,6 +78,8 @@ Future<void> _pump(
               pace: pace,
               averagePace: averagePace,
               ghostGap: ghostGap,
+              rowed: rowed,
+              limit: limit,
             ),
           ),
         ),
@@ -227,6 +232,30 @@ void main() {
     },
   );
 
+  testWidgets(
+    'shows the rowing time left and the lap without a total with a time limit',
+    (tester) async {
+      // 30 minutes, after 15:00.4 of rowing time without pauses.
+      await _pump(
+        tester,
+        _at(460, laps: null, lap: 3),
+        rowed: const Duration(minutes: 15, milliseconds: 400),
+        limit: const Duration(minutes: 30),
+      );
+
+      _expectLine(const Key('pace-box-course'), 'Gesamt', 'noch 15:00');
+      _expectLine(const Key('pace-box-lap'), 'Runde 3', 'noch 540 m');
+
+      await _pump(
+        tester,
+        _at(460, laps: null),
+        limit: const Duration(minutes: 90),
+        locale: const Locale('en'),
+      );
+      _expectLine(const Key('pace-box-course'), 'Total', '1:30:00 to go');
+    },
+  );
+
   testWidgets('shows times on a time course', (tester) async {
     const course = CourseDefinition(
       axis: CourseAxis.time,
@@ -369,36 +398,47 @@ void main() {
   });
 
   // Portrait box, landscape box on a phone on its side and a small phone, with and without a ghost.
-  for (final (size, gap) in const [
-    (Size(350, 380), null),
-    (Size(330, 320), null),
-    (Size(300, 280), null),
+  for (final (size, gap, limit) in const [
+    (Size(350, 380), null, null),
+    (Size(330, 320), null, null),
+    (Size(300, 280), null, null),
     (
       Size(350, 380),
       GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true),
+      null,
     ),
     (
       Size(330, 320),
       GhostGap(axis: CourseAxis.distance, amount: 72.3, ghostAhead: true),
+      null,
     ),
     (
       Size(300, 280),
       GhostGap(axis: CourseAxis.time, amount: 1234, ghostAhead: false),
+      null,
     ),
     (
       Size(240, 220),
       GhostGap(axis: CourseAxis.distance, amount: 7.6, ghostAhead: true),
+      null,
     ),
+    (
+      Size(330, 320),
+      GhostGap(axis: CourseAxis.distance, amount: 72.3, ghostAhead: true),
+      Duration(minutes: 180),
+    ),
+    (Size(240, 220), null, Duration(minutes: 180)),
   ]) {
     testWidgets(
       'fits ${size.width.toInt()} × ${size.height.toInt()} ${gap == null ? 'without' : 'with'} a ghost '
-      'with the pace as the largest text',
+      '${limit == null ? '' : 'and a time limit '}with the pace as the largest text',
       (tester) async {
         await _pump(
           tester,
-          _at(460, pace: BandStatus.above),
+          _at(460, pace: BandStatus.above, laps: limit == null ? 3 : null),
           size: size,
           ghostGap: gap,
+          limit: limit,
         );
 
         expect(tester.takeException(), isNull);

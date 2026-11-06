@@ -18,7 +18,7 @@ Setzt `template-screen` in `main` voraus (Ghost-Wahl in der Aufnahme, Ghost-Zeil
 
 ## 4. Live-Display
 
-- [ ] 4.1 Äusserer Ring und verbleibende Zeit bei Dauer, Runde ohne Gesamtzahl (D4). Verifikation: Unit-Tests von `ProgressFrameModel` (halbe Dauer = halber Ring, keine Rundengrenzen); Golden des Rahmens mit Dauer; Widget-Test: „15:00“ verbleibend und „Runde 3“; Overflow-Test bei 390 px hoch und quer
+- [x] 4.1 Äusserer Ring und verbleibende Zeit bei Dauer, Runde ohne Gesamtzahl (D4). Verifikation: Unit-Tests von `ProgressFrameModel` (halbe Dauer = halber Ring, keine Rundengrenzen); Golden des Rahmens mit Dauer; Widget-Test: „15:00“ verbleibend und „Runde 3“; Overflow-Test bei 390 px hoch und quer
 - [ ] 4.2 Ghost ohne Vorlage (D5). Verifikation: Test in `live_screen_test.dart` („with ghosts“): ohne Vorlage mit Ghost läuft der Runden-Ghost, kein Ghost auf der Streckenspur, keine Abstandszeile; mit ausgeschaltetem Ghost keiner
 
 ## 5. Start-Screen

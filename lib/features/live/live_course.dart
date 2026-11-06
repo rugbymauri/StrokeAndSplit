@@ -39,6 +39,7 @@ class CourseLiveView extends StatelessWidget {
     this.ghost,
     this.ghostGap,
     this.status,
+    this.limit,
   });
 
   final StatusTick? tick;
@@ -69,6 +70,9 @@ class CourseLiveView extends StatelessWidget {
 
   /// Connection and disconnect button beside the button; null leaves the button alone.
   final Widget? status;
+
+  /// The rowing time after which the session ends; null without one (course-rowing-free, Design D4).
+  final Duration? limit;
 
   static const _gap = 10.0;
 
@@ -254,6 +258,8 @@ class CourseLiveView extends StatelessWidget {
     ghost: ghost,
     ghostGap: ghostGap,
     upcoming: _upcoming,
+    rowed: session?.elapsed ?? Duration.zero,
+    limit: limit,
   );
 
   Widget _strokeRate(
