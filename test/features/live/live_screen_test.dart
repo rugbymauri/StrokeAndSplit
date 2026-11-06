@@ -17,6 +17,7 @@ import 'package:strokesplit/data/templates/template_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:strokesplit/features/connection/heart_rate_indicator.dart';
+import 'package:strokesplit/features/live/live_course.dart';
 import 'package:strokesplit/features/live/live_layout.dart';
 import 'package:strokesplit/features/live/live_screen.dart';
 import 'package:strokesplit/features/live/pace_box.dart';
@@ -816,6 +817,7 @@ void main() {
       required int courseSeconds,
       required int segmentSeconds,
       required int courseMetres,
+      bool ghost = true,
     }) {
       final definition = template.course.definition;
       final index = definition.segmentEnds.indexWhere((end) => end > inLap);
@@ -823,6 +825,7 @@ void main() {
         sessionId: 99,
         progress: SessionProgress(distanceMeters: courseMetres.toDouble(), elapsed: Duration(seconds: courseSeconds)),
         template: template,
+        ghost: ghost,
         lap: LapProgress(
           lap: lap,
           plannedLaps: template.laps,
@@ -887,6 +890,33 @@ void main() {
         await disposeWidgetsWithDatabase(tester);
       });
     }
+
+    testWidgets('started without ghost: no ghost on any track and no gap, no switch (template-screen)', (tester) async {
+      final template =
+          await templateOn(tester, CourseDefinition.single(axis: CourseAxis.distance, length: 1000), laps: 3);
+      await tester.runAsync(() => storeRowedSessionWithSamples(db, template: template, laps: [
+            for (var i = 0; i < 3; i++) RowedLap.single(230000, 1000),
+          ]));
+
+      await show(
+        tester,
+        rowing(template,
+            lap: 2,
+            inLap: 460,
+            lapSeconds: 115,
+            courseSeconds: 365,
+            segmentSeconds: 115,
+            courseMetres: 1460,
+            ghost: false),
+      );
+
+      expect(tester.widget<CourseLiveView>(find.byType(CourseLiveView)).ghost, isNull);
+      expect(paceBox(tester).ghost, isNull);
+      expect(paceBox(tester).ghostGap, isNull);
+      expect(find.byKey(const Key('pace-box-ghost-behind')), findsNothing);
+      expect(find.byType(Switch), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
 
     testWidgets('Offene Rundenzahl: no gap in the box, the lap ghost in the frame', (tester) async {
       final template =

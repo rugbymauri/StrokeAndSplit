@@ -27,7 +27,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 11 | `auto-pause` | 10/11 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (5.2) |
 | 12 | `health-connect` | 11/13 | in Umsetzung (`feature/health-connect`) | Spike (1.2) und Gerätetest (6.1), Nutzer |
 | 13 | `resistance-control` | 12/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
-| 14 | `template-screen` | 1/9 | in Arbeit (`feature/template-screen-apply`) | nach `ui-design`, `ghost` und `statistics` archivieren |
+| 14 | `template-screen` | 2/9 | in Arbeit (`feature/template-screen-apply`) | nach `ui-design`, `ghost` und `statistics` archivieren |
 | 15 | `course-rowing-free` | 0/11 | geplant | setzt `template-screen` voraus; erst nach `ghost` und `template-screen` archivieren |
 
 ## Warum diese Reihenfolge
@@ -306,7 +306,7 @@ Wunsch des Nutzers (2026-11-06): Ein Tipp auf eine Vorlage öffnet einen eigenen
 
 - [x] Geplant (2026-11-06, `feature/template-screen`). Entschieden (Nutzer): Ghost aus heisst alle drei Spuren und keine Abstandszeile; nur vor dem Start wählbar, nicht während der Fahrt; nicht gespeichert, jeder Start beginnt mit Ghost an; „Nochmal“ öffnet die Liste und darüber gleich den Vorlagen-Screen, Zurück führt zur Liste. Vorgabe ohne Widerspruch: Schalter über „Starten“, sichtbar auch ohne Bestleistung. Löst die aufklappbaren Karten aus `ui-design` (D6, Task 4.1) und die Plätze in der aufgeklappten Vorlage aus `statistics` ab.
 - [x] Geändert (Nutzer, 2026-11-06): Die Kachel „Nochmal“ entfällt ganz, statt Liste und Vorlagen-Screen zu öffnen (D3, Task 3.2). Neues Delta `erg-connection` ohne „Nochmal“; deshalb erst nach `ui-design`, `ghost` und `statistics` archivieren.
-- [ ] Umsetzung begonnen (2026-11-06, `feature/template-screen-apply`): 1.1 Ghost-Wahl in der Aufnahme.
+- [ ] Umsetzung begonnen (2026-11-06, `feature/template-screen-apply`): 1.1 Ghost-Wahl in der Aufnahme, 1.2 Live-Display ohne Ghost.
 
 ### 15. `course-rowing-free`: Strecke ohne Vorlage rudern, mit Runden, Dauer oder offen
 

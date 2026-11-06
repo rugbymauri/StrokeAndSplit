@@ -29,8 +29,9 @@ Future<void> connectRower(WidgetRef ref, RowerChoice choice) async {
 }
 
 /// Rows with the chosen rower, freely or [template] (Design D6). Without a
-/// chosen rower it opens "Geräte wählen" instead.
-Future<void> startRowing(BuildContext context, WidgetRef ref, {SessionTemplate? template}) async {
+/// chosen rower it opens "Geräte wählen" instead. Without [ghost] no ghost
+/// runs in the session of [template] (template-screen, Design D4).
+Future<void> startRowing(BuildContext context, WidgetRef ref, {SessionTemplate? template, bool ghost = true}) async {
   final navigator = Navigator.of(context);
   final choice = ref.read(chosenRowerProvider);
   if (choice == null) {
@@ -43,7 +44,7 @@ Future<void> startRowing(BuildContext context, WidgetRef ref, {SessionTemplate? 
     if (context.mounted) await showConnectError(context, choice.device?.name ?? '', e);
     return;
   }
-  await navigator.push(MaterialPageRoute<void>(builder: (_) => LiveScreen(template: template)));
+  await navigator.push(MaterialPageRoute<void>(builder: (_) => LiveScreen(template: template, ghost: ghost)));
 }
 
 /// Explains why the rower [deviceName] could not be connected.
