@@ -349,6 +349,32 @@ void main() {
 
       expect(_values(await rankings.zone(sprintId)), ['100: 18']);
     });
+    test('ranks the laps and sprints of a course rowed for a duration without a template', () async {
+      final lake = await courseWithSprints('Seerunde', [450], after: 450);
+      final id = await storeRowedSession(
+        db,
+        courseVersionId: await versionOf(lake),
+        plannedDuration: const Duration(minutes: 9),
+        laps: const [
+          RowedLap([(110000, 450), (18200, 100), (110000, 450)]),
+          RowedLap([(110000, 450), (18500, 100), (112000, 450)]),
+          // Ended by the duration in the sprint of the third lap.
+          RowedLap([(30000, 120), (17000, 50)], complete: false),
+        ],
+      );
+
+      final course = (await rankings.course(lake)).single;
+      final sprints = (await rankings.zone(sprintId)).single;
+
+      expect(
+        [for (final e in course.entries) (e.sessionId, e.lap)],
+        [(id, 1), (id, 2)],
+      );
+      expect(
+        [for (final e in sprints.entries) (e.sessionId, e.lap, e.durationMs)],
+        [(id, 1, 18200), (id, 2, 18500)],
+      );
+    });
   });
 
   group('template', () {
