@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:strokesplit/app/design_tokens.dart';
 import 'package:strokesplit/app/platform_providers.dart';
 import 'package:strokesplit/app/widgets/oar_stepper.dart';
+import 'package:strokesplit/app/widgets/ghost_symbol.dart';
 import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/courses/lap_tracker.dart';
@@ -1127,20 +1128,25 @@ void main() {
       required int segmentSeconds,
       required int courseMetres,
       bool ghost = true,
+      PlanLength? withoutTemplate,
     }) {
       final definition = template.course.definition;
       final index = definition.segmentEnds.indexWhere((end) => end > inLap);
+      // With [withoutTemplate] the course of the template is rowed for that length, without the template.
+      final plan = withoutTemplate == null
+          ? template.toPlan()
+          : SessionPlan(course: template.course, length: withoutTemplate);
       return ActiveRecording(
         sessionId: 99,
         progress: SessionProgress(
           distanceMeters: courseMetres.toDouble(),
           elapsed: Duration(seconds: courseSeconds),
         ),
-        plan: template.toPlan(),
+        plan: plan,
         ghost: ghost,
         lap: LapProgress(
           lap: lap,
-          plannedLaps: template.laps,
+          plannedLaps: plan.plannedLaps,
           segmentIndex: index,
           segment: definition.segments[index],
           segmentStart: definition.segmentStarts[index],
@@ -1271,6 +1277,58 @@ void main() {
         await disposeWidgetsWithDatabase(tester);
       },
     );
+
+    for (final ghost in [true, false]) {
+      testWidgets(
+        'without a template ${ghost ? 'the lap ghost runs' : 'no ghost runs with the ghost off'}, '
+        'none on the course track and no gap (course-rowing-free)',
+        (tester) async {
+          final template = await templateOn(
+            tester,
+            CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+            laps: 3,
+          );
+          await tester.runAsync(
+            () => storeRowedSessionWithSamples(
+              db,
+              template: template,
+              laps: [for (var i = 0; i < 3; i++) RowedLap.single(230000, 1000)],
+            ),
+          );
+
+          // The course of the template for 30 minutes: 1 460 m after 6:05, 115 s into lap 2.
+          await show(
+            tester,
+            rowing(
+              template,
+              lap: 2,
+              inLap: 460,
+              lapSeconds: 115,
+              courseSeconds: 365,
+              segmentSeconds: 115,
+              courseMetres: 1460,
+              ghost: ghost,
+              withoutTemplate: const TimeLimit(Duration(minutes: 30)),
+            ),
+          );
+
+          final box = paceBox(tester);
+          if (ghost) {
+            expect(box.ghost!.lap, closeTo(0.5, 0.005));
+            expect(box.ghost!.course, isNull);
+          } else {
+            expect(box.ghost, isNull);
+          }
+          expect(box.ghostGap, isNull);
+          expect(
+            find.byType(GhostSymbol),
+            findsNothing,
+            reason: 'no ghost line in the legend',
+          );
+          await disposeWidgetsWithDatabase(tester);
+        },
+      );
+    }
 
     testWidgets(
       'Offene Rundenzahl: no gap in the box, the lap ghost in the frame',
