@@ -7,6 +7,7 @@ import '../../data/courses/course_providers.dart';
 import '../../data/statistics/ranking_providers.dart';
 import '../../l10n/l10n.dart';
 import '../statistics/ranking_sections.dart';
+import 'course_start_screen.dart';
 import 'course_strip.dart';
 import 'courses_screen.dart';
 
@@ -18,8 +19,9 @@ Future<void> openCourseDetail(BuildContext context, Course course) {
   );
 }
 
-/// A course with places 1–3 per length and the way to edit it (Change
-/// statistics, Design D6). Deleting the course while it is open closes it too.
+/// A course with places 1–3 per length, the way to edit it (Change
+/// statistics, Design D6) and to row it (course-rowing-free, Design D6).
+/// Deleting the course while it is open closes it too.
 class CourseDetailScreen extends ConsumerWidget {
   const CourseDetailScreen({super.key, required this.courseId});
 
@@ -62,32 +64,63 @@ class CourseDetailScreen extends ConsumerWidget {
             constraints: const BoxConstraints(maxWidth: 640),
             child: course == null
                 ? const SizedBox.shrink()
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.pagePortrait,
-                      AppSpacing.l,
-                      AppSpacing.pagePortrait,
-                      AppSpacing.xxl,
-                    ),
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      CourseStrip(definition: course.definition),
-                      const SizedBox(height: 10),
-                      Text(
-                        courseSummary(l10n, course),
-                        style: AppTextStyles.caption,
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.pagePortrait,
+                            AppSpacing.l,
+                            AppSpacing.pagePortrait,
+                            AppSpacing.xxl,
+                          ),
+                          children: [
+                            CourseStrip(definition: course.definition),
+                            const SizedBox(height: 10),
+                            Text(
+                              courseSummary(l10n, course),
+                              style: AppTextStyles.caption,
+                            ),
+                            const SizedBox(height: AppSpacing.xxl),
+                            switch (rankings) {
+                              AsyncData(:final value) => RankingSections(
+                                rankings: value,
+                                axis: course.axis,
+                                length: course.definition.length,
+                              ),
+                              AsyncError(:final error) => Text(
+                                l10n.rankingLoadFailed('$error'),
+                              ),
+                              _ => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            },
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: AppSpacing.xxl),
-                      switch (rankings) {
-                        AsyncData(:final value) => RankingSections(
-                          rankings: value,
-                          axis: course.axis,
-                          length: course.definition.length,
+                      // Fixed below the rankings (course-rowing-free, Design D6).
+                      const Divider(height: 1),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.pagePortrait,
+                          AppSpacing.s,
+                          AppSpacing.pagePortrait,
+                          AppSpacing.l,
                         ),
-                        AsyncError(:final error) => Text(
-                          l10n.rankingLoadFailed('$error'),
+                        child: SizedBox(
+                          height: 56,
+                          child: FilledButton(
+                            key: const Key('course-row'),
+                            onPressed: () =>
+                                openCourseStart(context, course.id),
+                            child: Text(
+                              l10n.courseRow,
+                              style: AppTextStyles.cardTitle,
+                            ),
+                          ),
                         ),
-                        _ => const Center(child: CircularProgressIndicator()),
-                      },
+                      ),
                     ],
                   ),
           ),

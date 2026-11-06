@@ -307,5 +307,12 @@
   "healthFailedPermission": "Stroke & Split may not write to Health Connect.",
   "healthFailedUnavailable": "Health Connect is not available.",
   "healthFailed": "Sending to Health Connect failed.",
-  "healthGrantShort": "Grant"
+  "healthGrantShort": "Grant",
+  "courseRow": "Row",
+  "courseStartLaps": "Laps",
+  "courseStartDuration": "Duration",
+  "courseStartOpen": "Open",
+  "courseStartOpenHint": "You row until you end the session.",
+  "courseStartStart": "Start",
+  "stepMinutes": "{minutes, plural, =1{1 minute} other{{minutes} minutes}}"
 }

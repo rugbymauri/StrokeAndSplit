@@ -23,7 +23,7 @@ Setzt `template-screen` in `main` voraus (Ghost-Wahl in der Aufnahme, Ghost-Zeil
 
 ## 5. Start-Screen
 
-- [ ] 5.1 Button „Rudern“ in `CourseDetailScreen` und `CourseStartScreen` nach D6: Segmentbalken, Länge, drei Optionen, Rundenzahl, Dauer, offen, Ghost-Zeile, „Starten“. Verifikation: neue `test/features/courses/course_start_screen_test.dart`: „Rudern“ öffnet den Screen, Zurück zur Detailansicht; beim Öffnen „Runden“ mit 3; nur die gewählte Eingabe sichtbar; Werte bleiben beim Wechseln; Grenzen 1 Runde, 1 min und 180 min gesperrt; 90 min als „1:30:00“; „Starten“ mit 30 min startet eine Session mit `TimeLimit` und legt keine Vorlage an; erneutes Öffnen zeigt wieder die Vorgaben; Ghost aus startet ohne Ghost; deutsche und englische Texte; Overflow-Test bei 390 px und quer
+- [x] 5.1 Button „Rudern“ in `CourseDetailScreen` und `CourseStartScreen` nach D6: Segmentbalken, Länge, drei Optionen, Rundenzahl, Dauer, offen, Ghost-Zeile, „Starten“. Verifikation: neue `test/features/courses/course_start_screen_test.dart`: „Rudern“ öffnet den Screen, Zurück zur Detailansicht; beim Öffnen „Runden“ mit 3; nur die gewählte Eingabe sichtbar; Werte bleiben beim Wechseln; Grenzen 1 Runde, 1 min und 180 min gesperrt; 90 min als „1:30:00“; „Starten“ mit 30 min startet eine Session mit `TimeLimit` und legt keine Vorlage an; erneutes Öffnen zeigt wieder die Vorgaben; Ghost aus startet ohne Ghost; deutsche und englische Texte; Overflow-Test bei 390 px und quer
 
 ## 6. Titel
 

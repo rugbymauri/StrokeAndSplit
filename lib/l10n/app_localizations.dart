@@ -1950,6 +1950,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Erteilen'**
   String get healthGrantShort;
+
+  /// Course detail: button that opens the start screen to row the course without a template
+  ///
+  /// In de, this message translates to:
+  /// **'Rudern'**
+  String get courseRow;
+
+  /// Course start screen: option to row a number of laps
+  ///
+  /// In de, this message translates to:
+  /// **'Runden'**
+  String get courseStartLaps;
+
+  /// Course start screen: option to row for a total rowing time; also the name of its input for screen readers
+  ///
+  /// In de, this message translates to:
+  /// **'Dauer'**
+  String get courseStartDuration;
+
+  /// Course start screen: option to row until the user ends the session
+  ///
+  /// In de, this message translates to:
+  /// **'Offen'**
+  String get courseStartOpen;
+
+  /// Course start screen: hint shown instead of an input when the open option is chosen
+  ///
+  /// In de, this message translates to:
+  /// **'Du ruderst, bis du die Session beendest.'**
+  String get courseStartOpenHint;
+
+  /// Course start screen: button that starts rowing the course
+  ///
+  /// In de, this message translates to:
+  /// **'Starten'**
+  String get courseStartStart;
+
+  /// Step of a stepper in minutes for screen readers, as in '1 Minute mehr'
+  ///
+  /// In de, this message translates to:
+  /// **'{minutes, plural, =1{1 Minute} other{{minutes} Minuten}}'**
+  String stepMinutes(int minutes);
 }
 
 class _AppLocalizationsDelegate
