@@ -1,0 +1,21 @@
+# Analysis and tests for pull requests and main. Releases: see release.yml.
+# README, section "CI und Releases".
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # Started by hand ("Run workflow", `gh workflow run ci.yml --ref <branch>`) on any branch.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    uses: ./.github/workflows/check.yml
