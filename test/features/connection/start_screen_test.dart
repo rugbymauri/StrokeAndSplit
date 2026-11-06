@@ -376,101 +376,27 @@ void main() {
     });
   });
 
-  group('"Nochmal"', () {
-    /// Two templates and a session with each; the one with [newest] is rowed yesterday.
-    Future<(AppDatabase, Map<String, int>)> rowed(WidgetTester tester, {String newest = 'Seerunde x3'}) async {
-      final db = openTestDatabase();
-      final ids = (await tester.runAsync(() async {
-        final course = await CourseRepository(db).create(
-          'Seerunde',
-          CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
-        );
-        final templates = TemplateRepository(db);
-        final ids = {
-          'Seerunde x3': await templates.create('Seerunde x3', courseId: course, laps: 3),
-          'Seerunde offen': await templates.create('Seerunde offen', courseId: course, laps: null),
-        };
-        final now = DateTime.now();
-        for (final name in ids.keys) {
-          await SessionRepository(db).create(
-            startedAt: now.subtract(Duration(days: name == newest ? 1 : 3)),
-            source: ErgSourceKind.simulator,
-            template: await templates.get(ids[name]!),
-          );
-        }
-        return ids;
-      }))!;
-      return (db, ids);
-    }
-
-    testWidgets('shows the template of the newest session and opens it chosen', (tester) async {
-      final (db, ids) = await rowed(tester);
-      await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
-
-      final tile = find.byKey(const Key('row-again'));
-      expect(find.text('NOCHMAL'), findsOneWidget);
-      expect(find.descendant(of: tile, matching: find.text('Seerunde x3')), findsOneWidget);
-      expect(find.descendant(of: tile, matching: find.text('gestern')), findsOneWidget);
-
-      await tester.tap(tile);
-      await _settle(tester);
-
-      expect(find.byType(TemplatesScreen), findsOneWidget);
-      Finder start(String name) =>
-          find.descendant(of: find.byKey(Key('template-${ids[name]}')), matching: find.text('Starten'));
-      expect(start('Seerunde x3'), findsOneWidget);
-      expect(start('Seerunde offen'), findsNothing);
-      await disposeWidgetsWithDatabase(tester);
+  testWidgets('shows no tile "Nochmal" after a session with a template (template-screen)', (tester) async {
+    final db = openTestDatabase();
+    await tester.runAsync(() async {
+      final course = await CourseRepository(db).create(
+        'Seerunde',
+        CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+      );
+      final templates = TemplateRepository(db);
+      final id = await templates.create('Seerunde x3', courseId: course, laps: 3);
+      await SessionRepository(db).create(
+        startedAt: DateTime.now().subtract(const Duration(days: 1)),
+        source: ErgSourceKind.simulator,
+        template: await templates.get(id),
+      );
     });
+    await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
 
-    testWidgets('says how many days ago the session was', (tester) async {
-      final (db, _) = await rowed(tester, newest: 'none');
-      await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
-
-      expect(find.text('vor 3 Tagen'), findsOneWidget);
-      await disposeWidgetsWithDatabase(tester);
-    });
-
-    testWidgets('is missing without a session', (tester) async {
-      await _pumpStart(tester, chosen: const RowerChoice.simulator());
-
-      expect(find.byKey(const Key('row-again')), findsNothing);
-      expect(find.text('NOCHMAL'), findsNothing);
-      await disposeWidgetsWithDatabase(tester);
-    });
-
-    testWidgets('is missing when the template of the only session is deleted', (tester) async {
-      final db = openTestDatabase();
-      await tester.runAsync(() async {
-        final course = await CourseRepository(db).create(
-          'Seerunde',
-          CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
-        );
-        final templates = TemplateRepository(db);
-        final id = await templates.create('Seerunde x3', courseId: course, laps: 3);
-        await SessionRepository(db).create(
-          startedAt: DateTime.now(),
-          source: ErgSourceKind.simulator,
-          template: await templates.get(id),
-        );
-        await templates.delete(id);
-      });
-      await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
-
-      expect(find.byKey(const Key('row-again')), findsNothing);
-      await disposeWidgetsWithDatabase(tester);
-    });
-
-    testWidgets('skips the newest session when its template is deleted', (tester) async {
-      final (db, ids) = await rowed(tester);
-      await tester.runAsync(() => TemplateRepository(db).delete(ids['Seerunde x3']!));
-      await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);
-
-      final tile = find.byKey(const Key('row-again'));
-      expect(find.descendant(of: tile, matching: find.text('Seerunde offen')), findsOneWidget);
-      expect(find.descendant(of: tile, matching: find.text('vor 3 Tagen')), findsOneWidget);
-      await disposeWidgetsWithDatabase(tester);
-    });
+    expect(find.text('Rudern'), findsOneWidget);
+    expect(find.text('NOCHMAL'), findsNothing);
+    expect(find.text('Seerunde x3'), findsNothing);
+    await disposeWidgetsWithDatabase(tester);
   });
 
   group('at the start of the app', () {

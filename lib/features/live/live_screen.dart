@@ -33,10 +33,13 @@ const staleAfter = Duration(seconds: 3);
 
 /// The live rowing metrics, readable from the seat.
 class LiveScreen extends ConsumerStatefulWidget {
-  const LiveScreen({super.key, this.template});
+  const LiveScreen({super.key, this.template, this.ghost = true});
 
   /// Made ready as a session as soon as the source is connected; it starts with the first stroke.
   final SessionTemplate? template;
+
+  /// Whether the ghosts of [template] run in this session (template-screen, Design D4).
+  final bool ghost;
 
   @override
   ConsumerState<LiveScreen> createState() => _LiveScreenState();
@@ -76,7 +79,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     if (template == null || _templateStarted) return;
     _templateStarted = true;
     // Not within the listener that reports the connection.
-    Future.microtask(() => ref.read(sessionRecorderProvider.notifier).start(template: template));
+    Future.microtask(() => ref.read(sessionRecorderProvider.notifier).start(template: template, ghost: widget.ghost));
   }
 
   /// The session ended by itself after its last lap.
@@ -198,16 +201,18 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   Widget _status() => const LiveStatus();
 
   /// The live view of [template] at [lap] with its ghosts, recomputed with
-  /// every tick (Change ghost, Design D2–D4).
+  /// every tick (Change ghost, Design D2–D4). Without [ghost] the ghosts are
+  /// not even loaded (template-screen, Design D4).
   Widget _courseView(
     SessionTemplate template,
     LapProgress lap,
     ActiveRecording? recording,
     bool connected,
-    ForceCurves? forceCurves,
-  ) {
-    final ghosts = ref.watch(liveGhostsProvider(liveGhostsKey(template, lap)));
-    final shares = ghostShares(lap, template.course.definition, ghosts);
+    ForceCurves? forceCurves, {
+    required bool ghost,
+  }) {
+    final ghosts = ghost ? ref.watch(liveGhostsProvider(liveGhostsKey(template, lap))) : null;
+    final shares = ghosts == null ? null : ghostShares(lap, template.course.definition, ghosts);
     return CourseLiveView(
       tick: _tick,
       rrIntervalMs: _rrIntervalMs,
@@ -217,10 +222,10 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
       outdated: _stale,
       forceCurves: forceCurves,
       // On a time course the ghost stands where the rower is; the box shows the gap in metres instead.
-      ghost: template.course.axis == CourseAxis.time
+      ghost: shares == null || template.course.axis == CourseAxis.time
           ? null
           : FrameGhost(course: shares.course, lap: shares.lap, segment: shares.segment),
-      ghostGap: ghostGap(lap, template.course.axis, ghosts.course),
+      ghostGap: ghosts == null ? null : ghostGap(lap, template.course.axis, ghosts.course),
       action: _sessionButton(recording, connected),
       shortAction: _sessionButton(recording, connected, short: true),
       status: _status(),
@@ -254,7 +259,8 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                 ),
               Expanded(
                 child: switch ((recording?.lap, recording?.template)) {
-                  (final lap?, final template?) => _courseView(template, lap, recording, connected, forceCurves),
+                  (final lap?, final template?) =>
+                    _courseView(template, lap, recording, connected, forceCurves, ghost: recording!.ghost),
                   _ => FreeLiveView(
                       tick: _tick,
                       rrIntervalMs: _rrIntervalMs,

@@ -118,19 +118,6 @@
       }
     }
   },
-  "startAgain": "Nochmal",
-  "@startAgain": {
-    "description": "Start screen: label above the tile with the template of the newest session"
-  },
-  "startAgainDaysAgo": "{days, plural, =0{heute} =1{gestern} other{vor {days} Tagen}}",
-  "@startAgainDaysAgo": {
-    "description": "Start screen, tile 'Again': when the session was rowed; days is the number of days since, below a week",
-    "placeholders": {
-      "days": {
-        "type": "int"
-      }
-    }
-  },
   "zoneErrorNameMissing": "Der Name fehlt.",
   "@zoneErrorNameMissing": {
     "description": "Zone editor: the zone has no name"
@@ -991,7 +978,11 @@
   },
   "templateStart": "Starten",
   "@templateStart": {
-    "description": "Templates: button in the opened template that starts rowing it"
+    "description": "Template screen: button that starts rowing the template"
+  },
+  "templateGhost": "Gegen den Ghost rudern",
+  "@templateGhost": {
+    "description": "Template screen: switch above Start that turns the ghost on or off for the session started from there"
   },
   "templatePodiumTitle": "Bestleistungen",
   "@templatePodiumTitle": {

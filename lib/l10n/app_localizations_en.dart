@@ -100,21 +100,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get startAgain => 'Again';
-
-  @override
-  String startAgainDaysAgo(int days) {
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: '$days days ago',
-      one: 'yesterday',
-      zero: 'today',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get zoneErrorNameMissing => 'The name is missing.';
 
   @override
@@ -703,6 +688,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get templateStart => 'Start';
+
+  @override
+  String get templateGhost => 'Row against the ghost';
 
   @override
   String get templatePodiumTitle => 'Best results';

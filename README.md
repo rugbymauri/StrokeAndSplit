@@ -41,7 +41,7 @@ Alle Befehle zeigt `make help`.
 
 1. **Geräte wählen**: Am PM5 das Bluetooth-Menü öffnen (Verbinden) bzw. ein FTMS-Rudergerät einschalten. Die App sucht beim Start und listet die gefundenen Rudergeräte, jeweils mit dem Hinweis, ob es ein PM5 oder ein FTMS-Gerät ist, darunter **Simulator** und **Simulator (FTMS)**. Gerät wählen und **Weiter**. Viele Rudergeräte erlauben nur eine Bluetooth-Verbindung, ErgData oder andere Apps müssen also getrennt sein. Ein FTMS-Rudergerät fordert die App nach dem Verbinden zum Senden auf, setzt es aber nie zurück.
 2. Die App merkt sich das Rudergerät. Beim nächsten Start sucht sie es bis zu 10 s, verbindet und überspringt „Geräte wählen“. Wird es nicht gefunden, erscheint „Geräte wählen“ mit diesem Gerät vorausgewählt. War es ein Simulator, geht es ohne Suche weiter.
-3. **Startbildschirm**: Oben steht das gewählte Rudergerät, Antippen führt zurück zu „Geräte wählen“. Ist es verbunden, steht darunter „Verbunden“, und **Trennen** beendet die Verbindung, etwa damit ErgData das Gerät übernehmen kann. Ein anderes Gerät in „Geräte wählen“ trennt das bisherige ebenfalls. **Rudern** öffnet die Vorlagen (siehe unten), **Frei rudern** das Live-Display ohne Vorlage, beide nutzen eine bestehende Verbindung oder verbinden neu. **Nochmal** zeigt die zuletzt geruderte Vorlage und öffnet sie aufgeklappt in den Vorlagen. Unter **Sessions** lassen sich Sessions abspielen, als `.strokesplit` exportieren, importieren und löschen.
+3. **Startbildschirm**: Oben steht das gewählte Rudergerät, Antippen führt zurück zu „Geräte wählen“. Ist es verbunden, steht darunter „Verbunden“, und **Trennen** beendet die Verbindung, etwa damit ErgData das Gerät übernehmen kann. Ein anderes Gerät in „Geräte wählen“ trennt das bisherige ebenfalls. **Rudern** öffnet die Vorlagen (siehe unten), **Frei rudern** das Live-Display ohne Vorlage, beide nutzen eine bestehende Verbindung oder verbinden neu. Unter **Sessions** lassen sich Sessions abspielen, als `.strokesplit` exportieren, importieren und löschen.
 4. Beim freien Rudern im Live-Display **Session starten**. Zeit und Distanz zählen ab 0, auch wenn das Gerät schon etwas anzeigt, und laufen über Resets am Gerät hinweg weiter. Bei FTMS misst die App die Zeit selbst und hält sie an, sobald 4 s lang weder Distanz noch Schläge dazukommen. Schlagdetails wie Kraft und Zuglänge liefert nur der PM5. Die Watt übernimmt die App vom FTMS-Rudergerät, damit sie mit seinem Display übereinstimmen; meldet es keine, rechnet sie sie wie beim PM5 aus der Pace aus. Meldet ein FTMS-Rudergerät seine Widerstandsstufe (z.B. der Domyos Woodrower), steht sie klein unter den Watt („Stufe 7“), auch beim Rudern einer Vorlage. Der Simulator (FTMS) meldet Stufe 5.
 
    Lässt sich die Stufe über Bluetooth setzen (Woodrower: Stufe 1–15), stehen Ruderblatt-Tasten neben der Stufe: hoch erhöht, runter senkt um eine Stufe. Mehrere schnelle Tipps zählen zusammen. Angezeigt wird immer die Stufe, die das Gerät meldet; lehnt es ab, steht kurz „Stufe nicht gesetzt“. Beim Rudern einer Vorlage setzt die App zu Beginn jeder Zone mit Stufe diese Stufe, in freien Abschnitten und Zonen ohne Stufe die Grundstufe, also die Stufe beim Start der Session. Wer mitten in einem Abschnitt die Stufe ändert, über die Tasten oder am Gerät, behält sie bis zum nächsten Abschnitt; in einem Abschnitt ohne Stufe wird sie zur neuen Grundstufe. Das gilt auch für eine Änderung in einer Pause. Nach einem Verbindungsabbruch sendet die App die geltende Stufe erneut. Gesendet wird „Set Target Resistance Level“ als ein Byte in Zehnteln, wie FTMS 1.0 und der Woodrower es verlangen; meldet ein Gerät „ungültiger Wert“, versucht es die App einmal mit 16 Bit. Der Simulator (FTMS) nimmt Stufen 1–15 an.
@@ -58,7 +58,7 @@ Wird die App während einer Session beendet, bleibt die Session bis kurz davor e
 1. **Zonen** → **Zone anlegen**: Name, Achse (Distanz oder Zeit), feste Länge und mindestens ein Band, ein Pace-Band (z.B. 1:45–1:50) und/oder ein Schlagzahl-Band (z.B. 30–34). Die Liste zeigt die Zonen nach Achse und in wie vielen Strecken sie stecken.
 2. **Strecken** → **Strecke anlegen**: Name, Achse (Distanz in Metern oder Zeit als m:ss) und Länge. Mit **Zone einbauen** eine Zone wählen und ihre Startposition einstellen. Zonen der anderen Achse sind ausgegraut. Die Vorschau zeigt, wo die Zone liegt, und lehnt sie ab, wenn sie über das Streckenende ragt oder eine andere Zone überschneidet. Dieselbe Zone darf mehrfach vorkommen. Was zwischen den Zonen liegt, ist frei. Mit **+** bei einem freien Abschnitt beginnt die neue Zone dort, eine eingebaute Zone lässt sich antippen und verschieben oder mit **×** entfernen. Im Balken über der Liste heisst grau frei und blau Zone, schnellere Pace-Bänder sind heller.
 3. **Vorlagen** → **Vorlage anlegen** mit Name, Strecke und Runden, **Feste Anzahl** oder **Offen bis Stopp**.
-4. Vorlage antippen klappt sie mit ihren Zonen und Bändern auf. **Starten** verbindet das gewählte Rudergerät und startet die Session sofort. Der Stift öffnet den Editor, dort lässt sich die Vorlage auch löschen.
+4. Vorlage antippen öffnet ihren eigenen Screen mit Strecke, Runden, Zonen und Bändern sowie den Plätzen 1–3. Unten stehen der Schalter **Gegen den Ghost rudern** (siehe Ghost) und **Starten**, das das gewählte Rudergerät verbindet und die Session sofort startet. Der Stift öffnet den Editor, dort lässt sich die Vorlage auch löschen; danach zeigt die App wieder die Liste.
 5. Nach der letzten Runde endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit dem Anteil in der Zone, die beste mit Stern. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
 
 Im Live-Display mit Vorlage ist die Pace der grösste Wert. Darunter steht der Zonenstatus mit dem Band („In der Zone · 2:05–2:10“, sonst „Schneller“ bzw. „Langsamer“), die Schlagzahl-Karte zeigt ihr Band ebenso („Mehr Schläge“, „Weniger Schläge“). Blau heisst in der Zone, orange ausserhalb. Dazu kommen Kacheln für Rundenzeit, Watt, Puls (wenn Gurt oder Rudergerät ihn liefern) und den Anteil in der Zone.
@@ -83,7 +83,7 @@ Runden laufen nach Wanduhr: Eine Pause kostet bei Distanzstrecken Zeit und bei Z
 
 Die App führt Bestenlisten und zeigt jeweils die Plätze 1–3 mit Wert, Pace pro 500 m und Datum:
 
-- **Vorlage**: ganze Sessions, in denen alle geplanten Runden vollständig gerudert wurden, gewertet nach der Summe der Runden. Eine Liste pro Streckenlänge und Rundenzahl. Die aufgeklappte Vorlage zeigt die Liste ihrer aktuellen Länge und Rundenzahl. Bei offener Rundenzahl gibt es keine.
+- **Vorlage**: ganze Sessions, in denen alle geplanten Runden vollständig gerudert wurden, gewertet nach der Summe der Runden. Eine Liste pro Streckenlänge und Rundenzahl. Der Screen der Vorlage zeigt die Plätze 1–3 ihrer aktuellen Länge und Rundenzahl. Bei offener Rundenzahl gibt es keine.
 - **Strecke**: jede vollständige Runde, egal mit welcher Vorlage. Hatte die Strecke verschiedene Längen, gibt es eine Liste pro Länge.
 - **Zone**: jede Fahrt durch die Zone in einer vollständigen Runde, egal auf welcher Strecke, auch mehrere aus derselben Session. Eine Liste pro Zonenlänge.
 
@@ -105,7 +105,9 @@ Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen
 
 Die Pace-Box zeigt in der Zeile **Ghost** den Abstand zum Ghost der Vorlage (aussen): auf Distanzstrecken in Sekunden, auf Zeitstrecken in Metern, z.B. „7.6 s vor dir“ (Rückstand, orange), „12 m hinter dir“ (Vorsprung, blau) oder „gleichauf“. Ohne Ghost aussen fehlt die Zeile, die Ghosts auf den anderen Spuren laufen trotzdem.
 
-Die Ghosts folgen den Bestenlisten live: Wird eine Runde oder Zonenfahrt der laufenden Session neuer Platz 1, läuft der Ghost dieser Spur ab der nächsten Runde bzw. Fahrt gegen sie. Im Simulator laufen die Ghosts ebenso mit. Da Simulator-Sessions nicht in die Bestenlisten kommen, werden sie selbst nie Ghost. In der aufgeklappten Vorlage trägt Platz 1 das Ghost-Symbol.
+Die Ghosts folgen den Bestenlisten live: Wird eine Runde oder Zonenfahrt der laufenden Session neuer Platz 1, läuft der Ghost dieser Spur ab der nächsten Runde bzw. Fahrt gegen sie. Im Simulator laufen die Ghosts ebenso mit. Da Simulator-Sessions nicht in die Bestenlisten kommen, werden sie selbst nie Ghost. Auf dem Screen der Vorlage trägt Platz 1 das Ghost-Symbol.
+
+Der Schalter **Gegen den Ghost rudern** auf dem Screen der Vorlage steht bei jedem Öffnen auf an. Ausgeschaltet läuft in der Session, die von dort startet, auf keiner Spur ein Ghost, und die Pace-Box zeigt keinen Abstand. Die Wahl gilt nur für diese eine Session und lässt sich während der Fahrt nicht ändern.
 
 ### Pulsgurt
 
@@ -154,7 +156,7 @@ lib/
     connection/        Geräte wählen, Startbildschirm, Verbindungsanzeige
     courses/           Strecken-Liste und -Editor mit „Zone einbauen“
     zones/             Zonen-Liste und -Editor
-    templates/         Vorlagen-Liste und -Editor
+    templates/         Vorlagen-Liste, Screen einer Vorlage und Editor
     live/              Live-Display mit Pace-Box und Fortschrittsrahmen
     sessions/          Session-Liste und Zusammenfassung
     simulator/         Bedienung des Simulators
