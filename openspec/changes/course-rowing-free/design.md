@@ -78,7 +78,7 @@ Neu in `lib/features/courses/course_start_screen.dart`, geöffnet vom Button „
 +-------------------------------------+
 ```
 
-- Optionen als `SegmentedButton`, beim Öffnen „Runden“. Die Werte der anderen Optionen bleiben im State, solange der Screen offen ist.
+- Optionen als `SegmentedButton`, beim Öffnen „Runden“. Bei der Umsetzung geändert: die Optionsleiste des Vorlagen-Editors, nach `lib/app/widgets/segment_choice.dart` gezogen, damit beide gleich aussehen. Die Werte der anderen Optionen bleiben im State, solange der Screen offen ist.
 - Rundenzahl mit `OarStepper` wie im Vorlagen-Editor, ab 1, Start 3.
 - Dauer mit `OarStepper` in 1-min-Schritten, 1–180 min, Start 30. Gedrückt halten wiederholt schneller. Anzeige über die vorhandene Zeitformatierung (`30:00`, `1:30:00`).
 - Ghost-Zeile und „Starten“ sind dasselbe Widget wie auf dem Vorlagen-Screen. `template-screen` legt es so an, dass es sich teilen lässt; sonst zieht dieser Change es nach `lib/app/widgets/`.

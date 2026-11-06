@@ -1187,4 +1187,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get healthGrantShort => 'Grant';
+
+  @override
+  String get courseRow => 'Row';
+
+  @override
+  String get courseStartLaps => 'Laps';
+
+  @override
+  String get courseStartDuration => 'Duration';
+
+  @override
+  String get courseStartOpen => 'Open';
+
+  @override
+  String get courseStartOpenHint => 'You row until you end the session.';
+
+  @override
+  String get courseStartStart => 'Start';
+
+  @override
+  String stepMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes',
+      one: '1 minute',
+    );
+    return '$_temp0';
+  }
 }

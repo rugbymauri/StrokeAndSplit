@@ -1641,5 +1641,38 @@
   "healthGrantShort": "Erteilen",
   "@healthGrantShort": {
     "description": "Short button in the message about a missing Health Connect permission that asks for it again; must stay short to fit next to the message"
+  },
+  "courseRow": "Rudern",
+  "@courseRow": {
+    "description": "Course detail: button that opens the start screen to row the course without a template"
+  },
+  "courseStartLaps": "Runden",
+  "@courseStartLaps": {
+    "description": "Course start screen: option to row a number of laps"
+  },
+  "courseStartDuration": "Dauer",
+  "@courseStartDuration": {
+    "description": "Course start screen: option to row for a total rowing time; also the name of its input for screen readers"
+  },
+  "courseStartOpen": "Offen",
+  "@courseStartOpen": {
+    "description": "Course start screen: option to row until the user ends the session"
+  },
+  "courseStartOpenHint": "Du ruderst, bis du die Session beendest.",
+  "@courseStartOpenHint": {
+    "description": "Course start screen: hint shown instead of an input when the open option is chosen"
+  },
+  "courseStartStart": "Starten",
+  "@courseStartStart": {
+    "description": "Course start screen: button that starts rowing the course"
+  },
+  "stepMinutes": "{minutes, plural, =1{1 Minute} other{{minutes} Minuten}}",
+  "@stepMinutes": {
+    "description": "Step of a stepper in minutes for screen readers, as in '1 Minute mehr'",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   }
 }
