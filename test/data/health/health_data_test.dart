@@ -1,10 +1,14 @@
 import 'package:drift/drift.dart' hide isNull;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/health/health_workout.dart';
 import 'package:strokesplit/data/sessions/session_accumulator.dart';
+import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
+import 'package:strokesplit/data/templates/template_repository.dart';
 
 import '../../support/fixtures.dart';
 import '../../support/test_database.dart';
@@ -142,5 +146,42 @@ void main() {
 
   test('knows no session that is not stored', () async {
     expect(await repository.healthData(42), isNull);
+  });
+
+  test('titles a course rowed without a template by the course and a template by its name', () async {
+    final courses = CourseRepository(db);
+    final course = (await courses.get(
+      await courses.create(
+        'Seerunde',
+        CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+      ),
+    ))!;
+    Future<String> title(SessionPlan plan) async {
+      final id = await repository.create(
+        startedAt: startedAt,
+        source: ErgSourceKind.pm5,
+        plan: plan,
+      );
+      await repository.finish(id);
+      return healthWorkoutOf(
+        (await repository.healthData(id))!,
+        freeTitle: 'Freies Rudern',
+      ).title;
+    }
+
+    expect(
+      await title(
+        SessionPlan(
+          course: course,
+          length: const TimeLimit(Duration(minutes: 30)),
+        ),
+      ),
+      'Seerunde',
+    );
+    final templates = TemplateRepository(db);
+    final x3 = (await templates.get(
+      await templates.create('Seerunde x3', courseId: course.id, laps: 3),
+    ))!;
+    expect(await title(x3.toPlan()), 'Seerunde x3');
   });
 }

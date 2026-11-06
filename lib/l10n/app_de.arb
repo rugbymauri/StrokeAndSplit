@@ -1674,5 +1674,18 @@
         "type": "int"
       }
     }
+  },
+  "planMinutes": "{minutes} min",
+  "@planMinutes": {
+    "description": "Planned total rowing time of a session without a template, after the course name, e.g. 'Seerunde · 30 min'",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "planOpen": "offen",
+  "@planOpen": {
+    "description": "Planned length of a session without a template that runs until the rower ends it, after the course name, e.g. 'Seerunde · offen'"
   }
 }

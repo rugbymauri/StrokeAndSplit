@@ -27,7 +27,7 @@ Setzt `template-screen` in `main` voraus (Ghost-Wahl in der Aufnahme, Ghost-Zeil
 
 ## 6. Titel
 
-- [ ] 6.1 `planLabel` und Titel ohne Vorlage in Session-Liste, Zusammenfassung und Health Connect (D7). Verifikation: Widget-Tests: Liste und Zusammenfassung zeigen „Seerunde · 30 min“, „Seerunde · 3 Runden“, „Seerunde · offen“, keine Platzmarke für eine Vorlage; Health-Export-Test nimmt den Streckennamen
+- [x] 6.1 `planLabel` und Titel ohne Vorlage in Session-Liste, Zusammenfassung und Health Connect (D7). Verifikation: Widget-Tests: Liste und Zusammenfassung zeigen „Seerunde · 30 min“, „Seerunde · 3 Runden“, „Seerunde · offen“, keine Platzmarke für eine Vorlage; Health-Export-Test nimmt den Streckennamen
 
 ## 7. Doku und Abschluss
 

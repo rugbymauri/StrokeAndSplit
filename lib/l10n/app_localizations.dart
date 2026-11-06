@@ -1992,6 +1992,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{minutes, plural, =1{1 Minute} other{{minutes} Minuten}}'**
   String stepMinutes(int minutes);
+
+  /// Planned total rowing time of a session without a template, after the course name, e.g. 'Seerunde · 30 min'
+  ///
+  /// In de, this message translates to:
+  /// **'{minutes} min'**
+  String planMinutes(int minutes);
+
+  /// Planned length of a session without a template that runs until the rower ends it, after the course name, e.g. 'Seerunde · offen'
+  ///
+  /// In de, this message translates to:
+  /// **'offen'**
+  String get planOpen;
 }
 
 class _AppLocalizationsDelegate

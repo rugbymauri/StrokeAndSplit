@@ -498,6 +498,46 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
+    for (final (label, laps, duration) in const [
+      ('Seerunde · 30 min', null, Duration(minutes: 30)),
+      ('Seerunde · 3 Runden', 3, null),
+      ('Seerunde · offen', null, null),
+    ]) {
+      testWidgets(
+        'names a session without a template "$label", with all laps and no place of a template',
+        (tester) async {
+          final seerunde = await template(tester);
+          await row(tester, seerunde, [250, 250, 250]);
+          // Faster than the session of the template, but rowed without one (course-rowing-free, Design D7).
+          final id = (await tester.runAsync(
+            () => storeRowedSession(
+              db,
+              courseVersionId: seerunde.course.versionId,
+              plannedLaps: laps,
+              plannedDuration: duration,
+              startedAt: DateTime(2026, 10, 2, 7),
+              laps: [
+                RowedLap.single(240000, 1000),
+                RowedLap.single(241000, 1000),
+                RowedLap.single(100000, 400, complete: false),
+              ],
+            ),
+          ))!;
+          await _pump(tester, db, id);
+
+          expect(find.text(label), findsOneWidget);
+          expect(find.text('Seerunde x3'), findsNothing);
+          expect(find.byKey(const Key('session-place')), findsNothing);
+          expect(_marks(tester, const Key('lap-best')), ['Platz 1']);
+          expect(
+            _caption(tester, const Key('lap-3')),
+            'unvollständig · 1:40.0',
+          );
+          await disposeWidgetsWithDatabase(tester);
+        },
+      );
+    }
+
     testWidgets('marks the runs through a zone', (tester) async {
       final sprintrunde = await tester.runAsync(() async {
         const sprint = Zone(
