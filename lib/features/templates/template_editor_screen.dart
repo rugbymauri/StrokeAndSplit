@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/design_tokens.dart';
 import '../../app/widgets/oar_stepper.dart';
+import '../../app/widgets/segment_choice.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import '../../data/templates/session_template.dart';
@@ -156,8 +157,12 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
               const SizedBox(height: 24),
               Text(l10n.templateLaps.toUpperCase(), style: AppTextStyles.label),
               const SizedBox(height: 10),
-              _LapsChoice(
-                open: _open,
+              SegmentChoice(
+                options: [
+                  (false, l10n.templateFixedLaps),
+                  (true, l10n.templateOpenLaps),
+                ],
+                value: _open,
                 onChanged: (open) => setState(() => _open = open),
               ),
               if (!_open) ...[
@@ -182,66 +187,6 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
               FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The choice between a fixed and an open number of laps.
-class _LapsChoice extends StatelessWidget {
-  const _LapsChoice({required this.open, required this.onChanged});
-
-  final bool open;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    Widget option(bool value, String text) {
-      final selected = open == value;
-      return Expanded(
-        child: Semantics(
-          inMutuallyExclusiveGroup: true,
-          checked: selected,
-          child: Material(
-            color: selected ? AppColors.line : Colors.transparent,
-            borderRadius: BorderRadius.circular(9),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(9),
-              onTap: () => onChanged(value),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 44),
-                child: Center(
-                  child: Text(
-                    text,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.body.copyWith(
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                      color: selected ? AppColors.text : AppColors.textMuted,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadii.small),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Row(
-          children: [
-            option(false, l10n.templateFixedLaps),
-            const SizedBox(width: 4),
-            option(true, l10n.templateOpenLaps),
-          ],
         ),
       ),
     );
