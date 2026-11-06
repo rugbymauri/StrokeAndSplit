@@ -32,7 +32,7 @@ Setzt `template-screen` in `main` voraus (Ghost-Wahl in der Aufnahme, Ghost-Zeil
 ## 7. Doku und Abschluss
 
 - [x] 7.1 README: Abschnitt zu Strecken um „Rudern“, den Start-Screen und die Gesamtdauer ergänzen. Verifikation: Abschnitt beschreibt Einstieg, drei Optionen, Pausen und Ende mitten in der Runde
-- [ ] 7.2 Gesamtprüfung: `make check` grün; App unter Linux mit Simulator: „Seerunde“ 3 min mit Dauer rudern, eine Pause einlegen, Ende nach 3 min Ruderzeit, Zusammenfassung und Liste mit „· 3 min“, keine neue Vorlage
+- [x] 7.2 Gesamtprüfung: `make check` grün; App unter Linux mit Simulator: „Seerunde“ 3 min mit Dauer rudern, eine Pause einlegen, Ende nach 3 min Ruderzeit, Zusammenfassung und Liste mit „· 3 min“, keine neue Vorlage
 - [ ] 7.3 Test am Gerät (Nutzer): eine Strecke mit Dauer am Rudergerät rudern, Ende und Titel prüfen
 
 ## Workflow follow-up
