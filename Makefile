@@ -23,7 +23,7 @@ APK ?=
 APK_BUILT := build/app/outputs/flutter-apk/app-release.apk
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor deps analyze test check codegen l10n schema check-generated icons run run-android spike spike-android pull-recordings build-linux apk install-apk appimage clean
+.PHONY: help doctor deps analyze test check coverage codegen l10n schema check-generated icons run run-android spike spike-android pull-recordings build-linux apk install-apk appimage clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -44,6 +44,11 @@ test: ## Run all tests of the app and the local packages
 	cd $(PROTOCOL) && $(DART) test
 
 check: analyze test ## Run analysis and tests (same as tool/check.sh)
+
+coverage: ## Run all tests with coverage and print it (lcov files in coverage/ and $(PROTOCOL)/coverage/)
+	$(FLUTTER) test --coverage
+	cd $(PROTOCOL) && $(DART) test --coverage-path=coverage/lcov.info
+	@tool/coverage_summary.sh App=coverage/lcov.info erg_protocol=$(PROTOCOL)/coverage/lcov.info
 
 codegen: ## Generate code (drift, ...) with build_runner
 	$(DART) run build_runner build --delete-conflicting-outputs

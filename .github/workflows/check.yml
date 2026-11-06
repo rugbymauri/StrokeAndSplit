@@ -1,5 +1,6 @@
-# `make deps check` (analysis and tests of the app and erg_protocol), called by ci.yml and
-# release.yml.
+# Analysis and tests of the app and erg_protocol (`make deps analyze coverage`, the same as
+# `make check` plus coverage), called by ci.yml and release.yml. The coverage goes to the job
+# summary and as lcov files into the artifact "coverage".
 name: Check
 
 on:
@@ -18,4 +19,19 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup-flutter
       - run: make deps
-      - run: make check
+      - run: make analyze
+      - run: make coverage
+      - name: Coverage summary
+        run: |
+          {
+            echo "### Coverage"
+            echo
+            tool/coverage_summary.sh App=coverage/lcov.info erg_protocol=packages/erg_protocol/coverage/lcov.info
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage
+          path: |
+            coverage/lcov.info
+            packages/erg_protocol/coverage/lcov.info
+          retention-days: 7
