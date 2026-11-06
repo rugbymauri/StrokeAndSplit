@@ -165,6 +165,7 @@ Die manuelle Segmentlänge ersetzt der Change `zones`: Strecken bestehen dort au
   - Keine Kacheln für alle Vorlagen und keine Liste der letzten Sessions: Der Bildschirm bleibt ruhig, und der häufigste Fall, dieselbe Vorlage noch einmal zu rudern, braucht trotzdem nur zwei Tipps.
   - *Alternativen:* wie im Canvas (alle Vorlagen als Kacheln, letzte Sessions) oder ganz schlank (nur Quelle, „Rudern“, „Frei rudern“). Verworfen, weil der Canvas am Erg zu voll ist und die schlanke Variante für die Lieblingsvorlage einen Schritt mehr braucht.
 - „Vorlage wählen“ klappt die gewählte Vorlage auf, mit Bändern, Ghost-Bestzeit (sobald `ghost` da ist) und „Starten“. Der Stift öffnet den Vorlagen-Editor.
+  *Abgelöst (2026-11-06)*: Change `template-screen` öffnet eine Vorlage auf einem eigenen Screen statt sie aufzuklappen (dort D1, D2).
 - Die drei Tabs „Vorlagen“, „Strecken“ und „Zonen“ bestehen seit `zones` (`templates_screen.dart`). Dieser Change gestaltet sie nur neu, Aufbau und Navigation bleiben. Eine Strecke öffnet den Strecken-Editor, eine Zone den Zonen-Editor.
 
 ### D7: Ruderblatt-Tasten für Zahlen

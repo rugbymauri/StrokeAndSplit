@@ -19,7 +19,7 @@ Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Bes
 
 ## 4. Doku und Abschluss
 
-- [ ] 4.1 README: Abschnitte zu Vorlagen und Ghost auf den Vorlagen-Screen und den Schalter umstellen. In `ui-design` (design.md D6, aufklappbare Karten) und `statistics` (Plätze in der aufgeklappten Vorlage) einen Vermerk setzen, dass dieser Change sie ablöst. Verifikation: `grep -n -i aufklapp README.md` ohne Treffer zur Vorlagenwahl; Vermerke in beiden Changes vorhanden
+- [x] 4.1 README: Abschnitte zu Vorlagen und Ghost auf den Vorlagen-Screen und den Schalter umstellen. In `ui-design` (design.md D6, aufklappbare Karten) und `statistics` (Plätze in der aufgeklappten Vorlage) einen Vermerk setzen, dass dieser Change sie ablöst. Verifikation: `grep -n -i aufklapp README.md` ohne Treffer zur Vorlagenwahl; Vermerke in beiden Changes vorhanden
 - [ ] 4.2 Gesamtprüfung: `make check` grün; App unter Linux mit Simulator: Vorlage öffnen, Ghost aus, starten, kein Ghost im Rahmen; mit Ghost wie bisher; Startbildschirm ohne „Nochmal“
 - [ ] 4.3 Test am Gerät (Nutzer): Vorlage am Handy öffnen, Schalter und „Starten“ ohne Scrollen erreichbar, Session ohne Ghost
 
