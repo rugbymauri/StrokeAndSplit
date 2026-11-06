@@ -25,7 +25,8 @@ Alle Befehle zeigt `make help`.
 | Befehl | Zweck |
 |---|---|
 | `make run` / `make run-android` | App auf Linux bzw. einem per USB verbundenen Android-Gerät starten |
-| `make check` | Statische Analyse und Tests von App und `erg_protocol` |
+| `make check` | Formatierung, statische Analyse und Tests von App und `erg_protocol` |
+| `make format` | Allen Dart-Code mit `dart format` formatieren |
 | `make coverage` | Tests mit Coverage, zeigt die Zeilenabdeckung je Paket; lcov-Dateien in `coverage/` und `packages/erg_protocol/coverage/` |
 | `make l10n` | Übersetzungen neu erzeugen, nach Änderungen an `lib/l10n/app_*.arb` |
 | `make codegen` | drift-Code neu erzeugen, nach Änderungen an `lib/data/db/database.dart` |
@@ -237,6 +238,8 @@ Die Pipeline läuft mit GitHub Actions (`.github/workflows/`) in Docker-Images v
 | Pull Request oder Push auf `main`, der `.github/` ändert | `lint-workflows.yml`: `actionlint` (Syntax und Ausdrücke) und `zizmor` (Sicherheit, Konfiguration in `.github/zizmor.yml`) |
 
 Ein Branch ohne Pull Request bekommt keine Pipeline, andere Tags ebenfalls nicht.
+
+`check` bricht ab, wenn Code nicht mit `dart format` formatiert ist (`make format` behebt das). Der Commit, der das ganze Repository einmal formatiert hat, steht in `.git-blame-ignore-revs`; damit `git blame` ihn lokal überspringt, einmal `git config blame.ignoreRevsFile .git-blame-ignore-revs` setzen. Ein älterer Branch bekommt beim Rebase über diesen Commit Konflikte: die eigene Seite nehmen, danach `make format` und weiter rebasen.
 
 `check` schreibt die Zeilenabdeckung je Paket in die Zusammenfassung des Workflow-Laufs und hängt die lcov-Dateien sieben Tage als Artefakt `coverage` an, etwa für die Anzeige im Editor (VS Code „Coverage Gutters“). Die Zahl der App enthält auch generierten Code.
 
