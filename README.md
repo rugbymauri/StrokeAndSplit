@@ -231,8 +231,11 @@ Die Pipeline läuft mit GitHub Actions (`.github/workflows/`) in Docker-Images v
 | Push auf `main` | `ci.yml`: `check` |
 | Tag `vX.Y.Z` | `release.yml`: `verify-tag` und `check`, `build-apk` und `build-appimage`, dann `release` |
 | von Hand gestartet („Run workflow“, `gh workflow run ci.yml --ref <branch>`) | `ci.yml`: `check`, auf jedem Branch |
+| Pull Request oder Push auf `main`, der `.github/` ändert | `lint-workflows.yml`: `actionlint` (Syntax und Ausdrücke) und `zizmor` (Sicherheit, Konfiguration in `.github/zizmor.yml`) |
 
 Ein Branch ohne Pull Request bekommt keine Pipeline, andere Tags ebenfalls nicht.
+
+Alle Actions sind auf einen Commit-SHA gepinnt, die Version steht als Kommentar dahinter. Dependabot hebt beides gemeinsam an. Checkouts behalten kein Token (`persist-credentials: false`), Release-Builds laufen ohne Cache, damit kein manipulierter Cache in ein veröffentlichtes Paket gelangt. Lokal prüfen: `uvx zizmor .` und `docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint`.
 
 **Release erstellen**: Einen Commit von `main` mit der neuen Version taggen und den Tag pushen.
 
@@ -265,7 +268,7 @@ Fehlt das Secret, bricht `build-apk` mit einer Meldung ab, statt mit einem Zufal
 
 ### Abhängigkeiten aktualisieren
 
-Dependabot (`.github/dependabot.yml`) öffnet jede Woche Pull Requests für die Dart-Pakete von App und `erg_protocol`, den Gradle-Build und die GitHub Actions. Minor- und Patch-Updates kommen pro Ökosystem gebündelt in einem Pull Request, Major-Updates einzeln. Das Flutter-Image `ghcr.io/cirruslabs/flutter` in den Workflows und die Flutter-Version in `.github/actions/setup-flutter` erfasst Dependabot nicht, sie werden zusammen mit dem lokalen Flutter von Hand angehoben.
+Dependabot (`.github/dependabot.yml`) öffnet jede Woche Pull Requests für die Dart-Pakete von App und `erg_protocol`, den Gradle-Build und die GitHub Actions. Minor- und Patch-Updates kommen pro Ökosystem gebündelt in einem Pull Request, Major-Updates einzeln. Neue Versionen nimmt Dependabot erst nach einer Woche, damit fehlerhafte oder gekaperte Releases vorher auffallen. Das Flutter-Image `ghcr.io/cirruslabs/flutter` in den Workflows und die Flutter-Version in `.github/actions/setup-flutter` erfasst Dependabot nicht, sie werden zusammen mit dem lokalen Flutter von Hand angehoben.
 
 ### Installation
 

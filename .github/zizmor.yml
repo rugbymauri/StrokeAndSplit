@@ -1,0 +1,6 @@
+# Configuration of zizmor (lint-workflows.yml).
+rules:
+  # Local actions and reusable workflows stay at ./.github/..., which actionlint and older
+  # runners understand.
+  self-repository:
+    disable: true
