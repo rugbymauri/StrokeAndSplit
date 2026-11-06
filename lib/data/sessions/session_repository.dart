@@ -53,6 +53,7 @@ class SessionRepository {
       templateName: plan?.template?.name,
       courseVersionId: plan?.course.versionId,
       plannedLaps: plan?.plannedLaps,
+      plannedDurationMs: plan?.plannedDuration?.inMilliseconds,
     );
   }
 
@@ -65,6 +66,7 @@ class SessionRepository {
     String? templateName,
     int? courseVersionId,
     int? plannedLaps,
+    int? plannedDurationMs,
     bool imported = false,
   }) {
     return _db
@@ -80,6 +82,7 @@ class SessionRepository {
             templateName: Value(templateName),
             courseVersionId: Value(courseVersionId),
             plannedLaps: Value(plannedLaps),
+            plannedDurationMs: Value(plannedDurationMs),
             imported: Value(imported),
           ),
         );

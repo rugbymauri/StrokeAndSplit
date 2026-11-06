@@ -1111,6 +1111,17 @@ class $SessionsTable extends Sessions
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _plannedDurationMsMeta = const VerificationMeta(
+    'plannedDurationMs',
+  );
+  @override
+  late final GeneratedColumn<int> plannedDurationMs = GeneratedColumn<int>(
+    'planned_duration_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _importedMeta = const VerificationMeta(
     'imported',
   );
@@ -1214,6 +1225,7 @@ class $SessionsTable extends Sessions
     templateName,
     courseVersionId,
     plannedLaps,
+    plannedDurationMs,
     imported,
     averageHeartRate,
     maxHeartRate,
@@ -1335,6 +1347,15 @@ class $SessionsTable extends Sessions
         plannedLaps.isAcceptableOrUnknown(
           data['planned_laps']!,
           _plannedLapsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('planned_duration_ms')) {
+      context.handle(
+        _plannedDurationMsMeta,
+        plannedDurationMs.isAcceptableOrUnknown(
+          data['planned_duration_ms']!,
+          _plannedDurationMsMeta,
         ),
       );
     }
@@ -1472,6 +1493,10 @@ class $SessionsTable extends Sessions
         DriftSqlType.int,
         data['${effectivePrefix}planned_laps'],
       ),
+      plannedDurationMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}planned_duration_ms'],
+      ),
       imported: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}imported'],
@@ -1541,6 +1566,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
   /// Null for an open number of laps.
   final int? plannedLaps;
 
+  /// The rowing time after which the session ends by itself (Change
+  /// course-rowing-free, Design D3); null without one and before schema 10.
+  final int? plannedDurationMs;
+
   /// Set by the import; imported sessions count in no ranking (Change
   /// statistics, Design D3). Sessions before schema 5 count as recorded here.
   final bool imported;
@@ -1571,6 +1600,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     this.templateName,
     this.courseVersionId,
     this.plannedLaps,
+    this.plannedDurationMs,
     required this.imported,
     this.averageHeartRate,
     this.maxHeartRate,
@@ -1629,6 +1659,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     if (!nullToAbsent || plannedLaps != null) {
       map['planned_laps'] = Variable<int>(plannedLaps);
     }
+    if (!nullToAbsent || plannedDurationMs != null) {
+      map['planned_duration_ms'] = Variable<int>(plannedDurationMs);
+    }
     map['imported'] = Variable<bool>(imported);
     if (!nullToAbsent || averageHeartRate != null) {
       map['average_heart_rate'] = Variable<int>(averageHeartRate);
@@ -1684,6 +1717,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       plannedLaps: plannedLaps == null && nullToAbsent
           ? const Value.absent()
           : Value(plannedLaps),
+      plannedDurationMs: plannedDurationMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(plannedDurationMs),
       imported: Value(imported),
       averageHeartRate: averageHeartRate == null && nullToAbsent
           ? const Value.absent()
@@ -1733,6 +1769,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       templateName: serializer.fromJson<String?>(json['templateName']),
       courseVersionId: serializer.fromJson<int?>(json['courseVersionId']),
       plannedLaps: serializer.fromJson<int?>(json['plannedLaps']),
+      plannedDurationMs: serializer.fromJson<int?>(json['plannedDurationMs']),
       imported: serializer.fromJson<bool>(json['imported']),
       averageHeartRate: serializer.fromJson<int?>(json['averageHeartRate']),
       maxHeartRate: serializer.fromJson<int?>(json['maxHeartRate']),
@@ -1771,6 +1808,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       'templateName': serializer.toJson<String?>(templateName),
       'courseVersionId': serializer.toJson<int?>(courseVersionId),
       'plannedLaps': serializer.toJson<int?>(plannedLaps),
+      'plannedDurationMs': serializer.toJson<int?>(plannedDurationMs),
       'imported': serializer.toJson<bool>(imported),
       'averageHeartRate': serializer.toJson<int?>(averageHeartRate),
       'maxHeartRate': serializer.toJson<int?>(maxHeartRate),
@@ -1799,6 +1837,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     Value<String?> templateName = const Value.absent(),
     Value<int?> courseVersionId = const Value.absent(),
     Value<int?> plannedLaps = const Value.absent(),
+    Value<int?> plannedDurationMs = const Value.absent(),
     bool? imported,
     Value<int?> averageHeartRate = const Value.absent(),
     Value<int?> maxHeartRate = const Value.absent(),
@@ -1830,6 +1869,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         ? courseVersionId.value
         : this.courseVersionId,
     plannedLaps: plannedLaps.present ? plannedLaps.value : this.plannedLaps,
+    plannedDurationMs: plannedDurationMs.present
+        ? plannedDurationMs.value
+        : this.plannedDurationMs,
     imported: imported ?? this.imported,
     averageHeartRate: averageHeartRate.present
         ? averageHeartRate.value
@@ -1883,6 +1925,9 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       plannedLaps: data.plannedLaps.present
           ? data.plannedLaps.value
           : this.plannedLaps,
+      plannedDurationMs: data.plannedDurationMs.present
+          ? data.plannedDurationMs.value
+          : this.plannedDurationMs,
       imported: data.imported.present ? data.imported.value : this.imported,
       averageHeartRate: data.averageHeartRate.present
           ? data.averageHeartRate.value
@@ -1921,6 +1966,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ..write('templateName: $templateName, ')
           ..write('courseVersionId: $courseVersionId, ')
           ..write('plannedLaps: $plannedLaps, ')
+          ..write('plannedDurationMs: $plannedDurationMs, ')
           ..write('imported: $imported, ')
           ..write('averageHeartRate: $averageHeartRate, ')
           ..write('maxHeartRate: $maxHeartRate, ')
@@ -1951,6 +1997,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     templateName,
     courseVersionId,
     plannedLaps,
+    plannedDurationMs,
     imported,
     averageHeartRate,
     maxHeartRate,
@@ -1980,6 +2027,7 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           other.templateName == this.templateName &&
           other.courseVersionId == this.courseVersionId &&
           other.plannedLaps == this.plannedLaps &&
+          other.plannedDurationMs == this.plannedDurationMs &&
           other.imported == this.imported &&
           other.averageHeartRate == this.averageHeartRate &&
           other.maxHeartRate == this.maxHeartRate &&
@@ -2007,6 +2055,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
   final Value<String?> templateName;
   final Value<int?> courseVersionId;
   final Value<int?> plannedLaps;
+  final Value<int?> plannedDurationMs;
   final Value<bool> imported;
   final Value<int?> averageHeartRate;
   final Value<int?> maxHeartRate;
@@ -2032,6 +2081,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.templateName = const Value.absent(),
     this.courseVersionId = const Value.absent(),
     this.plannedLaps = const Value.absent(),
+    this.plannedDurationMs = const Value.absent(),
     this.imported = const Value.absent(),
     this.averageHeartRate = const Value.absent(),
     this.maxHeartRate = const Value.absent(),
@@ -2058,6 +2108,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.templateName = const Value.absent(),
     this.courseVersionId = const Value.absent(),
     this.plannedLaps = const Value.absent(),
+    this.plannedDurationMs = const Value.absent(),
     this.imported = const Value.absent(),
     this.averageHeartRate = const Value.absent(),
     this.maxHeartRate = const Value.absent(),
@@ -2086,6 +2137,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Expression<String>? templateName,
     Expression<int>? courseVersionId,
     Expression<int>? plannedLaps,
+    Expression<int>? plannedDurationMs,
     Expression<bool>? imported,
     Expression<int>? averageHeartRate,
     Expression<int>? maxHeartRate,
@@ -2112,6 +2164,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       if (templateName != null) 'template_name': templateName,
       if (courseVersionId != null) 'course_version_id': courseVersionId,
       if (plannedLaps != null) 'planned_laps': plannedLaps,
+      if (plannedDurationMs != null) 'planned_duration_ms': plannedDurationMs,
       if (imported != null) 'imported': imported,
       if (averageHeartRate != null) 'average_heart_rate': averageHeartRate,
       if (maxHeartRate != null) 'max_heart_rate': maxHeartRate,
@@ -2140,6 +2193,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Value<String?>? templateName,
     Value<int?>? courseVersionId,
     Value<int?>? plannedLaps,
+    Value<int?>? plannedDurationMs,
     Value<bool>? imported,
     Value<int?>? averageHeartRate,
     Value<int?>? maxHeartRate,
@@ -2166,6 +2220,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       templateName: templateName ?? this.templateName,
       courseVersionId: courseVersionId ?? this.courseVersionId,
       plannedLaps: plannedLaps ?? this.plannedLaps,
+      plannedDurationMs: plannedDurationMs ?? this.plannedDurationMs,
       imported: imported ?? this.imported,
       averageHeartRate: averageHeartRate ?? this.averageHeartRate,
       maxHeartRate: maxHeartRate ?? this.maxHeartRate,
@@ -2236,6 +2291,9 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     if (plannedLaps.present) {
       map['planned_laps'] = Variable<int>(plannedLaps.value);
     }
+    if (plannedDurationMs.present) {
+      map['planned_duration_ms'] = Variable<int>(plannedDurationMs.value);
+    }
     if (imported.present) {
       map['imported'] = Variable<bool>(imported.value);
     }
@@ -2280,6 +2338,7 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
           ..write('templateName: $templateName, ')
           ..write('courseVersionId: $courseVersionId, ')
           ..write('plannedLaps: $plannedLaps, ')
+          ..write('plannedDurationMs: $plannedDurationMs, ')
           ..write('imported: $imported, ')
           ..write('averageHeartRate: $averageHeartRate, ')
           ..write('maxHeartRate: $maxHeartRate, ')
@@ -8396,6 +8455,7 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   Value<String?> templateName,
   Value<int?> courseVersionId,
   Value<int?> plannedLaps,
+  Value<int?> plannedDurationMs,
   Value<bool> imported,
   Value<int?> averageHeartRate,
   Value<int?> maxHeartRate,
@@ -8422,6 +8482,7 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<String?> templateName,
   Value<int?> courseVersionId,
   Value<int?> plannedLaps,
+  Value<int?> plannedDurationMs,
   Value<bool> imported,
   Value<int?> averageHeartRate,
   Value<int?> maxHeartRate,
@@ -8685,6 +8746,11 @@ class $$SessionsTableFilterComposer
 
   ColumnFilters<int> get plannedLaps => $composableBuilder(
     column: $table.plannedLaps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get plannedDurationMs => $composableBuilder(
+    column: $table.plannedDurationMs,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -9029,6 +9095,11 @@ class $$SessionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get plannedDurationMs => $composableBuilder(
+    column: $table.plannedDurationMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get imported => $composableBuilder(
     column: $table.imported,
     builder: (column) => ColumnOrderings(column),
@@ -9180,6 +9251,11 @@ class $$SessionsTableAnnotationComposer
 
   GeneratedColumn<int> get plannedLaps => $composableBuilder(
     column: $table.plannedLaps,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get plannedDurationMs => $composableBuilder(
+    column: $table.plannedDurationMs,
     builder: (column) => column,
   );
 
@@ -9489,6 +9565,7 @@ class $$SessionsTableTableManager
                 Value<String?> templateName = const Value.absent(),
                 Value<int?> courseVersionId = const Value.absent(),
                 Value<int?> plannedLaps = const Value.absent(),
+                Value<int?> plannedDurationMs = const Value.absent(),
                 Value<bool> imported = const Value.absent(),
                 Value<int?> averageHeartRate = const Value.absent(),
                 Value<int?> maxHeartRate = const Value.absent(),
@@ -9514,6 +9591,7 @@ class $$SessionsTableTableManager
                 templateName: templateName,
                 courseVersionId: courseVersionId,
                 plannedLaps: plannedLaps,
+                plannedDurationMs: plannedDurationMs,
                 imported: imported,
                 averageHeartRate: averageHeartRate,
                 maxHeartRate: maxHeartRate,
@@ -9541,6 +9619,7 @@ class $$SessionsTableTableManager
                 Value<String?> templateName = const Value.absent(),
                 Value<int?> courseVersionId = const Value.absent(),
                 Value<int?> plannedLaps = const Value.absent(),
+                Value<int?> plannedDurationMs = const Value.absent(),
                 Value<bool> imported = const Value.absent(),
                 Value<int?> averageHeartRate = const Value.absent(),
                 Value<int?> maxHeartRate = const Value.absent(),
@@ -9566,6 +9645,7 @@ class $$SessionsTableTableManager
                 templateName: templateName,
                 courseVersionId: courseVersionId,
                 plannedLaps: plannedLaps,
+                plannedDurationMs: plannedDurationMs,
                 imported: imported,
                 averageHeartRate: averageHeartRate,
                 maxHeartRate: maxHeartRate,

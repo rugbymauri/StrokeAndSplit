@@ -8,7 +8,7 @@ Setzt `template-screen` in `main` voraus (Ghost-Wahl in der Aufnahme, Ghost-Zeil
 
 ## 2. Daten
 
-- [ ] 2.1 Schema 10 nach D3: `sessions.planned_duration_ms`, `from9To10`, `make schema`, `make codegen`; `create(plan:)` speichert die Dauer. Verifikation: generierter Migrationstest 9 → 10, Repository-Test mit `TimeLimit(30 min)`
+- [x] 2.1 Schema 10 nach D3: `sessions.planned_duration_ms`, `from9To10`, `make schema`, `make codegen`; `create(plan:)` speichert die Dauer. Verifikation: generierter Migrationstest 9 → 10, Repository-Test mit `TimeLimit(30 min)`
 - [ ] 2.2 Export und Import mit `durationMs` im Block `template` (D3). Verifikation: Export/Import-Test mit Dauer und ohne Vorlage ergibt dieselbe Dauer, dieselben Runden und keinen Vorlagennamen; ein Header ohne `durationMs` (Stand Schema 9) importiert unverändert, in `session_export_test.dart`
 
 ## 3. Ende nach Dauer

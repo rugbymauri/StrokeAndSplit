@@ -164,6 +164,10 @@ class Sessions extends Table {
   /// Null for an open number of laps.
   IntColumn get plannedLaps => integer().nullable()();
 
+  /// The rowing time after which the session ends by itself (Change
+  /// course-rowing-free, Design D3); null without one and before schema 10.
+  IntColumn get plannedDurationMs => integer().nullable()();
+
   /// Set by the import; imported sessions count in no ranking (Change
   /// statistics, Design D3). Sessions before schema 5 count as recorded here.
   BoolColumn get imported => boolean().withDefault(const Constant(false))();
@@ -337,7 +341,7 @@ class AppDatabase extends _$AppDatabase {
   );
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -411,6 +415,10 @@ class AppDatabase extends _$AppDatabase {
           schema.courseSegments,
           schema.courseSegments.resistanceLevel,
         );
+      },
+      // Planned duration of a course rowed without a template (Change course-rowing-free, D3).
+      from9To10: (m, schema) async {
+        await m.addColumn(schema.sessions, schema.sessions.plannedDurationMs);
       },
     ),
     beforeOpen: (details) async {
