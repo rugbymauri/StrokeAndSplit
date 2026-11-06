@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/design_tokens.dart';
-import '../../app/widgets/ghost_symbol.dart';
+import '../../app/widgets/ghost_switch.dart';
 import '../../data/templates/template_providers.dart';
 import '../../l10n/l10n.dart';
 import '../connection/rower_connection.dart';
@@ -119,7 +119,8 @@ class _TemplateScreenState extends ConsumerState<TemplateScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _GhostSwitch(
+                            GhostSwitch(
+                              key: const Key('template-ghost'),
                               value: _ghost,
                               onChanged: (value) =>
                                   setState(() => _ghost = value),
@@ -146,44 +147,6 @@ class _TemplateScreenState extends ConsumerState<TemplateScreen> {
                       ),
                     ],
                   ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The ghost symbol, the text and a switch in one row that reacts to a tap
-/// anywhere on it (Design D5).
-class _GhostSwitch extends StatelessWidget {
-  const _GhostSwitch({required this.value, required this.onChanged});
-
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return MergeSemantics(
-      child: InkWell(
-        key: const Key('template-ghost'),
-        borderRadius: BorderRadius.circular(AppRadii.small),
-        onTap: () => onChanged(!value),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 48),
-          child: Row(
-            children: [
-              const ExcludeSemantics(
-                child: GhostSymbol(rimColor: AppColors.bg),
-              ),
-              const SizedBox(width: AppSpacing.m),
-              Expanded(
-                child: Text(
-                  context.l10n.templateGhost,
-                  style: AppTextStyles.body,
-                ),
-              ),
-              Switch(value: value, onChanged: onChanged),
-            ],
           ),
         ),
       ),
