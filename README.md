@@ -29,6 +29,7 @@ Alle Befehle zeigt `make help`.
 | `make l10n` | Übersetzungen neu erzeugen, nach Änderungen an `lib/l10n/app_*.arb` |
 | `make codegen` | drift-Code neu erzeugen, nach Änderungen an `lib/data/db/database.dart` |
 | `make schema` | Schema-Snapshot und Migrationstests erzeugen, nach dem Erhöhen von `schemaVersion` |
+| `make check-generated` | Alles Generierte neu erzeugen und prüfen, dass es mit den eingecheckten Dateien übereinstimmt (wie in CI, braucht ein sauberes Arbeitsverzeichnis) |
 | `make spike` / `make spike-android` | Minimal-App, die Rohpakete von PM5 und FTMS-Rudergeräten mitschneidet (siehe unten) |
 | `make ftms-rower FILE=…` | Software-FTMS-Rudergerät, das eine Aufnahme über Bluetooth abspielt (siehe unten) |
 | `make pull-recordings` | Mitschnitte vom Android-Gerät nach `./recordings` kopieren |
@@ -227,13 +228,15 @@ Die Pipeline läuft mit GitHub Actions (`.github/workflows/`) in Docker-Images v
 
 | Anlass | Was läuft |
 |---|---|
-| Pull Request | `ci.yml`: `check` (`make deps check`, also Analyse und Tests von App und `erg_protocol`) |
-| Push auf `main` | `ci.yml`: `check` |
+| Pull Request | `ci.yml`: `check` (`make deps check`, also Analyse und Tests von App und `erg_protocol`), `generated` (`make check-generated`) |
+| Push auf `main` | `ci.yml`: `check`, `generated` |
 | Tag `vX.Y.Z` | `release.yml`: `verify-tag` und `check`, `build-apk` und `build-appimage`, dann `release` |
 | von Hand gestartet („Run workflow“, `gh workflow run ci.yml --ref <branch>`) | `ci.yml`: `check`, auf jedem Branch |
 | Pull Request oder Push auf `main`, der `.github/` ändert | `lint-workflows.yml`: `actionlint` (Syntax und Ausdrücke) und `zizmor` (Sicherheit, Konfiguration in `.github/zizmor.yml`) |
 
 Ein Branch ohne Pull Request bekommt keine Pipeline, andere Tags ebenfalls nicht.
+
+`generated` erzeugt drift-Code, Übersetzungen und drift-Schema-Snapshots neu (`make codegen l10n schema`) und schlägt fehl, wenn sich danach etwas von den eingecheckten Dateien unterscheidet, etwa weil nach einer Änderung an einer Tabelle, einer ARB-Datei oder an `schemaVersion` das Generieren vergessen wurde. Lokal läuft dasselbe mit `make check-generated` auf einem sauberen Arbeitsverzeichnis.
 
 Alle Actions sind auf einen Commit-SHA gepinnt, die Version steht als Kommentar dahinter. Dependabot hebt beides gemeinsam an. Checkouts behalten kein Token (`persist-credentials: false`), Release-Builds laufen ohne Cache, damit kein manipulierter Cache in ein veröffentlichtes Paket gelangt. Lokal prüfen: `uvx zizmor .` und `docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint`.
 
