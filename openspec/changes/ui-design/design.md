@@ -161,6 +161,7 @@ Die manuelle Segmentlänge ersetzt der Change `zones`: Strecken bestehen dort au
   - „Sessions“ (entschieden 2026-10-18 vom Nutzer): ein Button über die volle Breite mit Symbol `history`, als `OutlinedButton` unter der Kachel „Nochmal“, statt eines Links. „Rudern“ bleibt primär (gefüllt), „Frei rudern“ und „Sessions“ sind sekundär (umrandet), „Sessions“ etwas niedriger als „Frei rudern“ (48 statt 52 px).
   - „Rudern“ öffnet „Vorlage wählen“. „Frei rudern“ startet direkt.
   - „Nochmal“ zeigt die Vorlage der jüngsten Session, deren Vorlage noch existiert, mit Name und Datum der Session („gestern“). Antippen öffnet „Vorlage wählen“ mit dieser Vorlage vorausgewählt. Gibt es keine solche Session, fehlt die Kachel.
+    *Abgelöst (2026-11-06)*: Change `template-screen` entfernt die Kachel „Nochmal“ (dort D3).
   - Keine Kacheln für alle Vorlagen und keine Liste der letzten Sessions: Der Bildschirm bleibt ruhig, und der häufigste Fall, dieselbe Vorlage noch einmal zu rudern, braucht trotzdem nur zwei Tipps.
   - *Alternativen:* wie im Canvas (alle Vorlagen als Kacheln, letzte Sessions) oder ganz schlank (nur Quelle, „Rudern“, „Frei rudern“). Verworfen, weil der Canvas am Erg zu voll ist und die schlanke Variante für die Lieblingsvorlage einen Schritt mehr braucht.
 - „Vorlage wählen“ klappt die gewählte Vorlage auf, mit Bändern, Ghost-Bestzeit (sobald `ghost` da ist) und „Starten“. Der Stift öffnet den Vorlagen-Editor.

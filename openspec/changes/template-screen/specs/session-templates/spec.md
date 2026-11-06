@@ -27,14 +27,3 @@ Vom Screen einer Vorlage aus SHALL der Nutzer die Vorlage bearbeiten können. Na
 #### Scenario: Vorlage gelöscht
 - **WHEN** der Nutzer die Vorlage vom Screen aus bearbeitet und im Editor löscht
 - **THEN** zeigt die App die Vorlagenliste ohne diese Vorlage
-
-### Requirement: Nochmal öffnet die Vorlage
-Die Kachel „Nochmal“ auf dem Startbildschirm SHALL die Vorlagenliste und darüber sofort den Screen der Vorlage öffnen, die sie zeigt. „Zurück“ vom Screen MUST zur Vorlagenliste führen.
-
-#### Scenario: Nochmal antippen
-- **WHEN** der Nutzer auf dem Startbildschirm die Kachel „Nochmal“ mit „Seerunde x3“ antippt
-- **THEN** zeigt die App den Screen von „Seerunde x3“
-
-#### Scenario: Zurück nach Nochmal
-- **WHEN** der Nutzer nach „Nochmal“ auf dem Screen von „Seerunde x3“ zurück geht
-- **THEN** zeigt die App die Vorlagenliste, ein weiteres Zurück den Startbildschirm
