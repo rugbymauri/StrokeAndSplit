@@ -263,6 +263,10 @@ Alle APKs aus der Pipeline sind mit demselben Debug-Schlüssel signiert, damit e
 
 Fehlt das Secret, bricht `build-apk` mit einer Meldung ab, statt mit einem Zufallsschlüssel zu signieren.
 
+### Abhängigkeiten aktualisieren
+
+Dependabot (`.github/dependabot.yml`) öffnet jede Woche Pull Requests für die Dart-Pakete von App und `erg_protocol`, den Gradle-Build und die GitHub Actions. Minor- und Patch-Updates kommen pro Ökosystem gebündelt in einem Pull Request, Major-Updates einzeln. Das Flutter-Image `ghcr.io/cirruslabs/flutter` in den Workflows und die Flutter-Version in `.github/actions/setup-flutter` erfasst Dependabot nicht, sie werden zusammen mit dem lokalen Flutter von Hand angehoben.
+
 ### Installation
 
 **Android**: Die APK von der Release-Seite laden, im Handy-Browser oder am Rechner und dann aufs Handy übertragen (z. B. `adb install strokesplit-1.2.0-android.apk`). Beim Öffnen fragt Android, ob der Browser bzw. Dateimanager Apps aus unbekannten Quellen installieren darf. Eine neuere APK aus der Pipeline lässt sich über eine ältere installieren, die Sessions bleiben erhalten. Eine selbst gebaute APK (`make apk`, `make run-android`) hat einen anderen Schlüssel, vor dem Wechsel muss die App deinstalliert werden.
