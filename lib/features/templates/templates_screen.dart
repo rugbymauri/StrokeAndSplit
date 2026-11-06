@@ -7,21 +7,17 @@ import '../../data/courses/course_providers.dart';
 import '../../data/templates/session_template.dart';
 import '../../data/templates/template_providers.dart';
 import '../../l10n/l10n.dart';
-import '../connection/rower_connection.dart';
 import '../courses/course_format.dart';
 import '../courses/course_strip.dart';
 import '../courses/courses_screen.dart';
 import '../zones/zones_screen.dart';
 import 'template_editor_screen.dart';
 import 'template_format.dart';
-import 'template_podium.dart';
+import 'template_screen.dart';
 
 /// Templates, courses and zones in three tabs (canvas „Vorlage wählen“).
 class TemplatesScreen extends StatelessWidget {
-  const TemplatesScreen({super.key, this.selectedTemplateId});
-
-  /// The template shown opened, e.g. from "Nochmal" on the start screen.
-  final int? selectedTemplateId;
+  const TemplatesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +57,7 @@ class TemplatesScreen extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            _TemplatesTab(selectedTemplateId: selectedTemplateId),
+            const _TemplatesTab(),
             const CoursesScreen(embedded: true),
             const ZonesScreen(embedded: true),
           ],
@@ -71,22 +67,13 @@ class TemplatesScreen extends StatelessWidget {
   }
 }
 
-/// All templates, to open, start, create and edit them.
-class _TemplatesTab extends ConsumerStatefulWidget {
-  const _TemplatesTab({this.selectedTemplateId});
-
-  final int? selectedTemplateId;
-
-  @override
-  ConsumerState<_TemplatesTab> createState() => _TemplatesTabState();
-}
-
-class _TemplatesTabState extends ConsumerState<_TemplatesTab> {
-  /// The opened template; at most one is open at a time.
-  late int? _opened = widget.selectedTemplateId;
+/// All templates, to open one on its own screen and to create one (Change
+/// template-screen, Design D2).
+class _TemplatesTab extends ConsumerWidget {
+  const _TemplatesTab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final templates = ref.watch(templatesProvider);
     final hasCourses = ref.watch(coursesProvider).value?.isNotEmpty ?? true;
     final l10n = context.l10n;
@@ -111,22 +98,10 @@ class _TemplatesTabState extends ConsumerState<_TemplatesTab> {
                     AsyncData(value: []) => Center(
                         child: Text(l10n.templatesEmpty, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
                       ),
-                    // Not lazy, so that the template from "Nochmal" can scroll into view.
-                    AsyncData(:final value) => SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            for (final (i, template) in value.indexed) ...[
-                              if (i > 0) const SizedBox(height: 10),
-                              _TemplateCard(
-                                template: template,
-                                opened: template.id == _opened,
-                                scrollIntoView: template.id == widget.selectedTemplateId,
-                                onTap: () => setState(() => _opened = _opened == template.id ? null : template.id),
-                              ),
-                            ],
-                          ],
-                        ),
+                    AsyncData(:final value) => ListView.separated(
+                        itemCount: value.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
+                        itemBuilder: (context, i) => _TemplateCard(template: value[i]),
                       ),
                     AsyncError(:final error) => Center(child: Text(l10n.templatesLoadFailed('$error'))),
                     _ => const Center(child: CircularProgressIndicator()),
@@ -167,9 +142,8 @@ class _TemplatesTabState extends ConsumerState<_TemplatesTab> {
   }
 }
 
-Future<void> _openEditor(BuildContext context, {SessionTemplate? template}) {
-  return Navigator.of(context)
-      .push(MaterialPageRoute<void>(builder: (_) => TemplateEditorScreen(template: template)));
+Future<void> _openEditor(BuildContext context) {
+  return Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const TemplateEditorScreen()));
 }
 
 class _NoCourse extends StatelessWidget {
@@ -213,118 +187,45 @@ List<String> templateZoneLines(AppLocalizations l10n, Course course) {
   return lines.isEmpty ? [l10n.courseZonesSummary(0, '')] : lines.toList();
 }
 
-/// A template as a card; opened it shows the bands of its zones, places 1–3
-/// of its ranking and "Starten", and the pencil leads to the editor (Design D6).
-class _TemplateCard extends ConsumerStatefulWidget {
-  const _TemplateCard({
-    required this.template,
-    required this.opened,
-    required this.scrollIntoView,
-    required this.onTap,
-  });
+/// A template as a compact card with its name, details and course; a tap
+/// opens its screen (Change template-screen, Design D2).
+class _TemplateCard extends StatelessWidget {
+  const _TemplateCard({required this.template});
 
   final SessionTemplate template;
-  final bool opened;
-
-  /// Whether the card scrolls into view when it is first shown.
-  final bool scrollIntoView;
-
-  final VoidCallback onTap;
-
-  @override
-  ConsumerState<_TemplateCard> createState() => _TemplateCardState();
-}
-
-class _TemplateCardState extends ConsumerState<_TemplateCard> {
-  @override
-  void initState() {
-    super.initState();
-    if (widget.scrollIntoView) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) Scrollable.ensureVisible(context, alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final template = widget.template;
-    final opened = widget.opened;
-    return Semantics(
-      selected: opened,
-      child: Material(
-        key: Key('template-${template.id}'),
-        color: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadii.cardLarge),
-          side: opened ? const BorderSide(color: AppColors.zoneIn, width: 2) : const BorderSide(color: AppColors.line),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: widget.onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.l),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      key: Key('template-${template.id}'),
+      color: AppColors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadii.cardLarge),
+        side: const BorderSide(color: AppColors.line),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => openTemplate(context, template.id),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.l),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(template.name, style: AppTextStyles.cardTitle),
-                          const SizedBox(height: 2),
-                          Text(templateDetails(l10n, template), style: AppTextStyles.subtitle),
-                        ],
-                      ),
-                    ),
-                    if (opened)
-                      IconButton(
-                        key: const Key('template-edit'),
-                        tooltip: l10n.templateEdit,
-                        color: AppColors.textMuted,
-                        iconSize: 20,
-                        visualDensity: VisualDensity.compact,
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => _openEditor(context, template: template),
-                      ),
+                    Text(template.name, style: AppTextStyles.cardTitle),
+                    const SizedBox(height: 2),
+                    Text(templateDetails(l10n, template), style: AppTextStyles.subtitle),
+                    const SizedBox(height: AppSpacing.m),
+                    CourseStrip(definition: template.course.definition, height: 10),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.m),
-                CourseStrip(definition: template.course.definition, height: 10),
-                if (opened) ...[
-                  const SizedBox(height: AppSpacing.m),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            for (final line in templateZoneLines(l10n, template.course))
-                              Text(line, style: AppTextStyles.caption),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.m),
-                  TemplatePodium(template: template),
-                  const SizedBox(height: AppSpacing.m),
-                  SizedBox(
-                    height: 56,
-                    child: FilledButton(
-                      key: const Key('template-start'),
-                      onPressed: () => startRowing(context, ref, template: template),
-                      child: Text(l10n.templateStart, style: AppTextStyles.cardTitle),
-                    ),
-                  ),
-                ],
-              ],
-            ),
+              ),
+              const SizedBox(width: AppSpacing.m),
+              const Icon(Icons.chevron_right, color: AppColors.textMuted),
+            ],
           ),
         ),
       ),
