@@ -1,5 +1,6 @@
-# Analysis and tests for pull requests and main, and a check that the generated files are
-# committed. Releases: see release.yml.
+# Analysis and tests for pull requests and main, a check that the generated files are committed,
+# and the APK and AppImage builds (in pull requests only when build files change). Releases: see
+# release.yml.
 # README, section "CI und Releases".
 name: CI
 
@@ -33,3 +34,33 @@ jobs:
       - run: git config --global --add safe.directory "$PWD"
       - run: make deps
       - run: make check-generated
+
+  # Which parts a pull request touches; pushes to main and manual runs build everything.
+  changes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      build: ${{ steps.filter.outputs.build }}
+    steps:
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          filters: |
+            build:
+              - android/**
+              - linux/**
+              - assets/**
+              - pubspec.yaml
+              - pubspec.lock
+              - packages/*/pubspec.yaml
+              - Makefile
+              - tool/build_appimage.sh
+              - .github/workflows/build.yml
+              - .github/actions/**
+
+  build:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.build == 'true') }}
+    uses: ./.github/workflows/build.yml

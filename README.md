@@ -224,17 +224,19 @@ Vom selben Linux-Rechner aus geht es nicht: Der Bluetooth-Adapter kann nicht gle
 
 ## CI und Releases
 
-Die Pipeline läuft mit GitHub Actions (`.github/workflows/`) in Docker-Images von `cirruslabs/flutter`. Analyse und Tests stehen in `check.yml`, `ci.yml` und `release.yml` rufen sie auf.
+Die Pipeline läuft mit GitHub Actions (`.github/workflows/`) in Docker-Images von `cirruslabs/flutter`. Analyse und Tests stehen in `check.yml`, die Builds von APK und AppImage in `build.yml`; `ci.yml` und `release.yml` rufen beide auf.
 
 | Anlass | Was läuft |
 |---|---|
-| Pull Request | `ci.yml`: `check` (`make deps check`, also Analyse und Tests von App und `erg_protocol`), `generated` (`make check-generated`) |
-| Push auf `main` | `ci.yml`: `check`, `generated` |
-| Tag `vX.Y.Z` | `release.yml`: `verify-tag` und `check`, `build-apk` und `build-appimage`, dann `release` |
-| von Hand gestartet („Run workflow“, `gh workflow run ci.yml --ref <branch>`) | `ci.yml`: `check`, auf jedem Branch |
+| Pull Request | `ci.yml`: `check` (`make deps check`, also Analyse und Tests von App und `erg_protocol`), `generated` (`make check-generated`), `build` (APK und AppImage, nur wenn der Pull Request Build-Dateien ändert) |
+| Push auf `main` | `ci.yml`: `check`, `generated`, `build` |
+| Tag `vX.Y.Z` | `release.yml`: `verify-tag` und `check`, `build` (APK und AppImage), dann `release` |
+| von Hand gestartet („Run workflow“, `gh workflow run ci.yml --ref <branch>`) | `ci.yml`: `check`, `generated`, `build`, auf jedem Branch |
 | Pull Request oder Push auf `main`, der `.github/` ändert | `lint-workflows.yml`: `actionlint` (Syntax und Ausdrücke) und `zizmor` (Sicherheit, Konfiguration in `.github/zizmor.yml`) |
 
 Ein Branch ohne Pull Request bekommt keine Pipeline, andere Tags ebenfalls nicht.
+
+`build` findet Fehler in Gradle, CMake oder im AppImage-Skript vor dem Release. In Pull Requests läuft es nur, wenn sich `android/`, `linux/`, `assets/`, die `pubspec`-Dateien, das Makefile, `tool/build_appimage.sh`, `build.yml` oder `.github/actions/` ändern. Die APK und das AppImage hängen sieben Tage als Artefakte am Workflow-Lauf und heissen `strokesplit-dev-…`. Die APK ist mit einem zufälligen Debug-Schlüssel signiert und lässt sich deshalb nicht über ein Release installieren.
 
 `generated` erzeugt drift-Code, Übersetzungen und drift-Schema-Snapshots neu (`make codegen l10n schema`) und schlägt fehl, wenn sich danach etwas von den eingecheckten Dateien unterscheidet, etwa weil nach einer Änderung an einer Tabelle, einer ARB-Datei oder an `schemaVersion` das Generieren vergessen wurde. Lokal läuft dasselbe mit `make check-generated` auf einem sauberen Arbeitsverzeichnis.
 
@@ -260,14 +262,14 @@ Alle APKs aus der Pipeline sind mit demselben Debug-Schlüssel signiert, damit e
      -alias androiddebugkey -storepass android -keypass android \
      -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
    ```
-2. Den Keystore Base64-kodiert als Repository-Secret `ANDROID_DEBUG_KEYSTORE` anlegen. Secrets sind Text, `build-apk` dekodiert ihn wieder:
+2. Den Keystore Base64-kodiert als Repository-Secret `ANDROID_DEBUG_KEYSTORE` anlegen. Secrets sind Text, `build.yml` dekodiert ihn im Release wieder:
    ```sh
    base64 -w0 strokesplit-debug.keystore | gh secret set ANDROID_DEBUG_KEYSTORE
    ```
    Alternativ unter „Settings → Secrets and variables → Actions“. Pull Requests aus Forks sehen das Secret nicht.
 3. Die Keystore-Datei sicher aufbewahren. Geht sie verloren, müssen alle Nutzer die App vor dem nächsten Update deinstallieren.
 
-Fehlt das Secret, bricht `build-apk` mit einer Meldung ab, statt mit einem Zufallsschlüssel zu signieren.
+Fehlt das Secret, bricht der APK-Build eines Releases mit einer Meldung ab, statt mit einem Zufallsschlüssel zu signieren.
 
 ### Abhängigkeiten aktualisieren
 
