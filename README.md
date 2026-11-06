@@ -64,6 +64,16 @@ Wird die App während einer Session beendet, bleibt die Session bis kurz davor e
 4. Vorlage antippen öffnet ihren eigenen Screen mit Strecke, Runden, Zonen und Bändern sowie den Plätzen 1–3. Unten stehen der Schalter **Gegen den Ghost rudern** (siehe Ghost) und **Starten**, das das gewählte Rudergerät verbindet und die Session sofort startet. Der Stift öffnet den Editor, dort lässt sich die Vorlage auch löschen; danach zeigt die App wieder die Liste.
 5. Nach der letzten Runde endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit dem Anteil in der Zone, die beste mit Stern. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
 
+**Strecke ohne Vorlage rudern**: Die Detailansicht einer Strecke (Strecke in ihrer Liste antippen) hat unten den Button **Rudern**. Er öffnet einen Start-Screen mit Segmentbalken und Länge der Strecke und drei Optionen, von denen nur die gewählte ihre Eingabe zeigt:
+
+- **Runden**: Rundenzahl ab 1, beim Öffnen 3. Nach der letzten Runde endet die Session von selbst.
+- **Dauer**: Gesamtdauer der Ruderzeit in Schritten von 1 min, 1 bis 180 min, beim Öffnen 30 min, angezeigt als `30:00` bzw. ab einer Stunde `1:30:00`.
+- **Offen**: gerudert wird, bis du die Session beendest.
+
+Unten stehen wie auf dem Screen einer Vorlage **Gegen den Ghost rudern** und **Starten**. Die Werte bleiben beim Wechseln zwischen den Optionen erhalten, gespeichert wird nichts: Es entsteht keine Vorlage, und jedes Öffnen beginnt wieder mit 3 Runden.
+
+Bei einer Dauer zählt nur die Ruderzeit ohne Pausen, eine Pause von 2 min verschiebt das Ende also um 2 min. Die Session endet beim ersten Messwert, mit dem die Ruderzeit die Dauer erreicht, also höchstens etwa eine Sekunde danach. Liegt das Ende mitten in einer Runde, wird sie als unvollständig gespeichert. Auf der Zeitstrecke „Vier Minuten“ ergeben 30 min also 7 vollständige Runden und eine achte nach 2 min. Session-Liste und Zusammenfassung nennen eine Session ohne Vorlage nach Strecke und Plan, z.B. „Seerunde · 30 min“, „Seerunde · 3 Runden“ oder „Seerunde · offen“; Health Connect bekommt den Namen der Strecke als Titel.
+
 Im Live-Display mit Vorlage ist die Pace der grösste Wert. Darunter steht der Zonenstatus mit dem Band („In der Zone · 2:05–2:10“, sonst „Schneller“ bzw. „Langsamer“), die Schlagzahl-Karte zeigt ihr Band ebenso („Mehr Schläge“, „Weniger Schläge“). Blau heisst in der Zone, orange ausserhalb. Dazu kommen Kacheln für Rundenzeit, Watt, Puls (wenn Gurt oder Rudergerät ihn liefern) und den Anteil in der Zone.
 
 Um die Pace läuft ein Fortschrittsrahmen aus drei Spuren, jede beginnt oben in der Mitte und läuft im Uhrzeigersinn, an der Spitze sitzt ein Schiffchen:
@@ -74,7 +84,7 @@ Um die Pace läuft ein Fortschrittsrahmen aus drei Spuren, jede beginnt oben in 
 | Mitte, grau | die aktuelle Runde, Kerben an den Abschnittsgrenzen | „Runde 2 / 3 · noch 540 m“ |
 | innen, farbig | den aktuellen Abschnitt, blau bzw. orange nach dem Zonenstatus der Pace, grau, wenn er frei ist | „Tempo · noch 340 m“ bzw. „frei · noch 340 m“ |
 
-Bei offener Rundenzahl fehlt die äussere Spur, die Legende zeigt dann „Runde 2“. Bei Zeitstrecken stehen statt Metern Zeiten.
+Bei offener Rundenzahl fehlt die äussere Spur, die Legende zeigt dann „Runde 2“. Bei einer Dauer zeigt die äussere Spur den Anteil der Ruderzeit an der Dauer, ohne Kerben, und die Legende die verbleibende Ruderzeit („Gesamt · noch 15:00“) und die Runde ohne Gesamtzahl („Runde 3“). Bei Zeitstrecken stehen statt Metern Zeiten.
 
 Eine Zone kann zusätzlich eine Widerstandsstufe (1–25) tragen, die die App beim Rudern auf einem FTMS-Rudergerät mit verstellbarem Widerstand setzt (siehe oben); sie steht in den Listen hinter den Bändern („· Stufe 10“). Eine Stufe allein ersetzt kein Band. Hat das Gerät weniger Stufen, nimmt die App seine höchste.
 
@@ -87,10 +97,10 @@ Runden laufen nach Wanduhr: Eine Pause kostet bei Distanzstrecken Zeit und bei Z
 Die App führt Bestenlisten und zeigt jeweils die Plätze 1–3 mit Wert, Pace pro 500 m und Datum:
 
 - **Vorlage**: ganze Sessions, in denen alle geplanten Runden vollständig gerudert wurden, gewertet nach der Summe der Runden. Eine Liste pro Streckenlänge und Rundenzahl. Der Screen der Vorlage zeigt die Plätze 1–3 ihrer aktuellen Länge und Rundenzahl. Bei offener Rundenzahl gibt es keine.
-- **Strecke**: jede vollständige Runde, egal mit welcher Vorlage. Hatte die Strecke verschiedene Längen, gibt es eine Liste pro Länge.
+- **Strecke**: jede vollständige Runde, egal mit welcher Vorlage oder ohne Vorlage. Hatte die Strecke verschiedene Längen, gibt es eine Liste pro Länge.
 - **Zone**: jede Fahrt durch die Zone in einer vollständigen Runde, egal auf welcher Strecke, auch mehrere aus derselben Session. Eine Liste pro Zonenlänge.
 
-Strecke oder Zone in ihrer Liste antippen öffnet die Detailansicht mit den Plätzen pro Länge, die aktuelle zuerst. Der Stift dort öffnet den Editor. Die Zusammenfassung markiert jede Runde und Zonenfahrt auf Platz 1–3 (z.B. „Platz 2“, „Sprint · Platz 1“) und ebenso die Session in der Liste ihrer Vorlage. Die Marken zeigen den aktuellen Stand, wird eine Runde später überholt, verschwindet ihre Marke.
+Strecke oder Zone in ihrer Liste antippen öffnet die Detailansicht mit den Plätzen pro Länge, die aktuelle zuerst. Der Stift dort öffnet den Editor, bei einer Strecke führt **Rudern** zum Start-Screen (siehe oben). Die Zusammenfassung markiert jede Runde und Zonenfahrt auf Platz 1–3 (z.B. „Platz 2“, „Sprint · Platz 1“) und ebenso die Session in der Liste ihrer Vorlage. Die Marken zeigen den aktuellen Stand, wird eine Runde später überholt, verschwindet ihre Marke.
 
 Gewertet wird nach Wanduhr, Pausen zählen also mit, auch in der Pace: Distanzen nach der Zeit, Zeitstrecken und -zonen nach den Metern. Bei Gleichstand liegt der frühere Eintrag vorne. Es zählen nur Sessions, die auf diesem Gerät an einem PM5 oder FTMS-Rudergerät gerudert wurden, keine aus dem Simulator, aus einem Replay oder importierte. Gelöschte Sessions verschwinden aus den Listen. Wird eine Vorlage, Strecke oder Zone gelöscht, fällt ihre Liste weg, die Sessions bleiben.
 
@@ -104,13 +114,13 @@ Beim Rudern einer Vorlage läuft auf jeder Spur des Fortschrittsrahmens ein Ghos
 | Mitte | Platz 1 der Strecke mit gleicher Länge | startet mit jeder Runde neu |
 | innen | Platz 1 der Zone des aktuellen Abschnitts mit gleicher Länge | startet mit jeder Fahrt durch die Zone neu |
 
-Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen nicht bei offener Rundenzahl, innen nicht in einem freien Abschnitt, beim freien Rudern gar keiner. Kämen sich Ghost und eigenes Schiffchen in die Quere, rückt der Ghost quer zur Spur nach aussen und kehrt auf die Mitte zurück, sobald wieder Platz ist. Auf Zeitstrecken lägen beide immer auf gleicher Höhe, dort zeigt der Rahmen deshalb keinen Ghost.
+Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen nicht bei offener Rundenzahl und nicht auf einer Strecke ohne Vorlage, innen nicht in einem freien Abschnitt, beim freien Rudern gar keiner. Kämen sich Ghost und eigenes Schiffchen in die Quere, rückt der Ghost quer zur Spur nach aussen und kehrt auf die Mitte zurück, sobald wieder Platz ist. Auf Zeitstrecken lägen beide immer auf gleicher Höhe, dort zeigt der Rahmen deshalb keinen Ghost.
 
 Die Pace-Box zeigt in der Zeile **Ghost** den Abstand zum Ghost der Vorlage (aussen): auf Distanzstrecken in Sekunden, auf Zeitstrecken in Metern, z.B. „7.6 s vor dir“ (Rückstand, orange), „12 m hinter dir“ (Vorsprung, blau) oder „gleichauf“. Ohne Ghost aussen fehlt die Zeile, die Ghosts auf den anderen Spuren laufen trotzdem.
 
 Die Ghosts folgen den Bestenlisten live: Wird eine Runde oder Zonenfahrt der laufenden Session neuer Platz 1, läuft der Ghost dieser Spur ab der nächsten Runde bzw. Fahrt gegen sie. Im Simulator laufen die Ghosts ebenso mit. Da Simulator-Sessions nicht in die Bestenlisten kommen, werden sie selbst nie Ghost. Auf dem Screen der Vorlage trägt Platz 1 das Ghost-Symbol.
 
-Der Schalter **Gegen den Ghost rudern** auf dem Screen der Vorlage steht bei jedem Öffnen auf an. Ausgeschaltet läuft in der Session, die von dort startet, auf keiner Spur ein Ghost, und die Pace-Box zeigt keinen Abstand. Die Wahl gilt nur für diese eine Session und lässt sich während der Fahrt nicht ändern.
+Der Schalter **Gegen den Ghost rudern** auf dem Screen der Vorlage und dem Start-Screen einer Strecke steht bei jedem Öffnen auf an. Ausgeschaltet läuft in der Session, die von dort startet, auf keiner Spur ein Ghost, und die Pace-Box zeigt keinen Abstand. Die Wahl gilt nur für diese eine Session und lässt sich während der Fahrt nicht ändern.
 
 ### Pulsgurt
 
@@ -157,7 +167,7 @@ lib/
   l10n/                Übersetzungen: app_de.arb (Vorlage), app_en.arb und der erzeugte Code
   features/
     connection/        Geräte wählen, Startbildschirm, Verbindungsanzeige
-    courses/           Strecken-Liste und -Editor mit „Zone einbauen“
+    courses/           Strecken-Liste, Detailansicht, Start-Screen und Editor mit „Zone einbauen“
     zones/             Zonen-Liste und -Editor
     templates/         Vorlagen-Liste, Screen einer Vorlage und Editor
     live/              Live-Display mit Pace-Box und Fortschrittsrahmen
