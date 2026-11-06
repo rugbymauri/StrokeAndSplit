@@ -8,6 +8,11 @@ inputs:
   flutter-version:
     description: Flutter version of the project (.metadata)
     default: "3.47.7"
+  cache:
+    description: >
+      Restore and save the pub cache. Release builds turn it off, so that a poisoned cache can
+      not end up in a published file.
+    default: "true"
 
 runs:
   using: composite
@@ -16,14 +21,16 @@ runs:
       shell: bash
       env:
         FLUTTER_VERSION: ${{ inputs.flutter-version }}
-      run: |
+      # PUB_CACHE is a fixed path without outside input.
+      run: | # zizmor: ignore[github-env]
         git config --global --add safe.directory "$FLUTTER_HOME"
         git -C "$FLUTTER_HOME" fetch --quiet --depth 1 origin "refs/tags/$FLUTTER_VERSION:refs/tags/$FLUTTER_VERSION"
         git -C "$FLUTTER_HOME" checkout --quiet --force "$FLUTTER_VERSION"
         flutter --version
         # Inside a container github.workspace is the host path, so take the working directory.
         echo "PUB_CACHE=$PWD/.pub-cache" >> "$GITHUB_ENV"
-    - uses: actions/cache@v6
+    - if: inputs.cache == 'true'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: .pub-cache
         key: pub-${{ inputs.flutter-version }}-${{ hashFiles('pubspec.lock', 'packages/erg_protocol/pubspec.yaml') }}

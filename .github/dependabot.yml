@@ -10,6 +10,9 @@ updates:
       - /packages/erg_protocol
     schedule:
       interval: weekly
+    # Wait a week before taking a new release, so that broken or hijacked releases are caught first.
+    cooldown:
+      default-days: 7
     groups:
       pub:
         update-types: [minor, patch]
@@ -21,6 +24,9 @@ updates:
     directory: /android
     schedule:
       interval: weekly
+    # Wait a week before taking a new release, so that broken or hijacked releases are caught first.
+    cooldown:
+      default-days: 7
     groups:
       gradle:
         update-types: [minor, patch]
@@ -34,6 +40,9 @@ updates:
       - /.github/actions/*
     schedule:
       interval: weekly
+    # Wait a week before taking a new release, so that broken or hijacked releases are caught first.
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns: ["*"]

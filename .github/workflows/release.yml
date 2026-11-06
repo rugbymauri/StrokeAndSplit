@@ -23,9 +23,10 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Tag is on main
         run: |
           git fetch --quiet origin "+refs/heads/main:refs/remotes/origin/main"
@@ -59,14 +60,13 @@ jobs:
       VERSION: ${{ needs.verify-tag.outputs.version }}
       ANDROID_DEBUG_KEYSTORE: ${{ secrets.ANDROID_DEBUG_KEYSTORE }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-flutter
-      - run: echo "GRADLE_USER_HOME=$PWD/.gradle" >> "$GITHUB_ENV"
-      - uses: actions/cache@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          path: .gradle
-          key: gradle-${{ hashFiles('android/**/*.gradle.kts', 'android/gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: gradle-
+          persist-credentials: false
+      # No caches for release builds, see the input cache of setup-flutter.
+      - uses: ./.github/actions/setup-flutter
+        with:
+          cache: "false"
       - name: Install the shared debug keystore
         run: |
           if [ -z "${ANDROID_DEBUG_KEYSTORE:-}" ]; then
@@ -82,7 +82,7 @@ jobs:
       - run: |
           mkdir -p build/dist
           cp build/app/outputs/flutter-apk/app-release.apk "build/dist/$APP_NAME-$VERSION-android.apk"
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: apk
           path: build/dist/
@@ -95,8 +95,12 @@ jobs:
     env:
       VERSION: ${{ needs.verify-tag.outputs.version }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-flutter
+        with:
+          cache: "false"
       - name: Install the Linux build tools
         run: |
           apt-get update -qq
@@ -107,7 +111,7 @@ jobs:
       - run: |
           mkdir -p build/dist
           cp "build/appimage/$APP_NAME-$VERSION-x86_64.AppImage" build/dist/
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: appimage
           path: build/dist/
@@ -122,7 +126,7 @@ jobs:
       VERSION: ${{ needs.verify-tag.outputs.version }}
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: dist
           merge-multiple: true
