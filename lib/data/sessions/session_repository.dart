@@ -472,7 +472,12 @@ class SessionRepository {
     final metadata = {
       ...recording.metadata,
       if (course != null) ...{
-        'template': {'name': session.templateName, 'laps': session.plannedLaps},
+        // Without a template the name is null; the duration only with one (course-rowing-free, D3).
+        'template': {
+          'name': session.templateName,
+          'laps': session.plannedLaps,
+          'durationMs': ?session.plannedDurationMs,
+        },
         'course': _courseJson(course),
       },
       'session': {
@@ -537,6 +542,7 @@ class SessionRepository {
           ? null
           : await _importCourse(course.name, course.definition),
       plannedLaps: template?['laps'] as int?,
+      plannedDurationMs: template?['durationMs'] as int?,
       imported: true,
     );
     final accumulator = SessionAccumulator(

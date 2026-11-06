@@ -197,7 +197,7 @@ Eine Session auf einer Vorlage hat im Header zusätzlich die Vorlage und die ger
                         {"length": 200}]}
 ```
 
-Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwendet, sonst angelegt. Fehlende Zonen legt der Import an, eine Zone mit gleichem Namen und gleichen Bändern wird wiederverwendet. Dateien von vor den Zonen haben kein `zone`, ihre Segmente mit Band werden zu Zonen nach dem Muster „Seerunde 2“. Die Runden entstehen aus den Rohpaketen neu und sind deshalb identisch. `laps` ist `null` bei offener Rundenzahl, `length` ist in Metern bzw. Sekunden.
+Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwendet, sonst angelegt. Fehlende Zonen legt der Import an, eine Zone mit gleichem Namen und gleichen Bändern wird wiederverwendet. Dateien von vor den Zonen haben kein `zone`, ihre Segmente mit Band werden zu Zonen nach dem Muster „Seerunde 2“. Die Runden entstehen aus den Rohpaketen neu und sind deshalb identisch. `laps` ist `null` bei offener Rundenzahl, `length` ist in Metern bzw. Sekunden. Eine Strecke, die ohne Vorlage gerudert wurde, hat `"name": null`; mit Gesamtdauer steht diese in Millisekunden in `durationMs`, etwa `"template": {"name": null, "laps": null, "durationMs": 1800000}`. Dateien ohne `durationMs` lassen sich weiterhin importieren.
 
 ## Spike
 
