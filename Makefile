@@ -23,7 +23,7 @@ APK ?=
 APK_BUILT := build/app/outputs/flutter-apk/app-release.apk
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor deps analyze test check coverage codegen l10n schema check-generated icons run run-android spike spike-android pull-recordings build-linux apk install-apk appimage clean
+.PHONY: help doctor deps analyze format test check coverage codegen l10n schema check-generated icons run run-android spike spike-android pull-recordings build-linux apk install-apk appimage clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -35,13 +35,18 @@ deps: ## Fetch dependencies of the app and the local packages
 	$(FLUTTER) pub get
 	cd $(PROTOCOL) && $(DART) pub get
 
-analyze: ## Run static analysis on the app and the local packages
+analyze: ## Run static analysis and the format check on the app and the local packages
+	@$(DART) format --output=none --set-exit-if-changed . > /dev/null \
+		|| { $(DART) format --output=none . | grep '^Changed'; echo "Code is not formatted: run make format."; exit 1; }
 	$(FLUTTER) analyze
 	cd $(PROTOCOL) && $(DART) analyze --fatal-infos
 
 test: ## Run all tests of the app and the local packages
 	$(FLUTTER) test
 	cd $(PROTOCOL) && $(DART) test
+
+format: ## Format all Dart code of the app and the local packages
+	$(DART) format .
 
 check: analyze test ## Run analysis and tests (same as tool/check.sh)
 
