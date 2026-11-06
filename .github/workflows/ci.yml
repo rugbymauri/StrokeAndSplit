@@ -1,4 +1,5 @@
-# Analysis and tests for pull requests and main. Releases: see release.yml.
+# Analysis and tests for pull requests and main, and a check that the generated files are
+# committed. Releases: see release.yml.
 # README, section "CI und Releases".
 name: CI
 
@@ -19,3 +20,16 @@ concurrency:
 jobs:
   check:
     uses: ./.github/workflows/check.yml
+
+  generated:
+    runs-on: ubuntu-latest
+    container: ghcr.io/cirruslabs/flutter:3.44.0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-flutter
+      # The checkout belongs to the runner user, git in the container runs as root.
+      - run: git config --global --add safe.directory "$PWD"
+      - run: make deps
+      - run: make check-generated

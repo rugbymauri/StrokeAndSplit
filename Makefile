@@ -23,7 +23,7 @@ APK ?=
 APK_BUILT := build/app/outputs/flutter-apk/app-release.apk
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor deps analyze test check codegen schema icons run run-android spike spike-android pull-recordings build-linux apk install-apk appimage clean
+.PHONY: help doctor deps analyze test check codegen l10n schema check-generated icons run run-android spike spike-android pull-recordings build-linux apk install-apk appimage clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -53,6 +53,12 @@ l10n: ## Generate the translations from lib/l10n/*.arb (after changing an ARB fi
 
 schema: ## Snapshot the drift schema and generate migration tests (after bumping schemaVersion)
 	$(DART) run drift_dev make-migrations
+
+check-generated: codegen l10n schema ## Fail if drift code, translations or schema snapshots differ from the committed files (needs a clean working tree)
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		git status --short; git diff --stat; \
+		echo "Generated files are out of date: run make codegen l10n schema and commit the result."; exit 1; \
+	fi
 
 icons: ## Render the app icon from assets/icon/*.svg and generate the platform icons (after changing an SVG, needs ImageMagick with librsvg)
 	magick -background none assets/icon/app_icon.svg assets/icon/app_icon.png
