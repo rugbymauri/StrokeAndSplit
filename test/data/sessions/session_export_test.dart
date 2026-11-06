@@ -6,6 +6,7 @@ import 'package:strokesplit/data/courses/course_layout.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sessions/session_accumulator.dart';
+import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/templates/template_repository.dart';
@@ -333,10 +334,12 @@ void main() {
 
     /// Records just_row as "Seerunde x3" on the phone, by default on a course
     /// with the zone "Tempo" from 20 to 40 m.
+    /// A session on "Seerunde x3", or with [limit] on "Seerunde" without a template.
     Future<(AppDatabase, int)> recordOnPhone({
       CourseDefinition? definition,
       bool ftms = false,
       Zone zone = tempo,
+      Duration? limit,
     }) async {
       final db = openTestDatabase();
       final zoneId = await ZoneRepository(db).create(zone);
@@ -358,14 +361,16 @@ void main() {
         startedAt: DateTime.utc(2026, 10, 16, 7),
         source: ftms ? ErgSourceKind.ftms : ErgSourceKind.pm5,
         protocol: ftms ? ErgProtocol.ftms : ErgProtocol.pm5,
-        plan: template.toPlan(),
+        plan: limit == null
+            ? template.toPlan()
+            : SessionPlan(course: template.course, length: TimeLimit(limit)),
       );
       final protocol = ftms ? ErgProtocol.ftms : ErgProtocol.pm5;
       final accumulator = SessionAccumulator(
         id,
         protocol: protocol,
         course: course,
-        plannedLaps: 3,
+        plannedLaps: limit == null ? 3 : null,
       );
       (ftms ? ftmsRowing(seconds: 40) : loadFixture('just_row').packets)
           .forEach(accumulator.add);
@@ -409,6 +414,8 @@ void main() {
         (session.templateName, session.plannedLaps, session.templateId),
         ('Seerunde x3', 3, null),
       );
+      // A file from before schema 10 has no duration either.
+      expect(session.plannedDurationMs, isNull);
       final zone = (await ZoneRepository(laptop).all()).single;
       expect(zone.sameAs(tempo), isTrue);
       final course = (await CourseRepository(laptop).all()).single;
@@ -423,6 +430,32 @@ void main() {
         isTrue,
       );
       expect(course.versionId, session.courseVersionId);
+    });
+
+    test('keeps the planned duration of a course rowed without a template (course-rowing-free)', () async {
+      final (phone, recorded) = await recordOnPhone(
+        limit: const Duration(minutes: 30),
+      );
+      final laptop = openTestDatabase();
+
+      final bytes = await SessionRepository(phone).export(recorded);
+      final header = jsonDecode(
+        const LineSplitter().convert(utf8.decode(gzip.decode(bytes))).first,
+      ) as Map;
+      expect(header['template'], {
+        'name': null,
+        'laps': null,
+        'durationMs': 1800000,
+      });
+      final imported = await SessionRepository(laptop).import(bytes);
+
+      expect(await results(laptop, imported), await results(phone, recorded));
+      final session = (await SessionRepository(laptop).get(imported))!;
+      expect(
+        (session.templateName, session.plannedLaps, session.plannedDurationMs),
+        (null, null, 1800000),
+      );
+      expect(session.courseVersionId, isNotNull);
     });
 
     test(
