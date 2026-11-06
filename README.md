@@ -255,6 +255,12 @@ git push origin v1.2.0
 
 `verify-tag` bricht ab, wenn der Commit nicht auf `main` liegt oder es das Release schon gibt. Ein Release wird nie überschrieben, ein fehlerhaftes Release in GitHub löschen und mit einer neuen Version taggen. Der Versionsname der Pakete kommt aus dem Tag (`1.2.0`), der Android-Versionscode ist die Laufnummer des Release-Workflows (`GITHUB_RUN_NUMBER`) und steigt damit mit jedem Release. `pubspec.yaml` bleibt unverändert. Das Release enthält `strokesplit-1.2.0-android.apk` und `strokesplit-1.2.0-x86_64.AppImage` als Dateien.
 
+Jede Datei eines Releases hat eine signierte Build-Provenance (`actions/attest`): Sie belegt, dass die Datei aus diesem Repository und Commit vom Release-Workflow gebaut wurde. Prüfen mit:
+
+```sh
+gh attestation verify strokesplit-1.2.0-android.apk --repo rugbymauri/StrokeAndSplit
+```
+
 ### Einrichtung in GitHub (einmalig)
 
 Alle APKs aus der Pipeline sind mit demselben Debug-Schlüssel signiert, damit eine neue Version über eine ältere installiert werden kann. Der Schlüssel ist ein gewöhnlicher Android-Debug-Keystore und nicht für den Play Store gedacht.

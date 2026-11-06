@@ -66,6 +66,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      # Build provenance (actions/attest): signing certificate, attestation, storage record.
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     env:
       VERSION: ${{ needs.verify-tag.outputs.version }}
       GH_TOKEN: ${{ github.token }}
@@ -74,6 +78,10 @@ jobs:
         with:
           path: dist
           merge-multiple: true
+      - name: Attest the build provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: dist/*
       - name: Create release ${{ github.ref_name }}
         run: |
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
@@ -81,5 +89,7 @@ jobs:
             --notes "Stroke & Split $VERSION, built from commit $GITHUB_SHA.
 
           - Android: universal APK. Signed with the shared debug key of the pipeline, not suitable for the Play Store. Allow installing from unknown sources.
-          - Linux: AppImage for x86_64, needs GTK 3. Make it executable with \`chmod +x\` and start it." \
+          - Linux: AppImage for x86_64, needs GTK 3. Make it executable with \`chmod +x\` and start it.
+
+          Check the origin of a file with \`gh attestation verify <file> --repo $GITHUB_REPOSITORY\`." \
             "dist/$APP_NAME-$VERSION-android.apk" "dist/$APP_NAME-$VERSION-x86_64.AppImage"
