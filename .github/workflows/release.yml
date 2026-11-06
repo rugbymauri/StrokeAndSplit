@@ -13,9 +13,8 @@ concurrency:
   group: release-${{ github.ref }}
 
 env:
-  # Binary and file name, the same as in linux/CMakeLists.txt and tool/build_appimage.sh.
+  # File name of the packages, see build.yml.
   APP_NAME: strokesplit
-  APPLICATION_ID: ch.strokesplit.strokesplit
 
 jobs:
   verify-tag:
@@ -52,73 +51,18 @@ jobs:
   check:
     uses: ./.github/workflows/check.yml
 
-  build-apk:
+  build:
     needs: verify-tag
-    runs-on: ubuntu-latest
-    container: ghcr.io/cirruslabs/flutter:3.44.0
-    env:
-      VERSION: ${{ needs.verify-tag.outputs.version }}
+    uses: ./.github/workflows/build.yml
+    with:
+      version: ${{ needs.verify-tag.outputs.version }}
+      release: true
+      retention-days: 1
+    secrets:
       ANDROID_DEBUG_KEYSTORE: ${{ secrets.ANDROID_DEBUG_KEYSTORE }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      # No caches for release builds, see the input cache of setup-flutter.
-      - uses: ./.github/actions/setup-flutter
-        with:
-          cache: "false"
-      - name: Install the shared debug keystore
-        run: |
-          if [ -z "${ANDROID_DEBUG_KEYSTORE:-}" ]; then
-            echo "::error::Secret ANDROID_DEBUG_KEYSTORE (Base64-encoded debug keystore) is missing. Without it the APK would get a random key and could not update earlier releases. See README, section \"CI und Releases\"."
-            exit 1
-          fi
-          mkdir -p ~/.android
-          # Secrets are text, so the keystore is kept Base64-encoded.
-          printf '%s' "$ANDROID_DEBUG_KEYSTORE" | base64 --decode > ~/.android/debug.keystore
-          keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey > /dev/null
-      - run: make deps
-      - run: make apk BUILD_NAME="$VERSION" BUILD_NUMBER="$GITHUB_RUN_NUMBER"
-      - run: |
-          mkdir -p build/dist
-          cp build/app/outputs/flutter-apk/app-release.apk "build/dist/$APP_NAME-$VERSION-android.apk"
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: apk
-          path: build/dist/
-          retention-days: 1
-
-  build-appimage:
-    needs: verify-tag
-    runs-on: ubuntu-latest
-    container: ghcr.io/cirruslabs/flutter:3.44.0
-    env:
-      VERSION: ${{ needs.verify-tag.outputs.version }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup-flutter
-        with:
-          cache: "false"
-      - name: Install the Linux build tools
-        run: |
-          apt-get update -qq
-          DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends clang cmake ninja-build pkg-config libgtk-3-dev file desktop-file-utils > /dev/null
-      - run: make deps
-      - run: make build-linux BUILD_NAME="$VERSION" BUILD_NUMBER="$GITHUB_RUN_NUMBER"
-      - run: make appimage BUILD_NAME="$VERSION"
-      - run: |
-          mkdir -p build/dist
-          cp "build/appimage/$APP_NAME-$VERSION-x86_64.AppImage" build/dist/
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: appimage
-          path: build/dist/
-          retention-days: 1
 
   release:
-    needs: [verify-tag, check, build-apk, build-appimage]
+    needs: [verify-tag, check, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
