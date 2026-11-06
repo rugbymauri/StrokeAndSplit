@@ -1,0 +1,42 @@
+# Weekly update pull requests for the Dart packages, the Gradle build and the GitHub Actions.
+# The Flutter image of the workflows (ghcr.io/cirruslabs/flutter) is not covered, see README,
+# section "CI und Releases".
+version: 2
+
+updates:
+  - package-ecosystem: pub
+    directories:
+      - /
+      - /packages/erg_protocol
+    schedule:
+      interval: weekly
+    groups:
+      pub:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: gradle
+    directory: /android
+    schedule:
+      interval: weekly
+    groups:
+      gradle:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /.github/actions/*
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci
+      include: scope
