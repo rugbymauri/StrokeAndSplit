@@ -9,7 +9,7 @@ import '../db/database.dart';
 import '../health/health_export.dart';
 import '../sources/erg_source.dart';
 import '../sources/erg_source_providers.dart';
-import '../templates/session_template.dart';
+import 'session_plan.dart';
 import 'first_stroke.dart';
 import 'pace_track.dart';
 import 'session_accumulator.dart';
@@ -60,7 +60,7 @@ class ActiveRecording {
   const ActiveRecording({
     required this.sessionId,
     required this.progress,
-    this.template,
+    this.plan,
     this.ghost = true,
     this.lap,
     this.paused = false,
@@ -73,13 +73,13 @@ class ActiveRecording {
   final SessionProgress progress;
 
   /// What is rowed; null for a free session.
-  final SessionTemplate? template;
+  final SessionPlan? plan;
 
-  /// Whether the ghosts of [template] run; fixed when the session starts
-  /// (template-screen, Design D4). Without a template it has no meaning.
+  /// Whether the ghosts of [plan] run; fixed when the session starts
+  /// (template-screen, Design D4). Without a plan it has no meaning.
   final bool ghost;
 
-  /// Where the session is on the course of [template].
+  /// Where the session is on the course of [plan].
   final LapProgress? lap;
 
   /// Whether the session is paused because the rower stopped (Change auto-pause, Design D4).
@@ -133,15 +133,15 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
   SessionRepository get _repository => ref.read(sessionRepositoryProvider);
 
   /// Starts a session with the active source; time and distance count from
-  /// zero, whatever the PM5 shows at the moment. With a [template] the
-  /// session is only ready: it starts with the first stroke, follows its
-  /// course and ends by itself after the last lap. Without [ghost] no ghost
-  /// runs in this session.
-  Future<void> start({SessionTemplate? template, bool ghost = true}) async {
+  /// zero, whatever the PM5 shows at the moment. With a [plan] the session is
+  /// only ready: it starts with the first stroke, follows its course and ends
+  /// by itself after the last lap. Without [ghost] no ghost runs in this
+  /// session.
+  Future<void> start({SessionPlan? plan, bool ghost = true}) async {
     if (state != null) return;
     final source = ref.read(activeErgSourceProvider);
     if (source == null) throw StateError('No data source');
-    if (template == null) return _begin(source, null, ghost, const []);
+    if (plan == null) return _begin(source, null, ghost, const []);
 
     state = ActiveRecording(
       sessionId: null,
@@ -149,11 +149,11 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
         distanceMeters: 0,
         elapsed: Duration.zero,
       ),
-      template: template,
+      plan: plan,
       ghost: ghost,
       lap: LapTracker(
-        template.course.definition,
-        plannedLaps: template.laps,
+        plan.course.definition,
+        plannedLaps: plan.plannedLaps,
       ).progress,
     );
     final detector = FirstStrokeDetector(source.protocol);
@@ -162,7 +162,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
       // Packets that arrive while the session is created are added to the early ones.
       if (early case final early?) return early.add(packet);
       final first = early = detector.add(packet);
-      if (first != null) _beginning = _begin(source, template, ghost, first);
+      if (first != null) _beginning = _begin(source, plan, ghost, first);
     });
   }
 
@@ -170,7 +170,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
   /// packets: the base of the first stroke and what followed (Design D2).
   Future<void> _begin(
     ErgSource source,
-    SessionTemplate? template,
+    SessionPlan? plan,
     bool ghost,
     List<RawPacket> early,
   ) async {
@@ -182,18 +182,18 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
           source.kind == ErgSourceKind.pm5 || source.kind == ErgSourceKind.ftms
           ? source.name
           : null,
-      template: template,
+      plan: plan,
     );
     final accumulator = _accumulator = SessionAccumulator(
       id,
       protocol: source.protocol,
-      course: template?.course.definition,
-      plannedLaps: template?.laps,
+      course: plan?.course.definition,
+      plannedLaps: plan?.plannedLaps,
     );
     ActiveRecording current() => ActiveRecording(
       sessionId: id,
       progress: accumulator.progress,
-      template: template,
+      plan: plan,
       ghost: ghost,
       lap: accumulator.lapProgress,
       paused: accumulator.paused,
@@ -206,7 +206,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
       final changed =
           accumulator.progress != state?.progress ||
           accumulator.paused != state?.paused;
-      if (template != null || changed) state = current();
+      if (plan != null || changed) state = current();
       if (accumulator.lapsFinished) unawaited(_finishAfterLastLap());
     }
 

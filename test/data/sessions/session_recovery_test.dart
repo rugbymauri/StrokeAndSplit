@@ -87,7 +87,7 @@ void main() {
       final id = await repository.create(
         startedAt: DateTime(2026, 10, 16),
         source: ErgSourceKind.pm5,
-        template: template,
+        plan: template.toPlan(),
       );
       final accumulator = SessionAccumulator(
         id,

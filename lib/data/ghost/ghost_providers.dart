@@ -5,7 +5,7 @@ import '../courses/lap_tracker.dart';
 import '../sessions/session_providers.dart';
 import '../statistics/ranking.dart';
 import '../statistics/ranking_providers.dart';
-import '../templates/session_template.dart';
+import '../sessions/session_plan.dart';
 import 'ghost.dart';
 import 'ghost_progress.dart';
 import 'ghost_repository.dart';
@@ -58,9 +58,10 @@ final zoneGhostProvider = Provider.autoDispose
       return _placeOne(ref, rankings, key.axis, key.length);
     });
 
-/// What decides the ghosts of a running template; see [liveGhostsKey].
+/// What decides the ghosts of a running plan; see [liveGhostsKey]. Without
+/// a template there is no ghost of the template (course-rowing-free, Design D5).
 typedef LiveGhostsKey = ({
-  int templateId,
+  int? templateId,
   int courseId,
   CourseAxis axis,
   int length,
@@ -69,14 +70,14 @@ typedef LiveGhostsKey = ({
   int segmentLength,
 });
 
-/// The key of [liveGhostsProvider] for [template] at the moment of
-/// [progress]; it only changes from one segment to the next.
-LiveGhostsKey liveGhostsKey(SessionTemplate template, LapProgress progress) => (
-  templateId: template.id,
-  courseId: template.course.id,
-  axis: template.course.axis,
-  length: template.course.definition.length,
-  laps: template.laps,
+/// The key of [liveGhostsProvider] for [plan] at the moment of [progress];
+/// it only changes from one segment to the next.
+LiveGhostsKey liveGhostsKey(SessionPlan plan, LapProgress progress) => (
+  templateId: plan.template?.id,
+  courseId: plan.course.id,
+  axis: plan.course.axis,
+  length: plan.course.definition.length,
+  laps: plan.plannedLaps,
   zoneId: progress.segment.zoneId,
   segmentLength: progress.segmentEnd - progress.segmentStart,
 );
@@ -92,11 +93,11 @@ LiveGhostsKey liveGhostsKey(SessionTemplate template, LapProgress progress) => (
 /// never ranked and so never ghosts.
 final liveGhostsProvider = Provider.autoDispose
     .family<LiveGhosts, LiveGhostsKey>((ref, key) {
-      final (laps, zoneId) = (key.laps, key.zoneId);
-      final template = laps == null
+      final (templateId, laps, zoneId) = (key.templateId, key.laps, key.zoneId);
+      final template = templateId == null || laps == null
           ? null
           : (
-              templateId: key.templateId,
+              templateId: templateId,
               axis: key.axis,
               length: key.length,
               laps: laps,

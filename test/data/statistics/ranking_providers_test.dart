@@ -67,7 +67,7 @@ void main() {
     expect(seen.last.single.entries.single.durationMs, 30000);
 
     final recorder = container.read(sessionRecorderProvider.notifier);
-    await recorder.start(template: template);
+    await recorder.start(plan: template.toPlan());
     // 100 m at 4 m/s; the session starts with the first stroke and ends by itself after its only lap.
     ftmsRowing(seconds: 30).forEach(source.emit);
     await pumpEventQueue();

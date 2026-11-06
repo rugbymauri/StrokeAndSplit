@@ -14,7 +14,7 @@ import '../../data/sessions/session_providers.dart';
 import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/simulated_source.dart';
-import '../../data/templates/session_template.dart';
+import '../../data/sessions/session_plan.dart';
 import '../../l10n/l10n.dart';
 import '../connection/connection_indicator.dart';
 import '../connection/heart_rate_indicator.dart';
@@ -33,12 +33,12 @@ const staleAfter = Duration(seconds: 3);
 
 /// The live rowing metrics, readable from the seat.
 class LiveScreen extends ConsumerStatefulWidget {
-  const LiveScreen({super.key, this.template, this.ghost = true});
+  const LiveScreen({super.key, this.plan, this.ghost = true});
 
   /// Made ready as a session as soon as the source is connected; it starts with the first stroke.
-  final SessionTemplate? template;
+  final SessionPlan? plan;
 
-  /// Whether the ghosts of [template] run in this session (template-screen, Design D4).
+  /// Whether the ghosts of [plan] run in this session (template-screen, Design D4).
   final bool ghost;
 
   @override
@@ -58,7 +58,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   StreamSubscription<RowingEvent>? _events;
   Wakelock? _wakelock;
   var _wakelockOn = false;
-  var _templateStarted = false;
+  var _planStarted = false;
 
   @override
   void initState() {
@@ -71,22 +71,22 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     );
     ref.listenManual(ergConnectionStateProvider, (_, state) {
       _updateWakelock(state.value);
-      if (state.value == ErgConnectionState.connected) _startTemplate();
+      if (state.value == ErgConnectionState.connected) _startPlan();
     }, fireImmediately: true);
     ref.listenManual(finishedSessionProvider, (_, id) {
       if (id != null) _showFinished(id);
     });
   }
 
-  void _startTemplate() {
-    final template = widget.template;
-    if (template == null || _templateStarted) return;
-    _templateStarted = true;
+  void _startPlan() {
+    final plan = widget.plan;
+    if (plan == null || _planStarted) return;
+    _planStarted = true;
     // Not within the listener that reports the connection.
     Future.microtask(
       () => ref
           .read(sessionRecorderProvider.notifier)
-          .start(template: template, ghost: widget.ghost),
+          .start(plan: plan, ghost: widget.ghost),
     );
   }
 
@@ -226,11 +226,11 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   /// Connection, strap and source, beside the session button in place of a title bar.
   Widget _status() => const LiveStatus();
 
-  /// The live view of [template] at [lap] with its ghosts, recomputed with
+  /// The live view of [plan] at [lap] with its ghosts, recomputed with
   /// every tick (Change ghost, Design D2–D4). Without [ghost] the ghosts are
   /// not even loaded (template-screen, Design D4).
   Widget _courseView(
-    SessionTemplate template,
+    SessionPlan plan,
     LapProgress lap,
     ActiveRecording? recording,
     bool connected,
@@ -238,21 +238,21 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     required bool ghost,
   }) {
     final ghosts = ghost
-        ? ref.watch(liveGhostsProvider(liveGhostsKey(template, lap)))
+        ? ref.watch(liveGhostsProvider(liveGhostsKey(plan, lap)))
         : null;
     final shares = ghosts == null
         ? null
-        : ghostShares(lap, template.course.definition, ghosts);
+        : ghostShares(lap, plan.course.definition, ghosts);
     return CourseLiveView(
       tick: _tick,
       rrIntervalMs: _rrIntervalMs,
       session: recording?.progress,
       lap: lap,
-      course: template.course.definition,
+      course: plan.course.definition,
       outdated: _stale,
       forceCurves: forceCurves,
       // On a time course the ghost stands where the rower is; the box shows the gap in metres instead.
-      ghost: shares == null || template.course.axis == CourseAxis.time
+      ghost: shares == null || plan.course.axis == CourseAxis.time
           ? null
           : FrameGhost(
               course: shares.course,
@@ -261,7 +261,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
             ),
       ghostGap: ghosts == null
           ? null
-          : ghostGap(lap, template.course.axis, ghosts.course),
+          : ghostGap(lap, plan.course.axis, ghosts.course),
       action: _sessionButton(recording, connected),
       shortAction: _sessionButton(recording, connected, short: true),
       status: _status(),
@@ -299,9 +299,9 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                     actions: [const SizedBox.shrink()],
                   ),
                 Expanded(
-                  child: switch ((recording?.lap, recording?.template)) {
-                    (final lap?, final template?) => _courseView(
-                      template,
+                  child: switch ((recording?.lap, recording?.plan)) {
+                    (final lap?, final plan?) => _courseView(
+                      plan,
                       lap,
                       recording,
                       connected,

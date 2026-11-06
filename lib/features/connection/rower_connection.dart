@@ -6,7 +6,7 @@ import '../../data/sources/ble/ble_transport.dart';
 import '../../data/sources/erg_source.dart';
 import '../../data/sources/erg_source_providers.dart';
 import '../../data/sources/rower_choice.dart';
-import '../../data/templates/session_template.dart';
+import '../../data/sessions/session_plan.dart';
 import '../../l10n/l10n.dart';
 import '../live/live_screen.dart';
 import 'choose_devices_screen.dart';
@@ -31,13 +31,13 @@ Future<void> connectRower(WidgetRef ref, RowerChoice choice) async {
   }
 }
 
-/// Rows with the chosen rower, freely or [template] (Design D6). Without a
+/// Rows with the chosen rower, freely or [plan] (Design D6). Without a
 /// chosen rower it opens "Geräte wählen" instead. Without [ghost] no ghost
-/// runs in the session of [template] (template-screen, Design D4).
+/// runs in the session of [plan] (template-screen, Design D4).
 Future<void> startRowing(
   BuildContext context,
   WidgetRef ref, {
-  SessionTemplate? template,
+  SessionPlan? plan,
   bool ghost = true,
 }) async {
   final navigator = Navigator.of(context);
@@ -58,7 +58,7 @@ Future<void> startRowing(
   }
   await navigator.push(
     MaterialPageRoute<void>(
-      builder: (_) => LiveScreen(template: template, ghost: ghost),
+      builder: (_) => LiveScreen(plan: plan, ghost: ghost),
     ),
   );
 }

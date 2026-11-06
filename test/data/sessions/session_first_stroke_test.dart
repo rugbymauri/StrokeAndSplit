@@ -97,12 +97,12 @@ void main() {
           ...decoder.flush(),
         ].whereType<StatusTick>();
 
-        await setup.recorder.start(template: template);
+        await setup.recorder.start(plan: template.toPlan());
         await setup.emitAll(packets.take(trigger));
 
         final ready = setup.recording!;
         expect(
-          (ready.ready, ready.sessionId, ready.template?.name),
+          (ready.ready, ready.sessionId, ready.plan?.template?.name),
           (true, null, 'Lang'),
         );
         expect(ready.progress.elapsed, Duration.zero);
@@ -157,7 +157,7 @@ void main() {
     final packets = loadFixture('just_row').packets;
     final (_, trigger) = _start(packets, ErgProtocol.pm5);
 
-    await setup.recorder.start(template: await _template(db));
+    await setup.recorder.start(plan: (await _template(db)).toPlan());
     await setup.emitAll(packets.take(trigger));
     expect(await setup.recorder.stop(), isNull);
 
@@ -188,7 +188,7 @@ void main() {
     final packets = loadFixture('just_row').packets;
     final (_, trigger) = _start(packets, ErgProtocol.pm5);
 
-    await setup.recorder.start(template: await _template(db));
+    await setup.recorder.start(plan: (await _template(db)).toPlan());
     await setup.emitAll(packets.take(trigger));
     (setup.source as FakeErgSource).emit(packets[trigger]);
     // Delivered, but the session is still being created.
@@ -207,7 +207,7 @@ void main() {
     final db = openTestDatabase();
     final setup = _Setup(db, FakeErgSource());
     final template = await _template(db);
-    await setup.recorder.start(template: template);
+    await setup.recorder.start(plan: template.toPlan());
     await setup.emitAll(loadFixture('just_row').packets);
     final id = (await setup.recorder.stop())!;
     final repository = setup.container.read(sessionRepositoryProvider);
@@ -233,7 +233,7 @@ void main() {
     final replay = ReplaySource(await repository.rawRecording(id), speed: 200);
     final again = _Setup(db, replay);
     await replay.start();
-    await again.recorder.start(template: template);
+    await again.recorder.start(plan: template.toPlan());
     expect(again.recording!.ready, isTrue);
     await Future<void>.delayed(const Duration(seconds: 1));
     final replayed = (await again.recorder.stop())!;

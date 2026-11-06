@@ -227,7 +227,7 @@ void main() {
         (ErgSourceKind.simulator, ErgProtocol.ftms),
       );
       expect(
-        setup.container.read(sessionRecorderProvider)?.template?.name,
+        setup.container.read(sessionRecorderProvider)?.plan?.template?.name,
         'Seerunde x3',
       );
       expect(find.text('Runde 1 / 3'), findsOneWidget);
@@ -255,7 +255,7 @@ void main() {
         expect(find.text('Runde 1 / 3'), findsOneWidget);
         expect(find.text('Beenden'), findsOneWidget);
         expect(
-          setup.container.read(sessionRecorderProvider)?.template?.name,
+          setup.container.read(sessionRecorderProvider)?.plan?.template?.name,
           'Seerunde x3',
         );
 
@@ -339,7 +339,7 @@ void main() {
 
         final recording = setup.container.read(sessionRecorderProvider);
         expect(
-          (recording?.template?.name, recording?.ghost),
+          (recording?.plan?.template?.name, recording?.ghost),
           ('Seerunde x3', false),
         );
         await stopRowing(setup);

@@ -4,7 +4,7 @@ Setzt `template-screen` in `main` voraus (Ghost-Wahl in der Aufnahme, Ghost-Zeil
 
 ## 1. Plan statt Vorlage
 
-- [ ] 1.1 `SessionPlan` und `PlanLength` (`Laps`, `TimeLimit`, `OpenLength`) nach D1, `SessionTemplate.toPlan()`; Recorder `start(plan:, ghost:)`, `ActiveRecording.plan`, `SessionRepository.create(plan:)`, `startRowing(..., plan:)`, `LiveScreen`, Ghost-Keys mit nullable `templateId` (D5). Noch ohne Dauer und ohne neuen Screen. Verifikation: alle bestehenden Tests grün ohne inhaltliche Änderung; neuer Recorder-Test: Plan ohne Vorlage legt eine Session mit `course_version_id`, `planned_laps` und ohne `template_id` an
+- [x] 1.1 `SessionPlan` und `PlanLength` (`LapCount`, `TimeLimit`, `OpenLength`) nach D1, `SessionTemplate.toPlan()`; Recorder `start(plan:, ghost:)`, `ActiveRecording.plan`, `SessionRepository.create(plan:)`, `startRowing(..., plan:)`, `LiveScreen`, Ghost-Keys mit nullable `templateId` (D5). Noch ohne Dauer und ohne neuen Screen. Verifikation: alle bestehenden Tests grün ohne inhaltliche Änderung; neuer Recorder-Test: Plan ohne Vorlage legt eine Session mit `course_version_id`, `planned_laps` und ohne `template_id` an
 
 ## 2. Daten
 

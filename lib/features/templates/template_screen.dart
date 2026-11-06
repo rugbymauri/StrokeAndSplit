@@ -132,7 +132,7 @@ class _TemplateScreenState extends ConsumerState<TemplateScreen> {
                                 onPressed: () => startRowing(
                                   context,
                                   ref,
-                                  template: template,
+                                  plan: template.toPlan(),
                                   ghost: _ghost,
                                 ),
                                 child: Text(
