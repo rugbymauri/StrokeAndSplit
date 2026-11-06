@@ -154,7 +154,7 @@ ActiveRecording _onCourse({
       distanceMeters: 1520,
       elapsed: Duration(minutes: 6, seconds: 20),
     ),
-    template: SessionTemplate(
+    plan: SessionTemplate(
       id: 1,
       name: 'Seerunde x3',
       laps: 3,
@@ -165,7 +165,7 @@ ActiveRecording _onCourse({
         version: 1,
         definition: course,
       ),
-    ),
+    ).toPlan(),
     lap: LapProgress(
       lap: 2,
       plannedLaps: 3,
@@ -1122,7 +1122,7 @@ void main() {
           distanceMeters: courseMetres.toDouble(),
           elapsed: Duration(seconds: courseSeconds),
         ),
-        template: template,
+        plan: template.toPlan(),
         ghost: ghost,
         lap: LapProgress(
           lap: lap,

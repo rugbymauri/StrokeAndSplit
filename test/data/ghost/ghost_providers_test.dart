@@ -108,7 +108,7 @@ void main() {
     LapProgress? progress,
   ]) async {
     final key = liveGhostsKey(
-      template,
+      template.toPlan(),
       progress ??
           LapTracker(
             template.course.definition,
@@ -152,7 +152,7 @@ void main() {
       final fake = source as FakeErgSource;
       final container = containerWith(source);
       final recorder = container.read(sessionRecorderProvider.notifier);
-      await recorder.start(template: template);
+      await recorder.start(plan: template.toPlan());
       final rowing = _ftmsRowing([(25, 4), (20, 5), (25, 4)]);
 
       rowing.take(36).forEach(fake.emit);

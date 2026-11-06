@@ -28,12 +28,12 @@ Neu ist `SessionPlan` in `lib/data/sessions/session_plan.dart`: die `Course` in 
 
 ```
 sealed class PlanLength
-  Laps(int count)          -> Ende nach der letzten Runde
+  LapCount(int count)      -> Ende nach der letzten Runde
   TimeLimit(Duration time) -> Ende nach der Ruderzeit
   OpenLength()             -> Ende durch den Nutzer
 ```
 
-`SessionTemplate` liefert ihren Plan über `toPlan()` (Laps oder OpenLength). Der Recorder startet mit `start(plan:, ghost:)`, `ActiveRecording` trägt `plan` statt `template`. `SessionRepository.create(plan:)` setzt `template_id` und `template_name` nur mit Vorlage, sonst `course_version_id`, `planned_laps` und neu `planned_duration_ms`. Frei rudern bleibt `plan: null`.
+`SessionTemplate` liefert ihren Plan über `toPlan()` (`LapCount` oder `OpenLength`). `LapCount` statt `Laps`, weil `Laps` schon die Tabelle der Runden in Drift ist (bei der Umsetzung geändert). Der Recorder startet mit `start(plan:, ghost:)`, `ActiveRecording` trägt `plan` statt `template`. `SessionRepository.create(plan:)` setzt `template_id` und `template_name` nur mit Vorlage, sonst `course_version_id`, `planned_laps` und neu `planned_duration_ms`. Frei rudern bleibt `plan: null`.
 
 *Alternative*: `SessionTemplate` mit `id: null` und leerem Namen. Verworfen, weil dann jede Stelle, die heute eine echte Vorlage annimmt (Ghost der Vorlage, Platzmarke), still eine falsche Vorlage bekäme. Mit `plan.template == null` ist der Fall sichtbar.
 

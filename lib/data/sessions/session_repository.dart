@@ -13,7 +13,7 @@ import '../courses/course_repository.dart';
 import '../courses/lap_tracker.dart';
 import '../zones/zone_repository.dart';
 import '../sources/erg_source.dart';
-import '../templates/session_template.dart';
+import 'session_plan.dart';
 import 'pace_track.dart';
 import 'session_accumulator.dart';
 
@@ -42,17 +42,17 @@ class SessionRepository {
     required ErgSourceKind source,
     ErgProtocol protocol = ErgProtocol.pm5,
     String? deviceName,
-    SessionTemplate? template,
+    SessionPlan? plan,
   }) {
     return _insert(
       startedAt: startedAt,
       source: source,
       protocol: protocol,
       deviceName: deviceName,
-      templateId: template?.id,
-      templateName: template?.name,
-      courseVersionId: template?.course.versionId,
-      plannedLaps: template?.laps,
+      templateId: plan?.template?.id,
+      templateName: plan?.template?.name,
+      courseVersionId: plan?.course.versionId,
+      plannedLaps: plan?.plannedLaps,
     );
   }
 

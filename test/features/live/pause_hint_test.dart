@@ -104,7 +104,9 @@ class _Home extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
     body: TextButton(
       onPressed: () => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => LiveScreen(template: template)),
+        MaterialPageRoute<void>(
+          builder: (_) => LiveScreen(plan: template.toPlan()),
+        ),
       ),
       child: const Text('Los'),
     ),

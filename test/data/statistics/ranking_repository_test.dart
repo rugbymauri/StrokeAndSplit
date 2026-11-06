@@ -588,7 +588,7 @@ void main() {
         final recorded = await sessions.create(
           startedAt: DateTime.utc(2026, 10, 16, 7),
           source: ErgSourceKind.pm5,
-          template: template,
+          plan: template.toPlan(),
         );
         final accumulator = SessionAccumulator(
           recorded,

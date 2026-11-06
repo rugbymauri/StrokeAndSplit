@@ -358,7 +358,7 @@ void main() {
         startedAt: DateTime.utc(2026, 10, 16, 7),
         source: ftms ? ErgSourceKind.ftms : ErgSourceKind.pm5,
         protocol: ftms ? ErgProtocol.ftms : ErgProtocol.pm5,
-        template: template,
+        plan: template.toPlan(),
       );
       final protocol = ftms ? ErgProtocol.ftms : ErgProtocol.pm5;
       final accumulator = SessionAccumulator(

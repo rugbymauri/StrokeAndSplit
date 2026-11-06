@@ -104,7 +104,7 @@ void main() {
           await source.start();
           await c
               .read(sessionRecorderProvider.notifier)
-              .start(template: template);
+              .start(plan: template.toPlan());
         });
         async.elapse(const Duration(seconds: 3));
         expect(

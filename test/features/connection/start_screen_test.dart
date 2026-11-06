@@ -552,7 +552,7 @@ void main() {
         await SessionRepository(db).create(
           startedAt: DateTime.now().subtract(const Duration(days: 1)),
           source: ErgSourceKind.simulator,
-          template: await templates.get(id),
+          plan: (await templates.get(id))!.toPlan(),
         );
       });
       await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);

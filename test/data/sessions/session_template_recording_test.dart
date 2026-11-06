@@ -1,6 +1,7 @@
 import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/db/database.dart';
+import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
@@ -63,10 +64,10 @@ void main() {
         await source.start();
         await container
             .read(sessionRecorderProvider.notifier)
-            .start(template: template);
+            .start(plan: template.toPlan());
         return container.read(sessionRecorderProvider)!;
       });
-      expect((ready.ready, ready.template?.name), (true, 'Seerunde x3'));
+      expect((ready.ready, ready.plan?.template?.name), (true, 'Seerunde x3'));
       // The simulator rows from the start: its second status starts the session.
       async.elapse(const Duration(milliseconds: 500));
       final started = container.read(sessionRecorderProvider)!;
@@ -123,7 +124,7 @@ void main() {
           await source.start();
           await container
               .read(sessionRecorderProvider.notifier)
-              .start(template: template);
+              .start(plan: template.toPlan());
         });
 
         async.elapse(const Duration(seconds: 30));
@@ -178,7 +179,7 @@ void main() {
           await source.start();
           await container
               .read(sessionRecorderProvider.notifier)
-              .start(template: template);
+              .start(plan: template.toPlan());
         });
         async.elapse(const Duration(seconds: 30));
         expect(
@@ -245,7 +246,7 @@ void main() {
           await source.start();
           await container
               .read(sessionRecorderProvider.notifier)
-              .start(template: template, ghost: false);
+              .start(plan: template.toPlan(), ghost: false);
         });
         expect(
           container.read(sessionRecorderProvider)!.ghost,
@@ -275,7 +276,7 @@ void main() {
           async,
           () => container
               .read(sessionRecorderProvider.notifier)
-              .start(template: template),
+              .start(plan: template.toPlan()),
         );
         expect(
           container.read(sessionRecorderProvider)!.ghost,
@@ -288,6 +289,49 @@ void main() {
     },
   );
 
+  test('a course rowed without a template has laps but no template (course-rowing-free)', () {
+    fakeAsync((async) {
+      final course = _run(async, () async {
+        final courses = CourseRepository(db);
+        final id = await courses.create(
+          'Seerunde',
+          CourseDefinition.single(axis: CourseAxis.distance, length: 100),
+        );
+        return (await courses.get(id))!;
+      });
+      final plan = SessionPlan(course: course, length: const LapCount(2));
+      _run(async, () async {
+        await source.start();
+        await container
+            .read(sessionRecorderProvider.notifier)
+            .start(plan: plan);
+      });
+      async.elapse(const Duration(milliseconds: 500));
+      final started = container.read(sessionRecorderProvider)!;
+      expect((started.plan?.template, started.lap!.plannedLaps), (null, 2));
+
+      // 2 × 100 m at 2:10 /500 m take 52 s.
+      async.elapse(const Duration(seconds: 60));
+      expect(container.read(sessionRecorderProvider), isNull);
+      final session = _run(
+        async,
+        (db.select(
+          db.sessions,
+        )..where((s) => s.id.equals(started.sessionId!))).getSingle,
+      );
+      expect((session.templateId, session.templateName), (null, null));
+      expect(
+        (session.courseVersionId, session.plannedLaps),
+        (course.versionId, 2),
+      );
+      expect(
+        [for (final l in _run(async, db.select(db.laps).get)) l.complete],
+        [true, true],
+      );
+      source.stop();
+    });
+  });
+
   test('a session without template has no laps', () {
     fakeAsync((async) {
       _run(async, () async {
@@ -297,7 +341,7 @@ void main() {
       async.elapse(const Duration(seconds: 10));
 
       final recording = container.read(sessionRecorderProvider)!;
-      expect((recording.template, recording.lap), (null, null));
+      expect((recording.plan, recording.lap), (null, null));
       _run(async, container.read(sessionRecorderProvider.notifier).stop);
       expect(_run(async, db.select(db.laps).get), isEmpty);
       source.stop();

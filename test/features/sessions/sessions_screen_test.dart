@@ -246,7 +246,7 @@ void main() {
         final session = await setup.repository.create(
           startedAt: DateTime(2026, 10, 16, 7),
           source: ErgSourceKind.simulator,
-          template: await templates.get(id),
+          plan: (await templates.get(id))!.toPlan(),
         );
         await setup.repository.finish(session);
       }
