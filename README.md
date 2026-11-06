@@ -26,6 +26,7 @@ Alle Befehle zeigt `make help`.
 |---|---|
 | `make run` / `make run-android` | App auf Linux bzw. einem per USB verbundenen Android-Gerät starten |
 | `make check` | Statische Analyse und Tests von App und `erg_protocol` |
+| `make coverage` | Tests mit Coverage, zeigt die Zeilenabdeckung je Paket; lcov-Dateien in `coverage/` und `packages/erg_protocol/coverage/` |
 | `make l10n` | Übersetzungen neu erzeugen, nach Änderungen an `lib/l10n/app_*.arb` |
 | `make codegen` | drift-Code neu erzeugen, nach Änderungen an `lib/data/db/database.dart` |
 | `make schema` | Schema-Snapshot und Migrationstests erzeugen, nach dem Erhöhen von `schemaVersion` |
@@ -228,13 +229,15 @@ Die Pipeline läuft mit GitHub Actions (`.github/workflows/`) in Docker-Images v
 
 | Anlass | Was läuft |
 |---|---|
-| Pull Request | `ci.yml`: `check` (`make deps check`, also Analyse und Tests von App und `erg_protocol`), `generated` (`make check-generated`), `build` (APK und AppImage, nur wenn der Pull Request Build-Dateien ändert) |
+| Pull Request | `ci.yml`: `check` (`make deps analyze coverage`, also Analyse und Tests von App und `erg_protocol` mit Coverage), `generated` (`make check-generated`), `build` (APK und AppImage, nur wenn der Pull Request Build-Dateien ändert) |
 | Push auf `main` | `ci.yml`: `check`, `generated`, `build` |
 | Tag `vX.Y.Z` | `release.yml`: `verify-tag` und `check`, `build` (APK und AppImage), dann `release` |
 | von Hand gestartet („Run workflow“, `gh workflow run ci.yml --ref <branch>`) | `ci.yml`: `check`, `generated`, `build`, auf jedem Branch |
 | Pull Request oder Push auf `main`, der `.github/` ändert | `lint-workflows.yml`: `actionlint` (Syntax und Ausdrücke) und `zizmor` (Sicherheit, Konfiguration in `.github/zizmor.yml`) |
 
 Ein Branch ohne Pull Request bekommt keine Pipeline, andere Tags ebenfalls nicht.
+
+`check` schreibt die Zeilenabdeckung je Paket in die Zusammenfassung des Workflow-Laufs und hängt die lcov-Dateien sieben Tage als Artefakt `coverage` an, etwa für die Anzeige im Editor (VS Code „Coverage Gutters“). Die Zahl der App enthält auch generierten Code.
 
 `build` findet Fehler in Gradle, CMake oder im AppImage-Skript vor dem Release. In Pull Requests läuft es nur, wenn sich `android/`, `linux/`, `assets/`, die `pubspec`-Dateien, das Makefile, `tool/build_appimage.sh`, `build.yml` oder `.github/actions/` ändern. Die APK und das AppImage hängen sieben Tage als Artefakte am Workflow-Lauf und heissen `strokesplit-dev-…`. Die APK ist mit einem zufälligen Debug-Schlüssel signiert und lässt sich deshalb nicht über ein Release installieren.
 
