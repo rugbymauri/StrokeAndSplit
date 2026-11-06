@@ -255,6 +255,8 @@ git push origin v1.2.0
 
 `verify-tag` bricht ab, wenn der Commit nicht auf `main` liegt oder es das Release schon gibt. Ein Release wird nie überschrieben, ein fehlerhaftes Release in GitHub löschen und mit einer neuen Version taggen. Der Versionsname der Pakete kommt aus dem Tag (`1.2.0`), der Android-Versionscode ist die Laufnummer des Release-Workflows (`GITHUB_RUN_NUMBER`) und steigt damit mit jedem Release. `pubspec.yaml` bleibt unverändert. Das Release enthält `strokesplit-1.2.0-android.apk` und `strokesplit-1.2.0-x86_64.AppImage` als Dateien.
 
+Die Release-Notes listen unter „Changes“ die Commits seit dem letzten Versions-Tag vom Typ `feat`, `fix`, `perf` und `revert`, erzeugt von git-cliff (Konfiguration in `cliff.toml`). Vorschau auf das nächste Release: `uvx git-cliff --unreleased`.
+
 Jede Datei eines Releases hat eine signierte Build-Provenance (`actions/attest`): Sie belegt, dass die Datei aus diesem Repository und Commit vom Release-Workflow gebaut wurde. Prüfen mit:
 
 ```sh
