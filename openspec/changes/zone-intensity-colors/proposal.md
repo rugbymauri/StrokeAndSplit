@@ -16,6 +16,7 @@ Im Streckenbalken sind heute alle Zonen blau. Nur Pace-Bänder sind abgestuft, u
 
   Hat eine Zone mehrere Vorgaben, bestimmt die härteste die Farbe.
 - **Wo die Farbe erscheint**: Streckenbalken in allen Listen und Detailansichten, Balken und Abschnittszeilen im Strecken-Editor, Farbmarke vor jeder Zone in der Zonenliste. Freie Abschnitte bleiben grau.
+- **Legende der Streckenliste**: zeigt „leicht“, „mittel“, „hart“ und „frei“ statt „Zone“ und „Helligkeit = Tempo“.
 - **Die relative Abstufung der Pace-Bänder entfällt.** **BREAKING** nur für das Aussehen: Eine Strecke mit mehreren Pace-Zonen ist nicht mehr hell- bis dunkelblau.
 - **Live-Anzeige unverändert**: Dort heisst blau weiterhin „in der Zone“ und orange „ausserhalb“. Die neuen Farben sind gedämpfte, eigene Töne und stehen nicht für Warnung, Fehler oder „verbunden“.
 

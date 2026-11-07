@@ -1446,9 +1446,17 @@
       }
     }
   },
-  "courseLegendShade": "Helligkeit = Tempo",
-  "@courseLegendShade": {
-    "description": "Course list: legend saying that brighter zones in the bar have a faster pace band"
+  "zoneIntensityEasy": "leicht",
+  "@zoneIntensityEasy": {
+    "description": "Course list legend: the colour of an easy zone"
+  },
+  "zoneIntensityMedium": "mittel",
+  "@zoneIntensityMedium": {
+    "description": "Course list legend: the colour of a medium zone"
+  },
+  "zoneIntensityHard": "hart",
+  "@zoneIntensityHard": {
+    "description": "Course list legend: the colour of a hard zone"
   },
   "rankingLength": "Bestenliste {length}",
   "@rankingLength": {

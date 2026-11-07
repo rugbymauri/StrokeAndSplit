@@ -1723,11 +1723,23 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{noch nie gerudert} other{{count}× gerudert}}'**
   String courseRowedCount(int count);
 
-  /// Course list: legend saying that brighter zones in the bar have a faster pace band
+  /// Course list legend: the colour of an easy zone
   ///
   /// In de, this message translates to:
-  /// **'Helligkeit = Tempo'**
-  String get courseLegendShade;
+  /// **'leicht'**
+  String get zoneIntensityEasy;
+
+  /// Course list legend: the colour of a medium zone
+  ///
+  /// In de, this message translates to:
+  /// **'mittel'**
+  String get zoneIntensityMedium;
+
+  /// Course list legend: the colour of a hard zone
+  ///
+  /// In de, this message translates to:
+  /// **'hart'**
+  String get zoneIntensityHard;
 
   /// Course and zone details: label above places 1–3 of one length, e.g. 'Bestenliste 1000 m'
   ///

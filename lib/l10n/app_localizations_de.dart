@@ -1046,7 +1046,13 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get courseLegendShade => 'Helligkeit = Tempo';
+  String get zoneIntensityEasy => 'leicht';
+
+  @override
+  String get zoneIntensityMedium => 'mittel';
+
+  @override
+  String get zoneIntensityHard => 'hart';
 
   @override
   String rankingLength(String length) {

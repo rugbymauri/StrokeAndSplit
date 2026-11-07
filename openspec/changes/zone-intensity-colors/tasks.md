@@ -1,6 +1,6 @@
 # Tasks
 
-Keine neuen Texte, keine Schema-Änderung.
+Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschreibung, danach `make l10n`; der generierte Code wird committet.
 
 ## 1. Härte berechnen
 
@@ -17,6 +17,7 @@ Keine neuen Texte, keine Schema-Änderung.
   - `course_strip_test.dart`: Die beiden Abstufungstests sind durch einen Test ersetzt, der leicht, mittel, hart und frei auf die vier Farben abbildet; der Test mit einer Zone nur mit Stufe erwartet `intensityHard` statt `zoneIn`.
   - Ein Test zeigt, dass dieselbe Zone neben verschiedenen Nachbarn dieselbe Farbe hat.
   - Die Live-Tests (`progress_frame_test.dart`, `pace_box_test.dart`) bleiben unverändert grün.
+- [x] 2.3 Legende der Streckenliste: statt „Zone“ (blau) und „Helligkeit = Tempo“ die Farben „leicht“, „mittel“, „hart“ und „frei“; neue Texte `zoneIntensityEasy`, `zoneIntensityMedium`, `zoneIntensityHard` (de/en), `courseLegendShade` entfällt, danach `make l10n`. Verifikation: `courses_screen_test.dart` findet die neuen Texte auf Deutsch und Englisch.
 - [ ] 2.2 Farben in der App prüfen: unter Linux (Scratch-DB) Zonenliste, Streckenliste und Strecken-Editor mit je einer leichten, mittleren und harten Zone ansehen. Verifikation:
   - Die drei Farben sind auf dem dunklen Hintergrund klar unterscheidbar.
   - Sie sehen nicht aus wie „ausserhalb der Zone“ oder „verbunden“.

@@ -263,9 +263,10 @@ class _Legend extends StatelessWidget {
       spacing: AppSpacing.l,
       runSpacing: AppSpacing.xs,
       children: [
-        swatch(AppColors.zoneIn, l10n.segmentZone),
+        swatch(AppColors.intensityEasy, l10n.zoneIntensityEasy),
+        swatch(AppColors.intensityMedium, l10n.zoneIntensityMedium),
+        swatch(AppColors.intensityHard, l10n.zoneIntensityHard),
         swatch(AppColors.line, l10n.segmentFree),
-        Text(l10n.courseLegendShade, style: AppTextStyles.caption),
       ],
     );
   }
