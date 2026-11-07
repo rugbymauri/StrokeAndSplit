@@ -24,7 +24,7 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 
 - [x] 5.1 README (Abschnitt „Zonen, Strecken und Workouts“ und alle weiteren Stellen) und `docs/implementation-plan.md` sprechen von Workouts. Verifikation: `grep -i vorlage README.md` ist leer.
 - [x] 5.2 Gesamtprüfung: `make check` grün; die Linux-App mit einer Scratch-DB in Schema 10 starten, die Migration läuft, Workouts, Strecken und Sessions sind da, und nirgends steht „Vorlage“.
-- [ ] 5.3 Am Handy (Nutzer): App über die bestehende Installation aktualisieren; die Workouts und Sessions sind noch da, die Texte sprechen von Workouts.
+- [x] 5.3 Am Handy (Nutzer): App über die bestehende Installation aktualisieren; die Workouts und Sessions sind noch da, die Texte sprechen von Workouts.
 
 ## Workflow follow-up
 
