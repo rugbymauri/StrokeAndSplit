@@ -1,10 +1,14 @@
 ## MODIFIED Requirements
 
 ### Requirement: Session starten und beenden
-Der Nutzer SHALL eine Session in der App starten und beenden können, solange eine Datenquelle verbunden ist. Distanz und Zeit der Session MUST ab dem Start der Session zählen, unabhängig vom Stand der PM5-Anzeige. Bei freiem Rudern startet die Session mit „Session starten“, mit einer Vorlage erst mit dem ersten Ruderschlag.
+Der Nutzer SHALL eine Session in der App starten und beenden können, solange eine Datenquelle verbunden ist. Distanz und Zeit der Session MUST ab dem Start der Session zählen, unabhängig vom Stand der Anzeige am Rudergerät. Bei freiem Rudern startet die Session mit „Session starten“, mit einer Vorlage erst mit dem ersten Ruderschlag.
 
 #### Scenario: Session starten
 - **WHEN** der Nutzer mit verbundenem PM5 „Session starten“ wählt, während der PM5 bereits 500 m anzeigt
+- **THEN** beginnt die Session bei 0 m und 0:00
+
+#### Scenario: Session mit FTMS-Rudergerät starten
+- **WHEN** der Nutzer mit verbundenem FTMS-Rudergerät „Session starten“ wählt, während das Gerät bereits 800 m meldet
 - **THEN** beginnt die Session bei 0 m und 0:00
 
 #### Scenario: Session beenden

@@ -6,16 +6,20 @@ Begleitet das Rudern einer Vorlage: Die App zählt Runden und Segmente, zeigt im
 
 ## Requirements
 
-### Requirement: Fortschritt nach Wanduhr messen
-Beim Rudern einer Vorlage SHALL der Fortschritt einer Zeitstrecke nach Wanduhr gemessen werden, einschliesslich Pausen, in denen der PM5 seine Uhr anhält. Rundenzeiten von Distanzstrecken MUST ebenfalls Pausen enthalten.
+### Requirement: Fortschritt nach Sessionzeit messen
+Beim Rudern einer Vorlage SHALL der Fortschritt einer Zeitstrecke nach der Sessionzeit gemessen werden, also nach Wanduhr ohne die Pausen der Session, unabhängig davon, ob der PM5 seine Uhr anhält. Rundenzeiten und Abschnittszeiten MUST ebenfalls nach der Sessionzeit gemessen werden und die Pausen damit nicht enthalten.
 
 #### Scenario: Pause in einer Distanzrunde
-- **WHEN** der Nutzer eine 1000-m-Runde in 4:00 Ruderzeit rudert und dabei 30 Sekunden pausiert
-- **THEN** ist die Rundenzeit 4:30
+- **WHEN** der Nutzer in einer 1000-m-Runde rudert und dabei 30 Sekunden stillsitzt
+- **THEN** enthält die Rundenzeit die Zeit bis zum Beginn der Pause, aber nicht die Pause
 
 #### Scenario: Pause in einer Zeitrunde
-- **WHEN** der Nutzer in einer 4-min-Runde nach 3 Minuten 30 Sekunden pausiert und weiterrudert
-- **THEN** endet die Runde 4 Minuten nach ihrem Beginn und die Rundendistanz enthält nur die geruderten Meter
+- **WHEN** der Nutzer in einer 4-min-Runde nach 3 Minuten aufhört, 30 Sekunden stillsitzt und weiterrudert
+- **THEN** steht die Restzeit der Runde in der Pause still, und die Runde endet nach 4 Minuten Sessionzeit
+
+#### Scenario: Ältere Session in der Rangliste
+- **WHEN** eine Session aus einer früheren Version mit einer Pause in der Rangliste steht
+- **THEN** zählt ihre Runde weiter mit der gespeicherten Zeit einschliesslich der Pause
 
 ### Requirement: Runden fortlaufend zählen
 Die App SHALL eine Runde beenden, sobald die Länge der Strecke erreicht ist, und die nächste Runde unmittelbar anschliessen. Die Rundengrenze MUST zwischen zwei Messpunkten auf die exakte Streckenlänge interpoliert werden, und Überschuss MUST der nächsten Runde zugerechnet werden.
@@ -43,15 +47,19 @@ Beendet der Nutzer die Session mitten in einer Runde, SHALL die angefangene Rund
 - **THEN** zeigt die Zusammenfassung Runde 1 mit ihrer Zeit und Runde 2 als unvollständig mit 400 m
 
 ### Requirement: Runde und Segment live anzeigen
-Beim Rudern einer Vorlage SHALL das Live-Display die aktuelle Runde (bei fester Zahl als „Runde 2 von 3“), den aktuellen Abschnitt mit dem Namen seiner Zone bzw. „frei“, die Restdistanz bzw. Restzeit bis zum Abschnittsende und die Zielbänder der Zone anzeigen.
+Beim Rudern einer Vorlage SHALL das Live-Display die aktuelle Runde (bei fester Zahl als „Runde 2 / 3“), den aktuellen Abschnitt mit dem Namen seiner Zone bzw. „frei“, die Restdistanz bzw. Restzeit bis zum Abschnittsende und die Zielbänder der Zone anzeigen.
 
 #### Scenario: Mitten in der Zone Tempo
 - **WHEN** der Nutzer in Runde 2 von 3 bei 520 m in der Zone „Tempo“ von 200 bis 800 m mit Band 2:05–2:10 rudert
-- **THEN** zeigt das Display „Runde 2 von 3“, „Tempo“, „280 m“ bis zum Abschnittsende und „2:05–2:10“
+- **THEN** zeigt das Display „Runde 2 / 3“, „Tempo“, „280 m“ bis zum Abschnittsende und „2:05–2:10“
 
 #### Scenario: Freier Abschnitt
 - **WHEN** der Nutzer bei 300 m einer Strecke rudert, in der die erste Zone bei 500 m beginnt
 - **THEN** zeigt das Display „frei“ und „200 m“ bis zum Abschnittsende
+
+#### Scenario: Zone nur mit Stufe
+- **WHEN** der Nutzer bei 700 m in der Zone „Kraft“ von 500 bis 1000 m rudert, die nur Stufe 12 und kein Band hat
+- **THEN** zeigt das Display „Kraft“ statt „frei“ und „300 m“ bis zum Abschnittsende, aber kein Zielband
 
 ### Requirement: Zonenstatus anzeigen
 Hat das aktuelle Segment ein Band, SHALL das Live-Display für Pace bzw. Schlagzahl sichtbar anzeigen, ob der aktuelle Wert im Band liegt. Liegt er ausserhalb, MUST die Anzeige die Richtung zeigen: schneller oder langsamer bzw. mehr oder weniger Schläge.
@@ -69,15 +77,19 @@ Hat das aktuelle Segment ein Band, SHALL das Live-Display für Pace bzw. Schlagz
 - **THEN** zeigt das Display keine Zonenmarkierung
 
 ### Requirement: Anteil in der Zone zählen
-Für jedes Segment mit mindestens einem Band SHALL die App den Anteil der Zeit messen, in dem alle gesetzten Bänder gleichzeitig eingehalten wurden. Zeit ohne gültigen Messwert, etwa in einer Pause, MUST als ausserhalb der Zone zählen. Das Live-Display SHALL den laufenden Anteil der aktuellen Runde anzeigen.
+Für jedes Segment mit mindestens einem Band SHALL die App den Anteil der Sessionzeit messen, in dem alle gesetzten Bänder gleichzeitig eingehalten wurden. Zeit ohne gültigen Messwert ausserhalb einer Pause MUST als ausserhalb der Zone zählen. Die Pausen der Session MUST weder als innerhalb noch als ausserhalb zählen. Das Live-Display SHALL den laufenden Anteil der aktuellen Runde anzeigen.
 
 #### Scenario: Teilweise in der Zone
 - **WHEN** der Nutzer ein 60-Sekunden-Segment 45 Sekunden lang in beiden Bändern rudert
 - **THEN** beträgt der Anteil in der Zone für dieses Segment 75 %
 
 #### Scenario: Pause im Segment
-- **WHEN** der Nutzer in einem Segment mit Band 10 Sekunden pausiert
-- **THEN** zählen diese 10 Sekunden als ausserhalb der Zone
+- **WHEN** der Nutzer in einem Segment mit Band 30 Sekunden stillsitzt
+- **THEN** zählt die Pause nicht zum Anteil in der Zone, nur die Zeit bis zum Beginn der Pause
+
+#### Scenario: Zone nur mit Stufe
+- **WHEN** der Nutzer eine Runde rudert, deren einzige Zone „Kraft“ nur Stufe 12 und kein Band hat
+- **THEN** hat weder das Segment noch die Runde einen Anteil in der Zone
 
 ### Requirement: Runden- und Segmentergebnisse speichern
 Die App SHALL pro Runde Beginn, Ende, Dauer, Distanz, Status (vollständig oder unvollständig) und Anteil in der Zone speichern und pro Segment einer Runde Dauer, Distanz und Anteil in der Zone. Die Ergebnisse MUST eine App-Beendigung während der Session so überstehen wie die übrige Aufzeichnung.
@@ -107,3 +119,43 @@ Wird eine Session auf einer Vorlage exportiert und wieder importiert, SHALL sie 
 #### Scenario: Export und Import
 - **WHEN** eine Session „Seerunde x3“ auf dem Handy exportiert und auf dem Laptop importiert wird, wo es die Strecke nicht gibt
 - **THEN** zeigt die importierte Session dieselben drei Rundenzeiten und die Strecke „Seerunde“ ist auf dem Laptop vorhanden
+
+### Requirement: Strecke ohne Vorlage rudern
+Eine Session, die ohne Vorlage auf einer Strecke läuft, SHALL Runden, Abschnitte, Zonenstatus, Anteil in der Zone und Ergebnisse genauso messen, anzeigen und speichern wie eine Session auf einer Vorlage mit dieser Strecke. Ihre vollständigen Runden und Zonenfahrten MUST in den Ranglisten von Strecke und Zone zählen.
+
+#### Scenario: Drei Runden ohne Vorlage
+- **WHEN** der Nutzer „Seerunde“ ohne Vorlage mit 3 Runden rudert
+- **THEN** zeigt das Live-Display „Runde 2 von 3“ und den aktuellen Abschnitt, und die Session endet nach der dritten Runde
+
+#### Scenario: Rangliste der Strecke
+- **WHEN** der Nutzer „Seerunde“ ohne Vorlage rudert und eine Runde in 4:05 schafft, schneller als alle bisherigen
+- **THEN** steht diese Runde auf Platz 1 der Rangliste von „Seerunde“
+
+### Requirement: Nach der Gesamtdauer beenden
+Bei einer Session mit Gesamtdauer SHALL die App die Session automatisch beenden, sobald die Ruderzeit ohne Pausen die Dauer erreicht, und die Zusammenfassung zeigen. Liegt das Ende mitten in einer Runde, MUST diese Runde als unvollständig gespeichert werden.
+
+#### Scenario: Ende mitten in der Runde
+- **WHEN** der Nutzer 30 min auf „Seerunde“ rudert und nach 30 min Ruderzeit in Runde 8 bei 1.3 km von 2.4 km ist
+- **THEN** endet die Session, Runde 8 ist unvollständig, und die Zusammenfassung erscheint
+
+#### Scenario: Pause zählt nicht
+- **WHEN** der Nutzer bei 30 min Dauer nach 20 min Ruderzeit 2 min pausiert
+- **THEN** endet die Session erst nach weiteren 10 min Ruderzeit
+
+#### Scenario: Zeitstrecke mit Gesamtdauer
+- **WHEN** der Nutzer die Zeitstrecke „Vier Minuten“ 30 min lang rudert
+- **THEN** sind 7 Runden vollständig und Runde 8 nach 2 min unvollständig
+
+### Requirement: Gesamtdauer live anzeigen
+Bei einer Session mit Gesamtdauer SHALL der äussere Ring des Fortschrittsrahmens den Anteil der Ruderzeit an der Dauer zeigen, ohne Rundengrenzen. Das Live-Display MUST die verbleibende Ruderzeit zeigen und die Runde ohne Gesamtzahl, etwa „Runde 3“.
+
+#### Scenario: Halbzeit
+- **WHEN** der Nutzer bei 30 min Dauer 15 min gerudert hat
+- **THEN** ist der äussere Ring zur Hälfte gefüllt, und das Live-Display zeigt 15:00 verbleibend
+
+### Requirement: Zusammenfassung ohne Vorlage
+Die Zusammenfassung einer Session ohne Vorlage auf einer Strecke SHALL statt der Vorlage die Strecke und die geplante Länge nennen: die Rundenzahl, die Dauer oder „offen“. Sie MUST alle Runden wie bei einer Vorlage zeigen und keine Platzmarke für eine Vorlage.
+
+#### Scenario: 30 min auf der Seerunde
+- **WHEN** der Nutzer die Zusammenfassung einer Session mit 30 min auf „Seerunde“ öffnet
+- **THEN** steht dort „Seerunde · 30 min“ mit allen Runden, die letzte als unvollständig markiert
