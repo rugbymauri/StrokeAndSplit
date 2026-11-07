@@ -20,11 +20,13 @@ final ghostTrackProvider = FutureProvider.autoDispose
       (ref, entry) => ref.watch(ghostRepositoryProvider).track(entry),
     );
 
-/// The ranking of a workout with this course length and number of laps.
+/// The ranking of a workout with this order of course lengths, joined by
+/// commas so the key compares by value, and number of laps.
 typedef WorkoutGhostKey = ({
   int workoutId,
   CourseAxis axis,
   int length,
+  String chain,
   int laps,
 });
 
@@ -37,7 +39,14 @@ typedef LengthGhostKey = ({int id, CourseAxis axis, int length});
 final workoutGhostProvider = Provider.autoDispose
     .family<GhostTrack?, WorkoutGhostKey>((ref, key) {
       final rankings = ref.watch(workoutRankingsProvider(key.workoutId)).value;
-      return _placeOne(ref, rankings, key.axis, key.length, laps: key.laps);
+      return _placeOne(
+        ref,
+        rankings,
+        key.axis,
+        key.length,
+        laps: key.laps,
+        chain: key.chain,
+      );
     });
 
 /// The ghost of the lap track: place 1 of the course with the length rowed
@@ -60,9 +69,10 @@ final zoneGhostProvider = Provider.autoDispose
 /// a workout there is no ghost of the workout (course-rowing-free, Design D5).
 typedef LiveGhostsKey = ({
   int? workoutId,
-  int courseId,
+  int? courseId,
   CourseAxis axis,
   int length,
+  String chain,
   int? laps,
   int? zoneId,
   int segmentLength,
@@ -72,9 +82,11 @@ typedef LiveGhostsKey = ({
 /// it only changes from one segment to the next.
 LiveGhostsKey liveGhostsKey(SessionPlan plan, LapProgress progress) => (
   workoutId: plan.workout?.id,
-  courseId: plan.course.id,
-  axis: plan.course.axis,
-  length: plan.course.definition.length,
+  // A lap of a chain runs several courses (Change workout-course-chain, D5).
+  courseId: plan.courses.length == 1 ? plan.courses.single.id : null,
+  axis: plan.axis,
+  length: plan.definition.length,
+  chain: plan.courses.map((c) => c.definition.length).join(','),
   laps: plan.plannedLaps,
   zoneId: progress.segment.zoneId,
   segmentLength: progress.segmentEnd - progress.segmentStart,
@@ -92,25 +104,29 @@ LiveGhostsKey liveGhostsKey(SessionPlan plan, LapProgress progress) => (
 final liveGhostsProvider = Provider.autoDispose
     .family<LiveGhosts, LiveGhostsKey>((ref, key) {
       final (workoutId, laps, zoneId) = (key.workoutId, key.laps, key.zoneId);
+      final courseId = key.courseId;
       final workout = workoutId == null || laps == null
           ? null
           : (
               workoutId: workoutId,
               axis: key.axis,
               length: key.length,
+              chain: key.chain,
               laps: laps,
             );
       return (
         course: workout == null
             ? null
             : ref.watch(workoutGhostProvider(workout)),
-        lap: ref.watch(
-          courseGhostProvider((
-            id: key.courseId,
-            axis: key.axis,
-            length: key.length,
-          )),
-        ),
+        lap: courseId == null
+            ? null
+            : ref.watch(
+                courseGhostProvider((
+                  id: courseId,
+                  axis: key.axis,
+                  length: key.length,
+                )),
+              ),
         segment: zoneId == null
             ? null
             : ref.watch(
@@ -132,9 +148,16 @@ GhostTrack? _placeOne(
   CourseAxis axis,
   int length, {
   int? laps,
+  String? chain,
 }) {
   final ranking = rankings
-      ?.where((r) => r.axis == axis && r.length == length && r.laps == laps)
+      ?.where(
+        (r) =>
+            r.axis == axis &&
+            r.length == length &&
+            r.laps == laps &&
+            r.courseLengths?.join(',') == chain,
+      )
       .firstOrNull;
   final entry = ranking?.entries.firstOrNull;
   return entry == null ? null : ref.watch(ghostTrackProvider(entry)).value;

@@ -45,19 +45,54 @@ final class OpenLength extends PlanLength {
   int get hashCode => 0;
 }
 
-/// What is rowed: a course for a [length], from a workout or chosen right
-/// on the course (course-rowing-free, Design D1). A free session has no plan.
+/// What is rowed: one or more courses one after the other for a [length],
+/// from a workout or chosen right on a course (course-rowing-free, Design
+/// D1; workout-course-chain, Design D2). A free session has no plan.
 @immutable
 class SessionPlan {
-  const SessionPlan({required this.course, required this.length, this.workout});
+  SessionPlan({
+    required List<Course> courses,
+    required this.length,
+    this.workout,
+  }) : courses = List.unmodifiable(courses),
+       courseStarts = _starts(courses),
+       definition = CourseDefinition.chain([
+         for (final c in courses) c.definition,
+       ]);
 
-  /// The course in the version that is rowed.
-  final Course course;
+  static List<int> _starts(List<Course> courses) {
+    var start = 0;
+    return List.unmodifiable([
+      for (final c in courses)
+        (start += c.definition.segments.length) - c.definition.segments.length,
+    ]);
+  }
+
+  /// The courses in the version that is rowed, in their order; at least one.
+  final List<Course> courses;
+
+  /// The courses as one: a lap rows all of them.
+  final CourseDefinition definition;
+
+  /// The index of the first segment of each course within a lap.
+  final List<int> courseStarts;
 
   final PlanLength length;
 
   /// The workout the plan comes from; null when the course is rowed without one.
   final ({int id, String name})? workout;
+
+  CourseAxis get axis => definition.axis;
+
+  /// The index of the course that segment [segment] of a lap belongs to.
+  int courseAt(int segment) {
+    var index = 0;
+    while (index + 1 < courseStarts.length &&
+        courseStarts[index + 1] <= segment) {
+      index++;
+    }
+    return index;
+  }
 
   /// The number of laps; null unless the plan has a fixed number of them.
   int? get plannedLaps => switch (length) {

@@ -18,6 +18,8 @@ import '../../support/fixtures.dart';
 import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
 
@@ -50,7 +52,11 @@ void main() {
     );
     final workouts = WorkoutRepository(db);
     final workout = (await workouts.get(
-      await workouts.create('Seerunde x1', courseId: course, laps: 1),
+      await workouts.create(
+        'Seerunde x1',
+        courseIds: [course],
+        length: const LapCount(1),
+      ),
     ))!;
     await storeRowedSession(
       db,
@@ -146,8 +152,8 @@ void main() {
     final workouts = WorkoutRepository(db);
     final workoutId = await workouts.create(
       'Seerunde x3',
-      courseId: course,
-      laps: 3,
+      courseIds: [course],
+      length: const LapCount(3),
     );
     final workout = (await workouts.get(workoutId))!;
     for (var i = 0; i < 200; i++) {

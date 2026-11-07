@@ -5,10 +5,10 @@ import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
-import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
+import '../../support/session_rows.dart';
 
 const _sprint = Zone(
   name: 'Sprint',
@@ -50,16 +50,15 @@ void main() {
   }
 
   Future<void> row(int courseId) async {
-    await db
-        .into(db.sessions)
-        .insert(
-          SessionsCompanion.insert(
-            startedAt: DateTime(2026, 10, 16),
-            status: SessionStatus.complete,
-            source: ErgSourceKind.pm5,
-            courseVersionId: Value((await courses.get(courseId))!.versionId),
-          ),
-        );
+    await insertSession(
+      db,
+      SessionsCompanion.insert(
+        startedAt: DateTime(2026, 10, 16),
+        status: SessionStatus.complete,
+        source: ErgSourceKind.pm5,
+      ),
+      courseVersionIds: [(await courses.get(courseId))!.versionId],
+    );
   }
 
   /// `500–600 Sprint` for each placed zone of the course.

@@ -13,6 +13,8 @@ import 'fake_ble_transport.dart';
 import 'localized_app.dart';
 import 'test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 /// A database with courses and workouts, and the app around a screen of the
 /// workout choice.
 class WorkoutSetup {
@@ -68,10 +70,10 @@ class WorkoutSetup {
   Future<int> addWorkout(
     WidgetTester tester,
     String name, {
-    required int courseId,
-    int? laps = 3,
+    required List<int> courseIds,
+    PlanLength length = const LapCount(3),
   }) async => (await tester.runAsync(
-    () => workouts.create(name, courseId: courseId, laps: laps),
+    () => workouts.create(name, courseIds: courseIds, length: length),
   ))!;
 
   Future<void> pump(

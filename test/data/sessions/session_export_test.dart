@@ -18,6 +18,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 
 import '../../support/fixtures.dart';
 import '../../support/test_database.dart';
+import '../../support/session_rows.dart';
 
 /// The summary without the fields that differ between two copies.
 Map<String, Object?> _summary(SessionRow s) => {
@@ -198,7 +199,7 @@ void main() {
       isTrue,
     );
     expect(session.distanceDm, greaterThan(0));
-    expect(session.courseVersionId, isNull);
+    expect(await repository.sessionCourses(id), isEmpty);
     expect(await repository.laps(id), isEmpty);
   });
 
@@ -354,7 +355,11 @@ void main() {
       final courseId = await CourseRepository(db).create('Seerunde', course);
       final workouts = WorkoutRepository(db);
       final workout = (await workouts.get(
-        await workouts.create('Seerunde x3', courseId: courseId, laps: 3),
+        await workouts.create(
+          'Seerunde x3',
+          courseIds: [courseId],
+          length: const LapCount(3),
+        ),
       ))!;
       final repository = SessionRepository(db);
       final id = await repository.create(
@@ -363,7 +368,7 @@ void main() {
         protocol: ftms ? ErgProtocol.ftms : ErgProtocol.pm5,
         plan: limit == null
             ? workout.toPlan()
-            : SessionPlan(course: workout.course, length: TimeLimit(limit)),
+            : SessionPlan(courses: [workout.chain], length: TimeLimit(limit)),
       );
       final protocol = ftms ? ErgProtocol.ftms : ErgProtocol.pm5;
       final accumulator = SessionAccumulator(
@@ -429,7 +434,7 @@ void main() {
         ),
         isTrue,
       );
-      expect(course.versionId, session.courseVersionId);
+      expect(await sessionVersionIds(laptop, imported), [course.versionId]);
     });
 
     test('keeps the planned duration of a course rowed without a workout (course-rowing-free)', () async {
@@ -455,7 +460,7 @@ void main() {
         (session.workoutName, session.plannedLaps, session.plannedDurationMs),
         (null, null, 1800000),
       );
-      expect(session.courseVersionId, isNotNull);
+      expect(await sessionVersionIds(laptop, imported), hasLength(1));
     });
 
     test(
@@ -504,7 +509,11 @@ void main() {
         ) as Map;
         await SessionRepository(laptop).import(bytes);
 
-        expect((header['course'] as Map)['segments'][1]['resistanceLevel'], 10);
+        expect(
+          ((header['courses'] as List).single
+              as Map)['segments'][1]['resistanceLevel'],
+          10,
+        );
         expect(
           (await ZoneRepository(laptop).all()).single.sameAs(hard),
           isTrue,
@@ -528,10 +537,9 @@ void main() {
 
         expect(await CourseRepository(phone).all(), hasLength(1));
         expect(await ZoneRepository(phone).all(), hasLength(1));
-        final original = (await SessionRepository(phone).get(recorded))!;
         expect(
-          (await SessionRepository(phone).get(imported))!.courseVersionId,
-          original.courseVersionId,
+          await sessionVersionIds(phone, imported),
+          await sessionVersionIds(phone, recorded),
         );
       },
     );
@@ -566,7 +574,9 @@ void main() {
       final header = jsonDecode(lines.first) as Map<String, Object?>;
 
       expect(header['workout'], {'name': 'Seerunde x3', 'laps': 3});
-      expect((header['course'] as Map)['segments'], [
+      final course = (header['courses'] as List).single as Map;
+      expect((course['name'], course['firstSegment']), ('Seerunde', 0));
+      expect(course['segments'], [
         {'length': 20},
         {
           'length': 20,

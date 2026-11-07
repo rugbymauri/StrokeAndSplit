@@ -4,6 +4,7 @@ import 'package:clock/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
+import '../courses/course.dart';
 import '../courses/lap_tracker.dart';
 import '../db/database.dart';
 import '../health/health_export.dart';
@@ -31,6 +32,12 @@ final sessionsProvider = StreamProvider<List<SessionRow>>(
 
 final sessionProvider = StreamProvider.family<SessionRow?, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).watch(id),
+);
+
+/// The courses a stored session rowed, in their order; empty for a free
+/// session (Change workout-course-chain).
+final sessionCoursesProvider = FutureProvider.family<List<Course>, int>(
+  (ref, id) => ref.watch(sessionRepositoryProvider).courses(id),
 );
 
 /// The laps of a session on a course, in order.
@@ -151,10 +158,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
       ),
       plan: plan,
       ghost: ghost,
-      lap: LapTracker(
-        plan.course.definition,
-        plannedLaps: plan.plannedLaps,
-      ).progress,
+      lap: LapTracker(plan.definition, plannedLaps: plan.plannedLaps).progress,
     );
     final detector = FirstStrokeDetector(source.protocol);
     List<RawPacket>? early;
@@ -187,7 +191,7 @@ class SessionRecorder extends Notifier<ActiveRecording?> {
     final accumulator = _accumulator = SessionAccumulator(
       id,
       protocol: source.protocol,
-      course: plan?.course.definition,
+      course: plan?.definition,
       plannedLaps: plan?.plannedLaps,
       plannedDuration: plan?.plannedDuration,
     );

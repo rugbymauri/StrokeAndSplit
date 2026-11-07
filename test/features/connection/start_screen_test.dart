@@ -26,6 +26,8 @@ import '../../support/fake_ble_transport.dart';
 import '../../support/localized_app.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _h10 = FoundHeartRateMonitor(
   id: 'A0:9E:1A:00:00:01',
@@ -474,8 +476,11 @@ void main() {
             'Seerunde',
             CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
           );
-          await WorkoutRepository(db)
-              .create('Seerunde x3', courseId: course, laps: 3);
+          await WorkoutRepository(db).create(
+            'Seerunde x3',
+            courseIds: [course],
+            length: const LapCount(3),
+          );
         });
         final container = await pumpConnected(tester, db: db);
         final source = container.read(activeErgSourceProvider);
@@ -546,8 +551,8 @@ void main() {
         final workouts = WorkoutRepository(db);
         final id = await workouts.create(
           'Seerunde x3',
-          courseId: course,
-          laps: 3,
+          courseIds: [course],
+          length: const LapCount(3),
         );
         await SessionRepository(db).create(
           startedAt: DateTime.now().subtract(const Duration(days: 1)),

@@ -95,11 +95,11 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                               style: AppTextStyles.subtitle,
                             ),
                             const SizedBox(height: AppSpacing.m),
-                            CourseStrip(definition: workout.course.definition),
+                            CourseStrip(definition: workout.chain.definition),
                             const SizedBox(height: AppSpacing.m),
                             for (final line in workoutZoneLines(
                               l10n,
-                              workout.course,
+                              workout.chain,
                             ))
                               Text(line, style: AppTextStyles.caption),
                             const SizedBox(height: AppSpacing.xxl),

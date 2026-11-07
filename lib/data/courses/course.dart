@@ -108,6 +108,23 @@ class CourseDefinition {
         segments: [CourseSegment(length: length)],
       );
 
+  /// The courses of a workout one after the other, as a single course whose
+  /// segments are theirs (Change workout-course-chain, Design D2). All share
+  /// one axis.
+  factory CourseDefinition.chain(List<CourseDefinition> courses) {
+    if (courses.isEmpty) throw ArgumentError('A chain needs a course');
+    final axis = courses.first.axis;
+    if (courses.any((c) => c.axis != axis)) {
+      throw ArgumentError('The courses of a chain share one axis');
+    }
+    if (courses.length == 1) return courses.single;
+    return CourseDefinition(
+      axis: axis,
+      length: courses.fold(0, (sum, c) => sum + c.length),
+      segments: [for (final c in courses) ...c.segments],
+    );
+  }
+
   final CourseAxis axis;
 
   /// In metres or seconds, depending on [axis].
@@ -163,6 +180,23 @@ class Course {
   final CourseDefinition definition;
 
   CourseAxis get axis => definition.axis;
+
+  /// The courses of a chain shown as one: named `Einrudern + Seerunde`, with
+  /// their segments one after the other; a single course stays as it is
+  /// (Change workout-course-chain). Its ids are those of the first course.
+  static Course chain(List<Course> courses) {
+    if (courses.length == 1) return courses.single;
+    final first = courses.first;
+    return Course(
+      id: first.id,
+      name: courses.map((c) => c.name).join(' + '),
+      versionId: first.versionId,
+      version: first.version,
+      definition: CourseDefinition.chain([
+        for (final c in courses) c.definition,
+      ]),
+    );
+  }
 }
 
 /// A course length as entered: `1000 m` or `4:00`.

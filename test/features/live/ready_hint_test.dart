@@ -19,6 +19,8 @@ import '../../support/fixtures.dart';
 import '../../support/localized_app.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
 
@@ -58,7 +60,11 @@ class _Harness {
       );
       final workouts = WorkoutRepository(db);
       return workouts.get(
-        await workouts.create('Seerunde x3', courseId: course, laps: 3),
+        await workouts.create(
+          'Seerunde x3',
+          courseIds: [course],
+          length: const LapCount(3),
+        ),
       );
     }))!;
     await tester.pumpWidget(

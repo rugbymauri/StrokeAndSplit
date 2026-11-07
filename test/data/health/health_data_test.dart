@@ -172,7 +172,7 @@ void main() {
     expect(
       await title(
         SessionPlan(
-          course: course,
+          courses: [course],
           length: const TimeLimit(Duration(minutes: 30)),
         ),
       ),
@@ -180,7 +180,11 @@ void main() {
     );
     final workouts = WorkoutRepository(db);
     final x3 = (await workouts.get(
-      await workouts.create('Seerunde x3', courseId: course.id, laps: 3),
+      await workouts.create(
+        'Seerunde x3',
+        courseIds: [course.id],
+        length: const LapCount(3),
+      ),
     ))!;
     expect(await title(x3.toPlan()), 'Seerunde x3');
   });

@@ -22,6 +22,8 @@ import '../support/fake_ble_transport.dart';
 import '../support/test_database.dart';
 import '../support/localized_app.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 /// Laps and segments of a session, to compare two copies.
 Future<List<Object>> _results(AppDatabase db, int id) async => [
   for (final l in await SessionRepository(db).laps(id))
@@ -66,8 +68,11 @@ void main() {
             ],
           ),
         );
-        await WorkoutRepository(db)
-            .create('Dreiteiler x2', courseId: course, laps: 2);
+        await WorkoutRepository(db).create(
+          'Dreiteiler x2',
+          courseIds: [course],
+          length: const LapCount(2),
+        );
       });
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -172,8 +177,9 @@ void main() {
         ).definition!;
         final course = await CourseRepository(db)
             .create('Seerunde', definition);
-        await WorkoutRepository(db)
-            .create('Seerunde x2', courseId: course, laps: 2);
+        await WorkoutRepository(
+          db,
+        ).create('Seerunde x2', courseIds: [course], length: const LapCount(2));
       });
       await tester.pumpWidget(
         UncontrolledProviderScope(

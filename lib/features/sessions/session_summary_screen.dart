@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/design_tokens.dart';
 import '../../data/courses/course.dart';
-import '../../data/courses/course_providers.dart';
 import '../../data/db/database.dart';
 import '../../data/sessions/pace_track.dart';
 import '../../data/sessions/session_providers.dart';
@@ -100,11 +99,14 @@ class _Summary extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final versionId = session.courseVersionId;
-    final course = versionId == null
-        ? null
-        : ref.watch(courseVersionProvider(versionId)).value;
-    final laps = versionId == null
+    // A chain of courses is shown as one course (Change workout-course-chain).
+    final course = switch (ref
+        .watch(sessionCoursesProvider(session.id))
+        .value) {
+      null || [] => null,
+      final courses => Course.chain(courses),
+    };
+    final laps = course == null
         ? const <LapRow>[]
         : ref.watch(sessionLapsProvider(session.id)).value ?? const [];
     final places =

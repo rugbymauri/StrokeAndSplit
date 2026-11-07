@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -28,9 +29,8 @@ class WorkoutPodium extends ConsumerWidget {
     final laps = workout.laps;
     if (laps == null) return _Hint(l10n.workoutPodiumOpenLaps);
     final rankings = ref.watch(workoutRankingsProvider(workout.id));
-    final course = workout.course;
     return switch (rankings) {
-      AsyncData(:final value) => switch (_current(value, course, laps)) {
+      AsyncData(:final value) => switch (_current(value, workout, laps)) {
         final Ranking ranking when ranking.entries.isNotEmpty => _Places(
           ranking: ranking,
         ),
@@ -41,11 +41,12 @@ class WorkoutPodium extends ConsumerWidget {
     };
   }
 
-  /// The ranking of the course length and number of laps rowed today.
-  static Ranking? _current(List<Ranking> rankings, Course course, int laps) {
+  /// The ranking of the course lengths and number of laps rowed today.
+  static Ranking? _current(List<Ranking> rankings, Workout workout, int laps) {
+    final lengths = [for (final c in workout.courses) c.definition.length];
     for (final r in rankings) {
-      if (r.axis == course.axis &&
-          r.length == course.definition.length &&
+      if (r.axis == workout.axis &&
+          listEquals(r.courseLengths, lengths) &&
           r.laps == laps) {
         return r;
       }

@@ -13,13 +13,20 @@ class RankingRepository {
   final AppDatabase _db;
 
   /// Only sessions rowed on an erg on this device count, none imported (Design D3).
+  /// The session rows a single course (Change workout-course-chain, D4).
+  static const _single =
+      '(SELECT COUNT(*) FROM session_courses x WHERE x.session_id = s.id) = 1';
+
   static final _counted =
       "s.source IN ('${ErgSourceKind.pm5.name}', '${ErgSourceKind.ftms.name}') AND s.imported = 0";
 
-  /// The complete laps on course [courseId], one ranking per length of the
-  /// rowed versions, the current length first (Design D2).
+  /// The complete runs over course [courseId], one ranking per length of the
+  /// rowed versions, the current length first (Design D2). A session with
+  /// this course alone runs it once per complete lap; in a chain each lap
+  /// runs it once, complete when its end was reached (Change
+  /// workout-course-chain, Design D4).
   Future<List<Ranking>> course(int courseId) async {
-    final rows = await _db
+    final laps = await _db
         .customSelect(
           '''
         SELECT s.id AS session, s.started_at AS started_at, c.axis AS axis, v.length AS length, l.lap_no AS lap,
@@ -27,9 +34,39 @@ class RankingRepository {
           l.start_distance_dm AS start_distance, l.end_distance_dm AS end_distance
         FROM laps l
         JOIN sessions s ON s.id = l.session_id
-        JOIN course_versions v ON v.id = s.course_version_id
+        JOIN session_courses sc ON sc.session_id = s.id
+        JOIN course_versions v ON v.id = sc.course_version_id
         JOIN courses c ON c.id = v.course_id
-        WHERE v.course_id = ? AND c.deleted_at IS NULL AND l.complete = 1 AND $_counted''',
+        WHERE v.course_id = ? AND c.deleted_at IS NULL AND l.complete = 1 AND $_counted
+          AND $_single''',
+          variables: [Variable.withInt(courseId)],
+        )
+        .get();
+    final runs = await _db
+        .customSelect(
+          '''
+        SELECT s.id AS session, s.started_at AS started_at, c.axis AS axis, v.length AS length,
+          l.lap_no AS lap, sc.first_segment AS position,
+          l.start_wall_ms AS lap_wall, l.start_distance_dm AS lap_distance,
+          (SELECT COALESCE(SUM(b.duration_ms), 0) FROM lap_segments b WHERE b.session_id = l.session_id
+            AND b.lap_no = l.lap_no AND b.position < sc.first_segment) AS before_wall,
+          (SELECT COALESCE(SUM(b.distance_dm), 0) FROM lap_segments b WHERE b.session_id = l.session_id
+            AND b.lap_no = l.lap_no AND b.position < sc.first_segment) AS before_distance,
+          SUM(ls.duration_ms) AS duration, SUM(ls.distance_dm) AS distance
+        FROM session_courses sc
+        JOIN sessions s ON s.id = sc.session_id
+        JOIN course_versions v ON v.id = sc.course_version_id
+        JOIN courses c ON c.id = v.course_id
+        JOIN (SELECT version_id, COUNT(*) AS count FROM course_segments GROUP BY version_id) n
+          ON n.version_id = v.id
+        JOIN laps l ON l.session_id = s.id
+        JOIN lap_segments ls ON ls.session_id = l.session_id AND ls.lap_no = l.lap_no
+          AND ls.position >= sc.first_segment AND ls.position < sc.first_segment + n.count
+        WHERE v.course_id = ? AND c.deleted_at IS NULL AND $_counted AND NOT $_single
+          AND (l.complete = 1 OR EXISTS (SELECT 1 FROM lap_segments b WHERE b.session_id = l.session_id
+            AND b.lap_no = l.lap_no AND b.position >= sc.first_segment + n.count))
+        GROUP BY sc.session_id, sc.position, l.lap_no
+        HAVING COUNT(*) = n.count''',
           variables: [Variable.withInt(courseId)],
         )
         .get();
@@ -44,24 +81,34 @@ class RankingRepository {
         .getSingleOrNull();
     return _rankings(
       [
-        for (final row in rows)
+        for (final row in laps)
           (
-            _axis(row),
-            row.read<int>('length'),
-            null,
-            _entry(row, lap: row.read<int>('lap')),
+            axis: _axis(row),
+            length: row.read<int>('length'),
+            laps: null,
+            courseLengths: null,
+            entry: _entry(row, lap: row.read<int>('lap')),
+          ),
+        for (final row in runs)
+          (
+            axis: _axis(row),
+            length: row.read<int>('length'),
+            laps: null,
+            courseLengths: null,
+            entry: _segmentEntry(row),
           ),
       ],
       current: current == null
           ? null
-          : (_axis(current), current.read<int>('length'), null),
+          : (_axis(current), current.read<int>('length'), null, null),
     );
   }
 
   /// The segments of complete laps on which zone [zoneId] lay, one ranking
   /// per length of the zone when rowed, the current length first (Design
   /// D2). Start and end follow from the start of the lap and the segments
-  /// before (Design D5).
+  /// before (Design D5). A lap segment belongs to the course of the session
+  /// whose segments it falls into (Change workout-course-chain, Design D4).
   Future<List<Ranking>> zone(int zoneId) async {
     final rows = await _db
         .customSelect(
@@ -76,7 +123,9 @@ class RankingRepository {
         FROM lap_segments ls
         JOIN laps l ON l.session_id = ls.session_id AND l.lap_no = ls.lap_no
         JOIN sessions s ON s.id = ls.session_id
-        JOIN course_segments cs ON cs.version_id = s.course_version_id AND cs.position = ls.position
+        JOIN session_courses sc ON sc.session_id = ls.session_id
+        JOIN course_segments cs ON cs.version_id = sc.course_version_id
+          AND cs.position = ls.position - sc.first_segment
         JOIN course_versions v ON v.id = cs.version_id
         JOIN courses c ON c.id = v.course_id
         JOIN zones z ON z.id = cs.zone_id
@@ -93,67 +142,115 @@ class RankingRepository {
     return _rankings(
       [
         for (final row in rows)
-          (_axis(row), row.read<int>('length'), null, _segmentEntry(row)),
+          (
+            axis: _axis(row),
+            length: row.read<int>('length'),
+            laps: null,
+            courseLengths: null,
+            entry: _segmentEntry(row),
+          ),
       ],
       current: current == null
           ? null
-          : (_axis(current), current.read<int>('length'), null),
+          : (_axis(current), current.read<int>('length'), null, null),
     );
   }
 
   /// The sessions on workout [workoutId] with all planned laps complete,
-  /// ranked by the sum of their laps; one ranking per course length and
-  /// number of laps, the current ones first (Design D2). A workout with an
-  /// open number of laps has no ranking.
+  /// ranked by the sum of their laps; one ranking per order of course
+  /// lengths and number of laps, the current ones first (Design D2; Change
+  /// workout-course-chain, Design D4). A workout with an open number of laps
+  /// or a duration has no ranking.
   Future<List<Ranking>> workout(int workoutId) async {
-    final current = await _db
+    final workout = await _db
         .customSelect(
-          '''
-        SELECT c.axis AS axis, v.length AS length, b.laps AS laps
-        FROM workout_blocks b
-        JOIN courses c ON c.id = b.course_id
-        JOIN course_versions v ON v.course_id = c.id
-        WHERE b.workout_id = ? AND b.position = 0
-        ORDER BY v.version DESC LIMIT 1''',
+          'SELECT laps FROM workouts WHERE id = ?',
           variables: [Variable.withInt(workoutId)],
         )
         .getSingleOrNull();
-    final laps = current?.read<int?>('laps');
-    if (current == null || laps == null) return [];
+    final laps = workout?.read<int?>('laps');
+    if (laps == null) return [];
+    final blocks = await _db
+        .customSelect(
+          '''
+        SELECT c.axis AS axis,
+          (SELECT v.length FROM course_versions v WHERE v.course_id = b.course_id
+            ORDER BY v.version DESC LIMIT 1) AS length
+        FROM workout_blocks b JOIN courses c ON c.id = b.course_id
+        WHERE b.workout_id = ? ORDER BY b.position''',
+          variables: [Variable.withInt(workoutId)],
+        )
+        .get();
+    if (blocks.isEmpty) return [];
+    final currentLengths = [for (final b in blocks) b.read<int>('length')];
 
     final rows = await _db
         .customSelect(
           '''
-        SELECT s.id AS session, s.started_at AS started_at, c.axis AS axis, v.length AS length, s.planned_laps AS laps,
+        SELECT s.id AS session, s.started_at AS started_at, s.planned_laps AS laps,
           MIN(l.start_wall_ms) AS start_wall, MAX(l.end_wall_ms) AS end_wall,
           MIN(l.start_distance_dm) AS start_distance, MAX(l.end_distance_dm) AS end_distance,
           SUM(l.end_wall_ms - l.start_wall_ms) AS duration, SUM(l.end_distance_dm - l.start_distance_dm) AS distance
         FROM sessions s
         JOIN laps l ON l.session_id = s.id
-        JOIN course_versions v ON v.id = s.course_version_id
-        JOIN courses c ON c.id = v.course_id
         WHERE s.workout_id = ? AND l.complete = 1 AND l.lap_no <= s.planned_laps AND $_counted
         GROUP BY s.id
         HAVING COUNT(*) = s.planned_laps''',
           variables: [Variable.withInt(workoutId)],
         )
         .get();
+    final chains = await _chains([
+      for (final r in rows) r.read<int>('session'),
+    ]);
     return _rankings(
       [
         for (final row in rows)
-          (
-            _axis(row),
-            row.read<int>('length'),
-            row.read<int>('laps'),
-            _entry(
-              row,
-              durationMs: row.read<int>('duration'),
-              distanceDm: row.read<int>('distance'),
+          if (chains[row.read<int>('session')] case (final axis, final lengths))
+            (
+              axis: axis,
+              length: lengths.fold(0, (sum, l) => sum + l),
+              laps: row.read<int>('laps'),
+              courseLengths: lengths,
+              entry: _entry(
+                row,
+                durationMs: row.read<int>('duration'),
+                distanceDm: row.read<int>('distance'),
+              ),
             ),
-          ),
       ],
-      current: (_axis(current), current.read<int>('length'), laps),
+      current: (
+        _axis(blocks.first),
+        currentLengths.fold(0, (sum, l) => sum + l),
+        laps,
+        currentLengths,
+      ),
     );
+  }
+
+  /// The axis and the course lengths in their order of each of [sessionIds].
+  Future<Map<int, (CourseAxis, List<int>)>> _chains(
+    List<int> sessionIds,
+  ) async {
+    if (sessionIds.isEmpty) return const {};
+    final rows = await _db
+        .customSelect(
+          '''
+        SELECT sc.session_id AS session, c.axis AS axis, v.length AS length
+        FROM session_courses sc
+        JOIN course_versions v ON v.id = sc.course_version_id
+        JOIN courses c ON c.id = v.course_id
+        WHERE sc.session_id IN (${List.filled(sessionIds.length, '?').join(', ')})
+        ORDER BY sc.session_id, sc.position''',
+          variables: [for (final id in sessionIds) Variable.withInt(id)],
+        )
+        .get();
+    final chains = <int, (CourseAxis, List<int>)>{};
+    for (final row in rows) {
+      final session = row.read<int>('session');
+      final chain = chains[session] ??= (_axis(row), <int>[]);
+      chain.$2.add(row.read<int>('length'));
+    }
+    return chains;
   }
 
   /// [load] now and again after every change to sessions, laps, courses,
@@ -168,6 +265,7 @@ class RankingRepository {
     _db.zones,
     _db.workouts,
     _db.workoutBlocks,
+    _db.sessionCourses,
   ], load);
 
   static RankingEntry _segmentEntry(QueryRow row) {
@@ -207,32 +305,65 @@ class RankingRepository {
     distanceDm: distanceDm,
   );
 
-  /// One ranking per axis, length and number of laps; [current] first, the
-  /// others by length.
+  /// One ranking per axis, length, number of laps and order of course
+  /// lengths; [current] first, the others by length.
   static List<Ranking> _rankings(
-    List<(CourseAxis, int, int?, RankingEntry)> rows, {
-    required (CourseAxis, int, int?)? current,
+    List<
+      ({
+        CourseAxis axis,
+        int length,
+        int? laps,
+        List<int>? courseLengths,
+        RankingEntry entry,
+      })
+    >
+    rows, {
+    required (CourseAxis, int, int?, List<int>?)? current,
   }) {
-    final groups = <(CourseAxis, int, int?), List<RankingEntry>>{};
-    for (final (axis, length, laps, entry) in rows) {
-      (groups[(axis, length, laps)] ??= []).add(entry);
+    String key(CourseAxis axis, int length, int? laps, List<int>? lengths) =>
+        '${axis.name}|$length|$laps|${lengths?.join(',')}';
+    final groups =
+        <String, (CourseAxis, int, int?, List<int>?, List<RankingEntry>)>{};
+    for (final r in rows) {
+      final group = groups[key(r.axis, r.length, r.laps, r.courseLengths)] ??= (
+        r.axis,
+        r.length,
+        r.laps,
+        r.courseLengths,
+        [],
+      );
+      group.$5.add(r.entry);
     }
+    final currentKey = current == null
+        ? null
+        : key(current.$1, current.$2, current.$3, current.$4);
     final keys = groups.keys.toList()
       ..sort((a, b) {
-        if (a == current || b == current) return a == current ? -1 : 1;
-        final byLength = a.$2.compareTo(b.$2);
+        if (a == currentKey || b == currentKey) return a == currentKey ? -1 : 1;
+        final (ga, gb) = (groups[a]!, groups[b]!);
+        final byLength = ga.$2.compareTo(gb.$2);
         if (byLength != 0) return byLength;
-        final byAxis = a.$1.index.compareTo(b.$1.index);
-        return byAxis != 0 ? byAxis : (a.$3 ?? 0).compareTo(b.$3 ?? 0);
+        final byAxis = ga.$1.index.compareTo(gb.$1.index);
+        if (byAxis != 0) return byAxis;
+        final byLaps = (ga.$3 ?? 0).compareTo(gb.$3 ?? 0);
+        return byLaps != 0 ? byLaps : a.compareTo(b);
       });
     return [
-      for (final key in keys)
-        Ranking(
-          axis: key.$1,
-          length: key.$2,
-          laps: key.$3,
-          entries: rankEntries(key.$1, groups[key]!),
-        ),
+      for (final k in keys)
+        if (groups[k] case (
+          final axis,
+          final length,
+          final laps,
+          final lengths,
+          final entries,
+        ))
+          Ranking(
+            axis: axis,
+            length: length,
+            laps: laps,
+            courseLengths: lengths,
+            entries: rankEntries(axis, entries),
+          ),
     ];
   }
 }

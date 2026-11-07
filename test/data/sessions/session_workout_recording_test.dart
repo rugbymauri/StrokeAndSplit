@@ -3,6 +3,7 @@ import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
+import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/sources/simulated_source.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
+import '../../support/session_rows.dart';
 
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
@@ -57,7 +59,11 @@ void main() {
         );
         final workouts = WorkoutRepository(db);
         return (await workouts.get(
-          await workouts.create('Seerunde x3', courseId: course, laps: 3),
+          await workouts.create(
+            'Seerunde x3',
+            courseIds: [course],
+            length: const LapCount(3),
+          ),
         ))!;
       });
       final ready = _run(async, () async {
@@ -94,12 +100,77 @@ void main() {
         (session.workoutId, session.workoutName, session.plannedLaps),
         (workout.id, 'Seerunde x3', 3),
       );
-      expect(session.courseVersionId, workout.course.versionId);
+      expect(_run(async, () => sessionVersionIds(db, session.id)), [
+        workout.chain.versionId,
+      ]);
       expect(
         [for (final l in laps) (l.lapNo, l.complete)],
         [(1, true), (2, true), (3, true)],
       );
       expect(laps.last.endDistanceDm, 3000);
+      source.stop();
+    });
+  });
+
+  test('a workout with three courses stores them with their first segment', () {
+    fakeAsync((async) {
+      final workout = _run(async, () async {
+        final courses = CourseRepository(db);
+        final ids = [
+          await courses.create(
+            'Einrudern',
+            CourseDefinition.single(axis: CourseAxis.distance, length: 100),
+          ),
+          await courses.create(
+            '2 km Intervall',
+            const CourseDefinition(
+              axis: CourseAxis.distance,
+              length: 200,
+              segments: [
+                CourseSegment(length: 50),
+                CourseSegment(length: 100, spmMin: 20, spmMax: 24),
+                CourseSegment(length: 50),
+              ],
+            ),
+          ),
+          await courses.create(
+            'Ausrudern',
+            CourseDefinition.single(axis: CourseAxis.distance, length: 100),
+          ),
+        ];
+        final workouts = WorkoutRepository(db);
+        return (await workouts.get(
+          await workouts.create(
+            'Intervalltraining',
+            courseIds: ids,
+            length: const LapCount(1),
+          ),
+        ))!;
+      });
+      _run(async, () async {
+        await source.start();
+        await container
+            .read(sessionRecorderProvider.notifier)
+            .start(plan: workout.toPlan());
+      });
+      async.elapse(const Duration(milliseconds: 500));
+      final id = container.read(sessionRecorderProvider)!.sessionId!;
+
+      // 400 m at 2:10 /500 m take 104 s.
+      async.elapse(const Duration(seconds: 120));
+      expect(container.read(sessionRecorderProvider), isNull);
+
+      final rows = _run(async, () => SessionRepository(db).sessionCourses(id));
+      expect(
+        [for (final r in rows) (r.position, r.courseVersionId, r.firstSegment)],
+        [
+          (0, workout.courses[0].versionId, 0),
+          (1, workout.courses[1].versionId, 1),
+          (2, workout.courses[2].versionId, 4),
+        ],
+      );
+      final laps = _run(async, db.select(db.laps).get);
+      expect([for (final l in laps) (l.lapNo, l.endDistanceDm)], [(1, 4000)]);
       source.stop();
     });
   });
@@ -115,7 +186,11 @@ void main() {
           );
           final workouts = WorkoutRepository(db);
           return (await workouts.get(
-            await workouts.create('Vier Minuten', courseId: course, laps: 1),
+            await workouts.create(
+              'Vier Minuten',
+              courseIds: [course],
+              length: const LapCount(1),
+            ),
           ))!;
         });
         _run(async, () async {
@@ -172,7 +247,11 @@ void main() {
           );
           final workouts = WorkoutRepository(db);
           return (await workouts.get(
-            await workouts.create('Vier Minuten', courseId: course, laps: 1),
+            await workouts.create(
+              'Vier Minuten',
+              courseIds: [course],
+              length: const LapCount(1),
+            ),
           ))!;
         });
         _run(async, () async {
@@ -239,7 +318,11 @@ void main() {
           );
           final workouts = WorkoutRepository(db);
           return (await workouts.get(
-            await workouts.create('Seerunde x3', courseId: course, laps: 3),
+            await workouts.create(
+              'Seerunde x3',
+              courseIds: [course],
+              length: const LapCount(3),
+            ),
           ))!;
         });
         _run(async, () async {
@@ -299,7 +382,7 @@ void main() {
         );
         return (await courses.get(id))!;
       });
-      final plan = SessionPlan(course: course, length: const LapCount(2));
+      final plan = SessionPlan(courses: [course], length: const LapCount(2));
       _run(async, () async {
         await source.start();
         await container
@@ -320,10 +403,10 @@ void main() {
         )..where((s) => s.id.equals(started.sessionId!))).getSingle,
       );
       expect((session.workoutId, session.workoutName), (null, null));
-      expect(
-        (session.courseVersionId, session.plannedLaps),
-        (course.versionId, 2),
-      );
+      expect(session.plannedLaps, 2);
+      expect(_run(async, () => sessionVersionIds(db, session.id)), [
+        course.versionId,
+      ]);
       expect(
         [for (final l in _run(async, db.select(db.laps).get)) l.complete],
         [true, true],

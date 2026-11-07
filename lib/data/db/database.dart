@@ -111,18 +111,20 @@ class Workouts extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
   DateTimeColumn get createdAt => dateTime()();
+
+  // The length of the whole chain of courses (Change workout-course-chain,
+  // Design D1): a number of laps or a duration; neither means open.
+  IntColumn get laps => integer().nullable()();
+  IntColumn get durationS => integer().nullable()();
 }
 
-/// The parts of a workout; the app uses exactly one for now.
+/// The courses of a workout, rowed one after the other without gaps.
 @DataClassName('WorkoutBlockRow')
 class WorkoutBlocks extends Table {
   IntColumn get workoutId =>
       integer().references(Workouts, #id, onDelete: KeyAction.cascade)();
   IntColumn get position => integer()();
   IntColumn get courseId => integer().references(Courses, #id)();
-
-  /// Null means open: laps follow until the session is stopped.
-  IntColumn get laps => integer().nullable()();
 
   @override
   Set<Column> get primaryKey => {workoutId, position};
@@ -158,8 +160,6 @@ class Sessions extends Table {
 
   /// The workout name at the time, kept when the workout is deleted.
   TextColumn get workoutName => text().nullable()();
-  IntColumn get courseVersionId =>
-      integer().nullable().references(CourseVersions, #id)();
 
   /// Null for an open number of laps.
   IntColumn get plannedLaps => integer().nullable()();
@@ -290,6 +290,23 @@ class Pauses extends Table {
   Set<Column> get primaryKey => {sessionId, startWallMs};
 }
 
+/// The course versions a session rows, in their order (Change
+/// workout-course-chain, Design D3).
+@DataClassName('SessionCourseRow')
+class SessionCourses extends Table {
+  IntColumn get sessionId =>
+      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
+  IntColumn get position => integer()();
+  IntColumn get courseVersionId => integer().references(CourseVersions, #id)();
+
+  /// The index of the first segment of this course within a lap, so a lap
+  /// segment maps to a segment of its course version.
+  IntColumn get firstSegment => integer()();
+
+  @override
+  Set<Column> get primaryKey => {sessionId, position};
+}
+
 @DataClassName('LapSegmentRow')
 class LapSegments extends Table {
   IntColumn get sessionId =>
@@ -318,6 +335,7 @@ class LapSegments extends Table {
     WorkoutBlocks,
     Laps,
     LapSegments,
+    SessionCourses,
     RrIntervals,
     Pauses,
   ],
@@ -341,7 +359,7 @@ class AppDatabase extends _$AppDatabase {
   );
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -440,6 +458,27 @@ class AppDatabase extends _$AppDatabase {
           'template_name',
           schema.sessions.workoutName,
         );
+      },
+      // Workouts chain courses (Change workout-course-chain, Design D10): the
+      // laps move from the block to the workout, the course version of a
+      // session into its own table. Rebuilding a table drops the old column.
+      from11To12: (m, schema) async {
+        await m.addColumn(schema.workouts, schema.workouts.laps);
+        await m.addColumn(schema.workouts, schema.workouts.durationS);
+        await m.database.customStatement(
+          'UPDATE workouts SET laps = (SELECT b.laps FROM workout_blocks b '
+          'WHERE b.workout_id = workouts.id AND b.position = 0)',
+        );
+        await m.alterTable(TableMigration(schema.workoutBlocks));
+
+        await m.createTable(schema.sessionCourses);
+        await m.database.customStatement(
+          'INSERT INTO session_courses '
+          '(session_id, position, course_version_id, first_segment) '
+          'SELECT id, 0, course_version_id, 0 FROM sessions '
+          'WHERE course_version_id IS NOT NULL',
+        );
+        await m.alterTable(TableMigration(schema.sessions));
       },
     ),
     beforeOpen: (details) async {

@@ -10,6 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fixtures.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 void main() {
   test(
     'keeps a session that ended with the app and marks it incomplete',
@@ -81,7 +83,11 @@ void main() {
       final courseId = await CourseRepository(db).create('Seerunde', course);
       final workouts = WorkoutRepository(db);
       final workout = (await workouts.get(
-        await workouts.create('Seerunde x5', courseId: courseId, laps: 5),
+        await workouts.create(
+          'Seerunde x5',
+          courseIds: [courseId],
+          length: const LapCount(5),
+        ),
       ))!;
 
       final id = await repository.create(

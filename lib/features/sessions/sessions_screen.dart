@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/courses/course_providers.dart';
+import '../../data/courses/course.dart';
 import '../../data/db/database.dart';
 import '../../data/health/health_export.dart';
 import '../../data/sessions/session_providers.dart';
@@ -64,11 +64,13 @@ class _SessionTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pace = session.averagePaceCs;
     final l10n = context.l10n;
-    final versionId = session.courseVersionId;
     // Without a workout the course names the session (course-rowing-free, Design D7).
-    final courseName = session.workoutName != null || versionId == null
+    final courseName = session.workoutName != null
         ? null
-        : ref.watch(courseVersionProvider(versionId)).value?.name;
+        : switch (ref.watch(sessionCoursesProvider(session.id)).value) {
+            null || [] => null,
+            final courses => Course.chain(courses).name,
+          };
     final details = [
       ?sessionName(l10n, session, courseName),
       '${session.distanceDm ~/ 10} m',
