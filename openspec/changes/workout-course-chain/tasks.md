@@ -28,7 +28,7 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 
 - [x] 5.1 Gemeinsames Widget für Runden/Dauer/offen aus dem Start-Screen der Strecke herauslösen (D8). Verifikation: bestehende Tests von `course-session-setup` grün.
 - [x] 5.2 Workout-Editor mit Streckenliste (anhängen, hoch/runter, entfernen, letzte nicht entfernbar), Auswahl nach Achse und Länge über das gemeinsame Widget (D8). Verifikation: Widget-Tests „Strecke anhängen“ (Runde 2500 m), „Nur gleiche Achse“, „Strecke verschieben“, „Letzte Strecke“, „Erste Strecke ersetzen“, „Dauer wählen“ und „Werte bleiben beim Wechseln“; der Editor passt in 400 × 400 ohne Überlauf, auch mit langen Zonennamen.
-- [ ] 5.3 Workout-Liste, Workout-Screen, Session-Liste und Zusammenfassung zeigen die Strecken als „A + B + C“ und die Länge mit Runden, Dauer oder offen. Verifikation: Widget-Tests „Mehrere Strecken“ (Liste und Zusammenfassung), „Mehrere Strecken ansehen“ (Screen mit Strecken in Reihenfolge und Summe) und „Workout mit Dauer“ in der Liste („45:00“).
+- [x] 5.3 Workout-Liste, Workout-Screen, Session-Liste und Zusammenfassung zeigen die Strecken als „A + B + C“ und die Länge mit Runden, Dauer oder offen. Verifikation: Widget-Tests „Mehrere Strecken“ (Liste und Zusammenfassung), „Mehrere Strecken ansehen“ (Screen mit Strecken in Reihenfolge und Summe) und „Workout mit Dauer“ in der Liste („45:00“).
 - [ ] 5.4 Strecke löschen nach D9: aus Ketten entfernen, Bausteine neu nummerieren, leere Workouts löschen; der Dialog nennt nur diese. Verifikation: Repository- und Widget-Tests „Strecke eines Workouts löschen“ und „Strecke aus einer Kette löschen“.
 
 ## 6. Doku und Prüfung

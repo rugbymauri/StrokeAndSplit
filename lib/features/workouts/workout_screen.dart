@@ -7,6 +7,7 @@ import '../../data/workouts/workout_providers.dart';
 import '../../l10n/l10n.dart';
 import '../connection/rower_connection.dart';
 import '../courses/course_strip.dart';
+import '../courses/courses_screen.dart';
 import 'workout_editor_screen.dart';
 import 'workout_podium.dart';
 import 'workouts_screen.dart';
@@ -97,11 +98,39 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                             const SizedBox(height: AppSpacing.m),
                             CourseStrip(definition: workout.chain.definition),
                             const SizedBox(height: AppSpacing.m),
-                            for (final line in workoutZoneLines(
-                              l10n,
-                              workout.chain,
-                            ))
-                              Text(line, style: AppTextStyles.caption),
+                            if (workout.courses.length == 1)
+                              for (final line in workoutZoneLines(
+                                l10n,
+                                workout.chain,
+                              ))
+                                Text(line, style: AppTextStyles.caption)
+                            else
+                              // Each course in its place with its zones
+                              // (Change workout-course-chain).
+                              for (final (i, course)
+                                  in workout.courses.indexed) ...[
+                                if (i > 0) const SizedBox(height: AppSpacing.m),
+                                Text(
+                                  course.name,
+                                  key: Key('workout-course-$i'),
+                                  style: AppTextStyles.cardTitle,
+                                ),
+                                Text(
+                                  courseSummary(l10n, course),
+                                  style: AppTextStyles.caption,
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                CourseStrip(
+                                  definition: course.definition,
+                                  height: 10,
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                for (final line in workoutZoneLines(
+                                  l10n,
+                                  course,
+                                ))
+                                  Text(line, style: AppTextStyles.caption),
+                              ],
                             const SizedBox(height: AppSpacing.xxl),
                             WorkoutPodium(workout: workout),
                           ],

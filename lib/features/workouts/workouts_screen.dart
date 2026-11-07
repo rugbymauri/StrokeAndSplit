@@ -203,11 +203,13 @@ class _NoCourse extends StatelessWidget {
   }
 }
 
-/// `Seerunde · 1000 m · 3 Runden` below the name of a workout.
+/// `Seerunde · 1000 m · 3 Runden` below the name of a workout; with several
+/// courses `Einrudern + Seerunde · 1500 m · 45:00`, the length of a lap being
+/// the sum (Change workout-course-chain).
 String workoutDetails(AppLocalizations l10n, Workout workout) {
   final course = workout.chain;
   return '${course.name} · ${formatCourseLength(course.axis, course.definition.length)} · '
-      '${formatLaps(l10n, workout.laps)}';
+      '${formatPlanLength(l10n, workout.length)}';
 }
 
 /// The zones of a course with their bands, each once, e.g.

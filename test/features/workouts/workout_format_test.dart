@@ -1,4 +1,5 @@
 import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/features/workouts/workout_format.dart';
 import 'package:strokesplit/features/workouts/workouts_screen.dart';
 import 'package:strokesplit/l10n/l10n.dart';
@@ -6,6 +7,19 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('formats the length of a workout', () {
+    final de = lookupAppLocalizations(const Locale('de'));
+
+    expect(
+      [
+        formatPlanLength(de, const LapCount(3)),
+        formatPlanLength(de, const TimeLimit(Duration(minutes: 45))),
+        formatPlanLength(de, const OpenLength()),
+      ],
+      ['3 Runden', '45:00', 'offen'],
+    );
+  });
+
   test('formats the number of laps in German and English', () {
     final de = lookupAppLocalizations(const Locale('de'));
     final en = lookupAppLocalizations(const Locale('en'));
