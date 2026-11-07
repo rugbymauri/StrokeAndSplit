@@ -1429,10 +1429,10 @@ abstract class AppLocalizations {
   /// **'„{name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten ihre Runden.'**
   String courseDeleteBody(String name);
 
-  /// Courses: workouts deleted with the course; workouts is a list of quoted names
+  /// Courses: workouts deleted with the course because it is their only one; workouts is a list of quoted names. Workouts with other courses only lose this one and are not named
   ///
   /// In de, this message translates to:
-  /// **'Diese Workouts verwenden die Strecke und werden mitgelöscht: {workouts}.'**
+  /// **'Diese Workouts haben keine andere Strecke und werden mitgelöscht: {workouts}.'**
   String courseDeleteWorkouts(String workouts);
 
   /// Course editor: title for a new course

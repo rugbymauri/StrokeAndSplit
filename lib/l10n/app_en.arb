@@ -221,7 +221,7 @@
   "coursesLoadFailed": "Courses could not be loaded: {error}",
   "courseDeleteTitle": "Delete course?",
   "courseDeleteBody": "“{name}” disappears from the list. Sessions already rowed keep their laps.",
-  "courseDeleteWorkouts": "These workouts use the course and are deleted with it: {workouts}.",
+  "courseDeleteWorkouts": "These workouts have no other course and are deleted with it: {workouts}.",
   "courseNew": "New course",
   "courseEdit": "Edit course",
   "courseNameMissing": "The name is missing.",

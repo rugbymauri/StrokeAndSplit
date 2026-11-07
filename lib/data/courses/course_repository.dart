@@ -181,31 +181,56 @@ class CourseRepository {
     _db.courseVersions,
   ], rowCounts);
 
-  /// Names of the workouts that row this course.
-  Future<List<String>> workoutsUsing(int id) async {
-    final query =
-        _db.select(_db.workouts).join([
-            innerJoin(
-              _db.workoutBlocks,
-              _db.workoutBlocks.workoutId.equalsExp(_db.workouts.id),
-            ),
-          ])
-          ..where(_db.workoutBlocks.courseId.equals(id))
-          ..orderBy([OrderingTerm.asc(_db.workouts.name)]);
-    final rows = await query.get();
-    return {for (final row in rows) row.readTable(_db.workouts).name}.toList();
-  }
+  /// Names of the workouts that row only this course, so deleting it
+  /// deletes them too (Change workout-course-chain, Design D9).
+  Future<List<String>> workoutsLeftEmpty(int id) => _db
+      .customSelect(
+        '''
+        SELECT w.name AS name FROM workouts w
+        WHERE EXISTS (SELECT 1 FROM workout_blocks b WHERE b.workout_id = w.id AND b.course_id = ?1)
+          AND NOT EXISTS (SELECT 1 FROM workout_blocks b WHERE b.workout_id = w.id AND b.course_id != ?1)
+        ORDER BY w.name''',
+        variables: [Variable.withInt(id)],
+        readsFrom: {_db.workouts, _db.workoutBlocks},
+      )
+      .map((row) => row.read<String>('name'))
+      .get();
 
-  /// Removes the course from the list together with the workouts using it;
-  /// sessions rowed on it keep their version.
+  /// Removes the course from the list and from every workout, numbering the
+  /// courses left in each workout anew and deleting workouts left without
+  /// one (Change workout-course-chain, Design D9); sessions rowed on it keep
+  /// their version.
   Future<void> delete(int id) {
     return _db.transaction(() async {
       final blocks = await (_db.select(
         _db.workoutBlocks,
       )..where((b) => b.courseId.equals(id))).get();
+      final workoutIds = {for (final b in blocks) b.workoutId};
       await (_db.delete(
-        _db.workouts,
-      )..where((t) => t.id.isIn(blocks.map((b) => b.workoutId)))).go();
+        _db.workoutBlocks,
+      )..where((b) => b.courseId.equals(id))).go();
+      for (final workoutId in workoutIds) {
+        final left =
+            await (_db.select(_db.workoutBlocks)
+                  ..where((b) => b.workoutId.equals(workoutId))
+                  ..orderBy([(b) => OrderingTerm.asc(b.position)]))
+                .get();
+        if (left.isEmpty) {
+          await (_db.delete(
+            _db.workouts,
+          )..where((w) => w.id.equals(workoutId))).go();
+          continue;
+        }
+        // Delete and insert again, so no two blocks share a position meanwhile.
+        await (_db.delete(
+          _db.workoutBlocks,
+        )..where((b) => b.workoutId.equals(workoutId))).go();
+        for (final (position, block) in left.indexed) {
+          await _db
+              .into(_db.workoutBlocks)
+              .insert(block.copyWith(position: position));
+        }
+      }
       await (_db.update(_db.courses)..where((c) => c.id.equals(id))).write(
         CoursesCompanion(deletedAt: Value(clock.now())),
       );

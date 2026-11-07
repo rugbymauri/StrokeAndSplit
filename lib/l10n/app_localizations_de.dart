@@ -826,7 +826,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String courseDeleteWorkouts(String workouts) {
-    return 'Diese Workouts verwenden die Strecke und werden mitgelöscht: $workouts.';
+    return 'Diese Workouts haben keine andere Strecke und werden mitgelöscht: $workouts.';
   }
 
   @override

@@ -739,6 +739,60 @@ void main() {
     },
   );
 
+  testWidgets(
+    'Strecke aus einer Kette löschen: does not name a workout that keeps other courses',
+    (tester) async {
+      final setup = _Setup();
+      await tester.runAsync(() async {
+        final ids = [
+          for (final (name, length) in [('Einrudern', 500), ('Ausrudern', 500)])
+            await setup.courses.create(
+              name,
+              CourseDefinition.single(
+                axis: CourseAxis.distance,
+                length: length,
+              ),
+            ),
+        ];
+        final workout = await setup.db
+            .into(setup.db.workouts)
+            .insert(
+              WorkoutsCompanion.insert(
+                name: 'Intervalltraining',
+                createdAt: DateTime(2026),
+              ),
+            );
+        for (final (position, id) in ids.indexed) {
+          await setup.db
+              .into(setup.db.workoutBlocks)
+              .insert(
+                WorkoutBlocksCompanion.insert(
+                  workoutId: workout,
+                  position: position,
+                  courseId: id,
+                ),
+              );
+        }
+      });
+      await setup.pump(tester);
+
+      // The list is sorted by name: "Ausrudern" comes first.
+      await tester.tap(find.byTooltip('Löschen').first);
+      await setup.settle(tester);
+      expect(find.text('Strecke löschen?'), findsOneWidget);
+      expect(find.textContaining('„Ausrudern“ verschwindet'), findsOneWidget);
+      expect(find.textContaining('Intervalltraining'), findsNothing);
+      await tester.tap(find.widgetWithText(FilledButton, 'Löschen'));
+      await setup.settle(tester);
+
+      final workouts = await tester.runAsync(
+        () => setup.db.select(setup.db.workouts).get(),
+      );
+      expect(workouts!.single.name, 'Intervalltraining');
+      await disposeWidgetsWithDatabase(tester);
+    },
+  );
+
   group('version hint', () {
     const hint = Key('course-version-hint');
 

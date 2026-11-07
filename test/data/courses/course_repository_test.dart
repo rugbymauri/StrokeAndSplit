@@ -39,19 +39,22 @@ Future<int> _rowSession(AppDatabase db, int versionId) async {
   return id;
 }
 
-Future<int> _workout(AppDatabase db, String name, int courseId) async {
+/// Stores the workout [name] rowing [courseIds] in this order.
+Future<int> _workout(AppDatabase db, String name, List<int> courseIds) async {
   final id = await db
       .into(db.workouts)
       .insert(WorkoutsCompanion.insert(name: name, createdAt: DateTime(2026)));
-  await db
-      .into(db.workoutBlocks)
-      .insert(
-        WorkoutBlocksCompanion.insert(
-          workoutId: id,
-          position: 0,
-          courseId: courseId,
-        ),
-      );
+  for (final (position, courseId) in courseIds.indexed) {
+    await db
+        .into(db.workoutBlocks)
+        .insert(
+          WorkoutBlocksCompanion.insert(
+            workoutId: id,
+            position: position,
+            courseId: courseId,
+          ),
+        );
+  }
   return id;
 }
 
@@ -183,23 +186,63 @@ void main() {
     expect(laps.single.endWallMs, 240000);
   });
 
-  test('deleting a course deletes the workouts using it', () async {
-    final id = await courses.create('Seerunde', _seerunde);
-    final other = await courses.create(
-      'Sprint',
-      CourseDefinition.single(axis: CourseAxis.distance, length: 500),
-    );
-    await _workout(db, 'Seerunde x3', id);
-    await _workout(db, 'Sprint x5', other);
+  test(
+    'Strecke eines Workouts löschen: deletes the workouts rowing only it',
+    () async {
+      final id = await courses.create('Seerunde', _seerunde);
+      final other = await courses.create(
+        'Sprint',
+        CourseDefinition.single(axis: CourseAxis.distance, length: 500),
+      );
+      await _workout(db, 'Seerunde x3', [id]);
+      await _workout(db, 'Sprint x5', [other]);
 
-    expect(await courses.workoutsUsing(id), ['Seerunde x3']);
-    await courses.delete(id);
+      expect(await courses.workoutsLeftEmpty(id), ['Seerunde x3']);
+      await courses.delete(id);
 
-    expect((await db.select(db.workouts).get()).map((t) => t.name), [
-      'Sprint x5',
-    ]);
-    expect(await db.select(db.workoutBlocks).get(), hasLength(1));
-  });
+      expect((await db.select(db.workouts).get()).map((t) => t.name), [
+        'Sprint x5',
+      ]);
+      expect(await db.select(db.workoutBlocks).get(), hasLength(1));
+    },
+  );
+
+  test(
+    'Strecke aus einer Kette löschen: keeps the workout with the other courses',
+    () async {
+      final einrudern = await courses.create(
+        'Einrudern',
+        CourseDefinition.single(axis: CourseAxis.distance, length: 500),
+      );
+      final intervall = await courses.create(
+        '2 km Intervall',
+        CourseDefinition.single(axis: CourseAxis.distance, length: 2000),
+      );
+      final ausrudern = await courses.create(
+        'Ausrudern',
+        CourseDefinition.single(axis: CourseAxis.distance, length: 500),
+      );
+      final training = await _workout(db, 'Intervalltraining', [
+        einrudern,
+        ausrudern,
+        intervall,
+        ausrudern,
+      ]);
+      await _workout(db, 'Nur Ausrudern', [ausrudern, ausrudern]);
+
+      expect(await courses.workoutsLeftEmpty(ausrudern), ['Nur Ausrudern']);
+      await courses.delete(ausrudern);
+
+      final blocks = await db.select(db.workoutBlocks).get();
+      expect(
+        [for (final b in blocks) (b.workoutId, b.position, b.courseId)],
+        [(training, 0, einrudern), (training, 1, intervall)],
+      );
+      expect((await db.select(db.workouts).get()).map((t) => t.name), [
+        'Intervalltraining',
+      ]);
+    },
+  );
 
   test('tells the list about changes', () async {
     final updates = courses.watchAll().map(
