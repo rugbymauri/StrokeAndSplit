@@ -1693,6 +1693,18 @@ abstract class AppLocalizations {
   /// **'{zone} verschieben'**
   String courseMovingZone(String zone);
 
+  /// Place zone screen: why a zone does not fit at the chosen start; the placed zone it would overlap and its range, e.g. '700–1200 m'
+  ///
+  /// In de, this message translates to:
+  /// **'Überschneidet „{other}“ ({range}).'**
+  String placeZoneOverlap(String other, String range);
+
+  /// Place zone screen: why a zone does not fit at the chosen start; the length of the course, e.g. '2000 m'
+  ///
+  /// In de, this message translates to:
+  /// **'Ragt über das Streckenende bei {length}.'**
+  String placeZoneBeyondEnd(String length);
+
   /// Place zone screen: heading of the easy zones
   ///
   /// In de, this message translates to:

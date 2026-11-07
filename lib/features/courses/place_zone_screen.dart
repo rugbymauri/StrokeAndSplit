@@ -77,10 +77,35 @@ class _PlaceZoneScreenState extends ConsumerState<PlaceZoneScreen> {
       placements: placements,
       zones: {...zones, zone.id: zone},
     );
+    final index = placements.length - 1;
     final error = layout.errors
-        .where((e) => e.placements.contains(placements.length - 1))
+        .where((e) => e.placements.contains(index))
         .firstOrNull;
-    return error == null ? null : placementErrorText(context.l10n, error);
+    if (error == null) return null;
+    final l10n = context.l10n;
+    // Said from the zone being chosen: what it would overlap, where it ends.
+    switch (error.kind) {
+      case PlacementErrorKind.overlap:
+        final i = error.placements.where((i) => i != index).firstOrNull;
+        final other = i == null ? null : placements[i];
+        final otherZone = other == null ? null : zones[other.zoneId];
+        if (other != null && otherZone != null) {
+          return l10n.placeZoneOverlap(
+            otherZone.name,
+            formatCourseRange(
+              widget.axis,
+              other.start,
+              other.start + otherZone.length,
+            ),
+          );
+        }
+      case PlacementErrorKind.beyondEnd:
+        return l10n.placeZoneBeyondEnd(
+          formatCourseLength(widget.axis, widget.length),
+        );
+      default:
+    }
+    return placementErrorText(l10n, error);
   }
 
   void _place(Zone zone) =>
