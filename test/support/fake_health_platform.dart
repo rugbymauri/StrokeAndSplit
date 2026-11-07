@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:strokesplit/data/health/health_platform.dart';
-import 'package:strokesplit/data/health/health_workout.dart';
+import 'package:strokesplit/data/health/health_exercise.dart';
 
-/// Health Connect in memory: it keeps one workout per id, as the app replaces an earlier write.
+/// Health Connect in memory: it keeps one exercise per id, as the app replaces an earlier write.
 class FakeHealthPlatform implements HealthPlatform {
   FakeHealthPlatform({
     this.health = HealthStatus.available,
@@ -23,7 +23,7 @@ class FakeHealthPlatform implements HealthPlatform {
   /// Fails the next writes with this reason.
   HealthFailure? failure;
 
-  final workouts = <String, HealthWorkout>{};
+  final exercises = <String, HealthExercise>{};
   var writes = 0;
   var installs = 0;
   var settings = 0;
@@ -57,12 +57,12 @@ class FakeHealthPlatform implements HealthPlatform {
   Stream<void> get privacyRequests => _privacy.stream;
 
   @override
-  Future<void> write(HealthWorkout workout, {required int version}) async {
+  Future<void> write(HealthExercise exercise, {required int version}) async {
     writes++;
     if (failure case final failure?) throw HealthException(failure);
     if (!granted.contains(HealthKind.exercise)) {
       throw const HealthException(HealthFailure.permission);
     }
-    workouts[workout.id] = workout;
+    exercises[exercise.id] = exercise;
   }
 }

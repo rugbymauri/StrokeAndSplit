@@ -8,7 +8,7 @@ import 'package:strokesplit/app/app_language.dart';
 import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/health/health_export.dart';
 import 'package:strokesplit/data/health/health_platform.dart';
-import 'package:strokesplit/data/health/health_workout.dart';
+import 'package:strokesplit/data/health/health_exercise.dart';
 import 'package:strokesplit/data/sessions/session_accumulator.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
@@ -96,10 +96,10 @@ void main() {
 
     expect(await setup.exporter.export(id), isNull);
 
-    final workout = setup.health.workouts.values.single;
-    expect(workout.title, 'Freies Rudern');
-    expect(workout.meters, 2000);
-    expect(workout.start, DateTime.utc(2026, 11, 2, 18));
+    final exercise = setup.health.exercises.values.single;
+    expect(exercise.title, 'Freies Rudern');
+    expect(exercise.meters, 2000);
+    expect(exercise.start, DateTime.utc(2026, 11, 2, 18));
     expect(await setup.exportedAt(id), isNotNull);
   });
 
@@ -111,7 +111,7 @@ void main() {
 
     await setup.exporter.export(await setup.session());
 
-    expect(setup.health.workouts.values.single.title, 'Free rowing');
+    expect(setup.health.exercises.values.single.title, 'Free rowing');
   });
 
   test('replaces an earlier write of the same session', () async {
@@ -122,7 +122,7 @@ void main() {
     await setup.exporter.export(id);
 
     expect(setup.health.writes, 2);
-    expect(setup.health.workouts, hasLength(1));
+    expect(setup.health.exercises, hasLength(1));
   });
 
   test(
@@ -156,7 +156,7 @@ void main() {
 
       await setup.exporter.sessionFinished(id);
 
-      expect(setup.health.workouts, hasLength(1));
+      expect(setup.health.exercises, hasLength(1));
       expect(setup.container.read(healthExportFailureProvider), isNull);
     });
 
@@ -222,7 +222,7 @@ void main() {
       final id = (await recorder.stop())!;
       await pumpEventQueue();
 
-      expect(setup.health.workouts, hasLength(1));
+      expect(setup.health.exercises, hasLength(1));
       expect(await setup.exportedAt(id), isNotNull);
     });
   });

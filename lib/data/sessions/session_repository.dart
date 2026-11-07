@@ -7,7 +7,7 @@ import 'package:drift/drift.dart';
 import 'package:erg_protocol/erg_protocol.dart';
 
 import '../db/database.dart';
-import '../health/health_workout.dart';
+import '../health/health_exercise.dart';
 import '../courses/course.dart';
 import '../courses/course_repository.dart';
 import '../courses/lap_tracker.dart';

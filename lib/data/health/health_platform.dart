@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-import 'health_workout.dart';
+import 'health_exercise.dart';
 
 /// Whether Health Connect can be used on the device.
 enum HealthStatus { available, updateRequired, unavailable }
@@ -41,9 +41,9 @@ abstract interface class HealthPlatform {
   Future<bool> openedForPrivacy();
   Stream<void> get privacyRequests;
 
-  /// Writes [workout], replacing what an earlier write of the same session left; [version] orders the writes.
+  /// Writes [exercise], replacing what an earlier write of the same session left; [version] orders the writes.
   /// Throws a [HealthException].
-  Future<void> write(HealthWorkout workout, {required int version});
+  Future<void> write(HealthExercise exercise, {required int version});
 }
 
 /// Health Connect through the channel of the Android app.
@@ -93,11 +93,11 @@ class ChannelHealthPlatform implements HealthPlatform {
   Stream<void> get privacyRequests => _privacy.stream;
 
   @override
-  Future<void> write(HealthWorkout workout, {required int version}) async {
+  Future<void> write(HealthExercise exercise, {required int version}) async {
     try {
       await _channel.invokeMethod<void>(
         'writeSession',
-        workoutToChannel(workout, version: version),
+        exerciseToChannel(exercise, version: version),
       );
     } on PlatformException catch (e) {
       throw HealthException(
@@ -120,9 +120,9 @@ class ChannelHealthPlatform implements HealthPlatform {
   }
 }
 
-/// [workout] as the Android app reads it: times in milliseconds since the epoch.
-Map<String, Object?> workoutToChannel(
-  HealthWorkout workout, {
+/// [exercise] as the Android app reads it: times in milliseconds since the epoch.
+Map<String, Object?> exerciseToChannel(
+  HealthExercise exercise, {
   required int version,
 }) {
   int ms(DateTime time) => time.millisecondsSinceEpoch;
@@ -138,21 +138,21 @@ Map<String, Object?> workoutToChannel(
       },
   ];
   return {
-    'id': workout.id,
+    'id': exercise.id,
     'version': version,
-    'start': ms(workout.start),
-    'end': ms(workout.end),
-    'title': workout.title,
-    'meters': workout.meters,
-    'kilocalories': workout.kilocalories,
-    'heartRate': series(workout.heartRate),
-    'power': series(workout.power),
-    'speed': series(workout.speed),
+    'start': ms(exercise.start),
+    'end': ms(exercise.end),
+    'title': exercise.title,
+    'meters': exercise.meters,
+    'kilocalories': exercise.kilocalories,
+    'heartRate': series(exercise.heartRate),
+    'power': series(exercise.power),
+    'speed': series(exercise.speed),
     'laps': [
-      for (final lap in workout.laps) [ms(lap.start), ms(lap.end), lap.meters],
+      for (final lap in exercise.laps) [ms(lap.start), ms(lap.end), lap.meters],
     ],
     'segments': [
-      for (final segment in workout.segments)
+      for (final segment in exercise.segments)
         [ms(segment.start), ms(segment.end), segment.type.name],
     ],
   };

@@ -62,7 +62,7 @@ class HealthSample {
   final double value;
 }
 
-/// One series record: a part of a series of at most [HealthWorkout.seriesPart].
+/// One series record: a part of a series of at most [HealthExercise.seriesPart].
 class HealthSeries {
   const HealthSeries({required this.id, required this.samples});
 
@@ -101,9 +101,9 @@ class HealthSegment {
   final HealthSegmentType type;
 }
 
-/// A session as a Health Connect workout of the type rowing machine, with its series, laps and pauses.
-class HealthWorkout {
-  const HealthWorkout({
+/// A session as a Health Connect exercise of the type rowing machine, with its series, laps and pauses.
+class HealthExercise {
+  const HealthExercise({
     required this.id,
     required this.start,
     required this.end,
@@ -139,8 +139,8 @@ class HealthWorkout {
   final List<HealthSegment> segments;
 }
 
-/// The workout of [data] (Design D3); [freeTitle] names a session without a template.
-HealthWorkout healthWorkoutOf(
+/// The exercise of [data] (Design D3); [freeTitle] names a session without a template.
+HealthExercise healthExerciseOf(
   HealthSessionData data, {
   required String freeTitle,
 }) {
@@ -168,7 +168,7 @@ HealthWorkout healthWorkoutOf(
     final parts = <int, List<HealthSample>>{};
     for (final (ms, v) in perSecond.values) {
       parts
-          .putIfAbsent(ms ~/ HealthWorkout.seriesPart.inMilliseconds, () => [])
+          .putIfAbsent(ms ~/ HealthExercise.seriesPart.inMilliseconds, () => [])
           .add(HealthSample(at(ms), v));
     }
     return [
@@ -244,7 +244,7 @@ HealthWorkout healthWorkoutOf(
   }
 
   final calories = inSession.map((p) => p.calories ?? 0).fold(0, math.max);
-  return HealthWorkout(
+  return HealthExercise(
     id: id,
     start: startedAt,
     end: end,

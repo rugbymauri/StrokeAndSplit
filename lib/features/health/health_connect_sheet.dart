@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/health/health_export.dart';
 import '../../data/health/health_platform.dart';
-import '../../data/health/health_workout.dart';
+import '../../data/health/health_exercise.dart';
 import '../../l10n/l10n.dart';
 import 'health_privacy_screen.dart';
 

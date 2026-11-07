@@ -10,7 +10,7 @@ import '../../l10n/app_localizations.dart';
 import '../sessions/session_providers.dart';
 import '../sources/erg_source.dart';
 import 'health_platform.dart';
-import 'health_workout.dart';
+import 'health_exercise.dart';
 
 /// Where the choice to write sessions to Health Connect is kept (Change health-connect, Design D5).
 abstract interface class HealthExportStore {
@@ -85,7 +85,7 @@ class HealthExportEnabled extends Notifier<bool> {
     await ref.read(healthExportStoreProvider).write(enabled);
   }
 
-  /// Asks for the permissions and switches the export on once the app may write workouts.
+  /// Asks for the permissions and switches the export on once the app may write exercises.
   Future<HealthEnableResult> enable() async {
     final platform = ref.read(healthPlatformProvider);
     try {
@@ -167,11 +167,11 @@ class HealthExporter {
     final data = await repository.healthData(id);
     if (data == null) return HealthFailure.failed;
     final texts = lookupAppLocalizations(_ref.read(appLanguageProvider).locale);
-    final workout = healthWorkoutOf(data, freeTitle: texts.healthFreeTitle);
+    final exercise = healthExerciseOf(data, freeTitle: texts.healthFreeTitle);
     try {
       await _ref
           .read(healthPlatformProvider)
-          .write(workout, version: clock.now().millisecondsSinceEpoch);
+          .write(exercise, version: clock.now().millisecondsSinceEpoch);
     } on Object catch (e) {
       await repository.clearHealthExported(id);
       return e is HealthException ? e.reason : HealthFailure.failed;
