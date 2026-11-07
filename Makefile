@@ -12,6 +12,9 @@ SPIKE          := lib/spike/spike_main.dart
 RECORDINGS     := recordings
 ANDROID_FILES  := /sdcard/Android/data/ch.strokesplit.strokesplit/files
 
+# Let Gradle's native library loader run on JDK 24+ without "restricted method" warnings.
+export GRADLE_OPTS := $(strip $(GRADLE_OPTS) --enable-native-access=ALL-UNNAMED)
+
 # Optional version for release builds, e.g. `make apk BUILD_NAME=1.2.0 BUILD_NUMBER=42`.
 # Without them, Flutter takes the version from pubspec.yaml.
 BUILD_NAME   ?=
