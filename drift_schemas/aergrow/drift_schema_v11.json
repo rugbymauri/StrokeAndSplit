@@ -370,7 +370,7 @@
           },
           {
             "name": "workout_id",
-            "getter_name": "templateId",
+            "getter_name": "workoutId",
             "moor_type": "int",
             "nullable": true,
             "customConstraints": null,
@@ -396,7 +396,7 @@
           },
           {
             "name": "workout_name",
-            "getter_name": "templateName",
+            "getter_name": "workoutName",
             "moor_type": "string",
             "nullable": true,
             "customConstraints": null,
@@ -1156,7 +1156,7 @@
         "columns": [
           {
             "name": "workout_id",
-            "getter_name": "templateId",
+            "getter_name": "workoutId",
             "moor_type": "int",
             "nullable": false,
             "customConstraints": null,
