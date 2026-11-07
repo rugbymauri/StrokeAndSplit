@@ -45,42 +45,46 @@ void main() {
     expect(_segment(1), findsNothing);
   });
 
-  testWidgets('a placed zone is blue, as wide as it is long, with its name', (
-    tester,
-  ) async {
-    final strip = CourseStrip(
-      definition: _course(const [
-        CourseSegment(length: 200),
-        CourseSegment(
-          length: 600,
-          paceFastCs: 12500,
-          paceSlowCs: 13000,
-          zoneId: 1,
-          zoneName: 'Tempo',
-        ),
-        CourseSegment(length: 200),
-      ]),
-      height: CourseStrip.namedHeight,
-      showNames: true,
-      selected: 1,
-    );
-    await _pump(tester, strip);
+  testWidgets(
+    'a placed hard zone is red, as wide as it is long, with its name',
+    (tester) async {
+      final strip = CourseStrip(
+        definition: _course(const [
+          CourseSegment(length: 200),
+          CourseSegment(
+            length: 600,
+            paceFastCs: 12500,
+            paceSlowCs: 13000,
+            zoneId: 1,
+            zoneName: 'Tempo',
+          ),
+          CourseSegment(length: 200),
+        ]),
+        height: CourseStrip.namedHeight,
+        showNames: true,
+        selected: 1,
+      );
+      await _pump(tester, strip);
 
-    expect(
-      [
-        for (final i in [0, 1, 2]) _colorOf(tester, i),
-      ],
-      [AppColors.line, AppColors.zoneIn, AppColors.line],
-    );
-    expect(tester.getSize(_segment(1)).width, closeTo(400 * 0.6, 0.01));
-    expect(tester.getSize(_segment(1)).height, CourseStrip.namedHeight);
-    expect(find.text('Tempo'), findsOneWidget);
-    final outline =
-        tester.widget<Container>(_segment(1)).foregroundDecoration!
-            as BoxDecoration;
-    expect(outline.border, Border.all(color: AppColors.text, width: 2));
-    expect(tester.widget<Container>(_segment(0)).foregroundDecoration, isNull);
-  });
+      expect(
+        [
+          for (final i in [0, 1, 2]) _colorOf(tester, i),
+        ],
+        [AppColors.line, AppColors.intensityHard, AppColors.line],
+      );
+      expect(tester.getSize(_segment(1)).width, closeTo(400 * 0.6, 0.01));
+      expect(tester.getSize(_segment(1)).height, CourseStrip.namedHeight);
+      expect(find.text('Tempo'), findsOneWidget);
+      final outline =
+          tester.widget<Container>(_segment(1)).foregroundDecoration!
+              as BoxDecoration;
+      expect(outline.border, Border.all(color: AppColors.text, width: 2));
+      expect(
+        tester.widget<Container>(_segment(0)).foregroundDecoration,
+        isNull,
+      );
+    },
+  );
 
   testWidgets(
     'a zone without a name is called Zone, free gaps stay unlabelled',
@@ -101,94 +105,52 @@ void main() {
     },
   );
 
-  testWidgets('faster pace bands are brighter, stroke-rate bands stay zoneIn', (
+  testWidgets('zones are green, orange or red by how hard they are', (
     tester,
   ) async {
     await _pump(
       tester,
       CourseStrip(
         definition: _course(const [
-          CourseSegment(length: 100, paceFastCs: 13000, paceSlowCs: 13500),
-          CourseSegment(length: 100, paceFastCs: 12000, paceSlowCs: 12500),
-          CourseSegment(length: 100, paceFastCs: 12500, paceSlowCs: 13000),
-          CourseSegment(length: 100, paceFastCs: 12000, paceSlowCs: 12500),
+          // Pace middles 3:10, 2:30 and 1:47:30, then stroke rate 18–20.
+          CourseSegment(length: 100, paceFastCs: 18500, paceSlowCs: 19500),
+          CourseSegment(length: 100, paceFastCs: 14800, paceSlowCs: 15200),
+          CourseSegment(length: 100, paceFastCs: 10500, paceSlowCs: 11000),
           CourseSegment(length: 100, spmMin: 18, spmMax: 20),
           CourseSegment(length: 100),
         ]),
       ),
     );
 
-    final middle = Color.lerp(
-      CourseStrip.fastestPace,
-      CourseStrip.slowestPace,
-      0.5,
-    );
     expect(
       [
-        for (final i in [0, 1, 2, 3, 4, 5]) _colorOf(tester, i),
+        for (final i in [0, 1, 2, 3, 4]) _colorOf(tester, i),
       ],
       [
-        CourseStrip.slowestPace,
-        CourseStrip.fastestPace,
-        middle,
-        CourseStrip.fastestPace,
-        AppColors.zoneIn,
+        AppColors.intensityEasy,
+        AppColors.intensityMedium,
+        AppColors.intensityHard,
+        AppColors.intensityEasy,
         AppColors.line,
       ],
     );
   });
 
-  testWidgets(
-    'shades the pace bands in proportion to the pace, keeping close bands apart',
-    (tester) async {
-      await _pump(
-        tester,
-        CourseStrip(
-          definition: _course(const [
-            // Middles 1:50, 1:55 and 2:30.
-            CourseSegment(length: 100, paceFastCs: 10900, paceSlowCs: 11100),
-            CourseSegment(length: 100, paceFastCs: 11400, paceSlowCs: 11600),
-            CourseSegment(length: 100, paceFastCs: 14900, paceSlowCs: 15100),
-          ]),
-        ),
-      );
-
-      // 1:55 is 5 of 40 seconds slower, less than the smallest step.
-      expect(
-        [
-          for (final i in [0, 1, 2]) _colorOf(tester, i),
-        ],
-        [
-          CourseStrip.fastestPace,
-          Color.lerp(
-            CourseStrip.fastestPace,
-            CourseStrip.slowestPace,
-            CourseStrip.minShadeStep,
-          ),
-          CourseStrip.slowestPace,
-        ],
-      );
-    },
-  );
-
-  testWidgets('a band far from the others keeps its proportional shade', (
-    tester,
-  ) async {
-    await _pump(
-      tester,
-      CourseStrip(
-        definition: _course(const [
-          // Middles 1:50, 2:20 and 2:30.
-          CourseSegment(length: 100, paceFastCs: 10900, paceSlowCs: 11100),
-          CourseSegment(length: 100, paceFastCs: 13900, paceSlowCs: 14100),
-          CourseSegment(length: 100, paceFastCs: 14900, paceSlowCs: 15100),
-        ]),
-      ),
+  test('a zone keeps its colour next to any other zone', () {
+    const endurance = CourseSegment(
+      length: 500,
+      paceFastCs: 14800,
+      paceSlowCs: 15200,
+    );
+    const sprint = CourseSegment(
+      length: 100,
+      paceFastCs: 10500,
+      paceSlowCs: 11000,
     );
 
     expect(
-      _colorOf(tester, 1),
-      Color.lerp(CourseStrip.fastestPace, CourseStrip.slowestPace, 0.75),
+      CourseStrip.segmentColors([endurance]).single,
+      CourseStrip.segmentColors([sprint, endurance]).last,
     );
   });
 
@@ -210,7 +172,7 @@ void main() {
     expect(tapped, 1);
   });
 
-  testWidgets('a zone with only a level is blue with its name', (tester) async {
+  testWidgets('a zone with only level 12 is red with its name', (tester) async {
     await _pump(
       tester,
       CourseStrip(
@@ -232,7 +194,7 @@ void main() {
       [
         for (final i in [0, 1]) _colorOf(tester, i),
       ],
-      [AppColors.line, AppColors.zoneIn],
+      [AppColors.line, AppColors.intensityHard],
     );
     expect(find.text('Kraft'), findsOneWidget);
   });

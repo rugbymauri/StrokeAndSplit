@@ -44,6 +44,16 @@ abstract final class AppColors {
   /// Text out of the zone.
   static const zoneOutText = Color(0xFFFFC58F);
 
+  /// An easy zone in course bars and the zone list, muted so it does not
+  /// read as [connected].
+  static const intensityEasy = Color(0xFF2F8F5B);
+
+  /// A medium zone, darker than [zoneOut] so it does not read as a warning.
+  static const intensityMedium = Color(0xFFB97A2E);
+
+  /// A hard zone.
+  static const intensityHard = Color(0xFFB8443F);
+
   /// The bands of the zone that starts in a few seconds.
   static const upcoming = Color(0xFFFFD84A);
 
