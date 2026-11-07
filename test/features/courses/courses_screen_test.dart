@@ -1,3 +1,4 @@
+import 'package:strokesplit/app/design_tokens.dart';
 import 'package:strokesplit/app/widgets/oar_stepper.dart';
 import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_layout.dart';
@@ -610,6 +611,17 @@ void main() {
         findsWidgets,
       );
       expect((await setup.stored(tester)).single.definition.length, 2000);
+      final swatch = find.descendant(
+        of: find.byKey(const Key('section-0')),
+        matching: find.byWidgetPredicate(
+          (w) =>
+              w is Container &&
+              w.decoration is BoxDecoration &&
+              (w.decoration! as BoxDecoration).color ==
+                  AppColors.intensityMedium,
+        ),
+      );
+      expect(swatch, findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
   });

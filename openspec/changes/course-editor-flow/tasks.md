@@ -26,7 +26,7 @@ Neue oder geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.
   - Ein Tipp auf eine andere Zone markiert diese.
   - Nach „Speichern“ hat die Strecke die neue Lage.
   - `course_strip_test.dart`: Langdruck meldet den Index.
-- [ ] 2.2 Fehleransicht nach D4. Verifikation: Ein Widget-Test kürzt eine Strecke unter ihre Zonen und findet die Härte-Farbe statt `AppColors.zoneIn`.
+- [x] 2.2 Fehleransicht nach D4. Verifikation: Ein Widget-Test kürzt eine Strecke unter ihre Zonen und findet die Härte-Farbe statt `AppColors.zoneIn`.
 
 ## 3. Doku und Abschluss
 
