@@ -255,12 +255,12 @@ void main() {
       await stepTo(tester, _start, 1300);
 
       expect(
-        find.text(
-          '„Ausdauer 2:30“ (1300–1800 m) überschneidet „Ausdauer 2:30“ (1000–1500 m).',
-        ),
-        findsOneWidget,
+        find.text('Überschneidet „Ausdauer 2:30“ (1000–1500 m).'),
+        findsNWidgets(2),
       );
+      // The sprint overlaps it too.
       expect(offered(tester, endurance), isFalse);
+      expect(offered(tester, sprint), isFalse);
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -275,9 +275,7 @@ void main() {
       await stepTo(tester, _start, 1800);
 
       expect(
-        find.text(
-          '„Ausdauer 2:30“ (1800–2300 m) ragt über das Streckenende bei 2000 m.',
-        ),
+        find.text('Ragt über das Streckenende bei 2000 m.'),
         findsOneWidget,
       );
       expect(offered(tester, endurance), isFalse);
@@ -298,9 +296,7 @@ void main() {
         await stepTo(tester, _start, 1800);
 
         expect(
-          find.text(
-            '“Ausdauer 2:30” (1800–2300 m) extends past the end of the course at 2000 m.',
-          ),
+          find.text('Extends past the end of the course at 2000 m.'),
           findsOneWidget,
         );
         await disposeWidgetsWithDatabase(tester);

@@ -1024,6 +1024,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String placeZoneOverlap(String other, String range) {
+    return 'Overlaps “$other” ($range).';
+  }
+
+  @override
+  String placeZoneBeyondEnd(String length) {
+    return 'Extends past the end of the course at $length.';
+  }
+
+  @override
   String get placeZoneGroupEasy => 'Easy';
 
   @override
