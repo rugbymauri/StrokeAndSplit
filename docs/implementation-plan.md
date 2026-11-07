@@ -9,25 +9,11 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors` archiviert. Geplant: `course-editor-flow`.
+Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors` und `course-editor-flow` archiviert, kein Change offen.
 
 ## Überblick
 
 Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests unter „Offene Punkte“.
-
-### `course-editor-flow`
-
-- **Ziel**: Strecke einfacher zusammenstellen: eigener Screen „Zone einbauen“ mit Start zuerst und Zonen nach Härte gruppiert, Verschieben im Editor mit den Ruderblatt-Tasten.
-- **Branch**: Planung auf `docs/course-editor-flow-proposal`, Umsetzung auf `feature/course-editor-flow`, Stand 2026-11-07 6/6, Gerätetest bestanden.
-- **Entschieden** (Nutzer, 2026-11-07):
-  - Der Start kommt zuerst, die Zonen sind nach leicht/mittel/hart gruppiert.
-  - „Zone einbauen“ wird ein eigener Screen.
-  - Verschoben wird mit den Ruderblatt-Tasten, nicht durch Ziehen.
-- **Annahmen**, beim Review bestätigen:
-  - Neben dem Langdruck markiert auch ein Tipp eine Zone, im Balken wie in der Liste.
-  - Die Nachbarzonen sind Anschlag.
-  - Ein Tipp auf eine passende Zone baut sie ohne „Einbauen“-Knopf ein.
-  - Zonen der anderen Achse werden ausgeblendet.
 
 ## Offene Entscheide
 
@@ -114,3 +100,4 @@ Nacharbeit:
 | `zone-level-only` | 2026-11-07 | Zone nur mit Stufe; 3.3 offen. Nach dem Archivieren in `course-rowing` die Texte aus `ui-design` („Runde 2 / 3“) und `auto-pause` (Pausen) wiederhergestellt, die das Delta überschrieben hatte |
 | `gitlab-pipeline` | – | gelöscht (Nutzer, 2026-11-07), nicht archiviert: CI und Releases laufen über GitHub Actions |
 | `zone-intensity-colors` | 2026-11-07 | Zonen nach Härte grün, orange oder rot; Gerätetest 3.3 vom Nutzer bestätigt. Die Grenzen (u. a. rot ab 24 spm, Mitte des Bands) stehen in der Spec `zones` |
+| `course-editor-flow` | 2026-11-07 | Eigener Screen „Zone einbauen“ (Start zuerst, Zonen nach Härte), Verschieben mit den Ruderblatt-Tasten, Editoren im sicheren Bereich; Gerätetest 3.3 vom Nutzer bestätigt. Die Annahmen (Tipp markiert, Nachbarzone als Anschlag, Tipp baut ein, andere Achse ausgeblendet) kamen mit dem Merge, einzeln bestätigt hat sie der Nutzer nicht |
