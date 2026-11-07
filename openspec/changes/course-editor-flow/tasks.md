@@ -32,4 +32,4 @@ Neue oder geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.
 
 - [x] 3.1 README, Abschnitt „Zonen, Strecken und Vorlagen“ Schritt 2: Einbauen über den Screen mit Start zuerst und Gruppen, Verschieben per Langdruck oder Tipp mit den Ruderblatt-Tasten. Verifikation: Der Abschnitt widerspricht den Specs nicht.
 - [x] 3.2 Gesamtprüfung: `make check` grün. In der Linux-App (Scratch-DB) eine Strecke mit drei Zonen zusammenstellen, eine verschieben und speichern. Verifikation: Screen, Gruppen, ausgegraute Zonen mit Grund, Bedienfeld und Anschlag verhalten sich wie im Spec.
-- [ ] 3.3 Am Handy (Nutzer): eine Strecke zusammenstellen und eine Zone per Langdruck verschieben.
+- [x] 3.3 Am Handy (Nutzer): eine Strecke zusammenstellen und eine Zone per Langdruck verschieben.
