@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:strokesplit/data/health/health_platform.dart';
-import 'package:strokesplit/data/health/health_workout.dart';
+import 'package:strokesplit/data/health/health_exercise.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +24,7 @@ void main() {
 
   final start = DateTime.utc(2026, 11, 2, 18, 30);
   DateTime at(int seconds) => start.add(Duration(seconds: seconds));
-  final workout = HealthWorkout(
+  final exercise = HealthExercise(
     id: 'strokesplit-1',
     start: start,
     end: at(600),
@@ -48,8 +48,8 @@ void main() {
     ],
   );
 
-  test('sends a workout with times in milliseconds', () async {
-    await ChannelHealthPlatform().write(workout, version: 7);
+  test('sends an exercise with times in milliseconds', () async {
+    await ChannelHealthPlatform().write(exercise, version: 7);
 
     final ms = start.millisecondsSinceEpoch;
     expect(calls.single.method, 'writeSession');
@@ -88,7 +88,7 @@ void main() {
     answer = (_) =>
         throw PlatformException(code: 'permission', message: 'not permitted');
     await expectLater(
-      ChannelHealthPlatform().write(workout, version: 1),
+      ChannelHealthPlatform().write(exercise, version: 1),
       throwsA(
         isA<HealthException>().having(
           (e) => e.reason,
@@ -99,7 +99,7 @@ void main() {
     );
     answer = (_) => throw PlatformException(code: 'odd');
     await expectLater(
-      ChannelHealthPlatform().write(workout, version: 1),
+      ChannelHealthPlatform().write(exercise, version: 1),
       throwsA(
         isA<HealthException>().having(
           (e) => e.reason,

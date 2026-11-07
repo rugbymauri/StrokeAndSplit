@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:strokesplit/app/platform_providers.dart';
 import 'package:strokesplit/data/health/health_export.dart';
 import 'package:strokesplit/data/health/health_platform.dart';
-import 'package:strokesplit/data/health/health_workout.dart';
+import 'package:strokesplit/data/health/health_exercise.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/features/health/health_privacy_screen.dart';
 import 'package:strokesplit/features/sessions/sessions_screen.dart';
@@ -94,7 +94,7 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('stays off when the permission for workouts is refused', (
+  testWidgets('stays off when the permission for exercises is refused', (
     tester,
   ) async {
     final setup = _Setup(grants: {HealthKind.heartRate});

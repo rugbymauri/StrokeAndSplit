@@ -5,7 +5,7 @@ import 'package:strokesplit/app/platform_providers.dart';
 import 'package:strokesplit/app/strokesplit_app.dart';
 import 'package:strokesplit/data/health/health_export.dart';
 import 'package:strokesplit/data/health/health_platform.dart';
-import 'package:strokesplit/data/health/health_workout.dart';
+import 'package:strokesplit/data/health/health_exercise.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
@@ -129,7 +129,7 @@ void main() {
       });
       await tester.pumpAndSettle();
 
-      expect(setup.health.workouts, hasLength(1));
+      expect(setup.health.exercises, hasLength(1));
       expect(find.text('An Health Connect übertragen.'), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
@@ -144,7 +144,7 @@ void main() {
       expect(find.text('Nicht an Health Connect übertragen'), findsOneWidget);
       await setup.send(tester);
 
-      expect(setup.health.workouts, hasLength(1));
+      expect(setup.health.exercises, hasLength(1));
       expect(
         find.textContaining('An Health Connect übertragen am '),
         findsOneWidget,

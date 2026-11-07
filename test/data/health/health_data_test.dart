@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/db/database.dart';
-import 'package:strokesplit/data/health/health_workout.dart';
+import 'package:strokesplit/data/health/health_exercise.dart';
 import 'package:strokesplit/data/sessions/session_accumulator.dart';
 import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
@@ -89,7 +89,7 @@ void main() {
     },
   );
 
-  test('gives a recorded session with a pause as a workout', () async {
+  test('gives a recorded session with a pause as an exercise', () async {
     final id = await repository.create(
       startedAt: startedAt,
       source: ErgSourceKind.pm5,
@@ -100,16 +100,16 @@ void main() {
     await repository.write(accumulator.takeBatch());
     await repository.finish(id);
 
-    final workout = healthWorkoutOf(
+    final exercise = healthExerciseOf(
       (await repository.healthData(id))!,
       freeTitle: 'Freies Rudern',
     );
-    expect(workout.title, 'Freies Rudern');
-    expect(workout.meters, greaterThan(0));
-    expect(workout.power, isNotEmpty);
-    expect(workout.speed, isNotEmpty);
+    expect(exercise.title, 'Freies Rudern');
+    expect(exercise.meters, greaterThan(0));
+    expect(exercise.power, isNotEmpty);
+    expect(exercise.speed, isNotEmpty);
     expect(
-      workout.segments.where((s) => s.type == HealthSegmentType.pause),
+      exercise.segments.where((s) => s.type == HealthSegmentType.pause),
       isNotEmpty,
     );
   });
@@ -163,7 +163,7 @@ void main() {
         plan: plan,
       );
       await repository.finish(id);
-      return healthWorkoutOf(
+      return healthExerciseOf(
         (await repository.healthData(id))!,
         freeTitle: 'Freies Rudern',
       ).title;
