@@ -237,7 +237,7 @@ void main() {
     });
 
     test('a recording without a stop imports as before auto-pause, without a pause', () async {
-      // From the first movement on, as a session on a template stores it.
+      // From the first movement on, as a session on a workout stores it.
       final recording = loadFixture('force_curve');
       final detector = FirstStrokeDetector(ErgProtocol.pm5);
       final packets = <RawPacket>[];

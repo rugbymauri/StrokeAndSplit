@@ -119,7 +119,7 @@ void main() {
       expect(lapShare(300), 1);
     });
 
-    test('the ghost of the template runs over all laps', () {
+    test('the ghost of the workout runs over all laps', () {
       final courseGhost = _ghost([(0, 0), (750, 3000)]);
       final progress = _at(
         _seerunde,

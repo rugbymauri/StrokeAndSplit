@@ -3,12 +3,12 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $TemplatesTable extends Templates
-    with TableInfo<$TemplatesTable, TemplateRow> {
+class $WorkoutsTable extends Workouts
+    with TableInfo<$WorkoutsTable, WorkoutRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $TemplatesTable(this.attachedDatabase, [this._alias]);
+  $WorkoutsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -51,7 +51,7 @@ class $TemplatesTable extends Templates
   static const String $name = 'workouts';
   @override
   VerificationContext validateIntegrity(
-    Insertable<TemplateRow> instance, {
+    Insertable<WorkoutRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -81,9 +81,9 @@ class $TemplatesTable extends Templates
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  TemplateRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  WorkoutRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return TemplateRow(
+    return WorkoutRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -100,16 +100,16 @@ class $TemplatesTable extends Templates
   }
 
   @override
-  $TemplatesTable createAlias(String alias) {
-    return $TemplatesTable(attachedDatabase, alias);
+  $WorkoutsTable createAlias(String alias) {
+    return $WorkoutsTable(attachedDatabase, alias);
   }
 }
 
-class TemplateRow extends DataClass implements Insertable<TemplateRow> {
+class WorkoutRow extends DataClass implements Insertable<WorkoutRow> {
   final int id;
   final String name;
   final DateTime createdAt;
-  const TemplateRow({
+  const WorkoutRow({
     required this.id,
     required this.name,
     required this.createdAt,
@@ -123,20 +123,20 @@ class TemplateRow extends DataClass implements Insertable<TemplateRow> {
     return map;
   }
 
-  TemplatesCompanion toCompanion(bool nullToAbsent) {
-    return TemplatesCompanion(
+  WorkoutsCompanion toCompanion(bool nullToAbsent) {
+    return WorkoutsCompanion(
       id: Value(id),
       name: Value(name),
       createdAt: Value(createdAt),
     );
   }
 
-  factory TemplateRow.fromJson(
+  factory WorkoutRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return TemplateRow(
+    return WorkoutRow(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -152,14 +152,14 @@ class TemplateRow extends DataClass implements Insertable<TemplateRow> {
     };
   }
 
-  TemplateRow copyWith({int? id, String? name, DateTime? createdAt}) =>
-      TemplateRow(
+  WorkoutRow copyWith({int? id, String? name, DateTime? createdAt}) =>
+      WorkoutRow(
         id: id ?? this.id,
         name: name ?? this.name,
         createdAt: createdAt ?? this.createdAt,
       );
-  TemplateRow copyWithCompanion(TemplatesCompanion data) {
-    return TemplateRow(
+  WorkoutRow copyWithCompanion(WorkoutsCompanion data) {
+    return WorkoutRow(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -168,7 +168,7 @@ class TemplateRow extends DataClass implements Insertable<TemplateRow> {
 
   @override
   String toString() {
-    return (StringBuffer('TemplateRow(')
+    return (StringBuffer('WorkoutRow(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt')
@@ -181,28 +181,28 @@ class TemplateRow extends DataClass implements Insertable<TemplateRow> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is TemplateRow &&
+      (other is WorkoutRow &&
           other.id == this.id &&
           other.name == this.name &&
           other.createdAt == this.createdAt);
 }
 
-class TemplatesCompanion extends UpdateCompanion<TemplateRow> {
+class WorkoutsCompanion extends UpdateCompanion<WorkoutRow> {
   final Value<int> id;
   final Value<String> name;
   final Value<DateTime> createdAt;
-  const TemplatesCompanion({
+  const WorkoutsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
-  TemplatesCompanion.insert({
+  WorkoutsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     required DateTime createdAt,
   }) : name = Value(name),
        createdAt = Value(createdAt);
-  static Insertable<TemplateRow> custom({
+  static Insertable<WorkoutRow> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<DateTime>? createdAt,
@@ -214,12 +214,12 @@ class TemplatesCompanion extends UpdateCompanion<TemplateRow> {
     });
   }
 
-  TemplatesCompanion copyWith({
+  WorkoutsCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
     Value<DateTime>? createdAt,
   }) {
-    return TemplatesCompanion(
+    return WorkoutsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
@@ -243,7 +243,7 @@ class TemplatesCompanion extends UpdateCompanion<TemplateRow> {
 
   @override
   String toString() {
-    return (StringBuffer('TemplatesCompanion(')
+    return (StringBuffer('WorkoutsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt')
@@ -1061,11 +1061,11 @@ class $SessionsTable extends Sessions
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
-  static const VerificationMeta _templateIdMeta = const VerificationMeta(
-    'templateId',
+  static const VerificationMeta _workoutIdMeta = const VerificationMeta(
+    'workoutId',
   );
   @override
-  late final GeneratedColumn<int> templateId = GeneratedColumn<int>(
+  late final GeneratedColumn<int> workoutId = GeneratedColumn<int>(
     'workout_id',
     aliasedName,
     true,
@@ -1075,11 +1075,11 @@ class $SessionsTable extends Sessions
       'REFERENCES workouts (id) ON DELETE SET NULL',
     ),
   );
-  static const VerificationMeta _templateNameMeta = const VerificationMeta(
-    'templateName',
+  static const VerificationMeta _workoutNameMeta = const VerificationMeta(
+    'workoutName',
   );
   @override
-  late final GeneratedColumn<String> templateName = GeneratedColumn<String>(
+  late final GeneratedColumn<String> workoutName = GeneratedColumn<String>(
     'workout_name',
     aliasedName,
     true,
@@ -1221,8 +1221,8 @@ class $SessionsTable extends Sessions
     averageWatts,
     averageStrokeRate,
     strokeCount,
-    templateId,
-    templateName,
+    workoutId,
+    workoutName,
     courseVersionId,
     plannedLaps,
     plannedDurationMs,
@@ -1319,16 +1319,16 @@ class $SessionsTable extends Sessions
     }
     if (data.containsKey('workout_id')) {
       context.handle(
-        _templateIdMeta,
-        templateId.isAcceptableOrUnknown(data['workout_id']!, _templateIdMeta),
+        _workoutIdMeta,
+        workoutId.isAcceptableOrUnknown(data['workout_id']!, _workoutIdMeta),
       );
     }
     if (data.containsKey('workout_name')) {
       context.handle(
-        _templateNameMeta,
-        templateName.isAcceptableOrUnknown(
+        _workoutNameMeta,
+        workoutName.isAcceptableOrUnknown(
           data['workout_name']!,
-          _templateNameMeta,
+          _workoutNameMeta,
         ),
       );
     }
@@ -1477,11 +1477,11 @@ class $SessionsTable extends Sessions
         DriftSqlType.int,
         data['${effectivePrefix}stroke_count'],
       )!,
-      templateId: attachedDatabase.typeMapping.read(
+      workoutId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}workout_id'],
       ),
-      templateName: attachedDatabase.typeMapping.read(
+      workoutName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}workout_name'],
       ),
@@ -1557,10 +1557,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
   final int? averageWatts;
   final double? averageStrokeRate;
   final int strokeCount;
-  final int? templateId;
+  final int? workoutId;
 
-  /// The template name at the time, kept when the template is deleted.
-  final String? templateName;
+  /// The workout name at the time, kept when the workout is deleted.
+  final String? workoutName;
   final int? courseVersionId;
 
   /// Null for an open number of laps.
@@ -1596,8 +1596,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     this.averageWatts,
     this.averageStrokeRate,
     required this.strokeCount,
-    this.templateId,
-    this.templateName,
+    this.workoutId,
+    this.workoutName,
     this.courseVersionId,
     this.plannedLaps,
     this.plannedDurationMs,
@@ -1647,11 +1647,11 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       map['average_stroke_rate'] = Variable<double>(averageStrokeRate);
     }
     map['stroke_count'] = Variable<int>(strokeCount);
-    if (!nullToAbsent || templateId != null) {
-      map['workout_id'] = Variable<int>(templateId);
+    if (!nullToAbsent || workoutId != null) {
+      map['workout_id'] = Variable<int>(workoutId);
     }
-    if (!nullToAbsent || templateName != null) {
-      map['workout_name'] = Variable<String>(templateName);
+    if (!nullToAbsent || workoutName != null) {
+      map['workout_name'] = Variable<String>(workoutName);
     }
     if (!nullToAbsent || courseVersionId != null) {
       map['course_version_id'] = Variable<int>(courseVersionId);
@@ -1705,12 +1705,12 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ? const Value.absent()
           : Value(averageStrokeRate),
       strokeCount: Value(strokeCount),
-      templateId: templateId == null && nullToAbsent
+      workoutId: workoutId == null && nullToAbsent
           ? const Value.absent()
-          : Value(templateId),
-      templateName: templateName == null && nullToAbsent
+          : Value(workoutId),
+      workoutName: workoutName == null && nullToAbsent
           ? const Value.absent()
-          : Value(templateName),
+          : Value(workoutName),
       courseVersionId: courseVersionId == null && nullToAbsent
           ? const Value.absent()
           : Value(courseVersionId),
@@ -1765,8 +1765,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         json['averageStrokeRate'],
       ),
       strokeCount: serializer.fromJson<int>(json['strokeCount']),
-      templateId: serializer.fromJson<int?>(json['templateId']),
-      templateName: serializer.fromJson<String?>(json['templateName']),
+      workoutId: serializer.fromJson<int?>(json['workoutId']),
+      workoutName: serializer.fromJson<String?>(json['workoutName']),
       courseVersionId: serializer.fromJson<int?>(json['courseVersionId']),
       plannedLaps: serializer.fromJson<int?>(json['plannedLaps']),
       plannedDurationMs: serializer.fromJson<int?>(json['plannedDurationMs']),
@@ -1804,8 +1804,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       'averageWatts': serializer.toJson<int?>(averageWatts),
       'averageStrokeRate': serializer.toJson<double?>(averageStrokeRate),
       'strokeCount': serializer.toJson<int>(strokeCount),
-      'templateId': serializer.toJson<int?>(templateId),
-      'templateName': serializer.toJson<String?>(templateName),
+      'workoutId': serializer.toJson<int?>(workoutId),
+      'workoutName': serializer.toJson<String?>(workoutName),
       'courseVersionId': serializer.toJson<int?>(courseVersionId),
       'plannedLaps': serializer.toJson<int?>(plannedLaps),
       'plannedDurationMs': serializer.toJson<int?>(plannedDurationMs),
@@ -1833,8 +1833,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     Value<int?> averageWatts = const Value.absent(),
     Value<double?> averageStrokeRate = const Value.absent(),
     int? strokeCount,
-    Value<int?> templateId = const Value.absent(),
-    Value<String?> templateName = const Value.absent(),
+    Value<int?> workoutId = const Value.absent(),
+    Value<String?> workoutName = const Value.absent(),
     Value<int?> courseVersionId = const Value.absent(),
     Value<int?> plannedLaps = const Value.absent(),
     Value<int?> plannedDurationMs = const Value.absent(),
@@ -1863,8 +1863,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         ? averageStrokeRate.value
         : this.averageStrokeRate,
     strokeCount: strokeCount ?? this.strokeCount,
-    templateId: templateId.present ? templateId.value : this.templateId,
-    templateName: templateName.present ? templateName.value : this.templateName,
+    workoutId: workoutId.present ? workoutId.value : this.workoutId,
+    workoutName: workoutName.present ? workoutName.value : this.workoutName,
     courseVersionId: courseVersionId.present
         ? courseVersionId.value
         : this.courseVersionId,
@@ -1913,12 +1913,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       strokeCount: data.strokeCount.present
           ? data.strokeCount.value
           : this.strokeCount,
-      templateId: data.templateId.present
-          ? data.templateId.value
-          : this.templateId,
-      templateName: data.templateName.present
-          ? data.templateName.value
-          : this.templateName,
+      workoutId: data.workoutId.present ? data.workoutId.value : this.workoutId,
+      workoutName: data.workoutName.present
+          ? data.workoutName.value
+          : this.workoutName,
       courseVersionId: data.courseVersionId.present
           ? data.courseVersionId.value
           : this.courseVersionId,
@@ -1962,8 +1960,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ..write('averageWatts: $averageWatts, ')
           ..write('averageStrokeRate: $averageStrokeRate, ')
           ..write('strokeCount: $strokeCount, ')
-          ..write('templateId: $templateId, ')
-          ..write('templateName: $templateName, ')
+          ..write('workoutId: $workoutId, ')
+          ..write('workoutName: $workoutName, ')
           ..write('courseVersionId: $courseVersionId, ')
           ..write('plannedLaps: $plannedLaps, ')
           ..write('plannedDurationMs: $plannedDurationMs, ')
@@ -1993,8 +1991,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     averageWatts,
     averageStrokeRate,
     strokeCount,
-    templateId,
-    templateName,
+    workoutId,
+    workoutName,
     courseVersionId,
     plannedLaps,
     plannedDurationMs,
@@ -2023,8 +2021,8 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           other.averageWatts == this.averageWatts &&
           other.averageStrokeRate == this.averageStrokeRate &&
           other.strokeCount == this.strokeCount &&
-          other.templateId == this.templateId &&
-          other.templateName == this.templateName &&
+          other.workoutId == this.workoutId &&
+          other.workoutName == this.workoutName &&
           other.courseVersionId == this.courseVersionId &&
           other.plannedLaps == this.plannedLaps &&
           other.plannedDurationMs == this.plannedDurationMs &&
@@ -2051,8 +2049,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
   final Value<int?> averageWatts;
   final Value<double?> averageStrokeRate;
   final Value<int> strokeCount;
-  final Value<int?> templateId;
-  final Value<String?> templateName;
+  final Value<int?> workoutId;
+  final Value<String?> workoutName;
   final Value<int?> courseVersionId;
   final Value<int?> plannedLaps;
   final Value<int?> plannedDurationMs;
@@ -2077,8 +2075,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.averageWatts = const Value.absent(),
     this.averageStrokeRate = const Value.absent(),
     this.strokeCount = const Value.absent(),
-    this.templateId = const Value.absent(),
-    this.templateName = const Value.absent(),
+    this.workoutId = const Value.absent(),
+    this.workoutName = const Value.absent(),
     this.courseVersionId = const Value.absent(),
     this.plannedLaps = const Value.absent(),
     this.plannedDurationMs = const Value.absent(),
@@ -2104,8 +2102,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.averageWatts = const Value.absent(),
     this.averageStrokeRate = const Value.absent(),
     this.strokeCount = const Value.absent(),
-    this.templateId = const Value.absent(),
-    this.templateName = const Value.absent(),
+    this.workoutId = const Value.absent(),
+    this.workoutName = const Value.absent(),
     this.courseVersionId = const Value.absent(),
     this.plannedLaps = const Value.absent(),
     this.plannedDurationMs = const Value.absent(),
@@ -2133,8 +2131,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Expression<int>? averageWatts,
     Expression<double>? averageStrokeRate,
     Expression<int>? strokeCount,
-    Expression<int>? templateId,
-    Expression<String>? templateName,
+    Expression<int>? workoutId,
+    Expression<String>? workoutName,
     Expression<int>? courseVersionId,
     Expression<int>? plannedLaps,
     Expression<int>? plannedDurationMs,
@@ -2160,8 +2158,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       if (averageWatts != null) 'average_watts': averageWatts,
       if (averageStrokeRate != null) 'average_stroke_rate': averageStrokeRate,
       if (strokeCount != null) 'stroke_count': strokeCount,
-      if (templateId != null) 'workout_id': templateId,
-      if (templateName != null) 'workout_name': templateName,
+      if (workoutId != null) 'workout_id': workoutId,
+      if (workoutName != null) 'workout_name': workoutName,
       if (courseVersionId != null) 'course_version_id': courseVersionId,
       if (plannedLaps != null) 'planned_laps': plannedLaps,
       if (plannedDurationMs != null) 'planned_duration_ms': plannedDurationMs,
@@ -2189,8 +2187,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Value<int?>? averageWatts,
     Value<double?>? averageStrokeRate,
     Value<int>? strokeCount,
-    Value<int?>? templateId,
-    Value<String?>? templateName,
+    Value<int?>? workoutId,
+    Value<String?>? workoutName,
     Value<int?>? courseVersionId,
     Value<int?>? plannedLaps,
     Value<int?>? plannedDurationMs,
@@ -2216,8 +2214,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       averageWatts: averageWatts ?? this.averageWatts,
       averageStrokeRate: averageStrokeRate ?? this.averageStrokeRate,
       strokeCount: strokeCount ?? this.strokeCount,
-      templateId: templateId ?? this.templateId,
-      templateName: templateName ?? this.templateName,
+      workoutId: workoutId ?? this.workoutId,
+      workoutName: workoutName ?? this.workoutName,
       courseVersionId: courseVersionId ?? this.courseVersionId,
       plannedLaps: plannedLaps ?? this.plannedLaps,
       plannedDurationMs: plannedDurationMs ?? this.plannedDurationMs,
@@ -2279,11 +2277,11 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     if (strokeCount.present) {
       map['stroke_count'] = Variable<int>(strokeCount.value);
     }
-    if (templateId.present) {
-      map['workout_id'] = Variable<int>(templateId.value);
+    if (workoutId.present) {
+      map['workout_id'] = Variable<int>(workoutId.value);
     }
-    if (templateName.present) {
-      map['workout_name'] = Variable<String>(templateName.value);
+    if (workoutName.present) {
+      map['workout_name'] = Variable<String>(workoutName.value);
     }
     if (courseVersionId.present) {
       map['course_version_id'] = Variable<int>(courseVersionId.value);
@@ -2334,8 +2332,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
           ..write('averageWatts: $averageWatts, ')
           ..write('averageStrokeRate: $averageStrokeRate, ')
           ..write('strokeCount: $strokeCount, ')
-          ..write('templateId: $templateId, ')
-          ..write('templateName: $templateName, ')
+          ..write('workoutId: $workoutId, ')
+          ..write('workoutName: $workoutName, ')
           ..write('courseVersionId: $courseVersionId, ')
           ..write('plannedLaps: $plannedLaps, ')
           ..write('plannedDurationMs: $plannedDurationMs, ')
@@ -5237,17 +5235,17 @@ class CourseSegmentsCompanion extends UpdateCompanion<CourseSegmentRow> {
   }
 }
 
-class $TemplateBlocksTable extends TemplateBlocks
-    with TableInfo<$TemplateBlocksTable, TemplateBlockRow> {
+class $WorkoutBlocksTable extends WorkoutBlocks
+    with TableInfo<$WorkoutBlocksTable, WorkoutBlockRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $TemplateBlocksTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _templateIdMeta = const VerificationMeta(
-    'templateId',
+  $WorkoutBlocksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _workoutIdMeta = const VerificationMeta(
+    'workoutId',
   );
   @override
-  late final GeneratedColumn<int> templateId = GeneratedColumn<int>(
+  late final GeneratedColumn<int> workoutId = GeneratedColumn<int>(
     'workout_id',
     aliasedName,
     false,
@@ -5292,7 +5290,7 @@ class $TemplateBlocksTable extends TemplateBlocks
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [templateId, position, courseId, laps];
+  List<GeneratedColumn> get $columns => [workoutId, position, courseId, laps];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -5300,18 +5298,18 @@ class $TemplateBlocksTable extends TemplateBlocks
   static const String $name = 'workout_blocks';
   @override
   VerificationContext validateIntegrity(
-    Insertable<TemplateBlockRow> instance, {
+    Insertable<WorkoutBlockRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('workout_id')) {
       context.handle(
-        _templateIdMeta,
-        templateId.isAcceptableOrUnknown(data['workout_id']!, _templateIdMeta),
+        _workoutIdMeta,
+        workoutId.isAcceptableOrUnknown(data['workout_id']!, _workoutIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_templateIdMeta);
+      context.missing(_workoutIdMeta);
     }
     if (data.containsKey('position')) {
       context.handle(
@@ -5339,12 +5337,12 @@ class $TemplateBlocksTable extends TemplateBlocks
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {templateId, position};
+  Set<GeneratedColumn> get $primaryKey => {workoutId, position};
   @override
-  TemplateBlockRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  WorkoutBlockRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return TemplateBlockRow(
-      templateId: attachedDatabase.typeMapping.read(
+    return WorkoutBlockRow(
+      workoutId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}workout_id'],
       )!,
@@ -5364,21 +5362,20 @@ class $TemplateBlocksTable extends TemplateBlocks
   }
 
   @override
-  $TemplateBlocksTable createAlias(String alias) {
-    return $TemplateBlocksTable(attachedDatabase, alias);
+  $WorkoutBlocksTable createAlias(String alias) {
+    return $WorkoutBlocksTable(attachedDatabase, alias);
   }
 }
 
-class TemplateBlockRow extends DataClass
-    implements Insertable<TemplateBlockRow> {
-  final int templateId;
+class WorkoutBlockRow extends DataClass implements Insertable<WorkoutBlockRow> {
+  final int workoutId;
   final int position;
   final int courseId;
 
   /// Null means open: laps follow until the session is stopped.
   final int? laps;
-  const TemplateBlockRow({
-    required this.templateId,
+  const WorkoutBlockRow({
+    required this.workoutId,
     required this.position,
     required this.courseId,
     this.laps,
@@ -5386,7 +5383,7 @@ class TemplateBlockRow extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['workout_id'] = Variable<int>(templateId);
+    map['workout_id'] = Variable<int>(workoutId);
     map['position'] = Variable<int>(position);
     map['course_id'] = Variable<int>(courseId);
     if (!nullToAbsent || laps != null) {
@@ -5395,22 +5392,22 @@ class TemplateBlockRow extends DataClass
     return map;
   }
 
-  TemplateBlocksCompanion toCompanion(bool nullToAbsent) {
-    return TemplateBlocksCompanion(
-      templateId: Value(templateId),
+  WorkoutBlocksCompanion toCompanion(bool nullToAbsent) {
+    return WorkoutBlocksCompanion(
+      workoutId: Value(workoutId),
       position: Value(position),
       courseId: Value(courseId),
       laps: laps == null && nullToAbsent ? const Value.absent() : Value(laps),
     );
   }
 
-  factory TemplateBlockRow.fromJson(
+  factory WorkoutBlockRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return TemplateBlockRow(
-      templateId: serializer.fromJson<int>(json['templateId']),
+    return WorkoutBlockRow(
+      workoutId: serializer.fromJson<int>(json['workoutId']),
       position: serializer.fromJson<int>(json['position']),
       courseId: serializer.fromJson<int>(json['courseId']),
       laps: serializer.fromJson<int?>(json['laps']),
@@ -5420,29 +5417,27 @@ class TemplateBlockRow extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'templateId': serializer.toJson<int>(templateId),
+      'workoutId': serializer.toJson<int>(workoutId),
       'position': serializer.toJson<int>(position),
       'courseId': serializer.toJson<int>(courseId),
       'laps': serializer.toJson<int?>(laps),
     };
   }
 
-  TemplateBlockRow copyWith({
-    int? templateId,
+  WorkoutBlockRow copyWith({
+    int? workoutId,
     int? position,
     int? courseId,
     Value<int?> laps = const Value.absent(),
-  }) => TemplateBlockRow(
-    templateId: templateId ?? this.templateId,
+  }) => WorkoutBlockRow(
+    workoutId: workoutId ?? this.workoutId,
     position: position ?? this.position,
     courseId: courseId ?? this.courseId,
     laps: laps.present ? laps.value : this.laps,
   );
-  TemplateBlockRow copyWithCompanion(TemplateBlocksCompanion data) {
-    return TemplateBlockRow(
-      templateId: data.templateId.present
-          ? data.templateId.value
-          : this.templateId,
+  WorkoutBlockRow copyWithCompanion(WorkoutBlocksCompanion data) {
+    return WorkoutBlockRow(
+      workoutId: data.workoutId.present ? data.workoutId.value : this.workoutId,
       position: data.position.present ? data.position.value : this.position,
       courseId: data.courseId.present ? data.courseId.value : this.courseId,
       laps: data.laps.present ? data.laps.value : this.laps,
@@ -5451,8 +5446,8 @@ class TemplateBlockRow extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('TemplateBlockRow(')
-          ..write('templateId: $templateId, ')
+    return (StringBuffer('WorkoutBlockRow(')
+          ..write('workoutId: $workoutId, ')
           ..write('position: $position, ')
           ..write('courseId: $courseId, ')
           ..write('laps: $laps')
@@ -5461,48 +5456,48 @@ class TemplateBlockRow extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(templateId, position, courseId, laps);
+  int get hashCode => Object.hash(workoutId, position, courseId, laps);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is TemplateBlockRow &&
-          other.templateId == this.templateId &&
+      (other is WorkoutBlockRow &&
+          other.workoutId == this.workoutId &&
           other.position == this.position &&
           other.courseId == this.courseId &&
           other.laps == this.laps);
 }
 
-class TemplateBlocksCompanion extends UpdateCompanion<TemplateBlockRow> {
-  final Value<int> templateId;
+class WorkoutBlocksCompanion extends UpdateCompanion<WorkoutBlockRow> {
+  final Value<int> workoutId;
   final Value<int> position;
   final Value<int> courseId;
   final Value<int?> laps;
   final Value<int> rowid;
-  const TemplateBlocksCompanion({
-    this.templateId = const Value.absent(),
+  const WorkoutBlocksCompanion({
+    this.workoutId = const Value.absent(),
     this.position = const Value.absent(),
     this.courseId = const Value.absent(),
     this.laps = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  TemplateBlocksCompanion.insert({
-    required int templateId,
+  WorkoutBlocksCompanion.insert({
+    required int workoutId,
     required int position,
     required int courseId,
     this.laps = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : templateId = Value(templateId),
+  }) : workoutId = Value(workoutId),
        position = Value(position),
        courseId = Value(courseId);
-  static Insertable<TemplateBlockRow> custom({
-    Expression<int>? templateId,
+  static Insertable<WorkoutBlockRow> custom({
+    Expression<int>? workoutId,
     Expression<int>? position,
     Expression<int>? courseId,
     Expression<int>? laps,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (templateId != null) 'workout_id': templateId,
+      if (workoutId != null) 'workout_id': workoutId,
       if (position != null) 'position': position,
       if (courseId != null) 'course_id': courseId,
       if (laps != null) 'laps': laps,
@@ -5510,15 +5505,15 @@ class TemplateBlocksCompanion extends UpdateCompanion<TemplateBlockRow> {
     });
   }
 
-  TemplateBlocksCompanion copyWith({
-    Value<int>? templateId,
+  WorkoutBlocksCompanion copyWith({
+    Value<int>? workoutId,
     Value<int>? position,
     Value<int>? courseId,
     Value<int?>? laps,
     Value<int>? rowid,
   }) {
-    return TemplateBlocksCompanion(
-      templateId: templateId ?? this.templateId,
+    return WorkoutBlocksCompanion(
+      workoutId: workoutId ?? this.workoutId,
       position: position ?? this.position,
       courseId: courseId ?? this.courseId,
       laps: laps ?? this.laps,
@@ -5529,8 +5524,8 @@ class TemplateBlocksCompanion extends UpdateCompanion<TemplateBlockRow> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (templateId.present) {
-      map['workout_id'] = Variable<int>(templateId.value);
+    if (workoutId.present) {
+      map['workout_id'] = Variable<int>(workoutId.value);
     }
     if (position.present) {
       map['position'] = Variable<int>(position.value);
@@ -5549,8 +5544,8 @@ class TemplateBlocksCompanion extends UpdateCompanion<TemplateBlockRow> {
 
   @override
   String toString() {
-    return (StringBuffer('TemplateBlocksCompanion(')
-          ..write('templateId: $templateId, ')
+    return (StringBuffer('WorkoutBlocksCompanion(')
+          ..write('workoutId: $workoutId, ')
           ..write('position: $position, ')
           ..write('courseId: $courseId, ')
           ..write('laps: $laps, ')
@@ -7080,7 +7075,7 @@ class PausesCompanion extends UpdateCompanion<PauseRow> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $TemplatesTable templates = $TemplatesTable(this);
+  late final $WorkoutsTable workouts = $WorkoutsTable(this);
   late final $CoursesTable courses = $CoursesTable(this);
   late final $CourseVersionsTable courseVersions = $CourseVersionsTable(this);
   late final $SessionsTable sessions = $SessionsTable(this);
@@ -7089,7 +7084,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RawPacketsTable rawPackets = $RawPacketsTable(this);
   late final $ZonesTable zones = $ZonesTable(this);
   late final $CourseSegmentsTable courseSegments = $CourseSegmentsTable(this);
-  late final $TemplateBlocksTable templateBlocks = $TemplateBlocksTable(this);
+  late final $WorkoutBlocksTable workoutBlocks = $WorkoutBlocksTable(this);
   late final $LapsTable laps = $LapsTable(this);
   late final $LapSegmentsTable lapSegments = $LapSegmentsTable(this);
   late final $RrIntervalsTable rrIntervals = $RrIntervalsTable(this);
@@ -7119,7 +7114,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-    templates,
+    workouts,
     courses,
     courseVersions,
     sessions,
@@ -7128,7 +7123,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     rawPackets,
     zones,
     courseSegments,
-    templateBlocks,
+    workoutBlocks,
     laps,
     lapSegments,
     rrIntervals,
@@ -7214,20 +7209,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ]);
 }
 
-typedef $$TemplatesTableCreateCompanionBuilder = TemplatesCompanion Function({
+typedef $$WorkoutsTableCreateCompanionBuilder = WorkoutsCompanion Function({
   Value<int> id,
   required String name,
   required DateTime createdAt,
 });
-typedef $$TemplatesTableUpdateCompanionBuilder = TemplatesCompanion Function({
+typedef $$WorkoutsTableUpdateCompanionBuilder = WorkoutsCompanion Function({
   Value<int> id,
   Value<String> name,
   Value<DateTime> createdAt,
 });
 
-final class $$TemplatesTableReferences
-    extends BaseReferences<_$AppDatabase, $TemplatesTable, TemplateRow> {
-  $$TemplatesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$WorkoutsTableReferences
+    extends BaseReferences<_$AppDatabase, $WorkoutsTable, WorkoutRow> {
+  $$WorkoutsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$SessionsTable, List<SessionRow>>
   _sessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
@@ -7239,7 +7234,7 @@ final class $$TemplatesTableReferences
     final manager = $$SessionsTableTableManager(
       $_db,
       $_db.sessions,
-    ).filter((f) => f.templateId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.workoutId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_sessionsRefsTable($_db));
     return ProcessedTableManager(
@@ -7247,28 +7242,28 @@ final class $$TemplatesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$TemplateBlocksTable, List<TemplateBlockRow>>
-  _templateBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.templateBlocks,
+  static MultiTypedResultKey<$WorkoutBlocksTable, List<WorkoutBlockRow>>
+  _workoutBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.workoutBlocks,
     aliasName: 'workouts__id__workout_blocks__workout_id',
   );
 
-  $$TemplateBlocksTableProcessedTableManager get templateBlocksRefs {
-    final manager = $$TemplateBlocksTableTableManager(
+  $$WorkoutBlocksTableProcessedTableManager get workoutBlocksRefs {
+    final manager = $$WorkoutBlocksTableTableManager(
       $_db,
-      $_db.templateBlocks,
-    ).filter((f) => f.templateId.id.sqlEquals($_itemColumn<int>('id')!));
+      $_db.workoutBlocks,
+    ).filter((f) => f.workoutId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_templateBlocksRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_workoutBlocksRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
 
-class $$TemplatesTableFilterComposer
-    extends Composer<_$AppDatabase, $TemplatesTable> {
-  $$TemplatesTableFilterComposer({
+class $$WorkoutsTableFilterComposer
+    extends Composer<_$AppDatabase, $WorkoutsTable> {
+  $$WorkoutsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -7297,7 +7292,7 @@ class $$TemplatesTableFilterComposer
       composer: this,
       getCurrentColumn: (t) => t.id,
       referencedTable: $db.sessions,
-      getReferencedColumn: (t) => t.templateId,
+      getReferencedColumn: (t) => t.workoutId,
       builder:
           (
             joinBuilder, {
@@ -7315,22 +7310,22 @@ class $$TemplatesTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> templateBlocksRefs(
-    Expression<bool> Function($$TemplateBlocksTableFilterComposer f) f,
+  Expression<bool> workoutBlocksRefs(
+    Expression<bool> Function($$WorkoutBlocksTableFilterComposer f) f,
   ) {
-    final $$TemplateBlocksTableFilterComposer composer = $composerBuilder(
+    final $$WorkoutBlocksTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.templateBlocks,
-      getReferencedColumn: (t) => t.templateId,
+      referencedTable: $db.workoutBlocks,
+      getReferencedColumn: (t) => t.workoutId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplateBlocksTableFilterComposer(
+          }) => $$WorkoutBlocksTableFilterComposer(
             $db: $db,
-            $table: $db.templateBlocks,
+            $table: $db.workoutBlocks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7341,9 +7336,9 @@ class $$TemplatesTableFilterComposer
   }
 }
 
-class $$TemplatesTableOrderingComposer
-    extends Composer<_$AppDatabase, $TemplatesTable> {
-  $$TemplatesTableOrderingComposer({
+class $$WorkoutsTableOrderingComposer
+    extends Composer<_$AppDatabase, $WorkoutsTable> {
+  $$WorkoutsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -7366,9 +7361,9 @@ class $$TemplatesTableOrderingComposer
   );
 }
 
-class $$TemplatesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $TemplatesTable> {
-  $$TemplatesTableAnnotationComposer({
+class $$WorkoutsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WorkoutsTable> {
+  $$WorkoutsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -7391,7 +7386,7 @@ class $$TemplatesTableAnnotationComposer
       composer: this,
       getCurrentColumn: (t) => t.id,
       referencedTable: $db.sessions,
-      getReferencedColumn: (t) => t.templateId,
+      getReferencedColumn: (t) => t.workoutId,
       builder:
           (
             joinBuilder, {
@@ -7409,22 +7404,22 @@ class $$TemplatesTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> templateBlocksRefs<T extends Object>(
-    Expression<T> Function($$TemplateBlocksTableAnnotationComposer a) f,
+  Expression<T> workoutBlocksRefs<T extends Object>(
+    Expression<T> Function($$WorkoutBlocksTableAnnotationComposer a) f,
   ) {
-    final $$TemplateBlocksTableAnnotationComposer composer = $composerBuilder(
+    final $$WorkoutBlocksTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.templateBlocks,
-      getReferencedColumn: (t) => t.templateId,
+      referencedTable: $db.workoutBlocks,
+      getReferencedColumn: (t) => t.workoutId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplateBlocksTableAnnotationComposer(
+          }) => $$WorkoutBlocksTableAnnotationComposer(
             $db: $db,
-            $table: $db.templateBlocks,
+            $table: $db.workoutBlocks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7435,43 +7430,43 @@ class $$TemplatesTableAnnotationComposer
   }
 }
 
-class $$TemplatesTableTableManager
+class $$WorkoutsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $TemplatesTable,
-          TemplateRow,
-          $$TemplatesTableFilterComposer,
-          $$TemplatesTableOrderingComposer,
-          $$TemplatesTableAnnotationComposer,
-          $$TemplatesTableCreateCompanionBuilder,
-          $$TemplatesTableUpdateCompanionBuilder,
-          (TemplateRow, $$TemplatesTableReferences),
-          TemplateRow,
-          PrefetchHooks Function({bool sessionsRefs, bool templateBlocksRefs})
+          $WorkoutsTable,
+          WorkoutRow,
+          $$WorkoutsTableFilterComposer,
+          $$WorkoutsTableOrderingComposer,
+          $$WorkoutsTableAnnotationComposer,
+          $$WorkoutsTableCreateCompanionBuilder,
+          $$WorkoutsTableUpdateCompanionBuilder,
+          (WorkoutRow, $$WorkoutsTableReferences),
+          WorkoutRow,
+          PrefetchHooks Function({bool sessionsRefs, bool workoutBlocksRefs})
         > {
-  $$TemplatesTableTableManager(_$AppDatabase db, $TemplatesTable table)
+  $$WorkoutsTableTableManager(_$AppDatabase db, $WorkoutsTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$TemplatesTableFilterComposer($db: db, $table: table),
+              $$WorkoutsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$TemplatesTableOrderingComposer($db: db, $table: table),
+              $$WorkoutsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$TemplatesTableAnnotationComposer($db: db, $table: table),
+              $$WorkoutsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
-          }) => TemplatesCompanion(id: id, name: name, createdAt: createdAt),
+          }) => WorkoutsCompanion(id: id, name: name, createdAt: createdAt),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String name,
                 required DateTime createdAt,
-              }) => TemplatesCompanion.insert(
+              }) => WorkoutsCompanion.insert(
                 id: id,
                 name: name,
                 createdAt: createdAt,
@@ -7479,34 +7474,34 @@ class $$TemplatesTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$TemplatesTable, TemplateRow>(table),
-                  $$TemplatesTableReferences(db, table, e),
+                  e.readTable<$WorkoutsTable, WorkoutRow>(table),
+                  $$WorkoutsTableReferences(db, table, e),
                 ),
               )
               .toList(),
           prefetchHooksCallback:
-              ({sessionsRefs = false, templateBlocksRefs = false}) {
+              ({sessionsRefs = false, workoutBlocksRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (sessionsRefs) db.sessions,
-                    if (templateBlocksRefs) db.templateBlocks,
+                    if (workoutBlocksRefs) db.workoutBlocks,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (sessionsRefs)
                         await $_getPrefetchedDataByColumns<
-                          TemplateRow,
-                          $TemplatesTable,
+                          WorkoutRow,
+                          $WorkoutsTable,
                           SessionRow,
                           $SessionsTable
                         >(
                           currentTable: table,
-                          referencedTable: $$TemplatesTableReferences
+                          referencedTable: $$WorkoutsTableReferences
                               ._sessionsRefsTable(db),
                           managerFromTypedResult: (p0) =>
-                              $$TemplatesTableReferences(
+                              $$WorkoutsTableReferences(
                                 db,
                                 table,
                                 p0,
@@ -7515,22 +7510,22 @@ class $$TemplatesTableTableManager
                           referencedColumn: 'workout_id',
                           typedResults: items,
                         ),
-                      if (templateBlocksRefs)
+                      if (workoutBlocksRefs)
                         await $_getPrefetchedDataByColumns<
-                          TemplateRow,
-                          $TemplatesTable,
-                          TemplateBlockRow,
-                          $TemplateBlocksTable
+                          WorkoutRow,
+                          $WorkoutsTable,
+                          WorkoutBlockRow,
+                          $WorkoutBlocksTable
                         >(
                           currentTable: table,
-                          referencedTable: $$TemplatesTableReferences
-                              ._templateBlocksRefsTable(db),
+                          referencedTable: $$WorkoutsTableReferences
+                              ._workoutBlocksRefsTable(db),
                           managerFromTypedResult: (p0) =>
-                              $$TemplatesTableReferences(
+                              $$WorkoutsTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).templateBlocksRefs,
+                              ).workoutBlocksRefs,
                           currentColumn: 'id',
                           referencedColumn: 'workout_id',
                           typedResults: items,
@@ -7543,19 +7538,19 @@ class $$TemplatesTableTableManager
       );
 }
 
-typedef $$TemplatesTableProcessedTableManager =
+typedef $$WorkoutsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $TemplatesTable,
-      TemplateRow,
-      $$TemplatesTableFilterComposer,
-      $$TemplatesTableOrderingComposer,
-      $$TemplatesTableAnnotationComposer,
-      $$TemplatesTableCreateCompanionBuilder,
-      $$TemplatesTableUpdateCompanionBuilder,
-      (TemplateRow, $$TemplatesTableReferences),
-      TemplateRow,
-      PrefetchHooks Function({bool sessionsRefs, bool templateBlocksRefs})
+      $WorkoutsTable,
+      WorkoutRow,
+      $$WorkoutsTableFilterComposer,
+      $$WorkoutsTableOrderingComposer,
+      $$WorkoutsTableAnnotationComposer,
+      $$WorkoutsTableCreateCompanionBuilder,
+      $$WorkoutsTableUpdateCompanionBuilder,
+      (WorkoutRow, $$WorkoutsTableReferences),
+      WorkoutRow,
+      PrefetchHooks Function({bool sessionsRefs, bool workoutBlocksRefs})
     >;
 typedef $$CoursesTableCreateCompanionBuilder = CoursesCompanion Function({
   Value<int> id,
@@ -7592,19 +7587,19 @@ final class $$CoursesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$TemplateBlocksTable, List<TemplateBlockRow>>
-  _templateBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.templateBlocks,
+  static MultiTypedResultKey<$WorkoutBlocksTable, List<WorkoutBlockRow>>
+  _workoutBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.workoutBlocks,
     aliasName: 'courses__id__workout_blocks__course_id',
   );
 
-  $$TemplateBlocksTableProcessedTableManager get templateBlocksRefs {
-    final manager = $$TemplateBlocksTableTableManager(
+  $$WorkoutBlocksTableProcessedTableManager get workoutBlocksRefs {
+    final manager = $$WorkoutBlocksTableTableManager(
       $_db,
-      $_db.templateBlocks,
+      $_db.workoutBlocks,
     ).filter((f) => f.courseId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_templateBlocksRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_workoutBlocksRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -7666,22 +7661,22 @@ class $$CoursesTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> templateBlocksRefs(
-    Expression<bool> Function($$TemplateBlocksTableFilterComposer f) f,
+  Expression<bool> workoutBlocksRefs(
+    Expression<bool> Function($$WorkoutBlocksTableFilterComposer f) f,
   ) {
-    final $$TemplateBlocksTableFilterComposer composer = $composerBuilder(
+    final $$WorkoutBlocksTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.templateBlocks,
+      referencedTable: $db.workoutBlocks,
       getReferencedColumn: (t) => t.courseId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplateBlocksTableFilterComposer(
+          }) => $$WorkoutBlocksTableFilterComposer(
             $db: $db,
-            $table: $db.templateBlocks,
+            $table: $db.workoutBlocks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7768,22 +7763,22 @@ class $$CoursesTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> templateBlocksRefs<T extends Object>(
-    Expression<T> Function($$TemplateBlocksTableAnnotationComposer a) f,
+  Expression<T> workoutBlocksRefs<T extends Object>(
+    Expression<T> Function($$WorkoutBlocksTableAnnotationComposer a) f,
   ) {
-    final $$TemplateBlocksTableAnnotationComposer composer = $composerBuilder(
+    final $$WorkoutBlocksTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.templateBlocks,
+      referencedTable: $db.workoutBlocks,
       getReferencedColumn: (t) => t.courseId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplateBlocksTableAnnotationComposer(
+          }) => $$WorkoutBlocksTableAnnotationComposer(
             $db: $db,
-            $table: $db.templateBlocks,
+            $table: $db.workoutBlocks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7809,7 +7804,7 @@ class $$CoursesTableTableManager
           CourseRow,
           PrefetchHooks Function({
             bool courseVersionsRefs,
-            bool templateBlocksRefs,
+            bool workoutBlocksRefs,
           })
         > {
   $$CoursesTableTableManager(_$AppDatabase db, $CoursesTable table)
@@ -7856,12 +7851,12 @@ class $$CoursesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({courseVersionsRefs = false, templateBlocksRefs = false}) {
+              ({courseVersionsRefs = false, workoutBlocksRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (courseVersionsRefs) db.courseVersions,
-                    if (templateBlocksRefs) db.templateBlocks,
+                    if (workoutBlocksRefs) db.workoutBlocks,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -7886,22 +7881,22 @@ class $$CoursesTableTableManager
                           referencedColumn: 'course_id',
                           typedResults: items,
                         ),
-                      if (templateBlocksRefs)
+                      if (workoutBlocksRefs)
                         await $_getPrefetchedDataByColumns<
                           CourseRow,
                           $CoursesTable,
-                          TemplateBlockRow,
-                          $TemplateBlocksTable
+                          WorkoutBlockRow,
+                          $WorkoutBlocksTable
                         >(
                           currentTable: table,
                           referencedTable: $$CoursesTableReferences
-                              ._templateBlocksRefsTable(db),
+                              ._workoutBlocksRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$CoursesTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).templateBlocksRefs,
+                              ).workoutBlocksRefs,
                           currentColumn: 'id',
                           referencedColumn: 'course_id',
                           typedResults: items,
@@ -7926,7 +7921,7 @@ typedef $$CoursesTableProcessedTableManager =
       $$CoursesTableUpdateCompanionBuilder,
       (CourseRow, $$CoursesTableReferences),
       CourseRow,
-      PrefetchHooks Function({bool courseVersionsRefs, bool templateBlocksRefs})
+      PrefetchHooks Function({bool courseVersionsRefs, bool workoutBlocksRefs})
     >;
 typedef $$CourseVersionsTableCreateCompanionBuilder =
     CourseVersionsCompanion Function({
@@ -8451,8 +8446,8 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   Value<int?> averageWatts,
   Value<double?> averageStrokeRate,
   Value<int> strokeCount,
-  Value<int?> templateId,
-  Value<String?> templateName,
+  Value<int?> workoutId,
+  Value<String?> workoutName,
   Value<int?> courseVersionId,
   Value<int?> plannedLaps,
   Value<int?> plannedDurationMs,
@@ -8478,8 +8473,8 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<int?> averageWatts,
   Value<double?> averageStrokeRate,
   Value<int> strokeCount,
-  Value<int?> templateId,
-  Value<String?> templateName,
+  Value<int?> workoutId,
+  Value<String?> workoutName,
   Value<int?> courseVersionId,
   Value<int?> plannedLaps,
   Value<int?> plannedDurationMs,
@@ -8496,17 +8491,17 @@ final class $$SessionsTableReferences
     extends BaseReferences<_$AppDatabase, $SessionsTable, SessionRow> {
   $$SessionsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $TemplatesTable _templateIdTable(_$AppDatabase db) =>
-      db.templates.createAlias('sessions__workout_id__workouts__id');
+  static $WorkoutsTable _workoutIdTable(_$AppDatabase db) =>
+      db.workouts.createAlias('sessions__workout_id__workouts__id');
 
-  $$TemplatesTableProcessedTableManager? get templateId {
+  $$WorkoutsTableProcessedTableManager? get workoutId {
     final $_column = $_itemColumn<int>('workout_id');
     if ($_column == null) return null;
-    final manager = $$TemplatesTableTableManager(
+    final manager = $$WorkoutsTableTableManager(
       $_db,
-      $_db.templates,
+      $_db.workouts,
     ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_workoutIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -8739,8 +8734,8 @@ class $$SessionsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get templateName => $composableBuilder(
-    column: $table.templateName,
+  ColumnFilters<String> get workoutName => $composableBuilder(
+    column: $table.workoutName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8789,20 +8784,20 @@ class $$SessionsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  $$TemplatesTableFilterComposer get templateId {
-    final $$TemplatesTableFilterComposer composer = $composerBuilder(
+  $$WorkoutsTableFilterComposer get workoutId {
+    final $$WorkoutsTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.templateId,
-      referencedTable: $db.templates,
+      getCurrentColumn: (t) => t.workoutId,
+      referencedTable: $db.workouts,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplatesTableFilterComposer(
+          }) => $$WorkoutsTableFilterComposer(
             $db: $db,
-            $table: $db.templates,
+            $table: $db.workouts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9085,8 +9080,8 @@ class $$SessionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get templateName => $composableBuilder(
-    column: $table.templateName,
+  ColumnOrderings<String> get workoutName => $composableBuilder(
+    column: $table.workoutName,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -9135,20 +9130,20 @@ class $$SessionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  $$TemplatesTableOrderingComposer get templateId {
-    final $$TemplatesTableOrderingComposer composer = $composerBuilder(
+  $$WorkoutsTableOrderingComposer get workoutId {
+    final $$WorkoutsTableOrderingComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.templateId,
-      referencedTable: $db.templates,
+      getCurrentColumn: (t) => t.workoutId,
+      referencedTable: $db.workouts,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplatesTableOrderingComposer(
+          }) => $$WorkoutsTableOrderingComposer(
             $db: $db,
-            $table: $db.templates,
+            $table: $db.workouts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9244,8 +9239,8 @@ class $$SessionsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get templateName => $composableBuilder(
-    column: $table.templateName,
+  GeneratedColumn<String> get workoutName => $composableBuilder(
+    column: $table.workoutName,
     builder: (column) => column,
   );
 
@@ -9288,20 +9283,20 @@ class $$SessionsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  $$TemplatesTableAnnotationComposer get templateId {
-    final $$TemplatesTableAnnotationComposer composer = $composerBuilder(
+  $$WorkoutsTableAnnotationComposer get workoutId {
+    final $$WorkoutsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.templateId,
-      referencedTable: $db.templates,
+      getCurrentColumn: (t) => t.workoutId,
+      referencedTable: $db.workouts,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplatesTableAnnotationComposer(
+          }) => $$WorkoutsTableAnnotationComposer(
             $db: $db,
-            $table: $db.templates,
+            $table: $db.workouts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9524,7 +9519,7 @@ class $$SessionsTableTableManager
           (SessionRow, $$SessionsTableReferences),
           SessionRow,
           PrefetchHooks Function({
-            bool templateId,
+            bool workoutId,
             bool courseVersionId,
             bool samplesRefs,
             bool strokesRefs,
@@ -9561,8 +9556,8 @@ class $$SessionsTableTableManager
                 Value<int?> averageWatts = const Value.absent(),
                 Value<double?> averageStrokeRate = const Value.absent(),
                 Value<int> strokeCount = const Value.absent(),
-                Value<int?> templateId = const Value.absent(),
-                Value<String?> templateName = const Value.absent(),
+                Value<int?> workoutId = const Value.absent(),
+                Value<String?> workoutName = const Value.absent(),
                 Value<int?> courseVersionId = const Value.absent(),
                 Value<int?> plannedLaps = const Value.absent(),
                 Value<int?> plannedDurationMs = const Value.absent(),
@@ -9587,8 +9582,8 @@ class $$SessionsTableTableManager
                 averageWatts: averageWatts,
                 averageStrokeRate: averageStrokeRate,
                 strokeCount: strokeCount,
-                templateId: templateId,
-                templateName: templateName,
+                workoutId: workoutId,
+                workoutName: workoutName,
                 courseVersionId: courseVersionId,
                 plannedLaps: plannedLaps,
                 plannedDurationMs: plannedDurationMs,
@@ -9615,8 +9610,8 @@ class $$SessionsTableTableManager
                 Value<int?> averageWatts = const Value.absent(),
                 Value<double?> averageStrokeRate = const Value.absent(),
                 Value<int> strokeCount = const Value.absent(),
-                Value<int?> templateId = const Value.absent(),
-                Value<String?> templateName = const Value.absent(),
+                Value<int?> workoutId = const Value.absent(),
+                Value<String?> workoutName = const Value.absent(),
                 Value<int?> courseVersionId = const Value.absent(),
                 Value<int?> plannedLaps = const Value.absent(),
                 Value<int?> plannedDurationMs = const Value.absent(),
@@ -9641,8 +9636,8 @@ class $$SessionsTableTableManager
                 averageWatts: averageWatts,
                 averageStrokeRate: averageStrokeRate,
                 strokeCount: strokeCount,
-                templateId: templateId,
-                templateName: templateName,
+                workoutId: workoutId,
+                workoutName: workoutName,
                 courseVersionId: courseVersionId,
                 plannedLaps: plannedLaps,
                 plannedDurationMs: plannedDurationMs,
@@ -9664,7 +9659,7 @@ class $$SessionsTableTableManager
               .toList(),
           prefetchHooksCallback:
               ({
-                templateId = false,
+                workoutId = false,
                 courseVersionId = false,
                 samplesRefs = false,
                 strokesRefs = false,
@@ -9701,14 +9696,14 @@ class $$SessionsTableTableManager
                           dynamic
                         >
                       >(state) {
-                        if (templateId) {
+                        if (workoutId) {
                           state = state.withJoin(
                             currentTable: table,
-                            currentColumn: table.templateId,
+                            currentColumn: table.workoutId,
                             referencedTable: $$SessionsTableReferences
-                                ._templateIdTable(db),
+                                ._workoutIdTable(db),
                             referencedColumn: $$SessionsTableReferences
-                                ._templateIdTable(db)
+                                ._workoutIdTable(db)
                                 .id,
                           ) as T;
                         }
@@ -9885,7 +9880,7 @@ typedef $$SessionsTableProcessedTableManager =
       (SessionRow, $$SessionsTableReferences),
       SessionRow,
       PrefetchHooks Function({
-        bool templateId,
+        bool workoutId,
         bool courseVersionId,
         bool samplesRefs,
         bool strokesRefs,
@@ -11930,43 +11925,43 @@ typedef $$CourseSegmentsTableProcessedTableManager =
       CourseSegmentRow,
       PrefetchHooks Function({bool versionId, bool zoneId})
     >;
-typedef $$TemplateBlocksTableCreateCompanionBuilder =
-    TemplateBlocksCompanion Function({
-      required int templateId,
+typedef $$WorkoutBlocksTableCreateCompanionBuilder =
+    WorkoutBlocksCompanion Function({
+      required int workoutId,
       required int position,
       required int courseId,
       Value<int?> laps,
       Value<int> rowid,
     });
-typedef $$TemplateBlocksTableUpdateCompanionBuilder =
-    TemplateBlocksCompanion Function({
-      Value<int> templateId,
+typedef $$WorkoutBlocksTableUpdateCompanionBuilder =
+    WorkoutBlocksCompanion Function({
+      Value<int> workoutId,
       Value<int> position,
       Value<int> courseId,
       Value<int?> laps,
       Value<int> rowid,
     });
 
-final class $$TemplateBlocksTableReferences
+final class $$WorkoutBlocksTableReferences
     extends
-        BaseReferences<_$AppDatabase, $TemplateBlocksTable, TemplateBlockRow> {
-  $$TemplateBlocksTableReferences(
+        BaseReferences<_$AppDatabase, $WorkoutBlocksTable, WorkoutBlockRow> {
+  $$WorkoutBlocksTableReferences(
     super.$_db,
     super.$_table,
     super.$_typedResult,
   );
 
-  static $TemplatesTable _templateIdTable(_$AppDatabase db) =>
-      db.templates.createAlias('workout_blocks__workout_id__workouts__id');
+  static $WorkoutsTable _workoutIdTable(_$AppDatabase db) =>
+      db.workouts.createAlias('workout_blocks__workout_id__workouts__id');
 
-  $$TemplatesTableProcessedTableManager get templateId {
+  $$WorkoutsTableProcessedTableManager get workoutId {
     final $_column = $_itemColumn<int>('workout_id')!;
 
-    final manager = $$TemplatesTableTableManager(
+    final manager = $$WorkoutsTableTableManager(
       $_db,
-      $_db.templates,
+      $_db.workouts,
     ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_workoutIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -11991,9 +11986,9 @@ final class $$TemplateBlocksTableReferences
   }
 }
 
-class $$TemplateBlocksTableFilterComposer
-    extends Composer<_$AppDatabase, $TemplateBlocksTable> {
-  $$TemplateBlocksTableFilterComposer({
+class $$WorkoutBlocksTableFilterComposer
+    extends Composer<_$AppDatabase, $WorkoutBlocksTable> {
+  $$WorkoutBlocksTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -12010,20 +12005,20 @@ class $$TemplateBlocksTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  $$TemplatesTableFilterComposer get templateId {
-    final $$TemplatesTableFilterComposer composer = $composerBuilder(
+  $$WorkoutsTableFilterComposer get workoutId {
+    final $$WorkoutsTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.templateId,
-      referencedTable: $db.templates,
+      getCurrentColumn: (t) => t.workoutId,
+      referencedTable: $db.workouts,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplatesTableFilterComposer(
+          }) => $$WorkoutsTableFilterComposer(
             $db: $db,
-            $table: $db.templates,
+            $table: $db.workouts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12057,9 +12052,9 @@ class $$TemplateBlocksTableFilterComposer
   }
 }
 
-class $$TemplateBlocksTableOrderingComposer
-    extends Composer<_$AppDatabase, $TemplateBlocksTable> {
-  $$TemplateBlocksTableOrderingComposer({
+class $$WorkoutBlocksTableOrderingComposer
+    extends Composer<_$AppDatabase, $WorkoutBlocksTable> {
+  $$WorkoutBlocksTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -12076,20 +12071,20 @@ class $$TemplateBlocksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  $$TemplatesTableOrderingComposer get templateId {
-    final $$TemplatesTableOrderingComposer composer = $composerBuilder(
+  $$WorkoutsTableOrderingComposer get workoutId {
+    final $$WorkoutsTableOrderingComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.templateId,
-      referencedTable: $db.templates,
+      getCurrentColumn: (t) => t.workoutId,
+      referencedTable: $db.workouts,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplatesTableOrderingComposer(
+          }) => $$WorkoutsTableOrderingComposer(
             $db: $db,
-            $table: $db.templates,
+            $table: $db.workouts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12123,9 +12118,9 @@ class $$TemplateBlocksTableOrderingComposer
   }
 }
 
-class $$TemplateBlocksTableAnnotationComposer
-    extends Composer<_$AppDatabase, $TemplateBlocksTable> {
-  $$TemplateBlocksTableAnnotationComposer({
+class $$WorkoutBlocksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WorkoutBlocksTable> {
+  $$WorkoutBlocksTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -12138,20 +12133,20 @@ class $$TemplateBlocksTableAnnotationComposer
   GeneratedColumn<int> get laps =>
       $composableBuilder(column: $table.laps, builder: (column) => column);
 
-  $$TemplatesTableAnnotationComposer get templateId {
-    final $$TemplatesTableAnnotationComposer composer = $composerBuilder(
+  $$WorkoutsTableAnnotationComposer get workoutId {
+    final $$WorkoutsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.templateId,
-      referencedTable: $db.templates,
+      getCurrentColumn: (t) => t.workoutId,
+      referencedTable: $db.workouts,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TemplatesTableAnnotationComposer(
+          }) => $$WorkoutsTableAnnotationComposer(
             $db: $db,
-            $table: $db.templates,
+            $table: $db.workouts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12185,43 +12180,41 @@ class $$TemplateBlocksTableAnnotationComposer
   }
 }
 
-class $$TemplateBlocksTableTableManager
+class $$WorkoutBlocksTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $TemplateBlocksTable,
-          TemplateBlockRow,
-          $$TemplateBlocksTableFilterComposer,
-          $$TemplateBlocksTableOrderingComposer,
-          $$TemplateBlocksTableAnnotationComposer,
-          $$TemplateBlocksTableCreateCompanionBuilder,
-          $$TemplateBlocksTableUpdateCompanionBuilder,
-          (TemplateBlockRow, $$TemplateBlocksTableReferences),
-          TemplateBlockRow,
-          PrefetchHooks Function({bool templateId, bool courseId})
+          $WorkoutBlocksTable,
+          WorkoutBlockRow,
+          $$WorkoutBlocksTableFilterComposer,
+          $$WorkoutBlocksTableOrderingComposer,
+          $$WorkoutBlocksTableAnnotationComposer,
+          $$WorkoutBlocksTableCreateCompanionBuilder,
+          $$WorkoutBlocksTableUpdateCompanionBuilder,
+          (WorkoutBlockRow, $$WorkoutBlocksTableReferences),
+          WorkoutBlockRow,
+          PrefetchHooks Function({bool workoutId, bool courseId})
         > {
-  $$TemplateBlocksTableTableManager(
-    _$AppDatabase db,
-    $TemplateBlocksTable table,
-  ) : super(
+  $$WorkoutBlocksTableTableManager(_$AppDatabase db, $WorkoutBlocksTable table)
+    : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$TemplateBlocksTableFilterComposer($db: db, $table: table),
+              $$WorkoutBlocksTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$TemplateBlocksTableOrderingComposer($db: db, $table: table),
+              $$WorkoutBlocksTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$TemplateBlocksTableAnnotationComposer($db: db, $table: table),
+              $$WorkoutBlocksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> templateId = const Value.absent(),
+                Value<int> workoutId = const Value.absent(),
                 Value<int> position = const Value.absent(),
                 Value<int> courseId = const Value.absent(),
                 Value<int?> laps = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => TemplateBlocksCompanion(
-                templateId: templateId,
+              }) => WorkoutBlocksCompanion(
+                workoutId: workoutId,
                 position: position,
                 courseId: courseId,
                 laps: laps,
@@ -12229,13 +12222,13 @@ class $$TemplateBlocksTableTableManager
               ),
           createCompanionCallback:
               ({
-                required int templateId,
+                required int workoutId,
                 required int position,
                 required int courseId,
                 Value<int?> laps = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => TemplateBlocksCompanion.insert(
-                templateId: templateId,
+              }) => WorkoutBlocksCompanion.insert(
+                workoutId: workoutId,
                 position: position,
                 courseId: courseId,
                 laps: laps,
@@ -12244,12 +12237,12 @@ class $$TemplateBlocksTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$TemplateBlocksTable, TemplateBlockRow>(table),
-                  $$TemplateBlocksTableReferences(db, table, e),
+                  e.readTable<$WorkoutBlocksTable, WorkoutBlockRow>(table),
+                  $$WorkoutBlocksTableReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({templateId = false, courseId = false}) {
+          prefetchHooksCallback: ({workoutId = false, courseId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -12269,14 +12262,14 @@ class $$TemplateBlocksTableTableManager
                       dynamic
                     >
                   >(state) {
-                    if (templateId) {
+                    if (workoutId) {
                       state = state.withJoin(
                         currentTable: table,
-                        currentColumn: table.templateId,
-                        referencedTable: $$TemplateBlocksTableReferences
-                            ._templateIdTable(db),
-                        referencedColumn: $$TemplateBlocksTableReferences
-                            ._templateIdTable(db)
+                        currentColumn: table.workoutId,
+                        referencedTable: $$WorkoutBlocksTableReferences
+                            ._workoutIdTable(db),
+                        referencedColumn: $$WorkoutBlocksTableReferences
+                            ._workoutIdTable(db)
                             .id,
                       ) as T;
                     }
@@ -12284,9 +12277,9 @@ class $$TemplateBlocksTableTableManager
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.courseId,
-                        referencedTable: $$TemplateBlocksTableReferences
+                        referencedTable: $$WorkoutBlocksTableReferences
                             ._courseIdTable(db),
-                        referencedColumn: $$TemplateBlocksTableReferences
+                        referencedColumn: $$WorkoutBlocksTableReferences
                             ._courseIdTable(db)
                             .id,
                       ) as T;
@@ -12303,19 +12296,19 @@ class $$TemplateBlocksTableTableManager
       );
 }
 
-typedef $$TemplateBlocksTableProcessedTableManager =
+typedef $$WorkoutBlocksTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $TemplateBlocksTable,
-      TemplateBlockRow,
-      $$TemplateBlocksTableFilterComposer,
-      $$TemplateBlocksTableOrderingComposer,
-      $$TemplateBlocksTableAnnotationComposer,
-      $$TemplateBlocksTableCreateCompanionBuilder,
-      $$TemplateBlocksTableUpdateCompanionBuilder,
-      (TemplateBlockRow, $$TemplateBlocksTableReferences),
-      TemplateBlockRow,
-      PrefetchHooks Function({bool templateId, bool courseId})
+      $WorkoutBlocksTable,
+      WorkoutBlockRow,
+      $$WorkoutBlocksTableFilterComposer,
+      $$WorkoutBlocksTableOrderingComposer,
+      $$WorkoutBlocksTableAnnotationComposer,
+      $$WorkoutBlocksTableCreateCompanionBuilder,
+      $$WorkoutBlocksTableUpdateCompanionBuilder,
+      (WorkoutBlockRow, $$WorkoutBlocksTableReferences),
+      WorkoutBlockRow,
+      PrefetchHooks Function({bool workoutId, bool courseId})
     >;
 typedef $$LapsTableCreateCompanionBuilder = LapsCompanion Function({
   required int sessionId,
@@ -13592,8 +13585,8 @@ typedef $$PausesTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$TemplatesTableTableManager get templates =>
-      $$TemplatesTableTableManager(_db, _db.templates);
+  $$WorkoutsTableTableManager get workouts =>
+      $$WorkoutsTableTableManager(_db, _db.workouts);
   $$CoursesTableTableManager get courses =>
       $$CoursesTableTableManager(_db, _db.courses);
   $$CourseVersionsTableTableManager get courseVersions =>
@@ -13610,8 +13603,8 @@ class $AppDatabaseManager {
       $$ZonesTableTableManager(_db, _db.zones);
   $$CourseSegmentsTableTableManager get courseSegments =>
       $$CourseSegmentsTableTableManager(_db, _db.courseSegments);
-  $$TemplateBlocksTableTableManager get templateBlocks =>
-      $$TemplateBlocksTableTableManager(_db, _db.templateBlocks);
+  $$WorkoutBlocksTableTableManager get workoutBlocks =>
+      $$WorkoutBlocksTableTableManager(_db, _db.workoutBlocks);
   $$LapsTableTableManager get laps => $$LapsTableTableManager(_db, _db.laps);
   $$LapSegmentsTableTableManager get lapSegments =>
       $$LapSegmentsTableTableManager(_db, _db.lapSegments);

@@ -3,8 +3,8 @@ import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:strokesplit/features/sessions/session_summary_screen.dart';
@@ -35,7 +35,7 @@ Future<int> _session(
           startedAt: _startedAt,
           status: SessionStatus.complete,
           source: ErgSourceKind.simulator,
-          templateName: Value('$name x${laps.length}'),
+          workoutName: Value('$name x${laps.length}'),
           courseVersionId: Value(versionId),
           plannedLaps: Value(laps.length),
           durationMs: Value(laps.fold(0, (sum, lap) => sum + lap.$1 * 1000)),
@@ -391,35 +391,33 @@ void main() {
 
     setUp(() => db = openTestDatabase());
 
-    /// A template "Seerunde x[laps]" on a new 1000 m course.
-    Future<SessionTemplate> template(
-      WidgetTester tester, {
-      int laps = 3,
-    }) async => (await tester.runAsync(() async {
-      final courseId = await CourseRepository(db).create(
-        'Seerunde',
-        CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
-      );
-      final templates = TemplateRepository(db);
-      return (await templates.get(
-        await templates.create(
-          'Seerunde x$laps',
-          courseId: courseId,
-          laps: laps,
-        ),
-      ))!;
-    }))!;
+    /// A workout "Seerunde x[laps]" on a new 1000 m course.
+    Future<Workout> workout(WidgetTester tester, {int laps = 3}) async =>
+        (await tester.runAsync(() async {
+          final courseId = await CourseRepository(db).create(
+            'Seerunde',
+            CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
+          );
+          final workouts = WorkoutRepository(db);
+          return (await workouts.get(
+            await workouts.create(
+              'Seerunde x$laps',
+              courseId: courseId,
+              laps: laps,
+            ),
+          ))!;
+        }))!;
 
     Future<int> row(
       WidgetTester tester,
-      SessionTemplate template,
+      Workout workout,
       List<int> seconds, {
       int day = 1,
       ErgSourceKind source = ErgSourceKind.pm5,
     }) async => (await tester.runAsync(
       () => storeRowedSession(
         db,
-        template: template,
+        workout: workout,
         source: source,
         startedAt: DateTime(2026, 10, day, 7),
         laps: [for (final s in seconds) RowedLap.single(s * 1000, 1000)],
@@ -427,7 +425,7 @@ void main() {
     ))!;
 
     testWidgets('marks a new second best lap', (tester) async {
-      final seerunde = await template(tester);
+      final seerunde = await workout(tester);
       await row(tester, seerunde, [245, 260, 262]);
       final id = await row(tester, seerunde, [252, 248, 255], day: 2);
       await _pump(tester, db, id);
@@ -447,7 +445,7 @@ void main() {
     });
 
     testWidgets('drops the mark of a lap overtaken later', (tester) async {
-      final seerunde = await template(tester, laps: 1);
+      final seerunde = await workout(tester, laps: 1);
       final id = await row(tester, seerunde, [248]);
       await row(tester, seerunde, [245], day: 2);
       await row(tester, seerunde, [240], day: 3);
@@ -461,7 +459,7 @@ void main() {
     });
 
     testWidgets('gives no marks to a simulated session', (tester) async {
-      final seerunde = await template(tester);
+      final seerunde = await workout(tester);
       final id = await row(tester, seerunde, [
         252,
         248,
@@ -476,8 +474,8 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('marks the session on place 1 of its template', (tester) async {
-      final seerunde = await template(tester, laps: 2);
+    testWidgets('marks the session on place 1 of its workout', (tester) async {
+      final seerunde = await workout(tester, laps: 2);
       await row(tester, seerunde, [250, 250]);
       final id = await row(tester, seerunde, [246, 249], day: 2);
       await _pump(tester, db, id, locale: const Locale('en'));
@@ -504,11 +502,11 @@ void main() {
       ('Seerunde · offen', null, null),
     ]) {
       testWidgets(
-        'names a session without a template "$label", with all laps and no place of a template',
+        'names a session without a workout "$label", with all laps and no place of a workout',
         (tester) async {
-          final seerunde = await template(tester);
+          final seerunde = await workout(tester);
           await row(tester, seerunde, [250, 250, 250]);
-          // Faster than the session of the template, but rowed without one (course-rowing-free, Design D7).
+          // Faster than the session of the workout, but rowed without one (course-rowing-free, Design D7).
           final id = (await tester.runAsync(
             () => storeRowedSession(
               db,
@@ -562,15 +560,15 @@ void main() {
             ],
           ),
         );
-        final templates = TemplateRepository(db);
-        return (await templates.get(
-          await templates.create('Sprintrunde x2', courseId: courseId, laps: 2),
+        final workouts = WorkoutRepository(db);
+        return (await workouts.get(
+          await workouts.create('Sprintrunde x2', courseId: courseId, laps: 2),
         ))!;
       });
       final id = (await tester.runAsync(
         () => storeRowedSession(
           db,
-          template: sprintrunde!,
+          workout: sprintrunde!,
           laps: [
             const RowedLap([
               (100000, 400),

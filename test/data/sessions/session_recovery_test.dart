@@ -4,7 +4,7 @@ import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sessions/session_accumulator.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fixtures.dart';
@@ -79,15 +79,15 @@ void main() {
         length: rowed ~/ 5,
       );
       final courseId = await CourseRepository(db).create('Seerunde', course);
-      final templates = TemplateRepository(db);
-      final template = (await templates.get(
-        await templates.create('Seerunde x5', courseId: courseId, laps: 5),
+      final workouts = WorkoutRepository(db);
+      final workout = (await workouts.get(
+        await workouts.create('Seerunde x5', courseId: courseId, laps: 5),
       ))!;
 
       final id = await repository.create(
         startedAt: DateTime(2026, 10, 16),
         source: ErgSourceKind.pm5,
-        plan: template.toPlan(),
+        plan: workout.toPlan(),
       );
       final accumulator = SessionAccumulator(
         id,

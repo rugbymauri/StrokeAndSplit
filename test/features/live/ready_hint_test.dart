@@ -5,8 +5,8 @@ import 'package:strokesplit/data/sessions/first_stroke.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/features/live/live_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +28,7 @@ class _Fixed extends ActiveErgSource {
   ErgSource? build() => source;
 }
 
-/// The live display of a template rowed on a PM5 that plays `just_row`
+/// The live display of a workout rowed on a PM5 that plays `just_row`
 /// (start-on-first-stroke).
 class _Harness {
   final db = openTestDatabase();
@@ -51,14 +51,14 @@ class _Harness {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    final template = (await tester.runAsync(() async {
+    final workout = (await tester.runAsync(() async {
       final course = await CourseRepository(db).create(
         'Seerunde',
         CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
       );
-      final templates = TemplateRepository(db);
-      return templates.get(
-        await templates.create('Seerunde x3', courseId: course, laps: 3),
+      final workouts = WorkoutRepository(db);
+      return workouts.get(
+        await workouts.create('Seerunde x3', courseId: course, laps: 3),
       );
     }))!;
     await tester.pumpWidget(
@@ -68,7 +68,7 @@ class _Harness {
           activeErgSourceProvider.overrideWith(() => _Fixed(source)),
           wakelockProvider.overrideWithValue(FakeWakelock()),
         ],
-        child: LocalizedApp(locale: locale, home: _Home(template)),
+        child: LocalizedApp(locale: locale, home: _Home(workout)),
       ),
     );
     await tester.tap(find.text('Los'));
@@ -96,16 +96,16 @@ class _Harness {
 }
 
 class _Home extends StatelessWidget {
-  const _Home(this.template);
+  const _Home(this.workout);
 
-  final SessionTemplate template;
+  final Workout workout;
 
   @override
   Widget build(BuildContext context) => Scaffold(
     body: TextButton(
       onPressed: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => LiveScreen(plan: template.toPlan()),
+          builder: (_) => LiveScreen(plan: workout.toPlan()),
         ),
       ),
       child: const Text('Los'),
@@ -117,7 +117,7 @@ const _hint = 'Bereit – startet mit dem ersten Schlag';
 
 void main() {
   testWidgets(
-    'shows that the template starts with the first stroke, until it does',
+    'shows that the workout starts with the first stroke, until it does',
     (tester) async {
       final harness = _Harness();
       await harness.pump(tester);

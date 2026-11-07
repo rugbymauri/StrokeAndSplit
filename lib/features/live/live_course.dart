@@ -19,10 +19,10 @@ import 'progress_frame.dart';
 import 'stroke_rate_card.dart';
 import 'upcoming_zone.dart';
 
-/// The live display while rowing a template (ui-design, Design D2): the pace
+/// The live display while rowing a workout (ui-design, Design D2): the pace
 /// box with the progress frame, the stroke rate card, the small tiles of the session and the lap, the
 /// force curve and the button that ends the session, with [status] beside it. The ghosts run in the
-/// progress frame and the gap to the ghost of the template is in the pace
+/// progress frame and the gap to the ghost of the workout is in the pace
 /// box (Change ghost, Design D1, D4).
 class CourseLiveView extends StatelessWidget {
   const CourseLiveView({
@@ -65,7 +65,7 @@ class CourseLiveView extends StatelessWidget {
   /// Where the ghosts are on the tracks; null without any.
   final FrameGhost? ghost;
 
-  /// The gap to the ghost of the whole template; null without one.
+  /// The gap to the ghost of the whole workout; null without one.
   final GhostGap? ghostGap;
 
   /// Connection and disconnect button beside the button; null leaves the button alone.

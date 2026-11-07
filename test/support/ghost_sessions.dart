@@ -1,6 +1,6 @@
 import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
 import 'package:drift/drift.dart';
 
 import 'rowed_sessions.dart';
@@ -11,7 +11,7 @@ import 'rowed_sessions.dart';
 Future<int> storeRowedSessionWithSamples(
   AppDatabase db, {
   int? courseVersionId,
-  SessionTemplate? template,
+  Workout? workout,
   DateTime? startedAt,
   ErgSourceKind source = ErgSourceKind.pm5,
   bool wallClock = true,
@@ -20,7 +20,7 @@ Future<int> storeRowedSessionWithSamples(
   final id = await storeRowedSession(
     db,
     courseVersionId: courseVersionId,
-    template: template,
+    workout: workout,
     startedAt: startedAt,
     source: source,
     laps: laps,

@@ -404,7 +404,7 @@ void main() {
     _expectLine(const Key('pace-box-ghost-ahead'), 'Ghost', '2.9 s behind you');
   });
 
-  testWidgets('has no ghost line without a ghost of the template', (
+  testWidgets('has no ghost line without a ghost of the workout', (
     tester,
   ) async {
     await _pump(tester, _at(460, laps: null));

@@ -174,7 +174,7 @@ abstract final class AppRadii {
   /// Cards, tiles and buttons.
   static const card = 14.0;
 
-  /// Template cards and the primary button at the bottom of a screen.
+  /// Workout cards and the primary button at the bottom of a screen.
   static const cardLarge = 16.0;
 
   /// The pace box with the progress frame.

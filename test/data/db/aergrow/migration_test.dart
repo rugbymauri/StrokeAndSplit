@@ -99,7 +99,7 @@ void main() {
       expect(session.status, SessionStatus.complete);
       expect(session.distanceDm, 2500);
       expect(session.averagePaceCs, 12000);
-      expect(session.templateId, isNull);
+      expect(session.workoutId, isNull);
       final samples = await db.select(db.samples).get();
       expect(samples.map((s) => (s.tMs, s.distanceDm, s.wallMs)), [
         (0, 0, null),
@@ -808,28 +808,25 @@ void main() {
       final db = AppDatabase(schema.newConnection());
       await verifier.migrateAndValidate(db, 11);
 
-      final row = (await db.select(db.templates).get()).single;
-      final block = (await db.select(db.templateBlocks).get()).single;
+      final row = (await db.select(db.workouts).get()).single;
+      final block = (await db.select(db.workoutBlocks).get()).single;
       final session = (await db.select(db.sessions).get()).single;
       expect((row.id, row.name), (workout, 'Seerunde x3'));
       expect(
-        (block.templateId, block.courseId, block.laps),
+        (block.workoutId, block.courseId, block.laps),
         (workout, course, 3),
       );
       expect(
-        (session.templateId, session.templateName),
+        (session.workoutId, session.workoutName),
         (workout, 'Seerunde x3'),
       );
 
       // The foreign keys follow the renamed table: deleting the workout
       // deletes its block and unlinks the session.
-      await db.delete(db.templates).go();
-      expect(await db.select(db.templateBlocks).get(), isEmpty);
+      await db.delete(db.workouts).go();
+      expect(await db.select(db.workoutBlocks).get(), isEmpty);
       final unlinked = (await db.select(db.sessions).get()).single;
-      expect(
-        (unlinked.templateId, unlinked.templateName),
-        (null, 'Seerunde x3'),
-      );
+      expect((unlinked.workoutId, unlinked.workoutName), (null, 'Seerunde x3'));
       await db.close();
     });
   });

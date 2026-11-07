@@ -101,11 +101,11 @@ class RankingRepository {
     );
   }
 
-  /// The sessions on template [templateId] with all planned laps complete,
+  /// The sessions on workout [workoutId] with all planned laps complete,
   /// ranked by the sum of their laps; one ranking per course length and
-  /// number of laps, the current ones first (Design D2). A template with an
+  /// number of laps, the current ones first (Design D2). A workout with an
   /// open number of laps has no ranking.
-  Future<List<Ranking>> template(int templateId) async {
+  Future<List<Ranking>> workout(int workoutId) async {
     final current = await _db
         .customSelect(
           '''
@@ -115,7 +115,7 @@ class RankingRepository {
         JOIN course_versions v ON v.course_id = c.id
         WHERE b.workout_id = ? AND b.position = 0
         ORDER BY v.version DESC LIMIT 1''',
-          variables: [Variable.withInt(templateId)],
+          variables: [Variable.withInt(workoutId)],
         )
         .getSingleOrNull();
     final laps = current?.read<int?>('laps');
@@ -135,7 +135,7 @@ class RankingRepository {
         WHERE s.workout_id = ? AND l.complete = 1 AND l.lap_no <= s.planned_laps AND $_counted
         GROUP BY s.id
         HAVING COUNT(*) = s.planned_laps''',
-          variables: [Variable.withInt(templateId)],
+          variables: [Variable.withInt(workoutId)],
         )
         .get();
     return _rankings(
@@ -157,7 +157,7 @@ class RankingRepository {
   }
 
   /// [load] now and again after every change to sessions, laps, courses,
-  /// zones or templates, e.g. a new, imported or deleted session.
+  /// zones or workouts, e.g. a new, imported or deleted session.
   Stream<T> watch<T>(Future<T> Function() load) => _db.watchTables([
     _db.sessions,
     _db.laps,
@@ -166,8 +166,8 @@ class RankingRepository {
     _db.courseVersions,
     _db.courseSegments,
     _db.zones,
-    _db.templates,
-    _db.templateBlocks,
+    _db.workouts,
+    _db.workoutBlocks,
   ], load);
 
   static RankingEntry _segmentEntry(QueryRow row) {

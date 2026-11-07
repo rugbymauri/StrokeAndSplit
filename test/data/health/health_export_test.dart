@@ -54,7 +54,7 @@ class _Setup {
 
   HealthExporter get exporter => container.read(healthExporterProvider);
 
-  /// A stored session of 2 000 m from [source], without a template.
+  /// A stored session of 2 000 m from [source], without a workout.
   Future<int> session({ErgSourceKind source = ErgSourceKind.pm5}) async {
     final repository = container.read(sessionRepositoryProvider);
     final id = await repository.create(

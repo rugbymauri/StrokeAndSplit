@@ -205,7 +205,7 @@ class _CourseTile extends ConsumerWidget {
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
     final repository = ref.read(courseRepositoryProvider);
-    final templates = await repository.templatesUsing(course.id);
+    final workouts = await repository.workoutsUsing(course.id);
     if (!context.mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -216,8 +216,8 @@ class _CourseTile extends ConsumerWidget {
           content: Text(
             [
               l10n.courseDeleteBody(course.name),
-              if (templates.isNotEmpty)
-                l10n.courseDeleteTemplates(l10n.quotedNames(templates)),
+              if (workouts.isNotEmpty)
+                l10n.courseDeleteWorkouts(l10n.quotedNames(workouts)),
             ].join('\n\n'),
           ),
           actions: [

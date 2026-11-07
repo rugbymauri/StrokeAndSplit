@@ -690,7 +690,7 @@ void main() {
   });
 
   testWidgets(
-    'deletes a course after confirmation and names the templates it takes along',
+    'deletes a course after confirmation and names the workouts it takes along',
     (tester) async {
       final setup = _Setup();
       await tester.runAsync(() async {
@@ -698,19 +698,19 @@ void main() {
           'Seerunde',
           CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
         );
-        final template = await setup.db
-            .into(setup.db.templates)
+        final workout = await setup.db
+            .into(setup.db.workouts)
             .insert(
-              TemplatesCompanion.insert(
+              WorkoutsCompanion.insert(
                 name: 'Seerunde x3',
                 createdAt: DateTime(2026),
               ),
             );
         await setup.db
-            .into(setup.db.templateBlocks)
+            .into(setup.db.workoutBlocks)
             .insert(
-              TemplateBlocksCompanion.insert(
-                templateId: template,
+              WorkoutBlocksCompanion.insert(
+                workoutId: workout,
                 position: 0,
                 courseId: id,
               ),
@@ -733,7 +733,7 @@ void main() {
 
       expect(find.text('Noch keine Strecken angelegt.'), findsOneWidget);
       expect(
-        await tester.runAsync(() => setup.db.select(setup.db.templates).get()),
+        await tester.runAsync(() => setup.db.select(setup.db.workouts).get()),
         isEmpty,
       );
       await disposeWidgetsWithDatabase(tester);

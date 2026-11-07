@@ -8,14 +8,14 @@ HealthExercise _exercise({
   List<HealthLapInput> laps = const [],
   List<HealthPauseInput> pauses = const [],
   DateTime? endedAt,
-  String? template = 'Seerunde x3',
+  String? workout = 'Seerunde x3',
   int distanceDm = 30217,
 }) => healthExerciseOf(
   HealthSessionData(
     startedAt: _start,
     endedAt: endedAt,
     distanceDm: distanceDm,
-    templateName: template,
+    workoutName: workout,
     points: points,
     laps: laps,
     pauses: pauses,
@@ -32,7 +32,7 @@ void main() {
     expect((exercise.start, exercise.end), (_start, _at(600)));
     expect(exercise.title, 'Seerunde x3');
     expect(exercise.meters, 3021.7);
-    expect(_exercise(template: null).title, 'Freies Rudern');
+    expect(_exercise(workout: null).title, 'Freies Rudern');
   });
 
   test(

@@ -17,9 +17,9 @@ import 'progress_frame.dart';
 import 'progress_frame_model.dart';
 import 'upcoming_zone.dart';
 
-/// The pace while rowing a template, inside the progress frame, with the
+/// The pace while rowing a workout, inside the progress frame, with the
 /// zone status of the pace and a legend line for each track (ui-design,
-/// Design D3), plus the gap to the ghost of the template (Change ghost,
+/// Design D3), plus the gap to the ghost of the workout (Change ghost,
 /// Design D1, D4). It needs a bounded size; the pace shrinks to fit.
 class PaceBox extends StatelessWidget {
   const PaceBox({
@@ -45,7 +45,7 @@ class PaceBox extends StatelessWidget {
   final Duration? averagePace;
   final FrameGhost? ghost;
 
-  /// The gap to the ghost of the whole template; null without one, and then
+  /// The gap to the ghost of the whole workout; null without one, and then
   /// the box has no ghost line.
   final GhostGap? ghostGap;
 

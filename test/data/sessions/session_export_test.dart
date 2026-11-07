@@ -9,7 +9,7 @@ import 'package:strokesplit/data/sessions/session_accumulator.dart';
 import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:strokesplit/spike/raw_log_writer.dart';
@@ -334,7 +334,7 @@ void main() {
 
     /// Records just_row as "Seerunde x3" on the phone, by default on a course
     /// with the zone "Tempo" from 20 to 40 m.
-    /// A session on "Seerunde x3", or with [limit] on "Seerunde" without a template.
+    /// A session on "Seerunde x3", or with [limit] on "Seerunde" without a workout.
     Future<(AppDatabase, int)> recordOnPhone({
       CourseDefinition? definition,
       bool ftms = false,
@@ -352,9 +352,9 @@ void main() {
             zones: {zoneId: zone.copyWith(id: zoneId)},
           ).definition!;
       final courseId = await CourseRepository(db).create('Seerunde', course);
-      final templates = TemplateRepository(db);
-      final template = (await templates.get(
-        await templates.create('Seerunde x3', courseId: courseId, laps: 3),
+      final workouts = WorkoutRepository(db);
+      final workout = (await workouts.get(
+        await workouts.create('Seerunde x3', courseId: courseId, laps: 3),
       ))!;
       final repository = SessionRepository(db);
       final id = await repository.create(
@@ -362,8 +362,8 @@ void main() {
         source: ftms ? ErgSourceKind.ftms : ErgSourceKind.pm5,
         protocol: ftms ? ErgProtocol.ftms : ErgProtocol.pm5,
         plan: limit == null
-            ? template.toPlan()
-            : SessionPlan(course: template.course, length: TimeLimit(limit)),
+            ? workout.toPlan()
+            : SessionPlan(course: workout.course, length: TimeLimit(limit)),
       );
       final protocol = ftms ? ErgProtocol.ftms : ErgProtocol.pm5;
       final accumulator = SessionAccumulator(
@@ -411,7 +411,7 @@ void main() {
       );
       final session = (await SessionRepository(laptop).get(imported))!;
       expect(
-        (session.templateName, session.plannedLaps, session.templateId),
+        (session.workoutName, session.plannedLaps, session.workoutId),
         ('Seerunde x3', 3, null),
       );
       // A file from before schema 10 has no duration either.
@@ -432,7 +432,7 @@ void main() {
       expect(course.versionId, session.courseVersionId);
     });
 
-    test('keeps the planned duration of a course rowed without a template (course-rowing-free)', () async {
+    test('keeps the planned duration of a course rowed without a workout (course-rowing-free)', () async {
       final (phone, recorded) = await recordOnPhone(
         limit: const Duration(minutes: 30),
       );
@@ -452,7 +452,7 @@ void main() {
       expect(await results(laptop, imported), await results(phone, recorded));
       final session = (await SessionRepository(laptop).get(imported))!;
       expect(
-        (session.templateName, session.plannedLaps, session.plannedDurationMs),
+        (session.workoutName, session.plannedLaps, session.plannedDurationMs),
         (null, null, 1800000),
       );
       expect(session.courseVersionId, isNotNull);
@@ -536,7 +536,7 @@ void main() {
       },
     );
 
-    test('names template, course and zones in the header', () async {
+    test('names workout, course and zones in the header', () async {
       final (phone, recorded) = await recordOnPhone();
 
       final bytes = await SessionRepository(phone).export(recorded);

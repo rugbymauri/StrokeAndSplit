@@ -13,7 +13,7 @@ String planLabel(
   (null, null) => l10n.planOpen,
 };
 
-/// What [session] rowed: the name of its template, or without one the name of
+/// What [session] rowed: the name of its workout, or without one the name of
 /// its course and the planned length, e.g. `Seerunde · 30 min`; null for free
 /// rowing or while [courseName] is not loaded yet.
 String? sessionName(
@@ -21,7 +21,7 @@ String? sessionName(
   SessionRow session,
   String? courseName,
 ) {
-  if (session.templateName case final name?) return name;
+  if (session.workoutName case final name?) return name;
   if (session.courseVersionId == null || courseName == null) return null;
   final duration = session.plannedDurationMs;
   return '$courseName · ${planLabel(

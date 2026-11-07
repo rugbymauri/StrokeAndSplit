@@ -3,7 +3,7 @@ import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/statistics/session_places.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,13 +21,13 @@ void main() {
       'Seerunde',
       CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
     );
-    final templates = TemplateRepository(db);
-    final template = (await templates.get(
-      await templates.create('Seerunde x1', courseId: course, laps: 1),
+    final workouts = WorkoutRepository(db);
+    final workout = (await workouts.get(
+      await workouts.create('Seerunde x1', courseId: course, laps: 1),
     ))!;
     final id = await storeRowedSession(
       db,
-      template: template,
+      workout: workout,
       laps: [RowedLap.single(248000, 1000)],
     );
     final seen = <SessionPlaces>[];
@@ -41,7 +41,7 @@ void main() {
 
     await storeRowedSession(
       db,
-      template: template,
+      workout: workout,
       laps: [RowedLap.single(245000, 1000)],
     );
     await pumpEventQueue();
@@ -50,7 +50,7 @@ void main() {
     for (final ms in [240000, 242000]) {
       await storeRowedSession(
         db,
-        template: template,
+        workout: workout,
         laps: [RowedLap.single(ms, 1000)],
       );
     }
@@ -64,9 +64,9 @@ void main() {
       'Seerunde',
       CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
     );
-    final templates = TemplateRepository(db);
-    final template = (await templates.get(
-      await templates.create('Seerunde x1', courseId: course, laps: 1),
+    final workouts = WorkoutRepository(db);
+    final workout = (await workouts.get(
+      await workouts.create('Seerunde x1', courseId: course, laps: 1),
     ))!;
     final container = ProviderContainer(
       overrides: [databaseProvider.overrideWithValue(db)],
@@ -74,7 +74,7 @@ void main() {
     addTearDown(container.dispose);
     final id = await storeRowedSession(
       db,
-      template: template,
+      workout: workout,
       source: ErgSourceKind.simulator,
       laps: [RowedLap.single(248000, 1000)],
     );

@@ -26,13 +26,13 @@ Future<void> openCourseStart(BuildContext context, int courseId) {
 /// How long the course is rowed.
 enum _Length { laps, duration, open }
 
-/// More laps than anyone rows in one session, as in the template editor.
+/// More laps than anyone rows in one session, as in the workout editor.
 const _maxLaps = 99;
 
 /// The longest total time in minutes.
 const _maxMinutes = 180;
 
-/// Rows a course without a template: for a number of laps, a total rowing
+/// Rows a course without a workout: for a number of laps, a total rowing
 /// time or until the rower ends the session, with or without the ghost
 /// (course-rowing-free, Design D6). Nothing chosen here is stored; deleting
 /// the course closes the screen.
@@ -118,7 +118,7 @@ class _CourseStartScreenState extends ConsumerState<CourseStartScreen> {
                           ],
                         ),
                       ),
-                      // Fixed at the bottom like on the template screen.
+                      // Fixed at the bottom like on the workout screen.
                       const Divider(height: 1),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(
@@ -169,7 +169,7 @@ class _CourseStartScreenState extends ConsumerState<CourseStartScreen> {
       max: _maxLaps,
       stepLabel: l10n.lapsCount(1),
       label: l10n.courseStartLaps,
-      unit: l10n.templateLapsUnit(_laps),
+      unit: l10n.workoutLapsUnit(_laps),
       onChanged: (laps) => setState(() => _laps = laps),
     ),
     _Length.duration => OarStepper(

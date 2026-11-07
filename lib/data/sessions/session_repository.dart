@@ -35,8 +35,8 @@ class SessionRepository {
 
   final AppDatabase _db;
 
-  /// Starts a session; with a [template] it rows the course in the version
-  /// the template uses now.
+  /// Starts a session; with a [workout] it rows the course in the version
+  /// the workout uses now.
   Future<int> create({
     required DateTime startedAt,
     required ErgSourceKind source,
@@ -49,8 +49,8 @@ class SessionRepository {
       source: source,
       protocol: protocol,
       deviceName: deviceName,
-      templateId: plan?.template?.id,
-      templateName: plan?.template?.name,
+      workoutId: plan?.workout?.id,
+      workoutName: plan?.workout?.name,
       courseVersionId: plan?.course.versionId,
       plannedLaps: plan?.plannedLaps,
       plannedDurationMs: plan?.plannedDuration?.inMilliseconds,
@@ -62,8 +62,8 @@ class SessionRepository {
     required ErgSourceKind source,
     required ErgProtocol protocol,
     String? deviceName,
-    int? templateId,
-    String? templateName,
+    int? workoutId,
+    String? workoutName,
     int? courseVersionId,
     int? plannedLaps,
     int? plannedDurationMs,
@@ -78,8 +78,8 @@ class SessionRepository {
             source: source,
             protocol: Value(protocol),
             deviceName: Value(deviceName),
-            templateId: Value(templateId),
-            templateName: Value(templateName),
+            workoutId: Value(workoutId),
+            workoutName: Value(workoutName),
             courseVersionId: Value(courseVersionId),
             plannedLaps: Value(plannedLaps),
             plannedDurationMs: Value(plannedDurationMs),
@@ -380,9 +380,9 @@ class SessionRepository {
       startedAt: session.startedAt,
       endedAt: session.endedAt,
       distanceDm: session.distanceDm,
-      templateName: session.templateName,
+      workoutName: session.workoutName,
       courseName: switch (session.courseVersionId) {
-        final versionId? when session.templateName == null =>
+        final versionId? when session.workoutName == null =>
           (await CourseRepository(_db).atVersion(versionId)).name,
         _ => null,
       },
@@ -465,7 +465,7 @@ class SessionRepository {
   }
 
   /// The session as a `.strokesplit` file (Design D8): gzip-compressed lines
-  /// in the Stroke & Split raw format, with the summary in the header, and template and
+  /// in the Stroke & Split raw format, with the summary in the header, and workout and
   /// course of a session on a course (Design D7).
   Future<List<int>> export(int id) async {
     final session = (await get(id))!;
@@ -477,9 +477,9 @@ class SessionRepository {
     final metadata = {
       ...recording.metadata,
       if (course != null) ...{
-        // Without a template the name is null; the duration only with one (course-rowing-free, D3).
+        // Without a workout the name is null; the duration only with one (course-rowing-free, D3).
         'template': {
-          'name': session.templateName,
+          'name': session.workoutName,
           'laps': session.plannedLaps,
           'durationMs': ?session.plannedDurationMs,
         },
@@ -522,7 +522,7 @@ class SessionRepository {
     );
     final metadata = recording.metadata;
     final session = metadata['session'] as Map<String, Object?>? ?? const {};
-    final template = metadata['template'] as Map<String, Object?>?;
+    final workout = metadata['template'] as Map<String, Object?>?;
     final course = switch (metadata['course']) {
       final Map<String, Object?> json => (
         name: json['name']! as String,
@@ -542,19 +542,19 @@ class SessionRepository {
           ErgSourceKind.pm5,
       protocol: protocol,
       deviceName: metadata['device'] as String?,
-      templateName: template?['name'] as String?,
+      workoutName: workout?['name'] as String?,
       courseVersionId: course == null
           ? null
           : await _importCourse(course.name, course.definition),
-      plannedLaps: template?['laps'] as int?,
-      plannedDurationMs: template?['durationMs'] as int?,
+      plannedLaps: workout?['laps'] as int?,
+      plannedDurationMs: workout?['durationMs'] as int?,
       imported: true,
     );
     final accumulator = SessionAccumulator(
       id,
       protocol: protocol,
       course: course?.definition,
-      plannedLaps: template?['laps'] as int?,
+      plannedLaps: workout?['laps'] as int?,
     );
     recording.packets.forEach(accumulator.add);
     accumulator.finish();

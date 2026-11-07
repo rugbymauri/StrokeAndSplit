@@ -231,7 +231,7 @@ const _buttonShape = RoundedRectangleBorder(
   borderRadius: BorderRadius.all(Radius.circular(AppRadii.cardLarge)),
 );
 
-/// Date and course, the title, and template and source.
+/// Date and course, the title, and workout and source.
 class _Header extends StatelessWidget {
   const _Header({
     required this.session,
@@ -244,7 +244,7 @@ class _Header extends StatelessWidget {
   final Course? course;
   final List<LapRow> laps;
 
-  /// The place of the session in its template's ranking, if 1–3.
+  /// The place of the session in its workout's ranking, if 1–3.
   final int? place;
 
   @override

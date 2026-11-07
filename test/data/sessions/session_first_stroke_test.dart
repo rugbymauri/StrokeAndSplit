@@ -6,8 +6,8 @@ import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/sources/replay_source.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erg_protocol/erg_protocol.dart';
@@ -25,7 +25,7 @@ class _Fixed extends ActiveErgSource {
   ErgSource? build() => source;
 }
 
-/// A template session with [source] (start-on-first-stroke).
+/// A workout session with [source] (start-on-first-stroke).
 class _Setup {
   _Setup(this.db, this.source) {
     container = ProviderContainer(
@@ -57,14 +57,14 @@ class _Setup {
 }
 
 /// An open 10 km course, long enough for every fixture.
-Future<SessionTemplate> _template(AppDatabase db) async {
+Future<Workout> _workout(AppDatabase db) async {
   final course = await CourseRepository(db).create(
     'Lang',
     CourseDefinition.single(axis: CourseAxis.distance, length: 10000),
   );
-  final templates = TemplateRepository(db);
-  return (await templates.get(
-    await templates.create('Lang', courseId: course, laps: null),
+  final workouts = WorkoutRepository(db);
+  return (await workouts.get(
+    await workouts.create('Lang', courseId: course, laps: null),
   ))!;
 }
 
@@ -88,7 +88,7 @@ void main() {
       () async {
         final db = openTestDatabase();
         final setup = _Setup(db, FakeErgSource(kind: kind, protocol: protocol));
-        final template = await _template(db);
+        final workout = await _workout(db);
         final packets = loadFixture(fixture).packets;
         final (first, trigger) = _start(packets, protocol);
         final decoder = ErgDecoder.forProtocol(protocol);
@@ -97,12 +97,12 @@ void main() {
           ...decoder.flush(),
         ].whereType<StatusTick>();
 
-        await setup.recorder.start(plan: template.toPlan());
+        await setup.recorder.start(plan: workout.toPlan());
         await setup.emitAll(packets.take(trigger));
 
         final ready = setup.recording!;
         expect(
-          (ready.ready, ready.sessionId, ready.plan?.template?.name),
+          (ready.ready, ready.sessionId, ready.plan?.workout?.name),
           (true, null, 'Lang'),
         );
         expect(ready.progress.elapsed, Duration.zero);
@@ -157,7 +157,7 @@ void main() {
     final packets = loadFixture('just_row').packets;
     final (_, trigger) = _start(packets, ErgProtocol.pm5);
 
-    await setup.recorder.start(plan: (await _template(db)).toPlan());
+    await setup.recorder.start(plan: (await _workout(db)).toPlan());
     await setup.emitAll(packets.take(trigger));
     expect(await setup.recorder.stop(), isNull);
 
@@ -188,7 +188,7 @@ void main() {
     final packets = loadFixture('just_row').packets;
     final (_, trigger) = _start(packets, ErgProtocol.pm5);
 
-    await setup.recorder.start(plan: (await _template(db)).toPlan());
+    await setup.recorder.start(plan: (await _workout(db)).toPlan());
     await setup.emitAll(packets.take(trigger));
     (setup.source as FakeErgSource).emit(packets[trigger]);
     // Delivered, but the session is still being created.
@@ -206,8 +206,8 @@ void main() {
   test('import and replay give the same values as the recording', () async {
     final db = openTestDatabase();
     final setup = _Setup(db, FakeErgSource());
-    final template = await _template(db);
-    await setup.recorder.start(plan: template.toPlan());
+    final workout = await _workout(db);
+    await setup.recorder.start(plan: workout.toPlan());
     await setup.emitAll(loadFixture('just_row').packets);
     final id = (await setup.recorder.stop())!;
     final repository = setup.container.read(sessionRepositoryProvider);
@@ -229,11 +229,11 @@ void main() {
     expect(await samples(imported), await samples(id));
     expect(await laps(imported), await laps(id));
 
-    // Played back as a source, the template starts again with the first stroke.
+    // Played back as a source, the workout starts again with the first stroke.
     final replay = ReplaySource(await repository.rawRecording(id), speed: 200);
     final again = _Setup(db, replay);
     await replay.start();
-    await again.recorder.start(plan: template.toPlan());
+    await again.recorder.start(plan: workout.toPlan());
     expect(again.recording!.ready, isTrue);
     await Future<void>.delayed(const Duration(seconds: 1));
     final replayed = (await again.recorder.stop())!;

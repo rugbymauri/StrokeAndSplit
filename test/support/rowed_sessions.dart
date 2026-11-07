@@ -1,6 +1,6 @@
 import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
 import 'package:drift/drift.dart';
 
 /// A lap as stored after rowing: its segments in order, each with its time
@@ -17,11 +17,11 @@ class RowedLap {
 }
 
 /// Stores a finished session on [courseVersionId], or on the course of
-/// [template], with [laps] one after the other from the start.
+/// [workout], with [laps] one after the other from the start.
 Future<int> storeRowedSession(
   AppDatabase db, {
   int? courseVersionId,
-  SessionTemplate? template,
+  Workout? workout,
   int? plannedLaps,
   Duration? plannedDuration,
   DateTime? startedAt,
@@ -35,10 +35,10 @@ Future<int> storeRowedSession(
           startedAt: startedAt ?? DateTime(2026, 10, 1, 7),
           status: SessionStatus.complete,
           source: source,
-          templateId: Value(template?.id),
-          templateName: Value(template?.name),
-          courseVersionId: Value(courseVersionId ?? template!.course.versionId),
-          plannedLaps: Value(template == null ? plannedLaps : template.laps),
+          workoutId: Value(workout?.id),
+          workoutName: Value(workout?.name),
+          courseVersionId: Value(courseVersionId ?? workout!.course.versionId),
+          plannedLaps: Value(workout == null ? plannedLaps : workout.laps),
           plannedDurationMs: Value(plannedDuration?.inMilliseconds),
         ),
       );

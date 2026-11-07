@@ -14,8 +14,8 @@ import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/sources/resistance_control.dart';
 import 'package:strokesplit/data/sources/simulated_source.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:strokesplit/features/connection/heart_rate_indicator.dart';
@@ -158,7 +158,7 @@ ActiveRecording _onCourse({
       elapsed: Duration(minutes: 6, seconds: 20),
     ),
     plan: limit == null
-        ? SessionTemplate(
+        ? Workout(
             id: 1,
             name: 'Seerunde x3',
             laps: 3,
@@ -170,7 +170,7 @@ ActiveRecording _onCourse({
               definition: course,
             ),
           ).toPlan()
-        // Rowed on the course for a total time, without a template (course-rowing-free).
+        // Rowed on the course for a total time, without a workout (course-rowing-free).
         : SessionPlan(
             course: Course(
               id: 1,
@@ -318,12 +318,12 @@ void main() {
   });
 
   group('resistance level', () {
-    for (final template in [false, true]) {
+    for (final workout in [false, true]) {
       testWidgets(
-        'shows the level of the rower below the watts${template ? ' on a template' : ''}',
+        'shows the level of the rower below the watts${workout ? ' on a workout' : ''}',
         (tester) async {
           final harness = _Harness();
-          await harness.pump(tester, recording: template ? _onCourse() : null);
+          await harness.pump(tester, recording: workout ? _onCourse() : null);
           await harness.emit(tester, _tick(resistanceLevel: 7));
 
           final watts = tester.getRect(find.byKey(const Key('metric-watts')));
@@ -336,10 +336,10 @@ void main() {
       );
 
       testWidgets(
-        'shows none from a rower without levels${template ? ' on a template' : ''}',
+        'shows none from a rower without levels${workout ? ' on a workout' : ''}',
         (tester) async {
           final harness = _Harness();
-          await harness.pump(tester, recording: template ? _onCourse() : null);
+          await harness.pump(tester, recording: workout ? _onCourse() : null);
           await harness.emit(tester, _tick());
 
           expect(find.byKey(const Key('metric-watts')), findsOneWidget);
@@ -349,13 +349,13 @@ void main() {
       );
 
       testWidgets(
-        'raises and lowers the level with the oar blades${template ? ' on a template' : ''}',
+        'raises and lowers the level with the oar blades${workout ? ' on a workout' : ''}',
         (tester) async {
           final control = _Levels();
           final harness = _Harness();
           await harness.pump(
             tester,
-            recording: template ? _onCourse() : null,
+            recording: workout ? _onCourse() : null,
             source: _settable(control),
           );
           await harness.emit(tester, _tick(resistanceLevel: 6));
@@ -386,13 +386,13 @@ void main() {
       );
 
       testWidgets(
-        '+ is disabled at the highest level${template ? ' on a template' : ''}',
+        '+ is disabled at the highest level${workout ? ' on a workout' : ''}',
         (tester) async {
           final control = _Levels();
           final harness = _Harness();
           await harness.pump(
             tester,
-            recording: template ? _onCourse() : null,
+            recording: workout ? _onCourse() : null,
             source: _settable(control),
           );
           await harness.emit(tester, _tick(resistanceLevel: 15));
@@ -420,12 +420,12 @@ void main() {
       );
 
       testWidgets(
-        'offers no oar blades for a rower that cannot set its level${template ? ' on a template' : ''}',
+        'offers no oar blades for a rower that cannot set its level${workout ? ' on a workout' : ''}',
         (tester) async {
           final harness = _Harness();
           await harness.pump(
             tester,
-            recording: template ? _onCourse() : null,
+            recording: workout ? _onCourse() : null,
             source: FakeErgSource(
               kind: ErgSourceKind.ftms,
               protocol: ErgProtocol.ftms,
@@ -463,12 +463,12 @@ void main() {
       intervalsMs: intervalsMs,
     );
 
-    for (final template in [false, true]) {
+    for (final workout in [false, true]) {
       testWidgets(
-        'shows the last one at the heart rate${template ? ' on a template' : ''}',
+        'shows the last one at the heart rate${workout ? ' on a workout' : ''}',
         (tester) async {
           final harness = _Harness();
-          await harness.pump(tester, recording: template ? _onCourse() : null);
+          await harness.pump(tester, recording: workout ? _onCourse() : null);
           await harness.emit(tester, _tick(heartRate: 151));
           await harness.emit(tester, beats([790, 812]));
 
@@ -593,7 +593,7 @@ void main() {
     'small desktop window': const Size(640, 480),
   };
   for (final MapEntry(key: name, value: size) in layouts.entries) {
-    for (final (template, state, curves, simulator) in const [
+    for (final (workout, state, curves, simulator) in const [
       (false, ErgConnectionState.connected, true, false),
       (false, ErgConnectionState.connected, false, false),
       (true, ErgConnectionState.connected, true, false),
@@ -603,7 +603,7 @@ void main() {
       (true, ErgConnectionState.connected, false, true),
     ]) {
       final what =
-          '${template ? ' with a template' : ''}'
+          '${workout ? ' with a workout' : ''}'
           '${state == ErgConnectionState.connected ? '' : ' while ${state.name}'}'
           '${curves ? ' and PM5 force curves' : ' and a source without force curves'}'
           '${simulator ? ' from the simulator with its controls' : ''}';
@@ -614,7 +614,7 @@ void main() {
         await harness.pump(
           tester,
           size: size,
-          recording: template ? _onCourse(pace: BandStatus.above) : null,
+          recording: workout ? _onCourse(pace: BandStatus.above) : null,
           state: state,
           source: switch ((simulator, curves)) {
             (true, _) => SimulatedSource(
@@ -657,9 +657,9 @@ void main() {
         _expectLargestPace(
           tester,
           view,
-          Key(template ? 'pace-box-pace' : 'metric-pace'),
+          Key(workout ? 'pace-box-pace' : 'metric-pace'),
         );
-        if (template) {
+        if (workout) {
           // Room for a ghost moved out of the outer track (Change ghost, Design D5).
           final box = tester.getRect(find.byType(PaceBox));
           expect(
@@ -707,7 +707,7 @@ void main() {
     }
   }
 
-  group('on a template', () {
+  group('on a workout', () {
     /// The legend line with [key] in the pace box shows [label] and [value].
     void expectLine(String key, String label, String value) {
       final line = find.byKey(Key(key));
@@ -723,9 +723,7 @@ void main() {
       );
     }
 
-    testWidgets('shows the calories of the rower on a template', (
-      tester,
-    ) async {
+    testWidgets('shows the calories of the rower on a workout', (tester) async {
       final harness = _Harness();
       await harness.pump(tester, recording: _onCourse());
       await harness.emit(tester, _tick(calories: 87));
@@ -912,7 +910,7 @@ void main() {
   });
 
   group('without a title bar', () {
-    testWidgets('leaves out the app bar and the name of the template', (
+    testWidgets('leaves out the app bar and the name of the workout', (
       tester,
     ) async {
       final harness = _Harness();
@@ -964,18 +962,18 @@ void main() {
       );
     });
 
-    for (final (name, size, template) in const [
+    for (final (name, size, workout) in const [
       ('portrait', Size(390, 844), false),
       ('landscape', Size(844, 390), false),
-      ('portrait with a template', Size(390, 844), true),
-      ('landscape with a template', Size(844, 390), true),
+      ('portrait with a workout', Size(390, 844), true),
+      ('landscape with a workout', Size(844, 390), true),
     ]) {
       testWidgets('shows no disconnect button, $name', (tester) async {
         final harness = _Harness();
         await harness.pump(
           tester,
           size: size,
-          recording: template ? _onCourse() : null,
+          recording: workout ? _onCourse() : null,
         );
 
         expect(find.byTooltip('Trennen'), findsNothing);
@@ -1097,8 +1095,8 @@ void main() {
 
     setUp(() => db = openTestDatabase());
 
-    /// Stores [definition] as "Seerunde" and a template with [laps] on it.
-    Future<SessionTemplate> templateOn(
+    /// Stores [definition] as "Seerunde" and a workout with [laps] on it.
+    Future<Workout> workoutOn(
       WidgetTester tester,
       CourseDefinition definition, {
       required int? laps,
@@ -1106,9 +1104,9 @@ void main() {
       return (await tester.runAsync(() async {
         final course = await CourseRepository(db)
             .create('Seerunde', definition);
-        final templates = TemplateRepository(db);
-        return (await templates.get(
-          await templates.create(
+        final workouts = WorkoutRepository(db);
+        return (await workouts.get(
+          await workouts.create(
             'Seerunde x$laps',
             courseId: course,
             laps: laps,
@@ -1117,10 +1115,10 @@ void main() {
       }))!;
     }
 
-    /// Rowing [template] at [inLap] metres of lap [lap], with the given wall-clock
+    /// Rowing [workout] at [inLap] metres of lap [lap], with the given wall-clock
     /// times in seconds and [courseMetres] since the start.
     ActiveRecording rowing(
-      SessionTemplate template, {
+      Workout workout, {
       int lap = 1,
       required int inLap,
       required int lapSeconds,
@@ -1128,14 +1126,14 @@ void main() {
       required int segmentSeconds,
       required int courseMetres,
       bool ghost = true,
-      PlanLength? withoutTemplate,
+      PlanLength? withoutWorkout,
     }) {
-      final definition = template.course.definition;
+      final definition = workout.course.definition;
       final index = definition.segmentEnds.indexWhere((end) => end > inLap);
-      // With [withoutTemplate] the course of the template is rowed for that length, without the template.
-      final plan = withoutTemplate == null
-          ? template.toPlan()
-          : SessionPlan(course: template.course, length: withoutTemplate);
+      // With [withoutWorkout] the course of the workout is rowed for that length, without the workout.
+      final plan = withoutWorkout == null
+          ? workout.toPlan()
+          : SessionPlan(course: workout.course, length: withoutWorkout);
       return ActiveRecording(
         sessionId: 99,
         progress: SessionProgress(
@@ -1190,7 +1188,7 @@ void main() {
       testWidgets(
         'Runde 2: the lap ghost in the frame and the gap in the box, $name',
         (tester) async {
-          final template = await templateOn(
+          final workout = await workoutOn(
             tester,
             CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
             laps: 3,
@@ -1199,7 +1197,7 @@ void main() {
           await tester.runAsync(
             () => storeRowedSessionWithSamples(
               db,
-              template: template,
+              workout: workout,
               laps: [for (var i = 0; i < 3; i++) RowedLap.single(230000, 1000)],
             ),
           );
@@ -1208,7 +1206,7 @@ void main() {
           await show(
             tester,
             rowing(
-              template,
+              workout,
               lap: 2,
               inLap: 460,
               lapSeconds: 115,
@@ -1239,7 +1237,7 @@ void main() {
     testWidgets(
       'started without ghost: no ghost on any track and no gap, no switch (template-screen)',
       (tester) async {
-        final template = await templateOn(
+        final workout = await workoutOn(
           tester,
           CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
           laps: 3,
@@ -1247,7 +1245,7 @@ void main() {
         await tester.runAsync(
           () => storeRowedSessionWithSamples(
             db,
-            template: template,
+            workout: workout,
             laps: [for (var i = 0; i < 3; i++) RowedLap.single(230000, 1000)],
           ),
         );
@@ -1255,7 +1253,7 @@ void main() {
         await show(
           tester,
           rowing(
-            template,
+            workout,
             lap: 2,
             inLap: 460,
             lapSeconds: 115,
@@ -1280,10 +1278,10 @@ void main() {
 
     for (final ghost in [true, false]) {
       testWidgets(
-        'without a template ${ghost ? 'the lap ghost runs' : 'no ghost runs with the ghost off'}, '
+        'without a workout ${ghost ? 'the lap ghost runs' : 'no ghost runs with the ghost off'}, '
         'none on the course track and no gap (course-rowing-free)',
         (tester) async {
-          final template = await templateOn(
+          final workout = await workoutOn(
             tester,
             CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
             laps: 3,
@@ -1291,16 +1289,16 @@ void main() {
           await tester.runAsync(
             () => storeRowedSessionWithSamples(
               db,
-              template: template,
+              workout: workout,
               laps: [for (var i = 0; i < 3; i++) RowedLap.single(230000, 1000)],
             ),
           );
 
-          // The course of the template for 30 minutes: 1 460 m after 6:05, 115 s into lap 2.
+          // The course of the workout for 30 minutes: 1 460 m after 6:05, 115 s into lap 2.
           await show(
             tester,
             rowing(
-              template,
+              workout,
               lap: 2,
               inLap: 460,
               lapSeconds: 115,
@@ -1308,7 +1306,7 @@ void main() {
               segmentSeconds: 115,
               courseMetres: 1460,
               ghost: ghost,
-              withoutTemplate: const TimeLimit(Duration(minutes: 30)),
+              withoutWorkout: const TimeLimit(Duration(minutes: 30)),
             ),
           );
 
@@ -1333,7 +1331,7 @@ void main() {
     testWidgets(
       'Offene Rundenzahl: no gap in the box, the lap ghost in the frame',
       (tester) async {
-        final template = await templateOn(
+        final workout = await workoutOn(
           tester,
           CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
           laps: null,
@@ -1341,7 +1339,7 @@ void main() {
         await tester.runAsync(
           () => storeRowedSessionWithSamples(
             db,
-            template: template,
+            workout: workout,
             laps: [
               RowedLap.single(250000, 1000),
               RowedLap.single(248000, 1000),
@@ -1352,7 +1350,7 @@ void main() {
         await show(
           tester,
           rowing(
-            template,
+            workout,
             lap: 3,
             inLap: 500,
             lapSeconds: 124,
@@ -1392,11 +1390,11 @@ void main() {
           const CourseSegment(length: 900),
         ],
       );
-      final template = await templateOn(tester, definition, laps: 1);
+      final workout = await workoutOn(tester, definition, laps: 1);
       await tester.runAsync(
         () => storeRowedSessionWithSamples(
           db,
-          template: template,
+          workout: workout,
           laps: [
             const RowedLap([(20000, 100), (210000, 900)]),
           ],
@@ -1406,7 +1404,7 @@ void main() {
       await show(
         tester,
         rowing(
-          template,
+          workout,
           inLap: 300,
           lapSeconds: 60,
           courseSeconds: 60,
@@ -1426,7 +1424,7 @@ void main() {
     testWidgets(
       'Zeitstrecke: no ghost in the frame, the gap in metres in the box',
       (tester) async {
-        final template = await templateOn(
+        final workout = await workoutOn(
           tester,
           CourseDefinition.single(axis: CourseAxis.time, length: 240),
           laps: 1,
@@ -1435,7 +1433,7 @@ void main() {
         await tester.runAsync(
           () => storeRowedSessionWithSamples(
             db,
-            template: template,
+            workout: workout,
             laps: [RowedLap.single(240000, 1000)],
           ),
         );
@@ -1444,7 +1442,7 @@ void main() {
         await show(
           tester,
           rowing(
-            template,
+            workout,
             inLap: 120,
             lapSeconds: 120,
             courseSeconds: 120,
@@ -1463,7 +1461,7 @@ void main() {
     );
 
     testWidgets('rowing free shows no ghost', (tester) async {
-      final template = await templateOn(
+      final workout = await workoutOn(
         tester,
         CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
         laps: 1,
@@ -1471,7 +1469,7 @@ void main() {
       await tester.runAsync(
         () => storeRowedSessionWithSamples(
           db,
-          template: template,
+          workout: workout,
           laps: [RowedLap.single(230000, 1000)],
         ),
       );
@@ -1528,7 +1526,7 @@ void main() {
 
     for (final size in const [Size(390, 844), Size(360, 740)]) {
       testWidgets(
-        'fills the tiles on a template with values larger than before at ${size.width.toInt()} px',
+        'fills the tiles on a workout with values larger than before at ${size.width.toInt()} px',
         (tester) async {
           final harness = _Harness();
           await harness.pump(tester, size: size, recording: _onCourse());
@@ -1557,7 +1555,7 @@ void main() {
     }
 
     testWidgets(
-      'leaves out the force curve on a template on a phone lower than 360 × 740',
+      'leaves out the force curve on a workout on a phone lower than 360 × 740',
       (tester) async {
         final harness = _Harness();
         await harness.pump(

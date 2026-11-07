@@ -1187,13 +1187,13 @@ abstract class AppLocalizations {
   ///
   /// In de, this message translates to:
   /// **'Vorlage rudern'**
-  String get templatesTitle;
+  String get workoutsTitle;
 
   /// Templates: tab with the templates
   ///
   /// In de, this message translates to:
   /// **'Vorlagen'**
-  String get tabTemplates;
+  String get tabWorkouts;
 
   /// Templates: tab with the courses
   ///
@@ -1211,73 +1211,73 @@ abstract class AppLocalizations {
   ///
   /// In de, this message translates to:
   /// **'Vorlage anlegen'**
-  String get templateCreate;
+  String get workoutCreate;
 
   /// Template screen: button that starts rowing the template
   ///
   /// In de, this message translates to:
   /// **'Starten'**
-  String get templateStart;
+  String get workoutStart;
 
   /// Template screen: switch above Start that turns the ghost on or off for the session started from there
   ///
   /// In de, this message translates to:
   /// **'Gegen den Ghost rudern'**
-  String get templateGhost;
+  String get workoutGhost;
 
   /// Templates: heading above places 1–3 of the template's ranking in the opened template
   ///
   /// In de, this message translates to:
   /// **'Bestleistungen'**
-  String get templatePodiumTitle;
+  String get workoutPodiumTitle;
 
   /// Templates: hint in the opened template when it was never rowed completely on a rower
   ///
   /// In de, this message translates to:
   /// **'Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.'**
-  String get templatePodiumEmpty;
+  String get workoutPodiumEmpty;
 
   /// Templates: hint in the opened template with an open number of laps, which has no ranking
   ///
   /// In de, this message translates to:
   /// **'Bei offener Rundenzahl gibt es keine Bestzeit.'**
-  String get templatePodiumOpenLaps;
+  String get workoutPodiumOpenLaps;
 
   /// Templates: pace per 500 m of a place, pauses left out
   ///
   /// In de, this message translates to:
   /// **'{pace} /500 m'**
-  String templatePodiumPace(String pace);
+  String workoutPodiumPace(String pace);
 
   /// Templates: there is no template
   ///
   /// In de, this message translates to:
   /// **'Noch keine Vorlagen angelegt.'**
-  String get templatesEmpty;
+  String get workoutsEmpty;
 
   /// Templates: loading failed; error is the technical error
   ///
   /// In de, this message translates to:
   /// **'Vorlagen konnten nicht geladen werden: {error}'**
-  String templatesLoadFailed(String error);
+  String workoutsLoadFailed(String error);
 
   /// Templates: dialog title when there is no course
   ///
   /// In de, this message translates to:
   /// **'Zuerst eine Strecke anlegen'**
-  String get templateNeedsCourseTitle;
+  String get workoutNeedsCourseTitle;
 
   /// Templates: dialog text when there is no course
   ///
   /// In de, this message translates to:
   /// **'Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.'**
-  String get templateNeedsCourseBody;
+  String get workoutNeedsCourseBody;
 
   /// Templates: shown instead of the list when there is no course
   ///
   /// In de, this message translates to:
   /// **'Für eine Vorlage brauchst du zuerst eine Strecke.'**
-  String get templateNeedsCourse;
+  String get workoutNeedsCourse;
 
   /// Button that creates a course
   ///
@@ -1289,79 +1289,79 @@ abstract class AppLocalizations {
   ///
   /// In de, this message translates to:
   /// **'Vorlage löschen?'**
-  String get templateDeleteTitle;
+  String get workoutDeleteTitle;
 
   /// Templates: delete confirmation; name is the template
   ///
   /// In de, this message translates to:
   /// **'„{name}“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.'**
-  String templateDeleteBody(String name);
+  String workoutDeleteBody(String name);
 
   /// Template editor: title for a new template
   ///
   /// In de, this message translates to:
   /// **'Neue Vorlage'**
-  String get templateNew;
+  String get workoutNew;
 
   /// Template editor: title for an existing template
   ///
   /// In de, this message translates to:
   /// **'Vorlage bearbeiten'**
-  String get templateEdit;
+  String get workoutEdit;
 
   /// Template editor: the template has no name
   ///
   /// In de, this message translates to:
   /// **'Der Name fehlt.'**
-  String get templateNameMissing;
+  String get workoutNameMissing;
 
   /// Template editor: no course chosen
   ///
   /// In de, this message translates to:
   /// **'Wähle eine Strecke.'**
-  String get templateCourseMissing;
+  String get workoutCourseMissing;
 
   /// Template editor: label of the course field
   ///
   /// In de, this message translates to:
   /// **'Strecke'**
-  String get templateCourse;
+  String get workoutCourse;
 
   /// Template editor: choice for a fixed number of laps
   ///
   /// In de, this message translates to:
   /// **'Feste Anzahl'**
-  String get templateFixedLaps;
+  String get workoutFixedLaps;
 
   /// Template editor: choice for an open number of laps, rowed until the session ends
   ///
   /// In de, this message translates to:
   /// **'Offen bis Stopp'**
-  String get templateOpenLaps;
+  String get workoutOpenLaps;
 
   /// Template editor: label of the number of laps
   ///
   /// In de, this message translates to:
   /// **'Runden'**
-  String get templateLaps;
+  String get workoutLaps;
 
   /// Template editor: unit after the number of laps, without the number
   ///
   /// In de, this message translates to:
   /// **'{laps, plural, =1{Runde} other{Runden}}'**
-  String templateLapsUnit(int laps);
+  String workoutLapsUnit(int laps);
 
   /// Template editor: label of the line with the total length of all laps
   ///
   /// In de, this message translates to:
   /// **'Ergibt'**
-  String get templateResult;
+  String get workoutResult;
 
   /// Template editor: after the length of one lap when the number of laps is open
   ///
   /// In de, this message translates to:
   /// **'pro Runde, bis du die Session beendest'**
-  String get templateResultOpen;
+  String get workoutResultOpen;
 
   /// Courses: title
   ///
@@ -1396,8 +1396,8 @@ abstract class AppLocalizations {
   /// Courses: templates deleted with the course; templates is a list of quoted names
   ///
   /// In de, this message translates to:
-  /// **'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: {templates}.'**
-  String courseDeleteTemplates(String templates);
+  /// **'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: {workouts}.'**
+  String courseDeleteWorkouts(String workouts);
 
   /// Course editor: title for a new course
   ///

@@ -676,10 +676,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get lapsOpen => 'offen';
 
   @override
-  String get templatesTitle => 'Vorlage rudern';
+  String get workoutsTitle => 'Vorlage rudern';
 
   @override
-  String get tabTemplates => 'Vorlagen';
+  String get tabWorkouts => 'Vorlagen';
 
   @override
   String get tabCourses => 'Strecken';
@@ -688,86 +688,86 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tabZones => 'Zonen';
 
   @override
-  String get templateCreate => 'Vorlage anlegen';
+  String get workoutCreate => 'Vorlage anlegen';
 
   @override
-  String get templateStart => 'Starten';
+  String get workoutStart => 'Starten';
 
   @override
-  String get templateGhost => 'Gegen den Ghost rudern';
+  String get workoutGhost => 'Gegen den Ghost rudern';
 
   @override
-  String get templatePodiumTitle => 'Bestleistungen';
+  String get workoutPodiumTitle => 'Bestleistungen';
 
   @override
-  String get templatePodiumEmpty =>
+  String get workoutPodiumEmpty =>
       'Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.';
 
   @override
-  String get templatePodiumOpenLaps =>
+  String get workoutPodiumOpenLaps =>
       'Bei offener Rundenzahl gibt es keine Bestzeit.';
 
   @override
-  String templatePodiumPace(String pace) {
+  String workoutPodiumPace(String pace) {
     return '$pace /500 m';
   }
 
   @override
-  String get templatesEmpty => 'Noch keine Vorlagen angelegt.';
+  String get workoutsEmpty => 'Noch keine Vorlagen angelegt.';
 
   @override
-  String templatesLoadFailed(String error) {
+  String workoutsLoadFailed(String error) {
     return 'Vorlagen konnten nicht geladen werden: $error';
   }
 
   @override
-  String get templateNeedsCourseTitle => 'Zuerst eine Strecke anlegen';
+  String get workoutNeedsCourseTitle => 'Zuerst eine Strecke anlegen';
 
   @override
-  String get templateNeedsCourseBody =>
+  String get workoutNeedsCourseBody =>
       'Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.';
 
   @override
-  String get templateNeedsCourse =>
+  String get workoutNeedsCourse =>
       'Für eine Vorlage brauchst du zuerst eine Strecke.';
 
   @override
   String get courseCreate => 'Strecke anlegen';
 
   @override
-  String get templateDeleteTitle => 'Vorlage löschen?';
+  String get workoutDeleteTitle => 'Vorlage löschen?';
 
   @override
-  String templateDeleteBody(String name) {
+  String workoutDeleteBody(String name) {
     return '„$name“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.';
   }
 
   @override
-  String get templateNew => 'Neue Vorlage';
+  String get workoutNew => 'Neue Vorlage';
 
   @override
-  String get templateEdit => 'Vorlage bearbeiten';
+  String get workoutEdit => 'Vorlage bearbeiten';
 
   @override
-  String get templateNameMissing => 'Der Name fehlt.';
+  String get workoutNameMissing => 'Der Name fehlt.';
 
   @override
-  String get templateCourseMissing => 'Wähle eine Strecke.';
+  String get workoutCourseMissing => 'Wähle eine Strecke.';
 
   @override
-  String get templateCourse => 'Strecke';
+  String get workoutCourse => 'Strecke';
 
   @override
-  String get templateFixedLaps => 'Feste Anzahl';
+  String get workoutFixedLaps => 'Feste Anzahl';
 
   @override
-  String get templateOpenLaps => 'Offen bis Stopp';
+  String get workoutOpenLaps => 'Offen bis Stopp';
 
   @override
-  String get templateLaps => 'Runden';
+  String get workoutLaps => 'Runden';
 
   @override
-  String templateLapsUnit(int laps) {
+  String workoutLapsUnit(int laps) {
     String _temp0 = intl.Intl.pluralLogic(
       laps,
       locale: localeName,
@@ -778,10 +778,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get templateResult => 'Ergibt';
+  String get workoutResult => 'Ergibt';
 
   @override
-  String get templateResultOpen => 'pro Runde, bis du die Session beendest';
+  String get workoutResultOpen => 'pro Runde, bis du die Session beendest';
 
   @override
   String get coursesTitle => 'Strecken';
@@ -803,8 +803,8 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String courseDeleteTemplates(String templates) {
-    return 'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: $templates.';
+  String courseDeleteWorkouts(String workouts) {
+    return 'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: $workouts.';
   }
 
   @override

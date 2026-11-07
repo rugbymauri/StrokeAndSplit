@@ -1,6 +1,6 @@
 import 'package:strokesplit/data/courses/course.dart';
-import 'package:strokesplit/features/templates/template_format.dart';
-import 'package:strokesplit/features/templates/templates_screen.dart';
+import 'package:strokesplit/features/workouts/workout_format.dart';
+import 'package:strokesplit/features/workouts/workouts_screen.dart';
 import 'package:strokesplit/l10n/l10n.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -42,6 +42,6 @@ void main() {
       ),
     );
 
-    expect(templateZoneLines(de, course), ['Kraft Stufe 12']);
+    expect(workoutZoneLines(de, course), ['Kraft Stufe 12']);
   });
 }

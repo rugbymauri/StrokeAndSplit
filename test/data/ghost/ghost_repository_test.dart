@@ -5,8 +5,8 @@ import 'package:strokesplit/data/ghost/ghost.dart';
 import 'package:strokesplit/data/ghost/ghost_repository.dart';
 import 'package:strokesplit/data/statistics/ranking.dart';
 import 'package:strokesplit/data/statistics/ranking_repository.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -22,7 +22,7 @@ void main() {
   late RankingRepository rankings;
   late GhostRepository ghosts;
   late int sprintId;
-  late SessionTemplate template;
+  late Workout workout;
 
   /// A lap of 1000 m on the Seerunde with the sprint at its start and again
   /// from 400 m.
@@ -55,19 +55,19 @@ void main() {
         ],
       ),
     );
-    final templates = TemplateRepository(db);
-    template = (await templates.get(
-      await templates.create('Seerunde x3', courseId: course, laps: 3),
+    final workouts = WorkoutRepository(db);
+    workout = (await workouts.get(
+      await workouts.create('Seerunde x3', courseId: course, laps: 3),
     ))!;
   });
 
   test('rebuilds a lap from its beginning to its end', () async {
     await storeRowedSessionWithSamples(
       db,
-      template: template,
+      workout: workout,
       laps: [lap(21000), lap(19000), lap(20000)],
     );
-    final best = (await rankings.course(template.course.id))
+    final best = (await rankings.course(workout.course.id))
         .single
         .entries
         .first;
@@ -87,7 +87,7 @@ void main() {
     () async {
       await storeRowedSessionWithSamples(
         db,
-        template: template,
+        workout: workout,
         laps: [lap(21000), lap(21000), lap(21000)],
       );
       final second = (await rankings.zone(sprintId)).single.entries
@@ -105,10 +105,10 @@ void main() {
   test('rebuilds a whole session over three laps', () async {
     await storeRowedSessionWithSamples(
       db,
-      template: template,
+      workout: workout,
       laps: [lap(21000), lap(19000), lap(20000)],
     );
-    final entry = (await rankings.template(template.id)).single.entries.single;
+    final entry = (await rankings.workout(workout.id)).single.entries.single;
 
     final track = (await ghosts.track(entry))!;
 
@@ -123,11 +123,11 @@ void main() {
     () async {
       await storeRowedSessionWithSamples(
         db,
-        template: template,
+        workout: workout,
         wallClock: false,
         laps: [lap(21000)],
       );
-      final entry = (await rankings.course(template.course.id))
+      final entry = (await rankings.course(workout.course.id))
           .single
           .entries
           .single;
@@ -137,8 +137,8 @@ void main() {
   );
 
   test('gives no course for a session without samples', () async {
-    await storeRowedSession(db, template: template, laps: [lap(21000)]);
-    final entry = (await rankings.course(template.course.id))
+    await storeRowedSession(db, workout: workout, laps: [lap(21000)]);
+    final entry = (await rankings.course(workout.course.id))
         .single
         .entries
         .single;

@@ -28,15 +28,15 @@ final zoneRankingsProvider = StreamProvider.family<List<Ranking>, int>((
   return repository.watch(() async => _podium(await repository.zone(zoneId)));
 });
 
-/// Places 1–3 of a template per course length and number of laps, the
+/// Places 1–3 of a workout per course length and number of laps, the
 /// current ones first; empty for an open number of laps.
-final templateRankingsProvider = StreamProvider.family<List<Ranking>, int>((
+final workoutRankingsProvider = StreamProvider.family<List<Ranking>, int>((
   ref,
-  templateId,
+  workoutId,
 ) {
   final repository = ref.watch(rankingRepositoryProvider);
   return repository.watch(
-    () async => _podium(await repository.template(templateId)),
+    () async => _podium(await repository.workout(workoutId)),
   );
 });
 

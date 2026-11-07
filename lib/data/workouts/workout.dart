@@ -5,8 +5,8 @@ import '../sessions/session_plan.dart';
 
 /// What to row: a course and a number of laps (Design D4).
 @immutable
-class SessionTemplate {
-  const SessionTemplate({
+class Workout {
+  const Workout({
     required this.id,
     required this.name,
     required this.course,
@@ -22,13 +22,13 @@ class SessionTemplate {
   /// Null for an open number of laps.
   final int? laps;
 
-  /// Rowing this template (course-rowing-free, Design D1).
+  /// Rowing this workout (course-rowing-free, Design D1).
   SessionPlan toPlan() => SessionPlan(
     course: course,
     length: switch (laps) {
       final laps? => LapCount(laps),
       null => const OpenLength(),
     },
-    template: (id: id, name: name),
+    workout: (id: id, name: name),
   );
 }

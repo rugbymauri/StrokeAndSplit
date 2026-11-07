@@ -2,7 +2,7 @@ import '../courses/course.dart';
 import '../courses/lap_tracker.dart';
 import 'ghost.dart';
 
-/// The ghosts of a running template, one per track of the progress frame
+/// The ghosts of a running workout, one per track of the progress frame
 /// (Change ghost, Design D2); null where a track has no ghost.
 typedef LiveGhosts = ({
   GhostTrack? course,
@@ -17,7 +17,7 @@ typedef GhostShares = ({double? course, double? lap, double? segment});
 /// Where [ghosts] are on the tracks of [definition] at the moment of
 /// [progress], as the progress frame places the rower (Design D3).
 ///
-/// The ghost of the template runs from the start of the first lap, the one of
+/// The ghost of the workout runs from the start of the first lap, the one of
 /// the lap from the start of the current lap and the one of the zone from the
 /// start of the current segment (Design D2). With an open number of laps the
 /// outer track and with it its ghost is missing.
@@ -46,7 +46,7 @@ GhostShares ghostShares(
   );
 }
 
-/// How far the rower is from [ghost], the ghost of the template, at the
+/// How far the rower is from [ghost], the ghost of the workout, at the
 /// moment of [progress] on a course with [axis] (Design D4): on a distance
 /// axis the difference of the wall-clock times at the rower's distance, on a
 /// time axis the difference of the distances at the rower's wall-clock time.

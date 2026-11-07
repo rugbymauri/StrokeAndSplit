@@ -6,7 +6,7 @@ import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/statistics/ranking.dart';
 import 'package:strokesplit/data/statistics/ranking_providers.dart';
 import 'package:strokesplit/data/statistics/ranking_repository.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:erg_protocol/erg_protocol.dart';
@@ -48,13 +48,13 @@ void main() {
       'Seerunde',
       CourseDefinition.single(axis: CourseAxis.distance, length: 100),
     );
-    final templates = TemplateRepository(db);
-    final template = (await templates.get(
-      await templates.create('Seerunde x1', courseId: course, laps: 1),
+    final workouts = WorkoutRepository(db);
+    final workout = (await workouts.get(
+      await workouts.create('Seerunde x1', courseId: course, laps: 1),
     ))!;
     await storeRowedSession(
       db,
-      template: template,
+      workout: workout,
       laps: [RowedLap.single(30000, 100)],
     );
     final seen = <List<Ranking>>[];
@@ -67,7 +67,7 @@ void main() {
     expect(seen.last.single.entries.single.durationMs, 30000);
 
     final recorder = container.read(sessionRecorderProvider.notifier);
-    await recorder.start(plan: template.toPlan());
+    await recorder.start(plan: workout.toPlan());
     // 100 m at 4 m/s; the session starts with the first stroke and ends by itself after its only lap.
     ftmsRowing(seconds: 30).forEach(source.emit);
     await pumpEventQueue();
@@ -77,9 +77,9 @@ void main() {
     final first = seen.last.single.entries.first;
     expect((first.sessionId, first.durationMs), (id, 25000));
     expect(seen.last.single.entries, hasLength(2));
-    container.listen(templateRankingsProvider(template.id), (_, _) {});
+    container.listen(workoutRankingsProvider(workout.id), (_, _) {});
     final rankings = await container.read(
-      templateRankingsProvider(template.id).future,
+      workoutRankingsProvider(workout.id).future,
     );
     expect(rankings.single.entries.first.sessionId, id);
   });
@@ -143,13 +143,13 @@ void main() {
         ],
       ),
     );
-    final templates = TemplateRepository(db);
-    final templateId = await templates.create(
+    final workouts = WorkoutRepository(db);
+    final workoutId = await workouts.create(
       'Seerunde x3',
       courseId: course,
       laps: 3,
     );
-    final template = (await templates.get(templateId))!;
+    final workout = (await workouts.get(workoutId))!;
     for (var i = 0; i < 200; i++) {
       final lap = RowedLap([
         (18000 + i, 100),
@@ -160,7 +160,7 @@ void main() {
       final startedAt = DateTime(2026, 1, 1).add(Duration(hours: i));
       await storeRowedSession(
         db,
-        template: template,
+        workout: workout,
         startedAt: startedAt,
         laps: [lap, lap, lap],
       );
@@ -169,7 +169,7 @@ void main() {
 
     final watch = Stopwatch()..start();
     final results = [
-      await rankings.template(templateId),
+      await rankings.workout(workoutId),
       await rankings.course(course),
       await rankings.zone(sprintId),
       await rankings.zone(tempoId),

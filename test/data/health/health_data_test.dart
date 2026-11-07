@@ -8,7 +8,7 @@ import 'package:strokesplit/data/sessions/session_accumulator.dart';
 import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 
 import '../../support/fixtures.dart';
 import '../../support/test_database.dart';
@@ -75,7 +75,7 @@ void main() {
       final data = (await repository.healthData(id))!;
       expect(data.startedAt.toUtc(), startedAt);
       expect(data.endedAt!.toUtc(), startedAt.add(const Duration(seconds: 3)));
-      expect(data.templateName, isNull);
+      expect(data.workoutName, isNull);
       // Without a wall clock the time of the rower.
       expect(
         [
@@ -148,7 +148,7 @@ void main() {
     expect(await repository.healthData(42), isNull);
   });
 
-  test('titles a course rowed without a template by the course and a template by its name', () async {
+  test('titles a course rowed without a workout by the course and a workout by its name', () async {
     final courses = CourseRepository(db);
     final course = (await courses.get(
       await courses.create(
@@ -178,9 +178,9 @@ void main() {
       ),
       'Seerunde',
     );
-    final templates = TemplateRepository(db);
-    final x3 = (await templates.get(
-      await templates.create('Seerunde x3', courseId: course.id, laps: 3),
+    final workouts = WorkoutRepository(db);
+    final x3 = (await workouts.get(
+      await workouts.create('Seerunde x3', courseId: course.id, laps: 3),
     ))!;
     expect(await title(x3.toPlan()), 'Seerunde x3');
   });

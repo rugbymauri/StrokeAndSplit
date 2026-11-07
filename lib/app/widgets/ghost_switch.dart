@@ -5,7 +5,7 @@ import '../design_tokens.dart';
 import 'ghost_symbol.dart';
 
 /// The ghost symbol, the text and a switch in one row that reacts to a tap
-/// anywhere on it, above "Starten" on the screens of a template and of a
+/// anywhere on it, above "Starten" on the screens of a workout and of a
 /// course (template-screen, Design D5; course-rowing-free, Design D6).
 class GhostSwitch extends StatelessWidget {
   const GhostSwitch({super.key, required this.value, required this.onChanged});
@@ -29,7 +29,7 @@ class GhostSwitch extends StatelessWidget {
               const SizedBox(width: AppSpacing.m),
               Expanded(
                 child: Text(
-                  context.l10n.templateGhost,
+                  context.l10n.workoutGhost,
                   style: AppTextStyles.body,
                 ),
               ),

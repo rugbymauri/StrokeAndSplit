@@ -11,7 +11,7 @@ import '../../data/sources/rower_choice.dart';
 import '../../l10n/l10n.dart';
 import '../live/metric_tile.dart' show HeartIcon;
 import '../sessions/sessions_screen.dart';
-import '../templates/templates_screen.dart';
+import '../workouts/workouts_screen.dart';
 import 'choose_devices_screen.dart';
 import 'connection_indicator.dart';
 import 'option_card.dart';
@@ -56,7 +56,7 @@ class StartScreen extends ConsumerWidget {
                   child: FilledButton(
                     onPressed: () => navigator.push(
                       MaterialPageRoute<void>(
-                        builder: (_) => const TemplatesScreen(),
+                        builder: (_) => const WorkoutsScreen(),
                       ),
                     ),
                     child: Text(

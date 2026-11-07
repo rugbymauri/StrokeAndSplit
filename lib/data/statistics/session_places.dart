@@ -21,7 +21,7 @@ class SessionPlaces {
 
   static const none = SessionPlaces();
 
-  /// The place of the session in the ranking of its template.
+  /// The place of the session in the ranking of its workout.
   final int? session;
 
   /// The place of each lap in the ranking of its course, by lap number.
@@ -50,7 +50,7 @@ class SessionPlaces {
       'SessionPlaces(session $session, laps $laps, zones $zones)';
 }
 
-/// Looks up a session in the rankings of its template, course and zones.
+/// Looks up a session in the rankings of its workout, course and zones.
 class SessionPlacesRepository {
   SessionPlacesRepository(this._db, this._rankings);
 
@@ -63,7 +63,7 @@ class SessionPlacesRepository {
     final session = await _db
         .customSelect(
           '''
-        SELECT s.source AS source, s.workout_id AS template, s.course_version_id AS version, v.course_id AS course
+        SELECT s.source AS source, s.workout_id AS workout, s.course_version_id AS version, v.course_id AS course
         FROM sessions s LEFT JOIN course_versions v ON v.id = s.course_version_id
         WHERE s.id = ?''',
           variables: [Variable.withInt(sessionId)],
@@ -92,7 +92,7 @@ class SessionPlacesRepository {
           if (entry.sessionId == sessionId) key(entry): i + 1,
     };
 
-    final templateId = session.read<int?>('template');
+    final workoutId = session.read<int?>('workout');
     final zoneIds = await _db
         .customSelect(
           'SELECT DISTINCT zone_id AS zone FROM course_segments WHERE version_id = ? AND zone_id IS NOT NULL',
@@ -101,9 +101,9 @@ class SessionPlacesRepository {
         .map((row) => row.read<int>('zone'))
         .get();
     return SessionPlaces(
-      session: templateId == null
+      session: workoutId == null
           ? null
-          : places(await _rankings.template(templateId), (_) => 0)[0],
+          : places(await _rankings.workout(workoutId), (_) => 0)[0],
       laps: places(await _rankings.course(courseId), (e) => e.lap!),
       zones: {
         for (final zoneId in zoneIds)

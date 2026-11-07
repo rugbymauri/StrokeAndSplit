@@ -13,13 +13,13 @@ enum ForceCurveVariant {
   /// Its own card with title and legend, below the side values (portrait, free rowing).
   card,
 
-  /// A narrow strip labelled "Kraft" below the tiles (portrait, template).
+  /// A narrow strip labelled "Kraft" below the tiles (portrait, workout).
   strip,
 
   /// Below the pace, inside the pace card, without a frame of its own (landscape, free rowing).
   inline,
 
-  /// Inside the coloured stroke rate card, drawn in `text` (landscape, template).
+  /// Inside the coloured stroke rate card, drawn in `text` (landscape, workout).
   tinted,
 }
 

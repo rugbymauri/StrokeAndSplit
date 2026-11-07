@@ -8,7 +8,7 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 
 ## 2. Code
 
-- [ ] 2.1 Mechanischer Rename nach D3 in `lib/` und `test/`: Ordner und Dateien mit `git mv`, dann Bezeichner, l10n-Keys und Widget-Keys. Die Texte selbst bleiben in diesem Schritt unverändert. Verifikation: `grep -rniE 'template' lib test` findet nur noch die Ausnahmen aus D3 und den Lese-Fallback aus D5; `make check` ist grün.
+- [x] 2.1 Mechanischer Rename nach D3 in `lib/` und `test/`: Ordner und Dateien mit `git mv`, dann Bezeichner, l10n-Keys und Widget-Keys. Die Texte selbst bleiben in diesem Schritt unverändert. Verifikation: `grep -rniE 'template' lib test` findet nur noch die Ausnahmen aus D3 und den Lese-Fallback aus D5; `make check` ist grün.
 - [x] 2.2 `HealthWorkout` → `HealthExercise` nach D2, inklusive Datei, Funktion und Tests. Verifikation: `make check` grün.
 
 ## 3. Texte

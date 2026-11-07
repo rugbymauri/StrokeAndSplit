@@ -9,7 +9,7 @@ import 'package:strokesplit/features/courses/courses_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../support/template_setup.dart';
+import '../../support/workout_setup.dart';
 import '../../support/test_database.dart';
 
 const _laps = Key('course-start-laps');
@@ -19,11 +19,11 @@ const _openHint = Key('course-start-open-hint');
 /// The start screen of a course (course-rowing-free, Design D6).
 void main() {
   /// "Seerunde" in the list of courses, its detail and its start screen opened.
-  Future<TemplateSetup> openStart(
+  Future<WorkoutSetup> openStart(
     WidgetTester tester, {
     Locale locale = const Locale('de'),
   }) async {
-    final setup = TemplateSetup();
+    final setup = WorkoutSetup();
     await setup.addCourseWithZone(tester, 'Seerunde');
     await setup.pump(tester, home: const CoursesScreen(), locale: locale);
     await tester.tap(find.text('Seerunde'));
@@ -60,7 +60,7 @@ void main() {
     }
   }
 
-  Future<void> stopRowing(TemplateSetup setup) async {
+  Future<void> stopRowing(WorkoutSetup setup) async {
     await setup.container.read(sessionRecorderProvider.notifier).stop();
     await setup.container.read(activeErgSourceProvider.notifier).clear();
   }
@@ -180,7 +180,7 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('starts 30 minutes on the course without creating a template', (
+  testWidgets('starts 30 minutes on the course without creating a workout', (
     tester,
   ) async {
     final setup = await openStart(tester);
@@ -191,9 +191,9 @@ void main() {
     final recording = setup.container.read(sessionRecorderProvider)!;
     expect(recording.plan!.course.name, 'Seerunde');
     expect(recording.plan!.length, const TimeLimit(Duration(minutes: 30)));
-    expect((recording.plan!.template, recording.ghost), (null, true));
+    expect((recording.plan!.workout, recording.ghost), (null, true));
     expect(find.text('Runde 1'), findsOneWidget);
-    expect(await tester.runAsync(setup.templates.all), isEmpty);
+    expect(await tester.runAsync(setup.workouts.all), isEmpty);
     await stopRowing(setup);
     await disposeWidgetsWithDatabase(tester);
   });

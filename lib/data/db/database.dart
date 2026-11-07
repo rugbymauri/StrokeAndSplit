@@ -106,25 +106,18 @@ class CourseSegments extends Table {
   Set<Column> get primaryKey => {versionId, position};
 }
 
-@DataClassName('TemplateRow')
-class Templates extends Table {
-  @override
-  String get tableName => 'workouts';
-
+@DataClassName('WorkoutRow')
+class Workouts extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
   DateTimeColumn get createdAt => dateTime()();
 }
 
-/// The parts of a template; the app uses exactly one for now.
-@DataClassName('TemplateBlockRow')
-class TemplateBlocks extends Table {
-  @override
-  String get tableName => 'workout_blocks';
-
-  IntColumn get templateId => integer()
-      .named('workout_id')
-      .references(Templates, #id, onDelete: KeyAction.cascade)();
+/// The parts of a workout; the app uses exactly one for now.
+@DataClassName('WorkoutBlockRow')
+class WorkoutBlocks extends Table {
+  IntColumn get workoutId =>
+      integer().references(Workouts, #id, onDelete: KeyAction.cascade)();
   IntColumn get position => integer()();
   IntColumn get courseId => integer().references(Courses, #id)();
 
@@ -132,7 +125,7 @@ class TemplateBlocks extends Table {
   IntColumn get laps => integer().nullable()();
 
   @override
-  Set<Column> get primaryKey => {templateId, position};
+  Set<Column> get primaryKey => {workoutId, position};
 }
 
 @DataClassName('SessionRow')
@@ -156,14 +149,15 @@ class Sessions extends Table {
   RealColumn get averageStrokeRate => real().nullable()();
   IntColumn get strokeCount => integer().withDefault(const Constant(0))();
 
-  // Set when the session was started from a template (Design D4).
-  IntColumn get templateId => integer()
-      .named('workout_id')
-      .nullable()
-      .references(Templates, #id, onDelete: KeyAction.setNull)();
+  // Set when the session was started from a workout (Design D4).
+  IntColumn get workoutId => integer().nullable().references(
+    Workouts,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
 
-  /// The template name at the time, kept when the template is deleted.
-  TextColumn get templateName => text().named('workout_name').nullable()();
+  /// The workout name at the time, kept when the workout is deleted.
+  TextColumn get workoutName => text().nullable()();
   IntColumn get courseVersionId =>
       integer().nullable().references(CourseVersions, #id)();
 
@@ -320,8 +314,8 @@ class LapSegments extends Table {
     CourseVersions,
     CourseSegments,
     Zones,
-    Templates,
-    TemplateBlocks,
+    Workouts,
+    WorkoutBlocks,
     Laps,
     LapSegments,
     RrIntervals,
@@ -422,7 +416,7 @@ class AppDatabase extends _$AppDatabase {
           schema.courseSegments.resistanceLevel,
         );
       },
-      // Planned duration of a course rowed without a template (Change course-rowing-free, D3).
+      // Planned duration of a course rowed without a workout (Change course-rowing-free, D3).
       from9To10: (m, schema) async {
         await m.addColumn(schema.sessions, schema.sessions.plannedDurationMs);
       },
