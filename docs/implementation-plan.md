@@ -29,7 +29,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 13 | `resistance-control` | 12/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
 | 14 | `template-screen` | 8/9 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (4.3); nach `ui-design`, `ghost` und `statistics` archivieren |
 | 15 | `course-rowing-free` | 11/12 | umgesetzt bis auf Gerätetest 7.3 (`feature/course-rowing-free`) | setzt `template-screen` voraus; erst nach `ghost` und `template-screen` archivieren |
-| 16 | `zone-level-only` | 3/5 | in Umsetzung (`feature/zone-level-only`) | erst nach `resistance-control` archivieren |
+| 16 | `zone-level-only` | 4/5 | umgesetzt bis auf Gerätetest 3.3 (`feature/zone-level-only`) | Nutzer: Gerätetest 3.3; erst nach `resistance-control` archivieren |
 
 ## Warum diese Reihenfolge
 
@@ -323,7 +323,7 @@ Wunsch des Nutzers (2026-11-06): eine Strecke wählen, auf einem weiteren Screen
 Wunsch des Nutzers (2026-11-07): Beim Anlegen einer Zone soll neben Pace und Schlagzahl auch die Stufe allein genügen; nötig ist mindestens eins der drei.
 
 - [x] Proposal, Design, Specs und Tasks (2026-11-07, `docs/zone-level-only-proposal`, 5 Tasks). Entschieden (Nutzer): mindestens eins von Pace, Schlagzahl oder Stufe; die Zonenliste bleibt, sie zeigt die Werte schon. Vorgaben ohne Rückmeldung: Eine Zone nur mit Stufe gilt als Zone (Name im Streckenbalken, in der Pace-Box und im Rahmen, Stufe wird gesetzt), aber ohne Zonenmarkierung, ohne Anteil in der Zone und ohne Hinweis „Gleich …“; Ranglisten und Zonen-Ghost zählen wie bei jeder Zone. Im Design: `isFree` zählt die Stufe, neu `hasBand` für Messung und Hinweis (D1); Fehler `targetMissing` (D2). Keine Schema-Änderung. Das Delta `zones` ändert die Requirement „Widerstandsstufe einer Zone“ aus `resistance-control`, deshalb erst danach archivieren.
-- [ ] Umsetzung begonnen (2026-11-07, `feature/zone-level-only`): 1.1 Zone nur mit Stufe speichern, Fehler `targetMissing`, Texte de/en; 2.1 `isFree` zählt die Stufe, `hasBand` für Anteil in der Zone und Hinweis „Gleich …“; 3.1 README.
+- [ ] Umsetzung begonnen (2026-11-07, `feature/zone-level-only`): 1.1 Zone nur mit Stufe speichern, Fehler `targetMissing`, Texte de/en; 2.1 `isFree` zählt die Stufe, `hasBand` für Anteil in der Zone und Hinweis „Gleich …“; 3.1 README; 3.2 `make check` und Linux-Test mit Simulator (FTMS): „Kraft“ nur mit Stufe 12 in der Seerunde ab 0 m, Streckenbalken und Pace-Box zeigen „Kraft“, Stufe 12 gesetzt, kein Anteil in der Zone, Vorlagen-Screen „Kraft Stufe 12“. Offen: 3.3 Gerätetest (Nutzer). Bei der Umsetzung geändert: Der Hinweis „Mindestens eins ist nötig“ steht im Editor über den drei Karten statt zwischen Schlagzahl und Stufe.
 
 ## Offene Entscheide
 
@@ -349,6 +349,8 @@ Wunsch des Nutzers (2026-11-07): Beim Anlegen einer Zone soll neben Pace und Sch
 | F17 | Release nur für Tags auf `main`? **Vorläufig ja** (2026-10-16, nach Vorschlag): Tags ausserhalb von `main` lassen `verify-tag` fehlschlagen | gitlab-pipeline | gitlab-pipeline |
 
 ## Offene Punkte
+
+- [ ] `resistance-control`, gefunden im Linux-Test von `zone-level-only` (2026-11-07): Beginnt die Strecke mit einer Zone mit Stufe (ab 0 m), bleibt nach der Zone deren Stufe (12) statt der Grundstufe des Simulators (5). Vermutete Ursache: Beim Start hat das Gerät noch keine Stufe gemeldet, `ResistanceDirector.segmentStarted` sendet 12, und die erste Meldung danach (schon 12) wird zur Grundstufe. Betrifft jede Zone mit Stufe am Streckenanfang, nicht nur Zonen ohne Band. Beim Gerätetest 6.2 am Woodrower mitprüfen.
 
 Manuelle Tests archivierter Changes (Nutzer):
 - [ ] `courses` 7.1: Vorlage im Simulator in der Linux-App rudern (`make run`), Session endet nach der letzten Runde, Zusammenfassung mit Runden.

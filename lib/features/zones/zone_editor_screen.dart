@@ -238,6 +238,12 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+              // Pace, stroke rate and level are the three targets; at least one is needed (Change zone-level-only).
+              Text(
+                l10n.zoneBandHint,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 8),
               _BandCard(
                 switchKey: const Key('zone-pace-band'),
                 title: l10n.zonePaceBand,
@@ -299,11 +305,6 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.zoneBandHint,
-                style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 12),
               _BandCard(
