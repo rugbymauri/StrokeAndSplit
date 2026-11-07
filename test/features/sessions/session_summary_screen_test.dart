@@ -241,6 +241,74 @@ void main() {
     },
   );
 
+  testWidgets(
+    'Mehrere Strecken: names the courses after the workout and shows the laps over the chain',
+    (tester) async {
+      final db = openTestDatabase();
+      final id = await tester.runAsync(() async {
+        final courses = CourseRepository(db);
+        final versions = [
+          for (final (name, length) in [
+            ('Einrudern', 500),
+            ('2 km Intervall', 2000),
+            ('Ausrudern', 500),
+          ])
+            (await courses.get(
+              await courses.create(
+                name,
+                CourseDefinition.single(
+                  axis: CourseAxis.distance,
+                  length: length,
+                ),
+              ),
+            ))!.versionId,
+        ];
+        final id = await insertSession(
+          db,
+          SessionsCompanion.insert(
+            startedAt: _startedAt,
+            status: SessionStatus.complete,
+            source: ErgSourceKind.simulator,
+            workoutName: const Value('Intervalltraining'),
+            plannedLaps: const Value(2),
+            durationMs: const Value(1390000),
+            distanceDm: const Value(60000),
+          ),
+          courseVersionIds: versions,
+        );
+        for (final (i, (start, end)) in [
+          (0, 700000),
+          (700000, 1390000),
+        ].indexed) {
+          await db
+              .into(db.laps)
+              .insert(
+                LapsCompanion.insert(
+                  sessionId: id,
+                  lapNo: i + 1,
+                  startWallMs: start,
+                  endWallMs: end,
+                  startDistanceDm: i * 30000,
+                  endDistanceDm: (i + 1) * 30000,
+                  complete: true,
+                ),
+              );
+        }
+        return id;
+      });
+      await _pump(tester, db, id!);
+
+      expect(
+        find.text('Intervalltraining · Einrudern + 2 km Intervall + Ausrudern'),
+        findsOneWidget,
+      );
+      expect(find.text('16.10.2026, 07:00 · 2 × 3000 m'), findsOneWidget);
+      expect(_lap(tester, const Key('lap-1')), '11:40.0');
+      expect(_lap(tester, const Key('lap-best')), '11:30.0');
+      await disposeWidgetsWithDatabase(tester);
+    },
+  );
+
   testWidgets('shows laps without bars on a course without bands', (
     tester,
   ) async {

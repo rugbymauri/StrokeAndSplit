@@ -100,9 +100,8 @@ class _Summary extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     // A chain of courses is shown as one course (Change workout-course-chain).
-    final course = switch (ref
-        .watch(sessionCoursesProvider(session.id))
-        .value) {
+    final courses = ref.watch(sessionCoursesProvider(session.id)).value;
+    final course = switch (courses) {
       null || [] => null,
       final courses => Course.chain(courses),
     };
@@ -137,6 +136,7 @@ class _Summary extends ConsumerWidget {
                   _Header(
                     session: session,
                     course: course,
+                    chain: (courses?.length ?? 0) > 1,
                     laps: laps,
                     place: places.session,
                   ),
@@ -238,12 +238,16 @@ class _Header extends StatelessWidget {
   const _Header({
     required this.session,
     required this.course,
+    required this.chain,
     required this.laps,
     required this.place,
   });
 
   final SessionRow session;
   final Course? course;
+
+  /// Whether [course] is a chain of several courses, named after the workout.
+  final bool chain;
   final List<LapRow> laps;
 
   /// The place of the session in its workout's ranking, if 1–3.
@@ -262,7 +266,7 @@ class _Header extends StatelessWidget {
     }
     final name = course == null
         ? null
-        : sessionName(l10n, session, course.name);
+        : sessionName(l10n, session, course.name, chain: chain);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

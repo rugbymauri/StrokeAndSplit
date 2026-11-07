@@ -471,4 +471,78 @@ void main() {
       },
     );
   });
+
+  group('several courses', () {
+    Future<(WorkoutSetup, List<int>)> withChain(WidgetTester tester) async {
+      final setup = WorkoutSetup();
+      final ids = [
+        await setup.addCourse(tester, 'Einrudern', length: 500),
+        await setup.addCourseWithZone(tester, '2 km Intervall'),
+        await setup.addCourse(tester, 'Ausrudern', length: 500),
+      ];
+      return (setup, ids);
+    }
+
+    testWidgets('Mehrere Strecken: lists the courses and the length of a lap', (
+      tester,
+    ) async {
+      final (setup, ids) = await withChain(tester);
+      await setup.addWorkout(
+        tester,
+        'Intervalltraining',
+        courseIds: ids,
+        length: const LapCount(1),
+      );
+      await setup.addWorkout(
+        tester,
+        'Intervalltraining 45 min',
+        courseIds: ids,
+        length: const TimeLimit(Duration(minutes: 45)),
+      );
+      await setup.pump(tester);
+
+      expect(
+        find.text('Einrudern + 2 km Intervall + Ausrudern · 2000 m · 1 Runde'),
+        findsOneWidget,
+      );
+      // Workout mit Dauer: the duration instead of a number of laps.
+      expect(
+        find.text('Einrudern + 2 km Intervall + Ausrudern · 2000 m · 45:00'),
+        findsOneWidget,
+      );
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets(
+      'Mehrere Strecken ansehen: the screen shows each course in order with its zones',
+      (tester) async {
+        final (setup, ids) = await withChain(tester);
+        await setup.addWorkout(
+          tester,
+          'Intervalltraining',
+          courseIds: ids,
+          length: const LapCount(1),
+        );
+        await setup.pump(tester);
+        await setup.openWorkout(tester, 'Intervalltraining');
+
+        expect(
+          [
+            for (var i = 0; i < 3; i++)
+              tester.widget<Text>(find.byKey(Key('workout-course-$i'))).data,
+          ],
+          ['Einrudern', '2 km Intervall', 'Ausrudern'],
+        );
+        expect(
+          find.text(
+            'Einrudern + 2 km Intervall + Ausrudern · 2000 m · 1 Runde',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Tempo 2:05–2:10 · 20–22 spm'), findsOneWidget);
+        expect(find.text('ohne Zonen'), findsNWidgets(2));
+        await disposeWidgetsWithDatabase(tester);
+      },
+    );
+  });
 }
