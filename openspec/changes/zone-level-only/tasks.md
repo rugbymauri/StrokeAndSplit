@@ -24,7 +24,7 @@ Setzt `resistance-control` in `main` voraus (Stufe in Zone und Segment). Neue od
 ## 3. Doku und Abschluss
 
 - [x] 3.1 README: Abschnitte Zonen und Widerstand. „Eine Stufe allein ersetzt kein Band“ wird zu „mindestens eins von Pace, Schlagzahl oder Stufe“, und es kommt dazu, was eine Zone nur mit Stufe beim Rudern zeigt und was nicht. Verifikation: Beide Abschnitte widersprechen den Specs nicht mehr.
-- [ ] 3.2 Gesamtprüfung: `make check` grün. In der App unter Linux mit Simulator (FTMS) die Zone „Kraft“ nur mit Stufe 12 anlegen, in eine Strecke setzen und rudern. Verifikation:
+- [x] 3.2 Gesamtprüfung: `make check` grün. In der App unter Linux mit Simulator (FTMS) die Zone „Kraft“ nur mit Stufe 12 anlegen, in eine Strecke setzen und rudern. Verifikation:
   - Der Streckenbalken zeigt „Kraft“, die Pace-Box „Kraft“.
   - Der Simulator meldet Stufe 12 in der Zone.
   - Es gibt keinen Anteil in der Zone.
