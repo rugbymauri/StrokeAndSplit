@@ -143,11 +143,12 @@ class ResistanceController extends Notifier<ResistanceState> {
       if (level != state.level) state = state.copyWith(level: level);
       return;
     }
-    director.reported(level);
+    final send = director.reported(level);
     final whole = state.range?.wholeLevel(level) ?? level;
     if (whole != state.level || director.target != state.target) {
       state = state.copyWith(level: whole, target: director.target);
     }
+    _send(send);
   }
 
   void _onRecording(ActiveRecording? recording) {

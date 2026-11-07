@@ -66,8 +66,9 @@ void main() {
     return container;
   }
 
-  /// 100 m free, then a 100 m sprint on level 10, once.
-  Future<SessionTemplate> sprintTemplate() async {
+  /// 100 m free, then a 100 m sprint on level 10, once; with [sprintFirst]
+  /// the sprint comes first.
+  Future<SessionTemplate> sprintTemplate({bool sprintFirst = false}) async {
     final zoneId = await ZoneRepository(db).create(
       const Zone(
         name: 'Sprint',
@@ -82,7 +83,7 @@ void main() {
     final layout = resolveCourse(
       axis: CourseAxis.distance,
       length: 200,
-      placements: [ZonePlacement(zoneId: zoneId, start: 100)],
+      placements: [ZonePlacement(zoneId: zoneId, start: sprintFirst ? 0 : 100)],
       zones: {zoneId: zone},
     );
     final course = await CourseRepository(db)
@@ -122,6 +123,34 @@ void main() {
         expect(source.resistanceLevel, 10);
         async.elapse(const Duration(seconds: 2));
         expect(c.read(resistanceProvider).level, 10);
+        source.stop();
+      });
+    },
+  );
+
+  test(
+    'a course starting with the sprint returns to the level the simulator had',
+    () {
+      fakeAsync((async) {
+        final source = SimulatedSource(seed: 1, protocol: ErgProtocol.ftms);
+        final c = container(source);
+        final template = _run(async, () => sprintTemplate(sprintFirst: true));
+        _run(async, () async {
+          await source.start();
+          await c
+              .read(sessionRecorderProvider.notifier)
+              .start(plan: template.toPlan());
+        });
+        async.elapse(const Duration(seconds: 5));
+        expect(source.resistanceLevel, 10);
+
+        // 100 m at 2:10 /500 m take 26 s.
+        async.elapse(const Duration(seconds: 30));
+        expect(
+          c.read(sessionRecorderProvider)!.lap!.segment.resistanceLevel,
+          isNull,
+        );
+        expect(source.resistanceLevel, SimulatedSource.ftmsResistanceLevel);
         source.stop();
       });
     },

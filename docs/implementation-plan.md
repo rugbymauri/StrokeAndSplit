@@ -300,6 +300,7 @@ Wunsch des Nutzers (2026-11-05) für den Domyos Woodrower. Der Spike am Gerät z
 - [x] Zonen (2026-11-05, Task 5.2): Schalter „Widerstandsstufe“ mit Ruderblatt-Tasten 1–25 (Start 5) im Zoneneditor; „· Stufe 10“ hinter den Bändern in Zonenliste, Zonendetails, Streckeneditor und Vorlagen.
 - [x] README (2026-11-05, Task 6.1): Setzen der Stufe über die Ruderblatt-Tasten und pro Zone, Grundstufe, Änderung von Hand, Stand der Gerätetests.
 - [ ] Gerätetest 6.2 am Woodrower (Nutzer).
+- [x] Behoben (2026-11-07, `fix/resistance-base-level`, gefunden im Linux-Test von `zone-level-only`): Begann die Strecke mit einer Zone mit Stufe, wurde die gesendete Stufe zur Grundstufe, weil das Gerät beim Start noch keine Stufe gemeldet hatte. Der `ResistanceDirector` wartet jetzt mit dem ersten Segment auf die erste Meldung.
 
 ### 14. `template-screen`: Vorlage auf eigenem Screen, Ghost abschaltbar
 
