@@ -22,7 +22,7 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 
 ## 4. Export und Import
 
-- [ ] 4.1 Export schreibt `courses` mit `firstSegment`, Import liest `courses` und als Rückfall `course` (D7). Verifikation: Repository-Tests: Export und Import einer Session auf „Intervalltraining“ in eine leere DB ergeben dieselben Runden und legen die drei Strecken an; eine Datei im bisherigen Format mit `course` (auch mit `template`) importiert wie vorher.
+- [x] 4.1 Export schreibt `courses` mit `firstSegment`, Import liest `courses` und als Rückfall `course` (D7). Verifikation: Repository-Tests: Export und Import einer Session auf „Intervalltraining“ in eine leere DB ergeben dieselben Runden und legen die drei Strecken an; eine Datei im bisherigen Format mit `course` (auch mit `template`) importiert wie vorher.
 
 ## 5. Oberfläche
 
