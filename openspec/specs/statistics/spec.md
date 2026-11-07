@@ -1,7 +1,7 @@
 # statistics Specification
 
 ## Purpose
-Bestimmt aus den geruderten Sessions die besten Leistungen pro Vorlage, Strecke und Zone und zeigt die Plätze 1–3. Platz 1 jeder Ebene ist der Ghost, gegen den gerudert wird.
+Bestimmt aus den geruderten Sessions die besten Leistungen pro Workout, Strecke und Zone und zeigt die Plätze 1–3. Platz 1 jeder Ebene ist der Ghost, gegen den gerudert wird.
 
 ## Requirements
 
@@ -24,8 +24,8 @@ Ein Eintrag einer Rangliste SHALL auf einer Distanzachse nach der benötigten Ze
 - **WHEN** zwei Runden mit 4:08.0 gerudert wurden, am 1. und am 5. Oktober
 - **THEN** steht die Runde vom 1. Oktober vorne
 
-### Requirement: Rangliste einer Vorlage
-Die App SHALL pro Vorlage eine Rangliste führen, deren Einträge Sessions sind, in denen alle geplanten Runden vollständig gerudert wurden. Gewertet wird die Summe der Rundenzeiten bzw. Rundendistanzen. Nur Sessions mit gleicher Streckenlänge und gleicher Rundenzahl MUST in derselben Rangliste stehen. Eine Vorlage mit offener Rundenzahl hat keine Rangliste.
+### Requirement: Rangliste eines Workouts
+Die App SHALL pro Workout eine Rangliste führen, deren Einträge Sessions sind, in denen alle geplanten Runden vollständig gerudert wurden. Gewertet wird die Summe der Rundenzeiten bzw. Rundendistanzen. Nur Sessions mit gleicher Streckenlänge und gleicher Rundenzahl MUST in derselben Rangliste stehen. Ein Workout mit offener Rundenzahl hat keine Rangliste.
 
 #### Scenario: Drei Runden
 - **WHEN** „Seerunde x3“ zweimal vollständig gerudert wurde, in 12:31.8 und 12:24.1
@@ -33,22 +33,22 @@ Die App SHALL pro Vorlage eine Rangliste führen, deren Einträge Sessions sind,
 
 #### Scenario: Abgebrochene Session
 - **WHEN** eine Session auf „Seerunde x3“ nach Runde 2 beendet wurde
-- **THEN** steht sie nicht in der Rangliste der Vorlage
+- **THEN** steht sie nicht in der Rangliste des Workouts
 
 #### Scenario: Rundenzahl geändert
 - **WHEN** „Seerunde x3“ auf 4 Runden geändert und danach gerudert wurde
 - **THEN** stehen die 4-Runden-Sessions in einer eigenen Rangliste und die 3-Runden-Sessions bleiben in ihrer
 
 #### Scenario: Offene Rundenzahl
-- **WHEN** die Vorlage „Seerunde offen“ gerudert wurde
-- **THEN** zeigt die Vorlage keine Plätze, ihre Runden zählen aber für die Strecke
+- **WHEN** das Workout „Seerunde offen“ gerudert wurde
+- **THEN** zeigt das Workout keine Plätze, seine Runden zählen aber für die Strecke
 
 ### Requirement: Rangliste einer Strecke
-Die App SHALL pro Strecke eine Rangliste führen, deren Einträge vollständige Runden auf dieser Strecke sind, unabhängig von der Vorlage. Runden auf Versionen gleicher Länge MUST in derselben Rangliste stehen. Hatte die Strecke verschiedene Längen, SHALL es eine Rangliste pro Länge geben. Unvollständige Runden MUST NOT zählen.
+Die App SHALL pro Strecke eine Rangliste führen, deren Einträge vollständige Runden auf dieser Strecke sind, unabhängig vom Workout. Runden auf Versionen gleicher Länge MUST in derselben Rangliste stehen. Hatte die Strecke verschiedene Längen, SHALL es eine Rangliste pro Länge geben. Unvollständige Runden MUST NOT zählen.
 
-#### Scenario: Über Vorlagen hinweg
+#### Scenario: Über Workouts hinweg
 - **WHEN** „Seerunde“ mit „Seerunde x3“ und mit „Seerunde offen“ gerudert wurde
-- **THEN** stehen die Runden beider Vorlagen in derselben Rangliste von „Seerunde“
+- **THEN** stehen die Runden beider Workouts in derselben Rangliste von „Seerunde“
 
 #### Scenario: Länge geändert
 - **WHEN** „Seerunde“ mit 1000 m gerudert, auf 1200 m geändert und wieder gerudert wurde
@@ -59,7 +59,7 @@ Die App SHALL pro Strecke eine Rangliste führen, deren Einträge vollständige 
 - **THEN** stehen die Runden vor und nach der Änderung in derselben Rangliste
 
 ### Requirement: Rangliste einer Zone
-Die App SHALL pro Zone eine Rangliste führen, deren Einträge die Abschnitte vollständiger Runden sind, auf denen diese Zone lag, unabhängig von Strecke und Vorlage. Jede Fahrt durch die Zone ist ein eigener Eintrag, auch mehrere aus derselben Session. Nur Fahrten mit gleicher Zonenlänge zum Zeitpunkt des Ruderns MUST in derselben Rangliste stehen. Freie Abschnitte haben keine Rangliste.
+Die App SHALL pro Zone eine Rangliste führen, deren Einträge die Abschnitte vollständiger Runden sind, auf denen diese Zone lag, unabhängig von Strecke und Workout. Jede Fahrt durch die Zone ist ein eigener Eintrag, auch mehrere aus derselben Session. Nur Fahrten mit gleicher Zonenlänge zum Zeitpunkt des Ruderns MUST in derselben Rangliste stehen. Freie Abschnitte haben keine Rangliste.
 
 #### Scenario: Über Strecken hinweg
 - **WHEN** „Sprint“ in „2 km Intervall“ und in „Seerunde“ eingebaut ist und beide gerudert wurden
@@ -82,32 +82,32 @@ Die Ranglisten SHALL nur Sessions enthalten, die an einem Rudergerät aufgezeich
 
 #### Scenario: Import
 - **WHEN** der Nutzer eine am PM5 geruderte Session auf dem Laptop importiert
-- **THEN** erscheint die Session dort in keiner Rangliste ihrer Vorlage, Strecke und Zonen und bekommt keine Platzmarken
+- **THEN** erscheint die Session dort in keiner Rangliste ihres Workouts, Strecke und Zonen und bekommt keine Platzmarken
 
 ### Requirement: Gelöschtes verlässt die Ranglisten
-Wird eine Strecke, Zone oder Vorlage gelöscht, SHALL ihre Rangliste nicht mehr angezeigt werden. Wird eine Session gelöscht, MUST sie aus allen Ranglisten verschwinden. Die Sessions selbst MUST beim Löschen einer Strecke, Zone oder Vorlage erhalten bleiben.
+Wird eine Strecke, eine Zone oder ein Workout gelöscht, SHALL deren Rangliste nicht mehr angezeigt werden. Wird eine Session gelöscht, MUST sie aus allen Ranglisten verschwinden. Die Sessions selbst MUST beim Löschen einer Strecke, einer Zone oder eines Workouts erhalten bleiben.
 
 #### Scenario: Zone gelöscht
 - **WHEN** der Nutzer die Zone „Sprint“ löscht
 - **THEN** gibt es keine Rangliste von „Sprint“ mehr, und die Sessions zeigen weiterhin ihre Sprints
 
-#### Scenario: Vorlage gelöscht
-- **WHEN** der Nutzer die Vorlage „Seerunde x3“ löscht
+#### Scenario: Workout gelöscht
+- **WHEN** der Nutzer das Workout „Seerunde x3“ löscht
 - **THEN** zählen ihre Runden weiter für die Strecke „Seerunde“
 
 #### Scenario: Session gelöscht
 - **WHEN** der Nutzer die Session auf Platz 1 von „Seerunde“ löscht
 - **THEN** rücken die übrigen Einträge einen Platz vor
 
-### Requirement: Plätze in der Vorlagenwahl
-Der Screen einer Vorlage SHALL die Plätze 1–3 ihrer Rangliste mit Wert, Pace und Datum zeigen, für die aktuelle Streckenlänge und Rundenzahl. Gibt es noch keinen Eintrag oder ist die Rundenzahl offen, MUST stattdessen ein Hinweis stehen und kein Platz.
+### Requirement: Plätze in der Workout-Wahl
+Der Screen eines Workouts SHALL die Plätze 1–3 seiner Rangliste mit Wert, Pace und Datum zeigen, für die aktuelle Streckenlänge und Rundenzahl. Gibt es noch keinen Eintrag oder ist die Rundenzahl offen, MUST stattdessen ein Hinweis stehen und kein Platz.
 
 #### Scenario: Zwei Einträge
-- **WHEN** „Seerunde x3“ zweimal vollständig gerudert wurde und der Nutzer in der Vorlagenliste ihren Screen öffnet
+- **WHEN** „Seerunde x3“ zweimal vollständig gerudert wurde und der Nutzer in der Workout-Liste seinen Screen öffnet
 - **THEN** sieht er Platz 1 und 2 mit Zeit, Pace und Datum
 
 #### Scenario: Noch nie gerudert
-- **WHEN** der Nutzer den Screen einer neuen Vorlage öffnet
+- **WHEN** der Nutzer den Screen eines neuen Workouts öffnet
 - **THEN** steht dort, dass es noch keine Bestzeit gibt
 
 ### Requirement: Detailansicht von Strecke und Zone
@@ -122,7 +122,7 @@ Aus der Strecken- und der Zonenliste SHALL der Nutzer eine Detailansicht öffnen
 - **THEN** zeigt die Detailansicht zuerst die Rangliste für 1200 m und darunter die für 1000 m
 
 ### Requirement: Plätze in der Zusammenfassung
-Die Zusammenfassung einer Session auf einer Vorlage SHALL jede Runde und jede Zonenfahrt markieren, die in ihrer Rangliste auf Platz 1–3 steht, und ebenso die Session, wenn sie in der Rangliste ihrer Vorlage auf Platz 1–3 steht. Die Marke MUST den Platz nennen und den aktuellen Stand der Rangliste wiedergeben.
+Die Zusammenfassung einer Session auf einem Workout SHALL jede Runde und jede Zonenfahrt markieren, die in ihrer Rangliste auf Platz 1–3 steht, und ebenso die Session, wenn sie in der Rangliste ihres Workouts auf Platz 1–3 steht. Die Marke MUST den Platz nennen und den aktuellen Stand der Rangliste wiedergeben.
 
 #### Scenario: Neue zweitbeste Runde
 - **WHEN** der Nutzer auf „Seerunde“ eine Runde in 4:08 rudert und nur eine Runde schneller war

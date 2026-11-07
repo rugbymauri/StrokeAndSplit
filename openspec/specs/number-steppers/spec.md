@@ -6,7 +6,7 @@ TBD - created by archiving change ui-design. Update Purpose after archive.
 ## Requirements
 
 ### Requirement: Zahlen über Ruderblatt-Tasten einstellen
-Jeder Zahlenwert in den Editoren SHALL über ein Tastenpaar „mehr“ und „weniger“ eingestellt werden, ohne Tastatur: die Rundenzahl im Vorlagen-Editor, die Länge im Strecken-Editor, Länge, Pace-Band und Schlagzahl-Band im Zonen-Editor sowie die Startposition beim Einbauen und beim Verschieben einer Zone. Gedrückt halten MUST den Schritt wiederholen. Kann der Wert nicht weiter sinken oder steigen, MUST die betroffene Taste gesperrt sein.
+Jeder Zahlenwert in den Editoren SHALL über ein Tastenpaar „mehr“ und „weniger“ eingestellt werden, ohne Tastatur: die Rundenzahl im Workout-Editor, die Länge im Strecken-Editor, Länge, Pace-Band und Schlagzahl-Band im Zonen-Editor sowie die Startposition beim Einbauen und beim Verschieben einer Zone. Gedrückt halten MUST den Schritt wiederholen. Kann der Wert nicht weiter sinken oder steigen, MUST die betroffene Taste gesperrt sein.
 
 #### Scenario: Pace-Band anpassen
 - **WHEN** im Zonen-Editor die schnellste Pace 1:45 beträgt und der Nutzer einmal auf „mehr“ tippt
@@ -17,7 +17,7 @@ Jeder Zahlenwert in den Editoren SHALL über ein Tastenpaar „mehr“ und „we
 - **THEN** beginnt die Zone bei 1550 m
 
 #### Scenario: Minimum erreicht
-- **WHEN** im Vorlagen-Editor die feste Rundenzahl 1 beträgt
+- **WHEN** im Workout-Editor die feste Rundenzahl 1 beträgt
 - **THEN** ist die Taste „weniger“ gesperrt und die Rundenzahl bleibt 1
 
 #### Scenario: Gedrückt halten

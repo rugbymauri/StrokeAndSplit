@@ -36,10 +36,10 @@ Jeder Text der Oberfläche SHALL in jeder angebotenen Sprache vorliegen, auch Hi
 - **THEN** braucht es dafür nur eine zusätzliche Übersetzungsdatei, und die Sprache erscheint in der Sprachwahl
 
 ### Requirement: Eigene Namen bleiben unübersetzt
-Namen, die der Nutzer vergibt (Zonen, Strecken, Vorlagen), und Namen von Geräten SHALL in jeder Sprache so erscheinen, wie sie gespeichert sind.
+Namen, die der Nutzer vergibt (Zonen, Strecken, Workouts), und Namen von Geräten SHALL in jeder Sprache so erscheinen, wie sie gespeichert sind.
 
-#### Scenario: Vorlage auf Englisch
-- **WHEN** die Oberfläche englisch ist und eine Vorlage „Seerunde x3“ heisst
+#### Scenario: Workout auf Englisch
+- **WHEN** die Oberfläche englisch ist und ein Workout „Seerunde x3“ heisst
 - **THEN** steht sie als „Seerunde x3“ in der Liste
 
 ### Requirement: Formate nach Sprache

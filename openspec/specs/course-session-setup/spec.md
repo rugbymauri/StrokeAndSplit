@@ -1,7 +1,7 @@
 # course-session-setup Specification
 
 ## Purpose
-Lässt den Nutzer eine Strecke direkt rudern, ohne eine Vorlage anzulegen: Er wählt die Strecke, legt Runden, eine Gesamtdauer oder offen fest und startet.
+Lässt den Nutzer eine Strecke direkt rudern, ohne ein Workout anzulegen: Er wählt die Strecke, legt Runden, eine Gesamtdauer oder offen fest und startet.
 
 ## Requirements
 
@@ -49,12 +49,12 @@ Bei „Dauer“ SHALL der Nutzer die Gesamtdauer mit − und + in Schritten von 
 - **WHEN** der Nutzer die Dauer auf 90 min stellt
 - **THEN** zeigt der Screen „1:30:00“
 
-### Requirement: Starten ohne Vorlage
-„Starten“ SHALL eine Session auf der Strecke mit der gewählten Option beginnen, mit derselben Verbindung wie beim Start einer Vorlage. Dabei MUST NOT eine Vorlage angelegt werden. Die Wahl auf dem Start-Screen MUST NOT gespeichert werden; jedes Öffnen beginnt mit den Vorgaben.
+### Requirement: Starten ohne Workout
+„Starten“ SHALL eine Session auf der Strecke mit der gewählten Option beginnen, mit derselben Verbindung wie beim Start eines Workouts. Dabei MUST NOT ein Workout angelegt werden. Die Wahl auf dem Start-Screen MUST NOT gespeichert werden; jedes Öffnen beginnt mit den Vorgaben.
 
 #### Scenario: 30 min auf der Seerunde
 - **WHEN** der Nutzer auf dem Start-Screen von „Seerunde“ „Dauer“ mit 30 min wählt und „Starten“ antippt
-- **THEN** läuft eine Session auf „Seerunde“, die nach 30 min Ruderzeit endet, und die Vorlagenliste bleibt unverändert
+- **THEN** läuft eine Session auf „Seerunde“, die nach 30 min Ruderzeit endet, und die Workout-Liste bleibt unverändert
 
 #### Scenario: Erneut öffnen
 - **WHEN** der Nutzer nach einer Session mit 45 min den Start-Screen wieder öffnet

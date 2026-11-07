@@ -2,12 +2,12 @@
 
 ## Purpose
 
-Begleitet das Rudern einer Vorlage: Die App zählt Runden und Segmente, zeigt im Boot, ob Pace und Schlagzahl in der Zone liegen, und speichert pro Runde und Segment vergleichbare Ergebnisse. Diese Runden sind die Datengrundlage für den späteren Ghost.
+Begleitet das Rudern eines Workouts: Die App zählt Runden und Segmente, zeigt im Boot, ob Pace und Schlagzahl in der Zone liegen, und speichert pro Runde und Segment vergleichbare Ergebnisse. Diese Runden sind die Datengrundlage für den späteren Ghost.
 
 ## Requirements
 
 ### Requirement: Fortschritt nach Sessionzeit messen
-Beim Rudern einer Vorlage SHALL der Fortschritt einer Zeitstrecke nach der Sessionzeit gemessen werden, also nach Wanduhr ohne die Pausen der Session, unabhängig davon, ob der PM5 seine Uhr anhält. Rundenzeiten und Abschnittszeiten MUST ebenfalls nach der Sessionzeit gemessen werden und die Pausen damit nicht enthalten.
+Beim Rudern eines Workouts SHALL der Fortschritt einer Zeitstrecke nach der Sessionzeit gemessen werden, also nach Wanduhr ohne die Pausen der Session, unabhängig davon, ob der PM5 seine Uhr anhält. Rundenzeiten und Abschnittszeiten MUST ebenfalls nach der Sessionzeit gemessen werden und die Pausen damit nicht enthalten.
 
 #### Scenario: Pause in einer Distanzrunde
 - **WHEN** der Nutzer in einer 1000-m-Runde rudert und dabei 30 Sekunden stillsitzt
@@ -29,7 +29,7 @@ Die App SHALL eine Runde beenden, sobald die Länge der Strecke erreicht ist, un
 - **THEN** endet Runde 1 bei 1000 m nach 3:59.4 und Runde 2 beginnt bei 1000 m
 
 #### Scenario: Offene Rundenzahl
-- **WHEN** eine Vorlage mit offener Rundenzahl gerudert wird
+- **WHEN** ein Workout mit offener Rundenzahl gerudert wird
 - **THEN** folgt auf jede Runde eine weitere, bis der Nutzer die Session beendet
 
 ### Requirement: Nach der letzten Runde beenden
@@ -47,7 +47,7 @@ Beendet der Nutzer die Session mitten in einer Runde, SHALL die angefangene Rund
 - **THEN** zeigt die Zusammenfassung Runde 1 mit ihrer Zeit und Runde 2 als unvollständig mit 400 m
 
 ### Requirement: Runde und Segment live anzeigen
-Beim Rudern einer Vorlage SHALL das Live-Display die aktuelle Runde (bei fester Zahl als „Runde 2 / 3“), den aktuellen Abschnitt mit dem Namen seiner Zone bzw. „frei“, die Restdistanz bzw. Restzeit bis zum Abschnittsende und die Zielbänder der Zone anzeigen.
+Beim Rudern eines Workouts SHALL das Live-Display die aktuelle Runde (bei fester Zahl als „Runde 2 / 3“), den aktuellen Abschnitt mit dem Namen seiner Zone bzw. „frei“, die Restdistanz bzw. Restzeit bis zum Abschnittsende und die Zielbänder der Zone anzeigen.
 
 #### Scenario: Mitten in der Zone Tempo
 - **WHEN** der Nutzer in Runde 2 von 3 bei 520 m in der Zone „Tempo“ von 200 bis 800 m mit Band 2:05–2:10 rudert
@@ -103,7 +103,7 @@ Die App SHALL pro Runde Beginn, Ende, Dauer, Distanz, Status (vollständig oder 
 - **THEN** sind nach dem Neustart Runde 1 und 2 vollständig und Runde 3 als unvollständig gespeichert
 
 ### Requirement: Zusammenfassung mit Runden
-Die Zusammenfassung einer Session auf einer Vorlage SHALL Vorlage, Strecke und alle Runden mit ihrer Zeit (Distanzstrecke) bzw. Distanz (Zeitstrecke) und ihrem Anteil in der Zone zeigen. Die beste vollständige Runde MUST hervorgehoben sein.
+Die Zusammenfassung einer Session auf einem Workout SHALL Workout, Strecke und alle Runden mit ihrer Zeit (Distanzstrecke) bzw. Distanz (Zeitstrecke) und ihrem Anteil in der Zone zeigen. Die beste vollständige Runde MUST hervorgehoben sein.
 
 #### Scenario: Drei Runden auf Distanz
 - **WHEN** die Runden 4:12, 4:08 und 4:15 dauerten
@@ -113,22 +113,26 @@ Die Zusammenfassung einer Session auf einer Vorlage SHALL Vorlage, Strecke und a
 - **WHEN** auf einer 4-min-Strecke 1012 m, 1030 m und 998 m gerudert wurden
 - **THEN** zeigt die Zusammenfassung die drei Distanzen und hebt 1030 m hervor
 
-### Requirement: Export und Import einer Vorlagen-Session
-Wird eine Session auf einer Vorlage exportiert und wieder importiert, SHALL sie dieselben Runden- und Segmentergebnisse ergeben wie bei der Aufzeichnung. Fehlt beim Import die passende Strecke, MUST die Strecke in der gespeicherten Version aus der Datei angelegt werden.
+### Requirement: Export und Import einer Workout-Session
+Wird eine Session auf einem Workout exportiert und wieder importiert, SHALL sie dieselben Runden- und Segmentergebnisse ergeben wie bei der Aufzeichnung. Fehlt beim Import die passende Strecke, MUST die Strecke in der gespeicherten Version aus der Datei angelegt werden.
 
 #### Scenario: Export und Import
 - **WHEN** eine Session „Seerunde x3“ auf dem Handy exportiert und auf dem Laptop importiert wird, wo es die Strecke nicht gibt
 - **THEN** zeigt die importierte Session dieselben drei Rundenzeiten und die Strecke „Seerunde“ ist auf dem Laptop vorhanden
 
-### Requirement: Strecke ohne Vorlage rudern
-Eine Session, die ohne Vorlage auf einer Strecke läuft, SHALL Runden, Abschnitte, Zonenstatus, Anteil in der Zone und Ergebnisse genauso messen, anzeigen und speichern wie eine Session auf einer Vorlage mit dieser Strecke. Ihre vollständigen Runden und Zonenfahrten MUST in den Ranglisten von Strecke und Zone zählen.
+#### Scenario: Datei aus der Zeit vor den Workouts
+- **WHEN** der Nutzer eine Session importiert, die eine frühere Version der App mit der Vorlage „Seerunde x3“ exportiert hat
+- **THEN** zeigt die importierte Session „Seerunde x3“ als Workout mit ihren drei Rundenzeiten
 
-#### Scenario: Drei Runden ohne Vorlage
-- **WHEN** der Nutzer „Seerunde“ ohne Vorlage mit 3 Runden rudert
+### Requirement: Strecke ohne Workout rudern
+Eine Session, die ohne Workout auf einer Strecke läuft, SHALL Runden, Abschnitte, Zonenstatus, Anteil in der Zone und Ergebnisse genauso messen, anzeigen und speichern wie eine Session auf einem Workout mit dieser Strecke. Ihre vollständigen Runden und Zonenfahrten MUST in den Ranglisten von Strecke und Zone zählen.
+
+#### Scenario: Drei Runden ohne Workout
+- **WHEN** der Nutzer „Seerunde“ ohne Workout mit 3 Runden rudert
 - **THEN** zeigt das Live-Display „Runde 2 von 3“ und den aktuellen Abschnitt, und die Session endet nach der dritten Runde
 
 #### Scenario: Rangliste der Strecke
-- **WHEN** der Nutzer „Seerunde“ ohne Vorlage rudert und eine Runde in 4:05 schafft, schneller als alle bisherigen
+- **WHEN** der Nutzer „Seerunde“ ohne Workout rudert und eine Runde in 4:05 schafft, schneller als alle bisherigen
 - **THEN** steht diese Runde auf Platz 1 der Rangliste von „Seerunde“
 
 ### Requirement: Nach der Gesamtdauer beenden
@@ -153,8 +157,8 @@ Bei einer Session mit Gesamtdauer SHALL der äussere Ring des Fortschrittsrahmen
 - **WHEN** der Nutzer bei 30 min Dauer 15 min gerudert hat
 - **THEN** ist der äussere Ring zur Hälfte gefüllt, und das Live-Display zeigt 15:00 verbleibend
 
-### Requirement: Zusammenfassung ohne Vorlage
-Die Zusammenfassung einer Session ohne Vorlage auf einer Strecke SHALL statt der Vorlage die Strecke und die geplante Länge nennen: die Rundenzahl, die Dauer oder „offen“. Sie MUST alle Runden wie bei einer Vorlage zeigen und keine Platzmarke für eine Vorlage.
+### Requirement: Zusammenfassung ohne Workout
+Die Zusammenfassung einer Session ohne Workout auf einer Strecke SHALL statt des Workouts die Strecke und die geplante Länge nennen: die Rundenzahl, die Dauer oder „offen“. Sie MUST alle Runden wie bei einem Workout zeigen und keine Platzmarke für ein Workout.
 
 #### Scenario: 30 min auf der Seerunde
 - **WHEN** der Nutzer die Zusammenfassung einer Session mit 30 min auf „Seerunde“ öffnet
