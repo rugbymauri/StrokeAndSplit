@@ -478,7 +478,7 @@ class SessionRepository {
       ...recording.metadata,
       if (course != null) ...{
         // Without a workout the name is null; the duration only with one (course-rowing-free, D3).
-        'template': {
+        'workout': {
           'name': session.workoutName,
           'laps': session.plannedLaps,
           'durationMs': ?session.plannedDurationMs,
@@ -522,7 +522,9 @@ class SessionRepository {
     );
     final metadata = recording.metadata;
     final session = metadata['session'] as Map<String, Object?>? ?? const {};
-    final workout = metadata['template'] as Map<String, Object?>?;
+    // Files from before the rename name the workout a template (Change rename-workouts, Design D5).
+    final workout =
+        (metadata['workout'] ?? metadata['template']) as Map<String, Object?>?;
     final course = switch (metadata['course']) {
       final Map<String, Object?> json => (
         name: json['name']! as String,

@@ -442,7 +442,7 @@ void main() {
       final header = jsonDecode(
         const LineSplitter().convert(utf8.decode(gzip.decode(bytes))).first,
       ) as Map;
-      expect(header['template'], {
+      expect(header['workout'], {
         'name': null,
         'laps': null,
         'durationMs': 1800000,
@@ -536,6 +536,26 @@ void main() {
       },
     );
 
+    test('imports a file that names the workout a template', () async {
+      final (phone, recorded) = await recordOnPhone();
+      final laptop = openTestDatabase();
+
+      final bytes = await SessionRepository(phone).export(recorded);
+      final lines = const LineSplitter().convert(
+        utf8.decode(gzip.decode(bytes)),
+      );
+      final header = jsonDecode(lines.first) as Map<String, Object?>;
+      header['template'] = header.remove('workout');
+      final old = gzip.encode(
+        utf8.encode('${[jsonEncode(header), ...lines.skip(1)].join('\n')}\n'),
+      );
+      final imported = await SessionRepository(laptop).import(old);
+
+      final session = (await SessionRepository(laptop).get(imported))!;
+      expect((session.workoutName, session.plannedLaps), ('Seerunde x3', 3));
+      expect(await results(laptop, imported), await results(phone, recorded));
+    });
+
     test('names workout, course and zones in the header', () async {
       final (phone, recorded) = await recordOnPhone();
 
@@ -545,7 +565,7 @@ void main() {
       );
       final header = jsonDecode(lines.first) as Map<String, Object?>;
 
-      expect(header['template'], {'name': 'Seerunde x3', 'laps': 3});
+      expect(header['workout'], {'name': 'Seerunde x3', 'laps': 3});
       expect((header['course'] as Map)['segments'], [
         {'length': 20},
         {
