@@ -1156,10 +1156,6 @@
   "@coursePlaceZone": {
     "description": "Course editor: button and dialog title to place a zone"
   },
-  "courseMoveZone": "Zone verschieben",
-  "@courseMoveZone": {
-    "description": "Course editor: dialog title to move a placed zone"
-  },
   "coursePlaceHere": "Hier eine Zone einbauen",
   "@coursePlaceHere": {
     "description": "Course editor: tooltip on a free part"
@@ -1167,14 +1163,6 @@
   "courseRemoveZone": "Zone entfernen",
   "@courseRemoveZone": {
     "description": "Course editor: tooltip on a placed zone"
-  },
-  "coursePlace": "Einbauen",
-  "@coursePlace": {
-    "description": "Place dialog: button that places the zone"
-  },
-  "courseMove": "Verschieben",
-  "@courseMove": {
-    "description": "Place dialog: button that moves the zone"
   },
   "courseNoZones": "Noch keine Zonen angelegt. Lege zuerst eine an.",
   "@courseNoZones": {
@@ -1192,31 +1180,6 @@
         "type": "String"
       }
     }
-  },
-  "courseRange": "Strecke: {range}",
-  "@courseRange": {
-    "description": "Place dialog: the range of the course, e.g. '0–2000 m'",
-    "placeholders": {
-      "range": {
-        "type": "String"
-      }
-    }
-  },
-  "coursePlacedAt": "„{zone}“ liegt bei {range}.",
-  "@coursePlacedAt": {
-    "description": "Place dialog: where the zone would lie, e.g. '500–600 m'",
-    "placeholders": {
-      "zone": {
-        "type": "String"
-      },
-      "range": {
-        "type": "String"
-      }
-    }
-  },
-  "courseOtherAxis": "andere Achse",
-  "@courseOtherAxis": {
-    "description": "Place dialog: the zone is measured in time on a distance course or the other way round"
   },
   "axisDistance": "Distanz",
   "@axisDistance": {
@@ -1443,6 +1406,15 @@
     "placeholders": {
       "count": {
         "type": "int"
+      }
+    }
+  },
+  "courseMovingZone": "{zone} verschieben",
+  "@courseMovingZone": {
+    "description": "Course editor: heading of the panel that moves the marked zone",
+    "placeholders": {
+      "zone": {
+        "type": "String"
       }
     }
   },

@@ -1429,12 +1429,6 @@ abstract class AppLocalizations {
   /// **'Zone einbauen'**
   String get coursePlaceZone;
 
-  /// Course editor: dialog title to move a placed zone
-  ///
-  /// In de, this message translates to:
-  /// **'Zone verschieben'**
-  String get courseMoveZone;
-
   /// Course editor: tooltip on a free part
   ///
   /// In de, this message translates to:
@@ -1446,18 +1440,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Zone entfernen'**
   String get courseRemoveZone;
-
-  /// Place dialog: button that places the zone
-  ///
-  /// In de, this message translates to:
-  /// **'Einbauen'**
-  String get coursePlace;
-
-  /// Place dialog: button that moves the zone
-  ///
-  /// In de, this message translates to:
-  /// **'Verschieben'**
-  String get courseMove;
 
   /// Place dialog: there is no zone
   ///
@@ -1476,24 +1458,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Start ({unit})'**
   String courseStart(String unit);
-
-  /// Place dialog: the range of the course, e.g. '0–2000 m'
-  ///
-  /// In de, this message translates to:
-  /// **'Strecke: {range}'**
-  String courseRange(String range);
-
-  /// Place dialog: where the zone would lie, e.g. '500–600 m'
-  ///
-  /// In de, this message translates to:
-  /// **'„{zone}“ liegt bei {range}.'**
-  String coursePlacedAt(String zone, String range);
-
-  /// Place dialog: the zone is measured in time on a distance course or the other way round
-  ///
-  /// In de, this message translates to:
-  /// **'andere Achse'**
-  String get courseOtherAxis;
 
   /// Courses and zones measured in metres
   ///
@@ -1722,6 +1686,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{count, plural, =0{noch nie gerudert} other{{count}× gerudert}}'**
   String courseRowedCount(int count);
+
+  /// Course editor: heading of the panel that moves the marked zone
+  ///
+  /// In de, this message translates to:
+  /// **'{zone} verschieben'**
+  String courseMovingZone(String zone);
 
   /// Place zone screen: heading of the easy zones
   ///

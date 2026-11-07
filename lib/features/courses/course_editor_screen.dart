@@ -9,8 +9,6 @@ import '../../data/courses/course_providers.dart';
 import '../../data/zones/zone.dart';
 import '../../data/zones/zone_providers.dart';
 import '../../l10n/l10n.dart';
-import '../zones/zone_format.dart';
-import '../zones/zones_screen.dart';
 import 'course_format.dart';
 import 'course_strip.dart';
 import 'place_zone_screen.dart';
@@ -36,8 +34,9 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
       widget.course?.definition.placements ?? const <ZonePlacement>[];
   var _errors = <String>[];
 
-  /// The segment outlined in the strip while its dialog is open.
-  int? _selected;
+  /// The index in [_placements] of the zone being moved, outlined in the
+  /// strip and the list (Change course-editor-flow, D3).
+  int? _moving;
 
   bool get _isNew => widget.course == null;
 
@@ -77,37 +76,39 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     });
   }
 
-  /// Moves the placement at [index].
-  Future<void> _move(int index) async {
-    final placement = await showDialog<ZonePlacement>(
-      context: context,
-      builder: (_) => _PlaceZoneDialog(
-        axis: _axis,
-        length: _length,
-        others: [
-          for (final (i, p) in _placements.indexed)
-            if (i != index) p,
-        ],
-        initial: _placements[index],
-      ),
-    );
-    if (placement == null) return;
+  void _remove(int index) {
     setState(() {
-      _errors = [];
+      _moving = null;
       _placements = [
         for (final (i, p) in _placements.indexed)
           if (i != index) p,
-        placement,
-      ]..sort((a, b) => a.start.compareTo(b.start));
+      ];
     });
   }
 
-  void _remove(int index) {
-    setState(
-      () => _placements = [
-        for (final (i, p) in _placements.indexed)
-          if (i != index) p,
-      ],
+  /// Marks the zone at [index] for moving; a tap on the marked zone ends it.
+  void _mark(int index, {bool toggle = true}) =>
+      setState(() => _moving = toggle && _moving == index ? null : index);
+
+  /// Moves the marked zone to [start], between its neighbours.
+  void _moveTo(int start) => setState(() {
+    _placements = [
+      for (final (i, p) in _placements.indexed)
+        i == _moving ? ZonePlacement(zoneId: p.zoneId, start: start) : p,
+    ];
+  });
+
+  /// How far the zone at [index] may move: from the end of the zone before
+  /// it, or 0, to where it touches the zone after it, or the end.
+  (int, int) _moveRange(int index, Map<int, Zone> zones) {
+    final length = zones[_placements[index].zoneId]?.length ?? 0;
+    final before = index > 0 ? _placements[index - 1] : null;
+    final after = index + 1 < _placements.length
+        ? _placements[index + 1]
+        : null;
+    return (
+      before == null ? 0 : before.start + (zones[before.zoneId]?.length ?? 0),
+      (after?.start ?? _length) - length,
     );
   }
 
@@ -135,16 +136,19 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     if (mounted) Navigator.of(context).pop();
   }
 
-  /// Opens segment [i] like its row: a zone to move it, a free gap to place
-  /// one there; the strip outlines the segment meanwhile.
-  Future<void> _openSegment(CourseDefinition definition, int i) async {
-    setState(() => _selected = i);
-    if (definition.segments[i].zoneId == null) {
-      await _place(start: definition.segmentStarts[i]);
-    } else {
-      await _move(_indexAt(definition, i));
+  /// Opens segment [i] like its row: a zone is marked for moving, a free gap
+  /// ends moving and places a zone there.
+  Future<void> _openSegment(
+    CourseDefinition definition,
+    int i, {
+    bool toggle = true,
+  }) async {
+    if (definition.segments[i].zoneId != null) {
+      _mark(_indexAt(definition, i), toggle: toggle);
+      return;
     }
-    if (mounted) setState(() => _selected = null);
+    setState(() => _moving = null);
+    await _place(start: definition.segmentStarts[i]);
   }
 
   @override
@@ -156,6 +160,13 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
         ? 0
         : ref.watch(courseRowCountsProvider).value?[widget.course!.id]?.newest;
     final l10n = context.l10n;
+    final moving = _moving == null ? null : _placements[_moving!].start;
+    final selected = switch (layout.definition) {
+      final definition? when moving != null => definition.segmentStarts.indexOf(
+        moving,
+      ),
+      _ => null,
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -246,11 +257,25 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                   definition: definition,
                   height: CourseStrip.namedHeight,
                   showNames: true,
-                  selected: _selected,
+                  selected: selected,
                   onSegmentTap: (i) => _openSegment(definition, i),
+                  onSegmentLongPress: (i) =>
+                      _openSegment(definition, i, toggle: false),
                 ),
                 const SizedBox(height: 6),
                 _Ticks(axis: _axis, length: definition.length),
+                if (_moving case final moving?)
+                  if (zones[_placements[moving].zoneId] case final zone?) ...[
+                    const SizedBox(height: AppSpacing.m),
+                    _MovePanel(
+                      axis: _axis,
+                      zone: zone,
+                      start: _placements[moving].start,
+                      range: _moveRange(moving, zones),
+                      onChanged: _moveTo,
+                      onDone: () => setState(() => _moving = null),
+                    ),
+                  ],
                 const SizedBox(height: AppSpacing.m),
                 _SectionCard(
                   children: [
@@ -263,7 +288,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                         color: CourseStrip.segmentColors(
                           definition.segments,
                         )[i],
-                        selected: i == _selected,
+                        selected: i == selected,
                         onPlace: segment.zoneId == null
                             ? () => _openSegment(definition, i)
                             : null,
@@ -293,7 +318,6 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                           start: p.start,
                           segment: zone.segment,
                           color: AppColors.zoneIn,
-                          onMove: () => _move(i),
                           onRemove: () => _remove(i),
                         ),
                   ],
@@ -611,6 +635,78 @@ class _SectionTile extends StatelessWidget {
   }
 }
 
+/// Moves the marked zone with the oar buttons, within [range] (D3).
+class _MovePanel extends StatelessWidget {
+  const _MovePanel({
+    required this.axis,
+    required this.zone,
+    required this.start,
+    required this.range,
+    required this.onChanged,
+    required this.onDone,
+  });
+
+  final CourseAxis axis;
+  final Zone zone;
+  final int start;
+  final (int, int) range;
+  final ValueChanged<int> onChanged;
+  final VoidCallback onDone;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final distance = axis == CourseAxis.distance;
+    final step = placeZoneStep(axis);
+    return Container(
+      key: const Key('move-panel'),
+      padding: const EdgeInsets.all(AppSpacing.l),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.cardLarge),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.courseMovingZone(zone.name),
+                  style: AppTextStyles.cardTitle.copyWith(fontSize: 16),
+                ),
+              ),
+              TextButton(
+                key: const Key('move-done'),
+                onPressed: onDone,
+                child: Text(l10n.actionDone),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.s),
+          OarStepper(
+            key: const Key('move-start'),
+            value: start,
+            step: step,
+            min: range.$1,
+            max: range.$2,
+            stepLabel: distance ? '$step m' : l10n.stepSeconds(step),
+            format: distance ? null : (v) => formatCourseLength(axis, v),
+            unit: distance ? 'm' : 'min',
+            label: l10n.courseStart(distance ? 'm' : 'm:ss'),
+            onChanged: onChanged,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            formatCourseRange(axis, start, start + zone.length),
+            style: AppTextStyles.caption,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Says that changing a course rowed in its newest version stores a new version.
 class _VersionHint extends StatelessWidget {
   const _VersionHint({required this.rowed});
@@ -646,217 +742,8 @@ class _VersionHint extends StatelessWidget {
   }
 }
 
-/// Picks one of the stored zones and its start, and shows whether it fits.
-class _PlaceZoneDialog extends ConsumerStatefulWidget {
-  const _PlaceZoneDialog({
-    required this.axis,
-    required this.length,
-    required this.others,
-    this.initial,
-  });
-
-  final CourseAxis axis;
-  final int length;
-
-  /// The zones already placed, without the one being moved.
-  final List<ZonePlacement> others;
-  final ZonePlacement? initial;
-
-  @override
-  ConsumerState<_PlaceZoneDialog> createState() => _PlaceZoneDialogState();
-}
-
-class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
-  late int? _zoneId = widget.initial?.zoneId;
-  late var _start = widget.initial?.start ?? _firstFree();
-
-  /// The end of the last placed zone, or 0.
-  int _firstFree() {
-    final zones = _zones;
-    return widget.others.fold(0, (end, p) {
-      final zone = zones[p.zoneId];
-      return zone == null
-          ? end
-          : (p.start + zone.length > end ? p.start + zone.length : end);
-    });
-  }
-
-  Map<int, Zone> get _zones => _zonesById(ref.read(zonesProvider).value);
-
-  /// The placement and why it does not fit; null without a zone.
-  (ZonePlacement?, String?) _check(Map<int, Zone> zones) {
-    final zone = zones[_zoneId];
-    if (zone == null) return (null, null);
-    final placement = ZonePlacement(zoneId: zone.id, start: _start);
-    final placements = [...widget.others, placement];
-    final layout = resolveCourse(
-      axis: widget.axis,
-      length: widget.length,
-      placements: placements,
-      zones: zones,
-    );
-    final error = layout.errors
-        .where((e) => e.placements.contains(placements.length - 1))
-        .firstOrNull;
-    return (
-      placement,
-      error == null ? null : placementErrorText(context.l10n, error),
-    );
-  }
-
-  Future<void> _createZone() async {
-    final id = await openZoneEditor(context, axis: widget.axis);
-    if (id != null && mounted) setState(() => _zoneId = id);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final usages = ref.watch(zonesProvider).value ?? const <ZoneUsage>[];
-    final zones = _zonesById(usages);
-    final (placement, error) = _check(zones);
-    final zone = zones[_zoneId];
-    final theme = Theme.of(context);
-    final l10n = context.l10n;
-    final distance = widget.axis == CourseAxis.distance;
-    final step = _startStep(widget.axis);
-
-    return AlertDialog(
-      title: Text(
-        widget.initial == null ? l10n.coursePlaceZone : l10n.courseMoveZone,
-      ),
-      content: SizedBox(
-        width: 480,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            if (usages.isEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(l10n.courseNoZones),
-              ),
-            for (final u in usages)
-              _ZoneOption(
-                zone: u.zone,
-                enabled: u.zone.axis == widget.axis,
-                selected: u.zone.id == _zoneId,
-                onTap: () => setState(() => _zoneId = u.zone.id),
-              ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                onPressed: _createZone,
-                icon: const Icon(Icons.add),
-                label: Text(l10n.zoneCreate),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.courseStart(distance ? 'm' : 'm:ss'),
-              style: AppTextStyles.caption,
-            ),
-            const SizedBox(height: 6),
-            OarStepper(
-              key: const Key('place-start'),
-              value: _start,
-              step: step,
-              min: 0,
-              // The zone has to end with the course.
-              max: widget.length - (zone?.length ?? 0),
-              stepLabel: distance ? '$step m' : l10n.stepSeconds(step),
-              format: distance
-                  ? null
-                  : (v) => formatCourseLength(widget.axis, v),
-              unit: distance ? 'm' : 'min',
-              label: l10n.courseStart(distance ? 'm' : 'm:ss'),
-              onChanged: (v) => setState(() => _start = v),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l10n.courseRange(
-                formatCourseRange(widget.axis, 0, widget.length),
-              ),
-              style: AppTextStyles.caption,
-            ),
-            const SizedBox(height: 12),
-            if (zone != null && placement != null && error == null)
-              Text(
-                l10n.coursePlacedAt(
-                  zone.name,
-                  formatCourseRange(
-                    widget.axis,
-                    placement.start,
-                    placement.start + zone.length,
-                  ),
-                ),
-                key: const Key('place-preview'),
-              )
-            else if (error != null)
-              Text(
-                error,
-                key: const Key('place-error'),
-                style: TextStyle(color: theme.colorScheme.error),
-              ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.actionCancel),
-        ),
-        FilledButton(
-          onPressed: placement != null && error == null
-              ? () => Navigator.of(context).pop(placement)
-              : null,
-          child: Text(
-            widget.initial == null ? l10n.coursePlace : l10n.courseMove,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// A zone to choose; zones of the other axis are shown but cannot be chosen.
-class _ZoneOption extends StatelessWidget {
-  const _ZoneOption({
-    required this.zone,
-    required this.enabled,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final Zone zone;
-  final bool enabled;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      key: Key('zone-option-${zone.id}'),
-      enabled: enabled,
-      selected: selected,
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(
-        selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-      ),
-      title: Text(zone.name),
-      subtitle: Text(
-        enabled
-            ? zoneSummary(context.l10n, zone)
-            : '${zoneSummary(context.l10n, zone)} · ${context.l10n.courseOtherAxis}',
-      ),
-      onTap: enabled ? onTap : null,
-    );
-  }
-}
-
 /// Steps of design D7 for the length of a course: 100 m or 30 s.
 int _courseStep(CourseAxis axis) => axis == CourseAxis.distance ? 100 : 30;
-
-/// Steps of design D7 for the start of a zone: 50 m or 10 s.
-int _startStep(CourseAxis axis) => axis == CourseAxis.distance ? 50 : 10;
 
 Map<int, Zone> _zonesById(List<ZoneUsage>? usages) => {
   for (final u in usages ?? const <ZoneUsage>[]) u.zone.id: u.zone,
