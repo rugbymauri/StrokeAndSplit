@@ -63,7 +63,7 @@ class SessionPlacesRepository {
     final session = await _db
         .customSelect(
           '''
-        SELECT s.source AS source, s.template_id AS template, s.course_version_id AS version, v.course_id AS course
+        SELECT s.source AS source, s.workout_id AS template, s.course_version_id AS version, v.course_id AS course
         FROM sessions s LEFT JOIN course_versions v ON v.id = s.course_version_id
         WHERE s.id = ?''',
           variables: [Variable.withInt(sessionId)],

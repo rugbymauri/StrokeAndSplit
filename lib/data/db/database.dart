@@ -108,6 +108,9 @@ class CourseSegments extends Table {
 
 @DataClassName('TemplateRow')
 class Templates extends Table {
+  @override
+  String get tableName => 'workouts';
+
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
   DateTimeColumn get createdAt => dateTime()();
@@ -116,8 +119,12 @@ class Templates extends Table {
 /// The parts of a template; the app uses exactly one for now.
 @DataClassName('TemplateBlockRow')
 class TemplateBlocks extends Table {
-  IntColumn get templateId =>
-      integer().references(Templates, #id, onDelete: KeyAction.cascade)();
+  @override
+  String get tableName => 'workout_blocks';
+
+  IntColumn get templateId => integer()
+      .named('workout_id')
+      .references(Templates, #id, onDelete: KeyAction.cascade)();
   IntColumn get position => integer()();
   IntColumn get courseId => integer().references(Courses, #id)();
 
@@ -150,14 +157,13 @@ class Sessions extends Table {
   IntColumn get strokeCount => integer().withDefault(const Constant(0))();
 
   // Set when the session was started from a template (Design D4).
-  IntColumn get templateId => integer().nullable().references(
-    Templates,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
+  IntColumn get templateId => integer()
+      .named('workout_id')
+      .nullable()
+      .references(Templates, #id, onDelete: KeyAction.setNull)();
 
   /// The template name at the time, kept when the template is deleted.
-  TextColumn get templateName => text().nullable()();
+  TextColumn get templateName => text().named('workout_name').nullable()();
   IntColumn get courseVersionId =>
       integer().nullable().references(CourseVersions, #id)();
 
@@ -341,7 +347,7 @@ class AppDatabase extends _$AppDatabase {
   );
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -419,6 +425,27 @@ class AppDatabase extends _$AppDatabase {
       // Planned duration of a course rowed without a template (Change course-rowing-free, D3).
       from9To10: (m, schema) async {
         await m.addColumn(schema.sessions, schema.sessions.plannedDurationMs);
+      },
+      // Templates are called workouts (Change rename-workouts, Design D4);
+      // SQLite carries the foreign keys over to the renamed tables.
+      from10To11: (m, schema) async {
+        await m.renameTable(schema.workouts, 'templates');
+        await m.renameTable(schema.workoutBlocks, 'template_blocks');
+        await m.renameColumn(
+          schema.workoutBlocks,
+          'template_id',
+          schema.workoutBlocks.workoutId,
+        );
+        await m.renameColumn(
+          schema.sessions,
+          'template_id',
+          schema.sessions.workoutId,
+        );
+        await m.renameColumn(
+          schema.sessions,
+          'template_name',
+          schema.sessions.workoutName,
+        );
       },
     ),
     beforeOpen: (details) async {

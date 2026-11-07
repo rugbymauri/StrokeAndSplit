@@ -4,7 +4,7 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 
 ## 1. Datenbank
 
-- [ ] 1.1 Schema 11 nach D4: Tabellen `workouts` und `workout_blocks`, Spalten `workout_id` und `workout_name` in `sessions`, Migration `from10To11` mit `renameTable` und `renameColumn`; `make codegen` und `make schema`. Verifikation: Der erzeugte Migrationstest von 10 auf 11 ist grün. Ein zusätzlicher Test legt in Schema 10 ein Workout mit Block und eine damit geruderte Session an, migriert und findet Workout, Block, Verknüpfung und Namen wieder.
+- [x] 1.1 Schema 11 nach D4: Tabellen `workouts` und `workout_blocks`, Spalten `workout_id` und `workout_name` in `sessions`, Migration `from10To11` mit `renameTable` und `renameColumn`; `make codegen` und `make schema`. Verifikation: Der erzeugte Migrationstest von 10 auf 11 ist grün. Ein zusätzlicher Test legt in Schema 10 ein Workout mit Block und eine damit geruderte Session an, migriert und findet Workout, Block, Verknüpfung und Namen wieder.
 
 ## 2. Code
 

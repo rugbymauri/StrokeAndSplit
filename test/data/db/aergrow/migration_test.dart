@@ -19,6 +19,7 @@ import 'generated/schema_v5.dart' as v5;
 import 'generated/schema_v6.dart' as v6;
 import 'generated/schema_v7.dart' as v7;
 import 'generated/schema_v8.dart' as v8;
+import 'generated/schema_v10.dart' as v10;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -766,5 +767,70 @@ void main() {
         await db.close();
       },
     );
+  });
+  group('to version 11', () {
+    test('keeps templates, their blocks and sessions as workouts', () async {
+      final schema = await verifier.schemaAt(10);
+      final old = v10.DatabaseAtV10(schema.newConnection());
+      final course = await old
+          .into(old.courses)
+          .insert(
+            v10.CoursesCompanion.insert(name: 'Seerunde', axis: 'distance'),
+          );
+      final workout = await old
+          .into(old.templates)
+          .insert(
+            v10.TemplatesCompanion.insert(name: 'Seerunde x3', createdAt: 0),
+          );
+      await old
+          .into(old.templateBlocks)
+          .insert(
+            v10.TemplateBlocksCompanion.insert(
+              templateId: workout,
+              position: 0,
+              courseId: course,
+              laps: const Value(3),
+            ),
+          );
+      await old
+          .into(old.sessions)
+          .insert(
+            v10.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'pm5',
+              templateId: Value(workout),
+              templateName: const Value('Seerunde x3'),
+            ),
+          );
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 11);
+
+      final row = (await db.select(db.templates).get()).single;
+      final block = (await db.select(db.templateBlocks).get()).single;
+      final session = (await db.select(db.sessions).get()).single;
+      expect((row.id, row.name), (workout, 'Seerunde x3'));
+      expect(
+        (block.templateId, block.courseId, block.laps),
+        (workout, course, 3),
+      );
+      expect(
+        (session.templateId, session.templateName),
+        (workout, 'Seerunde x3'),
+      );
+
+      // The foreign keys follow the renamed table: deleting the workout
+      // deletes its block and unlinks the session.
+      await db.delete(db.templates).go();
+      expect(await db.select(db.templateBlocks).get(), isEmpty);
+      final unlinked = (await db.select(db.sessions).get()).single;
+      expect(
+        (unlinked.templateId, unlinked.templateName),
+        (null, 'Seerunde x3'),
+      );
+      await db.close();
+    });
   });
 }
