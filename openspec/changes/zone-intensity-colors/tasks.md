@@ -18,7 +18,7 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
   - Ein Test zeigt, dass dieselbe Zone neben verschiedenen Nachbarn dieselbe Farbe hat.
   - Die Live-Tests (`progress_frame_test.dart`, `pace_box_test.dart`) bleiben unverändert grün.
 - [x] 2.3 Legende der Streckenliste: statt „Zone“ (blau) und „Helligkeit = Tempo“ die Farben „leicht“, „mittel“, „hart“ und „frei“; neue Texte `zoneIntensityEasy`, `zoneIntensityMedium`, `zoneIntensityHard` (de/en), `courseLegendShade` entfällt, danach `make l10n`. Verifikation: `courses_screen_test.dart` findet die neuen Texte auf Deutsch und Englisch.
-- [ ] 2.2 Farben in der App prüfen: unter Linux (Scratch-DB) Zonenliste, Streckenliste und Strecken-Editor mit je einer leichten, mittleren und harten Zone ansehen. Verifikation:
+- [x] 2.2 Farben in der App prüfen: unter Linux (Scratch-DB) Zonenliste, Streckenliste und Strecken-Editor mit je einer leichten, mittleren und harten Zone ansehen. Verifikation:
   - Die drei Farben sind auf dem dunklen Hintergrund klar unterscheidbar.
   - Sie sehen nicht aus wie „ausserhalb der Zone“ oder „verbunden“.
   - Die Zonennamen im Editor-Balken sind auf allen drei Farben lesbar.
@@ -26,6 +26,6 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 ## 3. Doku und Abschluss
 
-- [ ] 3.1 README, Abschnitt Zonen: die Farben und ihre Grenzen nennen. Verifikation: Der Abschnitt widerspricht dem Spec nicht.
-- [ ] 3.2 Gesamtprüfung: `make check` grün.
+- [x] 3.1 README, Abschnitt Zonen: die Farben und ihre Grenzen nennen. Verifikation: Der Abschnitt widerspricht dem Spec nicht.
+- [x] 3.2 Gesamtprüfung: `make check` grün.
 - [ ] 3.3 Am Handy (Nutzer): Strecken- und Zonenliste ansehen, die Farben sind gut unterscheidbar.

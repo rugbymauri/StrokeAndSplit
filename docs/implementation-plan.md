@@ -18,7 +18,7 @@ Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests 
 ### `zone-intensity-colors`
 
 - **Ziel**: Zonen nach Härte grün, orange oder rot statt blau mit relativer Pace-Abstufung.
-- **Branch**: Planung auf `docs/zone-intensity-colors-proposal`, Umsetzung auf `feature/zone-intensity-colors`, Stand 2026-11-07 3/7.
+- **Branch**: Planung auf `docs/zone-intensity-colors-proposal`, Umsetzung auf `feature/zone-intensity-colors`, Stand 2026-11-07 6/7, offen Gerätetest 3.3 (Nutzer).
 - **Entschieden** (Nutzer, 2026-11-07):
   - Stufe 1–5 grün, 6–10 orange, ab 11 rot.
   - Pace 3:00 und langsamer grün, bis 2:30 orange, schneller rot.
