@@ -634,6 +634,21 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
+  testWidgets('keeps the save button above the navigation bar', (tester) async {
+    final setup = _Setup();
+    await setup.pump(tester, home: const CourseEditorScreen());
+    tester.view.physicalSize = const Size(400, 400);
+    tester.view.padding = const FakeViewPadding(bottom: 48);
+    await tester.pumpAndSettle();
+
+    final save = find.widgetWithText(FilledButton, 'Speichern');
+    await tester.drag(find.byType(ListView), const Offset(0, -3000));
+    await tester.pumpAndSettle();
+
+    expect(tester.getRect(save).bottom, lessThanOrEqualTo(400 - 48));
+    await disposeWidgetsWithDatabase(tester);
+  });
+
   testWidgets('shows the editor in English', (tester) async {
     final setup = _Setup();
     await setup.pump(

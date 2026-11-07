@@ -179,168 +179,171 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.pagePortrait,
-              AppSpacing.l,
-              AppSpacing.pagePortrait,
-              32,
-            ),
-            children: [
-              if (_errors.isNotEmpty) ErrorCard(errors: _errors),
-              _Label(l10n.fieldName),
-              TextField(
-                key: const Key('course-name'),
-                controller: _name,
-                style: AppTextStyles.cardTitle.copyWith(
-                  fontWeight: FontWeight.w400,
-                ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.pagePortrait,
+                AppSpacing.l,
+                AppSpacing.pagePortrait,
+                32,
               ),
-              const SizedBox(height: AppSpacing.l),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _Label(l10n.fieldAxis),
-                        _AxisChoice(
-                          axis: _axis,
-                          // The axis of a stored course stays, its laps would not compare;
-                          // placed zones keep it too.
-                          onChanged: _isNew && _placements.isEmpty
-                              ? (axis) => setState(() {
-                                  _axis = axis;
-                                  _length = _defaultLength(_axis);
-                                })
-                              : null,
-                        ),
-                      ],
-                    ),
+              children: [
+                if (_errors.isNotEmpty) ErrorCard(errors: _errors),
+                _Label(l10n.fieldName),
+                TextField(
+                  key: const Key('course-name'),
+                  controller: _name,
+                  style: AppTextStyles.cardTitle.copyWith(
+                    fontWeight: FontWeight.w400,
                   ),
-                  const SizedBox(width: AppSpacing.m),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _Label(l10n.fieldLengthPlain),
-                        OarStepper(
-                          key: const Key('course-length'),
-                          value: _length,
-                          step: _courseStep(_axis),
-                          min: _courseStep(_axis),
-                          stepLabel: distance
-                              ? '${_courseStep(_axis)} m'
-                              : l10n.stepSeconds(_courseStep(_axis)),
-                          format: distance
-                              ? null
-                              : (v) => formatCourseLength(_axis, v),
-                          unit: distance ? 'm' : 'min',
-                          label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
-                          size: OarStepperSize.compact,
-                          onChanged: (v) => setState(() => _length = v),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-              _Label(l10n.courseSequence),
-              if (layout.definition case final definition?) ...[
-                CourseStrip(
-                  key: const Key('course-strip'),
-                  definition: definition,
-                  height: CourseStrip.namedHeight,
-                  showNames: true,
-                  selected: selected,
-                  onSegmentTap: (i) => _openSegment(definition, i),
-                  onSegmentLongPress: (i) =>
-                      _openSegment(definition, i, toggle: false),
                 ),
-                const SizedBox(height: 6),
-                _Ticks(axis: _axis, length: definition.length),
-                if (_moving case final moving?)
-                  if (zones[_placements[moving].zoneId] case final zone?) ...[
-                    const SizedBox(height: AppSpacing.m),
-                    _MovePanel(
-                      axis: _axis,
-                      zone: zone,
-                      start: _placements[moving].start,
-                      range: _moveRange(moving, zones),
-                      onChanged: _moveTo,
-                      onDone: () => setState(() => _moving = null),
-                    ),
-                  ],
-                const SizedBox(height: AppSpacing.m),
-                _SectionCard(
+                const SizedBox(height: AppSpacing.l),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    for (final (i, segment) in definition.segments.indexed)
-                      _SectionTile(
-                        key: Key('section-$i'),
-                        axis: _axis,
-                        start: definition.segmentStarts[i],
-                        segment: segment,
-                        color: CourseStrip.segmentColors(
-                          definition.segments,
-                        )[i],
-                        selected: i == selected,
-                        onPlace: segment.zoneId == null
-                            ? () => _openSegment(definition, i)
-                            : null,
-                        onMove: segment.zoneId == null
-                            ? null
-                            : () => _openSegment(definition, i),
-                        onRemove: segment.zoneId == null
-                            ? null
-                            : () => _remove(_indexAt(definition, i)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _Label(l10n.fieldAxis),
+                          _AxisChoice(
+                            axis: _axis,
+                            // The axis of a stored course stays, its laps would not compare;
+                            // placed zones keep it too.
+                            onChanged: _isNew && _placements.isEmpty
+                                ? (axis) => setState(() {
+                                    _axis = axis;
+                                    _length = _defaultLength(_axis);
+                                  })
+                                : null,
+                          ),
+                        ],
                       ),
+                    ),
+                    const SizedBox(width: AppSpacing.m),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _Label(l10n.fieldLengthPlain),
+                          OarStepper(
+                            key: const Key('course-length'),
+                            value: _length,
+                            step: _courseStep(_axis),
+                            min: _courseStep(_axis),
+                            stepLabel: distance
+                                ? '${_courseStep(_axis)} m'
+                                : l10n.stepSeconds(_courseStep(_axis)),
+                            format: distance
+                                ? null
+                                : (v) => formatCourseLength(_axis, v),
+                            unit: distance ? 'm' : 'min',
+                            label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
+                            size: OarStepperSize.compact,
+                            onChanged: (v) => setState(() => _length = v),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ] else ...[
-                // The length no longer fits the zones: show them as placed.
-                ErrorCard(
-                  errors: [
-                    for (final e in layout.errors) placementErrorText(l10n, e),
-                  ],
-                ),
-                _SectionCard(
-                  children: [
-                    for (final (i, p) in _placements.indexed)
-                      if (zones[p.zoneId] case final zone?)
+                const SizedBox(height: AppSpacing.xxl),
+                _Label(l10n.courseSequence),
+                if (layout.definition case final definition?) ...[
+                  CourseStrip(
+                    key: const Key('course-strip'),
+                    definition: definition,
+                    height: CourseStrip.namedHeight,
+                    showNames: true,
+                    selected: selected,
+                    onSegmentTap: (i) => _openSegment(definition, i),
+                    onSegmentLongPress: (i) =>
+                        _openSegment(definition, i, toggle: false),
+                  ),
+                  const SizedBox(height: 6),
+                  _Ticks(axis: _axis, length: definition.length),
+                  if (_moving case final moving?)
+                    if (zones[_placements[moving].zoneId] case final zone?) ...[
+                      const SizedBox(height: AppSpacing.m),
+                      _MovePanel(
+                        axis: _axis,
+                        zone: zone,
+                        start: _placements[moving].start,
+                        range: _moveRange(moving, zones),
+                        onChanged: _moveTo,
+                        onDone: () => setState(() => _moving = null),
+                      ),
+                    ],
+                  const SizedBox(height: AppSpacing.m),
+                  _SectionCard(
+                    children: [
+                      for (final (i, segment) in definition.segments.indexed)
                         _SectionTile(
                           key: Key('section-$i'),
                           axis: _axis,
-                          start: p.start,
-                          segment: zone.segment,
-                          color: CourseStrip.segmentColors([zone.segment])
-                              .single,
-                          onRemove: () => _remove(i),
+                          start: definition.segmentStarts[i],
+                          segment: segment,
+                          color: CourseStrip.segmentColors(
+                            definition.segments,
+                          )[i],
+                          selected: i == selected,
+                          onPlace: segment.zoneId == null
+                              ? () => _openSegment(definition, i)
+                              : null,
+                          onMove: segment.zoneId == null
+                              ? null
+                              : () => _openSegment(definition, i),
+                          onRemove: segment.zoneId == null
+                              ? null
+                              : () => _remove(_indexAt(definition, i)),
                         ),
-                  ],
+                    ],
+                  ),
+                ] else ...[
+                  // The length no longer fits the zones: show them as placed.
+                  ErrorCard(
+                    errors: [
+                      for (final e in layout.errors)
+                        placementErrorText(l10n, e),
+                    ],
+                  ),
+                  _SectionCard(
+                    children: [
+                      for (final (i, p) in _placements.indexed)
+                        if (zones[p.zoneId] case final zone?)
+                          _SectionTile(
+                            key: Key('section-$i'),
+                            axis: _axis,
+                            start: p.start,
+                            segment: zone.segment,
+                            color: CourseStrip.segmentColors([zone.segment])
+                                .single,
+                            onRemove: () => _remove(i),
+                          ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.m),
+                OutlinedButton.icon(
+                  key: const Key('place-zone'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                  onPressed: () => _place(start: _firstFree()),
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.coursePlaceZone),
                 ),
+                if (rowed != null && rowed > 0) ...[
+                  const SizedBox(height: AppSpacing.l),
+                  _VersionHint(rowed: rowed),
+                ],
+                const SizedBox(height: AppSpacing.xxl),
+                FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
               ],
-              const SizedBox(height: AppSpacing.m),
-              OutlinedButton.icon(
-                key: const Key('place-zone'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                ),
-                onPressed: () => _place(start: _firstFree()),
-                icon: const Icon(Icons.add),
-                label: Text(l10n.coursePlaceZone),
-              ),
-              if (rowed != null && rowed > 0) ...[
-                const SizedBox(height: AppSpacing.l),
-                _VersionHint(rowed: rowed),
-              ],
-              const SizedBox(height: AppSpacing.xxl),
-              FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
-            ],
+            ),
           ),
         ),
       ),

@@ -140,78 +140,86 @@ class _PlaceZoneScreenState extends ConsumerState<PlaceZoneScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.coursePlaceZone)),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.pagePortrait,
-              AppSpacing.l,
-              AppSpacing.pagePortrait,
-              AppSpacing.xxl,
-            ),
-            children: [
-              SectionLabel(l10n.courseStart(distance ? 'm' : 'm:ss')),
-              OarStepper(
-                key: const Key('place-start'),
-                value: _start,
-                step: _step,
-                min: 0,
-                max: widget.length - _step,
-                stepLabel: distance ? '$_step m' : l10n.stepSeconds(_step),
-                format: distance
-                    ? null
-                    : (v) => formatCourseLength(widget.axis, v),
-                unit: distance ? 'm' : 'min',
-                label: l10n.courseStart(distance ? 'm' : 'm:ss'),
-                onChanged: (v) => setState(() => _start = v),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.pagePortrait,
+                AppSpacing.l,
+                AppSpacing.pagePortrait,
+                AppSpacing.xxl,
               ),
-              if (layout.definition case final definition?) ...[
-                const SizedBox(height: AppSpacing.m),
-                _Preview(definition: definition, share: _start / widget.length),
-              ],
-              const SizedBox(height: AppSpacing.xxl),
-              if (candidates.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.l),
-                  child: Text(l10n.courseNoZones, style: AppTextStyles.caption),
+              children: [
+                SectionLabel(l10n.courseStart(distance ? 'm' : 'm:ss')),
+                OarStepper(
+                  key: const Key('place-start'),
+                  value: _start,
+                  step: _step,
+                  min: 0,
+                  max: widget.length - _step,
+                  stepLabel: distance ? '$_step m' : l10n.stepSeconds(_step),
+                  format: distance
+                      ? null
+                      : (v) => formatCourseLength(widget.axis, v),
+                  unit: distance ? 'm' : 'min',
+                  label: l10n.courseStart(distance ? 'm' : 'm:ss'),
+                  onChanged: (v) => setState(() => _start = v),
                 ),
-              for (final intensity in ZoneIntensity.values)
-                if ([
-                      for (final z in candidates)
-                        if (zoneIntensity(z.segment) == intensity) z,
-                    ]
-                    case final group when group.isNotEmpty) ...[
-                  SectionLabel(_groupName(l10n, intensity)),
-                  Material(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppRadii.cardLarge),
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      children: [
-                        for (final (i, zone) in group.indexed) ...[
-                          if (i > 0) const Divider(height: 1),
-                          _ZoneOption(
-                            zone: zone,
-                            misfit: _misfit(zone, zones),
-                            onTap: () => _place(zone),
-                          ),
-                        ],
-                      ],
+                if (layout.definition case final definition?) ...[
+                  const SizedBox(height: AppSpacing.m),
+                  _Preview(
+                    definition: definition,
+                    share: _start / widget.length,
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.xxl),
+                if (candidates.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.l),
+                    child: Text(
+                      l10n.courseNoZones,
+                      style: AppTextStyles.caption,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.l),
-                ],
-              OutlinedButton.icon(
-                key: const Key('place-create-zone'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
+                for (final intensity in ZoneIntensity.values)
+                  if ([
+                        for (final z in candidates)
+                          if (zoneIntensity(z.segment) == intensity) z,
+                      ]
+                      case final group when group.isNotEmpty) ...[
+                    SectionLabel(_groupName(l10n, intensity)),
+                    Material(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppRadii.cardLarge),
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        children: [
+                          for (final (i, zone) in group.indexed) ...[
+                            if (i > 0) const Divider(height: 1),
+                            _ZoneOption(
+                              zone: zone,
+                              misfit: _misfit(zone, zones),
+                              onTap: () => _place(zone),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.l),
+                  ],
+                OutlinedButton.icon(
+                  key: const Key('place-create-zone'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                  onPressed: _createZone,
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.zoneCreate),
                 ),
-                onPressed: _createZone,
-                icon: const Icon(Icons.add),
-                label: Text(l10n.zoneCreate),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
