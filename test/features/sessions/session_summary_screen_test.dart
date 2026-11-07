@@ -489,7 +489,7 @@ void main() {
       );
       expect(
         find.byWidgetPredicate(
-          (w) => w is Text && w.semanticsLabel == 'Place 1 for the template',
+          (w) => w is Text && w.semanticsLabel == 'Place 1 for the workout',
         ),
         findsOneWidget,
       );

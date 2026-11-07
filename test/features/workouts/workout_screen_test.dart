@@ -150,7 +150,7 @@ void main() {
       expect(find.text('Tempo 2:05–2:10 · 20–22 spm'), findsOneWidget);
       expect(find.text('Start'), findsOneWidget);
       expect(find.text('Row against the ghost'), findsOneWidget);
-      expect(find.byTooltip('Edit template'), findsOneWidget);
+      expect(find.byTooltip('Edit workout'), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
 

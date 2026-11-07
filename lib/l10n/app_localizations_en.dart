@@ -600,7 +600,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String summarySessionPlace(int place) {
-    return 'Place $place for the template';
+    return 'Place $place for the workout';
   }
 
   @override
@@ -671,10 +671,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lapsOpen => 'open';
 
   @override
-  String get workoutsTitle => 'Row a template';
+  String get workoutsTitle => 'Row a workout';
 
   @override
-  String get tabWorkouts => 'Templates';
+  String get tabWorkouts => 'Workouts';
 
   @override
   String get tabCourses => 'Courses';
@@ -683,7 +683,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabZones => 'Zones';
 
   @override
-  String get workoutCreate => 'New template';
+  String get workoutCreate => 'New workout';
 
   @override
   String get workoutStart => 'Start';
@@ -708,11 +708,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get workoutsEmpty => 'No templates yet.';
+  String get workoutsEmpty => 'No workouts yet.';
 
   @override
   String workoutsLoadFailed(String error) {
-    return 'Templates could not be loaded: $error';
+    return 'Workouts could not be loaded: $error';
   }
 
   @override
@@ -720,16 +720,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workoutNeedsCourseBody =>
-      'A template rows a course. Create a course first.';
+      'A workout rows a course. Create a course first.';
 
   @override
-  String get workoutNeedsCourse => 'For a template you need a course first.';
+  String get workoutNeedsCourse => 'For a workout you need a course first.';
 
   @override
   String get courseCreate => 'New course';
 
   @override
-  String get workoutDeleteTitle => 'Delete template?';
+  String get workoutDeleteTitle => 'Delete workout?';
 
   @override
   String workoutDeleteBody(String name) {
@@ -737,10 +737,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get workoutNew => 'New template';
+  String get workoutNew => 'New workout';
 
   @override
-  String get workoutEdit => 'Edit template';
+  String get workoutEdit => 'Edit workout';
 
   @override
   String get workoutNameMissing => 'The name is missing.';
@@ -798,7 +798,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String courseDeleteWorkouts(String workouts) {
-    return 'These templates use the course and are deleted with it: $workouts.';
+    return 'These workouts use the course and are deleted with it: $workouts.';
   }
 
   @override
@@ -1134,7 +1134,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get healthConnectPermissionMissing =>
-      'Without permission for workouts, Stroke & Split cannot send anything to Health Connect.';
+      'Without permission for exercise sessions, Stroke & Split cannot send anything to Health Connect.';
 
   @override
   String get healthConnectGrant => 'Grant permission';
@@ -1166,7 +1166,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get healthPrivacyStop =>
-      'You can switch sending off at any time. Delete sent workouts in Health Connect.';
+      'You can switch sending off at any time. Delete sent exercise sessions in Health Connect.';
 
   @override
   String get healthSend => 'Send to Health Connect';
