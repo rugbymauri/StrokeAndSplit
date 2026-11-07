@@ -19,18 +19,18 @@ import '../../support/fake_heart_rate_transport.dart';
 import '../../support/localized_app.dart';
 import '../../support/test_database.dart';
 
-const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _pm5 = FoundRower(id: 'c0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _ftms = FoundRower(
-  id: 'AA:BB:CC:DD:EE:FF',
+  id: 'aa:bb:cc:dd:ee:ff',
   name: 'Stroke & Split FTMS',
   protocol: ErgProtocol.ftms,
 );
 const _h10 = FoundHeartRateMonitor(
-  id: 'A0:9E:1A:00:00:01',
+  id: 'a0:9e:1a:00:00:01',
   name: 'Polar H10 1A2B3C4D',
 );
 const _tickr = FoundHeartRateMonitor(
-  id: 'D4:22:CD:00:00:02',
+  id: 'd4:22:cd:00:00:02',
   name: 'TICKR 1234',
 );
 

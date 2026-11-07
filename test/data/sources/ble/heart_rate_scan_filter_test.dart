@@ -2,7 +2,7 @@ import 'package:strokesplit/data/sources/ble/heart_rate_scan_filter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const id = 'A0:9E:1A:12:34:56';
+  const id = 'a0:9e:1a:12:34:56';
 
   String? found(
     String name, {

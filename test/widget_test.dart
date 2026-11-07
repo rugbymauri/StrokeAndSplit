@@ -30,7 +30,7 @@ void main() {
     'connects the paired strap as soon as the rower is connected, before the live display',
     (tester) async {
       const h10 = FoundHeartRateMonitor(
-        id: 'A0:9E:1A:12:34:56',
+        id: 'a0:9e:1a:12:34:56',
         name: 'Polar H10 1A2B3C4D',
       );
       final rowers = FakeBleTransport();

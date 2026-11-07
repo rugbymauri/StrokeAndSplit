@@ -8,9 +8,9 @@ import 'package:erg_protocol/erg_protocol.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _pm5 = FoundRower(id: 'c0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _ftms = FoundRower(
-  id: 'AA:BB:CC:DD:EE:FF',
+  id: 'aa:bb:cc:dd:ee:ff',
   name: 'Stroke & Split FTMS',
   protocol: ErgProtocol.ftms,
 );

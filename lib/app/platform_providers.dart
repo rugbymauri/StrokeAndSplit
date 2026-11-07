@@ -7,23 +7,23 @@ import 'package:share_plus/share_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../data/sources/ble/ble_transport.dart';
-import '../data/sources/ble/flutter_blue_plus_transport.dart';
+import '../data/sources/ble/universal_ble_transport.dart';
 import '../data/sources/ble/heart_rate_transport.dart';
 
 /// The one plugin transport behind [bleTransportProvider] and
 /// [heartRateTransportProvider].
-final _flutterBluePlusTransportProvider = Provider<FlutterBluePlusTransport>(
-  (ref) => FlutterBluePlusTransport(),
+final _universalBleTransportProvider = Provider<UniversalBleTransport>(
+  (ref) => UniversalBleTransport(),
 );
 
 /// Bluetooth access to rowers; replaced by a fake in tests.
 final bleTransportProvider = Provider<BleTransport>(
-  (ref) => ref.watch(_flutterBluePlusTransportProvider),
+  (ref) => ref.watch(_universalBleTransportProvider),
 );
 
 /// Bluetooth access to heart rate straps; replaced by a fake in tests.
 final heartRateTransportProvider = Provider<HeartRateTransport>(
-  (ref) => ref.watch(_flutterBluePlusTransportProvider),
+  (ref) => ref.watch(_universalBleTransportProvider),
 );
 
 /// Keeps the screen on; replaced by a fake in tests.

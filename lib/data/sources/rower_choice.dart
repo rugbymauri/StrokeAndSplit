@@ -59,7 +59,8 @@ class RowerChoice {
       final protocol = ErgProtocol.values.byName(map['protocol']! as String);
       return RowerChoice.device(
         FoundRower(
-          id: map['id']! as String,
+          // Stored before universal_ble, an id may be an upper-case MAC.
+          id: (map['id']! as String).toLowerCase(),
           name: map['name']! as String,
           protocol: protocol,
         ),
