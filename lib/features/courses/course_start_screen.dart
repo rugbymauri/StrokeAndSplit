@@ -3,14 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/design_tokens.dart';
 import '../../app/widgets/ghost_switch.dart';
-import '../../app/widgets/oar_stepper.dart';
-import '../../app/widgets/segment_choice.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import '../../data/sessions/session_plan.dart';
 import '../../l10n/l10n.dart';
 import '../connection/rower_connection.dart';
-import '../live/formatters.dart';
+import '../sessions/plan_length_choice.dart';
 import 'course_strip.dart';
 import 'courses_screen.dart';
 
@@ -22,15 +20,6 @@ Future<void> openCourseStart(BuildContext context, int courseId) {
     ),
   );
 }
-
-/// How long the course is rowed.
-enum _Length { laps, duration, open }
-
-/// More laps than anyone rows in one session, as in the workout editor.
-const _maxLaps = 99;
-
-/// The longest total time in minutes.
-const _maxMinutes = 180;
 
 /// Rows a course without a workout: for a number of laps, a total rowing
 /// time or until the rower ends the session, with or without the ghost
@@ -47,16 +36,8 @@ class CourseStartScreen extends ConsumerStatefulWidget {
 
 class _CourseStartScreenState extends ConsumerState<CourseStartScreen> {
   // The values of all options stay while the screen is open.
-  var _length = _Length.laps;
-  var _laps = 3;
-  var _minutes = 30;
+  PlanLength _length = const LapCount(3);
   var _ghost = true;
-
-  PlanLength get _planLength => switch (_length) {
-    _Length.laps => LapCount(_laps),
-    _Length.duration => TimeLimit(Duration(minutes: _minutes)),
-    _Length.open => const OpenLength(),
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -102,19 +83,11 @@ class _CourseStartScreenState extends ConsumerState<CourseStartScreen> {
                               style: AppTextStyles.caption,
                             ),
                             const SizedBox(height: AppSpacing.xxl),
-                            SegmentChoice(
-                              key: const Key('course-start-length'),
-                              options: [
-                                (_Length.laps, l10n.courseStartLaps),
-                                (_Length.duration, l10n.courseStartDuration),
-                                (_Length.open, l10n.courseStartOpen),
-                              ],
-                              value: _length,
-                              onChanged: (length) =>
-                                  setState(() => _length = length),
+                            PlanLengthChoice(
+                              keyPrefix: 'course-start',
+                              initial: _length,
+                              onChanged: (length) => _length = length,
                             ),
-                            const SizedBox(height: AppSpacing.l),
-                            _input(l10n),
                           ],
                         ),
                       ),
@@ -159,42 +132,10 @@ class _CourseStartScreenState extends ConsumerState<CourseStartScreen> {
     );
   }
 
-  /// Only the input of the chosen option.
-  Widget _input(AppLocalizations l10n) => switch (_length) {
-    _Length.laps => OarStepper(
-      key: const Key('course-start-laps'),
-      value: _laps,
-      step: 1,
-      min: 1,
-      max: _maxLaps,
-      stepLabel: l10n.lapsCount(1),
-      label: l10n.courseStartLaps,
-      unit: l10n.workoutLapsUnit(_laps),
-      onChanged: (laps) => setState(() => _laps = laps),
-    ),
-    _Length.duration => OarStepper(
-      key: const Key('course-start-duration'),
-      value: _minutes,
-      step: 1,
-      min: 1,
-      max: _maxMinutes,
-      stepLabel: l10n.stepMinutes(1),
-      label: l10n.courseStartDuration,
-      format: (minutes) => formatElapsed(Duration(minutes: minutes)),
-      onChanged: (minutes) => setState(() => _minutes = minutes),
-    ),
-    _Length.open => Text(
-      l10n.courseStartOpenHint,
-      key: const Key('course-start-open-hint'),
-      style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
-      textAlign: TextAlign.center,
-    ),
-  };
-
   void _start(Course course) => startRowing(
     context,
     ref,
-    plan: SessionPlan(courses: [course], length: _planLength),
+    plan: SessionPlan(courses: [course], length: _length),
     ghost: _ghost,
   );
 }
