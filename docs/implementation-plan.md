@@ -9,11 +9,20 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors` und `course-editor-flow` archiviert, kein Change offen.
+Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors` und `course-editor-flow` archiviert. Geplant: `rename-workouts`.
 
 ## Überblick
 
 Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests unter „Offene Punkte“.
+
+### `rename-workouts`
+
+- **Ziel**: „Vorlage“ heisst überall „Workout“: Texte (DE/EN), Code, Datenbank (Schema 11), Export, Specs und Doku.
+- **Branch**: Planung auf `docs/rename-workouts-proposal`.
+- **Entschieden** (Nutzer, 2026-11-07): Der neue Begriff ist „Workout“, und es wird alles umbenannt, nicht nur die Texte.
+- **Annahmen**, beim Review bestätigen:
+  - Die englischen Health-Connect-Texte sprechen von „exercise sessions“, die Klasse `HealthWorkout` heisst `HealthExercise` (D2).
+  - Der Import liest weiter Dateien mit `template` (D5).
 
 ## Offene Entscheide
 
