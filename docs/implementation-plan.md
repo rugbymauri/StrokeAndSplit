@@ -9,11 +9,25 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. Keine aktiven Changes.
+Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. Geplant: `zone-intensity-colors`.
 
 ## Überblick
 
-Keine aktiven Changes. Die archivierten stehen unter „Erledigt“, ihre offenen Gerätetests unter „Offene Punkte“. Ein neuer Change bekommt hier wieder einen Abschnitt mit Branch, Stand und Entscheiden.
+Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests unter „Offene Punkte“.
+
+### `zone-intensity-colors`
+
+- **Ziel**: Zonen nach Härte grün, orange oder rot statt blau mit relativer Pace-Abstufung.
+- **Branch**: Planung auf `docs/zone-intensity-colors-proposal`, Stand 2026-11-07 geplant, 0/6.
+- **Entschieden** (Nutzer, 2026-11-07):
+  - Stufe 1–5 grün, 6–10 orange, ab 11 rot.
+  - Pace 3:00 und langsamer grün, bis 2:30 orange, schneller rot.
+  - Schlagzahl bis 21 grün, ab 22 orange, ab 24 rot.
+- **Annahmen**, beim Review bestätigen:
+  - Rot bei der Schlagzahl ab 24 (die Zahl fehlte in der Antwort).
+  - Bei einem Band zählt die Mitte.
+  - Die härteste Vorgabe bestimmt die Farbe.
+  - Die Live-Anzeige bleibt blau/orange.
 
 ## Offene Entscheide
 
