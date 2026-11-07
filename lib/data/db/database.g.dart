@@ -48,7 +48,7 @@ class $TemplatesTable extends Templates
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'templates';
+  static const String $name = 'workouts';
   @override
   VerificationContext validateIntegrity(
     Insertable<TemplateRow> instance, {
@@ -1066,13 +1066,13 @@ class $SessionsTable extends Sessions
   );
   @override
   late final GeneratedColumn<int> templateId = GeneratedColumn<int>(
-    'template_id',
+    'workout_id',
     aliasedName,
     true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES templates (id) ON DELETE SET NULL',
+      'REFERENCES workouts (id) ON DELETE SET NULL',
     ),
   );
   static const VerificationMeta _templateNameMeta = const VerificationMeta(
@@ -1080,7 +1080,7 @@ class $SessionsTable extends Sessions
   );
   @override
   late final GeneratedColumn<String> templateName = GeneratedColumn<String>(
-    'template_name',
+    'workout_name',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -1317,17 +1317,17 @@ class $SessionsTable extends Sessions
         ),
       );
     }
-    if (data.containsKey('template_id')) {
+    if (data.containsKey('workout_id')) {
       context.handle(
         _templateIdMeta,
-        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+        templateId.isAcceptableOrUnknown(data['workout_id']!, _templateIdMeta),
       );
     }
-    if (data.containsKey('template_name')) {
+    if (data.containsKey('workout_name')) {
       context.handle(
         _templateNameMeta,
         templateName.isAcceptableOrUnknown(
-          data['template_name']!,
+          data['workout_name']!,
           _templateNameMeta,
         ),
       );
@@ -1479,11 +1479,11 @@ class $SessionsTable extends Sessions
       )!,
       templateId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}template_id'],
+        data['${effectivePrefix}workout_id'],
       ),
       templateName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}template_name'],
+        data['${effectivePrefix}workout_name'],
       ),
       courseVersionId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -1648,10 +1648,10 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     }
     map['stroke_count'] = Variable<int>(strokeCount);
     if (!nullToAbsent || templateId != null) {
-      map['template_id'] = Variable<int>(templateId);
+      map['workout_id'] = Variable<int>(templateId);
     }
     if (!nullToAbsent || templateName != null) {
-      map['template_name'] = Variable<String>(templateName);
+      map['workout_name'] = Variable<String>(templateName);
     }
     if (!nullToAbsent || courseVersionId != null) {
       map['course_version_id'] = Variable<int>(courseVersionId);
@@ -2160,8 +2160,8 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       if (averageWatts != null) 'average_watts': averageWatts,
       if (averageStrokeRate != null) 'average_stroke_rate': averageStrokeRate,
       if (strokeCount != null) 'stroke_count': strokeCount,
-      if (templateId != null) 'template_id': templateId,
-      if (templateName != null) 'template_name': templateName,
+      if (templateId != null) 'workout_id': templateId,
+      if (templateName != null) 'workout_name': templateName,
       if (courseVersionId != null) 'course_version_id': courseVersionId,
       if (plannedLaps != null) 'planned_laps': plannedLaps,
       if (plannedDurationMs != null) 'planned_duration_ms': plannedDurationMs,
@@ -2280,10 +2280,10 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       map['stroke_count'] = Variable<int>(strokeCount.value);
     }
     if (templateId.present) {
-      map['template_id'] = Variable<int>(templateId.value);
+      map['workout_id'] = Variable<int>(templateId.value);
     }
     if (templateName.present) {
-      map['template_name'] = Variable<String>(templateName.value);
+      map['workout_name'] = Variable<String>(templateName.value);
     }
     if (courseVersionId.present) {
       map['course_version_id'] = Variable<int>(courseVersionId.value);
@@ -5248,13 +5248,13 @@ class $TemplateBlocksTable extends TemplateBlocks
   );
   @override
   late final GeneratedColumn<int> templateId = GeneratedColumn<int>(
-    'template_id',
+    'workout_id',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES templates (id) ON DELETE CASCADE',
+      'REFERENCES workouts (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _positionMeta = const VerificationMeta(
@@ -5297,7 +5297,7 @@ class $TemplateBlocksTable extends TemplateBlocks
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'template_blocks';
+  static const String $name = 'workout_blocks';
   @override
   VerificationContext validateIntegrity(
     Insertable<TemplateBlockRow> instance, {
@@ -5305,10 +5305,10 @@ class $TemplateBlocksTable extends TemplateBlocks
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('template_id')) {
+    if (data.containsKey('workout_id')) {
       context.handle(
         _templateIdMeta,
-        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+        templateId.isAcceptableOrUnknown(data['workout_id']!, _templateIdMeta),
       );
     } else if (isInserting) {
       context.missing(_templateIdMeta);
@@ -5346,7 +5346,7 @@ class $TemplateBlocksTable extends TemplateBlocks
     return TemplateBlockRow(
       templateId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}template_id'],
+        data['${effectivePrefix}workout_id'],
       )!,
       position: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -5386,7 +5386,7 @@ class TemplateBlockRow extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['template_id'] = Variable<int>(templateId);
+    map['workout_id'] = Variable<int>(templateId);
     map['position'] = Variable<int>(position);
     map['course_id'] = Variable<int>(courseId);
     if (!nullToAbsent || laps != null) {
@@ -5502,7 +5502,7 @@ class TemplateBlocksCompanion extends UpdateCompanion<TemplateBlockRow> {
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (templateId != null) 'template_id': templateId,
+      if (templateId != null) 'workout_id': templateId,
       if (position != null) 'position': position,
       if (courseId != null) 'course_id': courseId,
       if (laps != null) 'laps': laps,
@@ -5530,7 +5530,7 @@ class TemplateBlocksCompanion extends UpdateCompanion<TemplateBlockRow> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (templateId.present) {
-      map['template_id'] = Variable<int>(templateId.value);
+      map['workout_id'] = Variable<int>(templateId.value);
     }
     if (position.present) {
       map['position'] = Variable<int>(position.value);
@@ -7143,7 +7143,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
     WritePropagation(
       on: TableUpdateQuery.onTableName(
-        'templates',
+        'workouts',
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('sessions', kind: UpdateKind.update)],
@@ -7178,10 +7178,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
-        'templates',
+        'workouts',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('template_blocks', kind: UpdateKind.delete)],
+      result: [TableUpdate('workout_blocks', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -7232,7 +7232,7 @@ final class $$TemplatesTableReferences
   static MultiTypedResultKey<$SessionsTable, List<SessionRow>>
   _sessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.sessions,
-    aliasName: 'templates__id__sessions__template_id',
+    aliasName: 'workouts__id__sessions__workout_id',
   );
 
   $$SessionsTableProcessedTableManager get sessionsRefs {
@@ -7250,7 +7250,7 @@ final class $$TemplatesTableReferences
   static MultiTypedResultKey<$TemplateBlocksTable, List<TemplateBlockRow>>
   _templateBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.templateBlocks,
-    aliasName: 'templates__id__template_blocks__template_id',
+    aliasName: 'workouts__id__workout_blocks__workout_id',
   );
 
   $$TemplateBlocksTableProcessedTableManager get templateBlocksRefs {
@@ -7512,7 +7512,7 @@ class $$TemplatesTableTableManager
                                 p0,
                               ).sessionsRefs,
                           currentColumn: 'id',
-                          referencedColumn: 'template_id',
+                          referencedColumn: 'workout_id',
                           typedResults: items,
                         ),
                       if (templateBlocksRefs)
@@ -7532,7 +7532,7 @@ class $$TemplatesTableTableManager
                                 p0,
                               ).templateBlocksRefs,
                           currentColumn: 'id',
-                          referencedColumn: 'template_id',
+                          referencedColumn: 'workout_id',
                           typedResults: items,
                         ),
                     ];
@@ -7595,7 +7595,7 @@ final class $$CoursesTableReferences
   static MultiTypedResultKey<$TemplateBlocksTable, List<TemplateBlockRow>>
   _templateBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.templateBlocks,
-    aliasName: 'courses__id__template_blocks__course_id',
+    aliasName: 'courses__id__workout_blocks__course_id',
   );
 
   $$TemplateBlocksTableProcessedTableManager get templateBlocksRefs {
@@ -8497,10 +8497,10 @@ final class $$SessionsTableReferences
   $$SessionsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $TemplatesTable _templateIdTable(_$AppDatabase db) =>
-      db.templates.createAlias('sessions__template_id__templates__id');
+      db.templates.createAlias('sessions__workout_id__workouts__id');
 
   $$TemplatesTableProcessedTableManager? get templateId {
-    final $_column = $_itemColumn<int>('template_id');
+    final $_column = $_itemColumn<int>('workout_id');
     if ($_column == null) return null;
     final manager = $$TemplatesTableTableManager(
       $_db,
@@ -11957,10 +11957,10 @@ final class $$TemplateBlocksTableReferences
   );
 
   static $TemplatesTable _templateIdTable(_$AppDatabase db) =>
-      db.templates.createAlias('template_blocks__template_id__templates__id');
+      db.templates.createAlias('workout_blocks__workout_id__workouts__id');
 
   $$TemplatesTableProcessedTableManager get templateId {
-    final $_column = $_itemColumn<int>('template_id')!;
+    final $_column = $_itemColumn<int>('workout_id')!;
 
     final manager = $$TemplatesTableTableManager(
       $_db,
@@ -11974,7 +11974,7 @@ final class $$TemplateBlocksTableReferences
   }
 
   static $CoursesTable _courseIdTable(_$AppDatabase db) =>
-      db.courses.createAlias('template_blocks__course_id__courses__id');
+      db.courses.createAlias('workout_blocks__course_id__courses__id');
 
   $$CoursesTableProcessedTableManager get courseId {
     final $_column = $_itemColumn<int>('course_id')!;

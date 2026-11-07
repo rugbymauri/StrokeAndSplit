@@ -110,10 +110,10 @@ class RankingRepository {
         .customSelect(
           '''
         SELECT c.axis AS axis, v.length AS length, b.laps AS laps
-        FROM template_blocks b
+        FROM workout_blocks b
         JOIN courses c ON c.id = b.course_id
         JOIN course_versions v ON v.course_id = c.id
-        WHERE b.template_id = ? AND b.position = 0
+        WHERE b.workout_id = ? AND b.position = 0
         ORDER BY v.version DESC LIMIT 1''',
           variables: [Variable.withInt(templateId)],
         )
@@ -132,7 +132,7 @@ class RankingRepository {
         JOIN laps l ON l.session_id = s.id
         JOIN course_versions v ON v.id = s.course_version_id
         JOIN courses c ON c.id = v.course_id
-        WHERE s.template_id = ? AND l.complete = 1 AND l.lap_no <= s.planned_laps AND $_counted
+        WHERE s.workout_id = ? AND l.complete = 1 AND l.lap_no <= s.planned_laps AND $_counted
         GROUP BY s.id
         HAVING COUNT(*) = s.planned_laps''',
           variables: [Variable.withInt(templateId)],
