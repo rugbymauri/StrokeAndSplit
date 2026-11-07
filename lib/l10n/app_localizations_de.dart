@@ -106,8 +106,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get zoneErrorLengthMissing => 'Die Länge fehlt.';
 
   @override
-  String get zoneErrorBandMissing =>
-      'Es fehlt ein Band: Pace, Schlagzahl oder beides.';
+  String get zoneErrorTargetMissing => 'Gib Pace, Schlagzahl oder Stufe an.';
 
   @override
   String get zoneErrorPaceBoundMissing =>
@@ -881,7 +880,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get zonesEmpty =>
-      'Noch keine Zonen angelegt. Eine Zone ist ein Pace- oder Schlagzahl-Band über eine feste Länge, das du in Strecken einbaust.';
+      'Noch keine Zonen angelegt. Eine Zone gibt über eine feste Länge Pace, Schlagzahl oder Stufe vor, und du baust sie in Strecken ein.';
 
   @override
   String zonesLoadFailed(String error) {
@@ -977,7 +976,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get zoneBandHint =>
-      'Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.';
+      'Mindestens eins ist nötig: Pace, Schlagzahl oder Stufe.';
 
   @override
   String get dateTimePattern => 'dd.MM.yyyy, HH:mm';

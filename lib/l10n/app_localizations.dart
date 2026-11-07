@@ -272,11 +272,11 @@ abstract class AppLocalizations {
   /// **'Die Länge fehlt.'**
   String get zoneErrorLengthMissing;
 
-  /// Zone editor: neither a pace nor a stroke rate band is set
+  /// Zone editor: neither a pace band, a stroke rate band nor a resistance level is set
   ///
   /// In de, this message translates to:
-  /// **'Es fehlt ein Band: Pace, Schlagzahl oder beides.'**
-  String get zoneErrorBandMissing;
+  /// **'Gib Pace, Schlagzahl oder Stufe an.'**
+  String get zoneErrorTargetMissing;
 
   /// Zone editor: only one bound of the pace band is set
   ///
@@ -1528,7 +1528,7 @@ abstract class AppLocalizations {
   /// Zones: there is no zone, with what a zone is
   ///
   /// In de, this message translates to:
-  /// **'Noch keine Zonen angelegt. Eine Zone ist ein Pace- oder Schlagzahl-Band über eine feste Länge, das du in Strecken einbaust.'**
+  /// **'Noch keine Zonen angelegt. Eine Zone gibt über eine feste Länge Pace, Schlagzahl oder Stufe vor, und du baust sie in Strecken ein.'**
   String get zonesEmpty;
 
   /// Zones: loading failed; error is the technical error
@@ -1660,7 +1660,7 @@ abstract class AppLocalizations {
   /// Zone editor: what a zone needs
   ///
   /// In de, this message translates to:
-  /// **'Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.'**
+  /// **'Mindestens eins ist nötig: Pace, Schlagzahl oder Stufe.'**
   String get zoneBandHint;
 
   /// Pattern of a date with time for the intl package's DateFormat, e.g. '15.10.2026, 18:30'; keep the 24-hour clock

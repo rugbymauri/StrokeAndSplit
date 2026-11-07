@@ -5,7 +5,7 @@ import '../../l10n/l10n.dart';
 String zoneErrorText(AppLocalizations l10n, ZoneError error) => switch (error) {
   ZoneError.nameMissing => l10n.zoneErrorNameMissing,
   ZoneError.lengthMissing => l10n.zoneErrorLengthMissing,
-  ZoneError.bandMissing => l10n.zoneErrorBandMissing,
+  ZoneError.targetMissing => l10n.zoneErrorTargetMissing,
   ZoneError.paceBoundMissing => l10n.zoneErrorPaceBoundMissing,
   ZoneError.paceReversed => l10n.zoneErrorPaceReversed,
   ZoneError.spmBoundMissing => l10n.zoneErrorSpmBoundMissing,

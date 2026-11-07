@@ -106,7 +106,7 @@ class ZoneUsage {
 enum ZoneError {
   nameMissing,
   lengthMissing,
-  bandMissing,
+  targetMissing,
   paceBoundMissing,
   paceReversed,
   spmBoundMissing,
@@ -132,7 +132,9 @@ List<ZoneError> zoneErrors(Zone zone) {
   if (zone.length <= 0) errors.add(ZoneError.lengthMissing);
   final paceSet = zone.paceFastCs != null || zone.paceSlowCs != null;
   final spmSet = zone.spmMin != null || zone.spmMax != null;
-  if (!paceSet && !spmSet) errors.add(ZoneError.bandMissing);
+  if (!paceSet && !spmSet && zone.resistanceLevel == null) {
+    errors.add(ZoneError.targetMissing);
+  }
   if (paceSet && (zone.paceFastCs == null || zone.paceSlowCs == null)) {
     errors.add(ZoneError.paceBoundMissing);
   } else if (paceSet && zone.paceFastCs! > zone.paceSlowCs!) {

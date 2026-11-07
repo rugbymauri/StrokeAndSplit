@@ -126,9 +126,9 @@
   "@zoneErrorLengthMissing": {
     "description": "Zone editor: the zone has no length"
   },
-  "zoneErrorBandMissing": "Es fehlt ein Band: Pace, Schlagzahl oder beides.",
-  "@zoneErrorBandMissing": {
-    "description": "Zone editor: neither a pace nor a stroke rate band is set"
+  "zoneErrorTargetMissing": "Gib Pace, Schlagzahl oder Stufe an.",
+  "@zoneErrorTargetMissing": {
+    "description": "Zone editor: neither a pace band, a stroke rate band nor a resistance level is set"
   },
   "zoneErrorPaceBoundMissing": "Für das Pace-Band fehlt eine Grenze.",
   "@zoneErrorPaceBoundMissing": {
@@ -1243,7 +1243,7 @@
   "@zoneCreateShort": {
     "description": "Zones: button that creates a zone"
   },
-  "zonesEmpty": "Noch keine Zonen angelegt. Eine Zone ist ein Pace- oder Schlagzahl-Band über eine feste Länge, das du in Strecken einbaust.",
+  "zonesEmpty": "Noch keine Zonen angelegt. Eine Zone gibt über eine feste Länge Pace, Schlagzahl oder Stufe vor, und du baust sie in Strecken ein.",
   "@zonesEmpty": {
     "description": "Zones: there is no zone, with what a zone is"
   },
@@ -1366,7 +1366,7 @@
       }
     }
   },
-  "zoneBandHint": "Mindestens ein Band ist nötig, Pace, Schlagzahl oder beides.",
+  "zoneBandHint": "Mindestens eins ist nötig: Pace, Schlagzahl oder Stufe.",
   "@zoneBandHint": {
     "description": "Zone editor: what a zone needs"
   },

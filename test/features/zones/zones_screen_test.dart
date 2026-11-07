@@ -152,23 +152,24 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('a level alone is no band', (tester) async {
+    testWidgets('saves a zone with only a level and lists it', (tester) async {
       final setup = _Setup();
       await setup.pump(tester);
 
       await tester.tap(find.text('Zone anlegen'));
       await tester.pumpAndSettle();
-      await _name(tester, 'Stufe 8');
+      await _name(tester, 'Kraft');
       await _switch(tester, 'pace');
       await _switch(tester, 'resistance');
+      await _step(tester, {'length': 500, 'resistance-level': 12});
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
 
-      expect(
-        find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'),
-        findsOneWidget,
-      );
-      expect(await tester.runAsync(setup.zones.all), isEmpty);
+      expect(find.text('500 m · Stufe 12'), findsOneWidget);
+      final stored = (await tester.runAsync(setup.zones.all))!.single;
+      expect(stored.resistanceLevel, 12);
+      expect(stored.paceFastCs, isNull);
+      expect(stored.spmMin, isNull);
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -226,7 +227,9 @@ void main() {
     });
   });
 
-  testWidgets('does not save a zone without a band', (tester) async {
+  testWidgets('does not save a zone without pace, stroke rate or level', (
+    tester,
+  ) async {
     final setup = _Setup();
     await setup.pump(tester);
 
@@ -237,10 +240,7 @@ void main() {
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
 
-    expect(
-      find.text('Es fehlt ein Band: Pace, Schlagzahl oder beides.'),
-      findsOneWidget,
-    );
+    expect(find.text('Gib Pace, Schlagzahl oder Stufe an.'), findsOneWidget);
     expect(await tester.runAsync(setup.zones.all), isEmpty);
     await disposeWidgetsWithDatabase(tester);
   });
@@ -267,10 +267,7 @@ void main() {
     await setup.settle(tester);
 
     expect(find.text('The name is missing.'), findsOneWidget);
-    expect(
-      find.text('A band is missing: pace, stroke rate or both.'),
-      findsOneWidget,
-    );
+    expect(find.text('Set a pace, a stroke rate or a level.'), findsOneWidget);
     expect(await tester.runAsync(setup.zones.all), isEmpty);
     await disposeWidgetsWithDatabase(tester);
   });

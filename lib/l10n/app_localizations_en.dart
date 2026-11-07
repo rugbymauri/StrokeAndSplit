@@ -106,8 +106,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zoneErrorLengthMissing => 'The length is missing.';
 
   @override
-  String get zoneErrorBandMissing =>
-      'A band is missing: pace, stroke rate or both.';
+  String get zoneErrorTargetMissing => 'Set a pace, a stroke rate or a level.';
 
   @override
   String get zoneErrorPaceBoundMissing => 'The pace band is missing a bound.';
@@ -875,7 +874,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get zonesEmpty =>
-      'No zones yet. A zone is a pace or stroke rate band over a fixed length that you place in courses.';
+      'No zones yet. A zone sets a pace, a stroke rate or a level over a fixed length, and you place it in courses.';
 
   @override
   String zonesLoadFailed(String error) {
@@ -971,7 +970,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get zoneBandHint =>
-      'At least one band is needed: pace, stroke rate or both.';
+      'At least one is needed: pace, stroke rate or level.';
 
   @override
   String get dateTimePattern => 'MMM d, y, HH:mm';
