@@ -272,12 +272,39 @@ void main() {
     });
   });
 
-  test('a segment with level before any report is sent', () {
+  test('a segment with level before any report waits for the first report', () {
     fakeAsync((async) {
       final director = _director();
 
       expect(director.segmentStarted(_warmUp), isNull);
-      expect(director.segmentStarted(_sprint), 10);
+      expect(director.segmentStarted(_sprint), isNull);
+      expect(director.reported(5), 10);
+      expect(director.baseLevel, 5);
+      expect(director.target, 10);
+    });
+  });
+
+  test('a course starting with a zone with level returns to the level the '
+      'rower had', () {
+    fakeAsync((async) {
+      final director = _director()..sessionStarted();
+
+      expect(director.segmentStarted(_sprint), isNull);
+      expect(director.reported(5), 10);
+      async.elapse(const Duration(seconds: 1));
+      expect(director.reported(10), isNull);
+
+      expect(director.segmentStarted(_warmUp), 5);
+    });
+  });
+
+  test('a free segment before any report sends nothing after it', () {
+    fakeAsync((async) {
+      final director = _director();
+
+      expect(director.segmentStarted(_warmUp), isNull);
+      expect(director.reported(5), isNull);
+      expect(director.baseLevel, 5);
     });
   });
 

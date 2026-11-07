@@ -9,7 +9,9 @@ import '../courses/course.dart';
 /// level to send, or null when nothing is to be sent.
 ///
 /// - A segment with a level gets that level; every other segment gets the
-///   base level, the one the rower reported first.
+///   base level, the one the rower reported first. A segment that starts
+///   before the rower reported any level waits for that report, so the base
+///   level is the one the rower had and not the one just sent.
 /// - A level the rower reports that differs from the one asked for is a
 ///   change by hand: it holds until the next segment, and in a segment
 ///   without level it becomes the base level. A pause is no event, so a
@@ -32,28 +34,35 @@ class ResistanceDirector {
   var _segmentHasLevel = false;
   DateTime? _sentAt;
 
+  /// The segment that started before the rower reported its first level.
+  CourseSegment? _waitingSegment;
+
   /// The level asked for, or the one reported when nothing was asked for.
   int? get target => _target ?? _reported;
 
   /// The base level for segments without level.
   int? get baseLevel => _base;
 
-  /// The rower reports [level].
-  void reported(int level) {
+  /// The rower reports [level]; returns the level to send, which is only
+  /// ever the one of a segment that waited for this first report.
+  int? reported(int level) {
     final whole = range.wholeLevel(level);
     _reported = whole;
     if (_base == null) {
       _base = whole;
       _target ??= whole;
-      return;
+      final waiting = _waitingSegment;
+      _waitingSegment = null;
+      return waiting == null ? null : segmentStarted(waiting);
     }
     if (whole == _target) {
       _sentAt = null;
-      return;
+      return null;
     }
-    if (_waiting) return;
+    if (_waiting) return null;
     _target = whole;
     if (!_segmentHasLevel) _base = whole;
+    return null;
   }
 
   /// A session starts: its base level is the level the rower has now.
@@ -66,6 +75,10 @@ class ResistanceDirector {
   int? segmentStarted(CourseSegment segment) {
     final level = segment.resistanceLevel;
     _segmentHasLevel = level != null;
+    if (_base == null) {
+      _waitingSegment = segment;
+      return null;
+    }
     final wanted = level ?? _base;
     if (wanted == null) return null;
     final clamped = range.clamp(wanted);
