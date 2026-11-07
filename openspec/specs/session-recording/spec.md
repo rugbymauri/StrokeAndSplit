@@ -134,7 +134,7 @@ Die App SHALL zu jedem gespeicherten Messwert einer Session zusätzlich zur Zeit
 - **THEN** bleiben diese Sessions mit Zusammenfassung, Verlauf und Replay erhalten, mit ihrer bisherigen Dauer und ohne Pausen
 
 ### Requirement: Session eines Workouts zuordnen
-Eine Session, die mit einem Workout gestartet wurde, SHALL mit dem Workout und der geruderten Version ihrer Strecke verknüpft sein. Die Session-Liste MUST bei solchen Sessions den Namen des Workouts anzeigen.
+Eine Session, die mit einem Workout gestartet wurde, SHALL mit dem Workout und den geruderten Versionen aller seiner Strecken in ihrer Reihenfolge verknüpft sein. Die Session-Liste MUST bei solchen Sessions den Namen des Workouts anzeigen. Bestehende Sessions MUST nach dem Update mit ihrer einen Strecke verknüpft bleiben.
 
 #### Scenario: Liste mit Workout-Session
 - **WHEN** der Nutzer die Session-Liste öffnet und eine Session mit dem Workout „Seerunde x3“ gerudert hat
@@ -143,6 +143,14 @@ Eine Session, die mit einem Workout gestartet wurde, SHALL mit dem Workout und d
 #### Scenario: Workout später gelöscht
 - **WHEN** das Workout einer Session gelöscht wurde
 - **THEN** zeigt die Session weiterhin den Namen des Workouts und der Strecke, mit dem sie gerudert wurde
+
+#### Scenario: Workout später geändert
+- **WHEN** der Nutzer nach einer Session auf „Intervalltraining“ die Strecke „Ausrudern“ aus dem Workout entfernt
+- **THEN** zeigt die alte Session weiterhin alle drei Strecken, mit denen sie gerudert wurde
+
+#### Scenario: Session von vor dem Update
+- **WHEN** der Nutzer nach dem Update eine Session öffnet, die vorher auf „Seerunde“ gerudert wurde
+- **THEN** zeigt sie „Seerunde“ mit allen Runden wie vor dem Update
 
 ### Requirement: Kraftkurve aufzeichnen
 Die App SHALL die Kurvenpakete einer Session als Rohdaten mitspeichern, exportieren und importieren. Ein Replay MUST die Kraftkurve so zeigen wie während der Aufnahme.
