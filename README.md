@@ -44,37 +44,37 @@ Alle Befehle zeigt `make help`.
 
 1. **Geräte wählen**: Am PM5 das Bluetooth-Menü öffnen (Verbinden) bzw. ein FTMS-Rudergerät einschalten. Die App sucht beim Start und listet die gefundenen Rudergeräte, jeweils mit dem Hinweis, ob es ein PM5 oder ein FTMS-Gerät ist, darunter **Simulator** und **Simulator (FTMS)**. Gerät wählen und **Weiter**. Viele Rudergeräte erlauben nur eine Bluetooth-Verbindung, ErgData oder andere Apps müssen also getrennt sein. Ein FTMS-Rudergerät fordert die App nach dem Verbinden zum Senden auf, setzt es aber nie zurück.
 2. Die App merkt sich das Rudergerät. Beim nächsten Start sucht sie es bis zu 10 s, verbindet und überspringt „Geräte wählen“. Wird es nicht gefunden, erscheint „Geräte wählen“ mit diesem Gerät vorausgewählt. War es ein Simulator, geht es ohne Suche weiter.
-3. **Startbildschirm**: Oben steht das gewählte Rudergerät, Antippen führt zurück zu „Geräte wählen“. Ist es verbunden, steht darunter „Verbunden“, und **Trennen** beendet die Verbindung, etwa damit ErgData das Gerät übernehmen kann. Ein anderes Gerät in „Geräte wählen“ trennt das bisherige ebenfalls. **Rudern** öffnet die Vorlagen (siehe unten), **Frei rudern** das Live-Display ohne Vorlage, beide nutzen eine bestehende Verbindung oder verbinden neu. Unter **Sessions** lassen sich Sessions abspielen, als `.strokesplit` exportieren, importieren und löschen.
-4. Beim freien Rudern im Live-Display **Session starten**. Zeit und Distanz zählen ab 0, auch wenn das Gerät schon etwas anzeigt, und laufen über Resets am Gerät hinweg weiter. Bei FTMS misst die App die Zeit selbst und hält sie an, sobald 4 s lang weder Distanz noch Schläge dazukommen. Schlagdetails wie Kraft und Zuglänge liefert nur der PM5. Die Watt übernimmt die App vom FTMS-Rudergerät, damit sie mit seinem Display übereinstimmen; meldet es keine, rechnet sie sie wie beim PM5 aus der Pace aus. Meldet ein FTMS-Rudergerät seine Widerstandsstufe (z.B. der Domyos Woodrower), steht sie klein unter den Watt („Stufe 7“), auch beim Rudern einer Vorlage. Der Simulator (FTMS) meldet Stufe 5.
+3. **Startbildschirm**: Oben steht das gewählte Rudergerät, Antippen führt zurück zu „Geräte wählen“. Ist es verbunden, steht darunter „Verbunden“, und **Trennen** beendet die Verbindung, etwa damit ErgData das Gerät übernehmen kann. Ein anderes Gerät in „Geräte wählen“ trennt das bisherige ebenfalls. **Rudern** öffnet die Workouts (siehe unten), **Frei rudern** das Live-Display ohne Workout, beide nutzen eine bestehende Verbindung oder verbinden neu. Unter **Sessions** lassen sich Sessions abspielen, als `.strokesplit` exportieren, importieren und löschen.
+4. Beim freien Rudern im Live-Display **Session starten**. Zeit und Distanz zählen ab 0, auch wenn das Gerät schon etwas anzeigt, und laufen über Resets am Gerät hinweg weiter. Bei FTMS misst die App die Zeit selbst und hält sie an, sobald 4 s lang weder Distanz noch Schläge dazukommen. Schlagdetails wie Kraft und Zuglänge liefert nur der PM5. Die Watt übernimmt die App vom FTMS-Rudergerät, damit sie mit seinem Display übereinstimmen; meldet es keine, rechnet sie sie wie beim PM5 aus der Pace aus. Meldet ein FTMS-Rudergerät seine Widerstandsstufe (z.B. der Domyos Woodrower), steht sie klein unter den Watt („Stufe 7“), auch beim Rudern eines Workouts. Der Simulator (FTMS) meldet Stufe 5.
 
-   Lässt sich die Stufe über Bluetooth setzen (Woodrower: Stufe 1–15), stehen Ruderblatt-Tasten neben der Stufe: hoch erhöht, runter senkt um eine Stufe. Mehrere schnelle Tipps zählen zusammen. Angezeigt wird immer die Stufe, die das Gerät meldet; lehnt es ab, steht kurz „Stufe nicht gesetzt“. Beim Rudern einer Vorlage setzt die App zu Beginn jeder Zone mit Stufe diese Stufe, in freien Abschnitten und Zonen ohne Stufe die Grundstufe, also die Stufe beim Start der Session. Beginnt die Strecke mit einer Zone mit Stufe, setzt die App sie erst, wenn das Gerät seine Stufe zum ersten Mal gemeldet hat, damit diese die Grundstufe bleibt. Wer mitten in einem Abschnitt die Stufe ändert, über die Tasten oder am Gerät, behält sie bis zum nächsten Abschnitt; in einem Abschnitt ohne Stufe wird sie zur neuen Grundstufe. Das gilt auch für eine Änderung in einer Pause. Nach einem Verbindungsabbruch sendet die App die geltende Stufe erneut. Gesendet wird „Set Target Resistance Level“ als ein Byte in Zehnteln, wie FTMS 1.0 und der Woodrower es verlangen; meldet ein Gerät „ungültiger Wert“, versucht es die App einmal mit 16 Bit. Der Simulator (FTMS) nimmt Stufen 1–15 an.
-5. **Session beenden** zeigt die Zusammenfassung mit Durchschnittswerten und, bei einer Vorlage, den Runden. **Fertig** führt zum Startbildschirm, das Rudergerät bleibt verbunden.
+   Lässt sich die Stufe über Bluetooth setzen (Woodrower: Stufe 1–15), stehen Ruderblatt-Tasten neben der Stufe: hoch erhöht, runter senkt um eine Stufe. Mehrere schnelle Tipps zählen zusammen. Angezeigt wird immer die Stufe, die das Gerät meldet; lehnt es ab, steht kurz „Stufe nicht gesetzt“. Beim Rudern eines Workouts setzt die App zu Beginn jeder Zone mit Stufe diese Stufe, in freien Abschnitten und Zonen ohne Stufe die Grundstufe, also die Stufe beim Start der Session. Beginnt die Strecke mit einer Zone mit Stufe, setzt die App sie erst, wenn das Gerät seine Stufe zum ersten Mal gemeldet hat, damit diese die Grundstufe bleibt. Wer mitten in einem Abschnitt die Stufe ändert, über die Tasten oder am Gerät, behält sie bis zum nächsten Abschnitt; in einem Abschnitt ohne Stufe wird sie zur neuen Grundstufe. Das gilt auch für eine Änderung in einer Pause. Nach einem Verbindungsabbruch sendet die App die geltende Stufe erneut. Gesendet wird „Set Target Resistance Level“ als ein Byte in Zehnteln, wie FTMS 1.0 und der Woodrower es verlangen; meldet ein Gerät „ungültiger Wert“, versucht es die App einmal mit 16 Bit. Der Simulator (FTMS) nimmt Stufen 1–15 an.
+5. **Session beenden** zeigt die Zusammenfassung mit Durchschnittswerten und, bei einem Workout, den Runden. **Fertig** führt zum Startbildschirm, das Rudergerät bleibt verbunden.
 
-Das Live-Display passt sich dem Platz an: Ist er breiter als hoch, gilt das Querformat, auch im breiten Laptop-Fenster. Die Kopfzeile zeigt den Namen der Vorlage bzw. „Frei rudern“ und davor die Verbindung als Punkt: grün verbunden, orange beim Verbinden oder Wiederverbinden (mit Text darunter), leerer Ring getrennt. Simulator und Replay sind rechts markiert. Zurück, auf dem Desktop auch Esc, führt zum Startbildschirm, ohne zu trennen; eine laufende Session wird dabei gespeichert, eine noch nicht begonnene Vorlage verworfen. Ein Replay endet mit Zurück und führt zu den Sessions.
+Das Live-Display passt sich dem Platz an: Ist er breiter als hoch, gilt das Querformat, auch im breiten Laptop-Fenster. Die Kopfzeile zeigt den Namen des Workouts bzw. „Frei rudern“ und davor die Verbindung als Punkt: grün verbunden, orange beim Verbinden oder Wiederverbinden (mit Text darunter), leerer Ring getrennt. Simulator und Replay sind rechts markiert. Zurück, auf dem Desktop auch Esc, führt zum Startbildschirm, ohne zu trennen; eine laufende Session wird dabei gespeichert, ein noch nicht begonnenes Workout verworfen. Ein Replay endet mit Zurück und führt zu den Sessions.
 
 Wird die App während einer Session beendet, bleibt die Session bis kurz davor erhalten. Beim nächsten Start ist sie als unvollständig markiert.
 
-### Zonen, Strecken und Vorlagen
+### Zonen, Strecken und Workouts
 
-**Rudern** führt zu „Vorlage rudern“ mit drei Tabs: **Vorlagen**, **Strecken** und **Zonen**. Zahlen wie Länge, Bänder, Startposition und Runden werden in allen Editoren mit zwei Ruderblatt-Tasten eingestellt, nicht getippt: Die Taste mit dem Pfeil nach oben gibt mehr, die mit dem Pfeil nach unten weniger. Gedrückt halten wiederholt den Schritt, nach etwa einer Sekunde schneller. Am Minimum oder Maximum ist die Taste gesperrt.
+**Rudern** führt zu „Workout rudern“ mit drei Tabs: **Workouts**, **Strecken** und **Zonen**. Zahlen wie Länge, Bänder, Startposition und Runden werden in allen Editoren mit zwei Ruderblatt-Tasten eingestellt, nicht getippt: Die Taste mit dem Pfeil nach oben gibt mehr, die mit dem Pfeil nach unten weniger. Gedrückt halten wiederholt den Schritt, nach etwa einer Sekunde schneller. Am Minimum oder Maximum ist die Taste gesperrt.
 
 1. **Zonen** → **Zone anlegen**: Name, Achse (Distanz oder Zeit), feste Länge und mindestens eine Vorgabe: ein Pace-Band (z.B. 1:45–1:50), ein Schlagzahl-Band (z.B. 30–34), eine Widerstandsstufe oder eine Kombination davon. Die Liste zeigt die Zonen nach Achse und in wie vielen Strecken sie stecken.
 2. **Strecken** → **Strecke anlegen**: Name, Achse (Distanz in Metern oder Zeit als m:ss) und Länge. **Zone einbauen** öffnet einen eigenen Screen: oben die Startposition mit einer Vorschau der Strecke, darunter die Zonen der Achse der Strecke, gruppiert nach **Leicht**, **Mittel** und **Hart**. Eine Zone, die am gewählten Start über das Streckenende ragt oder eine andere Zone überschneidet, ist ausgegraut und nennt den Grund. Ein Tipp auf eine passende Zone baut sie ein. **Neue Zone anlegen** öffnet den Zonen-Editor, und passt die neue Zone am Start, wird sie gleich eingebaut. Dieselbe Zone darf mehrfach vorkommen. Was zwischen den Zonen liegt, ist frei. Mit **+** oder einem Tipp auf einen freien Abschnitt beginnt die neue Zone dort. Eine eingebaute Zone markiert man durch Antippen oder langes Drücken im Balken oder in der Liste. Unter dem Balken erscheint dann ihr Start mit den Ruderblatt-Tasten, und die Zone wandert mit jedem Tipp, höchstens bis an die Nachbarzonen bzw. an Anfang und Ende der Strecke; **Fertig** oder ein zweiter Tipp beendet das. Mit **×** wird eine Zone entfernt. Gespeichert wird alles erst mit **Speichern**. Im Balken über der Liste heisst grau frei; Zonen sind nach ihrer Härte gefärbt (siehe unten).
-3. **Vorlagen** → **Vorlage anlegen** mit Name, Strecke und Runden, **Feste Anzahl** oder **Offen bis Stopp**.
-4. Vorlage antippen öffnet ihren eigenen Screen mit Strecke, Runden, Zonen und Bändern sowie den Plätzen 1–3. Unten stehen der Schalter **Gegen den Ghost rudern** (siehe Ghost) und **Starten**, das das gewählte Rudergerät verbindet und die Session sofort startet. Der Stift öffnet den Editor, dort lässt sich die Vorlage auch löschen; danach zeigt die App wieder die Liste.
+3. **Workouts** → **Workout anlegen** mit Name, Strecke und Runden, **Feste Anzahl** oder **Offen bis Stopp**.
+4. Workout antippen öffnet seinen eigenen Screen mit Strecke, Runden, Zonen und Bändern sowie den Plätzen 1–3. Unten stehen der Schalter **Gegen den Ghost rudern** (siehe Ghost) und **Starten**, das das gewählte Rudergerät verbindet und die Session sofort startet. Der Stift öffnet den Editor, dort lässt sich das Workout auch löschen; danach zeigt die App wieder die Liste.
 5. Nach der letzten Runde endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit dem Anteil in der Zone, die beste mit Stern. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
 
-**Strecke ohne Vorlage rudern**: Die Detailansicht einer Strecke (Strecke in ihrer Liste antippen) hat unten den Button **Rudern**. Er öffnet einen Start-Screen mit Segmentbalken und Länge der Strecke und drei Optionen, von denen nur die gewählte ihre Eingabe zeigt:
+**Strecke ohne Workout rudern**: Die Detailansicht einer Strecke (Strecke in ihrer Liste antippen) hat unten den Button **Rudern**. Er öffnet einen Start-Screen mit Segmentbalken und Länge der Strecke und drei Optionen, von denen nur die gewählte ihre Eingabe zeigt:
 
 - **Runden**: Rundenzahl ab 1, beim Öffnen 3. Nach der letzten Runde endet die Session von selbst.
 - **Dauer**: Gesamtdauer der Ruderzeit in Schritten von 1 min, 1 bis 180 min, beim Öffnen 30 min, angezeigt als `30:00` bzw. ab einer Stunde `1:30:00`.
 - **Offen**: gerudert wird, bis du die Session beendest.
 
-Unten stehen wie auf dem Screen einer Vorlage **Gegen den Ghost rudern** und **Starten**. Die Werte bleiben beim Wechseln zwischen den Optionen erhalten, gespeichert wird nichts: Es entsteht keine Vorlage, und jedes Öffnen beginnt wieder mit 3 Runden.
+Unten stehen wie auf dem Screen eines Workouts **Gegen den Ghost rudern** und **Starten**. Die Werte bleiben beim Wechseln zwischen den Optionen erhalten, gespeichert wird nichts: Es entsteht kein Workout, und jedes Öffnen beginnt wieder mit 3 Runden.
 
-Bei einer Dauer zählt nur die Ruderzeit ohne Pausen, eine Pause von 2 min verschiebt das Ende also um 2 min. Die Session endet beim ersten Messwert, mit dem die Ruderzeit die Dauer erreicht, also höchstens etwa eine Sekunde danach. Liegt das Ende mitten in einer Runde, wird sie als unvollständig gespeichert. Auf der Zeitstrecke „Vier Minuten“ ergeben 30 min also 7 vollständige Runden und eine achte nach 2 min. Session-Liste und Zusammenfassung nennen eine Session ohne Vorlage nach Strecke und Plan, z.B. „Seerunde · 30 min“, „Seerunde · 3 Runden“ oder „Seerunde · offen“; Health Connect bekommt den Namen der Strecke als Titel.
+Bei einer Dauer zählt nur die Ruderzeit ohne Pausen, eine Pause von 2 min verschiebt das Ende also um 2 min. Die Session endet beim ersten Messwert, mit dem die Ruderzeit die Dauer erreicht, also höchstens etwa eine Sekunde danach. Liegt das Ende mitten in einer Runde, wird sie als unvollständig gespeichert. Auf der Zeitstrecke „Vier Minuten“ ergeben 30 min also 7 vollständige Runden und eine achte nach 2 min. Session-Liste und Zusammenfassung nennen eine Session ohne Workout nach Strecke und Plan, z.B. „Seerunde · 30 min“, „Seerunde · 3 Runden“ oder „Seerunde · offen“; Health Connect bekommt den Namen der Strecke als Titel.
 
-Im Live-Display mit Vorlage ist die Pace der grösste Wert. Darunter steht der Zonenstatus mit dem Band („In der Zone · 2:05–2:10“, sonst „Schneller“ bzw. „Langsamer“), die Schlagzahl-Karte zeigt ihr Band ebenso („Mehr Schläge“, „Weniger Schläge“). Blau heisst in der Zone, orange ausserhalb. Dazu kommen Kacheln für Rundenzeit, Watt, Puls (wenn Gurt oder Rudergerät ihn liefern) und den Anteil in der Zone.
+Im Live-Display mit Workout ist die Pace der grösste Wert. Darunter steht der Zonenstatus mit dem Band („In der Zone · 2:05–2:10“, sonst „Schneller“ bzw. „Langsamer“), die Schlagzahl-Karte zeigt ihr Band ebenso („Mehr Schläge“, „Weniger Schläge“). Blau heisst in der Zone, orange ausserhalb. Dazu kommen Kacheln für Rundenzeit, Watt, Puls (wenn Gurt oder Rudergerät ihn liefern) und den Anteil in der Zone.
 
 Um die Pace läuft ein Fortschrittsrahmen aus drei Spuren, jede beginnt oben in der Mitte und läuft im Uhrzeigersinn, an der Spitze sitzt ein Schiffchen:
 
@@ -106,31 +106,31 @@ Runden laufen nach Wanduhr: Eine Pause kostet bei Distanzstrecken Zeit und bei Z
 
 Die App führt Bestenlisten und zeigt jeweils die Plätze 1–3 mit Wert, Pace pro 500 m und Datum:
 
-- **Vorlage**: ganze Sessions, in denen alle geplanten Runden vollständig gerudert wurden, gewertet nach der Summe der Runden. Eine Liste pro Streckenlänge und Rundenzahl. Der Screen der Vorlage zeigt die Plätze 1–3 ihrer aktuellen Länge und Rundenzahl. Bei offener Rundenzahl gibt es keine.
-- **Strecke**: jede vollständige Runde, egal mit welcher Vorlage oder ohne Vorlage. Hatte die Strecke verschiedene Längen, gibt es eine Liste pro Länge.
+- **Workout**: ganze Sessions, in denen alle geplanten Runden vollständig gerudert wurden, gewertet nach der Summe der Runden. Eine Liste pro Streckenlänge und Rundenzahl. Der Screen des Workouts zeigt die Plätze 1–3 seiner aktuellen Länge und Rundenzahl. Bei offener Rundenzahl gibt es keine.
+- **Strecke**: jede vollständige Runde, egal mit welchem Workout oder ohne. Hatte die Strecke verschiedene Längen, gibt es eine Liste pro Länge.
 - **Zone**: jede Fahrt durch die Zone in einer vollständigen Runde, egal auf welcher Strecke, auch mehrere aus derselben Session. Eine Liste pro Zonenlänge.
 
-Strecke oder Zone in ihrer Liste antippen öffnet die Detailansicht mit den Plätzen pro Länge, die aktuelle zuerst. Der Stift dort öffnet den Editor, bei einer Strecke führt **Rudern** zum Start-Screen (siehe oben). Die Zusammenfassung markiert jede Runde und Zonenfahrt auf Platz 1–3 (z.B. „Platz 2“, „Sprint · Platz 1“) und ebenso die Session in der Liste ihrer Vorlage. Die Marken zeigen den aktuellen Stand, wird eine Runde später überholt, verschwindet ihre Marke.
+Strecke oder Zone in ihrer Liste antippen öffnet die Detailansicht mit den Plätzen pro Länge, die aktuelle zuerst. Der Stift dort öffnet den Editor, bei einer Strecke führt **Rudern** zum Start-Screen (siehe oben). Die Zusammenfassung markiert jede Runde und Zonenfahrt auf Platz 1–3 (z.B. „Platz 2“, „Sprint · Platz 1“) und ebenso die Session in der Liste ihres Workouts. Die Marken zeigen den aktuellen Stand, wird eine Runde später überholt, verschwindet ihre Marke.
 
-Gewertet wird nach Wanduhr, Pausen zählen also mit, auch in der Pace: Distanzen nach der Zeit, Zeitstrecken und -zonen nach den Metern. Bei Gleichstand liegt der frühere Eintrag vorne. Es zählen nur Sessions, die auf diesem Gerät an einem PM5 oder FTMS-Rudergerät gerudert wurden, keine aus dem Simulator, aus einem Replay oder importierte. Gelöschte Sessions verschwinden aus den Listen. Wird eine Vorlage, Strecke oder Zone gelöscht, fällt ihre Liste weg, die Sessions bleiben.
+Gewertet wird nach Wanduhr, Pausen zählen also mit, auch in der Pace: Distanzen nach der Zeit, Zeitstrecken und -zonen nach den Metern. Bei Gleichstand liegt der frühere Eintrag vorne. Es zählen nur Sessions, die auf diesem Gerät an einem PM5 oder FTMS-Rudergerät gerudert wurden, keine aus dem Simulator, aus einem Replay oder importierte. Gelöschte Sessions verschwinden aus den Listen. Wird ein Workout, eine Strecke oder eine Zone gelöscht, fällt deren Liste weg, die Sessions bleiben.
 
 ### Ghost
 
-Beim Rudern einer Vorlage läuft auf jeder Spur des Fortschrittsrahmens ein Ghost mit, ein violettes Schiffchen, schmaler als das eigene. Es zeigt, wo Platz 1 der passenden Bestenliste zur gleichen Zeit war:
+Beim Rudern eines Workouts läuft auf jeder Spur des Fortschrittsrahmens ein Ghost mit, ein violettes Schiffchen, schmaler als das eigene. Es zeigt, wo Platz 1 der passenden Bestenliste zur gleichen Zeit war:
 
 | Spur | Ghost | Läuft |
 |---|---|---|
-| aussen | Platz 1 der Vorlage mit gleicher Streckenlänge und Rundenzahl | über die ganze Session |
+| aussen | Platz 1 des Workouts mit gleicher Streckenlänge und Rundenzahl | über die ganze Session |
 | Mitte | Platz 1 der Strecke mit gleicher Länge | startet mit jeder Runde neu |
 | innen | Platz 1 der Zone des aktuellen Abschnitts mit gleicher Länge | startet mit jeder Fahrt durch die Zone neu |
 
-Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen nicht bei offener Rundenzahl und nicht auf einer Strecke ohne Vorlage, innen nicht in einem freien Abschnitt, beim freien Rudern gar keiner. Kämen sich Ghost und eigenes Schiffchen in die Quere, rückt der Ghost quer zur Spur nach aussen und kehrt auf die Mitte zurück, sobald wieder Platz ist. Auf Zeitstrecken lägen beide immer auf gleicher Höhe, dort zeigt der Rahmen deshalb keinen Ghost.
+Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen nicht bei offener Rundenzahl und nicht auf einer Strecke ohne Workout, innen nicht in einem freien Abschnitt, beim freien Rudern gar keiner. Kämen sich Ghost und eigenes Schiffchen in die Quere, rückt der Ghost quer zur Spur nach aussen und kehrt auf die Mitte zurück, sobald wieder Platz ist. Auf Zeitstrecken lägen beide immer auf gleicher Höhe, dort zeigt der Rahmen deshalb keinen Ghost.
 
-Die Pace-Box zeigt in der Zeile **Ghost** den Abstand zum Ghost der Vorlage (aussen): auf Distanzstrecken in Sekunden, auf Zeitstrecken in Metern, z.B. „7.6 s vor dir“ (Rückstand, orange), „12 m hinter dir“ (Vorsprung, blau) oder „gleichauf“. Ohne Ghost aussen fehlt die Zeile, die Ghosts auf den anderen Spuren laufen trotzdem.
+Die Pace-Box zeigt in der Zeile **Ghost** den Abstand zum Ghost des Workouts (aussen): auf Distanzstrecken in Sekunden, auf Zeitstrecken in Metern, z.B. „7.6 s vor dir“ (Rückstand, orange), „12 m hinter dir“ (Vorsprung, blau) oder „gleichauf“. Ohne Ghost aussen fehlt die Zeile, die Ghosts auf den anderen Spuren laufen trotzdem.
 
-Die Ghosts folgen den Bestenlisten live: Wird eine Runde oder Zonenfahrt der laufenden Session neuer Platz 1, läuft der Ghost dieser Spur ab der nächsten Runde bzw. Fahrt gegen sie. Im Simulator laufen die Ghosts ebenso mit. Da Simulator-Sessions nicht in die Bestenlisten kommen, werden sie selbst nie Ghost. Auf dem Screen der Vorlage trägt Platz 1 das Ghost-Symbol.
+Die Ghosts folgen den Bestenlisten live: Wird eine Runde oder Zonenfahrt der laufenden Session neuer Platz 1, läuft der Ghost dieser Spur ab der nächsten Runde bzw. Fahrt gegen sie. Im Simulator laufen die Ghosts ebenso mit. Da Simulator-Sessions nicht in die Bestenlisten kommen, werden sie selbst nie Ghost. Auf dem Screen des Workouts trägt Platz 1 das Ghost-Symbol.
 
-Der Schalter **Gegen den Ghost rudern** auf dem Screen der Vorlage und dem Start-Screen einer Strecke steht bei jedem Öffnen auf an. Ausgeschaltet läuft in der Session, die von dort startet, auf keiner Spur ein Ghost, und die Pace-Box zeigt keinen Abstand. Die Wahl gilt nur für diese eine Session und lässt sich während der Fahrt nicht ändern.
+Der Schalter **Gegen den Ghost rudern** auf dem Screen des Workouts und dem Start-Screen einer Strecke steht bei jedem Öffnen auf an. Ausgeschaltet läuft in der Session, die von dort startet, auf keiner Spur ein Ghost, und die Pace-Box zeigt keinen Abstand. Die Wahl gilt nur für diese eine Session und lässt sich während der Fahrt nicht ändern.
 
 ### Pulsgurt
 
@@ -153,13 +153,13 @@ Unter Android überträgt die App Sessions an Health Connect. Von dort lesen sie
 2. Ist die Übertragung eingeschaltet, geht jede Session von einem PM5 oder FTMS-Rudergerät nach dem Rudern im Hintergrund an Health Connect. Sessions aus dem Simulator und aus Replays gehen nie an Health Connect.
 3. **An Health Connect senden** im Menü einer Session und in der Zusammenfassung überträgt eine Session nachträglich, auch eine importierte. Erneutes Senden ersetzt die frühere Übertragung, es entsteht keine zweite Einheit.
 
-In Health Connect erscheint eine Trainingseinheit „Rudergerät“ mit Beginn und Ende, als Titel der Name der Vorlage bzw. „Freies Rudern“, dazu Distanz, Kalorien (sofern das Rudergerät welche meldet), die Verläufe von Puls, Leistung und Geschwindigkeit (ein Wert pro Sekunde), die Runden einer Vorlage mit ihrer Distanz und die Pausen. Schlagzahl, Kraftkurve und Rohdaten bleiben in der App. Die App liest nichts aus Health Connect.
+In Health Connect erscheint eine Trainingseinheit „Rudergerät“ mit Beginn und Ende, als Titel der Name des Workouts bzw. „Freies Rudern“, dazu Distanz, Kalorien (sofern das Rudergerät welche meldet), die Verläufe von Puls, Leistung und Geschwindigkeit (ein Wert pro Sekunde), die Runden eines Workouts mit ihrer Distanz und die Pausen. Schlagzahl, Kraftkurve und Rohdaten bleiben in der App. Die App liest nichts aus Health Connect.
 
 Die Zusammenfassung zeigt „An Health Connect übertragen am …“ bzw. „Nicht an Health Connect übertragen“. Schlägt eine Übertragung fehl, meldet die App den Grund, fehlt die Berechtigung, mit **Erteilen**. Eine automatische Wiederholung gibt es nicht. Der Status gehört zum Gerät: Export und Import nehmen ihn nicht mit, nach einem Update gelten alle bestehenden Sessions als nicht übertragen.
 
 ### Sprache
 
-Die App startet auf Deutsch. Das Sprach-Symbol oben rechts auf „Geräte wählen“ und dem Startbildschirm schaltet zwischen **Deutsch** und **English** um, also schon beim ersten Start. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Vorlagen), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten erscheinen in jeder Sprache gleich (`2:05`, `12:34`).
+Die App startet auf Deutsch. Das Sprach-Symbol oben rechts auf „Geräte wählen“ und dem Startbildschirm schaltet zwischen **Deutsch** und **English** um, also schon beim ersten Start. Die Wahl gilt sofort und bleibt über einen Neustart erhalten. Die Systemsprache spielt keine Rolle. Namen, die du selbst vergibst (Zonen, Strecken, Workouts), werden nicht übersetzt. Datum und Dezimalzeichen folgen der Sprache (`15.10.2026, 18:30` bzw. `Oct 15, 2026, 18:30`), Pace und Zeiten erscheinen in jeder Sprache gleich (`2:05`, `12:34`).
 
 ## Projektstruktur
 
@@ -171,15 +171,15 @@ lib/
     db/                drift-Schema (SQLite)
     courses/           Strecken, Versionen, Aufbau aus Zonen und Runden-Logik (LapTracker)
     zones/             Wiederverwendbare Zonen
-    templates/         Vorlagen aus Strecke und Rundenzahl
+    workouts/          Workouts aus Strecke und Rundenzahl
     sessions/          Aufzeichnung, Zusammenfassung, Export/Import
     health/            Übertragung an Health Connect (Kotlin-Kanal in android/app/src/main/kotlin)
-  l10n/                Übersetzungen: app_de.arb (Vorlage), app_en.arb und der erzeugte Code
+  l10n/                Übersetzungen: app_de.arb (Ausgangsdatei), app_en.arb und der erzeugte Code
   features/
     connection/        Geräte wählen, Startbildschirm, Verbindungsanzeige
     courses/           Strecken-Liste, Detailansicht, Start-Screen und Editor mit „Zone einbauen“
     zones/             Zonen-Liste und -Editor
-    templates/         Vorlagen-Liste, Screen einer Vorlage und Editor
+    workouts/          Workout-Liste, Screen eines Workouts und Editor
     live/              Live-Display mit Pace-Box und Fortschrittsrahmen
     sessions/          Session-Liste und Zusammenfassung
     simulator/         Bedienung des Simulators
@@ -205,10 +205,10 @@ Zahlen mit Mehrzahl über `plural`, Namen in Anführungszeichen stehen samt Zeic
 
 gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format (`"format": "strokesplit-raw"`), Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Pakete eines Pulsgurts stehen mit `"c": "2a37"` auf derselben Zeitachse, der `session`-Block im Header enthält, sofern vorhanden, `averageHeartRate`, `maxHeartRate` und `rmssdMs`. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren. Dateien von vor der Umbenennung (Endung `.aergrow`, Format `aergrow-raw`) liest der Import weiterhin, die Test-Fixtures sind bewusst in diesem alten Format.
 
-Eine Session auf einer Vorlage hat im Header zusätzlich die Vorlage und die geruderte Version der Strecke:
+Eine Session auf einem Workout hat im Header zusätzlich das Workout und die geruderte Version der Strecke:
 
 ```json
-"template": {"name": "Seerunde x3", "laps": 3},
+"workout": {"name": "Seerunde x3", "laps": 3},
 "course": {"name": "Seerunde", "axis": "distance", "length": 1000,
            "segments": [{"length": 200},
                         {"length": 600, "paceFastCs": 12500, "paceSlowCs": 13000, "spmMin": 20, "spmMax": 22,
@@ -217,7 +217,7 @@ Eine Session auf einer Vorlage hat im Header zusätzlich die Vorlage und die ger
                         {"length": 200}]}
 ```
 
-Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwendet, sonst angelegt. Fehlende Zonen legt der Import an, eine Zone mit gleichem Namen und gleichen Bändern wird wiederverwendet. Dateien von vor den Zonen haben kein `zone`, ihre Segmente mit Band werden zu Zonen nach dem Muster „Seerunde 2“. Die Runden entstehen aus den Rohpaketen neu und sind deshalb identisch. `laps` ist `null` bei offener Rundenzahl, `length` ist in Metern bzw. Sekunden. Eine Strecke, die ohne Vorlage gerudert wurde, hat `"name": null`; mit Gesamtdauer steht diese in Millisekunden in `durationMs`, etwa `"template": {"name": null, "laps": null, "durationMs": 1800000}`. Dateien ohne `durationMs` lassen sich weiterhin importieren.
+Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwendet, sonst angelegt. Fehlende Zonen legt der Import an, eine Zone mit gleichem Namen und gleichen Bändern wird wiederverwendet. Dateien von vor den Zonen haben kein `zone`, ihre Segmente mit Band werden zu Zonen nach dem Muster „Seerunde 2“. Die Runden entstehen aus den Rohpaketen neu und sind deshalb identisch. `laps` ist `null` bei offener Rundenzahl, `length` ist in Metern bzw. Sekunden. Eine Session, die ohne Workout gerudert wurde, hat `"name": null`; mit Gesamtdauer steht diese in Millisekunden in `durationMs`, etwa `"workout": {"name": null, "laps": null, "durationMs": 1800000}`. Dateien ohne `durationMs` lassen sich weiterhin importieren, ebenso Dateien aus der Zeit vor den Workouts, die den Eintrag `"template"` nennen.
 
 ## Spike
 
@@ -336,9 +336,9 @@ Die App hiess früher „AergRow“ (App-ID `ch.aergrow.aergrow`). Seit der Umbe
 3. In Stroke & Split unter **Sessions** → **Importieren** die `.aergrow`-Dateien einlesen.
 4. Erst wenn alle Sessions in Stroke & Split erscheinen, die alte App deinstallieren. Mit der Deinstallation löscht das System ihre Sessions.
 
-Strecken und Zonen kommen mit, soweit eine exportierte Session auf ihnen gerudert wurde. Vorlagen und nie geruderte Strecken müssen in Stroke & Split neu angelegt werden. Importierte Sessions zählen in keiner Bestenliste. Unter macOS gilt dasselbe, weil die Sandbox die Daten im Container der App-ID ablegt.
+Strecken und Zonen kommen mit, soweit eine exportierte Session auf ihnen gerudert wurde. Workouts und nie geruderte Strecken müssen in Stroke & Split neu angelegt werden. Importierte Sessions zählen in keiner Bestenliste. Unter macOS gilt dasselbe, weil die Sandbox die Daten im Container der App-ID ablegt.
 
-**Linux**: Hier hängt der Speicherort nicht an der App-ID. Beim ersten Start übernimmt Stroke & Split die bisherige Datenbank `aergrow.sqlite` im Dokumente-Ordner (z. B. `~/Dokumente`), indem es sie in `strokesplit.sqlite` umbenennt. Sessions, Strecken, Zonen und Vorlagen bleiben erhalten.
+**Linux**: Hier hängt der Speicherort nicht an der App-ID. Beim ersten Start übernimmt Stroke & Split die bisherige Datenbank `aergrow.sqlite` im Dokumente-Ordner (z. B. `~/Dokumente`), indem es sie in `strokesplit.sqlite` umbenennt. Sessions, Strecken, Zonen und Workouts bleiben erhalten.
 
 ## Plattform-Status
 

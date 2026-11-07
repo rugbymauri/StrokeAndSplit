@@ -18,7 +18,7 @@ Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests 
 ### `rename-workouts`
 
 - **Ziel**: „Vorlage“ heisst überall „Workout“: Texte (DE/EN), Code, Datenbank (Schema 11), Export, Specs und Doku.
-- **Branch**: Planung auf `docs/rename-workouts-proposal`, Umsetzung auf `feature/rename-workouts`, Stand 2026-11-07 6/9.
+- **Branch**: Planung auf `docs/rename-workouts-proposal`, Umsetzung auf `feature/rename-workouts`, Stand 2026-11-07 7/9.
 - **Entschieden** (Nutzer, 2026-11-07): Der neue Begriff ist „Workout“, und es wird alles umbenannt, nicht nur die Texte.
 - **Annahmen**, beim Review bestätigen:
   - Die englischen Health-Connect-Texte sprechen von „exercise sessions“, die Klasse `HealthWorkout` heisst `HealthExercise` (D2).
@@ -52,27 +52,27 @@ Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests 
 - [x] `resistance-control`, gefunden im Linux-Test von `zone-level-only` (2026-11-07), behoben in `fix/resistance-base-level` (PR #8): Beginnt die Strecke mit einer Zone mit Stufe (ab 0 m), bleibt nach der Zone deren Stufe (12) statt der Grundstufe des Simulators (5). Vermutete Ursache: Beim Start hat das Gerät noch keine Stufe gemeldet, `ResistanceDirector.segmentStarted` sendet 12, und die erste Meldung danach (schon 12) wird zur Grundstufe. Betrifft jede Zone mit Stufe am Streckenanfang, nicht nur Zonen ohne Band. Der `ResistanceDirector` wartet jetzt mit dem ersten Segment auf die erste Meldung. Beim Gerätetest `resistance-control` 6.2 am Woodrower mitprüfen.
 
 Manuelle Tests archivierter Changes (Nutzer):
-- [ ] `courses` 7.1: Vorlage im Simulator in der Linux-App rudern (`make run`), Session endet nach der letzten Runde, Zusammenfassung mit Runden.
+- [ ] `courses` 7.1: Workout im Simulator in der Linux-App rudern (`make run`), Session endet nach der letzten Runde, Zusammenfassung mit Runden.
 - [ ] `courses` 7.2: am echten PM5 500 m × 3 mit Pause in Runde 2.
 - [ ] `courses` 7.3: README-Schritte im Simulator (inzwischen inklusive Zonen).
 - [ ] `device-types` 7.1: am echten PM5 (Linux und Android) Suche, Verbinden, Session, Replay und Import alter Sessions unverändert.
 - [ ] `device-types` 7.2: Software-Rower vom Android-Handy: erscheint als FTMS, Verbinden, Control Point, Live-Daten, Pause, Reset.
-- [ ] `device-types` 7.3: Vorlage mit Zonen mit dem Software-Rower rudern; Zonenanzeige, Bänder und Runden.
+- [ ] `device-types` 7.3: Workout mit Zonen mit dem Software-Rower rudern; Zonenanzeige, Bänder und Runden.
 - [ ] `translations` 6.3: auf Linux und Android Sprache wechseln, neu starten, alle Screens in beiden Sprachen, keine abgeschnittenen Texte.
 - [ ] `ui-design` 6.1: Screenshots der Screens mit dem Canvas vergleichen, Abweichungen im Canvas oder Code bereinigen.
 - [ ] `force-curve` 3.4: am PM5 hoch und quer, angezeigte Schlaglänge plausibel (etwa 60–120 cm).
 - [ ] `heart-rate` 1.1/1.2: Spike mit Gurt neben PM5 bzw. FTMS-Rudergerät, Mitschnitt `heart_rate.jsonl` (ca. 2 min am PM5 mit Gurt).
 - [ ] `heart-rate` 2.6: Test gegen `heart_rate.jsonl` mit Puls- und RR-Werten (braucht den Mitschnitt aus 1.2).
 - [ ] `heart-rate` 6.3: auf Android und Linux mit Gurt, je mit PM5 und FTMS-Rudergerät: Koppeln, automatisch verbinden, Gurt kurz ausser Reichweite.
-- [ ] `statistics` 5.2: am Rudergerät „Seerunde x3“ zweimal rudern, Plätze in Vorlagenwahl und Detailansichten prüfen.
+- [ ] `statistics` 5.2: am Rudergerät „Seerunde x3“ zweimal rudern, Plätze in Workout-Wahl und Detailansichten prüfen.
 - [ ] `ghost` 8.2: am Rudergerät „Seerunde x3“ mit vorhandenen Einträgen rudern, Ghost auf allen drei Spuren.
 - [ ] `rename-stroke-and-split` 3.3: Übernahme einer `aergrow`-Datenbank ist umgesetzt (`legacy_database.dart`), der Haken fehlte; beim nächsten Durchsehen abhaken.
-- [ ] `start-on-first-stroke` 4.2: am PM5 Vorlage wählen, warten (Hinweis, 0:00, Ghost am Start), erster Schlag startet ab 0.
-- [ ] `auto-pause` 5.2: mit PM5 und FTMS-Rudergerät frei und mit Vorlage rudern und anhalten, „Pause“ sichtbar.
+- [ ] `start-on-first-stroke` 4.2: am PM5 Workout wählen, warten (Hinweis, 0:00, Ghost am Start), erster Schlag startet ab 0.
+- [ ] `auto-pause` 5.2: mit PM5 und FTMS-Rudergerät frei und mit Workout rudern und anhalten, „Pause“ sichtbar.
 - [ ] `health-connect` 1.2: Spike, Probe-Einheit `ROWING_MACHINE` mit Runden und Pause in Health Connect.
-- [ ] `health-connect` 6.1: am Android-Gerät Übertragung einschalten, Vorlage am PM5 mit Gurt und Pause rudern, Einheit in Health Connect prüfen.
-- [ ] `resistance-control` 6.2: am Woodrower frei mit −/+, Vorlage mit Zonen auf verschiedenen Stufen, mitten in der Zone am Gerät drehen, Pause, Verbindung trennen; dazu die Grundstufe nach einer Zone am Streckenanfang.
-- [ ] `template-screen` 4.3: am Handy Vorlage öffnen, Schalter und „Starten“ ohne Scrollen erreichbar, Session ohne Ghost.
+- [ ] `health-connect` 6.1: am Android-Gerät Übertragung einschalten, Workout am PM5 mit Gurt und Pause rudern, Einheit in Health Connect prüfen.
+- [ ] `resistance-control` 6.2: am Woodrower frei mit −/+, Workout mit Zonen auf verschiedenen Stufen, mitten in der Zone am Gerät drehen, Pause, Verbindung trennen; dazu die Grundstufe nach einer Zone am Streckenanfang.
+- [ ] `template-screen` 4.3: am Handy Workout öffnen, Schalter und „Starten“ ohne Scrollen erreichbar, Session ohne Ghost.
 - [ ] `course-rowing-free` 7.3: eine Strecke mit Dauer am Rudergerät rudern, Ende und Titel prüfen.
 - [ ] `zone-level-only` 3.3: am Woodrower eine Strecke mit einer Zone nur mit Stufe rudern, Stufe wechselt mit der Zone.
 - iOS und macOS bleiben ungetestet, es gibt keinen Mac.
