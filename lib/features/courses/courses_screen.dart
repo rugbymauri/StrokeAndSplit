@@ -205,7 +205,7 @@ class _CourseTile extends ConsumerWidget {
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
     final repository = ref.read(courseRepositoryProvider);
-    final workouts = await repository.workoutsUsing(course.id);
+    final workouts = await repository.workoutsLeftEmpty(course.id);
     if (!context.mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,

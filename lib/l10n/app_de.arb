@@ -1160,9 +1160,9 @@
       }
     }
   },
-  "courseDeleteWorkouts": "Diese Workouts verwenden die Strecke und werden mitgelöscht: {workouts}.",
+  "courseDeleteWorkouts": "Diese Workouts haben keine andere Strecke und werden mitgelöscht: {workouts}.",
   "@courseDeleteWorkouts": {
-    "description": "Courses: workouts deleted with the course; workouts is a list of quoted names",
+    "description": "Courses: workouts deleted with the course because it is their only one; workouts is a list of quoted names. Workouts with other courses only lose this one and are not named",
     "placeholders": {
       "workouts": {
         "type": "String"

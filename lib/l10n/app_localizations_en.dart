@@ -820,7 +820,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String courseDeleteWorkouts(String workouts) {
-    return 'These workouts use the course and are deleted with it: $workouts.';
+    return 'These workouts have no other course and are deleted with it: $workouts.';
   }
 
   @override
