@@ -4,7 +4,7 @@ Keine neuen Texte, keine Schema-Änderung.
 
 ## 1. Härte berechnen
 
-- [ ] 1.1 `lib/data/courses/zone_intensity.dart` nach D1: `ZoneIntensity { easy, medium, hard }`, `zoneIntensity(CourseSegment)` mit den Grenzen als Konstanten, `null` für freie Abschnitte, Maximum über die gesetzten Vorgaben. Verifikation: `test/data/courses/zone_intensity_test.dart` deckt die Szenarien aus dem Spec ab:
+- [x] 1.1 `lib/data/courses/zone_intensity.dart` nach D1: `ZoneIntensity { easy, medium, hard }`, `zoneIntensity(CourseSegment)` mit den Grenzen als Konstanten, `null` für freie Abschnitte, Maximum über die gesetzten Vorgaben. Verifikation: `test/data/courses/zone_intensity_test.dart` deckt die Szenarien aus dem Spec ab:
   - Pace 3:05–3:15 leicht, 2:28–2:32 mittel (Mitte genau 2:30), 2:55–3:05 leicht (Mitte genau 3:00), 2:20–2:30 hart.
   - Schlagzahl 20–22 leicht (Mitte 21), 21–22 mittel (Mitte 21,5), 22–26 hart (Mitte 24).
   - Stufe 5 leicht, 6 mittel, 10 mittel, 11 hart, 20 hart.
