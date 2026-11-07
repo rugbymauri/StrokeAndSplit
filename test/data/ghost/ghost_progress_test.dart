@@ -285,7 +285,7 @@ void main() {
       );
     });
 
-    test('Kein Ghost der Vorlage: no gap', () {
+    test('Kein Ghost des Workouts: no gap', () {
       expect(
         ghostGap(
           _at(_seerunde, plannedLaps: null, inLap: 500),
