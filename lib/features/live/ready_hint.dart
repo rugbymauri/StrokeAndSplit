@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/design_tokens.dart';
 import '../../l10n/l10n.dart';
 
-/// Tells the rower that a template session waits for the first stroke
+/// Tells the rower that a workout session waits for the first stroke
 /// (start-on-first-stroke, Design D5); readable from the seat.
 class ReadyHint extends StatelessWidget {
   const ReadyHint({super.key});

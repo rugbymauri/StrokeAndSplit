@@ -4,7 +4,7 @@ import '../../l10n/l10n.dart';
 import '../design_tokens.dart';
 
 /// The ghost as a small rhombus, the same shape as the ghost's boat in the
-/// progress frame, for the legend of the pace box and the template choice
+/// progress frame, for the legend of the pace box and the workout choice
 /// (Change ghost, Design D1).
 class GhostSymbol extends StatelessWidget {
   const GhostSymbol({super.key, this.rimColor = AppColors.surface});

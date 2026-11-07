@@ -671,10 +671,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lapsOpen => 'open';
 
   @override
-  String get templatesTitle => 'Row a template';
+  String get workoutsTitle => 'Row a template';
 
   @override
-  String get tabTemplates => 'Templates';
+  String get tabWorkouts => 'Templates';
 
   @override
   String get tabCourses => 'Courses';
@@ -683,85 +683,85 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabZones => 'Zones';
 
   @override
-  String get templateCreate => 'New template';
+  String get workoutCreate => 'New template';
 
   @override
-  String get templateStart => 'Start';
+  String get workoutStart => 'Start';
 
   @override
-  String get templateGhost => 'Row against the ghost';
+  String get workoutGhost => 'Row against the ghost';
 
   @override
-  String get templatePodiumTitle => 'Best results';
+  String get workoutPodiumTitle => 'Best results';
 
   @override
-  String get templatePodiumEmpty =>
+  String get workoutPodiumEmpty =>
       'No best time yet. Sessions with all laps on a rower count.';
 
   @override
-  String get templatePodiumOpenLaps =>
+  String get workoutPodiumOpenLaps =>
       'An open number of laps has no best time.';
 
   @override
-  String templatePodiumPace(String pace) {
+  String workoutPodiumPace(String pace) {
     return '$pace /500 m';
   }
 
   @override
-  String get templatesEmpty => 'No templates yet.';
+  String get workoutsEmpty => 'No templates yet.';
 
   @override
-  String templatesLoadFailed(String error) {
+  String workoutsLoadFailed(String error) {
     return 'Templates could not be loaded: $error';
   }
 
   @override
-  String get templateNeedsCourseTitle => 'Create a course first';
+  String get workoutNeedsCourseTitle => 'Create a course first';
 
   @override
-  String get templateNeedsCourseBody =>
+  String get workoutNeedsCourseBody =>
       'A template rows a course. Create a course first.';
 
   @override
-  String get templateNeedsCourse => 'For a template you need a course first.';
+  String get workoutNeedsCourse => 'For a template you need a course first.';
 
   @override
   String get courseCreate => 'New course';
 
   @override
-  String get templateDeleteTitle => 'Delete template?';
+  String get workoutDeleteTitle => 'Delete template?';
 
   @override
-  String templateDeleteBody(String name) {
+  String workoutDeleteBody(String name) {
     return '“$name” is deleted. Sessions rowed with it are kept.';
   }
 
   @override
-  String get templateNew => 'New template';
+  String get workoutNew => 'New template';
 
   @override
-  String get templateEdit => 'Edit template';
+  String get workoutEdit => 'Edit template';
 
   @override
-  String get templateNameMissing => 'The name is missing.';
+  String get workoutNameMissing => 'The name is missing.';
 
   @override
-  String get templateCourseMissing => 'Choose a course.';
+  String get workoutCourseMissing => 'Choose a course.';
 
   @override
-  String get templateCourse => 'Course';
+  String get workoutCourse => 'Course';
 
   @override
-  String get templateFixedLaps => 'Fixed number';
+  String get workoutFixedLaps => 'Fixed number';
 
   @override
-  String get templateOpenLaps => 'Open until stop';
+  String get workoutOpenLaps => 'Open until stop';
 
   @override
-  String get templateLaps => 'Laps';
+  String get workoutLaps => 'Laps';
 
   @override
-  String templateLapsUnit(int laps) {
+  String workoutLapsUnit(int laps) {
     String _temp0 = intl.Intl.pluralLogic(
       laps,
       locale: localeName,
@@ -772,10 +772,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get templateResult => 'Total';
+  String get workoutResult => 'Total';
 
   @override
-  String get templateResultOpen => 'per lap, until you end the session';
+  String get workoutResultOpen => 'per lap, until you end the session';
 
   @override
   String get coursesTitle => 'Courses';
@@ -797,8 +797,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String courseDeleteTemplates(String templates) {
-    return 'These templates use the course and are deleted with it: $templates.';
+  String courseDeleteWorkouts(String workouts) {
+    return 'These templates use the course and are deleted with it: $workouts.';
   }
 
   @override

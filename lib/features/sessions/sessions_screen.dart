@@ -65,8 +65,8 @@ class _SessionTile extends ConsumerWidget {
     final pace = session.averagePaceCs;
     final l10n = context.l10n;
     final versionId = session.courseVersionId;
-    // Without a template the course names the session (course-rowing-free, Design D7).
-    final courseName = session.templateName != null || versionId == null
+    // Without a workout the course names the session (course-rowing-free, Design D7).
+    final courseName = session.workoutName != null || versionId == null
         ? null
         : ref.watch(courseVersionProvider(versionId)).value?.name;
     final details = [

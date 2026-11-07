@@ -9,7 +9,7 @@ import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/sources/rower_choice.dart';
 import 'package:strokesplit/data/sources/simulated_source.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:erg_protocol/erg_protocol.dart';
@@ -40,7 +40,7 @@ Future<List<Object>> _results(AppDatabase db, int id) async => [
 
 void main() {
   testWidgets(
-    'rows a template with the simulator, pauses, and exports and imports the session',
+    'rows a workout with the simulator, pauses, and exports and imports the session',
     (tester) async {
       final db = openTestDatabase();
       final container = ProviderContainer(
@@ -66,7 +66,7 @@ void main() {
             ],
           ),
         );
-        await TemplateRepository(db)
+        await WorkoutRepository(db)
             .create('Dreiteiler x2', courseId: course, laps: 2);
       });
       await tester.pumpWidget(
@@ -140,7 +140,7 @@ void main() {
   );
 
   testWidgets(
-    'rows a template with a zone with the simulator as an FTMS rower',
+    'rows a workout with a zone with the simulator as an FTMS rower',
     (tester) async {
       final db = openTestDatabase();
       final container = ProviderContainer(
@@ -172,7 +172,7 @@ void main() {
         ).definition!;
         final course = await CourseRepository(db)
             .create('Seerunde', definition);
-        await TemplateRepository(db)
+        await WorkoutRepository(db)
             .create('Seerunde x2', courseId: course, laps: 2);
       });
       await tester.pumpWidget(
@@ -202,7 +202,7 @@ void main() {
         () => db.select(db.sessions).getSingle(),
       ))!;
       expect(
-        (session.protocol, session.templateName),
+        (session.protocol, session.workoutName),
         (ErgProtocol.ftms, 'Seerunde x2'),
       );
       final laps = (await tester.runAsync(

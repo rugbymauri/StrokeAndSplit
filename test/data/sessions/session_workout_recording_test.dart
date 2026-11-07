@@ -6,7 +6,7 @@ import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/sources/simulated_source.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,27 +47,27 @@ void main() {
     addTearDown(container.dispose);
   });
 
-  test('a template with three laps ends by itself after the third lap', () {
+  test('a workout with three laps ends by itself after the third lap', () {
     fakeAsync((async) {
-      final template = _run(async, () async {
+      final workout = _run(async, () async {
         final courses = CourseRepository(db);
         final course = await courses.create(
           'Seerunde',
           CourseDefinition.single(axis: CourseAxis.distance, length: 100),
         );
-        final templates = TemplateRepository(db);
-        return (await templates.get(
-          await templates.create('Seerunde x3', courseId: course, laps: 3),
+        final workouts = WorkoutRepository(db);
+        return (await workouts.get(
+          await workouts.create('Seerunde x3', courseId: course, laps: 3),
         ))!;
       });
       final ready = _run(async, () async {
         await source.start();
         await container
             .read(sessionRecorderProvider.notifier)
-            .start(plan: template.toPlan());
+            .start(plan: workout.toPlan());
         return container.read(sessionRecorderProvider)!;
       });
-      expect((ready.ready, ready.plan?.template?.name), (true, 'Seerunde x3'));
+      expect((ready.ready, ready.plan?.workout?.name), (true, 'Seerunde x3'));
       // The simulator rows from the start: its second status starts the session.
       async.elapse(const Duration(milliseconds: 500));
       final started = container.read(sessionRecorderProvider)!;
@@ -91,10 +91,10 @@ void main() {
       final laps = _run(async, db.select(db.laps).get);
       expect(session.status, SessionStatus.complete);
       expect(
-        (session.templateId, session.templateName, session.plannedLaps),
-        (template.id, 'Seerunde x3', 3),
+        (session.workoutId, session.workoutName, session.plannedLaps),
+        (workout.id, 'Seerunde x3', 3),
       );
-      expect(session.courseVersionId, template.course.versionId);
+      expect(session.courseVersionId, workout.course.versionId);
       expect(
         [for (final l in laps) (l.lapNo, l.complete)],
         [(1, true), (2, true), (3, true)],
@@ -105,26 +105,26 @@ void main() {
   });
 
   test(
-    'a time segment runs from the first stroke, not from choosing the template',
+    'a time segment runs from the first stroke, not from choosing the workout',
     () {
       fakeAsync((async) {
-        final template = _run(async, () async {
+        final workout = _run(async, () async {
           final course = await CourseRepository(db).create(
             'Vier Minuten',
             CourseDefinition.single(axis: CourseAxis.time, length: 240),
           );
-          final templates = TemplateRepository(db);
-          return (await templates.get(
-            await templates.create('Vier Minuten', courseId: course, laps: 1),
+          final workouts = WorkoutRepository(db);
+          return (await workouts.get(
+            await workouts.create('Vier Minuten', courseId: course, laps: 1),
           ))!;
         });
         _run(async, () async {
-          // Not rowing yet when the template is chosen.
+          // Not rowing yet when the workout is chosen.
           source.pause();
           await source.start();
           await container
               .read(sessionRecorderProvider.notifier)
-              .start(plan: template.toPlan());
+              .start(plan: workout.toPlan());
         });
 
         async.elapse(const Duration(seconds: 30));
@@ -165,21 +165,21 @@ void main() {
     'pauses when the rower stops and goes on with the next stroke (auto-pause)',
     () {
       fakeAsync((async) {
-        final template = _run(async, () async {
+        final workout = _run(async, () async {
           final course = await CourseRepository(db).create(
             'Vier Minuten',
             CourseDefinition.single(axis: CourseAxis.time, length: 240),
           );
-          final templates = TemplateRepository(db);
-          return (await templates.get(
-            await templates.create('Vier Minuten', courseId: course, laps: 1),
+          final workouts = WorkoutRepository(db);
+          return (await workouts.get(
+            await workouts.create('Vier Minuten', courseId: course, laps: 1),
           ))!;
         });
         _run(async, () async {
           await source.start();
           await container
               .read(sessionRecorderProvider.notifier)
-              .start(plan: template.toPlan());
+              .start(plan: workout.toPlan());
         });
         async.elapse(const Duration(seconds: 30));
         expect(
@@ -232,21 +232,21 @@ void main() {
     'the ghost choice stays fixed from the start to the end (template-screen)',
     () {
       fakeAsync((async) {
-        final template = _run(async, () async {
+        final workout = _run(async, () async {
           final course = await CourseRepository(db).create(
             'Seerunde',
             CourseDefinition.single(axis: CourseAxis.distance, length: 100),
           );
-          final templates = TemplateRepository(db);
-          return (await templates.get(
-            await templates.create('Seerunde x3', courseId: course, laps: 3),
+          final workouts = WorkoutRepository(db);
+          return (await workouts.get(
+            await workouts.create('Seerunde x3', courseId: course, laps: 3),
           ))!;
         });
         _run(async, () async {
           await source.start();
           await container
               .read(sessionRecorderProvider.notifier)
-              .start(plan: template.toPlan(), ghost: false);
+              .start(plan: workout.toPlan(), ghost: false);
         });
         expect(
           container.read(sessionRecorderProvider)!.ghost,
@@ -276,7 +276,7 @@ void main() {
           async,
           () => container
               .read(sessionRecorderProvider.notifier)
-              .start(plan: template.toPlan()),
+              .start(plan: workout.toPlan()),
         );
         expect(
           container.read(sessionRecorderProvider)!.ghost,
@@ -289,7 +289,7 @@ void main() {
     },
   );
 
-  test('a course rowed without a template has laps but no template (course-rowing-free)', () {
+  test('a course rowed without a workout has laps but no workout (course-rowing-free)', () {
     fakeAsync((async) {
       final course = _run(async, () async {
         final courses = CourseRepository(db);
@@ -308,7 +308,7 @@ void main() {
       });
       async.elapse(const Duration(milliseconds: 500));
       final started = container.read(sessionRecorderProvider)!;
-      expect((started.plan?.template, started.lap!.plannedLaps), (null, 2));
+      expect((started.plan?.workout, started.lap!.plannedLaps), (null, 2));
 
       // 2 × 100 m at 2:10 /500 m take 52 s.
       async.elapse(const Duration(seconds: 60));
@@ -319,7 +319,7 @@ void main() {
           db.sessions,
         )..where((s) => s.id.equals(started.sessionId!))).getSingle,
       );
-      expect((session.templateId, session.templateName), (null, null));
+      expect((session.workoutId, session.workoutName), (null, null));
       expect(
         (session.courseVersionId, session.plannedLaps),
         (course.versionId, 2),
@@ -332,7 +332,7 @@ void main() {
     });
   });
 
-  test('a session without template has no laps', () {
+  test('a session without workout has no laps', () {
     fakeAsync((async) {
       _run(async, () async {
         await source.start();

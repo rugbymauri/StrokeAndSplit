@@ -13,7 +13,7 @@ import 'live_text_styles.dart';
 import 'metric_tile.dart';
 import 'watts_tile.dart';
 
-/// The live display without a template (ui-design, Design D2): the pace on
+/// The live display without a workout (ui-design, Design D2): the pace on
 /// top or on the left, four tiles, a line with further values, the force
 /// curve and [action], the button that starts or ends the session, with [status] beside it.
 class FreeLiveView extends StatelessWidget {

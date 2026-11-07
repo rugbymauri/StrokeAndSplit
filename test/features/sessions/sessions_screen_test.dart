@@ -7,7 +7,7 @@ import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/features/sessions/sessions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -222,23 +222,23 @@ void main() {
     await setup.tearDown(tester);
   });
 
-  testWidgets('names the template of a session, also after it was deleted', (
+  testWidgets('names the workout of a session, also after it was deleted', (
     tester,
   ) async {
     final setup = _Setup();
     await tester.runAsync(() async {
       final courses = CourseRepository(setup.db);
-      final templates = TemplateRepository(setup.db);
+      final workouts = WorkoutRepository(setup.db);
       final course = await courses.create(
         'Seerunde',
         CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
       );
-      final kept = await templates.create(
+      final kept = await workouts.create(
         'Seerunde x3',
         courseId: course,
         laps: 3,
       );
-      final deleted = await templates.create(
+      final deleted = await workouts.create(
         'Seerunde offen',
         courseId: course,
         laps: null,
@@ -247,11 +247,11 @@ void main() {
         final session = await setup.repository.create(
           startedAt: DateTime(2026, 10, 16, 7),
           source: ErgSourceKind.simulator,
-          plan: (await templates.get(id))!.toPlan(),
+          plan: (await workouts.get(id))!.toPlan(),
         );
         await setup.repository.finish(session);
       }
-      await templates.delete(deleted);
+      await workouts.delete(deleted);
     });
     await setup.addSession(tester, DateTime(2026, 10, 15, 18, 30));
     await setup.pump(tester);
@@ -263,7 +263,7 @@ void main() {
   });
 
   testWidgets(
-    'names a course rowed without a template by the course and its planned length',
+    'names a course rowed without a workout by the course and its planned length',
     (tester) async {
       final setup = _Setup();
       await tester.runAsync(() async {

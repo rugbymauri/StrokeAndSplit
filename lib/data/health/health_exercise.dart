@@ -33,7 +33,7 @@ class HealthSessionData {
     required this.startedAt,
     required this.endedAt,
     required this.distanceDm,
-    required this.templateName,
+    required this.workoutName,
     this.courseName,
     this.points = const [],
     this.laps = const [],
@@ -44,10 +44,10 @@ class HealthSessionData {
   final DateTime? endedAt;
   final int distanceDm;
 
-  /// Null for free rowing and for a course rowed without a template.
-  final String? templateName;
+  /// Null for free rowing and for a course rowed without a workout.
+  final String? workoutName;
 
-  /// The course of a session without a template, its title then (course-rowing-free, Design D7);
+  /// The course of a session without a workout, its title then (course-rowing-free, Design D7);
   /// null for free rowing.
   final String? courseName;
   final List<HealthPoint> points;
@@ -139,7 +139,7 @@ class HealthExercise {
   final List<HealthSegment> segments;
 }
 
-/// The exercise of [data] (Design D3); [freeTitle] names a session without a template.
+/// The exercise of [data] (Design D3); [freeTitle] names a session without a workout.
 HealthExercise healthExerciseOf(
   HealthSessionData data, {
   required String freeTitle,
@@ -248,7 +248,7 @@ HealthExercise healthExerciseOf(
     id: id,
     start: startedAt,
     end: end,
-    title: data.templateName ?? data.courseName ?? freeTitle,
+    title: data.workoutName ?? data.courseName ?? freeTitle,
     meters: data.distanceDm / 10,
     kilocalories: calories > 0 ? calories.toDouble() : null,
     heartRate: series(

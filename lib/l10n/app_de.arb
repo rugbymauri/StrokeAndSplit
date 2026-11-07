@@ -956,12 +956,12 @@
   "@lapsOpen": {
     "description": "A template with an open number of laps"
   },
-  "templatesTitle": "Vorlage rudern",
-  "@templatesTitle": {
+  "workoutsTitle": "Vorlage rudern",
+  "@workoutsTitle": {
     "description": "Templates: title"
   },
-  "tabTemplates": "Vorlagen",
-  "@tabTemplates": {
+  "tabWorkouts": "Vorlagen",
+  "@tabWorkouts": {
     "description": "Templates: tab with the templates"
   },
   "tabCourses": "Strecken",
@@ -972,32 +972,32 @@
   "@tabZones": {
     "description": "Templates: tab with the zones"
   },
-  "templateCreate": "Vorlage anlegen",
-  "@templateCreate": {
+  "workoutCreate": "Vorlage anlegen",
+  "@workoutCreate": {
     "description": "Templates: button that creates a template"
   },
-  "templateStart": "Starten",
-  "@templateStart": {
+  "workoutStart": "Starten",
+  "@workoutStart": {
     "description": "Template screen: button that starts rowing the template"
   },
-  "templateGhost": "Gegen den Ghost rudern",
-  "@templateGhost": {
+  "workoutGhost": "Gegen den Ghost rudern",
+  "@workoutGhost": {
     "description": "Template screen: switch above Start that turns the ghost on or off for the session started from there"
   },
-  "templatePodiumTitle": "Bestleistungen",
-  "@templatePodiumTitle": {
+  "workoutPodiumTitle": "Bestleistungen",
+  "@workoutPodiumTitle": {
     "description": "Templates: heading above places 1–3 of the template's ranking in the opened template"
   },
-  "templatePodiumEmpty": "Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.",
-  "@templatePodiumEmpty": {
+  "workoutPodiumEmpty": "Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.",
+  "@workoutPodiumEmpty": {
     "description": "Templates: hint in the opened template when it was never rowed completely on a rower"
   },
-  "templatePodiumOpenLaps": "Bei offener Rundenzahl gibt es keine Bestzeit.",
-  "@templatePodiumOpenLaps": {
+  "workoutPodiumOpenLaps": "Bei offener Rundenzahl gibt es keine Bestzeit.",
+  "@workoutPodiumOpenLaps": {
     "description": "Templates: hint in the opened template with an open number of laps, which has no ranking"
   },
-  "templatePodiumPace": "{pace} /500 m",
-  "@templatePodiumPace": {
+  "workoutPodiumPace": "{pace} /500 m",
+  "@workoutPodiumPace": {
     "description": "Templates: pace per 500 m of a place, pauses left out",
     "placeholders": {
       "pace": {
@@ -1006,12 +1006,12 @@
       }
     }
   },
-  "templatesEmpty": "Noch keine Vorlagen angelegt.",
-  "@templatesEmpty": {
+  "workoutsEmpty": "Noch keine Vorlagen angelegt.",
+  "@workoutsEmpty": {
     "description": "Templates: there is no template"
   },
-  "templatesLoadFailed": "Vorlagen konnten nicht geladen werden: {error}",
-  "@templatesLoadFailed": {
+  "workoutsLoadFailed": "Vorlagen konnten nicht geladen werden: {error}",
+  "@workoutsLoadFailed": {
     "description": "Templates: loading failed; error is the technical error",
     "placeholders": {
       "error": {
@@ -1019,28 +1019,28 @@
       }
     }
   },
-  "templateNeedsCourseTitle": "Zuerst eine Strecke anlegen",
-  "@templateNeedsCourseTitle": {
+  "workoutNeedsCourseTitle": "Zuerst eine Strecke anlegen",
+  "@workoutNeedsCourseTitle": {
     "description": "Templates: dialog title when there is no course"
   },
-  "templateNeedsCourseBody": "Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.",
-  "@templateNeedsCourseBody": {
+  "workoutNeedsCourseBody": "Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.",
+  "@workoutNeedsCourseBody": {
     "description": "Templates: dialog text when there is no course"
   },
-  "templateNeedsCourse": "Für eine Vorlage brauchst du zuerst eine Strecke.",
-  "@templateNeedsCourse": {
+  "workoutNeedsCourse": "Für eine Vorlage brauchst du zuerst eine Strecke.",
+  "@workoutNeedsCourse": {
     "description": "Templates: shown instead of the list when there is no course"
   },
   "courseCreate": "Strecke anlegen",
   "@courseCreate": {
     "description": "Button that creates a course"
   },
-  "templateDeleteTitle": "Vorlage löschen?",
-  "@templateDeleteTitle": {
+  "workoutDeleteTitle": "Vorlage löschen?",
+  "@workoutDeleteTitle": {
     "description": "Templates: title of the delete confirmation"
   },
-  "templateDeleteBody": "„{name}“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.",
-  "@templateDeleteBody": {
+  "workoutDeleteBody": "„{name}“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.",
+  "@workoutDeleteBody": {
     "description": "Templates: delete confirmation; name is the template",
     "placeholders": {
       "name": {
@@ -1048,40 +1048,40 @@
       }
     }
   },
-  "templateNew": "Neue Vorlage",
-  "@templateNew": {
+  "workoutNew": "Neue Vorlage",
+  "@workoutNew": {
     "description": "Template editor: title for a new template"
   },
-  "templateEdit": "Vorlage bearbeiten",
-  "@templateEdit": {
+  "workoutEdit": "Vorlage bearbeiten",
+  "@workoutEdit": {
     "description": "Template editor: title for an existing template"
   },
-  "templateNameMissing": "Der Name fehlt.",
-  "@templateNameMissing": {
+  "workoutNameMissing": "Der Name fehlt.",
+  "@workoutNameMissing": {
     "description": "Template editor: the template has no name"
   },
-  "templateCourseMissing": "Wähle eine Strecke.",
-  "@templateCourseMissing": {
+  "workoutCourseMissing": "Wähle eine Strecke.",
+  "@workoutCourseMissing": {
     "description": "Template editor: no course chosen"
   },
-  "templateCourse": "Strecke",
-  "@templateCourse": {
+  "workoutCourse": "Strecke",
+  "@workoutCourse": {
     "description": "Template editor: label of the course field"
   },
-  "templateFixedLaps": "Feste Anzahl",
-  "@templateFixedLaps": {
+  "workoutFixedLaps": "Feste Anzahl",
+  "@workoutFixedLaps": {
     "description": "Template editor: choice for a fixed number of laps"
   },
-  "templateOpenLaps": "Offen bis Stopp",
-  "@templateOpenLaps": {
+  "workoutOpenLaps": "Offen bis Stopp",
+  "@workoutOpenLaps": {
     "description": "Template editor: choice for an open number of laps, rowed until the session ends"
   },
-  "templateLaps": "Runden",
-  "@templateLaps": {
+  "workoutLaps": "Runden",
+  "@workoutLaps": {
     "description": "Template editor: label of the number of laps"
   },
-  "templateLapsUnit": "{laps, plural, =1{Runde} other{Runden}}",
-  "@templateLapsUnit": {
+  "workoutLapsUnit": "{laps, plural, =1{Runde} other{Runden}}",
+  "@workoutLapsUnit": {
     "description": "Template editor: unit after the number of laps, without the number",
     "placeholders": {
       "laps": {
@@ -1089,12 +1089,12 @@
       }
     }
   },
-  "templateResult": "Ergibt",
-  "@templateResult": {
+  "workoutResult": "Ergibt",
+  "@workoutResult": {
     "description": "Template editor: label of the line with the total length of all laps"
   },
-  "templateResultOpen": "pro Runde, bis du die Session beendest",
-  "@templateResultOpen": {
+  "workoutResultOpen": "pro Runde, bis du die Session beendest",
+  "@workoutResultOpen": {
     "description": "Template editor: after the length of one lap when the number of laps is open"
   },
   "coursesTitle": "Strecken",
@@ -1127,11 +1127,11 @@
       }
     }
   },
-  "courseDeleteTemplates": "Diese Vorlagen verwenden die Strecke und werden mitgelöscht: {templates}.",
-  "@courseDeleteTemplates": {
+  "courseDeleteWorkouts": "Diese Vorlagen verwenden die Strecke und werden mitgelöscht: {workouts}.",
+  "@courseDeleteWorkouts": {
     "description": "Courses: templates deleted with the course; templates is a list of quoted names",
     "placeholders": {
-      "templates": {
+      "workouts": {
         "type": "String"
       }
     }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../design_tokens.dart';
 
 /// One of a few [options] side by side, the chosen one [value] filled, as in
-/// the template editor (laps) and on the start screen of a course.
+/// the workout editor (laps) and on the start screen of a course.
 class SegmentChoice<T> extends StatelessWidget {
   const SegmentChoice({
     super.key,

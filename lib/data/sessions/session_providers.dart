@@ -54,7 +54,7 @@ final sessionPaceTrackProvider = FutureProvider.family<PaceTrack, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).paceTrack(id),
 );
 
-/// A session being recorded right now, or with a template one that is ready
+/// A session being recorded right now, or with a workout one that is ready
 /// and starts with the first stroke.
 class ActiveRecording {
   const ActiveRecording({

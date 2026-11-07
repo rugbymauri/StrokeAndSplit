@@ -147,7 +147,7 @@ class GhostTrack {
       'GhostTrack(${points.length} points, $durationMs ms, $distanceDm dm)';
 }
 
-/// How far the rower is from the ghost of the template (Change ghost,
+/// How far the rower is from the ghost of the workout (Change ghost,
 /// Design D4).
 @immutable
 class GhostGap {

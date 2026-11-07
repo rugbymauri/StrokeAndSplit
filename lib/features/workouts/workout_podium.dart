@@ -7,34 +7,34 @@ import '../../app/widgets/ghost_symbol.dart';
 import '../../data/courses/course.dart';
 import '../../data/statistics/ranking.dart';
 import '../../data/statistics/ranking_providers.dart';
-import '../../data/templates/session_template.dart';
+import '../../data/workouts/workout.dart';
 import '../../l10n/l10n.dart';
 import '../live/formatters.dart';
 
 /// Room next to the value of place 1 for the ghost symbol (Change ghost, Design D6).
-const templateGhostSlotWidth = 20.0;
+const workoutGhostSlotWidth = 20.0;
 
-/// Places 1–3 of [template] for its current course length and number of
+/// Places 1–3 of [workout] for its current course length and number of
 /// laps, with value, pace and date; a hint instead without an entry or with
 /// an open number of laps (Change statistics, Design D6).
-class TemplatePodium extends ConsumerWidget {
-  const TemplatePodium({super.key, required this.template});
+class WorkoutPodium extends ConsumerWidget {
+  const WorkoutPodium({super.key, required this.workout});
 
-  final SessionTemplate template;
+  final Workout workout;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final laps = template.laps;
-    if (laps == null) return _Hint(l10n.templatePodiumOpenLaps);
-    final rankings = ref.watch(templateRankingsProvider(template.id));
-    final course = template.course;
+    final laps = workout.laps;
+    if (laps == null) return _Hint(l10n.workoutPodiumOpenLaps);
+    final rankings = ref.watch(workoutRankingsProvider(workout.id));
+    final course = workout.course;
     return switch (rankings) {
       AsyncData(:final value) => switch (_current(value, course, laps)) {
         final Ranking ranking when ranking.entries.isNotEmpty => _Places(
           ranking: ranking,
         ),
-        _ => _Hint(l10n.templatePodiumEmpty),
+        _ => _Hint(l10n.workoutPodiumEmpty),
       },
       // Places are an extra; while loading or on an error the card stays as it is.
       _ => const SizedBox.shrink(),
@@ -62,7 +62,7 @@ class _Hint extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     text,
-    key: const Key('template-podium-hint'),
+    key: const Key('workout-podium-hint'),
     style: AppTextStyles.caption,
   );
 }
@@ -76,13 +76,10 @@ class _Places extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Column(
-      key: const Key('template-podium'),
+      key: const Key('workout-podium'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          l10n.templatePodiumTitle.toUpperCase(),
-          style: AppTextStyles.label,
-        ),
+        Text(l10n.workoutPodiumTitle.toUpperCase(), style: AppTextStyles.label),
         const SizedBox(height: AppSpacing.xs),
         for (final (i, entry) in ranking.entries.indexed)
           _Place(place: i + 1, axis: ranking.axis, entry: entry),
@@ -110,7 +107,7 @@ class _Place extends StatelessWidget {
       CourseAxis.time => '${formatGrouped(entry.distanceDm ~/ 10)} m',
     };
     return Padding(
-      key: Key('template-place-$place'),
+      key: Key('workout-place-$place'),
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -133,8 +130,8 @@ class _Place extends StatelessWidget {
           ),
           // Place 1 is the ghost and carries its symbol; the others keep the columns aligned.
           SizedBox(
-            key: place == 1 ? const Key('template-ghost-slot') : null,
-            width: templateGhostSlotWidth,
+            key: place == 1 ? const Key('workout-ghost-slot') : null,
+            width: workoutGhostSlotWidth,
             child: place == 1
                 ? Text.rich(
                     const WidgetSpan(
@@ -148,7 +145,7 @@ class _Place extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              l10n.templatePodiumPace(
+              l10n.workoutPodiumPace(
                 formatPace(
                   paceCs == null ? null : Duration(milliseconds: paceCs * 10),
                 ),

@@ -4,20 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/design_tokens.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
-import '../../data/templates/session_template.dart';
-import '../../data/templates/template_providers.dart';
+import '../../data/workouts/workout.dart';
+import '../../data/workouts/workout_providers.dart';
 import '../../l10n/l10n.dart';
 import '../courses/course_format.dart';
 import '../courses/course_strip.dart';
 import '../courses/courses_screen.dart';
 import '../zones/zones_screen.dart';
-import 'template_editor_screen.dart';
-import 'template_format.dart';
-import 'template_screen.dart';
+import 'workout_editor_screen.dart';
+import 'workout_format.dart';
+import 'workout_screen.dart';
 
-/// Templates, courses and zones in three tabs (canvas „Vorlage wählen“).
-class TemplatesScreen extends StatelessWidget {
-  const TemplatesScreen({super.key});
+/// Workouts, courses and zones in three tabs (canvas „Vorlage wählen“).
+class WorkoutsScreen extends StatelessWidget {
+  const WorkoutsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class TemplatesScreen extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l10n.templatesTitle),
+          title: Text(l10n.workoutsTitle),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(56),
             child: Center(
@@ -48,7 +48,7 @@ class TemplatesScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(AppSpacing.xs),
                       child: TabBar(
                         tabs: [
-                          Tab(height: 40, text: l10n.tabTemplates),
+                          Tab(height: 40, text: l10n.tabWorkouts),
                           Tab(height: 40, text: l10n.tabCourses),
                           Tab(height: 40, text: l10n.tabZones),
                         ],
@@ -62,7 +62,7 @@ class TemplatesScreen extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            const _TemplatesTab(),
+            const _WorkoutsTab(),
             const CoursesScreen(embedded: true),
             const ZonesScreen(embedded: true),
           ],
@@ -72,14 +72,14 @@ class TemplatesScreen extends StatelessWidget {
   }
 }
 
-/// All templates, to open one on its own screen and to create one (Change
+/// All workouts, to open one on its own screen and to create one (Change
 /// template-screen, Design D2).
-class _TemplatesTab extends ConsumerWidget {
-  const _TemplatesTab();
+class _WorkoutsTab extends ConsumerWidget {
+  const _WorkoutsTab();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final templates = ref.watch(templatesProvider);
+    final workouts = ref.watch(workoutsProvider);
     final hasCourses = ref.watch(coursesProvider).value?.isNotEmpty ?? true;
     final l10n = context.l10n;
     return SafeArea(
@@ -98,13 +98,13 @@ class _TemplatesTab extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: switch (templates) {
+                  child: switch (workouts) {
                     AsyncData(value: []) when !hasCourses => _NoCourse(
                       onCreate: () => openCourseEditor(context),
                     ),
                     AsyncData(value: []) => Center(
                       child: Text(
-                        l10n.templatesEmpty,
+                        l10n.workoutsEmpty,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.subtitle,
                       ),
@@ -113,24 +113,24 @@ class _TemplatesTab extends ConsumerWidget {
                       itemCount: value.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, i) =>
-                          _TemplateCard(template: value[i]),
+                          _WorkoutCard(workout: value[i]),
                     ),
                     AsyncError(:final error) => Center(
-                      child: Text(l10n.templatesLoadFailed('$error')),
+                      child: Text(l10n.workoutsLoadFailed('$error')),
                     ),
                     _ => const Center(child: CircularProgressIndicator()),
                   },
                 ),
                 const SizedBox(height: AppSpacing.l),
                 OutlinedButton.icon(
-                  key: const Key('template-create'),
+                  key: const Key('workout-create'),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                   ),
                   onPressed: () =>
                       hasCourses ? _openEditor(context) : _offerCourse(context),
                   icon: const Icon(Icons.add),
-                  label: Text(l10n.templateCreate),
+                  label: Text(l10n.workoutCreate),
                 ),
               ],
             ),
@@ -146,8 +146,8 @@ class _TemplatesTab extends ConsumerWidget {
       builder: (context) {
         final l10n = context.l10n;
         return AlertDialog(
-          title: Text(l10n.templateNeedsCourseTitle),
-          content: Text(l10n.templateNeedsCourseBody),
+          title: Text(l10n.workoutNeedsCourseTitle),
+          content: Text(l10n.workoutNeedsCourseBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -168,7 +168,7 @@ class _TemplatesTab extends ConsumerWidget {
 Future<void> _openEditor(BuildContext context) {
   return Navigator.of(
     context,
-  ).push(MaterialPageRoute<void>(builder: (_) => const TemplateEditorScreen()));
+  ).push(MaterialPageRoute<void>(builder: (_) => const WorkoutEditorScreen()));
 }
 
 class _NoCourse extends StatelessWidget {
@@ -186,7 +186,7 @@ class _NoCourse extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              l10n.templateNeedsCourse,
+              l10n.workoutNeedsCourse,
               textAlign: TextAlign.center,
               style: AppTextStyles.subtitle,
             ),
@@ -203,16 +203,16 @@ class _NoCourse extends StatelessWidget {
   }
 }
 
-/// `Seerunde · 1000 m · 3 Runden` below the name of a template.
-String templateDetails(AppLocalizations l10n, SessionTemplate template) {
-  final course = template.course;
+/// `Seerunde · 1000 m · 3 Runden` below the name of a workout.
+String workoutDetails(AppLocalizations l10n, Workout workout) {
+  final course = workout.course;
   return '${course.name} · ${formatCourseLength(course.axis, course.definition.length)} · '
-      '${formatLaps(l10n, template.laps)}';
+      '${formatLaps(l10n, workout.laps)}';
 }
 
 /// The zones of a course with their bands, each once, e.g.
 /// `Tempo 2:05–2:10 · 20–22 spm`; `ohne Zonen` for a free course.
-List<String> templateZoneLines(AppLocalizations l10n, Course course) {
+List<String> workoutZoneLines(AppLocalizations l10n, Course course) {
   final lines = {
     for (final s in course.definition.segments)
       if (!s.isFree)
@@ -221,18 +221,18 @@ List<String> templateZoneLines(AppLocalizations l10n, Course course) {
   return lines.isEmpty ? [l10n.courseZonesSummary(0, '')] : lines.toList();
 }
 
-/// A template as a compact card with its name, details and course; a tap
+/// A workout as a compact card with its name, details and course; a tap
 /// opens its screen (Change template-screen, Design D2).
-class _TemplateCard extends StatelessWidget {
-  const _TemplateCard({required this.template});
+class _WorkoutCard extends StatelessWidget {
+  const _WorkoutCard({required this.workout});
 
-  final SessionTemplate template;
+  final Workout workout;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Material(
-      key: Key('template-${template.id}'),
+      key: Key('workout-${workout.id}'),
       color: AppColors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadii.cardLarge),
@@ -240,7 +240,7 @@ class _TemplateCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => openTemplate(context, template.id),
+        onTap: () => openWorkout(context, workout.id),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.l),
           child: Row(
@@ -249,15 +249,15 @@ class _TemplateCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(template.name, style: AppTextStyles.cardTitle),
+                    Text(workout.name, style: AppTextStyles.cardTitle),
                     const SizedBox(height: 2),
                     Text(
-                      templateDetails(l10n, template),
+                      workoutDetails(l10n, workout),
                       style: AppTextStyles.subtitle,
                     ),
                     const SizedBox(height: AppSpacing.m),
                     CourseStrip(
-                      definition: template.course.definition,
+                      definition: workout.course.definition,
                       height: 10,
                     ),
                   ],

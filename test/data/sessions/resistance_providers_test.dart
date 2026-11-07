@@ -11,8 +11,8 @@ import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/sources/resistance_control.dart';
 import 'package:strokesplit/data/sources/simulated_source.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 
@@ -68,7 +68,7 @@ void main() {
 
   /// 100 m free, then a 100 m sprint on level 10, once; with [sprintFirst]
   /// the sprint comes first.
-  Future<SessionTemplate> sprintTemplate({bool sprintFirst = false}) async {
+  Future<Workout> sprintWorkout({bool sprintFirst = false}) async {
     final zoneId = await ZoneRepository(db).create(
       const Zone(
         name: 'Sprint',
@@ -88,9 +88,9 @@ void main() {
     );
     final course = await CourseRepository(db)
         .create('Sprint', layout.definition!);
-    final templates = TemplateRepository(db);
-    return (await templates.get(
-      await templates.create('Sprint', courseId: course, laps: 1),
+    final workouts = WorkoutRepository(db);
+    return (await workouts.get(
+      await workouts.create('Sprint', courseId: course, laps: 1),
     ))!;
   }
 
@@ -100,12 +100,12 @@ void main() {
       fakeAsync((async) {
         final source = SimulatedSource(seed: 1, protocol: ErgProtocol.ftms);
         final c = container(source);
-        final template = _run(async, sprintTemplate);
+        final workout = _run(async, sprintWorkout);
         _run(async, () async {
           await source.start();
           await c
               .read(sessionRecorderProvider.notifier)
-              .start(plan: template.toPlan());
+              .start(plan: workout.toPlan());
         });
         async.elapse(const Duration(seconds: 3));
         expect(
@@ -134,12 +134,12 @@ void main() {
       fakeAsync((async) {
         final source = SimulatedSource(seed: 1, protocol: ErgProtocol.ftms);
         final c = container(source);
-        final template = _run(async, () => sprintTemplate(sprintFirst: true));
+        final workout = _run(async, () => sprintWorkout(sprintFirst: true));
         _run(async, () async {
           await source.start();
           await c
               .read(sessionRecorderProvider.notifier)
-              .start(plan: template.toPlan());
+              .start(plan: workout.toPlan());
         });
         async.elapse(const Duration(seconds: 5));
         expect(source.resistanceLevel, 10);

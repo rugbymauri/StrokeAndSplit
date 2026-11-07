@@ -9,12 +9,12 @@ Set<String> _keys(Map<String, Object?> arb) => {
     if (!key.startsWith('@')) key,
 };
 
-/// What a translation lacks or has too much compared with the template.
+/// What a translation lacks or has too much compared with the workout.
 ({Set<String> missing, Set<String> extra}) compareArb(
-  Map<String, Object?> template,
+  Map<String, Object?> workout,
   Map<String, Object?> other,
 ) {
-  final (expected, actual) = (_keys(template), _keys(other));
+  final (expected, actual) = (_keys(workout), _keys(other));
   return (
     missing: expected.difference(actual),
     extra: actual.difference(expected),
@@ -25,7 +25,7 @@ Map<String, Object?> _read(File file) =>
     jsonDecode(file.readAsStringSync()) as Map<String, Object?>;
 
 void main() {
-  final template = _read(File('lib/l10n/app_de.arb'));
+  final workout = _read(File('lib/l10n/app_de.arb'));
   final translations = Directory('lib/l10n')
       .listSync()
       .whereType<File>()
@@ -38,19 +38,19 @@ void main() {
 
   for (final file in translations) {
     test(
-      '${file.uri.pathSegments.last} has exactly the keys of the German template',
+      '${file.uri.pathSegments.last} has exactly the keys of the German workout',
       () {
-        final result = compareArb(template, _read(file));
+        final result = compareArb(workout, _read(file));
         expect(result.missing, isEmpty, reason: 'missing keys');
-        expect(result.extra, isEmpty, reason: 'keys not in the template');
+        expect(result.extra, isEmpty, reason: 'keys not in the workout');
       },
     );
   }
 
-  test('every key of the template is described for translators', () {
+  test('every key of the workout is described for translators', () {
     expect({
-      for (final key in _keys(template))
-        if (template['@$key'] == null) key,
+      for (final key in _keys(workout))
+        if (workout['@$key'] == null) key,
     }, isEmpty);
   });
 

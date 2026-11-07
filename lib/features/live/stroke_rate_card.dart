@@ -9,7 +9,7 @@ import 'live_text_styles.dart';
 import 'upcoming_zone.dart';
 import 'zone_hint.dart';
 
-/// The stroke rate while rowing a template, coloured by its zone status and
+/// The stroke rate while rowing a workout, coloured by its zone status and
 /// with the band of the segment (ui-design, Design D2 and D3).
 class StrokeRateCard extends StatelessWidget {
   const StrokeRateCard({

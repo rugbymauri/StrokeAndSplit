@@ -12,12 +12,12 @@ import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/sources/heart_rate_choice.dart';
 import 'package:strokesplit/data/sources/rower_choice.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/features/connection/choose_devices_screen.dart';
 import 'package:strokesplit/features/connection/start_screen.dart';
 import 'package:strokesplit/features/live/live_screen.dart';
 import 'package:strokesplit/features/sessions/sessions_screen.dart';
-import 'package:strokesplit/features/templates/templates_screen.dart';
+import 'package:strokesplit/features/workouts/workouts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -216,7 +216,7 @@ void main() {
       await tester.pump(const Duration(seconds: 15));
     });
 
-    testWidgets('"Rudern" opens the templates', (tester) async {
+    testWidgets('"Rudern" opens the workouts', (tester) async {
       await _pumpStart(tester, chosen: const RowerChoice.simulator());
 
       await tester.tap(find.text('Rudern'));
@@ -227,7 +227,7 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      expect(find.byType(TemplatesScreen), findsOneWidget);
+      expect(find.byType(WorkoutsScreen), findsOneWidget);
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -466,7 +466,7 @@ void main() {
     });
 
     testWidgets(
-      '"Rudern" starts a template with the connection without connecting again',
+      '"Rudern" starts a workout with the connection without connecting again',
       (tester) async {
         final db = openTestDatabase();
         await tester.runAsync(() async {
@@ -474,7 +474,7 @@ void main() {
             'Seerunde',
             CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
           );
-          await TemplateRepository(db)
+          await WorkoutRepository(db)
               .create('Seerunde x3', courseId: course, laps: 3);
         });
         final container = await pumpConnected(tester, db: db);
@@ -535,7 +535,7 @@ void main() {
   });
 
   testWidgets(
-    'shows no tile "Nochmal" after a session with a template (template-screen)',
+    'shows no tile "Nochmal" after a session with a workout (template-screen)',
     (tester) async {
       final db = openTestDatabase();
       await tester.runAsync(() async {
@@ -543,8 +543,8 @@ void main() {
           'Seerunde',
           CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
         );
-        final templates = TemplateRepository(db);
-        final id = await templates.create(
+        final workouts = WorkoutRepository(db);
+        final id = await workouts.create(
           'Seerunde x3',
           courseId: course,
           laps: 3,
@@ -552,7 +552,7 @@ void main() {
         await SessionRepository(db).create(
           startedAt: DateTime.now().subtract(const Duration(days: 1)),
           source: ErgSourceKind.simulator,
-          plan: (await templates.get(id))!.toPlan(),
+          plan: (await workouts.get(id))!.toPlan(),
         );
       });
       await _pumpStart(tester, chosen: const RowerChoice.simulator(), db: db);

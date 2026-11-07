@@ -45,23 +45,19 @@ final class OpenLength extends PlanLength {
   int get hashCode => 0;
 }
 
-/// What is rowed: a course for a [length], from a template or chosen right
+/// What is rowed: a course for a [length], from a workout or chosen right
 /// on the course (course-rowing-free, Design D1). A free session has no plan.
 @immutable
 class SessionPlan {
-  const SessionPlan({
-    required this.course,
-    required this.length,
-    this.template,
-  });
+  const SessionPlan({required this.course, required this.length, this.workout});
 
   /// The course in the version that is rowed.
   final Course course;
 
   final PlanLength length;
 
-  /// The template the plan comes from; null when the course is rowed without one.
-  final ({int id, String name})? template;
+  /// The workout the plan comes from; null when the course is rowed without one.
+  final ({int id, String name})? workout;
 
   /// The number of laps; null unless the plan has a fixed number of them.
   int? get plannedLaps => switch (length) {

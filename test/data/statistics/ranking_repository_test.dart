@@ -7,7 +7,7 @@ import 'package:strokesplit/data/sessions/session_repository.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/statistics/ranking.dart';
 import 'package:strokesplit/data/statistics/ranking_repository.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:drift/drift.dart' show Value;
@@ -27,14 +27,14 @@ List<String> _values(List<Ranking> rankings) => [
 void main() {
   late AppDatabase db;
   late CourseRepository courses;
-  late TemplateRepository templates;
+  late WorkoutRepository workouts;
   late RankingRepository rankings;
   late int seerunde;
 
   setUp(() async {
     db = openTestDatabase();
     courses = CourseRepository(db);
-    templates = TemplateRepository(db);
+    workouts = WorkoutRepository(db);
     rankings = RankingRepository(db);
     seerunde = await courses.create(
       'Seerunde',
@@ -46,20 +46,16 @@ void main() {
       (await courses.get(courseId))!.versionId;
 
   group('course', () {
-    test('ranks the laps of all templates on the course together', () async {
-      final x3 = (await templates.get(
-        await templates.create('Seerunde x3', courseId: seerunde, laps: 3),
+    test('ranks the laps of all workouts on the course together', () async {
+      final x3 = (await workouts.get(
+        await workouts.create('Seerunde x3', courseId: seerunde, laps: 3),
       ))!;
-      final open = (await templates.get(
-        await templates.create(
-          'Seerunde offen',
-          courseId: seerunde,
-          laps: null,
-        ),
+      final open = (await workouts.get(
+        await workouts.create('Seerunde offen', courseId: seerunde, laps: null),
       ))!;
       await storeRowedSession(
         db,
-        template: x3,
+        workout: x3,
         laps: [
           RowedLap.single(250000, 1000),
           RowedLap.single(248000, 1000),
@@ -68,7 +64,7 @@ void main() {
       );
       await storeRowedSession(
         db,
-        template: open,
+        workout: open,
         laps: [RowedLap.single(249000, 1000)],
       );
 
@@ -349,7 +345,7 @@ void main() {
 
       expect(_values(await rankings.zone(sprintId)), ['100: 18']);
     });
-    test('ranks the laps and sprints of a course rowed for a duration without a template', () async {
+    test('ranks the laps and sprints of a course rowed for a duration without a workout', () async {
       final lake = await courseWithSprints('Seerunde', [450], after: 450);
       final id = await storeRowedSession(
         db,
@@ -377,25 +373,25 @@ void main() {
     });
   });
 
-  group('template', () {
+  group('workout', () {
     late int x3;
 
     setUp(
-      () async => x3 = await templates.create(
+      () async => x3 = await workouts.create(
         'Seerunde x3',
         courseId: seerunde,
         laps: 3,
       ),
     );
 
-    /// Rows [template] with laps of [lapMs] each over 1000 m.
+    /// Rows [workout] with laps of [lapMs] each over 1000 m.
     Future<int> row(
-      int template,
+      int workout,
       List<int> lapMs, {
       bool lastComplete = true,
     }) async => storeRowedSession(
       db,
-      template: (await templates.get(template))!,
+      workout: (await workouts.get(workout))!,
       laps: [
         for (final (i, ms) in lapMs.indexed)
           RowedLap.single(
@@ -410,7 +406,7 @@ void main() {
       await row(x3, [250000, 251000, 250800]);
       final best = await row(x3, [248000, 248100, 248000]);
 
-      final ranked = await rankings.template(x3);
+      final ranked = await rankings.workout(x3);
 
       expect(_values(ranked), ['1000: 744, 751']);
       final first = ranked.single.entries.first;
@@ -434,12 +430,12 @@ void main() {
       await row(x3, [250000, 251000]);
       await row(x3, [250000, 251000, 100000], lastComplete: false);
 
-      expect(await rankings.template(x3), isEmpty);
+      expect(await rankings.workout(x3), isEmpty);
     });
 
     test('has a ranking per number of laps, the current one first', () async {
       await row(x3, [250000, 251000, 250800]);
-      await templates.update(
+      await workouts.update(
         x3,
         name: 'Seerunde x3',
         courseId: seerunde,
@@ -447,7 +443,7 @@ void main() {
       );
       await row(x3, [250000, 251000, 250800, 252000]);
 
-      final ranked = await rankings.template(x3);
+      final ranked = await rankings.workout(x3);
 
       expect(
         [for (final r in ranked) (r.length, r.laps, r.entries.length)],
@@ -456,14 +452,14 @@ void main() {
     });
 
     test('has no ranking for an open number of laps, its laps count for the course', () async {
-      final open = await templates.create(
+      final open = await workouts.create(
         'Seerunde offen',
         courseId: seerunde,
         laps: null,
       );
       await row(open, [250000, 251000]);
 
-      expect(await rankings.template(open), isEmpty);
+      expect(await rankings.workout(open), isEmpty);
       expect(_values(await rankings.course(seerunde)), ['1000: 250, 251']);
     });
   });
@@ -490,7 +486,7 @@ void main() {
       ErgSourceKind source = ErgSourceKind.pm5,
     }) async => storeRowedSession(
       db,
-      template: (await templates.get(x3))!,
+      workout: (await workouts.get(x3))!,
       source: source,
       laps: [for (final ms in sprintMs) lap(ms)],
     );
@@ -510,7 +506,7 @@ void main() {
           ],
         ),
       );
-      x3 = await templates.create('Seerunde x3', courseId: lake, laps: 3);
+      x3 = await workouts.create('Seerunde x3', courseId: lake, laps: 3);
     });
 
     test('counts no session of the simulator or a replay', () async {
@@ -519,13 +515,13 @@ void main() {
 
       expect(await rankings.course(lake), isEmpty);
       expect(await rankings.zone(sprintId), isEmpty);
-      expect(await rankings.template(x3), isEmpty);
+      expect(await rankings.workout(x3), isEmpty);
     });
 
     test('counts sessions of FTMS rowers', () async {
       await row([18000, 18000, 18000], source: ErgSourceKind.ftms);
 
-      expect(_values(await rankings.template(x3)), ['1000: 714']);
+      expect(_values(await rankings.workout(x3)), ['1000: 714']);
     });
 
     test(
@@ -548,12 +544,12 @@ void main() {
       },
     );
 
-    test('counts the laps of a deleted template for its course', () async {
+    test('counts the laps of a deleted workout for its course', () async {
       await row([18000, 18000, 18000]);
 
-      await templates.delete(x3);
+      await workouts.delete(x3);
 
-      expect(await rankings.template(x3), isEmpty);
+      expect(await rankings.workout(x3), isEmpty);
       expect(_values(await rankings.course(lake)), ['1000: 238, 238, 238']);
     });
 
@@ -578,7 +574,7 @@ void main() {
         ],
         [17500, 18500, 19500],
       );
-      expect(await rankings.template(x3), hasLength(1));
+      expect(await rankings.workout(x3), hasLength(1));
       expect((await rankings.course(lake)).single.entries, hasLength(3));
     });
 
@@ -603,18 +599,18 @@ void main() {
         ).definition!;
         final courseId = await CourseRepository(phone)
             .create('Seerunde', definition);
-        final phoneTemplates = TemplateRepository(phone);
-        final templateId = await phoneTemplates.create(
+        final phoneWorkouts = WorkoutRepository(phone);
+        final workoutId = await phoneWorkouts.create(
           'Seerunde x3',
           courseId: courseId,
           laps: 3,
         );
-        final template = (await phoneTemplates.get(templateId))!;
+        final workout = (await phoneWorkouts.get(workoutId))!;
         final sessions = SessionRepository(phone);
         final recorded = await sessions.create(
           startedAt: DateTime.utc(2026, 10, 16, 7),
           source: ErgSourceKind.pm5,
-          plan: template.toPlan(),
+          plan: workout.toPlan(),
         );
         final accumulator = SessionAccumulator(
           recorded,
@@ -632,12 +628,12 @@ void main() {
 
         final course = (await CourseRepository(laptop).all()).single;
         final zone = (await ZoneRepository(laptop).all()).single;
-        // The import links no template; linked by hand, the session still must not count.
-        final laptopTemplate = await TemplateRepository(laptop)
+        // The import links no workout; linked by hand, the session still must not count.
+        final laptopWorkout = await WorkoutRepository(laptop)
             .create('Seerunde x3', courseId: course.id, laps: 3);
         await (laptop.update(laptop.sessions)
               ..where((s) => s.id.equals(imported)))
-            .write(SessionsCompanion(templateId: Value(laptopTemplate)));
+            .write(SessionsCompanion(workoutId: Value(laptopWorkout)));
 
         expect(
           (await SessionRepository(laptop).get(imported))!.imported,
@@ -646,7 +642,7 @@ void main() {
         final laptopRankings = RankingRepository(laptop);
         expect(await laptopRankings.course(course.id), isEmpty);
         expect(await laptopRankings.zone(zone.id), isEmpty);
-        expect(await laptopRankings.template(laptopTemplate), isEmpty);
+        expect(await laptopRankings.workout(laptopWorkout), isEmpty);
         // On the phone, where it was rowed, the session counts.
         final phoneRankings = RankingRepository(phone);
         expect(
@@ -658,7 +654,7 @@ void main() {
           hasLength(3),
         );
         expect(
-          (await phoneRankings.template(templateId)).single.entries,
+          (await phoneRankings.workout(workoutId)).single.entries,
           hasLength(1),
         );
       },

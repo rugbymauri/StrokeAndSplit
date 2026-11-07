@@ -177,31 +177,31 @@ class CourseRepository {
   Stream<Map<int, CourseRowCount>> watchRowCounts() =>
       _db.watchTables([_db.sessions, _db.courseVersions], rowCounts);
 
-  /// Names of the templates that row this course.
-  Future<List<String>> templatesUsing(int id) async {
+  /// Names of the workouts that row this course.
+  Future<List<String>> workoutsUsing(int id) async {
     final query =
-        _db.select(_db.templates).join([
+        _db.select(_db.workouts).join([
             innerJoin(
-              _db.templateBlocks,
-              _db.templateBlocks.templateId.equalsExp(_db.templates.id),
+              _db.workoutBlocks,
+              _db.workoutBlocks.workoutId.equalsExp(_db.workouts.id),
             ),
           ])
-          ..where(_db.templateBlocks.courseId.equals(id))
-          ..orderBy([OrderingTerm.asc(_db.templates.name)]);
+          ..where(_db.workoutBlocks.courseId.equals(id))
+          ..orderBy([OrderingTerm.asc(_db.workouts.name)]);
     final rows = await query.get();
-    return {for (final row in rows) row.readTable(_db.templates).name}.toList();
+    return {for (final row in rows) row.readTable(_db.workouts).name}.toList();
   }
 
-  /// Removes the course from the list together with the templates using it;
+  /// Removes the course from the list together with the workouts using it;
   /// sessions rowed on it keep their version.
   Future<void> delete(int id) {
     return _db.transaction(() async {
       final blocks = await (_db.select(
-        _db.templateBlocks,
+        _db.workoutBlocks,
       )..where((b) => b.courseId.equals(id))).get();
       await (_db.delete(
-        _db.templates,
-      )..where((t) => t.id.isIn(blocks.map((b) => b.templateId)))).go();
+        _db.workouts,
+      )..where((t) => t.id.isIn(blocks.map((b) => b.workoutId)))).go();
       await (_db.update(_db.courses)..where((c) => c.id.equals(id))).write(
         CoursesCompanion(deletedAt: Value(clock.now())),
       );

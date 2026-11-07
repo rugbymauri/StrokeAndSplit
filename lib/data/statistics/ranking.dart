@@ -86,7 +86,7 @@ class RankingEntry {
       '$durationMs ms, $distanceDm dm)';
 }
 
-/// The entries of one length of a template, course or zone, best first
+/// The entries of one length of a workout, course or zone, best first
 /// (Design D2).
 @immutable
 class Ranking {
@@ -104,7 +104,7 @@ class Ranking {
   /// Of the course or zone, in metres or seconds depending on [axis].
   final int length;
 
-  /// The number of laps of a template ranking; null otherwise.
+  /// The number of laps of a workout ranking; null otherwise.
   final int? laps;
 
   final List<RankingEntry> entries;

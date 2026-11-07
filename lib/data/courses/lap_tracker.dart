@@ -75,7 +75,7 @@ class LapProgress {
   final Duration lapTime;
 
   /// Wall-clock time since the first lap started, pauses included; the ghost
-  /// of the template runs on it (Change ghost, Design D2).
+  /// of the workout runs on it (Change ghost, Design D2).
   final Duration courseTime;
 
   /// Wall-clock time since the current segment started, pauses included; the

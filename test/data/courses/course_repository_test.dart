@@ -40,15 +40,15 @@ Future<int> _rowSession(AppDatabase db, int versionId) async {
   return id;
 }
 
-Future<int> _template(AppDatabase db, String name, int courseId) async {
+Future<int> _workout(AppDatabase db, String name, int courseId) async {
   final id = await db
-      .into(db.templates)
-      .insert(TemplatesCompanion.insert(name: name, createdAt: DateTime(2026)));
+      .into(db.workouts)
+      .insert(WorkoutsCompanion.insert(name: name, createdAt: DateTime(2026)));
   await db
-      .into(db.templateBlocks)
+      .into(db.workoutBlocks)
       .insert(
-        TemplateBlocksCompanion.insert(
-          templateId: id,
+        WorkoutBlocksCompanion.insert(
+          workoutId: id,
           position: 0,
           courseId: courseId,
         ),
@@ -184,22 +184,22 @@ void main() {
     expect(laps.single.endWallMs, 240000);
   });
 
-  test('deleting a course deletes the templates using it', () async {
+  test('deleting a course deletes the workouts using it', () async {
     final id = await courses.create('Seerunde', _seerunde);
     final other = await courses.create(
       'Sprint',
       CourseDefinition.single(axis: CourseAxis.distance, length: 500),
     );
-    await _template(db, 'Seerunde x3', id);
-    await _template(db, 'Sprint x5', other);
+    await _workout(db, 'Seerunde x3', id);
+    await _workout(db, 'Sprint x5', other);
 
-    expect(await courses.templatesUsing(id), ['Seerunde x3']);
+    expect(await courses.workoutsUsing(id), ['Seerunde x3']);
     await courses.delete(id);
 
-    expect((await db.select(db.templates).get()).map((t) => t.name), [
+    expect((await db.select(db.workouts).get()).map((t) => t.name), [
       'Sprint x5',
     ]);
-    expect(await db.select(db.templateBlocks).get(), hasLength(1));
+    expect(await db.select(db.workoutBlocks).get(), hasLength(1));
   });
 
   test('tells the list about changes', () async {

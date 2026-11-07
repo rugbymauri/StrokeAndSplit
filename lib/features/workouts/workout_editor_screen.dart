@@ -6,31 +6,31 @@ import '../../app/widgets/oar_stepper.dart';
 import '../../app/widgets/segment_choice.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
-import '../../data/templates/session_template.dart';
-import '../../data/templates/template_providers.dart';
+import '../../data/workouts/workout.dart';
+import '../../data/workouts/workout_providers.dart';
 import '../../l10n/l10n.dart';
 import '../courses/course_strip.dart';
 import '../courses/courses_screen.dart';
 
-/// Creates a template, or edits [template] when given.
-class TemplateEditorScreen extends ConsumerStatefulWidget {
-  const TemplateEditorScreen({super.key, this.template});
+/// Creates a workout, or edits [workout] when given.
+class WorkoutEditorScreen extends ConsumerStatefulWidget {
+  const WorkoutEditorScreen({super.key, this.workout});
 
-  final SessionTemplate? template;
+  final Workout? workout;
 
   @override
-  ConsumerState<TemplateEditorScreen> createState() =>
-      _TemplateEditorScreenState();
+  ConsumerState<WorkoutEditorScreen> createState() =>
+      _WorkoutEditorScreenState();
 }
 
 /// More laps than anyone rows in one session.
 const _maxLaps = 99;
 
-class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
-  late final _name = TextEditingController(text: widget.template?.name);
-  late var _laps = widget.template?.laps ?? 3;
-  late int? _courseId = widget.template?.course.id;
-  late var _open = widget.template != null && widget.template!.laps == null;
+class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
+  late final _name = TextEditingController(text: widget.workout?.name);
+  late var _laps = widget.workout?.laps ?? 3;
+  late int? _courseId = widget.workout?.course.id;
+  late var _open = widget.workout != null && widget.workout!.laps == null;
   var _errors = <String>[];
 
   @override
@@ -44,20 +44,20 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
     final laps = _open ? null : _laps;
     final l10n = context.l10n;
     final errors = [
-      if (name.isEmpty) l10n.templateNameMissing,
-      if (_courseId == null) l10n.templateCourseMissing,
+      if (name.isEmpty) l10n.workoutNameMissing,
+      if (_courseId == null) l10n.workoutCourseMissing,
     ];
     if (errors.isNotEmpty) {
       setState(() => _errors = errors);
       return;
     }
-    final repository = ref.read(templateRepositoryProvider);
-    final template = widget.template;
-    if (template == null) {
+    final repository = ref.read(workoutRepositoryProvider);
+    final workout = widget.workout;
+    if (workout == null) {
       await repository.create(name, courseId: _courseId!, laps: laps);
     } else {
       await repository.update(
-        template.id,
+        workout.id,
         name: name,
         courseId: _courseId!,
         laps: laps,
@@ -67,14 +67,14 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
   }
 
   Future<void> _delete() async {
-    final template = widget.template!;
+    final workout = widget.workout!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         final l10n = context.l10n;
         return AlertDialog(
-          title: Text(l10n.templateDeleteTitle),
-          content: Text(l10n.templateDeleteBody(template.name)),
+          title: Text(l10n.workoutDeleteTitle),
+          content: Text(l10n.workoutDeleteBody(workout.name)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -89,7 +89,7 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
       },
     );
     if (confirmed != true) return;
-    await ref.read(templateRepositoryProvider).delete(template.id);
+    await ref.read(workoutRepositoryProvider).delete(workout.id);
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -102,10 +102,10 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.template == null ? l10n.templateNew : l10n.templateEdit,
+          widget.workout == null ? l10n.workoutNew : l10n.workoutEdit,
         ),
         actions: [
-          if (widget.template != null)
+          if (widget.workout != null)
             IconButton(
               tooltip: l10n.actionDelete,
               icon: const Icon(Icons.delete_outline),
@@ -131,17 +131,17 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
                     child: Text(e, style: TextStyle(color: colors.error)),
                   ),
                 TextField(
-                  key: const Key('template-name'),
+                  key: const Key('workout-name'),
                   controller: _name,
                   decoration: InputDecoration(labelText: l10n.fieldName),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
-                  key: const Key('template-course'),
+                  key: const Key('workout-course'),
                   initialValue: courses.any((c) => c.id == _courseId)
                       ? _courseId
                       : null,
-                  decoration: InputDecoration(labelText: l10n.templateCourse),
+                  decoration: InputDecoration(labelText: l10n.workoutCourse),
                   items: [
                     for (final c in courses)
                       DropdownMenuItem(
@@ -157,14 +157,14 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
                 ],
                 const SizedBox(height: 24),
                 Text(
-                  l10n.templateLaps.toUpperCase(),
+                  l10n.workoutLaps.toUpperCase(),
                   style: AppTextStyles.label,
                 ),
                 const SizedBox(height: 10),
                 SegmentChoice(
                   options: [
-                    (false, l10n.templateFixedLaps),
-                    (true, l10n.templateOpenLaps),
+                    (false, l10n.workoutFixedLaps),
+                    (true, l10n.workoutOpenLaps),
                   ],
                   value: _open,
                   onChanged: (open) => setState(() => _open = open),
@@ -172,14 +172,14 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
                 if (!_open) ...[
                   const SizedBox(height: 10),
                   OarStepper(
-                    key: const Key('template-laps'),
+                    key: const Key('workout-laps'),
                     value: _laps,
                     step: 1,
                     min: 1,
                     max: _maxLaps,
                     stepLabel: l10n.lapsCount(1),
-                    label: l10n.templateLaps,
-                    unit: l10n.templateLapsUnit(_laps),
+                    label: l10n.workoutLaps,
+                    unit: l10n.workoutLapsUnit(_laps),
                     onChanged: (laps) => setState(() => _laps = laps),
                   ),
                 ],
@@ -220,7 +220,7 @@ class _Result extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.templateResult, style: AppTextStyles.caption),
+            Text(l10n.workoutResult, style: AppTextStyles.caption),
             const SizedBox(height: 6),
             Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -231,7 +231,7 @@ class _Result extends StatelessWidget {
                     course.axis,
                     laps == null ? lap : lap * laps,
                   ),
-                  key: const Key('template-result'),
+                  key: const Key('workout-result'),
                   style: const TextStyle(
                     fontFamily: AppFonts.display,
                     fontSize: 32,
@@ -242,9 +242,9 @@ class _Result extends StatelessWidget {
                 Expanded(
                   child: Text(
                     laps == null
-                        ? l10n.templateResultOpen
+                        ? l10n.workoutResultOpen
                         : '$laps × ${formatCourseLength(course.axis, lap)}',
-                    key: const Key('template-result-detail'),
+                    key: const Key('workout-result-detail'),
                     textAlign: TextAlign.end,
                     style: AppTextStyles.subtitle,
                   ),

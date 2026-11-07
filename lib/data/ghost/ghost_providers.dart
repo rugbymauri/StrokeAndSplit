@@ -20,9 +20,9 @@ final ghostTrackProvider = FutureProvider.autoDispose
       (ref, entry) => ref.watch(ghostRepositoryProvider).track(entry),
     );
 
-/// The ranking of a template with this course length and number of laps.
-typedef TemplateGhostKey = ({
-  int templateId,
+/// The ranking of a workout with this course length and number of laps.
+typedef WorkoutGhostKey = ({
+  int workoutId,
   CourseAxis axis,
   int length,
   int laps,
@@ -31,14 +31,12 @@ typedef TemplateGhostKey = ({
 /// The ranking of a course or a zone with this length.
 typedef LengthGhostKey = ({int id, CourseAxis axis, int length});
 
-/// The ghost of the outer track: place 1 of the template with the length and
+/// The ghost of the outer track: place 1 of the workout with the length and
 /// number of laps rowed now (Change ghost, Design D2). Null without such an
 /// entry, without its course and while either is loading.
-final templateGhostProvider = Provider.autoDispose
-    .family<GhostTrack?, TemplateGhostKey>((ref, key) {
-      final rankings = ref
-          .watch(templateRankingsProvider(key.templateId))
-          .value;
+final workoutGhostProvider = Provider.autoDispose
+    .family<GhostTrack?, WorkoutGhostKey>((ref, key) {
+      final rankings = ref.watch(workoutRankingsProvider(key.workoutId)).value;
       return _placeOne(ref, rankings, key.axis, key.length, laps: key.laps);
     });
 
@@ -59,9 +57,9 @@ final zoneGhostProvider = Provider.autoDispose
     });
 
 /// What decides the ghosts of a running plan; see [liveGhostsKey]. Without
-/// a template there is no ghost of the template (course-rowing-free, Design D5).
+/// a workout there is no ghost of the workout (course-rowing-free, Design D5).
 typedef LiveGhostsKey = ({
-  int? templateId,
+  int? workoutId,
   int courseId,
   CourseAxis axis,
   int length,
@@ -73,7 +71,7 @@ typedef LiveGhostsKey = ({
 /// The key of [liveGhostsProvider] for [plan] at the moment of [progress];
 /// it only changes from one segment to the next.
 LiveGhostsKey liveGhostsKey(SessionPlan plan, LapProgress progress) => (
-  templateId: plan.template?.id,
+  workoutId: plan.workout?.id,
   courseId: plan.course.id,
   axis: plan.course.axis,
   length: plan.course.definition.length,
@@ -82,7 +80,7 @@ LiveGhostsKey liveGhostsKey(SessionPlan plan, LapProgress progress) => (
   segmentLength: progress.segmentEnd - progress.segmentStart,
 );
 
-/// The three ghosts of a running template, each place 1 of the ranking of its
+/// The three ghosts of a running workout, each place 1 of the ranking of its
 /// track (Design D2): none outside with an open number of laps, none inside
 /// in a free segment.
 ///
@@ -93,19 +91,19 @@ LiveGhostsKey liveGhostsKey(SessionPlan plan, LapProgress progress) => (
 /// never ranked and so never ghosts.
 final liveGhostsProvider = Provider.autoDispose
     .family<LiveGhosts, LiveGhostsKey>((ref, key) {
-      final (templateId, laps, zoneId) = (key.templateId, key.laps, key.zoneId);
-      final template = templateId == null || laps == null
+      final (workoutId, laps, zoneId) = (key.workoutId, key.laps, key.zoneId);
+      final workout = workoutId == null || laps == null
           ? null
           : (
-              templateId: templateId,
+              workoutId: workoutId,
               axis: key.axis,
               length: key.length,
               laps: laps,
             );
       return (
-        course: template == null
+        course: workout == null
             ? null
-            : ref.watch(templateGhostProvider(template)),
+            : ref.watch(workoutGhostProvider(workout)),
         lap: ref.watch(
           courseGhostProvider((
             id: key.courseId,

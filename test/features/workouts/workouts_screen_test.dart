@@ -1,22 +1,22 @@
 import 'package:strokesplit/app/widgets/oar_stepper.dart';
 import 'package:strokesplit/features/courses/place_zone_screen.dart';
 import 'package:strokesplit/features/connection/start_screen.dart';
-import 'package:strokesplit/features/templates/template_editor_screen.dart';
-import 'package:strokesplit/features/templates/template_screen.dart';
+import 'package:strokesplit/features/workouts/workout_editor_screen.dart';
+import 'package:strokesplit/features/workouts/workout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/oar_steppers.dart';
-import '../../support/template_setup.dart';
+import '../../support/workout_setup.dart';
 import '../../support/test_database.dart';
 
 void main() {
-  testWidgets('lists templates with course and laps', (tester) async {
-    final setup = TemplateSetup();
+  testWidgets('lists workouts with course and laps', (tester) async {
+    final setup = WorkoutSetup();
     final id = await setup.addCourse(tester, 'Seerunde');
     await tester.runAsync(() async {
-      await setup.templates.create('Seerunde x3', courseId: id, laps: 3);
-      await setup.templates.create('Seerunde offen', courseId: id, laps: null);
+      await setup.workouts.create('Seerunde x3', courseId: id, laps: 3);
+      await setup.workouts.create('Seerunde offen', courseId: id, laps: null);
     });
     await setup.pump(tester);
 
@@ -28,9 +28,9 @@ void main() {
   });
 
   testWidgets(
-    'creates a template with a fixed and one with an open number of laps',
+    'creates a workout with a fixed and one with an open number of laps',
     (tester) async {
-      final setup = TemplateSetup();
+      final setup = WorkoutSetup();
       await setup.addCourse(tester, 'Seerunde');
       await setup.pump(tester);
       expect(find.text('Noch keine Vorlagen angelegt.'), findsOneWidget);
@@ -38,8 +38,8 @@ void main() {
       Future<void> create(String name, {bool open = false}) async {
         await tester.tap(find.text('Vorlage anlegen'));
         await tester.pumpAndSettle();
-        await tester.enterText(find.byKey(const Key('template-name')), name);
-        await tester.tap(find.byKey(const Key('template-course')));
+        await tester.enterText(find.byKey(const Key('workout-name')), name);
+        await tester.tap(find.byKey(const Key('workout-course')));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Seerunde · 1000 m · frei').last);
         await tester.pumpAndSettle();
@@ -58,10 +58,10 @@ void main() {
     },
   );
 
-  testWidgets('does not save a template without name and course', (
+  testWidgets('does not save a workout without name and course', (
     tester,
   ) async {
-    final setup = TemplateSetup();
+    final setup = WorkoutSetup();
     await setup.addCourse(tester, 'Seerunde');
     await setup.pump(tester);
 
@@ -76,11 +76,11 @@ void main() {
   });
 
   testWidgets('shows the editor in English', (tester) async {
-    final setup = TemplateSetup();
+    final setup = WorkoutSetup();
     await setup.addCourse(tester, 'Seerunde');
     await setup.pump(
       tester,
-      home: const TemplateEditorScreen(),
+      home: const WorkoutEditorScreen(),
       locale: const Locale('en'),
     );
 
@@ -97,11 +97,11 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets('changes the laps of a template', (tester) async {
-    final setup = TemplateSetup();
+  testWidgets('changes the laps of a workout', (tester) async {
+    final setup = WorkoutSetup();
     final id = await setup.addCourse(tester, 'Seerunde');
     await tester.runAsync(
-      () => setup.templates.create('Seerunde x3', courseId: id, laps: 3),
+      () => setup.workouts.create('Seerunde x3', courseId: id, laps: 3),
     );
     await setup.pump(tester);
 
@@ -118,60 +118,55 @@ void main() {
     await disposeWidgetsWithDatabase(tester);
   });
 
-  testWidgets(
-    'opens a template on its own screen instead of opening the card',
-    (tester) async {
-      final setup = TemplateSetup();
-      final course = await setup.addCourseWithZone(tester, 'Seerunde');
-      final x3 = await setup.addTemplate(
-        tester,
-        'Seerunde x3',
-        courseId: course,
-      );
-      await setup.addTemplate(
-        tester,
-        'Seerunde offen',
-        courseId: course,
-        laps: null,
-      );
-      await setup.pump(tester);
+  testWidgets('opens a workout on its own screen instead of opening the card', (
+    tester,
+  ) async {
+    final setup = WorkoutSetup();
+    final course = await setup.addCourseWithZone(tester, 'Seerunde');
+    final x3 = await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+    await setup.addWorkout(
+      tester,
+      'Seerunde offen',
+      courseId: course,
+      laps: null,
+    );
+    await setup.pump(tester);
 
-      // No card shows zones, places or "Starten".
-      expect(find.text('Tempo 2:05–2:10 · 20–22 spm'), findsNothing);
-      expect(find.text('Starten'), findsNothing);
-      expect(find.byTooltip('Vorlage bearbeiten'), findsNothing);
-      expect(
-        find.descendant(
-          of: find.byKey(Key('template-$x3')),
-          matching: find.byIcon(Icons.chevron_right),
-        ),
-        findsOneWidget,
-      );
+    // No card shows zones, places or "Starten".
+    expect(find.text('Tempo 2:05–2:10 · 20–22 spm'), findsNothing);
+    expect(find.text('Starten'), findsNothing);
+    expect(find.byTooltip('Vorlage bearbeiten'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byKey(Key('workout-$x3')),
+        matching: find.byIcon(Icons.chevron_right),
+      ),
+      findsOneWidget,
+    );
 
-      await setup.openTemplate(tester, 'Seerunde x3');
-      expect(find.byType(TemplateScreen), findsOneWidget);
-      expect(find.text('Starten'), findsOneWidget);
-      await disposeWidgetsWithDatabase(tester);
-    },
-  );
+    await setup.openWorkout(tester, 'Seerunde x3');
+    expect(find.byType(WorkoutScreen), findsOneWidget);
+    expect(find.text('Starten'), findsOneWidget);
+    await disposeWidgetsWithDatabase(tester);
+  });
 
   group('number of laps', () {
-    Future<TemplateSetup> openEditor(
+    Future<WorkoutSetup> openEditor(
       WidgetTester tester, {
       int? laps = 3,
     }) async {
-      final setup = TemplateSetup();
+      final setup = WorkoutSetup();
       final id = await setup.addCourse(tester, 'Seerunde');
       await tester.runAsync(
-        () => setup.templates.create('Seerunde', courseId: id, laps: laps),
+        () => setup.workouts.create('Seerunde', courseId: id, laps: laps),
       );
-      final template = (await tester.runAsync(setup.templates.all))!.single;
-      await setup.pump(tester, home: TemplateEditorScreen(template: template));
+      final workout = (await tester.runAsync(setup.workouts.all))!.single;
+      await setup.pump(tester, home: WorkoutEditorScreen(workout: workout));
       return setup;
     }
 
     OarStepper laps(WidgetTester tester) =>
-        tester.widget<OarStepper>(find.byKey(const Key('template-laps')));
+        tester.widget<OarStepper>(find.byKey(const Key('workout-laps')));
 
     testWidgets('counts a fixed number of laps and shows what they add up to', (
       tester,
@@ -202,7 +197,7 @@ void main() {
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
 
-      expect((await tester.runAsync(setup.templates.all))!.single.laps, 3);
+      expect((await tester.runAsync(setup.workouts.all))!.single.laps, 3);
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -214,7 +209,7 @@ void main() {
       await tester.tap(find.text('Offen bis Stopp'));
       await tester.pump();
 
-      expect(find.byKey(const Key('template-laps')), findsNothing);
+      expect(find.byKey(const Key('workout-laps')), findsNothing);
       expect(find.text('1000 m'), findsOneWidget);
       expect(
         find.text('pro Runde, bis du die Session beendest'),
@@ -222,16 +217,16 @@ void main() {
       );
       await tester.tap(find.byTooltip('Speichern'));
       await setup.settle(tester);
-      expect((await tester.runAsync(setup.templates.all))!.single.laps, isNull);
+      expect((await tester.runAsync(setup.workouts.all))!.single.laps, isNull);
       await disposeWidgetsWithDatabase(tester);
     });
 
     testWidgets(
-      'starts an open template with three laps when it gets a fixed number',
+      'starts an open workout with three laps when it gets a fixed number',
       (tester) async {
         await openEditor(tester, laps: null);
 
-        expect(find.byKey(const Key('template-laps')), findsNothing);
+        expect(find.byKey(const Key('workout-laps')), findsNothing);
         await tester.tap(find.text('Feste Anzahl'));
         await tester.pump();
 
@@ -245,7 +240,7 @@ void main() {
   testWidgets('offers to create a course first when there is none', (
     tester,
   ) async {
-    final setup = TemplateSetup();
+    final setup = WorkoutSetup();
     await setup.pump(tester);
 
     expect(
@@ -268,7 +263,7 @@ void main() {
   });
 
   testWidgets('is reached from the start screen', (tester) async {
-    final setup = TemplateSetup();
+    final setup = WorkoutSetup();
     await setup.pump(tester, home: const StartScreen());
 
     await tester.tap(find.text('Rudern'));
@@ -286,7 +281,7 @@ void main() {
   group('across the tabs', () {
     Future<void> createZone(
       WidgetTester tester,
-      TemplateSetup setup,
+      WorkoutSetup setup,
       String name,
     ) async {
       await tester.tap(find.text('Zonen'));
@@ -300,7 +295,7 @@ void main() {
 
     Future<void> openPlaceDialog(
       WidgetTester tester,
-      TemplateSetup setup,
+      WorkoutSetup setup,
     ) async {
       await tester.tap(find.text('Strecken'));
       await setup.settle(tester);
@@ -313,7 +308,7 @@ void main() {
     testWidgets('offers every zone created in the zones tab when placing', (
       tester,
     ) async {
-      final setup = TemplateSetup();
+      final setup = WorkoutSetup();
       await setup.pump(tester);
 
       await createZone(tester, setup, 'Sprint');
@@ -353,7 +348,7 @@ void main() {
     testWidgets(
       'places zones created right in the dialog one after the other',
       (tester) async {
-        final setup = TemplateSetup();
+        final setup = WorkoutSetup();
         // Room for the course with both zones.
         tester.view.physicalSize = const Size(800, 1200);
         tester.view.devicePixelRatio = 1;
@@ -391,9 +386,9 @@ void main() {
     );
 
     testWidgets(
-      'offers a course created in the courses tab for a new template',
+      'offers a course created in the courses tab for a new workout',
       (tester) async {
-        final setup = TemplateSetup();
+        final setup = WorkoutSetup();
         await setup.addCourse(tester, 'Seerunde');
         await setup.pump(tester);
 
@@ -411,7 +406,7 @@ void main() {
         await setup.settle(tester);
         await tester.tap(find.text('Vorlage anlegen'));
         await setup.settle(tester);
-        await tester.tap(find.byKey(const Key('template-course')));
+        await tester.tap(find.byKey(const Key('workout-course')));
         await setup.settle(tester);
 
         expect(find.text('Sprintstrecke · 2000 m · frei'), findsWidgets);

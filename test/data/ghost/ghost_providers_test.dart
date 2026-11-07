@@ -7,8 +7,8 @@ import 'package:strokesplit/data/ghost/ghost_providers.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
-import 'package:strokesplit/data/templates/session_template.dart';
-import 'package:strokesplit/data/templates/template_repository.dart';
+import 'package:strokesplit/data/workouts/workout.dart';
+import 'package:strokesplit/data/workouts/workout_repository.dart';
 import 'package:strokesplit/data/zones/zone.dart';
 import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:erg_protocol/erg_protocol.dart';
@@ -78,12 +78,12 @@ Future<void> _settle() async {
 void main() {
   late AppDatabase db;
   late CourseRepository courses;
-  late TemplateRepository templates;
+  late WorkoutRepository workouts;
 
   setUp(() {
     db = openTestDatabase();
     courses = CourseRepository(db);
-    templates = TemplateRepository(db);
+    workouts = WorkoutRepository(db);
   });
 
   ProviderContainer containerWith([ErgSource? source]) {
@@ -101,18 +101,18 @@ void main() {
     return container;
   }
 
-  /// The ghosts for [template] at the state of [tracker], or of a fresh one.
+  /// The ghosts for [workout] at the state of [tracker], or of a fresh one.
   Future<LiveGhosts> ghostsOf(
     ProviderContainer container,
-    SessionTemplate template, [
+    Workout workout, [
     LapProgress? progress,
   ]) async {
     final key = liveGhostsKey(
-      template.toPlan(),
+      workout.toPlan(),
       progress ??
           LapTracker(
-            template.course.definition,
-            plannedLaps: template.laps,
+            workout.course.definition,
+            plannedLaps: workout.laps,
           ).progress,
     );
     container.listen(liveGhostsProvider(key), (_, _) {});
@@ -120,52 +120,52 @@ void main() {
     return container.read(liveGhostsProvider(key));
   }
 
-  Future<SessionTemplate> templateOn(
+  Future<Workout> workoutOn(
     CourseDefinition definition, {
     required int? laps,
   }) async {
     final course = await courses.create('Seerunde', definition);
-    return (await templates.get(
-      await templates.create('Seerunde x$laps', courseId: course, laps: laps),
+    return (await workouts.get(
+      await workouts.create('Seerunde x$laps', courseId: course, laps: laps),
     ))!;
   }
 
   group('during a recording', () {
-    late SessionTemplate template;
+    late Workout workout;
 
     setUp(() async {
-      template = await templateOn(
+      workout = await workoutOn(
         CourseDefinition.single(axis: CourseAxis.distance, length: 100),
         laps: 3,
       );
       // The best so far: three laps of 22 s each.
       await storeRowedSessionWithSamples(
         db,
-        template: template,
+        workout: workout,
         laps: [for (var i = 0; i < 3; i++) RowedLap.single(22000, 100)],
       );
     });
 
-    /// Records [template] with [source]: lap 1 in 25 s, lap 2 in 20 s and
+    /// Records [workout] with [source]: lap 1 in 25 s, lap 2 in 20 s and
     /// lap 3 in 25 s; returns the ghosts during lap 2 and during lap 3.
     Future<(LiveGhosts, LiveGhosts)> rowNewBestLap(ErgSource source) async {
       final fake = source as FakeErgSource;
       final container = containerWith(source);
       final recorder = container.read(sessionRecorderProvider.notifier);
-      await recorder.start(plan: template.toPlan());
+      await recorder.start(plan: workout.toPlan());
       final rowing = _ftmsRowing([(25, 4), (20, 5), (25, 4)]);
 
       rowing.take(36).forEach(fake.emit);
       await _settle();
       final recording = container.read(sessionRecorderProvider)!;
       expect(recording.lap!.lap, 2);
-      final inLap2 = await ghostsOf(container, template, recording.lap);
+      final inLap2 = await ghostsOf(container, workout, recording.lap);
 
       rowing.skip(36).take(10).forEach(fake.emit);
       await _settle();
       final inLap3Progress = container.read(sessionRecorderProvider)!.lap!;
       expect(inLap3Progress.lap, 3);
-      final inLap3 = await ghostsOf(container, template, inLap3Progress);
+      final inLap3 = await ghostsOf(container, workout, inLap3Progress);
       return (inLap2, inLap3);
     }
 
@@ -176,7 +176,7 @@ void main() {
 
       expect(inLap2.lap!.durationMs, 22000);
       expect(inLap3.lap!.durationMs, 20000);
-      // The session is no whole entry yet, the template ghost stays.
+      // The session is no whole entry yet, the workout ghost stays.
       expect(
         (inLap2.course!.durationMs, inLap3.course!.durationMs),
         (66000, 66000),
@@ -212,17 +212,17 @@ void main() {
   test(
     'Offene Rundenzahl: no ghost outside, the best lap on the lap track',
     () async {
-      final template = await templateOn(
+      final workout = await workoutOn(
         CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
         laps: null,
       );
       await storeRowedSessionWithSamples(
         db,
-        template: template,
+        workout: workout,
         laps: [RowedLap.single(250000, 1000), RowedLap.single(248000, 1000)],
       );
 
-      final ghosts = await ghostsOf(containerWith(), template);
+      final ghosts = await ghostsOf(containerWith(), workout);
 
       expect(ghosts.course, isNull);
       expect(ghosts.lap!.durationMs, 248000);
@@ -246,10 +246,10 @@ void main() {
         const CourseSegment(length: 900),
       ],
     );
-    final template = await templateOn(definition, laps: 1);
+    final workout = await workoutOn(definition, laps: 1);
     await storeRowedSessionWithSamples(
       db,
-      template: template,
+      workout: workout,
       laps: [
         const RowedLap([(20000, 100), (210000, 900)]),
       ],
@@ -259,9 +259,9 @@ void main() {
       ..add(const TrackPoint(wallMs: 0, distanceDm: 0))
       ..add(const TrackPoint(wallMs: 10000, distanceDm: 500));
 
-    final inZone = await ghostsOf(container, template, tracker.progress);
+    final inZone = await ghostsOf(container, workout, tracker.progress);
     tracker.add(const TrackPoint(wallMs: 60000, distanceDm: 3000));
-    final free = await ghostsOf(container, template, tracker.progress);
+    final free = await ghostsOf(container, workout, tracker.progress);
 
     expect(inZone.segment!.durationMs, 20000);
     expect(free.segment, isNull);
@@ -271,22 +271,22 @@ void main() {
   test(
     'no ghost for a length that has no entry yet, even with entries for others',
     () async {
-      var template = await templateOn(
+      var workout = await workoutOn(
         CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
         laps: 1,
       );
       await storeRowedSessionWithSamples(
         db,
-        template: template,
+        workout: workout,
         laps: [RowedLap.single(250000, 1000)],
       );
       await courses.updateDefinition(
-        template.course.id,
+        workout.course.id,
         CourseDefinition.single(axis: CourseAxis.distance, length: 1200),
       );
-      template = (await templates.get(template.id))!;
+      workout = (await workouts.get(workout.id))!;
 
-      final ghosts = await ghostsOf(containerWith(), template);
+      final ghosts = await ghostsOf(containerWith(), workout);
 
       expect(ghosts, (course: null, lap: null, segment: null));
     },
@@ -295,13 +295,13 @@ void main() {
   test(
     'no ghost without a ranking or without the course of its place 1',
     () async {
-      final template = await templateOn(
+      final workout = await workoutOn(
         CourseDefinition.single(axis: CourseAxis.distance, length: 1000),
         laps: 1,
       );
       final container = containerWith();
 
-      expect(await ghostsOf(container, template), (
+      expect(await ghostsOf(container, workout), (
         course: null,
         lap: null,
         segment: null,
@@ -309,10 +309,10 @@ void main() {
 
       await storeRowedSession(
         db,
-        template: template,
+        workout: workout,
         laps: [RowedLap.single(250000, 1000)],
       );
-      expect(await ghostsOf(container, template), (
+      expect(await ghostsOf(container, workout), (
         course: null,
         lap: null,
         segment: null,
