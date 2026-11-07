@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/design_tokens.dart';
-import '../../app/widgets/oar_stepper.dart';
-import '../../app/widgets/segment_choice.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
 import '../../data/sessions/session_plan.dart';
@@ -12,6 +10,8 @@ import '../../data/workouts/workout_providers.dart';
 import '../../l10n/l10n.dart';
 import '../courses/course_strip.dart';
 import '../courses/courses_screen.dart';
+import '../live/formatters.dart';
+import '../sessions/plan_length_choice.dart';
 
 /// Creates a workout, or edits [workout] when given.
 class WorkoutEditorScreen extends ConsumerStatefulWidget {
@@ -24,14 +24,10 @@ class WorkoutEditorScreen extends ConsumerStatefulWidget {
       _WorkoutEditorScreenState();
 }
 
-/// More laps than anyone rows in one session.
-const _maxLaps = 99;
-
 class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
   late final _name = TextEditingController(text: widget.workout?.name);
-  late var _laps = widget.workout?.laps ?? 3;
-  late int? _courseId = widget.workout?.courses.first.id;
-  late var _open = widget.workout?.length is OpenLength;
+  late final _courses = [...?widget.workout?.courses];
+  late PlanLength _length = widget.workout?.length ?? const LapCount(3);
   var _errors = <String>[];
 
   @override
@@ -42,34 +38,86 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
 
   Future<void> _save() async {
     final name = _name.text.trim();
-    final laps = _open ? null : _laps;
     final l10n = context.l10n;
     final errors = [
       if (name.isEmpty) l10n.workoutNameMissing,
-      if (_courseId == null) l10n.workoutCourseMissing,
+      if (_courses.isEmpty) l10n.workoutCourseMissing,
     ];
     if (errors.isNotEmpty) {
       setState(() => _errors = errors);
       return;
     }
     final repository = ref.read(workoutRepositoryProvider);
+    final courseIds = [for (final c in _courses) c.id];
     final workout = widget.workout;
     if (workout == null) {
-      await repository.create(
-        name,
-        courseIds: [_courseId!],
-        length: laps == null ? const OpenLength() : LapCount(laps),
-      );
+      await repository.create(name, courseIds: courseIds, length: _length);
     } else {
       await repository.update(
         workout.id,
         name: name,
-        courseIds: [_courseId!],
-        length: laps == null ? const OpenLength() : LapCount(laps),
+        courseIds: courseIds,
+        length: _length,
       );
     }
     if (mounted) Navigator.of(context).pop();
   }
+
+  /// Lets the rower pick a course: of the axis of the others, or of both
+  /// axes when it replaces the only one (workout-course-chain, Design D8).
+  Future<Course?> _pick({CourseAxis? axis}) {
+    final courses = (ref.read(coursesProvider).value ?? const <Course>[])
+        .where((c) => axis == null || c.axis == axis)
+        .toList();
+    return showModalBottomSheet<Course>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        final l10n = context.l10n;
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height * 0.8,
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Text(
+                    l10n.workoutCourseChoose,
+                    style: AppTextStyles.cardTitle,
+                  ),
+                ),
+                for (final c in courses)
+                  ListTile(
+                    key: Key('workout-pick-${c.id}'),
+                    title: Text(c.name),
+                    subtitle: Text(courseSummary(l10n, c)),
+                    onTap: () => Navigator.of(context).pop(c),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _append() async {
+    final course = await _pick(axis: _courses.firstOrNull?.axis);
+    if (course != null) setState(() => _courses.add(course));
+  }
+
+  Future<void> _replace(int index) async {
+    final course = await _pick(
+      axis: _courses.length == 1 ? null : _courses.first.axis,
+    );
+    if (course != null) setState(() => _courses[index] = course);
+  }
+
+  void _move(int index, int by) =>
+      setState(() => _courses.insert(index + by, _courses.removeAt(index)));
 
   Future<void> _delete() async {
     final workout = widget.workout!;
@@ -100,10 +148,10 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final courses = ref.watch(coursesProvider).value ?? const <Course>[];
+    // Keeps the list of courses loaded for the picker.
+    ref.watch(coursesProvider);
     final colors = Theme.of(context).colorScheme;
     final l10n = context.l10n;
-    final course = courses.where((c) => c.id == _courseId).firstOrNull;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -141,56 +189,56 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
                   decoration: InputDecoration(labelText: l10n.fieldName),
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<int>(
-                  key: const Key('workout-course'),
-                  initialValue: courses.any((c) => c.id == _courseId)
-                      ? _courseId
-                      : null,
-                  decoration: InputDecoration(labelText: l10n.workoutCourse),
-                  items: [
-                    for (final c in courses)
-                      DropdownMenuItem(
-                        value: c.id,
-                        child: Text('${c.name} · ${courseSummary(l10n, c)}'),
-                      ),
-                  ],
-                  onChanged: (id) => setState(() => _courseId = id),
-                ),
-                if (course != null) ...[
-                  const SizedBox(height: 8),
-                  CourseStrip(definition: course.definition),
-                ],
-                const SizedBox(height: 24),
                 Text(
-                  l10n.workoutLaps.toUpperCase(),
+                  l10n.workoutCourses.toUpperCase(),
                   style: AppTextStyles.label,
                 ),
                 const SizedBox(height: 10),
-                SegmentChoice(
-                  options: [
-                    (false, l10n.workoutFixedLaps),
-                    (true, l10n.workoutOpenLaps),
-                  ],
-                  value: _open,
-                  onChanged: (open) => setState(() => _open = open),
-                ),
-                if (!_open) ...[
-                  const SizedBox(height: 10),
-                  OarStepper(
-                    key: const Key('workout-laps'),
-                    value: _laps,
-                    step: 1,
-                    min: 1,
-                    max: _maxLaps,
-                    stepLabel: l10n.lapsCount(1),
-                    label: l10n.workoutLaps,
-                    unit: l10n.workoutLapsUnit(_laps),
-                    onChanged: (laps) => setState(() => _laps = laps),
+                for (final (i, course) in _courses.indexed) ...[
+                  _CourseCard(
+                    key: Key('workout-course-$i'),
+                    course: course,
+                    onUp: i == 0 ? null : () => _move(i, -1),
+                    onDown: i == _courses.length - 1 ? null : () => _move(i, 1),
+                    // The only course can only be replaced (Design D8).
+                    onRemove: _courses.length == 1
+                        ? null
+                        : () => setState(() => _courses.removeAt(i)),
+                    onReplace: () => _replace(i),
                   ),
+                  const SizedBox(height: 8),
                 ],
-                if (course != null) ...[
+                OutlinedButton.icon(
+                  key: const Key('workout-course-add'),
+                  onPressed: _append,
+                  icon: const Icon(Icons.add),
+                  label: Text(
+                    _courses.isEmpty
+                        ? l10n.workoutCourseChoose
+                        : l10n.workoutCourseAdd,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  l10n.workoutLength.toUpperCase(),
+                  style: AppTextStyles.label,
+                ),
+                const SizedBox(height: 10),
+                PlanLengthChoice(
+                  keyPrefix: 'workout',
+                  initial: _length,
+                  onChanged: (length) => setState(() => _length = length),
+                ),
+                if (_courses.isNotEmpty) ...[
                   const SizedBox(height: 22),
-                  _Result(course: course, laps: _open ? null : _laps),
+                  _Result(
+                    axis: _courses.first.axis,
+                    lap: _courses.fold(
+                      0,
+                      (sum, c) => sum + c.definition.length,
+                    ),
+                    length: _length,
+                  ),
                 ],
                 const SizedBox(height: 24),
                 FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
@@ -203,18 +251,128 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
   }
 }
 
-/// What the laps add up to: the whole length, or one lap when [laps] is open.
-class _Result extends StatelessWidget {
-  const _Result({required this.course, required this.laps});
+/// One course of the workout in its place: name, length and zones, with
+/// buttons to move, remove or replace it; a tap on it replaces it too.
+class _CourseCard extends StatelessWidget {
+  const _CourseCard({
+    super.key,
+    required this.course,
+    required this.onUp,
+    required this.onDown,
+    required this.onRemove,
+    required this.onReplace,
+  });
 
   final Course course;
-  final int? laps;
+  final VoidCallback? onUp;
+  final VoidCallback? onDown;
+
+  /// Null for the only course, which shows the button to replace it instead.
+  final VoidCallback? onRemove;
+  final VoidCallback onReplace;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final lap = course.definition.length;
-    final laps = this.laps;
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppRadii.small),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onReplace,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 6, 4, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          course.name,
+                          style: AppTextStyles.cardTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          courseSummary(l10n, course),
+                          style: AppTextStyles.caption,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: l10n.workoutCourseUp,
+                    visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.arrow_upward),
+                    onPressed: onUp,
+                  ),
+                  IconButton(
+                    tooltip: l10n.workoutCourseDown,
+                    visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.arrow_downward),
+                    onPressed: onDown,
+                  ),
+                  if (onRemove case final remove?)
+                    IconButton(
+                      tooltip: l10n.workoutCourseRemove,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(Icons.close),
+                      onPressed: remove,
+                    )
+                  else
+                    IconButton(
+                      tooltip: l10n.workoutCourseReplace,
+                      visualDensity: VisualDensity.compact,
+                      icon: const Icon(Icons.swap_horiz),
+                      onPressed: onReplace,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: CourseStrip(definition: course.definition),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// What the workout adds up to: all laps, the duration with the length of a
+/// lap, or one lap when open.
+class _Result extends StatelessWidget {
+  const _Result({required this.axis, required this.lap, required this.length});
+
+  final CourseAxis axis;
+
+  /// The length of one lap: the sum of all courses.
+  final int lap;
+  final PlanLength length;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final lapText = formatCourseLength(axis, lap);
+    final (value, detail) = switch (length) {
+      LapCount(:final count) => (
+        formatCourseLength(axis, lap * count),
+        '$count × $lapText',
+      ),
+      TimeLimit(:final time) => (
+        formatElapsed(time),
+        l10n.workoutResultDuration(lapText),
+      ),
+      OpenLength() => (lapText, l10n.workoutResultOpen),
+    };
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -232,10 +390,7 @@ class _Result extends StatelessWidget {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  formatCourseLength(
-                    course.axis,
-                    laps == null ? lap : lap * laps,
-                  ),
+                  value,
                   key: const Key('workout-result'),
                   style: const TextStyle(
                     fontFamily: AppFonts.display,
@@ -246,9 +401,7 @@ class _Result extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    laps == null
-                        ? l10n.workoutResultOpen
-                        : '$laps × ${formatCourseLength(course.axis, lap)}',
+                    detail,
                     key: const Key('workout-result-detail'),
                     textAlign: TextAlign.end,
                     style: AppTextStyles.subtitle,
