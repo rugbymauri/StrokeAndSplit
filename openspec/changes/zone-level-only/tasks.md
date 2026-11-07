@@ -4,7 +4,7 @@ Setzt `resistance-control` in `main` voraus (Stufe in Zone und Segment). Neue od
 
 ## 1. Zone nur mit Stufe speichern
 
-- [ ] 1.1 `zoneErrors` nach D2: `ZoneError.bandMissing` → `targetMissing`, nur wenn weder Pace, Schlagzahl noch Stufe gesetzt sind; Key `zoneErrorBandMissing` → `zoneErrorTargetMissing`, neuer Wortlaut in `zoneBandHint` und `zonesEmpty` (de/en). Verifikation:
+- [x] 1.1 `zoneErrors` nach D2: `ZoneError.bandMissing` → `targetMissing`, nur wenn weder Pace, Schlagzahl noch Stufe gesetzt sind; Key `zoneErrorBandMissing` → `zoneErrorTargetMissing`, neuer Wortlaut in `zoneBandHint` und `zonesEmpty` (de/en). Verifikation:
   - In `zone_repository_test.dart` wird „a zone with only a resistance level“ fehlerfrei gespeichert; „a zone without any band“ ohne Stufe ergibt `targetMissing`; eine halbe Pace-Grenze mit Stufe ergibt weiter `paceBoundMissing`.
   - Ein Widget-Test des Zonen-Editors speichert „Kraft“ mit 500 m und Stufe 12, und die Zonenliste zeigt „500 m · Stufe 12“.
   - Die deutschen und englischen Texte sind geprüft.

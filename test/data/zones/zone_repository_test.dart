@@ -152,30 +152,47 @@ void main() {
     );
   });
 
+  test('stores a zone with only a resistance level', () async {
+    const zone = Zone(
+      name: 'Kraft',
+      axis: CourseAxis.distance,
+      length: 500,
+      resistanceLevel: 12,
+    );
+
+    expect(zoneErrors(zone), isEmpty);
+    await zones.create(zone);
+    final stored = (await zones.all()).single;
+    expect(stored.resistanceLevel, 12);
+    expect(stored.paceFastCs, isNull);
+    expect(stored.spmMin, isNull);
+  });
+
   group('rejects', () {
     test('a zone without any band', () {
       const zone = Zone(name: 'Nichts', axis: CourseAxis.distance, length: 100);
 
-      expect(zoneErrors(zone), [ZoneError.bandMissing]);
+      expect(zoneErrors(zone), [ZoneError.targetMissing]);
       expect(
         () => zones.create(zone),
         throwsA(
           isA<ZoneValidationException>().having((e) => e.errors, 'errors', [
-            ZoneError.bandMissing,
+            ZoneError.targetMissing,
           ]),
         ),
       );
     });
 
-    test('a zone with only a resistance level', () {
+    test('half a pace band next to a resistance level', () {
       const zone = Zone(
-        name: 'Stufe 8',
+        name: 'Halb',
         axis: CourseAxis.distance,
         length: 100,
+        paceFastCs: 10500,
         resistanceLevel: 8,
       );
 
-      expect(zoneErrors(zone), [ZoneError.bandMissing]);
+      expect(zoneErrors(zone), [ZoneError.paceBoundMissing]);
     });
 
     test('a resistance level below 1', () {
