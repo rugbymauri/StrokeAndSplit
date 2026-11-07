@@ -40,6 +40,7 @@ class CourseLiveView extends StatelessWidget {
     this.ghostGap,
     this.status,
     this.limit,
+    this.courseName,
   });
 
   final StatusTick? tick;
@@ -51,6 +52,10 @@ class CourseLiveView extends StatelessWidget {
   final int? rrIntervalMs;
   final LapProgress lap;
   final CourseDefinition course;
+
+  /// The name of the course being rowed when a workout has several; null
+  /// otherwise (workout-course-chain, Design D6).
+  final String? courseName;
 
   /// Ends the session; [shortAction] does the same in the narrow landscape column.
   final Widget action;
@@ -260,6 +265,7 @@ class CourseLiveView extends StatelessWidget {
     upcoming: _upcoming,
     rowed: session?.elapsed ?? Duration.zero,
     limit: limit,
+    courseName: courseName,
   );
 
   Widget _strokeRate(

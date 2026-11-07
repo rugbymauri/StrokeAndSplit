@@ -33,6 +33,7 @@ class PaceBox extends StatelessWidget {
     this.upcoming,
     this.rowed = Duration.zero,
     this.limit,
+    this.courseName,
   });
 
   final LapProgress progress;
@@ -57,6 +58,10 @@ class PaceBox extends StatelessWidget {
 
   /// The rowing time after which the session ends; null without one (course-rowing-free, Design D4).
   final Duration? limit;
+
+  /// The name of the course being rowed, put before the zone when a workout
+  /// has several courses (workout-course-chain, Design D6).
+  final String? courseName;
 
   /// Room for the zone status, kept free without one so the pace stays put.
   static const statusHeight = 32.0;
@@ -204,9 +209,18 @@ class PaceBox extends StatelessWidget {
                     ProgressFramePainter.segmentColor(progress.pace),
                   ),
                   // The zone the rower is in, or a free gap (Change zones, Design D7).
-                  label: segment.isFree
-                      ? l10n.segmentFree
-                      : segment.zoneName ?? l10n.segmentZone,
+                  label: switch ((
+                    courseName,
+                    segment.isFree
+                        ? l10n.segmentFree
+                        : segment.zoneName ?? l10n.segmentZone,
+                  )) {
+                    (final course?, final zone) => l10n.paceBoxCourseSegment(
+                      course,
+                      zone,
+                    ),
+                    (null, final zone) => zone,
+                  },
                   value: l10n.courseRest(_amount(model.segmentRemaining)),
                 ),
                 if (ghostGap case final gap?) _ghostLine(l10n, gap),

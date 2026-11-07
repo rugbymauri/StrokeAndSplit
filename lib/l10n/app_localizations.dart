@@ -709,6 +709,12 @@ abstract class AppLocalizations {
   /// **'Gesamt'**
   String get paceBoxTotal;
 
+  /// Pace box: legend line of the current section in a workout with several courses: the name of the current course, then its zone or 'frei', e.g. '2 km Intervall · Tempo'
+  ///
+  /// In de, this message translates to:
+  /// **'{course} · {segment}'**
+  String paceBoxCourseSegment(String course, String segment);
+
   /// Pace box: legend line of the lap track with the current lap and the planned number of laps, e.g. 'Runde 2 / 3'
   ///
   /// In de, this message translates to:

@@ -250,6 +250,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
       lap: lap,
       course: plan.definition,
       limit: plan.plannedDuration,
+      courseName: recording?.courseName,
       outdated: _stale,
       forceCurves: forceCurves,
       // On a time course the ghost stands where the rower is; the box shows the gap in metres instead.
