@@ -130,7 +130,7 @@ Die App SHALL die Verbindung zum Rudergerät bzw. zum Simulator nach dem Rudern 
 - **THEN** wird die Verbindung beendet, die App versucht keine Wiederverbindung, und die Gerätezeile zeigt das Gerät wieder als nicht verbunden
 
 #### Scenario: Nochmals rudern mit bestehender Verbindung
-- **WHEN** das Rudergerät verbunden ist und der Nutzer „Frei rudern“ oder eine Vorlage startet
+- **WHEN** das Rudergerät verbunden ist und der Nutzer „Frei rudern“ oder ein Workout startet
 - **THEN** öffnet die App das Live-Display mit derselben Verbindung, ohne neu zu verbinden
 
 #### Scenario: Anderes Gerät wählen

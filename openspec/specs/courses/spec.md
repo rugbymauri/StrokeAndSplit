@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Lässt den Nutzer wiederverwendbare Strecken definieren: eine Länge in Metern oder Minuten, unterteilt in Segmente mit optionalen Zielbändern für Pace und Schlagzahl. Strecken sind die Grundlage für Vorlagen, Rundenvergleiche und den späteren Ghost.
+Lässt den Nutzer wiederverwendbare Strecken definieren: eine Länge in Metern oder Minuten, unterteilt in Segmente mit optionalen Zielbändern für Pace und Schlagzahl. Strecken sind die Grundlage für Workouts, Rundenvergleiche und den späteren Ghost.
 
 ## Requirements
 
@@ -51,15 +51,15 @@ Die App SHALL alle Strecken in einer Liste mit Name, Achse und Länge anzeigen. 
 - **THEN** entsteht keine neue Version und auch alte Sessions zeigen den neuen Namen
 
 ### Requirement: Strecke löschen
-Der Nutzer SHALL eine Strecke nach Bestätigung löschen können. Eine gelöschte Strecke verschwindet aus der Streckenliste und aus der Auswahl für Vorlagen. Sessions, die auf ihr gerudert wurden, MUST mit ihren Runden erhalten bleiben.
+Der Nutzer SHALL eine Strecke nach Bestätigung löschen können. Eine gelöschte Strecke verschwindet aus der Streckenliste und aus der Auswahl für Workouts. Sessions, die auf ihr gerudert wurden, MUST mit ihren Runden erhalten bleiben.
 
 #### Scenario: Geruderte Strecke löschen
 - **WHEN** der Nutzer die bereits geruderte Strecke „Seerunde“ löscht und bestätigt
 - **THEN** ist sie nicht mehr in der Streckenliste und die alten Sessions zeigen weiterhin ihre Rundenzeiten auf „Seerunde“
 
-#### Scenario: Strecke einer Vorlage löschen
-- **WHEN** der Nutzer eine Strecke löschen will, die eine Vorlage verwendet
-- **THEN** weist die Bestätigung darauf hin, dass auch die Vorlage gelöscht wird
+#### Scenario: Strecke eines Workouts löschen
+- **WHEN** der Nutzer eine Strecke löschen will, die ein Workout verwendet
+- **THEN** weist die Bestätigung darauf hin, dass auch das Workout gelöscht wird
 
 ### Requirement: Zonen in eine Strecke einbauen
 Der Nutzer SHALL vordefinierte Zonen in eine Strecke einbauen können, jede mit einer Startposition in der Achse der Strecke. Eine Zone MUST dieselbe Achse wie die Strecke haben, ganz innerhalb der Strecke liegen und darf keine andere eingebaute Zone überschneiden. Dieselbe Zone darf mehrfach eingebaut werden. Abschnitte ohne Zone sind frei. Eine Zone, die am gewählten Start nicht passt, MUST auf dem Screen „Zone einbauen“ ausgegraut sein und den Grund nennen.

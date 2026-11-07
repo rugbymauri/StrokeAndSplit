@@ -9,20 +9,11 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors` und `course-editor-flow` archiviert. Geplant: `rename-workouts`.
+Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow` und `rename-workouts` archiviert, kein Change offen.
 
 ## Überblick
 
 Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests unter „Offene Punkte“.
-
-### `rename-workouts`
-
-- **Ziel**: „Vorlage“ heisst überall „Workout“: Texte (DE/EN), Code, Datenbank (Schema 11), Export, Specs und Doku.
-- **Branch**: Planung auf `docs/rename-workouts-proposal`, Umsetzung auf `feature/rename-workouts`, Stand 2026-11-07 9/9, Gerätetest bestanden.
-- **Entschieden** (Nutzer, 2026-11-07): Der neue Begriff ist „Workout“, und es wird alles umbenannt, nicht nur die Texte.
-- **Annahmen**, beim Review bestätigen:
-  - Die englischen Health-Connect-Texte sprechen von „exercise sessions“, die Klasse `HealthWorkout` heisst `HealthExercise` (D2).
-  - Der Import liest weiter Dateien mit `template` (D5).
 
 ## Offene Entscheide
 
@@ -110,3 +101,4 @@ Nacharbeit:
 | `gitlab-pipeline` | – | gelöscht (Nutzer, 2026-11-07), nicht archiviert: CI und Releases laufen über GitHub Actions |
 | `zone-intensity-colors` | 2026-11-07 | Zonen nach Härte grün, orange oder rot; Gerätetest 3.3 vom Nutzer bestätigt. Die Grenzen (u. a. rot ab 24 spm, Mitte des Bands) stehen in der Spec `zones` |
 | `course-editor-flow` | 2026-11-07 | Eigener Screen „Zone einbauen“ (Start zuerst, Zonen nach Härte), Verschieben mit den Ruderblatt-Tasten, Editoren im sicheren Bereich; Gerätetest 3.3 vom Nutzer bestätigt. Die Annahmen (Tipp markiert, Nachbarzone als Anschlag, Tipp baut ein, andere Achse ausgeblendet) kamen mit dem Merge, einzeln bestätigt hat sie der Nutzer nicht |
+| `rename-workouts` | 2026-11-07 | „Vorlage“ heisst überall „Workout“: Texte DE/EN, Code, Datenbank (Schema 11), Export (Import liest weiter `template`), Specs (`session-templates` → `workouts`) und README; Health-Connect-Einträge heissen auf Englisch „exercise sessions“. Gerätetest 5.3 vom Nutzer bestätigt. Szenario-Titel und Purpose-Abschnitte mit „Vorlage“ beim Archivieren direkt in den Haupt-Specs umbenannt |
