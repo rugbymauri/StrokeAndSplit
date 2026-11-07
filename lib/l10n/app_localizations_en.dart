@@ -1041,6 +1041,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get placeZoneGroupEasy => 'Easy';
+
+  @override
+  String get placeZoneGroupMedium => 'Medium';
+
+  @override
+  String get placeZoneGroupHard => 'Hard';
+
+  @override
   String get zoneIntensityEasy => 'easy';
 
   @override

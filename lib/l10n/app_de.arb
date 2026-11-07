@@ -1446,6 +1446,18 @@
       }
     }
   },
+  "placeZoneGroupEasy": "Leicht",
+  "@placeZoneGroupEasy": {
+    "description": "Place zone screen: heading of the easy zones"
+  },
+  "placeZoneGroupMedium": "Mittel",
+  "@placeZoneGroupMedium": {
+    "description": "Place zone screen: heading of the medium zones"
+  },
+  "placeZoneGroupHard": "Hart",
+  "@placeZoneGroupHard": {
+    "description": "Place zone screen: heading of the hard zones"
+  },
   "zoneIntensityEasy": "leicht",
   "@zoneIntensityEasy": {
     "description": "Course list legend: the colour of an easy zone"
