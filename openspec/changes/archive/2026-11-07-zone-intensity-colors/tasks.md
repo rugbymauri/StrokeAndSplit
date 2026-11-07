@@ -28,4 +28,4 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 - [x] 3.1 README, Abschnitt Zonen: die Farben und ihre Grenzen nennen. Verifikation: Der Abschnitt widerspricht dem Spec nicht.
 - [x] 3.2 Gesamtprüfung: `make check` grün.
-- [ ] 3.3 Am Handy (Nutzer): Strecken- und Zonenliste ansehen, die Farben sind gut unterscheidbar.
+- [x] 3.3 Am Handy (Nutzer): Strecken- und Zonenliste ansehen, die Farben sind gut unterscheidbar.

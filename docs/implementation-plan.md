@@ -9,25 +9,11 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. Geplant: `zone-intensity-colors`.
+Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors` archiviert. Keine aktiven Changes.
 
 ## Überblick
 
-Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests unter „Offene Punkte“.
-
-### `zone-intensity-colors`
-
-- **Ziel**: Zonen nach Härte grün, orange oder rot statt blau mit relativer Pace-Abstufung.
-- **Branch**: Planung auf `docs/zone-intensity-colors-proposal`, Umsetzung auf `feature/zone-intensity-colors`, Stand 2026-11-07 6/7, offen Gerätetest 3.3 (Nutzer).
-- **Entschieden** (Nutzer, 2026-11-07):
-  - Stufe 1–5 grün, 6–10 orange, ab 11 rot.
-  - Pace 3:00 und langsamer grün, bis 2:30 orange, schneller rot.
-  - Schlagzahl bis 21 grün, ab 22 orange, ab 24 rot.
-- **Annahmen**, beim Review bestätigen:
-  - Rot bei der Schlagzahl ab 24 (die Zahl fehlte in der Antwort).
-  - Bei einem Band zählt die Mitte.
-  - Die härteste Vorgabe bestimmt die Farbe.
-  - Die Live-Anzeige bleibt blau/orange.
+Keine aktiven Changes. Die archivierten stehen unter „Erledigt“, ihre offenen Gerätetests unter „Offene Punkte“. Ein neuer Change bekommt hier wieder einen Abschnitt mit Branch, Stand und Entscheiden.
 
 ## Offene Entscheide
 
@@ -113,3 +99,4 @@ Nacharbeit:
 | `course-rowing-free` | 2026-11-07 | Strecke ohne Vorlage rudern, Runden, Dauer oder offen; 7.3 offen |
 | `zone-level-only` | 2026-11-07 | Zone nur mit Stufe; 3.3 offen. Nach dem Archivieren in `course-rowing` die Texte aus `ui-design` („Runde 2 / 3“) und `auto-pause` (Pausen) wiederhergestellt, die das Delta überschrieben hatte |
 | `gitlab-pipeline` | – | gelöscht (Nutzer, 2026-11-07), nicht archiviert: CI und Releases laufen über GitHub Actions |
+| `zone-intensity-colors` | 2026-11-07 | Zonen nach Härte grün, orange oder rot; Gerätetest 3.3 vom Nutzer bestätigt. Die Grenzen (u. a. rot ab 24 spm, Mitte des Bands) stehen in der Spec `zones` |
