@@ -18,7 +18,7 @@ Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests 
 ### `course-editor-flow`
 
 - **Ziel**: Strecke einfacher zusammenstellen: eigener Screen „Zone einbauen“ mit Start zuerst und Zonen nach Härte gruppiert, Verschieben im Editor mit den Ruderblatt-Tasten.
-- **Branch**: Planung auf `docs/course-editor-flow-proposal`, Umsetzung auf `feature/course-editor-flow`, Stand 2026-11-07 5/6, offen Gerätetest 3.3 (Nutzer).
+- **Branch**: Planung auf `docs/course-editor-flow-proposal`, Umsetzung auf `feature/course-editor-flow`, Stand 2026-11-07 6/6, Gerätetest bestanden.
 - **Entschieden** (Nutzer, 2026-11-07):
   - Der Start kommt zuerst, die Zonen sind nach leicht/mittel/hart gruppiert.
   - „Zone einbauen“ wird ein eigener Screen.
