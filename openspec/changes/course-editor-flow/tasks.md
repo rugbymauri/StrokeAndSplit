@@ -17,7 +17,7 @@ Neue oder geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.
 
 ## 2. Verschieben im Editor
 
-- [ ] 2.1 `CourseStrip.onSegmentLongPress`; `_moving`, Bedienfeld und Grenzen nach D3; `_PlaceZoneDialog` und `_ZoneOption` entfernen, nicht mehr gebrauchte Texte nach D5 entfernen. Verifikation in `courses_screen_test.dart`:
+- [x] 2.1 `CourseStrip.onSegmentLongPress`; `_moving`, Bedienfeld und Grenzen nach D3; `_PlaceZoneDialog` und `_ZoneOption` entfernen, nicht mehr gebrauchte Texte nach D5 entfernen. Verifikation in `courses_screen_test.dart`:
   - Langdruck auf eine Zone im Balken zeigt das Bedienfeld mit Name und Start.
   - Ein Tipp in der Liste markiert eine Zone ebenso.
   - „mehr“ verschiebt „Sprint“ von 500 auf 550 m in Balken und Liste.

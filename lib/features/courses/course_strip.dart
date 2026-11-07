@@ -17,6 +17,7 @@ class CourseStrip extends StatelessWidget {
     this.showNames = false,
     this.selected,
     this.onSegmentTap,
+    this.onSegmentLongPress,
   });
 
   /// The height in lists.
@@ -35,6 +36,7 @@ class CourseStrip extends StatelessWidget {
   final int? selected;
 
   final ValueChanged<int>? onSegmentTap;
+  final ValueChanged<int>? onSegmentLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,9 @@ class CourseStrip extends StatelessWidget {
                   flex: s.length,
                   child: GestureDetector(
                     onTap: onSegmentTap == null ? null : () => onSegmentTap!(i),
+                    onLongPress: onSegmentLongPress == null
+                        ? null
+                        : () => onSegmentLongPress!(i),
                     child: Container(
                       key: ValueKey('course-strip-segment-$i'),
                       margin: const EdgeInsets.symmetric(horizontal: 0.5),

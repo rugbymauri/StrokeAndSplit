@@ -398,27 +398,109 @@ void main() {
       await disposeWidgetsWithDatabase(tester);
     });
 
-    testWidgets('moves a zone back by one step', (tester) async {
+    CourseStrip strip(WidgetTester tester) =>
+        tester.widget<CourseStrip>(find.byKey(const Key('course-strip')));
+
+    List<String> zonesAt(WidgetTester tester) => [
+      for (final section in _sections(tester))
+        if (section.startsWith('ab ')) section.split(' · ').take(2).join(' · '),
+    ];
+
+    testWidgets('moves a zone back by one step from the list', (tester) async {
       await pumpWithZones(tester);
       await _openNew(tester, '2 km Intervall');
       await place(tester, sprint, 1600);
 
       await tester.tap(find.byKey(const Key('section-1')));
-      await setup.settle(tester);
-      expect(find.text('Zone verschieben'), findsOneWidget);
-      expect(stepperValue(tester, _start), 1600);
+      await tester.pump();
+      expect(find.text('Sprint verschieben'), findsOneWidget);
+      expect(stepperValue(tester, const Key('move-start')), 1600);
       await tester.tap(find.bySemanticsLabel('50 m weniger'));
       await tester.pump();
 
-      expect(find.text('1550'), findsOneWidget);
-      expect(find.text('„Sprint“ liegt bei 1550–1650 m.'), findsOneWidget);
-      await tester.tap(find.text('Verschieben'));
-      await tester.pumpAndSettle();
+      expect(find.text('1550–1650 m'), findsOneWidget);
       expect(_sections(tester).map((s) => s.split(' · ').take(2).join(' · ')), [
         '0–1550 m · frei',
         'ab 1550 m · Sprint',
         '1650–2000 m · frei',
       ]);
+      await _save(tester, setup);
+      expect((await setup.stored(tester)).single.definition.placements, [
+        ZonePlacement(zoneId: sprint, start: 1550),
+      ]);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('marks a zone by a long press on the strip', (tester) async {
+      await pumpWithZones(tester);
+      await _openNew(tester, '2 km Intervall');
+      await place(tester, sprint, 500);
+
+      await tester.longPress(find.byKey(const Key('course-strip-segment-1')));
+      await tester.pump();
+
+      expect(find.byKey(const Key('move-panel')), findsOneWidget);
+      expect(stepperValue(tester, const Key('move-start')), 500);
+      expect(strip(tester).selected, 1);
+      await tester.tap(find.bySemanticsLabel('50 m mehr'));
+      await tester.pump();
+      expect(zonesAt(tester), ['ab 550 m · Sprint']);
+      expect(strip(tester).selected, 1);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('stops a moved zone at its neighbour', (tester) async {
+      await pumpWithZones(tester);
+      await _openNew(tester, '2 km Intervall');
+      await place(tester, sprint, 800);
+      await place(tester, endurance, 1000);
+
+      await tester.tap(find.byKey(const Key('section-1')));
+      await tester.pump();
+      await stepTo(tester, const Key('move-start'), 900);
+
+      expect(
+        tester
+            .widget<OarStepper>(find.byKey(const Key('move-start')))
+            .canIncrease,
+        isFalse,
+      );
+      expect(zonesAt(tester), [
+        'ab 900 m · Sprint',
+        'ab 1000 m · Ausdauer 2:30',
+      ]);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('ends moving with Fertig, a second tap or another zone', (
+      tester,
+    ) async {
+      await pumpWithZones(tester);
+      await _openNew(tester, '2 km Intervall');
+      await place(tester, sprint, 500);
+      await place(tester, endurance, 1000);
+      final panel = find.byKey(const Key('move-panel'));
+
+      await tester.tap(find.byKey(const Key('course-strip-segment-1')));
+      await tester.pump();
+      expect(panel, findsOneWidget);
+      await tester.tap(find.text('Fertig'));
+      await tester.pump();
+      expect((panel.evaluate().isEmpty, strip(tester).selected), (true, null));
+
+      await tester.tap(find.byKey(const Key('course-strip-segment-1')));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('course-strip-segment-1')));
+      await tester.pump();
+      expect(panel, findsNothing);
+
+      await tester.tap(find.byKey(const Key('section-1')));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('section-3')));
+      await tester.pump();
+      expect(find.text('Ausdauer 2:30 verschieben'), findsOneWidget);
+      expect(stepperValue(tester, const Key('move-start')), 1000);
+      expect(strip(tester).selected, 3);
       await disposeWidgetsWithDatabase(tester);
     });
 
@@ -490,35 +572,6 @@ void main() {
         await disposeWidgetsWithDatabase(tester);
       },
     );
-
-    testWidgets('opens a zone from the strip and outlines it meanwhile', (
-      tester,
-    ) async {
-      await pumpWithZones(tester);
-      await _openNew(tester, '2 km Intervall');
-      await place(tester, sprint, 500);
-
-      await tester.tap(find.byKey(const Key('course-strip-segment-1')));
-      await setup.settle(tester);
-
-      expect(find.text('Zone verschieben'), findsOneWidget);
-      expect(stepperValue(tester, _start), 500);
-      expect(
-        tester
-            .widget<CourseStrip>(find.byKey(const Key('course-strip')))
-            .selected,
-        1,
-      );
-      await tester.tap(find.text('Abbrechen'));
-      await tester.pumpAndSettle();
-      expect(
-        tester
-            .widget<CourseStrip>(find.byKey(const Key('course-strip')))
-            .selected,
-        isNull,
-      );
-      await disposeWidgetsWithDatabase(tester);
-    });
 
     testWidgets('fits the list and the editor on a small phone', (
       tester,

@@ -172,6 +172,24 @@ void main() {
     expect(tapped, 1);
   });
 
+  testWidgets('a long press on a segment reports its index', (tester) async {
+    int? pressed;
+    await _pump(
+      tester,
+      CourseStrip(
+        definition: _course(const [
+          CourseSegment(length: 500),
+          CourseSegment(length: 500, spmMin: 20, spmMax: 24),
+        ]),
+        height: CourseStrip.namedHeight,
+        onSegmentLongPress: (i) => pressed = i,
+      ),
+    );
+
+    await tester.longPress(_segment(1));
+    expect(pressed, 1);
+  });
+
   testWidgets('a zone with only level 12 is red with its name', (tester) async {
     await _pump(
       tester,

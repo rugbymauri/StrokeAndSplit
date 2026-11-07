@@ -823,19 +823,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get coursePlaceZone => 'Zone einbauen';
 
   @override
-  String get courseMoveZone => 'Zone verschieben';
-
-  @override
   String get coursePlaceHere => 'Hier eine Zone einbauen';
 
   @override
   String get courseRemoveZone => 'Zone entfernen';
-
-  @override
-  String get coursePlace => 'Einbauen';
-
-  @override
-  String get courseMove => 'Verschieben';
 
   @override
   String get courseNoZones => 'Noch keine Zonen angelegt. Lege zuerst eine an.';
@@ -847,19 +838,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String courseStart(String unit) {
     return 'Start ($unit)';
   }
-
-  @override
-  String courseRange(String range) {
-    return 'Strecke: $range';
-  }
-
-  @override
-  String coursePlacedAt(String zone, String range) {
-    return '„$zone“ liegt bei $range.';
-  }
-
-  @override
-  String get courseOtherAxis => 'andere Achse';
 
   @override
   String get axisDistance => 'Distanz';
@@ -1043,6 +1021,11 @@ class AppLocalizationsDe extends AppLocalizations {
       zero: 'noch nie gerudert',
     );
     return '$_temp0';
+  }
+
+  @override
+  String courseMovingZone(String zone) {
+    return '$zone verschieben';
   }
 
   @override
