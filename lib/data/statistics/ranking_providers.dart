@@ -40,6 +40,21 @@ final workoutRankingsProvider = StreamProvider.family<List<Ranking>, int>((
   );
 });
 
+/// Place 1 of the laps of a workout per order of course lengths: the ghost
+/// of the lap track when the workout has several courses (Change
+/// workout-course-chain, Design D5).
+final workoutLapRankingsProvider = StreamProvider.family<List<Ranking>, int>((
+  ref,
+  workoutId,
+) {
+  final repository = ref.watch(rankingRepositoryProvider);
+  return repository.watch(
+    () async => [
+      for (final r in await repository.workoutLaps(workoutId)) r.top(1),
+    ],
+  );
+});
+
 List<Ranking> _podium(List<Ranking> rankings) => [
   for (final r in rankings) r.top(3),
 ];

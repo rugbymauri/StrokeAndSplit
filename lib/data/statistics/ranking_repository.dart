@@ -227,6 +227,38 @@ class RankingRepository {
     );
   }
 
+  /// The complete laps of sessions on workout [workoutId], one ranking per
+  /// order of course lengths, none current; the ghost of the lap track of a
+  /// workout with several courses (Change workout-course-chain, Design D5).
+  Future<List<Ranking>> workoutLaps(int workoutId) async {
+    final rows = await _db
+        .customSelect(
+          '''
+        SELECT s.id AS session, s.started_at AS started_at, l.lap_no AS lap,
+          l.start_wall_ms AS start_wall, l.end_wall_ms AS end_wall,
+          l.start_distance_dm AS start_distance, l.end_distance_dm AS end_distance
+        FROM laps l
+        JOIN sessions s ON s.id = l.session_id
+        WHERE s.workout_id = ? AND l.complete = 1 AND $_counted''',
+          variables: [Variable.withInt(workoutId)],
+        )
+        .get();
+    final chains = await _chains(
+      {for (final r in rows) r.read<int>('session')}.toList(),
+    );
+    return _rankings([
+      for (final row in rows)
+        if (chains[row.read<int>('session')] case (final axis, final lengths))
+          (
+            axis: axis,
+            length: lengths.fold(0, (sum, l) => sum + l),
+            laps: null,
+            courseLengths: lengths,
+            entry: _entry(row, lap: row.read<int>('lap')),
+          ),
+    ], current: null);
+  }
+
   /// The axis and the course lengths in their order of each of [sessionIds].
   Future<Map<int, (CourseAxis, List<int>)>> _chains(
     List<int> sessionIds,

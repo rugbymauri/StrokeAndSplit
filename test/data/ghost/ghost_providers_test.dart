@@ -325,4 +325,80 @@ void main() {
       ));
     },
   );
+
+  group('a workout with several courses', () {
+    late Workout chain;
+    late int intervall;
+
+    setUp(() async {
+      final ids = [
+        for (final (name, length) in [
+          ('Einrudern', 500),
+          ('2 km Intervall', 2000),
+          ('Ausrudern', 500),
+        ])
+          await courses.create(
+            name,
+            CourseDefinition.single(axis: CourseAxis.distance, length: length),
+          ),
+      ];
+      intervall = ids[1];
+      chain = (await workouts.get(
+        await workouts.create(
+          'Intervalltraining',
+          courseIds: ids,
+          length: const LapCount(2),
+        ),
+      ))!;
+    });
+
+    test('Runde über mehrere Strecken: the fastest earlier lap of the workout on the lap track', () async {
+      await storeRowedSessionWithSamples(
+        db,
+        workout: chain,
+        laps: [
+          const RowedLap([(120000, 500), (480000, 2000), (100000, 500)]),
+          const RowedLap([(118000, 500), (475000, 2000), (97000, 500)]),
+        ],
+      );
+
+      final ghosts = await ghostsOf(containerWith(), chain);
+
+      expect(ghosts.lap!.durationMs, 690000);
+      expect(ghosts.course!.durationMs, 1390000);
+    });
+
+    test('Kette erstmals gerudert: no ghost on the lap track, not even from the courses alone', () async {
+      await storeRowedSessionWithSamples(
+        db,
+        courseVersionId: (await courses.get(intervall))!.versionId,
+        laps: [RowedLap.single(480000, 2000)],
+      );
+
+      final ghosts = await ghostsOf(containerWith(), chain);
+
+      expect((ghosts.course, ghosts.lap, ghosts.segment), (null, null, null));
+    });
+
+    test('ignores the laps of the workout with other courses', () async {
+      await storeRowedSessionWithSamples(
+        db,
+        workout: chain,
+        laps: [
+          const RowedLap([(120000, 500), (480000, 2000), (100000, 500)]),
+        ],
+      );
+      await workouts.update(
+        chain.id,
+        name: chain.name,
+        courseIds: [for (final c in chain.courses.take(2)) c.id],
+        length: const LapCount(2),
+      );
+      final shorter = (await workouts.get(chain.id))!;
+
+      final ghosts = await ghostsOf(containerWith(), shorter);
+
+      expect(ghosts.lap, isNull);
+    });
+  });
 }

@@ -30,6 +30,14 @@ typedef WorkoutGhostKey = ({
   int laps,
 });
 
+/// The laps of a workout with this order of course lengths, joined by commas.
+typedef WorkoutLapGhostKey = ({
+  int workoutId,
+  CourseAxis axis,
+  int length,
+  String chain,
+});
+
 /// The ranking of a course or a zone with this length.
 typedef LengthGhostKey = ({int id, CourseAxis axis, int length});
 
@@ -57,6 +65,17 @@ final courseGhostProvider = Provider.autoDispose
       return _placeOne(ref, rankings, key.axis, key.length);
     });
 
+/// The ghost of the lap track of a workout with several courses: its
+/// fastest earlier lap with the same order of course lengths (Change
+/// workout-course-chain, Design D5).
+final workoutLapGhostProvider = Provider.autoDispose
+    .family<GhostTrack?, WorkoutLapGhostKey>((ref, key) {
+      final rankings = ref
+          .watch(workoutLapRankingsProvider(key.workoutId))
+          .value;
+      return _placeOne(ref, rankings, key.axis, key.length, chain: key.chain);
+    });
+
 /// The ghost of the segment track: place 1 of the zone with the length it
 /// has in the course rowed now (Design D2).
 final zoneGhostProvider = Provider.autoDispose
@@ -82,7 +101,8 @@ typedef LiveGhostsKey = ({
 /// it only changes from one segment to the next.
 LiveGhostsKey liveGhostsKey(SessionPlan plan, LapProgress progress) => (
   workoutId: plan.workout?.id,
-  // A lap of a chain runs several courses (Change workout-course-chain, D5).
+  // A lap of a chain runs several courses: its ghost is a lap of the
+  // workout (Change workout-course-chain, Design D5).
   courseId: plan.courses.length == 1 ? plan.courses.single.id : null,
   axis: plan.axis,
   length: plan.definition.length,
@@ -118,15 +138,24 @@ final liveGhostsProvider = Provider.autoDispose
         course: workout == null
             ? null
             : ref.watch(workoutGhostProvider(workout)),
-        lap: courseId == null
-            ? null
-            : ref.watch(
-                courseGhostProvider((
-                  id: courseId,
-                  axis: key.axis,
-                  length: key.length,
-                )),
-              ),
+        lap: switch ((courseId, workoutId)) {
+          (null, final workoutId?) => ref.watch(
+            workoutLapGhostProvider((
+              workoutId: workoutId,
+              axis: key.axis,
+              length: key.length,
+              chain: key.chain,
+            )),
+          ),
+          (null, null) => null,
+          (final courseId?, _) => ref.watch(
+            courseGhostProvider((
+              id: courseId,
+              axis: key.axis,
+              length: key.length,
+            )),
+          ),
+        },
         segment: zoneId == null
             ? null
             : ref.watch(
