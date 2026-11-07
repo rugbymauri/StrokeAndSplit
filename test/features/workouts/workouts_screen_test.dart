@@ -12,6 +12,30 @@ import '../../support/test_database.dart';
 
 import 'package:strokesplit/data/sessions/session_plan.dart';
 
+/// Chooses [option] (Runden, Dauer, Offen) in the length of the workout editor.
+Future<void> _chooseLength(WidgetTester tester, String option) async {
+  final choice = find.descendant(
+    of: find.byKey(const Key('workout-length')),
+    matching: find.text(option),
+  );
+  await tester.ensureVisible(choice);
+  await tester.tap(choice);
+  await tester.pump();
+}
+
+/// Picks the course [name] in the editor after tapping the button with [key].
+Future<void> _pickCourse(
+  WidgetTester tester,
+  String name, {
+  Key key = const Key('workout-course-add'),
+}) async {
+  await tester.ensureVisible(find.byKey(key));
+  await tester.tap(find.byKey(key));
+  await tester.pumpAndSettle();
+  await tester.tap(find.widgetWithText(ListTile, name).last);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets('lists workouts with course and laps', (tester) async {
     final setup = WorkoutSetup();
@@ -51,12 +75,8 @@ void main() {
         await tester.tap(find.text('Workout anlegen'));
         await tester.pumpAndSettle();
         await tester.enterText(find.byKey(const Key('workout-name')), name);
-        await tester.tap(find.byKey(const Key('workout-course')));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Seerunde · 1000 m · frei').last);
-        await tester.pumpAndSettle();
-        if (open) await tester.tap(find.text('Offen bis Stopp'));
-        await tester.pump();
+        await _pickCourse(tester, 'Seerunde');
+        if (open) await _chooseLength(tester, 'Offen');
         await tester.tap(find.byTooltip('Speichern'));
         await setup.settle(tester);
       }
@@ -97,8 +117,11 @@ void main() {
     );
 
     expect(find.text('New workout'), findsOneWidget);
-    expect(find.text('Fixed number'), findsOneWidget);
-    expect(find.text('Open until stop'), findsOneWidget);
+    expect(find.text('COURSES'), findsOneWidget);
+    expect(find.text('Choose course'), findsOneWidget);
+    expect(find.text('LENGTH'), findsOneWidget);
+    expect(find.text('Duration'), findsOneWidget);
+    expect(find.text('Open'), findsOneWidget);
     expect(find.text('laps'), findsOneWidget);
     expect(find.bySemanticsLabel('1 lap more'), findsOneWidget);
     await tester.tap(find.byTooltip('Save'));
@@ -241,8 +264,7 @@ void main() {
     ) async {
       final setup = await openEditor(tester);
 
-      await tester.tap(find.text('Offen bis Stopp'));
-      await tester.pump();
+      await _chooseLength(tester, 'Offen');
 
       expect(find.byKey(const Key('workout-laps')), findsNothing);
       expect(find.text('1000 m'), findsOneWidget);
@@ -262,8 +284,7 @@ void main() {
         await openEditor(tester, laps: null);
 
         expect(find.byKey(const Key('workout-laps')), findsNothing);
-        await tester.tap(find.text('Feste Anzahl'));
-        await tester.pump();
+        await _chooseLength(tester, 'Runden');
 
         expect(laps(tester).value, 3);
         expect(find.text('3000 m'), findsOneWidget);
@@ -441,10 +462,11 @@ void main() {
         await setup.settle(tester);
         await tester.tap(find.text('Workout anlegen'));
         await setup.settle(tester);
-        await tester.tap(find.byKey(const Key('workout-course')));
+        await tester.tap(find.byKey(const Key('workout-course-add')));
         await setup.settle(tester);
 
-        expect(find.text('Sprintstrecke · 2000 m · frei'), findsWidgets);
+        expect(find.widgetWithText(ListTile, 'Sprintstrecke'), findsOneWidget);
+        expect(find.text('2000 m · frei'), findsOneWidget);
         await disposeWidgetsWithDatabase(tester);
       },
     );

@@ -1072,21 +1072,37 @@
   "@workoutCourseMissing": {
     "description": "Workout editor: no course chosen"
   },
-  "workoutCourse": "Strecke",
-  "@workoutCourse": {
-    "description": "Workout editor: label of the course field"
+  "workoutCourses": "Strecken",
+  "@workoutCourses": {
+    "description": "Workout editor: label above the list of courses rowed one after the other"
   },
-  "workoutFixedLaps": "Feste Anzahl",
-  "@workoutFixedLaps": {
-    "description": "Workout editor: choice for a fixed number of laps"
+  "workoutCourseAdd": "Strecke anhängen",
+  "@workoutCourseAdd": {
+    "description": "Workout editor: button that appends a course after the last one"
   },
-  "workoutOpenLaps": "Offen bis Stopp",
-  "@workoutOpenLaps": {
-    "description": "Workout editor: choice for an open number of laps, rowed until the session ends"
+  "workoutCourseChoose": "Strecke wählen",
+  "@workoutCourseChoose": {
+    "description": "Workout editor: button of a new workout without a course yet, and title of the list to pick a course from"
   },
-  "workoutLaps": "Runden",
-  "@workoutLaps": {
-    "description": "Workout editor: label of the number of laps"
+  "workoutCourseUp": "Nach oben",
+  "@workoutCourseUp": {
+    "description": "Workout editor: tooltip of the button that moves a course one place up"
+  },
+  "workoutCourseDown": "Nach unten",
+  "@workoutCourseDown": {
+    "description": "Workout editor: tooltip of the button that moves a course one place down"
+  },
+  "workoutCourseRemove": "Strecke entfernen",
+  "@workoutCourseRemove": {
+    "description": "Workout editor: tooltip of the button that removes a course from the workout"
+  },
+  "workoutCourseReplace": "Strecke ersetzen",
+  "@workoutCourseReplace": {
+    "description": "Workout editor: tooltip of the button that replaces the only course of a workout by another one"
+  },
+  "workoutLength": "Länge",
+  "@workoutLength": {
+    "description": "Workout editor: label above the choice of laps, duration or open"
   },
   "workoutLapsUnit": "{laps, plural, =1{Runde} other{Runden}}",
   "@workoutLapsUnit": {
@@ -1100,6 +1116,15 @@
   "workoutResult": "Ergibt",
   "@workoutResult": {
     "description": "Workout editor: label of the line with the total length of all laps"
+  },
+  "workoutResultDuration": "Runden à {length}",
+  "@workoutResultDuration": {
+    "description": "Workout editor: after the total time of a workout with a duration, the length of one lap, e.g. 'Runden à 2500 m'",
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
   },
   "workoutResultOpen": "pro Runde, bis du die Session beendest",
   "@workoutResultOpen": {

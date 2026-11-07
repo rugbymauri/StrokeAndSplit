@@ -1327,29 +1327,53 @@ abstract class AppLocalizations {
   /// **'Wähle eine Strecke.'**
   String get workoutCourseMissing;
 
-  /// Workout editor: label of the course field
+  /// Workout editor: label above the list of courses rowed one after the other
   ///
   /// In de, this message translates to:
-  /// **'Strecke'**
-  String get workoutCourse;
+  /// **'Strecken'**
+  String get workoutCourses;
 
-  /// Workout editor: choice for a fixed number of laps
+  /// Workout editor: button that appends a course after the last one
   ///
   /// In de, this message translates to:
-  /// **'Feste Anzahl'**
-  String get workoutFixedLaps;
+  /// **'Strecke anhängen'**
+  String get workoutCourseAdd;
 
-  /// Workout editor: choice for an open number of laps, rowed until the session ends
+  /// Workout editor: button of a new workout without a course yet, and title of the list to pick a course from
   ///
   /// In de, this message translates to:
-  /// **'Offen bis Stopp'**
-  String get workoutOpenLaps;
+  /// **'Strecke wählen'**
+  String get workoutCourseChoose;
 
-  /// Workout editor: label of the number of laps
+  /// Workout editor: tooltip of the button that moves a course one place up
   ///
   /// In de, this message translates to:
-  /// **'Runden'**
-  String get workoutLaps;
+  /// **'Nach oben'**
+  String get workoutCourseUp;
+
+  /// Workout editor: tooltip of the button that moves a course one place down
+  ///
+  /// In de, this message translates to:
+  /// **'Nach unten'**
+  String get workoutCourseDown;
+
+  /// Workout editor: tooltip of the button that removes a course from the workout
+  ///
+  /// In de, this message translates to:
+  /// **'Strecke entfernen'**
+  String get workoutCourseRemove;
+
+  /// Workout editor: tooltip of the button that replaces the only course of a workout by another one
+  ///
+  /// In de, this message translates to:
+  /// **'Strecke ersetzen'**
+  String get workoutCourseReplace;
+
+  /// Workout editor: label above the choice of laps, duration or open
+  ///
+  /// In de, this message translates to:
+  /// **'Länge'**
+  String get workoutLength;
 
   /// Workout editor: unit after the number of laps, without the number
   ///
@@ -1362,6 +1386,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Ergibt'**
   String get workoutResult;
+
+  /// Workout editor: after the total time of a workout with a duration, the length of one lap, e.g. 'Runden à 2500 m'
+  ///
+  /// In de, this message translates to:
+  /// **'Runden à {length}'**
+  String workoutResultDuration(String length);
 
   /// Workout editor: after the length of one lap when the number of laps is open
   ///

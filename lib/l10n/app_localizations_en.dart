@@ -754,16 +754,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get workoutCourseMissing => 'Choose a course.';
 
   @override
-  String get workoutCourse => 'Course';
+  String get workoutCourses => 'Courses';
 
   @override
-  String get workoutFixedLaps => 'Fixed number';
+  String get workoutCourseAdd => 'Append course';
 
   @override
-  String get workoutOpenLaps => 'Open until stop';
+  String get workoutCourseChoose => 'Choose course';
 
   @override
-  String get workoutLaps => 'Laps';
+  String get workoutCourseUp => 'Move up';
+
+  @override
+  String get workoutCourseDown => 'Move down';
+
+  @override
+  String get workoutCourseRemove => 'Remove course';
+
+  @override
+  String get workoutCourseReplace => 'Replace course';
+
+  @override
+  String get workoutLength => 'Length';
 
   @override
   String workoutLapsUnit(int laps) {
@@ -778,6 +790,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workoutResult => 'Total';
+
+  @override
+  String workoutResultDuration(String length) {
+    return 'laps of $length';
+  }
 
   @override
   String get workoutResultOpen => 'per lap, until you end the session';

@@ -760,16 +760,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get workoutCourseMissing => 'Wähle eine Strecke.';
 
   @override
-  String get workoutCourse => 'Strecke';
+  String get workoutCourses => 'Strecken';
 
   @override
-  String get workoutFixedLaps => 'Feste Anzahl';
+  String get workoutCourseAdd => 'Strecke anhängen';
 
   @override
-  String get workoutOpenLaps => 'Offen bis Stopp';
+  String get workoutCourseChoose => 'Strecke wählen';
 
   @override
-  String get workoutLaps => 'Runden';
+  String get workoutCourseUp => 'Nach oben';
+
+  @override
+  String get workoutCourseDown => 'Nach unten';
+
+  @override
+  String get workoutCourseRemove => 'Strecke entfernen';
+
+  @override
+  String get workoutCourseReplace => 'Strecke ersetzen';
+
+  @override
+  String get workoutLength => 'Länge';
 
   @override
   String workoutLapsUnit(int laps) {
@@ -784,6 +796,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get workoutResult => 'Ergibt';
+
+  @override
+  String workoutResultDuration(String length) {
+    return 'Runden à $length';
+  }
 
   @override
   String get workoutResultOpen => 'pro Runde, bis du die Session beendest';
