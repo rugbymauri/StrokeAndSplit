@@ -15,9 +15,9 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 
 ## 3. Ranglisten und Ghost
 
-- [ ] 3.1 Rangliste einer Strecke aus `laps` (eine Strecke) und aus `lap_segments` (Kette) nach D4. Verifikation: Tests „Strecke in einer Kette“ (Fahrt allein und in der Kette in derselben Rangliste), „Kette abgebrochen“ (gegen gespeicherte Daten einer mitten in „Ausrudern“ beendeten Session) und ein Vergleich, dass Sessions mit einer Strecke dieselben Werte wie vor dem Change liefern.
-- [ ] 3.2 Rangliste einer Zone über `session_courses` und `first_segment` (D4). Verifikation: Test mit „Sprint“ in der zweiten Strecke einer Kette landet in der Rangliste von „Sprint“ mit richtiger Start- und Endzeit; bestehende Zonentests grün.
-- [ ] 3.3 Rangliste eines Workouts nach Folge der Streckenlängen und Rundenzahl, keine bei Dauer oder offen (D4); `session_places.dart` angepasst. Verifikation: Tests „Strecke angehängt“ (eigene Rangliste) und „Workout mit Dauer“ (keine Plätze); bestehende Workout-Ranglisten-Tests grün.
+- [x] 3.1 Rangliste einer Strecke aus `laps` (eine Strecke) und aus `lap_segments` (Kette) nach D4. Verifikation: Tests „Strecke in einer Kette“ (Fahrt allein und in der Kette in derselben Rangliste), „Kette abgebrochen“ (gegen gespeicherte Daten einer mitten in „Ausrudern“ beendeten Session) und ein Vergleich, dass Sessions mit einer Strecke dieselben Werte wie vor dem Change liefern.
+- [x] 3.2 Rangliste einer Zone über `session_courses` und `first_segment` (D4). Verifikation: Test mit „Sprint“ in der zweiten Strecke einer Kette landet in der Rangliste von „Sprint“ mit richtiger Start- und Endzeit; bestehende Zonentests grün.
+- [x] 3.3 Rangliste eines Workouts nach Folge der Streckenlängen und Rundenzahl, keine bei Dauer oder offen (D4); `session_places.dart` angepasst. Verifikation: Tests „Strecke angehängt“ (eigene Rangliste) und „Workout mit Dauer“ (keine Plätze); bestehende Workout-Ranglisten-Tests grün.
 - [ ] 3.4 Ghost der Rundenspur bei mehreren Strecken aus `workoutLaps` (D5). Verifikation: Tests „Runde über mehrere Strecken“ (Ghost erreicht das Rundenende nach der schnellsten früheren Runde) und „Kette erstmals gerudert“ (kein Ghost auf der Rundenspur); bei einer Strecke unverändert.
 
 ## 4. Export und Import
