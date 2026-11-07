@@ -29,6 +29,7 @@ Stand: 2026-10-16, `main` nach dem Merge von `foundation`, `courses`, `zones`, `
 | 13 | `resistance-control` | 12/13 | in Umsetzung (`feature/resistance-control`) | – (Gerätetest 6.2 am Woodrower am Schluss, Nutzer) |
 | 14 | `template-screen` | 8/9 | umgesetzt, in `main` gemergt | Nutzer: Test am Gerät (4.3); nach `ui-design`, `ghost` und `statistics` archivieren |
 | 15 | `course-rowing-free` | 11/12 | umgesetzt bis auf Gerätetest 7.3 (`feature/course-rowing-free`) | setzt `template-screen` voraus; erst nach `ghost` und `template-screen` archivieren |
+| 16 | `zone-level-only` | 0/6 | geplant, kann starten | erst nach `resistance-control` archivieren |
 
 ## Warum diese Reihenfolge
 
@@ -316,6 +317,12 @@ Wunsch des Nutzers (2026-11-06): eine Strecke wählen, auf einem weiteren Screen
 - [x] Proposal (2026-11-06). Entschieden (Nutzer): Einstieg über „Rudern“ in der Detailansicht der Strecke; drei sich ausschliessende Optionen, sichtbar nur die Eingabe der gewählten; Dauer nur hier, nicht in Vorlagen; Ende nach effektiver Ruderzeit ohne Pausen, auch mitten in der Runde; Dauer in Schritten von 1 min; geplante Dauer wird gespeichert (Schema 10); Ghost-Schalter auch hier; „Nochmal“ entfällt (in `template-screen`). Vorgaben ohne Rückmeldung: Dauer 1–180 min, Start 30 min; angebrochene Runde zählt nicht; Titel „Strecke · 30 min“.
 - [x] Design, Specs und Tasks (2026-11-06, 12 Tasks). Geklärt: Der `LapTracker` misst Zeitstrecken schon mit der Ruderzeit ohne Pausen (`auto-pause`), Runden und Dauer zählen also gleich. Entscheide im Design: `SessionPlan` statt `SessionTemplate` im Recorder (D1), Ende im Akkumulator beim ersten Datenpunkt über der Dauer (D2), `durationMs` im bestehenden Block `template` des Exports (D3), äusserer Ring nach Zeit ohne Rundengrenzen (D4). Vorgaben ohne Rückmeldung: Start-Option „Runden“ mit 3 Runden.
 - [ ] Umsetzung begonnen (2026-11-06, `feature/course-rowing-free`): 1.1 `SessionPlan` im Recorder, 2.1 Schema 10, 2.2 Export und Import der Dauer, 3.1 Ende nach Ruderzeit, 3.2 Ranglisten ohne Vorlage (ohne Codeänderung, nur Test), 4.1 Ring und Restzeit bei Dauer, 4.2 Ghost ohne Vorlage (nur Test), 5.1 Start-Screen `CourseStartScreen`, 6.1 Titel ohne Vorlage (Streckenname über `courseVersionProvider` statt Join), 7.1 README, 7.2 `make check` und Linux-Test mit Simulator (3 min mit 36 s Pause, Ende nach 3:00 Ruderzeit, „Seerunde · 3 min“, keine neue Vorlage). Offen: 7.3 Gerätetest (Nutzer). Abweichungen: `LapCount` statt `Laps` (Name der Drift-Tabelle); Optionsleiste des Vorlagen-Editors (`SegmentChoice`) statt Material-`SegmentedButton`.
+
+### 16. `zone-level-only`: Zone nur mit Widerstandsstufe
+
+Wunsch des Nutzers (2026-11-07): Beim Anlegen einer Zone soll neben Pace und Schlagzahl auch die Stufe allein genügen; nötig ist mindestens eins der drei.
+
+- [x] Proposal, Design, Specs und Tasks (2026-11-07, `docs/zone-level-only-proposal`, 6 Tasks). Entschieden (Nutzer): mindestens eins von Pace, Schlagzahl oder Stufe; die Zonenliste bleibt, sie zeigt die Werte schon. Vorgaben ohne Rückmeldung: Eine Zone nur mit Stufe gilt als Zone (Name im Streckenbalken, in der Pace-Box und im Rahmen, Stufe wird gesetzt), aber ohne Zonenmarkierung, ohne Anteil in der Zone und ohne Hinweis „Gleich …“; Ranglisten und Zonen-Ghost zählen wie bei jeder Zone. Im Design: `isFree` zählt die Stufe, neu `hasBand` für Messung und Hinweis (D1); Fehler `targetMissing` (D2). Keine Schema-Änderung. Das Delta `zones` ändert die Requirement „Widerstandsstufe einer Zone“ aus `resistance-control`, deshalb erst danach archivieren.
 
 ## Offene Entscheide
 
