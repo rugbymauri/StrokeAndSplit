@@ -118,74 +118,79 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              for (final e in _errors)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(e, style: TextStyle(color: colors.error)),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                for (final e in _errors)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(e, style: TextStyle(color: colors.error)),
+                  ),
+                TextField(
+                  key: const Key('template-name'),
+                  controller: _name,
+                  decoration: InputDecoration(labelText: l10n.fieldName),
                 ),
-              TextField(
-                key: const Key('template-name'),
-                controller: _name,
-                decoration: InputDecoration(labelText: l10n.fieldName),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<int>(
-                key: const Key('template-course'),
-                initialValue: courses.any((c) => c.id == _courseId)
-                    ? _courseId
-                    : null,
-                decoration: InputDecoration(labelText: l10n.templateCourse),
-                items: [
-                  for (final c in courses)
-                    DropdownMenuItem(
-                      value: c.id,
-                      child: Text('${c.name} · ${courseSummary(l10n, c)}'),
-                    ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<int>(
+                  key: const Key('template-course'),
+                  initialValue: courses.any((c) => c.id == _courseId)
+                      ? _courseId
+                      : null,
+                  decoration: InputDecoration(labelText: l10n.templateCourse),
+                  items: [
+                    for (final c in courses)
+                      DropdownMenuItem(
+                        value: c.id,
+                        child: Text('${c.name} · ${courseSummary(l10n, c)}'),
+                      ),
+                  ],
+                  onChanged: (id) => setState(() => _courseId = id),
+                ),
+                if (course != null) ...[
+                  const SizedBox(height: 8),
+                  CourseStrip(definition: course.definition),
                 ],
-                onChanged: (id) => setState(() => _courseId = id),
-              ),
-              if (course != null) ...[
-                const SizedBox(height: 8),
-                CourseStrip(definition: course.definition),
-              ],
-              const SizedBox(height: 24),
-              Text(l10n.templateLaps.toUpperCase(), style: AppTextStyles.label),
-              const SizedBox(height: 10),
-              SegmentChoice(
-                options: [
-                  (false, l10n.templateFixedLaps),
-                  (true, l10n.templateOpenLaps),
-                ],
-                value: _open,
-                onChanged: (open) => setState(() => _open = open),
-              ),
-              if (!_open) ...[
+                const SizedBox(height: 24),
+                Text(
+                  l10n.templateLaps.toUpperCase(),
+                  style: AppTextStyles.label,
+                ),
                 const SizedBox(height: 10),
-                OarStepper(
-                  key: const Key('template-laps'),
-                  value: _laps,
-                  step: 1,
-                  min: 1,
-                  max: _maxLaps,
-                  stepLabel: l10n.lapsCount(1),
-                  label: l10n.templateLaps,
-                  unit: l10n.templateLapsUnit(_laps),
-                  onChanged: (laps) => setState(() => _laps = laps),
+                SegmentChoice(
+                  options: [
+                    (false, l10n.templateFixedLaps),
+                    (true, l10n.templateOpenLaps),
+                  ],
+                  value: _open,
+                  onChanged: (open) => setState(() => _open = open),
                 ),
+                if (!_open) ...[
+                  const SizedBox(height: 10),
+                  OarStepper(
+                    key: const Key('template-laps'),
+                    value: _laps,
+                    step: 1,
+                    min: 1,
+                    max: _maxLaps,
+                    stepLabel: l10n.lapsCount(1),
+                    label: l10n.templateLaps,
+                    unit: l10n.templateLapsUnit(_laps),
+                    onChanged: (laps) => setState(() => _laps = laps),
+                  ),
+                ],
+                if (course != null) ...[
+                  const SizedBox(height: 22),
+                  _Result(course: course, laps: _open ? null : _laps),
+                ],
+                const SizedBox(height: 24),
+                FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
               ],
-              if (course != null) ...[
-                const SizedBox(height: 22),
-                _Result(course: course, laps: _open ? null : _laps),
-              ],
-              const SizedBox(height: 24),
-              FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
-            ],
+            ),
           ),
         ),
       ),

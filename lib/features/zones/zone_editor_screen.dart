@@ -171,173 +171,179 @@ class _ZoneEditorScreenState extends ConsumerState<ZoneEditorScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              if (_errors.isNotEmpty) ErrorCard(errors: _errors),
-              if (_courses.isNotEmpty)
-                Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: ListTile(
-                    key: const Key('zone-courses'),
-                    leading: const Icon(Icons.info_outline),
-                    title: Text(l10n.zoneInCourses(l10n.quotedNames(_courses))),
-                    subtitle: Text(l10n.zoneInCoursesHint),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                if (_errors.isNotEmpty) ErrorCard(errors: _errors),
+                if (_courses.isNotEmpty)
+                  Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: ListTile(
+                      key: const Key('zone-courses'),
+                      leading: const Icon(Icons.info_outline),
+                      title: Text(
+                        l10n.zoneInCourses(l10n.quotedNames(_courses)),
+                      ),
+                      subtitle: Text(l10n.zoneInCoursesHint),
+                    ),
+                  ),
+                TextField(
+                  key: const Key('zone-name'),
+                  controller: _name,
+                  decoration: InputDecoration(
+                    labelText: l10n.fieldName,
+                    hintText: l10n.zoneNameHint,
                   ),
                 ),
-              TextField(
-                key: const Key('zone-name'),
-                controller: _name,
-                decoration: InputDecoration(
-                  labelText: l10n.fieldName,
-                  hintText: l10n.zoneNameHint,
+                const SizedBox(height: 16),
+                SegmentedButton<CourseAxis>(
+                  segments: [
+                    ButtonSegment(
+                      value: CourseAxis.distance,
+                      label: Text(l10n.axisDistance),
+                      icon: const Icon(Icons.straighten),
+                    ),
+                    ButtonSegment(
+                      value: CourseAxis.time,
+                      label: Text(l10n.axisTime),
+                      icon: const Icon(Icons.timer_outlined),
+                    ),
+                  ],
+                  selected: {_axis},
+                  // A zone in a course keeps the axis of the course.
+                  onSelectionChanged: _courses.isEmpty
+                      ? (axis) => setState(() {
+                          _axis = axis.single;
+                          _length = _defaultLength(_axis);
+                        })
+                      : null,
                 ),
-              ),
-              const SizedBox(height: 16),
-              SegmentedButton<CourseAxis>(
-                segments: [
-                  ButtonSegment(
-                    value: CourseAxis.distance,
-                    label: Text(l10n.axisDistance),
-                    icon: const Icon(Icons.straighten),
-                  ),
-                  ButtonSegment(
-                    value: CourseAxis.time,
-                    label: Text(l10n.axisTime),
-                    icon: const Icon(Icons.timer_outlined),
-                  ),
-                ],
-                selected: {_axis},
-                // A zone in a course keeps the axis of the course.
-                onSelectionChanged: _courses.isEmpty
-                    ? (axis) => setState(() {
-                        _axis = axis.single;
-                        _length = _defaultLength(_axis);
-                      })
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              _Field(
-                label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
-                child: OarStepper(
-                  key: const Key('zone-length'),
-                  value: _length,
-                  step: _lengthStep,
-                  min: _lengthStep,
-                  stepLabel: distance
-                      ? '$_lengthStep m'
-                      : l10n.stepSeconds(_lengthStep),
-                  format: distance ? null : (v) => formatCourseLength(_axis, v),
-                  unit: distance ? 'm' : 'min',
+                const SizedBox(height: 16),
+                _Field(
                   label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
-                  size: OarStepperSize.compact,
-                  onChanged: (v) => setState(() => _length = v),
+                  child: OarStepper(
+                    key: const Key('zone-length'),
+                    value: _length,
+                    step: _lengthStep,
+                    min: _lengthStep,
+                    stepLabel: distance
+                        ? '$_lengthStep m'
+                        : l10n.stepSeconds(_lengthStep),
+                    format: distance
+                        ? null
+                        : (v) => formatCourseLength(_axis, v),
+                    unit: distance ? 'm' : 'min',
+                    label: l10n.fieldLength(distance ? 'm' : 'm:ss'),
+                    size: OarStepperSize.compact,
+                    onChanged: (v) => setState(() => _length = v),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              // Pace, stroke rate and level are the three targets; at least one is needed (Change zone-level-only).
-              Text(
-                l10n.zoneBandHint,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: 8),
-              _BandCard(
-                switchKey: const Key('zone-pace-band'),
-                title: l10n.zonePaceBand,
-                on: _hasPace,
-                onChanged: (on) => setState(() => _hasPace = on),
-                fields: [
-                  _Field(
-                    label: l10n.zonePaceFastest,
-                    child: _paceStepper(
-                      key: 'zone-pace-fast',
+                const SizedBox(height: 16),
+                // Pace, stroke rate and level are the three targets; at least one is needed (Change zone-level-only).
+                Text(
+                  l10n.zoneBandHint,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+                _BandCard(
+                  switchKey: const Key('zone-pace-band'),
+                  title: l10n.zonePaceBand,
+                  on: _hasPace,
+                  onChanged: (on) => setState(() => _hasPace = on),
+                  fields: [
+                    _Field(
                       label: l10n.zonePaceFastest,
-                      value: _paceFast,
-                      min: _paceMin,
-                      // The slowest pace moves along and stays within the range.
-                      max: _paceMax - (_paceSlow - _paceFast),
-                      onChanged: _movePaceBand,
+                      child: _paceStepper(
+                        key: 'zone-pace-fast',
+                        label: l10n.zonePaceFastest,
+                        value: _paceFast,
+                        min: _paceMin,
+                        // The slowest pace moves along and stays within the range.
+                        max: _paceMax - (_paceSlow - _paceFast),
+                        onChanged: _movePaceBand,
+                      ),
                     ),
-                  ),
-                  _Field(
-                    label: l10n.zonePaceSlowest,
-                    child: _paceStepper(
-                      key: 'zone-pace-slow',
+                    _Field(
                       label: l10n.zonePaceSlowest,
-                      value: _paceSlow,
-                      min: _paceFast,
-                      max: _paceMax,
-                      onChanged: (v) => _paceSlow = v,
+                      child: _paceStepper(
+                        key: 'zone-pace-slow',
+                        label: l10n.zonePaceSlowest,
+                        value: _paceSlow,
+                        min: _paceFast,
+                        max: _paceMax,
+                        onChanged: (v) => _paceSlow = v,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _BandCard(
-                switchKey: const Key('zone-spm-band'),
-                title: l10n.zoneSpmBand,
-                on: _hasSpm,
-                onChanged: (on) => setState(() => _hasSpm = on),
-                fields: [
-                  _Field(
-                    label: l10n.zoneSpmFrom,
-                    child: _spmStepper(
-                      key: 'zone-spm-min',
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _BandCard(
+                  switchKey: const Key('zone-spm-band'),
+                  title: l10n.zoneSpmBand,
+                  on: _hasSpm,
+                  onChanged: (on) => setState(() => _hasSpm = on),
+                  fields: [
+                    _Field(
                       label: l10n.zoneSpmFrom,
-                      value: _spmMin,
-                      min: _spmLowest,
-                      max: _spmMax,
-                      onChanged: (v) => _spmMin = v,
+                      child: _spmStepper(
+                        key: 'zone-spm-min',
+                        label: l10n.zoneSpmFrom,
+                        value: _spmMin,
+                        min: _spmLowest,
+                        max: _spmMax,
+                        onChanged: (v) => _spmMin = v,
+                      ),
                     ),
-                  ),
-                  _Field(
-                    label: l10n.zoneSpmTo,
-                    child: _spmStepper(
-                      key: 'zone-spm-max',
+                    _Field(
                       label: l10n.zoneSpmTo,
-                      value: _spmMax,
-                      min: _spmMin,
-                      max: _spmHighest,
-                      onChanged: (v) => _spmMax = v,
+                      child: _spmStepper(
+                        key: 'zone-spm-max',
+                        label: l10n.zoneSpmTo,
+                        value: _spmMax,
+                        min: _spmMin,
+                        max: _spmHighest,
+                        onChanged: (v) => _spmMax = v,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _BandCard(
-                switchKey: const Key('zone-resistance-band'),
-                title: l10n.zoneResistance,
-                on: _hasResistance,
-                onChanged: (on) => setState(() => _hasResistance = on),
-                fields: [
-                  _Field(
-                    label: l10n.zoneResistanceLevel,
-                    child: OarStepper(
-                      key: const Key('zone-resistance-level'),
-                      value: _resistance,
-                      step: 1,
-                      min: _resistanceLowest,
-                      max: _resistanceHighest,
-                      stepLabel: l10n.stepLevels(1),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _BandCard(
+                  switchKey: const Key('zone-resistance-band'),
+                  title: l10n.zoneResistance,
+                  on: _hasResistance,
+                  onChanged: (on) => setState(() => _hasResistance = on),
+                  fields: [
+                    _Field(
                       label: l10n.zoneResistanceLevel,
-                      size: OarStepperSize.compact,
-                      background: AppColors.bg,
-                      onChanged: (v) => setState(() => _resistance = v),
+                      child: OarStepper(
+                        key: const Key('zone-resistance-level'),
+                        value: _resistance,
+                        step: 1,
+                        min: _resistanceLowest,
+                        max: _resistanceHighest,
+                        stepLabel: l10n.stepLevels(1),
+                        label: l10n.zoneResistanceLevel,
+                        size: OarStepperSize.compact,
+                        background: AppColors.bg,
+                        onChanged: (v) => setState(() => _resistance = v),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.zoneResistanceHint,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: 16),
-              FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.zoneResistanceHint,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 16),
+                FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
+              ],
+            ),
           ),
         ),
       ),
