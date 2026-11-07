@@ -205,7 +205,7 @@ class _NoCourse extends StatelessWidget {
 
 /// `Seerunde · 1000 m · 3 Runden` below the name of a workout.
 String workoutDetails(AppLocalizations l10n, Workout workout) {
-  final course = workout.course;
+  final course = workout.chain;
   return '${course.name} · ${formatCourseLength(course.axis, course.definition.length)} · '
       '${formatLaps(l10n, workout.laps)}';
 }
@@ -257,7 +257,7 @@ class _WorkoutCard extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.m),
                     CourseStrip(
-                      definition: workout.course.definition,
+                      definition: workout.chain.definition,
                       height: 10,
                     ),
                   ],

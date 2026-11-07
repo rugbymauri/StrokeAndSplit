@@ -62,7 +62,7 @@ void main() {
       await container
           .read(sessionRecorderProvider.notifier)
           .start(
-            plan: SessionPlan(course: course, length: length),
+            plan: SessionPlan(courses: [course], length: length),
           );
     });
     async.elapse(const Duration(milliseconds: 500));

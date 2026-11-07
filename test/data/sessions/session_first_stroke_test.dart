@@ -16,6 +16,8 @@ import '../../support/fake_erg_source.dart';
 import '../../support/fixtures.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
 
@@ -64,7 +66,11 @@ Future<Workout> _workout(AppDatabase db) async {
   );
   final workouts = WorkoutRepository(db);
   return (await workouts.get(
-    await workouts.create('Lang', courseId: course, laps: null),
+    await workouts.create(
+      'Lang',
+      courseIds: [course],
+      length: const OpenLength(),
+    ),
   ))!;
 }
 

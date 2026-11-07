@@ -17,6 +17,10 @@ import '../../support/fixtures.dart';
 import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
+import '../../support/session_rows.dart';
+
 /// Per ranking its length and the values of its entries: seconds on a
 /// distance axis, metres on a time axis.
 List<String> _values(List<Ranking> rankings) => [
@@ -48,10 +52,18 @@ void main() {
   group('course', () {
     test('ranks the laps of all workouts on the course together', () async {
       final x3 = (await workouts.get(
-        await workouts.create('Seerunde x3', courseId: seerunde, laps: 3),
+        await workouts.create(
+          'Seerunde x3',
+          courseIds: [seerunde],
+          length: const LapCount(3),
+        ),
       ))!;
       final open = (await workouts.get(
-        await workouts.create('Seerunde offen', courseId: seerunde, laps: null),
+        await workouts.create(
+          'Seerunde offen',
+          courseIds: [seerunde],
+          length: const OpenLength(),
+        ),
       ))!;
       await storeRowedSession(
         db,
@@ -379,8 +391,8 @@ void main() {
     setUp(
       () async => x3 = await workouts.create(
         'Seerunde x3',
-        courseId: seerunde,
-        laps: 3,
+        courseIds: [seerunde],
+        length: const LapCount(3),
       ),
     );
 
@@ -438,8 +450,8 @@ void main() {
       await workouts.update(
         x3,
         name: 'Seerunde x3',
-        courseId: seerunde,
-        laps: 4,
+        courseIds: [seerunde],
+        length: const LapCount(4),
       );
       await row(x3, [250000, 251000, 250800, 252000]);
 
@@ -454,8 +466,8 @@ void main() {
     test('has no ranking for an open number of laps, its laps count for the course', () async {
       final open = await workouts.create(
         'Seerunde offen',
-        courseId: seerunde,
-        laps: null,
+        courseIds: [seerunde],
+        length: const OpenLength(),
       );
       await row(open, [250000, 251000]);
 
@@ -506,7 +518,11 @@ void main() {
           ],
         ),
       );
-      x3 = await workouts.create('Seerunde x3', courseId: lake, laps: 3);
+      x3 = await workouts.create(
+        'Seerunde x3',
+        courseIds: [lake],
+        length: const LapCount(3),
+      );
     });
 
     test('counts no session of the simulator or a replay', () async {
@@ -533,7 +549,7 @@ void main() {
 
         expect(await rankings.zone(sprintId), isEmpty);
         final rowed = await CourseRepository(db)
-            .atVersion((await SessionRepository(db).get(id))!.courseVersionId!);
+            .atVersion((await sessionVersionIds(db, id)).single);
         expect(rowed.definition.segments[1].zoneName, 'Sprint');
         expect(
           await (db.select(
@@ -602,8 +618,8 @@ void main() {
         final phoneWorkouts = WorkoutRepository(phone);
         final workoutId = await phoneWorkouts.create(
           'Seerunde x3',
-          courseId: courseId,
-          laps: 3,
+          courseIds: [courseId],
+          length: const LapCount(3),
         );
         final workout = (await phoneWorkouts.get(workoutId))!;
         final sessions = SessionRepository(phone);
@@ -629,8 +645,11 @@ void main() {
         final course = (await CourseRepository(laptop).all()).single;
         final zone = (await ZoneRepository(laptop).all()).single;
         // The import links no workout; linked by hand, the session still must not count.
-        final laptopWorkout = await WorkoutRepository(laptop)
-            .create('Seerunde x3', courseId: course.id, laps: 3);
+        final laptopWorkout = await WorkoutRepository(laptop).create(
+          'Seerunde x3',
+          courseIds: [course.id],
+          length: const LapCount(3),
+        );
         await (laptop.update(laptop.sessions)
               ..where((s) => s.id.equals(imported)))
             .write(SessionsCompanion(workoutId: Value(laptopWorkout)));

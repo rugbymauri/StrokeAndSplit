@@ -15,6 +15,8 @@ import '../../support/rowed_sessions.dart';
 import '../../support/workout_setup.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 void main() {
   Finder onScreen(Finder finder) =>
       find.descendant(of: find.byType(WorkoutScreen), matching: finder);
@@ -38,7 +40,7 @@ void main() {
     ) async {
       final setup = WorkoutSetup();
       final course = await setup.addCourseWithZone(tester, 'Seerunde');
-      await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+      await setup.addWorkout(tester, 'Seerunde x3', courseIds: [course]);
       await setup.pump(tester);
 
       await setup.openWorkout(tester, 'Seerunde x3');
@@ -69,7 +71,7 @@ void main() {
     ) async {
       final setup = WorkoutSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
-      await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+      await setup.addWorkout(tester, 'Seerunde x3', courseIds: [course]);
       await setup.pump(tester);
 
       await setup.openWorkout(tester, 'Seerunde x3');
@@ -83,7 +85,7 @@ void main() {
     ) async {
       final setup = WorkoutSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
-      await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+      await setup.addWorkout(tester, 'Seerunde x3', courseIds: [course]);
       await setup.pump(tester);
 
       await setup.openWorkout(tester, 'Seerunde x3');
@@ -107,7 +109,7 @@ void main() {
       (tester) async {
         final setup = WorkoutSetup();
         final course = await setup.addCourse(tester, 'Seerunde');
-        await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+        await setup.addWorkout(tester, 'Seerunde x3', courseIds: [course]);
         await setup.pump(tester);
 
         await setup.openWorkout(tester, 'Seerunde x3');
@@ -138,7 +140,7 @@ void main() {
       final id = await setup.addWorkout(
         tester,
         'Seerunde x3',
-        courseId: course,
+        courseIds: [course],
       );
       await setup.pump(
         tester,
@@ -169,7 +171,7 @@ void main() {
         final id = await setup.addWorkout(
           tester,
           'Seerunde x3',
-          courseId: course,
+          courseIds: [course],
         );
         await tester.runAsync(() async {
           final x3 = (await setup.workouts.get(id))!;
@@ -209,12 +211,12 @@ void main() {
         rower: const RowerChoice.simulator(ErgProtocol.ftms),
       );
       final course = await setup.addCourseWithZone(tester, 'Seerunde');
-      await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+      await setup.addWorkout(tester, 'Seerunde x3', courseIds: [course]);
       await setup.addWorkout(
         tester,
         'Seerunde offen',
-        courseId: course,
-        laps: null,
+        courseIds: [course],
+        length: const OpenLength(),
       );
       await setup.pump(tester);
 
@@ -241,7 +243,7 @@ void main() {
       (tester) async {
         final setup = WorkoutSetup();
         final id = await setup.addCourse(tester, 'Seerunde');
-        await setup.addWorkout(tester, 'Seerunde x3', courseId: id);
+        await setup.addWorkout(tester, 'Seerunde x3', courseIds: [id]);
         await setup.pump(tester);
 
         await setup.openWorkout(tester, 'Seerunde x3');
@@ -267,7 +269,7 @@ void main() {
     testWidgets('shows the summary when the last lap is done', (tester) async {
       final setup = WorkoutSetup();
       final id = await setup.addCourse(tester, 'Sprint', length: 100);
-      await setup.addWorkout(tester, 'Sprint x3', courseId: id);
+      await setup.addWorkout(tester, 'Sprint x3', courseIds: [id]);
       await setup.pump(tester);
 
       await setup.openWorkout(tester, 'Sprint x3');
@@ -301,7 +303,7 @@ void main() {
     ) async {
       final setup = WorkoutSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
-      await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+      await setup.addWorkout(tester, 'Seerunde x3', courseIds: [course]);
       await setup.pump(tester);
 
       await setup.openWorkout(tester, 'Seerunde x3');
@@ -327,7 +329,7 @@ void main() {
       (tester) async {
         final setup = WorkoutSetup();
         final course = await setup.addCourse(tester, 'Seerunde');
-        await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+        await setup.addWorkout(tester, 'Seerunde x3', courseIds: [course]);
         await setup.pump(tester);
 
         await setup.openWorkout(tester, 'Seerunde x3');
@@ -377,7 +379,7 @@ void main() {
         final id = await setup.addWorkout(
           tester,
           'Seerunde x3',
-          courseId: course,
+          courseIds: [course],
         );
         await tester.runAsync(() async {
           final x3 = (await setup.workouts.get(id))!;
@@ -441,8 +443,8 @@ void main() {
       final id = await setup.addWorkout(
         tester,
         'Seerunde x1',
-        courseId: course,
-        laps: 1,
+        courseIds: [course],
+        length: const LapCount(1),
       );
       await tester.runAsync(() async {
         final x1 = (await setup.workouts.get(id))!;
@@ -475,7 +477,7 @@ void main() {
     ) async {
       final setup = WorkoutSetup();
       final course = await setup.addCourse(tester, 'Seerunde');
-      await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+      await setup.addWorkout(tester, 'Seerunde x3', courseIds: [course]);
       await setup.pump(tester);
 
       await setup.openWorkout(tester, 'Seerunde x3');
@@ -499,8 +501,8 @@ void main() {
       final id = await setup.addWorkout(
         tester,
         'Seerunde offen',
-        courseId: course,
-        laps: null,
+        courseIds: [course],
+        length: const OpenLength(),
       );
       await tester.runAsync(() async {
         final open = (await setup.workouts.get(id))!;
@@ -530,8 +532,8 @@ void main() {
       final id = await setup.addWorkout(
         tester,
         'Seerunde x1',
-        courseId: course,
-        laps: 1,
+        courseIds: [course],
+        length: const LapCount(1),
       );
       await tester.runAsync(() async {
         final x1 = (await setup.workouts.get(id))!;
@@ -556,8 +558,8 @@ void main() {
       final id = await setup.addWorkout(
         tester,
         'Seerunde x1',
-        courseId: course,
-        laps: 1,
+        courseIds: [course],
+        length: const LapCount(1),
       );
       await tester.runAsync(() async {
         final x1 = (await setup.workouts.get(id))!;

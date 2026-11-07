@@ -94,6 +94,7 @@ class Ranking {
     required this.axis,
     required this.length,
     this.laps,
+    this.courseLengths,
     required this.entries,
   });
 
@@ -107,6 +108,10 @@ class Ranking {
   /// The number of laps of a workout ranking; null otherwise.
   final int? laps;
 
+  /// The lengths of the courses of a workout ranking in their order, whose
+  /// sum is [length]; null otherwise (Change workout-course-chain, D4).
+  final List<int>? courseLengths;
+
   final List<RankingEntry> entries;
 
   /// The first [count] places.
@@ -114,6 +119,7 @@ class Ranking {
     axis: axis,
     length: length,
     laps: laps,
+    courseLengths: courseLengths,
     entries: entries.take(count).toList(),
   );
 
@@ -123,13 +129,21 @@ class Ranking {
       other.axis == axis &&
       other.length == length &&
       other.laps == laps &&
+      listEquals(other.courseLengths, courseLengths) &&
       listEquals(other.entries, entries);
 
   @override
-  int get hashCode => Object.hash(axis, length, laps, Object.hashAll(entries));
+  int get hashCode => Object.hash(
+    axis,
+    length,
+    laps,
+    courseLengths == null ? null : Object.hashAll(courseLengths!),
+    Object.hashAll(entries),
+  );
 
   @override
-  String toString() => 'Ranking($axis, $length, laps $laps, $entries)';
+  String toString() =>
+      'Ranking($axis, $length, laps $laps, courses $courseLengths, $entries)';
 }
 
 /// [entries] best first: less time on a distance axis, more metres on a time

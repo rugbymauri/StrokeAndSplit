@@ -235,13 +235,13 @@ void main() {
       );
       final kept = await workouts.create(
         'Seerunde x3',
-        courseId: course,
-        laps: 3,
+        courseIds: [course],
+        length: const LapCount(3),
       );
       final deleted = await workouts.create(
         'Seerunde offen',
-        courseId: course,
-        laps: null,
+        courseIds: [course],
+        length: const OpenLength(),
       );
       for (final id in [kept, deleted]) {
         final session = await setup.repository.create(
@@ -282,7 +282,7 @@ void main() {
           final session = await setup.repository.create(
             startedAt: DateTime(2026, 10, day, 7),
             source: ErgSourceKind.pm5,
-            plan: SessionPlan(course: course, length: length),
+            plan: SessionPlan(courses: [course], length: length),
           );
           await setup.repository.finish(session);
         }

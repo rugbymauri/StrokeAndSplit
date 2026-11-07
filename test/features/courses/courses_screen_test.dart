@@ -11,7 +11,6 @@ import 'package:strokesplit/data/zones/zone_repository.dart';
 import 'package:strokesplit/features/courses/course_editor_screen.dart';
 import 'package:strokesplit/features/courses/course_strip.dart';
 import 'package:strokesplit/features/courses/courses_screen.dart';
-import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/oar_steppers.dart';
 import '../../support/test_database.dart';
 import '../../support/localized_app.dart';
+import '../../support/session_rows.dart';
 
 class _Setup {
   final db = openTestDatabase();
@@ -97,16 +97,15 @@ List<String> _sections(WidgetTester tester) => [
 Future<void> _row(_Setup setup, int id, int count) async {
   final versionId = (await setup.courses.get(id))!.versionId;
   for (var i = 0; i < count; i++) {
-    await setup.db
-        .into(setup.db.sessions)
-        .insert(
-          SessionsCompanion.insert(
-            startedAt: DateTime(2026, 10, 16),
-            status: SessionStatus.complete,
-            source: ErgSourceKind.pm5,
-            courseVersionId: Value(versionId),
-          ),
-        );
+    await insertSession(
+      setup.db,
+      SessionsCompanion.insert(
+        startedAt: DateTime(2026, 10, 16),
+        status: SessionStatus.complete,
+        source: ErgSourceKind.pm5,
+      ),
+      courseVersionIds: [versionId],
+    );
   }
 }
 

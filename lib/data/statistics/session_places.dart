@@ -63,19 +63,24 @@ class SessionPlacesRepository {
     final session = await _db
         .customSelect(
           '''
-        SELECT s.source AS source, s.workout_id AS workout, s.course_version_id AS version, v.course_id AS course
-        FROM sessions s LEFT JOIN course_versions v ON v.id = s.course_version_id
-        WHERE s.id = ?''',
+        SELECT s.source AS source, s.workout_id AS workout FROM sessions s WHERE s.id = ?''',
           variables: [Variable.withInt(sessionId)],
         )
         .getSingleOrNull();
-    final versionId = session?.read<int?>('version');
-    final courseId = session?.read<int?>('course');
+    final courses = await _db
+        .customSelect(
+          '''
+        SELECT sc.course_version_id AS version, v.course_id AS course
+        FROM session_courses sc JOIN course_versions v ON v.id = sc.course_version_id
+        WHERE sc.session_id = ? ORDER BY sc.position''',
+          variables: [Variable.withInt(sessionId)],
+        )
+        .get();
     // Sessions of the simulator or a replay never count (Design D3).
     final source = session == null
         ? null
         : ErgSourceKind.values.byName(session.read<String>('source'));
-    if (session == null || versionId == null || courseId == null) {
+    if (session == null || courses.isEmpty) {
       return SessionPlaces.none;
     }
     if (source != ErgSourceKind.pm5 && source != ErgSourceKind.ftms) {
@@ -95,8 +100,11 @@ class SessionPlacesRepository {
     final workoutId = session.read<int?>('workout');
     final zoneIds = await _db
         .customSelect(
-          'SELECT DISTINCT zone_id AS zone FROM course_segments WHERE version_id = ? AND zone_id IS NOT NULL',
-          variables: [Variable.withInt(versionId)],
+          'SELECT DISTINCT zone_id AS zone FROM course_segments '
+          'WHERE version_id IN (${List.filled(courses.length, '?').join(', ')}) AND zone_id IS NOT NULL',
+          variables: [
+            for (final c in courses) Variable.withInt(c.read<int>('version')),
+          ],
         )
         .map((row) => row.read<int>('zone'))
         .get();
@@ -104,7 +112,14 @@ class SessionPlacesRepository {
       session: workoutId == null
           ? null
           : places(await _rankings.workout(workoutId), (_) => 0)[0],
-      laps: places(await _rankings.course(courseId), (e) => e.lap!),
+      // A lap of a chain runs several courses, so only a single course
+      // places its laps (Change workout-course-chain).
+      laps: courses.length == 1
+          ? places(
+              await _rankings.course(courses.single.read<int>('course')),
+              (e) => e.lap!,
+            )
+          : const {},
       zones: {
         for (final zoneId in zoneIds)
           ...places(await _rankings.zone(zoneId), (e) => (e.lap!, e.position!)),

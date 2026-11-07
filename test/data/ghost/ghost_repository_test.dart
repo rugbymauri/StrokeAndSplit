@@ -17,6 +17,8 @@ import '../../support/ghost_sessions.dart';
 import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 void main() {
   late AppDatabase db;
   late RankingRepository rankings;
@@ -57,7 +59,11 @@ void main() {
     );
     final workouts = WorkoutRepository(db);
     workout = (await workouts.get(
-      await workouts.create('Seerunde x3', courseId: course, laps: 3),
+      await workouts.create(
+        'Seerunde x3',
+        courseIds: [course],
+        length: const LapCount(3),
+      ),
     ))!;
   });
 
@@ -67,10 +73,7 @@ void main() {
       workout: workout,
       laps: [lap(21000), lap(19000), lap(20000)],
     );
-    final best = (await rankings.course(workout.course.id))
-        .single
-        .entries
-        .first;
+    final best = (await rankings.course(workout.chain.id)).single.entries.first;
     expect(best.lap, 2);
 
     final track = (await ghosts.track(best))!;
@@ -127,7 +130,7 @@ void main() {
         wallClock: false,
         laps: [lap(21000)],
       );
-      final entry = (await rankings.course(workout.course.id))
+      final entry = (await rankings.course(workout.chain.id))
           .single
           .entries
           .single;
@@ -138,7 +141,7 @@ void main() {
 
   test('gives no course for a session without samples', () async {
     await storeRowedSession(db, workout: workout, laps: [lap(21000)]);
-    final entry = (await rankings.course(workout.course.id))
+    final entry = (await rankings.course(workout.chain.id))
         .single
         .entries
         .single;

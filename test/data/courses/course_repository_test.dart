@@ -2,10 +2,10 @@ import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
-import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_database.dart';
+import '../../support/session_rows.dart';
 
 final _seerunde = CourseDefinition.single(
   axis: CourseAxis.distance,
@@ -14,16 +14,15 @@ final _seerunde = CourseDefinition.single(
 
 /// Stores a session rowed on [versionId], with one lap.
 Future<int> _rowSession(AppDatabase db, int versionId) async {
-  final id = await db
-      .into(db.sessions)
-      .insert(
-        SessionsCompanion.insert(
-          startedAt: DateTime(2026, 10, 16),
-          status: SessionStatus.complete,
-          source: ErgSourceKind.pm5,
-          courseVersionId: Value(versionId),
-        ),
-      );
+  final id = await insertSession(
+    db,
+    SessionsCompanion.insert(
+      startedAt: DateTime(2026, 10, 16),
+      status: SessionStatus.complete,
+      source: ErgSourceKind.pm5,
+    ),
+    courseVersionIds: [versionId],
+  );
   await db
       .into(db.laps)
       .insert(

@@ -4,38 +4,42 @@ import 'package:drift/drift.dart';
 import '../courses/course_repository.dart';
 import '../db/database.dart';
 import '../db/watch.dart';
+import '../sessions/session_plan.dart';
 import 'workout.dart';
 
-/// Stores workouts, each with a single block for now (Design D4).
+/// Stores workouts: their courses as blocks in order and their length
+/// (Change workout-course-chain, Design D1).
 class WorkoutRepository {
   WorkoutRepository(this._db) : _courses = CourseRepository(_db);
 
   final AppDatabase _db;
   final CourseRepository _courses;
 
-  /// Stores a workout rowing [courseId] for [laps] laps, or open laps when
-  /// null, and returns its id.
-  Future<int> create(String name, {required int courseId, required int? laps}) {
-    _checkLaps(laps);
+  /// Stores a workout rowing [courseIds] one after the other for [length]
+  /// and returns its id.
+  Future<int> create(
+    String name, {
+    required List<int> courseIds,
+    required PlanLength length,
+  }) {
     return _db.transaction(() async {
+      await _check(courseIds, length);
       final id = await _db
           .into(_db.workouts)
-          .insert(WorkoutsCompanion.insert(name: name, createdAt: clock.now()));
-      await _db
-          .into(_db.workoutBlocks)
           .insert(
-            WorkoutBlocksCompanion.insert(
-              workoutId: id,
-              position: 0,
-              courseId: courseId,
-              laps: Value(laps),
+            WorkoutsCompanion.insert(
+              name: name,
+              createdAt: clock.now(),
+              laps: Value(_laps(length)),
+              durationS: Value(_durationS(length)),
             ),
           );
+      await _insertBlocks(id, courseIds);
       return id;
     });
   }
 
-  /// All workouts by name, with their course in its newest version.
+  /// All workouts by name, with their courses in their newest version.
   Future<List<Workout>> all() async {
     final rows =
         await (_db.select(_db.workouts)..orderBy([
@@ -60,23 +64,26 @@ class WorkoutRepository {
     return row == null ? null : _workout(row);
   }
 
-  /// Changes the workout; sessions rowed with it keep their laps.
+  /// Changes the workout; sessions rowed with it keep their courses and laps.
   Future<void> update(
     int id, {
     required String name,
-    required int courseId,
-    required int? laps,
+    required List<int> courseIds,
+    required PlanLength length,
   }) {
-    _checkLaps(laps);
     return _db.transaction(() async {
+      await _check(courseIds, length);
       await (_db.update(_db.workouts)..where((t) => t.id.equals(id))).write(
-        WorkoutsCompanion(name: Value(name)),
+        WorkoutsCompanion(
+          name: Value(name),
+          laps: Value(_laps(length)),
+          durationS: Value(_durationS(length)),
+        ),
       );
-      await (_db.update(
+      await (_db.delete(
         _db.workoutBlocks,
-      )..where((b) => b.workoutId.equals(id) & b.position.equals(0))).write(
-        WorkoutBlocksCompanion(courseId: Value(courseId), laps: Value(laps)),
-      );
+      )..where((b) => b.workoutId.equals(id))).go();
+      await _insertBlocks(id, courseIds);
     });
   }
 
@@ -89,28 +96,68 @@ class WorkoutRepository {
     });
   }
 
-  void _checkLaps(int? laps) {
-    if (laps != null && laps < 1) {
-      throw ArgumentError.value(
-        laps,
-        'laps',
-        'At least one lap, or null for open laps',
-      );
+  Future<void> _insertBlocks(int workoutId, List<int> courseIds) async {
+    for (final (position, courseId) in courseIds.indexed) {
+      await _db
+          .into(_db.workoutBlocks)
+          .insert(
+            WorkoutBlocksCompanion.insert(
+              workoutId: workoutId,
+              position: position,
+              courseId: courseId,
+            ),
+          );
     }
   }
 
+  Future<void> _check(List<int> courseIds, PlanLength length) async {
+    if (courseIds.isEmpty) {
+      throw ArgumentError.value(courseIds, 'courseIds', 'At least one course');
+    }
+    final axes = {
+      for (final id in courseIds.toSet()) (await _courses.get(id))?.axis,
+    };
+    if (axes.contains(null) || axes.length > 1) {
+      throw ArgumentError.value(
+        courseIds,
+        'courseIds',
+        'Existing courses on one axis',
+      );
+    }
+    switch (length) {
+      case LapCount(:final count) when count < 1:
+        throw ArgumentError.value(count, 'length', 'At least one lap');
+      case TimeLimit(:final time) when time.inSeconds < 1:
+        throw ArgumentError.value(time, 'length', 'At least one second');
+      case _:
+    }
+  }
+
+  static int? _laps(PlanLength length) => switch (length) {
+    LapCount(:final count) => count,
+    _ => null,
+  };
+
+  static int? _durationS(PlanLength length) => switch (length) {
+    TimeLimit(:final time) => time.inSeconds,
+    _ => null,
+  };
+
   Future<Workout> _workout(WorkoutRow row) async {
-    final block =
+    final blocks =
         await (_db.select(_db.workoutBlocks)
               ..where((b) => b.workoutId.equals(row.id))
-              ..orderBy([(b) => OrderingTerm.asc(b.position)])
-              ..limit(1))
-            .getSingle();
+              ..orderBy([(b) => OrderingTerm.asc(b.position)]))
+            .get();
     return Workout(
       id: row.id,
       name: row.name,
-      course: (await _courses.get(block.courseId))!,
-      laps: block.laps,
+      courses: [for (final b in blocks) (await _courses.get(b.courseId))!],
+      length: switch ((row.laps, row.durationS)) {
+        (final laps?, _) => LapCount(laps),
+        (_, final seconds?) => TimeLimit(Duration(seconds: seconds)),
+        _ => const OpenLength(),
+      },
     );
   }
 }

@@ -10,13 +10,23 @@ import '../../support/oar_steppers.dart';
 import '../../support/workout_setup.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 void main() {
   testWidgets('lists workouts with course and laps', (tester) async {
     final setup = WorkoutSetup();
     final id = await setup.addCourse(tester, 'Seerunde');
     await tester.runAsync(() async {
-      await setup.workouts.create('Seerunde x3', courseId: id, laps: 3);
-      await setup.workouts.create('Seerunde offen', courseId: id, laps: null);
+      await setup.workouts.create(
+        'Seerunde x3',
+        courseIds: [id],
+        length: const LapCount(3),
+      );
+      await setup.workouts.create(
+        'Seerunde offen',
+        courseIds: [id],
+        length: const OpenLength(),
+      );
     });
     await setup.pump(tester);
 
@@ -114,7 +124,11 @@ void main() {
     final setup = WorkoutSetup();
     final id = await setup.addCourse(tester, 'Seerunde');
     await tester.runAsync(
-      () => setup.workouts.create('Seerunde x3', courseId: id, laps: 3),
+      () => setup.workouts.create(
+        'Seerunde x3',
+        courseIds: [id],
+        length: const LapCount(3),
+      ),
     );
     await setup.pump(tester);
 
@@ -136,12 +150,16 @@ void main() {
   ) async {
     final setup = WorkoutSetup();
     final course = await setup.addCourseWithZone(tester, 'Seerunde');
-    final x3 = await setup.addWorkout(tester, 'Seerunde x3', courseId: course);
+    final x3 = await setup.addWorkout(
+      tester,
+      'Seerunde x3',
+      courseIds: [course],
+    );
     await setup.addWorkout(
       tester,
       'Seerunde offen',
-      courseId: course,
-      laps: null,
+      courseIds: [course],
+      length: const OpenLength(),
     );
     await setup.pump(tester);
 
@@ -171,7 +189,11 @@ void main() {
       final setup = WorkoutSetup();
       final id = await setup.addCourse(tester, 'Seerunde');
       await tester.runAsync(
-        () => setup.workouts.create('Seerunde', courseId: id, laps: laps),
+        () => setup.workouts.create(
+          'Seerunde',
+          courseIds: [id],
+          length: laps == null ? const OpenLength() : LapCount(laps),
+        ),
       );
       final workout = (await tester.runAsync(setup.workouts.all))!.single;
       await setup.pump(tester, home: WorkoutEditorScreen(workout: workout));

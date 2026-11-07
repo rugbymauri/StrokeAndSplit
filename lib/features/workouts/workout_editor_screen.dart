@@ -6,6 +6,7 @@ import '../../app/widgets/oar_stepper.dart';
 import '../../app/widgets/segment_choice.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/course_providers.dart';
+import '../../data/sessions/session_plan.dart';
 import '../../data/workouts/workout.dart';
 import '../../data/workouts/workout_providers.dart';
 import '../../l10n/l10n.dart';
@@ -29,8 +30,8 @@ const _maxLaps = 99;
 class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
   late final _name = TextEditingController(text: widget.workout?.name);
   late var _laps = widget.workout?.laps ?? 3;
-  late int? _courseId = widget.workout?.course.id;
-  late var _open = widget.workout != null && widget.workout!.laps == null;
+  late int? _courseId = widget.workout?.courses.first.id;
+  late var _open = widget.workout?.length is OpenLength;
   var _errors = <String>[];
 
   @override
@@ -54,13 +55,17 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
     final repository = ref.read(workoutRepositoryProvider);
     final workout = widget.workout;
     if (workout == null) {
-      await repository.create(name, courseId: _courseId!, laps: laps);
+      await repository.create(
+        name,
+        courseIds: [_courseId!],
+        length: laps == null ? const OpenLength() : LapCount(laps),
+      );
     } else {
       await repository.update(
         workout.id,
         name: name,
-        courseId: _courseId!,
-        laps: laps,
+        courseIds: [_courseId!],
+        length: laps == null ? const OpenLength() : LapCount(laps),
       );
     }
     if (mounted) Navigator.of(context).pop();

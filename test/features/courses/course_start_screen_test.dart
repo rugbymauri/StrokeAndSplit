@@ -189,7 +189,7 @@ void main() {
     await start(tester);
 
     final recording = setup.container.read(sessionRecorderProvider)!;
-    expect(recording.plan!.course.name, 'Seerunde');
+    expect(recording.plan!.courses.single.name, 'Seerunde');
     expect(recording.plan!.length, const TimeLimit(Duration(minutes: 30)));
     expect((recording.plan!.workout, recording.ghost), (null, true));
     expect(find.text('Runde 1'), findsOneWidget);

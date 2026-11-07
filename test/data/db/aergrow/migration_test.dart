@@ -20,6 +20,7 @@ import 'generated/schema_v6.dart' as v6;
 import 'generated/schema_v7.dart' as v7;
 import 'generated/schema_v8.dart' as v8;
 import 'generated/schema_v10.dart' as v10;
+import 'generated/schema_v11.dart' as v11;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -379,7 +380,11 @@ void main() {
       await verifier.migrateAndValidate(db, 7);
 
       final session = (await db.select(db.sessions).get()).single;
-      expect((session.protocol, session.courseVersionId), (ErgProtocol.pm5, 1));
+      // The column left sessions in schema 12; at version 7 it is still there.
+      final version = await db
+          .customSelect('SELECT course_version_id AS v FROM sessions')
+          .getSingle();
+      expect((session.protocol, version.read<int>('v')), (ErgProtocol.pm5, 1));
       await expectFullStrokes(db);
       final lap = (await db.select(db.laps).get()).single;
       expect((lap.endWallMs, lap.inZoneShare), (252000, 0.75));
@@ -809,11 +814,15 @@ void main() {
       await verifier.migrateAndValidate(db, 11);
 
       final row = (await db.select(db.workouts).get()).single;
-      final block = (await db.select(db.workoutBlocks).get()).single;
+      final block = await db
+          .customSelect(
+            'SELECT workout_id AS w, course_id AS c, laps FROM workout_blocks',
+          )
+          .getSingle();
       final session = (await db.select(db.sessions).get()).single;
       expect((row.id, row.name), (workout, 'Seerunde x3'));
       expect(
-        (block.workoutId, block.courseId, block.laps),
+        (block.read<int>('w'), block.read<int>('c'), block.read<int>('laps')),
         (workout, course, 3),
       );
       expect(
@@ -827,6 +836,117 @@ void main() {
       expect(await db.select(db.workoutBlocks).get(), isEmpty);
       final unlinked = (await db.select(db.sessions).get()).single;
       expect((unlinked.workoutId, unlinked.workoutName), (null, 'Seerunde x3'));
+      await db.close();
+    });
+  });
+
+  group('to version 12', () {
+    test('moves the laps into the workout and the course of a session '
+        'into its own table', () async {
+      final schema = await verifier.schemaAt(11);
+      final old = v11.DatabaseAtV11(schema.newConnection());
+      final course = await old
+          .into(old.courses)
+          .insert(
+            v11.CoursesCompanion.insert(name: 'Seerunde', axis: 'distance'),
+          );
+      final version = await old
+          .into(old.courseVersions)
+          .insert(
+            v11.CourseVersionsCompanion.insert(
+              courseId: course,
+              version: 1,
+              length: 1000,
+              createdAt: 0,
+            ),
+          );
+      final fixed = await old
+          .into(old.workouts)
+          .insert(
+            v11.WorkoutsCompanion.insert(name: 'Seerunde x3', createdAt: 0),
+          );
+      final open = await old
+          .into(old.workouts)
+          .insert(
+            v11.WorkoutsCompanion.insert(name: 'Seerunde offen', createdAt: 0),
+          );
+      for (final (workout, laps) in [(fixed, 3), (open, null)]) {
+        await old
+            .into(old.workoutBlocks)
+            .insert(
+              v11.WorkoutBlocksCompanion.insert(
+                workoutId: workout,
+                position: 0,
+                courseId: course,
+                laps: Value(laps),
+              ),
+            );
+      }
+      final onCourse = await old
+          .into(old.sessions)
+          .insert(
+            v11.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'pm5',
+              workoutId: Value(fixed),
+              workoutName: const Value('Seerunde x3'),
+              courseVersionId: Value(version),
+              plannedLaps: const Value(3),
+            ),
+          );
+      final free = await old
+          .into(old.sessions)
+          .insert(
+            v11.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'pm5',
+            ),
+          );
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 12);
+
+      final workouts = {
+        for (final w in await db.select(db.workouts).get())
+          w.id: (w.laps, w.durationS),
+      };
+      expect(workouts, {fixed: (3, null), open: (null, null)});
+      final blocks = await db.select(db.workoutBlocks).get();
+      expect(
+        [for (final b in blocks) (b.workoutId, b.position, b.courseId)],
+        [(fixed, 0, course), (open, 0, course)],
+      );
+      final courses = await db.select(db.sessionCourses).get();
+      expect(
+        [
+          for (final c in courses)
+            (c.sessionId, c.position, c.courseVersionId, c.firstSegment),
+        ],
+        [(onCourse, 0, version, 0)],
+      );
+      expect(
+        [for (final s in await db.select(db.sessions).get()) s.id],
+        [onCourse, free],
+      );
+      expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+
+      // The rebuilt tables keep their foreign keys: deleting the workout
+      // deletes its block and unlinks the session, deleting the session
+      // deletes its course.
+      await (db.delete(db.workouts)..where((w) => w.id.equals(fixed))).go();
+      expect(
+        [for (final b in await db.select(db.workoutBlocks).get()) b.workoutId],
+        [open],
+      );
+      final unlinked = await (db.select(
+        db.sessions,
+      )..where((s) => s.id.equals(onCourse))).getSingle();
+      expect(unlinked.workoutId, isNull);
+      await (db.delete(db.sessions)..where((s) => s.id.equals(onCourse))).go();
+      expect(await db.select(db.sessionCourses).get(), isEmpty);
       await db.close();
     });
   });

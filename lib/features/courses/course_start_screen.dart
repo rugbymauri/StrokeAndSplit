@@ -194,7 +194,7 @@ class _CourseStartScreenState extends ConsumerState<CourseStartScreen> {
   void _start(Course course) => startRowing(
     context,
     ref,
-    plan: SessionPlan(course: course, length: _planLength),
+    plan: SessionPlan(courses: [course], length: _planLength),
     ghost: _ghost,
   );
 }

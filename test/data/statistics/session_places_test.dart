@@ -10,6 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 void main() {
   test('follows the rankings when later sessions overtake a session', () async {
     final db = openTestDatabase();
@@ -23,7 +25,11 @@ void main() {
     );
     final workouts = WorkoutRepository(db);
     final workout = (await workouts.get(
-      await workouts.create('Seerunde x1', courseId: course, laps: 1),
+      await workouts.create(
+        'Seerunde x1',
+        courseIds: [course],
+        length: const LapCount(1),
+      ),
     ))!;
     final id = await storeRowedSession(
       db,
@@ -66,7 +72,11 @@ void main() {
     );
     final workouts = WorkoutRepository(db);
     final workout = (await workouts.get(
-      await workouts.create('Seerunde x1', courseId: course, laps: 1),
+      await workouts.create(
+        'Seerunde x1',
+        courseIds: [course],
+        length: const LapCount(1),
+      ),
     ))!;
     final container = ProviderContainer(
       overrides: [databaseProvider.overrideWithValue(db)],

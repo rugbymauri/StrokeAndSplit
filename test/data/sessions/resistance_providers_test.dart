@@ -19,6 +19,8 @@ import 'package:strokesplit/data/zones/zone_repository.dart';
 import '../../support/fake_erg_source.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
 
@@ -90,7 +92,11 @@ void main() {
         .create('Sprint', layout.definition!);
     final workouts = WorkoutRepository(db);
     return (await workouts.get(
-      await workouts.create('Sprint', courseId: course, laps: 1),
+      await workouts.create(
+        'Sprint',
+        courseIds: [course],
+        length: const LapCount(1),
+      ),
     ))!;
   }
 

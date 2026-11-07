@@ -116,7 +116,7 @@ class CourseRepository {
       if (definition == course.definition) return;
 
       final rowed =
-          await (_db.select(_db.sessions)
+          await (_db.select(_db.sessionCourses)
                 ..where((s) => s.courseVersionId.equals(course.versionId))
                 ..limit(1))
               .getSingleOrNull();
@@ -148,12 +148,13 @@ class CourseRepository {
         row.read(versions.courseId)!: row.read(newest)!,
     };
 
-    final sessions = _db.sessions.id.count();
+    // A session counts once per course, even when it rows the course twice.
+    final sessions = _db.sessionCourses.sessionId.count(distinct: true);
     final rows =
-        await (_db.selectOnly(_db.sessions).join([
+        await (_db.selectOnly(_db.sessionCourses).join([
                 innerJoin(
                   versions,
-                  versions.id.equalsExp(_db.sessions.courseVersionId),
+                  versions.id.equalsExp(_db.sessionCourses.courseVersionId),
                 ),
               ])
               ..addColumns([versions.courseId, versions.version, sessions])
@@ -174,8 +175,11 @@ class CourseRepository {
     return counts;
   }
 
-  Stream<Map<int, CourseRowCount>> watchRowCounts() =>
-      _db.watchTables([_db.sessions, _db.courseVersions], rowCounts);
+  Stream<Map<int, CourseRowCount>> watchRowCounts() => _db.watchTables([
+    _db.sessions,
+    _db.sessionCourses,
+    _db.courseVersions,
+  ], rowCounts);
 
   /// Names of the workouts that row this course.
   Future<List<String>> workoutsUsing(int id) async {

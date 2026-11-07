@@ -22,7 +22,7 @@ String? sessionName(
   String? courseName,
 ) {
   if (session.workoutName case final name?) return name;
-  if (session.courseVersionId == null || courseName == null) return null;
+  if (courseName == null) return null;
   final duration = session.plannedDurationMs;
   return '$courseName · ${planLabel(
     l10n,

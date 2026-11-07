@@ -17,6 +17,10 @@ import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 import '../../support/localized_app.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
+import '../../support/session_rows.dart';
+
 final _startedAt = DateTime(2026, 10, 16, 7);
 
 /// Stores a session on [course] with laps of the given (seconds, metres, complete, share in the zone).
@@ -28,20 +32,19 @@ Future<int> _session(
 ) async {
   final courseId = await CourseRepository(db).create(name, course);
   final versionId = (await CourseRepository(db).get(courseId))!.versionId;
-  final id = await db
-      .into(db.sessions)
-      .insert(
-        SessionsCompanion.insert(
-          startedAt: _startedAt,
-          status: SessionStatus.complete,
-          source: ErgSourceKind.simulator,
-          workoutName: Value('$name x${laps.length}'),
-          courseVersionId: Value(versionId),
-          plannedLaps: Value(laps.length),
-          durationMs: Value(laps.fold(0, (sum, lap) => sum + lap.$1 * 1000)),
-          distanceDm: Value(laps.fold(0, (sum, lap) => sum + lap.$2 * 10)),
-        ),
-      );
+  final id = await insertSession(
+    db,
+    SessionsCompanion.insert(
+      startedAt: _startedAt,
+      status: SessionStatus.complete,
+      source: ErgSourceKind.simulator,
+      workoutName: Value('$name x${laps.length}'),
+      plannedLaps: Value(laps.length),
+      durationMs: Value(laps.fold(0, (sum, lap) => sum + lap.$1 * 1000)),
+      distanceDm: Value(laps.fold(0, (sum, lap) => sum + lap.$2 * 10)),
+    ),
+    courseVersionIds: [versionId],
+  );
   var wall = 0;
   var distance = 0;
   for (final (i, (seconds, meters, complete, share)) in laps.indexed) {
@@ -402,8 +405,8 @@ void main() {
           return (await workouts.get(
             await workouts.create(
               'Seerunde x$laps',
-              courseId: courseId,
-              laps: laps,
+              courseIds: [courseId],
+              length: LapCount(laps),
             ),
           ))!;
         }))!;
@@ -510,7 +513,7 @@ void main() {
           final id = (await tester.runAsync(
             () => storeRowedSession(
               db,
-              courseVersionId: seerunde.course.versionId,
+              courseVersionId: seerunde.chain.versionId,
               plannedLaps: laps,
               plannedDuration: duration,
               startedAt: DateTime(2026, 10, 2, 7),
@@ -562,7 +565,11 @@ void main() {
         );
         final workouts = WorkoutRepository(db);
         return (await workouts.get(
-          await workouts.create('Sprintrunde x2', courseId: courseId, laps: 2),
+          await workouts.create(
+            'Sprintrunde x2',
+            courseIds: [courseId],
+            length: const LapCount(2),
+          ),
         ))!;
       });
       final id = (await tester.runAsync(

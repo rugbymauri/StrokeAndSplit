@@ -20,6 +20,8 @@ import '../../support/ghost_sessions.dart';
 import '../../support/rowed_sessions.dart';
 import '../../support/test_database.dart';
 
+import 'package:strokesplit/data/sessions/session_plan.dart';
+
 class _Fixed extends ActiveErgSource {
   _Fixed(this.source);
 
@@ -111,7 +113,7 @@ void main() {
       workout.toPlan(),
       progress ??
           LapTracker(
-            workout.course.definition,
+            workout.chain.definition,
             plannedLaps: workout.laps,
           ).progress,
     );
@@ -126,7 +128,11 @@ void main() {
   }) async {
     final course = await courses.create('Seerunde', definition);
     return (await workouts.get(
-      await workouts.create('Seerunde x$laps', courseId: course, laps: laps),
+      await workouts.create(
+        'Seerunde x$laps',
+        courseIds: [course],
+        length: laps == null ? const OpenLength() : LapCount(laps),
+      ),
     ))!;
   }
 
@@ -281,7 +287,7 @@ void main() {
         laps: [RowedLap.single(250000, 1000)],
       );
       await courses.updateDefinition(
-        workout.course.id,
+        workout.chain.id,
         CourseDefinition.single(axis: CourseAxis.distance, length: 1200),
       );
       workout = (await workouts.get(workout.id))!;

@@ -35,8 +35,8 @@ class SessionRepository {
 
   final AppDatabase _db;
 
-  /// Starts a session; with a [workout] it rows the course in the version
-  /// the workout uses now.
+  /// Starts a session; with a [plan] it rows the plan's courses in the
+  /// versions the plan holds (Change workout-course-chain, Design D3).
   Future<int> create({
     required DateTime startedAt,
     required ErgSourceKind source,
@@ -51,7 +51,12 @@ class SessionRepository {
       deviceName: deviceName,
       workoutId: plan?.workout?.id,
       workoutName: plan?.workout?.name,
-      courseVersionId: plan?.course.versionId,
+      courses: plan == null
+          ? const []
+          : [
+              for (final (i, c) in plan.courses.indexed)
+                (versionId: c.versionId, firstSegment: plan.courseStarts[i]),
+            ],
       plannedLaps: plan?.plannedLaps,
       plannedDurationMs: plan?.plannedDuration?.inMilliseconds,
     );
@@ -64,28 +69,60 @@ class SessionRepository {
     String? deviceName,
     int? workoutId,
     String? workoutName,
-    int? courseVersionId,
+    List<({int versionId, int firstSegment})> courses = const [],
     int? plannedLaps,
     int? plannedDurationMs,
     bool imported = false,
   }) {
-    return _db
-        .into(_db.sessions)
-        .insert(
-          SessionsCompanion.insert(
-            startedAt: startedAt,
-            status: SessionStatus.recording,
-            source: source,
-            protocol: Value(protocol),
-            deviceName: Value(deviceName),
-            workoutId: Value(workoutId),
-            workoutName: Value(workoutName),
-            courseVersionId: Value(courseVersionId),
-            plannedLaps: Value(plannedLaps),
-            plannedDurationMs: Value(plannedDurationMs),
-            imported: Value(imported),
-          ),
-        );
+    return _db.transaction(() async {
+      final id = await _db
+          .into(_db.sessions)
+          .insert(
+            SessionsCompanion.insert(
+              startedAt: startedAt,
+              status: SessionStatus.recording,
+              source: source,
+              protocol: Value(protocol),
+              deviceName: Value(deviceName),
+              workoutId: Value(workoutId),
+              workoutName: Value(workoutName),
+              plannedLaps: Value(plannedLaps),
+              plannedDurationMs: Value(plannedDurationMs),
+              imported: Value(imported),
+            ),
+          );
+      for (final (position, c) in courses.indexed) {
+        await _db
+            .into(_db.sessionCourses)
+            .insert(
+              SessionCoursesCompanion.insert(
+                sessionId: id,
+                position: position,
+                courseVersionId: c.versionId,
+                firstSegment: c.firstSegment,
+              ),
+            );
+      }
+      return id;
+    });
+  }
+
+  /// The course versions session [id] rows, in their order; empty for a
+  /// free session.
+  Future<List<SessionCourseRow>> sessionCourses(int id) =>
+      (_db.select(_db.sessionCourses)
+            ..where((c) => c.sessionId.equals(id))
+            ..orderBy([(c) => OrderingTerm.asc(c.position)]))
+          .get();
+
+  /// The courses session [id] rows in the versions it rowed, in their order;
+  /// empty for a free session.
+  Future<List<Course>> courses(int id) async {
+    final repository = CourseRepository(_db);
+    return [
+      for (final c in await sessionCourses(id))
+        await repository.atVersion(c.courseVersionId),
+    ];
   }
 
   /// Writes all rows of [batch] in one transaction.
@@ -195,7 +232,8 @@ class SessionRepository {
       _db.sessions,
     )..where((s) => s.status.equalsValue(SessionStatus.recording))).get();
     for (final session in interrupted) {
-      if (session.courseVersionId != null) await _finishLastLap(session);
+      final courses = await this.courses(session.id);
+      if (courses.isNotEmpty) await _finishLastLap(session, courses);
       await finish(session.id, status: SessionStatus.incomplete);
     }
     return interrupted.length;
@@ -203,9 +241,10 @@ class SessionRepository {
 
   /// Finishes the lap that was running when the app ended from the stored
   /// samples (Design D5); the finished laps are stored already.
-  Future<void> _finishLastLap(SessionRow session) async {
-    final course = await CourseRepository(_db)
-        .atVersion(session.courseVersionId!);
+  Future<void> _finishLastLap(SessionRow session, List<Course> courses) async {
+    final course = CourseDefinition.chain([
+      for (final c in courses) c.definition,
+    ]);
     final last =
         await (_db.select(_db.laps)
               ..where(
@@ -218,7 +257,7 @@ class SessionRepository {
     if (session.plannedLaps != null && lap > session.plannedLaps!) return;
 
     final tracker = LapTracker(
-      course.definition,
+      course,
       plannedLaps: session.plannedLaps,
       startLap: lap,
       startWallMs: last?.endWallMs ?? 0,
@@ -381,11 +420,12 @@ class SessionRepository {
       endedAt: session.endedAt,
       distanceDm: session.distanceDm,
       workoutName: session.workoutName,
-      courseName: switch (session.courseVersionId) {
-        final versionId? when session.workoutName == null =>
-          (await CourseRepository(_db).atVersion(versionId)).name,
-        _ => null,
-      },
+      courseName: session.workoutName == null
+          ? switch (await courses(id)) {
+              [] => null,
+              final courses => Course.chain(courses).name,
+            }
+          : null,
       points: [
         for (final row in rows)
           HealthPoint(
@@ -470,20 +510,23 @@ class SessionRepository {
   Future<List<int>> export(int id) async {
     final session = (await get(id))!;
     final recording = await rawRecording(id);
-    final versionId = session.courseVersionId;
-    final course = versionId == null
-        ? null
-        : await CourseRepository(_db).atVersion(versionId);
+    final rows = await sessionCourses(id);
+    final courses = await this.courses(id);
     final metadata = {
       ...recording.metadata,
-      if (course != null) ...{
+      if (courses.isNotEmpty) ...{
         // Without a workout the name is null; the duration only with one (course-rowing-free, D3).
         'workout': {
           'name': session.workoutName,
           'laps': session.plannedLaps,
           'durationMs': ?session.plannedDurationMs,
         },
-        'course': _courseJson(course),
+        // Each course with the index of its first segment in a lap (Change
+        // workout-course-chain, Design D7).
+        'courses': [
+          for (final (i, c) in courses.indexed)
+            {..._courseJson(c), 'firstSegment': rows[i].firstSegment},
+        ],
       },
       'session': {
         'status': session.status.name,
@@ -525,13 +568,35 @@ class SessionRepository {
     // Files from before the rename name the workout a template (Change rename-workouts, Design D5).
     final workout =
         (metadata['workout'] ?? metadata['template']) as Map<String, Object?>?;
-    final course = switch (metadata['course']) {
-      final Map<String, Object?> json => (
-        name: json['name']! as String,
-        definition: _courseDefinition(json),
-      ),
-      _ => null,
+    // Files from before the chains of courses hold a single course (Change
+    // workout-course-chain, Design D7).
+    final courseJsons = switch ((metadata['courses'], metadata['course'])) {
+      (final List<Object?> list, _) => list.cast<Map<String, Object?>>(),
+      (_, final Map<String, Object?> json) => [json],
+      _ => const <Map<String, Object?>>[],
     };
+    final courses = [
+      for (final json in courseJsons)
+        (
+          name: json['name']! as String,
+          definition: _courseDefinition(json),
+          firstSegment: json['firstSegment'] as int?,
+        ),
+    ];
+    final chain = courses.isEmpty
+        ? null
+        : CourseDefinition.chain([for (final c in courses) c.definition]);
+    var firstSegment = 0;
+    final versions = [
+      for (final c in courses)
+        (
+          versionId: await _importCourse(c.name, c.definition),
+          firstSegment:
+              c.firstSegment ??
+              (firstSegment += c.definition.segments.length) -
+                  c.definition.segments.length,
+        ),
+    ];
 
     // Files from before FTMS support name no protocol and are PM5 recordings.
     final protocol = ErgProtocol.parse(metadata['protocol']);
@@ -545,9 +610,7 @@ class SessionRepository {
       protocol: protocol,
       deviceName: metadata['device'] as String?,
       workoutName: workout?['name'] as String?,
-      courseVersionId: course == null
-          ? null
-          : await _importCourse(course.name, course.definition),
+      courses: versions,
       plannedLaps: workout?['laps'] as int?,
       plannedDurationMs: workout?['durationMs'] as int?,
       imported: true,
@@ -555,7 +618,7 @@ class SessionRepository {
     final accumulator = SessionAccumulator(
       id,
       protocol: protocol,
-      course: course?.definition,
+      course: chain,
       plannedLaps: workout?['laps'] as int?,
     );
     recording.packets.forEach(accumulator.add);

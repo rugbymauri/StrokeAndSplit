@@ -242,27 +242,25 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
         : null;
     final shares = ghosts == null
         ? null
-        : ghostShares(lap, plan.course.definition, ghosts);
+        : ghostShares(lap, plan.definition, ghosts);
     return CourseLiveView(
       tick: _tick,
       rrIntervalMs: _rrIntervalMs,
       session: recording?.progress,
       lap: lap,
-      course: plan.course.definition,
+      course: plan.definition,
       limit: plan.plannedDuration,
       outdated: _stale,
       forceCurves: forceCurves,
       // On a time course the ghost stands where the rower is; the box shows the gap in metres instead.
-      ghost: shares == null || plan.course.axis == CourseAxis.time
+      ghost: shares == null || plan.axis == CourseAxis.time
           ? null
           : FrameGhost(
               course: shares.course,
               lap: shares.lap,
               segment: shares.segment,
             ),
-      ghostGap: ghosts == null
-          ? null
-          : ghostGap(lap, plan.course.axis, ghosts.course),
+      ghostGap: ghosts == null ? null : ghostGap(lap, plan.axis, ghosts.course),
       action: _sessionButton(recording, connected),
       shortAction: _sessionButton(recording, connected, short: true),
       status: _status(),

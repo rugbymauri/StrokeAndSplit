@@ -161,24 +161,28 @@ ActiveRecording _onCourse({
         ? Workout(
             id: 1,
             name: 'Seerunde x3',
-            laps: 3,
-            course: Course(
-              id: 1,
-              name: 'Seerunde',
-              versionId: 1,
-              version: 1,
-              definition: course,
-            ),
+            length: const LapCount(3),
+            courses: [
+              Course(
+                id: 1,
+                name: 'Seerunde',
+                versionId: 1,
+                version: 1,
+                definition: course,
+              ),
+            ],
           ).toPlan()
         // Rowed on the course for a total time, without a workout (course-rowing-free).
         : SessionPlan(
-            course: Course(
-              id: 1,
-              name: 'Seerunde',
-              versionId: 1,
-              version: 1,
-              definition: course,
-            ),
+            courses: [
+              Course(
+                id: 1,
+                name: 'Seerunde',
+                versionId: 1,
+                version: 1,
+                definition: course,
+              ),
+            ],
             length: TimeLimit(limit),
           ),
     lap: LapProgress(
@@ -1108,8 +1112,8 @@ void main() {
         return (await workouts.get(
           await workouts.create(
             'Seerunde x$laps',
-            courseId: course,
-            laps: laps,
+            courseIds: [course],
+            length: laps == null ? const OpenLength() : LapCount(laps),
           ),
         ))!;
       }))!;
@@ -1128,12 +1132,12 @@ void main() {
       bool ghost = true,
       PlanLength? withoutWorkout,
     }) {
-      final definition = workout.course.definition;
+      final definition = workout.chain.definition;
       final index = definition.segmentEnds.indexWhere((end) => end > inLap);
       // With [withoutWorkout] the course of the workout is rowed for that length, without the workout.
       final plan = withoutWorkout == null
           ? workout.toPlan()
-          : SessionPlan(course: workout.course, length: withoutWorkout);
+          : SessionPlan(courses: [workout.chain], length: withoutWorkout);
       return ActiveRecording(
         sessionId: 99,
         progress: SessionProgress(
