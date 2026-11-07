@@ -18,7 +18,7 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 
 ## 4. Session-Dateien
 
-- [ ] 4.1 Export schreibt `workout`, Import liest `workout` und als Fallback `template` (D5). Verifikation in den Repository-Tests: Export und Import einer Workout-Session ergeben Namen und Runden; eine Datei mit `template` aus einem bestehenden Fixture oder Test-Helper liefert den Namen „Seerunde x3“ als Workout.
+- [x] 4.1 Export schreibt `workout`, Import liest `workout` und als Fallback `template` (D5). Verifikation in den Repository-Tests: Export und Import einer Workout-Session ergeben Namen und Runden; eine Datei mit `template` aus einem bestehenden Fixture oder Test-Helper liefert den Namen „Seerunde x3“ als Workout.
 
 ## 5. Doku und Prüfung
 
