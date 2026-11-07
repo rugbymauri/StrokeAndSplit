@@ -1046,6 +1046,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get placeZoneGroupEasy => 'Leicht';
+
+  @override
+  String get placeZoneGroupMedium => 'Mittel';
+
+  @override
+  String get placeZoneGroupHard => 'Hart';
+
+  @override
   String get zoneIntensityEasy => 'leicht';
 
   @override

@@ -1723,6 +1723,24 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{noch nie gerudert} other{{count}× gerudert}}'**
   String courseRowedCount(int count);
 
+  /// Place zone screen: heading of the easy zones
+  ///
+  /// In de, this message translates to:
+  /// **'Leicht'**
+  String get placeZoneGroupEasy;
+
+  /// Place zone screen: heading of the medium zones
+  ///
+  /// In de, this message translates to:
+  /// **'Mittel'**
+  String get placeZoneGroupMedium;
+
+  /// Place zone screen: heading of the hard zones
+  ///
+  /// In de, this message translates to:
+  /// **'Hart'**
+  String get placeZoneGroupHard;
+
   /// Course list legend: the colour of an easy zone
   ///
   /// In de, this message translates to:

@@ -4,7 +4,7 @@ Neue oder geänderte Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.
 
 ## 1. Screen „Zone einbauen“
 
-- [ ] 1.1 `PlaceZoneScreen` nach D1 und D2 mit den Texten aus D5; `_place` im Editor öffnet ihn statt `_PlaceZoneDialog`. Verifikation in `courses_screen_test.dart`:
+- [x] 1.1 `PlaceZoneScreen` nach D1 und D2 mit den Texten aus D5; `_place` im Editor öffnet ihn statt `_PlaceZoneDialog`. Verifikation in `courses_screen_test.dart`:
   - Der Start steht über den Zonen.
   - Die Zonen stehen unter „Leicht“, „Mittel“ und „Hart“.
   - Eine Zeit-Zone fehlt in einer Distanzstrecke.

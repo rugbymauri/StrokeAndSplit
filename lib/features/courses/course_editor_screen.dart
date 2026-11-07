@@ -13,6 +13,7 @@ import '../zones/zone_format.dart';
 import '../zones/zones_screen.dart';
 import 'course_format.dart';
 import 'course_strip.dart';
+import 'place_zone_screen.dart';
 import 'error_card.dart';
 import 'placement_error_text.dart';
 
@@ -59,8 +60,25 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     zones: zones,
   );
 
-  /// Places a zone, or moves the placement at [index] when given.
-  Future<void> _place({int? index, int? start}) async {
+  /// Places a zone on its own screen, starting at [start].
+  Future<void> _place({int start = 0}) async {
+    final placement = await openPlaceZone(
+      context,
+      axis: _axis,
+      length: _length,
+      placements: _placements,
+      start: start,
+    );
+    if (placement == null || !mounted) return;
+    setState(() {
+      _errors = [];
+      _placements = [..._placements, placement]
+        ..sort((a, b) => a.start.compareTo(b.start));
+    });
+  }
+
+  /// Moves the placement at [index].
+  Future<void> _move(int index) async {
     final placement = await showDialog<ZonePlacement>(
       context: context,
       builder: (_) => _PlaceZoneDialog(
@@ -70,8 +88,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
           for (final (i, p) in _placements.indexed)
             if (i != index) p,
         ],
-        initial: index == null ? null : _placements[index],
-        start: start,
+        initial: _placements[index],
       ),
     );
     if (placement == null) return;
@@ -125,7 +142,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
     if (definition.segments[i].zoneId == null) {
       await _place(start: definition.segmentStarts[i]);
     } else {
-      await _place(index: _indexAt(definition, i));
+      await _move(_indexAt(definition, i));
     }
     if (mounted) setState(() => _selected = null);
   }
@@ -276,7 +293,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                           start: p.start,
                           segment: zone.segment,
                           color: AppColors.zoneIn,
-                          onMove: () => _place(index: i),
+                          onMove: () => _move(i),
                           onRemove: () => _remove(i),
                         ),
                   ],
@@ -288,7 +305,7 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(48),
                 ),
-                onPressed: _place,
+                onPressed: () => _place(start: _firstFree()),
                 icon: const Icon(Icons.add),
                 label: Text(l10n.coursePlaceZone),
               ),
@@ -303,6 +320,17 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
         ),
       ),
     );
+  }
+
+  /// The end of the last placed zone, or 0; where a new zone starts.
+  int _firstFree() {
+    final zones = _zones;
+    var end = 0;
+    for (final p in _placements) {
+      final length = zones[p.zoneId]?.length ?? 0;
+      if (p.start + length > end) end = p.start + length;
+    }
+    return end < _length ? end : 0;
   }
 
   /// The index in [_placements] of the zone at segment [i].
@@ -625,7 +653,6 @@ class _PlaceZoneDialog extends ConsumerStatefulWidget {
     required this.length,
     required this.others,
     this.initial,
-    this.start,
   });
 
   final CourseAxis axis;
@@ -635,16 +662,13 @@ class _PlaceZoneDialog extends ConsumerStatefulWidget {
   final List<ZonePlacement> others;
   final ZonePlacement? initial;
 
-  /// Where to start a new zone, e.g. at a free gap.
-  final int? start;
-
   @override
   ConsumerState<_PlaceZoneDialog> createState() => _PlaceZoneDialogState();
 }
 
 class _PlaceZoneDialogState extends ConsumerState<_PlaceZoneDialog> {
   late int? _zoneId = widget.initial?.zoneId;
-  late var _start = widget.initial?.start ?? widget.start ?? _firstFree();
+  late var _start = widget.initial?.start ?? _firstFree();
 
   /// The end of the last placed zone, or 0.
   int _firstFree() {

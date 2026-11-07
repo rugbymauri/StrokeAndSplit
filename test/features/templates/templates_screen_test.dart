@@ -1,4 +1,5 @@
 import 'package:strokesplit/app/widgets/oar_stepper.dart';
+import 'package:strokesplit/features/courses/place_zone_screen.dart';
 import 'package:strokesplit/features/connection/start_screen.dart';
 import 'package:strokesplit/features/templates/template_editor_screen.dart';
 import 'package:strokesplit/features/templates/template_screen.dart';
@@ -319,12 +320,12 @@ void main() {
       await openPlaceDialog(tester, setup);
       expect(
         find.descendant(
-          of: find.byType(AlertDialog),
+          of: find.byType(PlaceZoneScreen),
           matching: find.text('Sprint'),
         ),
         findsOneWidget,
       );
-      await tester.tap(find.text('Abbrechen'));
+      await tester.tap(find.byType(BackButton));
       await setup.settle(tester);
       await tester.tap(find.byType(BackButton));
       await setup.settle(tester);
@@ -334,14 +335,14 @@ void main() {
 
       expect(
         find.descendant(
-          of: find.byType(AlertDialog),
+          of: find.byType(PlaceZoneScreen),
           matching: find.text('Sprint'),
         ),
         findsOneWidget,
       );
       expect(
         find.descendant(
-          of: find.byType(AlertDialog),
+          of: find.byType(PlaceZoneScreen),
           matching: find.text('Ausdauer'),
         ),
         findsOneWidget,
@@ -371,13 +372,11 @@ void main() {
         for (final (name, start) in [('Sprint', 500), ('Ausdauer', 1000)]) {
           await tester.tap(find.text('Zone einbauen'));
           await setup.settle(tester);
+          await stepTo(tester, const Key('place-start'), start);
           await tester.tap(find.text('Neue Zone anlegen'));
           await setup.settle(tester);
           await tester.enterText(find.byKey(const Key('zone-name')), name);
           await tester.tap(find.byTooltip('Speichern'));
-          await setup.settle(tester);
-          await stepTo(tester, const Key('place-start'), start);
-          await tester.tap(find.text('Einbauen'));
           await setup.settle(tester);
         }
         await tester.tap(find.byTooltip('Speichern'));
