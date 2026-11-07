@@ -458,7 +458,9 @@ void main() {
           find.text('Zeit · ohne Zonen · noch nie gerudert'),
           findsOneWidget,
         );
-        expect(find.text('Helligkeit = Tempo'), findsOneWidget);
+        expect(find.text('leicht'), findsOneWidget);
+        expect(find.text('mittel'), findsOneWidget);
+        expect(find.text('hart'), findsOneWidget);
         await disposeWidgetsWithDatabase(tester);
       },
     );
@@ -708,7 +710,7 @@ void main() {
       await setup.pump(tester, locale: const Locale('en'));
 
       expect(find.text('Distance · no zones · rowed once'), findsOneWidget);
-      expect(find.text('Brighter = faster'), findsOneWidget);
+      expect(find.text('hard'), findsOneWidget);
       await tester.tap(find.text('Seerunde'));
       await setup.settle(tester);
       await tester.tap(find.byTooltip('Edit'));
