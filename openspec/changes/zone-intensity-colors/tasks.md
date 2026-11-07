@@ -13,7 +13,7 @@ Keine neuen Texte, keine Schema-Änderung.
 
 ## 2. Farben zeigen
 
-- [ ] 2.1 `AppColors.intensityEasy`, `intensityMedium`, `intensityHard` nach D2; `CourseStrip.segmentColors` über `zoneIntensity` nach D3, die relative Pace-Abstufung entfällt. Verifikation:
+- [x] 2.1 `AppColors.intensityEasy`, `intensityMedium`, `intensityHard` nach D2; `CourseStrip.segmentColors` über `zoneIntensity` nach D3, die relative Pace-Abstufung entfällt. Verifikation:
   - `course_strip_test.dart`: Die beiden Abstufungstests sind durch einen Test ersetzt, der leicht, mittel, hart und frei auf die vier Farben abbildet; der Test mit einer Zone nur mit Stufe erwartet `intensityHard` statt `zoneIn`.
   - Ein Test zeigt, dass dieselbe Zone neben verschiedenen Nachbarn dieselbe Farbe hat.
   - Die Live-Tests (`progress_frame_test.dart`, `pace_box_test.dart`) bleiben unverändert grün.
