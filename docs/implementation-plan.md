@@ -9,7 +9,7 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow` und `rename-workouts` archiviert. In Arbeit: `workout-course-chain` (mehrere Strecken in einem Workout, Runden/Dauer/offen fürs ganze Workout) auf `feature/workout-course-chain`, 3/17: Schema 12 (`session_courses`, Länge im Workout), Workout mit Streckenliste, Session speichert ihre Strecken.
+Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow` und `rename-workouts` archiviert. In Arbeit: `workout-course-chain` (mehrere Strecken in einem Workout, Runden/Dauer/offen fürs ganze Workout) auf `feature/workout-course-chain`, 4/17: Schema 12 (`session_courses`, Länge im Workout), Workout mit Streckenliste, Rudern über mehrere Strecken als eine Runde, Session speichert ihre Strecken.
 
 ## Überblick
 
