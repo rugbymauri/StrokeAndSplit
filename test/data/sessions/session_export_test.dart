@@ -544,6 +544,123 @@ void main() {
       },
     );
 
+    /// Records just_row on the phone as "Intervalltraining" x3: "Einrudern"
+    /// (10 m), "Tempo-Mitte" (20 m, all in the zone "Tempo") and "Ausrudern"
+    /// (10 m) in a row (Change workout-course-chain).
+    Future<(AppDatabase, int)> recordChainOnPhone() async {
+      final db = openTestDatabase();
+      final zoneId = await ZoneRepository(db).create(tempo);
+      final courses = CourseRepository(db);
+      final ids = [
+        await courses.create(
+          'Einrudern',
+          CourseDefinition.single(axis: CourseAxis.distance, length: 10),
+        ),
+        await courses.create(
+          'Tempo-Mitte',
+          resolveCourse(
+            axis: CourseAxis.distance,
+            length: 20,
+            placements: [ZonePlacement(zoneId: zoneId, start: 0)],
+            zones: {zoneId: tempo.copyWith(id: zoneId)},
+          ).definition!,
+        ),
+        await courses.create(
+          'Ausrudern',
+          CourseDefinition.single(axis: CourseAxis.distance, length: 10),
+        ),
+      ];
+      final workouts = WorkoutRepository(db);
+      final plan = (await workouts.get(
+        await workouts.create(
+          'Intervalltraining',
+          courseIds: ids,
+          length: const LapCount(3),
+        ),
+      ))!.toPlan();
+      final repository = SessionRepository(db);
+      final id = await repository.create(
+        startedAt: DateTime.utc(2026, 10, 16, 7),
+        source: ErgSourceKind.pm5,
+        protocol: ErgProtocol.pm5,
+        plan: plan,
+      );
+      final accumulator = SessionAccumulator(
+        id,
+        protocol: ErgProtocol.pm5,
+        course: plan.definition,
+        plannedLaps: 3,
+      );
+      loadFixture('just_row').packets.forEach(accumulator.add);
+      accumulator.finish();
+      await repository.write(accumulator.takeBatch());
+      await repository.finish(id);
+      return (db, id);
+    }
+
+    test('gives the same laps for a workout with three courses after export and import, '
+        'and creates the courses', () async {
+      final (phone, recorded) = await recordChainOnPhone();
+      final laptop = openTestDatabase();
+
+      final bytes = await SessionRepository(phone).export(recorded);
+      final header = jsonDecode(
+        const LineSplitter().convert(utf8.decode(gzip.decode(bytes))).first,
+      ) as Map;
+      expect(
+        [
+          for (final c in header['courses'] as List)
+            ((c as Map)['name'], c['firstSegment']),
+        ],
+        [('Einrudern', 0), ('Tempo-Mitte', 1), ('Ausrudern', 2)],
+      );
+      final imported = await SessionRepository(laptop).import(bytes);
+
+      expect(await results(laptop, imported), await results(phone, recorded));
+      expect(
+        (await SessionRepository(laptop).laps(imported))
+            .where((l) => l.complete),
+        hasLength(3),
+      );
+      final rows = await SessionRepository(laptop).sessionCourses(imported);
+      final names = [
+        for (final r in rows)
+          (await CourseRepository(laptop).atVersion(r.courseVersionId)).name,
+      ];
+      expect(names, ['Einrudern', 'Tempo-Mitte', 'Ausrudern']);
+      expect([for (final r in rows) r.firstSegment], [0, 1, 2]);
+      expect(await CourseRepository(laptop).all(), hasLength(3));
+      expect((await ZoneRepository(laptop).all()).single.sameAs(tempo), isTrue);
+    });
+
+    for (final template in [false, true]) {
+      test('imports a file with a single course as before'
+          '${template ? ', also with a template' : ''}', () async {
+        final (phone, recorded) = await recordOnPhone();
+        final laptop = openTestDatabase();
+
+        final bytes = await SessionRepository(phone).export(recorded);
+        final lines = const LineSplitter().convert(
+          utf8.decode(gzip.decode(bytes)),
+        );
+        final header = jsonDecode(lines.first) as Map<String, Object?>;
+        header['course'] = ((header.remove('courses') as List).single as Map)
+          ..remove('firstSegment');
+        if (template) header['template'] = header.remove('workout');
+        final old = gzip.encode(
+          utf8.encode('${[jsonEncode(header), ...lines.skip(1)].join('\n')}\n'),
+        );
+        final imported = await SessionRepository(laptop).import(old);
+
+        expect(await results(laptop, imported), await results(phone, recorded));
+        final session = (await SessionRepository(laptop).get(imported))!;
+        expect((session.workoutName, session.plannedLaps), ('Seerunde x3', 3));
+        final course = (await CourseRepository(laptop).all()).single;
+        expect(course.name, 'Seerunde');
+        expect(await sessionVersionIds(laptop, imported), [course.versionId]);
+      });
+    }
+
     test('imports a file that names the workout a template', () async {
       final (phone, recorded) = await recordOnPhone();
       final laptop = openTestDatabase();
