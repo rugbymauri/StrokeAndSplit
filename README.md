@@ -60,9 +60,11 @@ Wird die App während einer Session beendet, bleibt die Session bis kurz davor e
 
 1. **Zonen** → **Zone anlegen**: Name, Achse (Distanz oder Zeit), feste Länge und mindestens eine Vorgabe: ein Pace-Band (z.B. 1:45–1:50), ein Schlagzahl-Band (z.B. 30–34), eine Widerstandsstufe oder eine Kombination davon. Die Liste zeigt die Zonen nach Achse und in wie vielen Strecken sie stecken.
 2. **Strecken** → **Strecke anlegen**: Name, Achse (Distanz in Metern oder Zeit als m:ss) und Länge. **Zone einbauen** öffnet einen eigenen Screen: oben die Startposition mit einer Vorschau der Strecke, darunter die Zonen der Achse der Strecke, gruppiert nach **Leicht**, **Mittel** und **Hart**. Eine Zone, die am gewählten Start über das Streckenende ragt oder eine andere Zone überschneidet, ist ausgegraut und nennt den Grund. Ein Tipp auf eine passende Zone baut sie ein. **Neue Zone anlegen** öffnet den Zonen-Editor, und passt die neue Zone am Start, wird sie gleich eingebaut. Dieselbe Zone darf mehrfach vorkommen. Was zwischen den Zonen liegt, ist frei. Mit **+** oder einem Tipp auf einen freien Abschnitt beginnt die neue Zone dort. Eine eingebaute Zone markiert man durch Antippen oder langes Drücken im Balken oder in der Liste. Unter dem Balken erscheint dann ihr Start mit den Ruderblatt-Tasten, und die Zone wandert mit jedem Tipp, höchstens bis an die Nachbarzonen bzw. an Anfang und Ende der Strecke; **Fertig** oder ein zweiter Tipp beendet das. Mit **×** wird eine Zone entfernt. Gespeichert wird alles erst mit **Speichern**. Im Balken über der Liste heisst grau frei; Zonen sind nach ihrer Härte gefärbt (siehe unten).
-3. **Workouts** → **Workout anlegen** mit Name, Strecke und Runden, **Feste Anzahl** oder **Offen bis Stopp**.
-4. Workout antippen öffnet seinen eigenen Screen mit Strecke, Runden, Zonen und Bändern sowie den Plätzen 1–3. Unten stehen der Schalter **Gegen den Ghost rudern** (siehe Ghost) und **Starten**, das das gewählte Rudergerät verbindet und die Session sofort startet. Der Stift öffnet den Editor, dort lässt sich das Workout auch löschen; danach zeigt die App wieder die Liste.
-5. Nach der letzten Runde endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit dem Anteil in der Zone, die beste mit Stern. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
+3. **Workouts** → **Workout anlegen** mit Name, Strecken und Länge. **Strecke wählen** legt die erste Strecke fest, **Strecke anhängen** fügt weitere dahinter an, lückenlos, und bietet nur Strecken derselben Achse an. Dieselbe Strecke darf mehrfach vorkommen. Jede Strecke steht als Karte mit Segmentbalken in der Liste, die Pfeile verschieben sie, **×** entfernt sie. Die letzte verbliebene Strecke lässt sich nur ersetzen (Pfeil-Symbol oder Tipp auf die Karte), dann auch durch eine der anderen Achse. Eine Runde ist die ganze Kette, ihre Länge die Summe der Strecken. Die Länge des Workouts gilt für die ganze Kette, wählbar wie auf dem Start-Screen einer Strecke: **Runden**, **Dauer** oder **Offen** (siehe unten), ein neues Workout beginnt mit 3 Runden. Die Liste zeigt z.B. „Einrudern + 2 km Intervall + Ausrudern · 3000 m · 1 Runde“ bzw. „· 45:00“ bei einer Dauer.
+4. Workout antippen öffnet seinen eigenen Screen mit Strecken, Länge, Zonen und Bändern sowie den Plätzen 1–3; bei mehreren Strecken steht jede in ihrer Reihenfolge mit ihren Zonen da. Unten stehen der Schalter **Gegen den Ghost rudern** (siehe Ghost) und **Starten**, das das gewählte Rudergerät verbindet und die Session sofort startet. Der Stift öffnet den Editor, dort lässt sich das Workout auch löschen; danach zeigt die App wieder die Liste.
+5. Nach der letzten Runde bzw. der Dauer endet die Session von selbst und die Zusammenfassung zeigt alle Runden mit dem Anteil in der Zone, die beste mit Stern; bei mehreren Strecken nennt sie diese nach dem Workout, z.B. „Intervalltraining · Einrudern + 2 km Intervall + Ausrudern“. Bei offener Rundenzahl endet sie mit **Session beenden**, eine angefangene Runde ist dann unvollständig.
+
+Eine gelöschte Strecke verschwindet aus allen Workouts, die übrigen Strecken rücken nach. Hätte ein Workout danach keine Strecke mehr, wird es mitgelöscht; nur solche Workouts nennt die Bestätigung.
 
 **Strecke ohne Workout rudern**: Die Detailansicht einer Strecke (Strecke in ihrer Liste antippen) hat unten den Button **Rudern**. Er öffnet einen Start-Screen mit Segmentbalken und Länge der Strecke und drei Optionen, von denen nur die gewählte ihre Eingabe zeigt:
 
@@ -82,9 +84,9 @@ Um die Pace läuft ein Fortschrittsrahmen aus drei Spuren, jede beginnt oben in 
 |---|---|---|
 | aussen, weiss | die ganze Strecke über alle Runden, Kerben an den Rundengrenzen | „Gesamt 1 460 / 3 000 m“ |
 | Mitte, grau | die aktuelle Runde, Kerben an den Abschnittsgrenzen | „Runde 2 / 3 · noch 540 m“ |
-| innen, farbig | den aktuellen Abschnitt, blau bzw. orange nach dem Zonenstatus der Pace, grau, wenn er frei ist | „Tempo · noch 340 m“ bzw. „frei · noch 340 m“ |
+| innen, farbig | den aktuellen Abschnitt, blau bzw. orange nach dem Zonenstatus der Pace, grau, wenn er frei ist | „Tempo · noch 340 m“ bzw. „frei · noch 340 m“, bei mehreren Strecken mit dem Namen der aktuellen davor: „2 km Intervall · Tempo“ |
 
-Bei offener Rundenzahl fehlt die äussere Spur, die Legende zeigt dann „Runde 2“. Bei einer Dauer zeigt die äussere Spur den Anteil der Ruderzeit an der Dauer, ohne Kerben, und die Legende die verbleibende Ruderzeit („Gesamt · noch 15:00“) und die Runde ohne Gesamtzahl („Runde 3“). Bei Zeitstrecken stehen statt Metern Zeiten.
+Bei mehreren Strecken geht die Runde über alle, beim Übergang zur nächsten Strecke beginnt keine neue Runde. Bei offener Rundenzahl fehlt die äussere Spur, die Legende zeigt dann „Runde 2“. Bei einer Dauer zeigt die äussere Spur den Anteil der Ruderzeit an der Dauer, ohne Kerben, und die Legende die verbleibende Ruderzeit („Gesamt · noch 15:00“) und die Runde ohne Gesamtzahl („Runde 3“). Bei Zeitstrecken stehen statt Metern Zeiten.
 
 Eine Zone kann zusätzlich eine Widerstandsstufe (1–25) tragen, die die App beim Rudern auf einem FTMS-Rudergerät mit verstellbarem Widerstand setzt (siehe oben); sie steht in den Listen hinter den Bändern („· Stufe 10“). Eine Zone kann auch nur eine Stufe tragen, etwa „Kraft, 500 m · Stufe 12“. Sie gilt beim Rudern als Zone: Ihr Name steht im Streckenbalken, in der Pace-Box und im Rahmen, und die App setzt ihre Stufe. Ohne Band gibt es aber keinen Zonenstatus, keinen Anteil in der Zone und keinen Hinweis „Gleich …“; ihre Fahrten zählen in der Bestenliste der Zone wie bei jeder Zone. Auf einem PM5 ist sie nur ein benannter Abschnitt. Hat das Gerät weniger Stufen, nimmt die App seine höchste.
 
@@ -106,8 +108,8 @@ Runden laufen nach Wanduhr: Eine Pause kostet bei Distanzstrecken Zeit und bei Z
 
 Die App führt Bestenlisten und zeigt jeweils die Plätze 1–3 mit Wert, Pace pro 500 m und Datum:
 
-- **Workout**: ganze Sessions, in denen alle geplanten Runden vollständig gerudert wurden, gewertet nach der Summe der Runden. Eine Liste pro Streckenlänge und Rundenzahl. Der Screen des Workouts zeigt die Plätze 1–3 seiner aktuellen Länge und Rundenzahl. Bei offener Rundenzahl gibt es keine.
-- **Strecke**: jede vollständige Runde, egal mit welchem Workout oder ohne. Hatte die Strecke verschiedene Längen, gibt es eine Liste pro Länge.
+- **Workout**: ganze Sessions, in denen alle geplanten Runden vollständig gerudert wurden, gewertet nach der Summe der Runden. Eine Liste pro Folge der Streckenlängen und Rundenzahl, eine angehängte Strecke beginnt also eine neue Liste. Der Screen des Workouts zeigt die Plätze 1–3 seiner aktuellen Strecken und Rundenzahl. Bei offener Rundenzahl oder einer Dauer gibt es keine.
+- **Strecke**: jede vollständige Runde, egal mit welchem Workout oder ohne. In einem Workout mit mehreren Strecken zählt jede Fahrt über die Strecke, die bis zu ihrem Ende gerudert wurde, auch wenn die Session danach abbrach. Hatte die Strecke verschiedene Längen, gibt es eine Liste pro Länge.
 - **Zone**: jede Fahrt durch die Zone in einer vollständigen Runde, egal auf welcher Strecke, auch mehrere aus derselben Session. Eine Liste pro Zonenlänge.
 
 Strecke oder Zone in ihrer Liste antippen öffnet die Detailansicht mit den Plätzen pro Länge, die aktuelle zuerst. Der Stift dort öffnet den Editor, bei einer Strecke führt **Rudern** zum Start-Screen (siehe oben). Die Zusammenfassung markiert jede Runde und Zonenfahrt auf Platz 1–3 (z.B. „Platz 2“, „Sprint · Platz 1“) und ebenso die Session in der Liste ihres Workouts. Die Marken zeigen den aktuellen Stand, wird eine Runde später überholt, verschwindet ihre Marke.
@@ -121,7 +123,7 @@ Beim Rudern eines Workouts läuft auf jeder Spur des Fortschrittsrahmens ein Gho
 | Spur | Ghost | Läuft |
 |---|---|---|
 | aussen | Platz 1 des Workouts mit gleicher Streckenlänge und Rundenzahl | über die ganze Session |
-| Mitte | Platz 1 der Strecke mit gleicher Länge | startet mit jeder Runde neu |
+| Mitte | Platz 1 der Strecke mit gleicher Länge; bei mehreren Strecken die schnellste frühere Runde dieses Workouts mit derselben Folge der Streckenlängen | startet mit jeder Runde neu |
 | innen | Platz 1 der Zone des aktuellen Abschnitts mit gleicher Länge | startet mit jeder Fahrt durch die Zone neu |
 
 Wo es keine Bestenliste oder noch keinen Eintrag gibt, läuft kein Ghost: aussen nicht bei offener Rundenzahl und nicht auf einer Strecke ohne Workout, innen nicht in einem freien Abschnitt, beim freien Rudern gar keiner. Kämen sich Ghost und eigenes Schiffchen in die Quere, rückt der Ghost quer zur Spur nach aussen und kehrt auf die Mitte zurück, sobald wieder Platz ist. Auf Zeitstrecken lägen beide immer auf gleicher Höhe, dort zeigt der Rahmen deshalb keinen Ghost.
@@ -171,7 +173,7 @@ lib/
     db/                drift-Schema (SQLite)
     courses/           Strecken, Versionen, Aufbau aus Zonen und Runden-Logik (LapTracker)
     zones/             Wiederverwendbare Zonen
-    workouts/          Workouts aus Strecke und Rundenzahl
+    workouts/          Workouts aus einer oder mehreren Strecken und ihrer Länge
     sessions/          Aufzeichnung, Zusammenfassung, Export/Import
     health/            Übertragung an Health Connect (Kotlin-Kanal in android/app/src/main/kotlin)
   l10n/                Übersetzungen: app_de.arb (Ausgangsdatei), app_en.arb und der erzeugte Code
@@ -205,19 +207,19 @@ Zahlen mit Mehrzahl über `plural`, Namen in Anführungszeichen stehen samt Zeic
 
 gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format (`"format": "strokesplit-raw"`), Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Pakete eines Pulsgurts stehen mit `"c": "2a37"` auf derselben Zeitachse, der `session`-Block im Header enthält, sofern vorhanden, `averageHeartRate`, `maxHeartRate` und `rmssdMs`. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren. Dateien von vor der Umbenennung (Endung `.aergrow`, Format `aergrow-raw`) liest der Import weiterhin, die Test-Fixtures sind bewusst in diesem alten Format.
 
-Eine Session auf einem Workout hat im Header zusätzlich das Workout und die geruderte Version der Strecke:
+Eine Session auf einem Workout hat im Header zusätzlich das Workout und die geruderten Versionen seiner Strecken in ihrer Reihenfolge, jede mit `firstSegment`, dem Index ihres ersten Segments in der Runde:
 
 ```json
 "workout": {"name": "Seerunde x3", "laps": 3},
-"course": {"name": "Seerunde", "axis": "distance", "length": 1000,
-           "segments": [{"length": 200},
-                        {"length": 600, "paceFastCs": 12500, "paceSlowCs": 13000, "spmMin": 20, "spmMax": 22,
-                         "zone": {"name": "Tempo", "axis": "distance", "length": 600, "paceFastCs": 12500,
-                                  "paceSlowCs": 13000, "spmMin": 20, "spmMax": 22}},
-                        {"length": 200}]}
+"courses": [{"name": "Seerunde", "axis": "distance", "length": 1000, "firstSegment": 0,
+             "segments": [{"length": 200},
+                          {"length": 600, "paceFastCs": 12500, "paceSlowCs": 13000, "spmMin": 20, "spmMax": 22,
+                           "zone": {"name": "Tempo", "axis": "distance", "length": 600, "paceFastCs": 12500,
+                                    "paceSlowCs": 13000, "spmMin": 20, "spmMax": 22}},
+                          {"length": 200}]}]
 ```
 
-Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwendet, sonst angelegt. Fehlende Zonen legt der Import an, eine Zone mit gleichem Namen und gleichen Bändern wird wiederverwendet. Dateien von vor den Zonen haben kein `zone`, ihre Segmente mit Band werden zu Zonen nach dem Muster „Seerunde 2“. Die Runden entstehen aus den Rohpaketen neu und sind deshalb identisch. `laps` ist `null` bei offener Rundenzahl, `length` ist in Metern bzw. Sekunden. Eine Session, die ohne Workout gerudert wurde, hat `"name": null`; mit Gesamtdauer steht diese in Millisekunden in `durationMs`, etwa `"workout": {"name": null, "laps": null, "durationMs": 1800000}`. Dateien ohne `durationMs` lassen sich weiterhin importieren, ebenso Dateien aus der Zeit vor den Workouts, die den Eintrag `"template"` nennen.
+Beim Import wird eine Strecke mit gleichem Namen und gleichem Ablauf wiederverwendet, sonst angelegt. Fehlende Zonen legt der Import an, eine Zone mit gleichem Namen und gleichen Bändern wird wiederverwendet. Dateien von vor den Zonen haben kein `zone`, ihre Segmente mit Band werden zu Zonen nach dem Muster „Seerunde 2“. Die Runden entstehen aus den Rohpaketen neu und sind deshalb identisch. `laps` ist `null` bei offener Rundenzahl, `length` ist in Metern bzw. Sekunden. Eine Session, die ohne Workout gerudert wurde, hat `"name": null`; mit Gesamtdauer steht diese in Millisekunden in `durationMs`, etwa `"workout": {"name": null, "laps": null, "durationMs": 1800000}`. Dateien ohne `durationMs` lassen sich weiterhin importieren, ebenso Dateien aus der Zeit vor den Workouts, die den Eintrag `"template"` nennen, und Dateien mit nur einer Strecke unter `"course"` statt `"courses"`. Ältere Versionen der App können Dateien mit `"courses"` nicht lesen.
 
 ## Spike
 
