@@ -281,7 +281,7 @@ class LapTracker {
   /// Adds the time from [from] to [to] with the zone state of [from].
   void _count(_Point from, _Point to) {
     final segment = course.segments[_segment];
-    if (segment.isFree) return;
+    if (!segment.hasBand) return;
     final duration = to.wallMs - from.wallMs;
     _segmentBandMs += duration;
     if (_inZone(segment, from)) _segmentInZoneMs += duration;

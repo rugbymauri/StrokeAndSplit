@@ -27,6 +27,7 @@ const _sprint = CourseSegment(
 );
 const _spmOnly = CourseSegment(length: 200, spmMin: 24, spmMax: 26, zoneId: 3);
 const _free = CourseSegment(length: 100);
+const _levelOnly = CourseSegment(length: 200, resistanceLevel: 12, zoneId: 4);
 const _pace = Duration(minutes: 2);
 
 /// In segment [index] of [course] with [remaining] left of it, in lap [lap] of [laps].
@@ -85,6 +86,11 @@ void main() {
 
     test('announces no free gap', () {
       expect(upcomingZone(_at(course, 1, 5), course, _pace), isNull);
+    });
+
+    test('announces no zone with only a level', () {
+      final level = _course([_warmUp, _levelOnly]);
+      expect(upcomingZone(_at(level, 0, 5), level, _pace), isNull);
     });
 
     test('announces no zone with the same bands', () {

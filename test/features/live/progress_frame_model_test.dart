@@ -112,6 +112,25 @@ void main() {
     );
   });
 
+  test('marks a zone with only a level on the lap track', () {
+    const kraft = CourseDefinition(
+      axis: CourseAxis.distance,
+      length: 1000,
+      segments: [
+        CourseSegment(length: 500),
+        CourseSegment(
+          length: 500,
+          resistanceLevel: 12,
+          zoneId: 4,
+          zoneName: 'Kraft',
+        ),
+      ],
+    );
+    expect(ProgressFrameModel.of(_rowed(kraft, 100), kraft).lap.zones, [
+      (0.5, 1.0),
+    ]);
+  });
+
   test('counts seconds on a time course', () {
     final frame = ProgressFrameModel.of(
       _timed(_intervals, 330, laps: 2),

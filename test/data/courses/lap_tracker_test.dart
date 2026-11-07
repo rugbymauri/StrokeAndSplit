@@ -254,6 +254,8 @@ void main() {
         (BandStatus.none, BandStatus.none),
       );
       expect(tracker.progress.lapInZoneShare, isNull);
+      expect(tracker.progress.pace, BandStatus.none);
+      expect(tracker.progress.strokeRate, BandStatus.none);
     });
 
     test('measures the share of time in the zone, weighted by time', () {
@@ -308,6 +310,26 @@ void main() {
         [null, 1.0, null],
       );
       expect(tracker.takeLaps().single.inZoneShare, 1.0);
+    });
+
+    test('a zone with only a level has no share', () {
+      const course = CourseDefinition(
+        axis: CourseAxis.distance,
+        length: 1000,
+        segments: [
+          CourseSegment(length: 500),
+          CourseSegment(length: 500, resistanceLevel: 12, zoneId: 4),
+        ],
+      );
+      final tracker = LapTracker(course);
+      _row(0, 250).forEach(tracker.add);
+
+      expect(
+        [for (final s in tracker.takeSegments()) s.inZoneShare],
+        [null, null],
+      );
+      expect(tracker.takeLaps().single.inZoneShare, isNull);
+      expect(tracker.progress.lapInZoneShare, isNull);
     });
 
     test('shows the running share of the current lap', () {

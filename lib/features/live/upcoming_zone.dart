@@ -9,7 +9,7 @@ import 'zone_hint.dart';
 const upcomingLead = Duration(seconds: 10);
 
 /// The zone that starts within [lead], so the rower can get ready for its bands; null when the next
-/// segment is free, rows with the same bands, is further away or there is none.
+/// segment has no band, rows with the same bands, is further away or there is none.
 ///
 /// On a distance course the time left comes from the current [pace]; without one nothing is announced.
 CourseSegment? upcomingZone(
@@ -28,7 +28,7 @@ CourseSegment? upcomingZone(
   } else {
     return null;
   }
-  if (next.isFree || _sameBands(next, progress.segment)) return null;
+  if (!next.hasBand || _sameBands(next, progress.segment)) return null;
   final double seconds;
   switch (course.axis) {
     case CourseAxis.time:
