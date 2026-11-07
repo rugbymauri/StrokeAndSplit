@@ -34,8 +34,8 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 ## 6. Doku und Prüfung
 
 - [x] 6.1 README (Abschnitt zu Zonen, Strecken und Workouts, Exportformat) und `docs/implementation-plan.md` beschreiben Workouts mit mehreren Strecken. Verifikation: Abschnitt gelesen; Plan nennt den Change als begonnen bzw. erledigt.
-- [ ] 6.2 Gesamtprüfung in der Linux-App mit einer Scratch-DB in Schema 11: Migration läuft, alte Workouts und Sessions unverändert; ein Workout „Einrudern + 2 km Intervall + Ausrudern“ mit 1 Runde im Simulator rudern, Streckenname im Live-Display, Zusammenfassung und Ranglisten der Strecken prüfen. Verifikation: Screenshots der Schritte.
-- [ ] 6.3 Am Handy (Nutzer): App aktualisieren, alte Workouts und Sessions sind da; ein Workout mit zwei Strecken und Dauer anlegen und rudern.
+- [x] 6.2 Gesamtprüfung in der Linux-App mit einer Scratch-DB in Schema 11: Migration läuft, alte Workouts und Sessions unverändert; ein Workout „Einrudern + 2 km Intervall + Ausrudern“ mit 1 Runde im Simulator rudern, Streckenname im Live-Display, Zusammenfassung und Ranglisten der Strecken prüfen. Verifikation: Screenshots der Schritte.
+- [x] 6.3 Am Handy (Nutzer): App aktualisieren, alte Workouts und Sessions sind da; ein Workout mit zwei Strecken und Dauer anlegen und rudern.
 
 ## Workflow follow-up
 
