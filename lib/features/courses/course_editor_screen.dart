@@ -317,7 +317,8 @@ class _CourseEditorScreenState extends ConsumerState<CourseEditorScreen> {
                           axis: _axis,
                           start: p.start,
                           segment: zone.segment,
-                          color: AppColors.zoneIn,
+                          color: CourseStrip.segmentColors([zone.segment])
+                              .single,
                           onRemove: () => _remove(i),
                         ),
                   ],
