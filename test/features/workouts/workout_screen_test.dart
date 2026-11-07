@@ -53,7 +53,7 @@ void main() {
         findsOneWidget,
       );
       expect(onScreen(find.text('Starten')), findsOneWidget);
-      expect(onScreen(find.byTooltip('Vorlage bearbeiten')), findsOneWidget);
+      expect(onScreen(find.byTooltip('Workout bearbeiten')), findsOneWidget);
 
       await tester.tap(find.byType(BackButton));
       await setup.settle(tester);
@@ -87,7 +87,7 @@ void main() {
       await setup.pump(tester);
 
       await setup.openWorkout(tester, 'Seerunde x3');
-      await tester.tap(find.byTooltip('Vorlage bearbeiten'));
+      await tester.tap(find.byTooltip('Workout bearbeiten'));
       await setup.settle(tester);
       await tester.enterText(
         find.byKey(const Key('workout-name')),
@@ -111,11 +111,11 @@ void main() {
         await setup.pump(tester);
 
         await setup.openWorkout(tester, 'Seerunde x3');
-        await tester.tap(find.byTooltip('Vorlage bearbeiten'));
+        await tester.tap(find.byTooltip('Workout bearbeiten'));
         await setup.settle(tester);
         await tester.tap(find.byTooltip('Löschen'));
         await tester.pumpAndSettle();
-        expect(find.text('Vorlage löschen?'), findsOneWidget);
+        expect(find.text('Workout löschen?'), findsOneWidget);
         await tester.tap(
           find.descendant(
             of: find.byType(AlertDialog),
@@ -127,7 +127,7 @@ void main() {
         expect(find.byType(WorkoutScreen), findsNothing);
         expect(find.byType(WorkoutsScreen), findsOneWidget);
         expect(find.text('Seerunde x3'), findsNothing);
-        expect(find.text('Noch keine Vorlagen angelegt.'), findsOneWidget);
+        expect(find.text('Noch keine Workouts angelegt.'), findsOneWidget);
         await disposeWidgetsWithDatabase(tester);
       },
     );

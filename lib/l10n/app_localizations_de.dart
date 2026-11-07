@@ -604,7 +604,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String summarySessionPlace(int place) {
-    return 'Platz $place der Vorlage';
+    return 'Platz $place des Workouts';
   }
 
   @override
@@ -676,10 +676,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get lapsOpen => 'offen';
 
   @override
-  String get workoutsTitle => 'Vorlage rudern';
+  String get workoutsTitle => 'Workout rudern';
 
   @override
-  String get tabWorkouts => 'Vorlagen';
+  String get tabWorkouts => 'Workouts';
 
   @override
   String get tabCourses => 'Strecken';
@@ -688,7 +688,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tabZones => 'Zonen';
 
   @override
-  String get workoutCreate => 'Vorlage anlegen';
+  String get workoutCreate => 'Workout anlegen';
 
   @override
   String get workoutStart => 'Starten';
@@ -713,11 +713,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get workoutsEmpty => 'Noch keine Vorlagen angelegt.';
+  String get workoutsEmpty => 'Noch keine Workouts angelegt.';
 
   @override
   String workoutsLoadFailed(String error) {
-    return 'Vorlagen konnten nicht geladen werden: $error';
+    return 'Workouts konnten nicht geladen werden: $error';
   }
 
   @override
@@ -725,17 +725,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get workoutNeedsCourseBody =>
-      'Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.';
+      'Ein Workout rudert eine Strecke. Lege dafür zuerst eine Strecke an.';
 
   @override
   String get workoutNeedsCourse =>
-      'Für eine Vorlage brauchst du zuerst eine Strecke.';
+      'Für ein Workout brauchst du zuerst eine Strecke.';
 
   @override
   String get courseCreate => 'Strecke anlegen';
 
   @override
-  String get workoutDeleteTitle => 'Vorlage löschen?';
+  String get workoutDeleteTitle => 'Workout löschen?';
 
   @override
   String workoutDeleteBody(String name) {
@@ -743,10 +743,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get workoutNew => 'Neue Vorlage';
+  String get workoutNew => 'Neues Workout';
 
   @override
-  String get workoutEdit => 'Vorlage bearbeiten';
+  String get workoutEdit => 'Workout bearbeiten';
 
   @override
   String get workoutNameMissing => 'Der Name fehlt.';
@@ -804,7 +804,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String courseDeleteWorkouts(String workouts) {
-    return 'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: $workouts.';
+    return 'Diese Workouts verwenden die Strecke und werden mitgelöscht: $workouts.';
   }
 
   @override
