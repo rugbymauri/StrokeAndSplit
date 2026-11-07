@@ -387,6 +387,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get paceBoxTotal => 'Gesamt';
 
   @override
+  String paceBoxCourseSegment(String course, String segment) {
+    return '$course · $segment';
+  }
+
+  @override
   String paceBoxLapOf(int lap, int laps) {
     return 'Runde $lap / $laps';
   }

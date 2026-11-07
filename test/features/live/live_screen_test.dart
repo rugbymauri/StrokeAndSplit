@@ -780,6 +780,87 @@ void main() {
       expect(find.text('200–800 m'), findsNothing);
     });
 
+    testWidgets(
+      'names the current course before the zone only with several courses',
+      (tester) async {
+        Course course(int id, String name, CourseDefinition definition) =>
+            Course(
+              id: id,
+              name: name,
+              versionId: id,
+              version: 1,
+              definition: definition,
+            );
+        const intervall = CourseDefinition(
+          axis: CourseAxis.distance,
+          length: 2000,
+          segments: [
+            CourseSegment(length: 500),
+            CourseSegment(length: 1000, spmMin: 24, spmMax: 28),
+            CourseSegment(length: 500),
+          ],
+        );
+        final plan = Workout(
+          id: 2,
+          name: 'Intervalltraining',
+          length: const LapCount(1),
+          courses: [
+            course(
+              1,
+              'Einrudern',
+              CourseDefinition.single(axis: CourseAxis.distance, length: 500),
+            ),
+            course(2, '2 km Intervall', intervall),
+            course(
+              3,
+              'Ausrudern',
+              CourseDefinition.single(axis: CourseAxis.distance, length: 500),
+            ),
+          ],
+        ).toPlan();
+        final harness = _Harness();
+        await harness.pump(
+          tester,
+          recording: ActiveRecording(
+            sessionId: 1,
+            progress: const SessionProgress(
+              distanceMeters: 800,
+              elapsed: Duration(minutes: 3, seconds: 20),
+            ),
+            plan: plan,
+            // At 800 m: 300 m into the free start of "2 km Intervall".
+            lap: LapProgress(
+              lap: 1,
+              plannedLaps: 1,
+              segmentIndex: 1,
+              segment: plan.definition.segments[1],
+              segmentStart: 500,
+              segmentEnd: 1000,
+              remaining: 200,
+              pace: BandStatus.missing,
+              strokeRate: BandStatus.missing,
+              lapInZoneShare: null,
+              lapTime: const Duration(minutes: 3, seconds: 20),
+            ),
+          ),
+        );
+        await harness.emit(tester, _tick());
+
+        expectLine('pace-box-segment', '2 km Intervall · frei', 'noch 200 m');
+      },
+    );
+
+    testWidgets('does not name the course of a workout with one course', (
+      tester,
+    ) async {
+      final harness = _Harness();
+      await harness.pump(tester, recording: _onCourse());
+      await harness.emit(tester, _tick());
+
+      expectLine('pace-box-segment', 'Tempo', 'noch 280 m');
+      expect(find.textContaining('Seerunde'), findsNothing);
+    });
+
     testWidgets('shows the course and the values in English', (tester) async {
       final harness = _Harness();
       await harness.pump(

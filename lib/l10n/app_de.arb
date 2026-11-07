@@ -519,6 +519,14 @@
   "@paceBoxTotal": {
     "description": "Pace box: legend line of the whole course over all laps, followed by e.g. '1 460 / 3 000 m'"
   },
+  "paceBoxCourseSegment": "{course} · {segment}",
+  "@paceBoxCourseSegment": {
+    "description": "Pace box: legend line of the current section in a workout with several courses: the name of the current course, then its zone or 'frei', e.g. '2 km Intervall · Tempo'",
+    "placeholders": {
+      "course": {"type": "String"},
+      "segment": {"type": "String"}
+    }
+  },
   "paceBoxLapOf": "Runde {lap} / {laps}",
   "@paceBoxLapOf": {
     "description": "Pace box: legend line of the lap track with the current lap and the planned number of laps, e.g. 'Runde 2 / 3'",

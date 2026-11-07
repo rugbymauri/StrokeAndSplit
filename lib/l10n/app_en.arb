@@ -101,6 +101,7 @@
   "courseRest": "{rest} to go",
   "courseInZoneShare": "Zone {percent} %",
   "paceBoxTotal": "Total",
+  "paceBoxCourseSegment": "{course} · {segment}",
   "paceBoxLapOf": "Lap {lap} / {laps}",
   "paceBoxGhost": "Ghost",
   "paceBoxGhostAhead": "{amount} ahead of you",

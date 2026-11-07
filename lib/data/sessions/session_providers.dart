@@ -94,6 +94,20 @@ class ActiveRecording {
 
   /// Whether the session waits for the first stroke (start-on-first-stroke, Design D1).
   bool get ready => sessionId == null;
+
+  /// The index in [SessionPlan.courses] of the course being rowed; null
+  /// without a plan (workout-course-chain, Design D6).
+  int? get courseIndex => switch ((plan, lap)) {
+    (final plan?, final lap?) => plan.courseAt(lap.segmentIndex),
+    _ => null,
+  };
+
+  /// The name of the course being rowed, only when the plan has several.
+  String? get courseName => switch ((plan, courseIndex)) {
+    (final plan?, final index?) when plan.courses.length > 1 =>
+      plan.courses[index].name,
+    _ => null,
+  };
 }
 
 /// A session that ended by itself after its last lap, until the live
