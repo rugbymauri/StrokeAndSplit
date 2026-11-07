@@ -7,25 +7,41 @@
 ## Requirements
 
 ### Requirement: Laufende Messwerte bereitstellen
-Die App SHALL aus den Statusdaten des PM5 laufend folgende Messwerte bereitstellen: verstrichene Zeit, Distanz, aktuelle Pace pro 500 m, Leistung in Watt, Schlagzahl, Herzfrequenz (falls vorhanden) und Kalorien.
+Die App SHALL aus den Statusdaten des Rudergeräts (PM5 oder FTMS) laufend folgende Messwerte bereitstellen: verstrichene Zeit, Distanz, aktuelle Pace pro 500 m, Leistung in Watt, Schlagzahl, Herzfrequenz (falls vorhanden, vom direkt verbundenen Gurt oder vom Rudergerät) und Kalorien. Liefert ein Gerät einen Wert nicht, MUST er als „nicht vorhanden“ gekennzeichnet sein.
 
 #### Scenario: Rudern mit verbundenem PM5
 - **WHEN** der Nutzer rudert und der PM5 Statusdaten sendet
 - **THEN** stehen die Messwerte innerhalb einer Sekunde nach Eintreffen der Daten zur Verfügung
 
+#### Scenario: Rudern mit verbundenem FTMS-Rudergerät
+- **WHEN** der Nutzer rudert und das FTMS-Rudergerät Rudern-Daten sendet
+- **THEN** stehen die Messwerte innerhalb einer Sekunde nach Eintreffen der Daten zur Verfügung
+
 #### Scenario: Kein Herzfrequenzgurt
-- **WHEN** der PM5 keine Herzfrequenz liefert
+- **WHEN** weder das Rudergerät noch ein direkt verbundener Gurt eine Herzfrequenz liefert
 - **THEN** ist die Herzfrequenz als „nicht vorhanden“ gekennzeichnet statt als 0 oder 255
 
+#### Scenario: FTMS-Gerät ohne Kalorien
+- **WHEN** ein FTMS-Rudergerät keinen Energieverbrauch meldet
+- **THEN** sind die Kalorien als „nicht vorhanden“ gekennzeichnet und die übrigen Messwerte laufen weiter
+
 ### Requirement: Schlag-Ereignisse bereitstellen
-Die App SHALL pro Ruderschlag ein Ereignis bereitstellen, das mindestens Schlagnummer, Durchzugslänge, Durchzugszeit, Erholungszeit, Spitzenkraft und Durchschnittskraft enthält.
+Die App SHALL pro Ruderschlag ein Ereignis bereitstellen, das mindestens Schlagnummer, Zeit und Distanz enthält. Durchzugslänge, Durchzugszeit, Erholungszeit, Spitzenkraft und Durchschnittskraft SHALL enthalten sein, wenn das Gerät sie liefert. Fehlen sie, MUST sie als „nicht vorhanden“ gekennzeichnet sein und MUST NOT geschätzt werden.
 
 #### Scenario: Ein Schlag wird ausgeführt
 - **WHEN** der PM5 die Daten eines abgeschlossenen Schlags sendet
-- **THEN** wird genau ein Schlag-Ereignis mit fortlaufender Schlagnummer erzeugt
+- **THEN** wird genau ein Schlag-Ereignis mit fortlaufender Schlagnummer und allen Schlagdetails erzeugt
+
+#### Scenario: Ein Schlag am FTMS-Rudergerät
+- **WHEN** der Schlagzähler eines FTMS-Rudergeräts um eins steigt
+- **THEN** wird genau ein Schlag-Ereignis mit dieser Schlagnummer erzeugt, dessen Durchzugs- und Kraftwerte als „nicht vorhanden“ gekennzeichnet sind
+
+#### Scenario: Verpasste Zählerstände
+- **WHEN** der Schlagzähler eines FTMS-Rudergeräts zwischen zwei Paketen von 40 auf 42 springt
+- **THEN** werden zwei Schlag-Ereignisse mit den Nummern 41 und 42 erzeugt
 
 ### Requirement: Workout-Zustand erkennen
-Die App SHALL den vom PM5 gemeldeten Workout-Typ und Workout-Zustand (z.B. wartet, rudert, Pause, beendet) bereitstellen und Zustandswechsel als Ereignis melden.
+Die App SHALL den vom PM5 gemeldeten Workout-Typ und Workout-Zustand (z.B. wartet, rudert, Pause, beendet) bereitstellen und Zustandswechsel als Ereignis melden. Bei FTMS-Rudergeräten MUST Workout-Typ und -Zustand als „unbekannt“ gekennzeichnet sein, weil der Standard sie nicht verlässlich liefert.
 
 #### Scenario: Workout am PM5 gestartet
 - **WHEN** der Nutzer am PM5 zu rudern beginnt
@@ -35,16 +51,117 @@ Die App SHALL den vom PM5 gemeldeten Workout-Typ und Workout-Zustand (z.B. warte
 - **WHEN** der Nutzer am PM5 ein neues Workout startet und Zeit und Distanz auf null fallen
 - **THEN** meldet die App einen Zustandswechsel, statt einen Rücksprung der Werte stillschweigend weiterzugeben
 
+#### Scenario: FTMS-Rudergerät
+- **WHEN** ein FTMS-Rudergerät die Datenquelle ist
+- **THEN** sind Workout-Typ und Workout-Zustand „unbekannt“
+
 ### Requirement: Einheitliche Daten über alle Quellen
-Messwerte und Ereignisse SHALL für alle Datenquellen (echter PM5, Simulator, Replay) dieselbe Form und Bedeutung haben, sodass Anzeige und Aufzeichnung die Quelle nicht unterscheiden müssen.
+Messwerte und Ereignisse SHALL für alle Datenquellen (echter PM5, FTMS-Rudergerät, Simulator, Replay) dieselbe Form und Bedeutung haben, sodass Anzeige, Aufzeichnung und Strecken die Quelle nicht unterscheiden müssen.
 
 #### Scenario: Replay einer aufgezeichneten Session
 - **WHEN** eine aufgezeichnete Session abgespielt wird
 - **THEN** entstehen dieselben Messwerte und Ereignisse wie bei der ursprünglichen Live-Session
 
+#### Scenario: Leistung des FTMS-Rudergeräts
+- **WHEN** ein FTMS-Rudergerät beim Rudern eine Pace von 2:00 pro 500 m und eine Leistung von 180 W meldet
+- **THEN** zeigt die App 180 Watt an, wie das Display des Geräts
+
+#### Scenario: FTMS-Rudergerät ohne Leistung
+- **WHEN** ein PM5 und ein FTMS-Rudergerät ohne Leistungsfeld dieselbe Pace von 2:00 pro 500 m melden
+- **THEN** zeigt die App für beide dieselbe Leistung in Watt an
+
 ### Requirement: Fehlerhafte Daten tolerieren
-Unvollständige oder unbekannte Datenpakete vom PM5 MUST NOT zum Absturz führen. Sie SHALL verworfen und für die Fehlersuche protokolliert werden.
+Unvollständige oder unbekannte Datenpakete vom Rudergerät MUST NOT zum Absturz führen. Sie SHALL verworfen und für die Fehlersuche protokolliert werden.
 
 #### Scenario: Unbekanntes Paket
 - **WHEN** ein Datenpaket mit unerwarteter Länge oder unbekanntem Typ eintrifft
 - **THEN** wird es ignoriert, protokolliert, und die übrigen Messwerte laufen weiter
+
+#### Scenario: FTMS-Paket kürzer als angekündigt
+- **WHEN** ein FTMS-Paket laut seinen Flags mehr Felder enthalten müsste, als Bytes vorhanden sind
+- **THEN** wird es verworfen und protokolliert, und die übrigen Messwerte laufen weiter
+
+### Requirement: Zeit bei FTMS selbst messen
+Bei FTMS-Rudergeräten SHALL die App die verstrichene Zeit selbst aus dem Eintreffen der Daten messen, unabhängig davon, ob das Gerät eine Zeit meldet. Die Zeit MUST nur laufen, solange gerudert wird, und MUST stehen bleiben, wenn der Nutzer aufhört, so wie am PM5.
+
+#### Scenario: Gerät ohne Zeitangabe
+- **WHEN** ein FTMS-Rudergerät keine verstrichene Zeit meldet und der Nutzer 2 Minuten rudert
+- **THEN** zeigt die App etwa 2:00 als verstrichene Zeit
+
+#### Scenario: Pause am FTMS-Rudergerät
+- **WHEN** der Nutzer aufhört zu rudern und weder Distanz noch Schlagzähler mehrere Sekunden lang steigen
+- **THEN** bleibt die verstrichene Zeit stehen und läuft weiter, sobald wieder gerudert wird
+
+### Requirement: Reset bei FTMS erkennen
+Fällt bei einem FTMS-Rudergerät die Distanz oder der Schlagzähler zurück, SHALL die App das als Reset am Gerät melden, so wie den Reset eines Workouts am PM5.
+
+#### Scenario: Gerät setzt die Distanz zurück
+- **WHEN** ein FTMS-Rudergerät bei 1500 m steht und das nächste Paket 0 m meldet
+- **THEN** meldet die App einen Reset, statt einen Rücksprung der Werte stillschweigend weiterzugeben
+
+### Requirement: Unplausible FTMS-Werte verwerfen
+Die App SHALL einzelne Werte eines FTMS-Rudergeräts als „nicht vorhanden“ behandeln, wenn sie ausserhalb plausibler Grenzen für das Rudern liegen oder 0 als Platzhalter für „kein Wert“ verwendet wird. Die übrigen Werte desselben Pakets MUST weiter verwendet werden.
+
+#### Scenario: Pace 0
+- **WHEN** ein FTMS-Rudergerät eine Pace von 0:00 pro 500 m meldet
+- **THEN** ist die Pace „nicht vorhanden“ und Distanz und Schlagzahl werden weiter angezeigt
+
+#### Scenario: Herzfrequenz 0
+- **WHEN** ein FTMS-Rudergerät eine Herzfrequenz von 0 meldet
+- **THEN** ist die Herzfrequenz „nicht vorhanden“
+
+#### Scenario: Unmögliche Schlagzahl
+- **WHEN** ein FTMS-Rudergerät eine Schlagzahl von 120 pro Minute meldet
+- **THEN** ist die Schlagzahl „nicht vorhanden“
+
+### Requirement: Kraftkurve pro Schlag
+Liefert die Quelle eine Kraftkurve, SHALL die App nach dem Durchzug jedes Schlags dessen vollständige Kurve als Folge von Kraftwerten in Newton bereitstellen, zugeordnet zur Schlagnummer. Unvollständige Kurven, etwa nach einem verlorenen Paket, MUST verworfen werden, statt eine verfälschte Kurve zu liefern.
+
+#### Scenario: Vollständiger Schlag
+- **WHEN** der PM5 nach dem Durchzug eines Schlags alle Kurvenpakete dieses Schlags sendet
+- **THEN** stellt die App genau eine Kurve für diesen Schlag bereit, deren Maximum der Spitzenkraft des Schlags entspricht
+
+#### Scenario: Schlaglänge zur Kurve
+- **WHEN** der PM5 vor der Kurve eines Schlags dessen Durchzugslänge meldet
+- **THEN** trägt die Kurve dieses Schlags dieselbe Durchzugslänge in Metern; fehlt sie oder ist sie 0, ist sie als nicht vorhanden gekennzeichnet
+
+#### Scenario: Paket verloren
+- **WHEN** ein Kurvenpaket eines Schlags fehlt
+- **THEN** stellt die App für diesen Schlag keine Kurve bereit, und der nächste Schlag wird wieder normal ausgewertet
+
+### Requirement: Herzfrequenz nach Vorrang wählen
+Die App SHALL als Herzfrequenz den Wert des direkt verbundenen Gurts verwenden, solange dessen letzter Wert höchstens 3 Sekunden alt ist. Sonst MUST sie den vom Rudergerät (PM5 oder FTMS) gemeldeten Wert verwenden und ohne beides die Herzfrequenz als „nicht vorhanden“ kennzeichnen. Die Regel MUST für Live, Aufzeichnung, Import und Replay gleich gelten und sich auf die Empfangszeit der Daten beziehen.
+
+#### Scenario: Gurt direkt und am PM5
+- **WHEN** der direkt verbundene Gurt 142 meldet und der PM5 gleichzeitig 140
+- **THEN** ist die Herzfrequenz 142
+
+#### Scenario: Gurt direkt und FTMS-Rudergerät mit Puls
+- **WHEN** der direkt verbundene Gurt 142 meldet und das FTMS-Rudergerät gleichzeitig 138
+- **THEN** ist die Herzfrequenz 142
+
+#### Scenario: Gurt fällt aus, Rudergerät liefert weiter
+- **WHEN** der direkt verbundene Gurt seit mehr als 3 Sekunden nichts gesendet hat und das Rudergerät 140 meldet
+- **THEN** ist die Herzfrequenz 140
+
+#### Scenario: Gurt fällt aus, Rudergerät ohne Puls
+- **WHEN** der direkt verbundene Gurt seit mehr als 3 Sekunden nichts gesendet hat und das Rudergerät keinen Puls meldet
+- **THEN** ist die Herzfrequenz „nicht vorhanden“
+
+### Requirement: RR-Intervalle bereitstellen
+Sendet der direkt verbundene Gurt RR-Intervalle (Abstand zwischen zwei Herzschlägen), SHALL die App jedes Intervall in Millisekunden mit seinem Empfangszeitpunkt bereitstellen. Ohne RR-Intervalle vom Gurt MUST NOT ein Intervall erfunden oder aus dem Puls abgeleitet werden.
+
+#### Scenario: Gurt mit RR-Intervallen
+- **WHEN** der Gurt in einer Messung zwei RR-Intervalle von 812 ms und 790 ms sendet
+- **THEN** stellt die App beide Intervalle in dieser Reihenfolge bereit
+
+#### Scenario: Puls nur über das Rudergerät
+- **WHEN** der Puls nur vom Rudergerät kommt, ob PM5 oder FTMS
+- **THEN** stellt die App keine RR-Intervalle bereit
+
+### Requirement: Gurt-Messungen tolerant lesen
+Die App SHALL Puls-Messungen des Gurts in beiden Formaten des Standards (8 und 16 Bit) lesen, auch mit oder ohne Energie- und RR-Angaben. Unvollständige Messungen MUST verworfen und protokolliert werden, ohne die übrigen Messwerte zu beeinflussen.
+
+#### Scenario: Abgeschnittene Messung
+- **WHEN** eine Gurt-Messung kürzer ist, als ihre Flags angeben
+- **THEN** wird sie ignoriert und protokolliert, und der Puls vom Rudergerät sowie alle Rudermesswerte laufen weiter
