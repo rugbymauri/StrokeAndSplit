@@ -1,3 +1,4 @@
+import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_layout.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
 import 'package:strokesplit/data/db/database.dart';
@@ -150,6 +151,26 @@ void main() {
       [for (final z in await zones.all()) z.name],
       ['Ausdauer', 'Sprint', 'Vier Minuten'],
     );
+  });
+
+  test('places an imported segment with only a level as a zone', () async {
+    final placed = await zones.placeZones(
+      'Seerunde',
+      const CourseDefinition(
+        axis: CourseAxis.distance,
+        length: 1000,
+        segments: [
+          CourseSegment(length: 500),
+          CourseSegment(length: 500, resistanceLevel: 12, zoneName: 'Kraft'),
+        ],
+      ),
+    );
+
+    expect(placed.segments.first.zoneId, isNull);
+    final kraft = placed.segments.last;
+    expect(kraft.zoneId, isNotNull);
+    expect(kraft.resistanceLevel, 12);
+    expect((await zones.all()).single.name, 'Kraft');
   });
 
   test('stores a zone with only a resistance level', () async {

@@ -11,7 +11,7 @@ Setzt `resistance-control` in `main` voraus (Stufe in Zone und Segment). Neue od
 
 ## 2. Zone nur mit Stufe beim Rudern
 
-- [ ] 2.1 `CourseSegment.isFree` zählt die Stufe, neu `hasBand` (D1); `lap_tracker._count` und `upcomingZone` fragen `hasBand` (D3); Kommentar an `resistanceLevel` angepasst. Verifikation:
+- [x] 2.1 `CourseSegment.isFree` zählt die Stufe, neu `hasBand` (D1); `lap_tracker._count` und `upcomingZone` fragen `hasBand` (D3); Kommentar an `resistanceLevel` angepasst. Verifikation:
   - `LapTracker`-Test: Ein Segment nur mit Stufe ergibt weder für das Segment noch für die Runde einen Anteil in der Zone.
   - `upcomingZone`-Test: Vor einem Segment nur mit Stufe kommt kein Hinweis.
   - `ProgressFrameModel`-Test: Das Segment nur mit Stufe ist eine Zone im Rahmen.

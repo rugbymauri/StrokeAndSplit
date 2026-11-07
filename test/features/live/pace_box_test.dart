@@ -190,6 +190,23 @@ void main() {
     expect(find.byIcon(Icons.arrow_upward), findsNothing);
   });
 
+  testWidgets('names a zone with only a level without a zone status', (
+    tester,
+  ) async {
+    const kraft = CourseSegment(
+      length: 600,
+      resistanceLevel: 12,
+      zoneId: 4,
+      zoneName: 'Kraft',
+    );
+
+    await _pump(tester, _at(460, segment: kraft, pace: BandStatus.none));
+
+    _expectLine(const Key('pace-box-segment'), 'Kraft', 'noch 340 m');
+    expect(find.byKey(const Key('pace-box-status')), findsNothing);
+    expect(find.byIcon(Icons.check_circle), findsNothing);
+  });
+
   testWidgets(
     'tints the box in the zone colour and keeps it plain in a free gap',
     (tester) async {

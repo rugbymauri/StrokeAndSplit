@@ -28,7 +28,9 @@ class CourseSegment {
   final int? spmMax;
 
   /// Resistance level of the placed zone; null rows on the base level
-  /// (Change resistance-control). It is no band, so it leaves [isFree] alone.
+  /// (Change resistance-control). It makes a zone without a band, so a
+  /// segment with only a level is not free but has nothing to measure
+  /// (Change zone-level-only, Design D1).
   final int? resistanceLevel;
 
   /// The placed zone; null for a free gap and in rowed versions from before
@@ -41,8 +43,11 @@ class CourseSegment {
   bool get hasPaceBand => paceFastCs != null && paceSlowCs != null;
   bool get hasSpmBand => spmMin != null && spmMax != null;
 
-  /// A segment without any band is rowed freely.
-  bool get isFree => !hasPaceBand && !hasSpmBand;
+  /// Whether the segment has a band to measure the rowing against.
+  bool get hasBand => hasPaceBand || hasSpmBand;
+
+  /// A segment without any band and without a level is rowed freely.
+  bool get isFree => !hasBand && resistanceLevel == null;
 
   CourseSegment withLength(int length) => CourseSegment(
     length: length,

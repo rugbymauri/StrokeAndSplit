@@ -209,4 +209,31 @@ void main() {
     await tester.tap(_segment(1));
     expect(tapped, 1);
   });
+
+  testWidgets('a zone with only a level is blue with its name', (tester) async {
+    await _pump(
+      tester,
+      CourseStrip(
+        definition: _course(const [
+          CourseSegment(length: 500),
+          CourseSegment(
+            length: 500,
+            resistanceLevel: 12,
+            zoneId: 4,
+            zoneName: 'Kraft',
+          ),
+        ]),
+        height: CourseStrip.namedHeight,
+        showNames: true,
+      ),
+    );
+
+    expect(
+      [
+        for (final i in [0, 1]) _colorOf(tester, i),
+      ],
+      [AppColors.line, AppColors.zoneIn],
+    );
+    expect(find.text('Kraft'), findsOneWidget);
+  });
 }
