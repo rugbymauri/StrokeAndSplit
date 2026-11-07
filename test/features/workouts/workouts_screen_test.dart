@@ -20,6 +20,8 @@ void main() {
     });
     await setup.pump(tester);
 
+    expect(find.text('Workout rudern'), findsOneWidget);
+    expect(find.text('Workouts'), findsOneWidget);
     expect(find.text('Seerunde x3'), findsOneWidget);
     expect(find.text('Seerunde · 1000 m · 3 Runden'), findsOneWidget);
     expect(find.text('Seerunde · 1000 m · offen'), findsOneWidget);
@@ -33,10 +35,10 @@ void main() {
       final setup = WorkoutSetup();
       await setup.addCourse(tester, 'Seerunde');
       await setup.pump(tester);
-      expect(find.text('Noch keine Vorlagen angelegt.'), findsOneWidget);
+      expect(find.text('Noch keine Workouts angelegt.'), findsOneWidget);
 
       Future<void> create(String name, {bool open = false}) async {
-        await tester.tap(find.text('Vorlage anlegen'));
+        await tester.tap(find.text('Workout anlegen'));
         await tester.pumpAndSettle();
         await tester.enterText(find.byKey(const Key('workout-name')), name);
         await tester.tap(find.byKey(const Key('workout-course')));
@@ -65,7 +67,7 @@ void main() {
     await setup.addCourse(tester, 'Seerunde');
     await setup.pump(tester);
 
-    await tester.tap(find.text('Vorlage anlegen'));
+    await tester.tap(find.text('Workout anlegen'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Speichern'));
     await setup.settle(tester);
@@ -107,7 +109,7 @@ void main() {
 
     await tester.tap(find.text('Seerunde x3'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Vorlage bearbeiten'));
+    await tester.tap(find.byTooltip('Workout bearbeiten'));
     await tester.pumpAndSettle();
     await tester.tap(find.bySemanticsLabel('1 Runde mehr'));
     await tester.pump();
@@ -135,7 +137,7 @@ void main() {
     // No card shows zones, places or "Starten".
     expect(find.text('Tempo 2:05–2:10 · 20–22 spm'), findsNothing);
     expect(find.text('Starten'), findsNothing);
-    expect(find.byTooltip('Vorlage bearbeiten'), findsNothing);
+    expect(find.byTooltip('Workout bearbeiten'), findsNothing);
     expect(
       find.descendant(
         of: find.byKey(Key('workout-$x3')),
@@ -244,10 +246,10 @@ void main() {
     await setup.pump(tester);
 
     expect(
-      find.text('Für eine Vorlage brauchst du zuerst eine Strecke.'),
+      find.text('Für ein Workout brauchst du zuerst eine Strecke.'),
       findsOneWidget,
     );
-    await tester.tap(find.text('Vorlage anlegen'));
+    await tester.tap(find.text('Workout anlegen'));
     await tester.pumpAndSettle();
     expect(find.text('Zuerst eine Strecke anlegen'), findsOneWidget);
     await tester.tap(
@@ -402,9 +404,9 @@ void main() {
         );
         await tester.tap(find.byTooltip('Speichern'));
         await setup.settle(tester);
-        await tester.tap(find.text('Vorlagen'));
+        await tester.tap(find.text('Workouts'));
         await setup.settle(tester);
-        await tester.tap(find.text('Vorlage anlegen'));
+        await tester.tap(find.text('Workout anlegen'));
         await setup.settle(tester);
         await tester.tap(find.byKey(const Key('workout-course')));
         await setup.settle(tester);

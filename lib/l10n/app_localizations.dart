@@ -128,13 +128,13 @@ abstract class AppLocalizations {
   /// **'Gegen dich selbst rudern'**
   String get startTagline;
 
-  /// Start screen: button that opens the templates to pick one
+  /// Start screen: button that opens the workouts to pick one
   ///
   /// In de, this message translates to:
   /// **'Rudern'**
   String get startRow;
 
-  /// Start screen: button that starts rowing without a template
+  /// Start screen: button that starts rowing without a workout
   ///
   /// In de, this message translates to:
   /// **'Frei rudern'**
@@ -613,19 +613,19 @@ abstract class AppLocalizations {
   /// **'Ø Pace'**
   String get metricAveragePace;
 
-  /// Live display on a template: label of the time rowed in the current lap
+  /// Live display on a workout: label of the time rowed in the current lap
   ///
   /// In de, this message translates to:
   /// **'Runde'**
   String get metricLapTime;
 
-  /// Live display in landscape on a template: short button that ends the recorded session
+  /// Live display in landscape on a workout: short button that ends the recorded session
   ///
   /// In de, this message translates to:
   /// **'Beenden'**
   String get liveStopShort;
 
-  /// Live display on a template: notice while the session waits for the first stroke to start
+  /// Live display on a workout: notice while the session waits for the first stroke to start
   ///
   /// In de, this message translates to:
   /// **'Bereit – startet mit dem ersten Schlag'**
@@ -643,7 +643,7 @@ abstract class AppLocalizations {
   /// **'Kraftkurve'**
   String get liveForceCurve;
 
-  /// Live display on a template: short label of the narrow strip with the force curve
+  /// Live display on a workout: short label of the narrow strip with the force curve
   ///
   /// In de, this message translates to:
   /// **'Kraft'**
@@ -715,7 +715,7 @@ abstract class AppLocalizations {
   /// **'Runde {lap} / {laps}'**
   String paceBoxLapOf(int lap, int laps);
 
-  /// Pace box: legend line with the gap to the ghost of the template, i.e. its best session rowed again for comparison; followed by e.g. '7.6 s vor dir'
+  /// Pace box: legend line with the gap to the ghost of the workout, i.e. its best session rowed again for comparison; followed by e.g. '7.6 s vor dir'
   ///
   /// In de, this message translates to:
   /// **'Ghost'**
@@ -1075,10 +1075,10 @@ abstract class AppLocalizations {
   /// **'{zone} · Platz {place}'**
   String summaryZonePlace(String zone, int place);
 
-  /// Summary: screen reader label of the mark of a session on place 1 to 3 of its template's ranking
+  /// Summary: screen reader label of the mark of a session on place 1 to 3 of its workout's ranking
   ///
   /// In de, this message translates to:
-  /// **'Platz {place} der Vorlage'**
+  /// **'Platz {place} des Workouts'**
   String summarySessionPlace(int place);
 
   /// Closes the summary of a session
@@ -1171,112 +1171,112 @@ abstract class AppLocalizations {
   /// **'Name'**
   String get fieldName;
 
-  /// Number of laps of a template
+  /// Number of laps of a workout
   ///
   /// In de, this message translates to:
   /// **'{laps, plural, =1{1 Runde} other{{laps} Runden}}'**
   String lapsCount(int laps);
 
-  /// A template with an open number of laps
+  /// A workout with an open number of laps
   ///
   /// In de, this message translates to:
   /// **'offen'**
   String get lapsOpen;
 
-  /// Templates: title
+  /// Workouts: title
   ///
   /// In de, this message translates to:
-  /// **'Vorlage rudern'**
+  /// **'Workout rudern'**
   String get workoutsTitle;
 
-  /// Templates: tab with the templates
+  /// Workouts: tab with the workouts
   ///
   /// In de, this message translates to:
-  /// **'Vorlagen'**
+  /// **'Workouts'**
   String get tabWorkouts;
 
-  /// Templates: tab with the courses
+  /// Workouts: tab with the courses
   ///
   /// In de, this message translates to:
   /// **'Strecken'**
   String get tabCourses;
 
-  /// Templates: tab with the zones
+  /// Workouts: tab with the zones
   ///
   /// In de, this message translates to:
   /// **'Zonen'**
   String get tabZones;
 
-  /// Templates: button that creates a template
+  /// Workouts: button that creates a workout
   ///
   /// In de, this message translates to:
-  /// **'Vorlage anlegen'**
+  /// **'Workout anlegen'**
   String get workoutCreate;
 
-  /// Template screen: button that starts rowing the template
+  /// Workout screen: button that starts rowing the workout
   ///
   /// In de, this message translates to:
   /// **'Starten'**
   String get workoutStart;
 
-  /// Template screen: switch above Start that turns the ghost on or off for the session started from there
+  /// Workout screen: switch above Start that turns the ghost on or off for the session started from there
   ///
   /// In de, this message translates to:
   /// **'Gegen den Ghost rudern'**
   String get workoutGhost;
 
-  /// Templates: heading above places 1–3 of the template's ranking in the opened template
+  /// Workouts: heading above places 1–3 of the workout's ranking in the opened workout
   ///
   /// In de, this message translates to:
   /// **'Bestleistungen'**
   String get workoutPodiumTitle;
 
-  /// Templates: hint in the opened template when it was never rowed completely on a rower
+  /// Workouts: hint in the opened workout when it was never rowed completely on a rower
   ///
   /// In de, this message translates to:
   /// **'Noch keine Bestzeit. Es zählen Sessions mit allen Runden an einem Rudergerät.'**
   String get workoutPodiumEmpty;
 
-  /// Templates: hint in the opened template with an open number of laps, which has no ranking
+  /// Workouts: hint in the opened workout with an open number of laps, which has no ranking
   ///
   /// In de, this message translates to:
   /// **'Bei offener Rundenzahl gibt es keine Bestzeit.'**
   String get workoutPodiumOpenLaps;
 
-  /// Templates: pace per 500 m of a place, pauses left out
+  /// Workouts: pace per 500 m of a place, pauses left out
   ///
   /// In de, this message translates to:
   /// **'{pace} /500 m'**
   String workoutPodiumPace(String pace);
 
-  /// Templates: there is no template
+  /// Workouts: there is no workout
   ///
   /// In de, this message translates to:
-  /// **'Noch keine Vorlagen angelegt.'**
+  /// **'Noch keine Workouts angelegt.'**
   String get workoutsEmpty;
 
-  /// Templates: loading failed; error is the technical error
+  /// Workouts: loading failed; error is the technical error
   ///
   /// In de, this message translates to:
-  /// **'Vorlagen konnten nicht geladen werden: {error}'**
+  /// **'Workouts konnten nicht geladen werden: {error}'**
   String workoutsLoadFailed(String error);
 
-  /// Templates: dialog title when there is no course
+  /// Workouts: dialog title when there is no course
   ///
   /// In de, this message translates to:
   /// **'Zuerst eine Strecke anlegen'**
   String get workoutNeedsCourseTitle;
 
-  /// Templates: dialog text when there is no course
+  /// Workouts: dialog text when there is no course
   ///
   /// In de, this message translates to:
-  /// **'Eine Vorlage rudert eine Strecke. Lege dafür zuerst eine Strecke an.'**
+  /// **'Ein Workout rudert eine Strecke. Lege dafür zuerst eine Strecke an.'**
   String get workoutNeedsCourseBody;
 
-  /// Templates: shown instead of the list when there is no course
+  /// Workouts: shown instead of the list when there is no course
   ///
   /// In de, this message translates to:
-  /// **'Für eine Vorlage brauchst du zuerst eine Strecke.'**
+  /// **'Für ein Workout brauchst du zuerst eine Strecke.'**
   String get workoutNeedsCourse;
 
   /// Button that creates a course
@@ -1285,79 +1285,79 @@ abstract class AppLocalizations {
   /// **'Strecke anlegen'**
   String get courseCreate;
 
-  /// Templates: title of the delete confirmation
+  /// Workouts: title of the delete confirmation
   ///
   /// In de, this message translates to:
-  /// **'Vorlage löschen?'**
+  /// **'Workout löschen?'**
   String get workoutDeleteTitle;
 
-  /// Templates: delete confirmation; name is the template
+  /// Workouts: delete confirmation; name is the workout
   ///
   /// In de, this message translates to:
   /// **'„{name}“ wird gelöscht. Damit geruderte Sessions bleiben erhalten.'**
   String workoutDeleteBody(String name);
 
-  /// Template editor: title for a new template
+  /// Workout editor: title for a new workout
   ///
   /// In de, this message translates to:
-  /// **'Neue Vorlage'**
+  /// **'Neues Workout'**
   String get workoutNew;
 
-  /// Template editor: title for an existing template
+  /// Workout editor: title for an existing workout
   ///
   /// In de, this message translates to:
-  /// **'Vorlage bearbeiten'**
+  /// **'Workout bearbeiten'**
   String get workoutEdit;
 
-  /// Template editor: the template has no name
+  /// Workout editor: the workout has no name
   ///
   /// In de, this message translates to:
   /// **'Der Name fehlt.'**
   String get workoutNameMissing;
 
-  /// Template editor: no course chosen
+  /// Workout editor: no course chosen
   ///
   /// In de, this message translates to:
   /// **'Wähle eine Strecke.'**
   String get workoutCourseMissing;
 
-  /// Template editor: label of the course field
+  /// Workout editor: label of the course field
   ///
   /// In de, this message translates to:
   /// **'Strecke'**
   String get workoutCourse;
 
-  /// Template editor: choice for a fixed number of laps
+  /// Workout editor: choice for a fixed number of laps
   ///
   /// In de, this message translates to:
   /// **'Feste Anzahl'**
   String get workoutFixedLaps;
 
-  /// Template editor: choice for an open number of laps, rowed until the session ends
+  /// Workout editor: choice for an open number of laps, rowed until the session ends
   ///
   /// In de, this message translates to:
   /// **'Offen bis Stopp'**
   String get workoutOpenLaps;
 
-  /// Template editor: label of the number of laps
+  /// Workout editor: label of the number of laps
   ///
   /// In de, this message translates to:
   /// **'Runden'**
   String get workoutLaps;
 
-  /// Template editor: unit after the number of laps, without the number
+  /// Workout editor: unit after the number of laps, without the number
   ///
   /// In de, this message translates to:
   /// **'{laps, plural, =1{Runde} other{Runden}}'**
   String workoutLapsUnit(int laps);
 
-  /// Template editor: label of the line with the total length of all laps
+  /// Workout editor: label of the line with the total length of all laps
   ///
   /// In de, this message translates to:
   /// **'Ergibt'**
   String get workoutResult;
 
-  /// Template editor: after the length of one lap when the number of laps is open
+  /// Workout editor: after the length of one lap when the number of laps is open
   ///
   /// In de, this message translates to:
   /// **'pro Runde, bis du die Session beendest'**
@@ -1393,10 +1393,10 @@ abstract class AppLocalizations {
   /// **'„{name}“ verschwindet aus der Liste. Bereits geruderte Sessions behalten ihre Runden.'**
   String courseDeleteBody(String name);
 
-  /// Courses: templates deleted with the course; templates is a list of quoted names
+  /// Courses: workouts deleted with the course; workouts is a list of quoted names
   ///
   /// In de, this message translates to:
-  /// **'Diese Vorlagen verwenden die Strecke und werden mitgelöscht: {workouts}.'**
+  /// **'Diese Workouts verwenden die Strecke und werden mitgelöscht: {workouts}.'**
   String courseDeleteWorkouts(String workouts);
 
   /// Course editor: title for a new course
@@ -1603,7 +1603,7 @@ abstract class AppLocalizations {
   /// **'Stufe'**
   String get zoneResistanceLevel;
 
-  /// Zone list, course and template: resistance level of a zone after its bands
+  /// Zone list, course and workout: resistance level of a zone after its bands
   ///
   /// In de, this message translates to:
   /// **'Stufe {level}'**
@@ -1795,13 +1795,13 @@ abstract class AppLocalizations {
   /// **'{count}× gerudert. Änderst du Länge oder Zonen, entsteht eine neue Version. Alte Rundenzeiten bleiben vergleichbar.'**
   String courseVersionHint(int count);
 
-  /// Screen reader label of the ghost symbol (a small violet rhombus) in the pace box legend and the template choice; the ghost is the best result rowed again for comparison
+  /// Screen reader label of the ghost symbol (a small violet rhombus) in the pace box legend and the workout choice; the ghost is the best result rowed again for comparison
   ///
   /// In de, this message translates to:
   /// **'Ghost'**
   String get ghostSymbolLabel;
 
-  /// Title of a session without a template as a workout in Health Connect (and Google Fit)
+  /// Title of a session without a workout as a workout in Health Connect (and Google Fit)
   ///
   /// In de, this message translates to:
   /// **'Freies Rudern'**
@@ -1963,7 +1963,7 @@ abstract class AppLocalizations {
   /// **'Erteilen'**
   String get healthGrantShort;
 
-  /// Course detail: button that opens the start screen to row the course without a template
+  /// Course detail: button that opens the start screen to row the course without a workout
   ///
   /// In de, this message translates to:
   /// **'Rudern'**
@@ -2005,13 +2005,13 @@ abstract class AppLocalizations {
   /// **'{minutes, plural, =1{1 Minute} other{{minutes} Minuten}}'**
   String stepMinutes(int minutes);
 
-  /// Planned total rowing time of a session without a template, after the course name, e.g. 'Seerunde · 30 min'
+  /// Planned total rowing time of a session without a workout, after the course name, e.g. 'Seerunde · 30 min'
   ///
   /// In de, this message translates to:
   /// **'{minutes} min'**
   String planMinutes(int minutes);
 
-  /// Planned length of a session without a template that runs until the rower ends it, after the course name, e.g. 'Seerunde · offen'
+  /// Planned length of a session without a workout that runs until the rower ends it, after the course name, e.g. 'Seerunde · offen'
   ///
   /// In de, this message translates to:
   /// **'offen'**
