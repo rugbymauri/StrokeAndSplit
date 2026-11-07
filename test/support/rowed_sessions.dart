@@ -18,8 +18,9 @@ class RowedLap {
   final bool complete;
 }
 
-/// Stores a finished session on [courseVersionId], or on the course of
-/// [workout], with [laps] one after the other from the start.
+/// Stores a finished session on [courseVersionId], or on the courses of
+/// [workout], with [laps] one after the other from the start; a lap of a
+/// workout with several courses has the segments of all of them.
 Future<int> storeRowedSession(
   AppDatabase db, {
   int? courseVersionId,
@@ -41,7 +42,9 @@ Future<int> storeRowedSession(
       plannedLaps: Value(workout == null ? plannedLaps : workout.laps),
       plannedDurationMs: Value(plannedDuration?.inMilliseconds),
     ),
-    courseVersionIds: [courseVersionId ?? workout!.chain.versionId],
+    courseVersionIds: courseVersionId != null
+        ? [courseVersionId]
+        : [for (final c in workout!.courses) c.versionId],
   );
   var wallMs = 0;
   var distanceDm = 0;
