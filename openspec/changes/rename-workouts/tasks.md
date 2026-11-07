@@ -14,7 +14,7 @@ Texte nur über `lib/l10n/app_de.arb` und `lib/l10n/app_en.arb` mit `@`-Beschrei
 ## 3. Texte
 
 - [x] 3.1 Deutsche Texte nach D1: jede Erwähnung von „Vorlage“ in `app_de.arb`, auch in zusammengesetzten Wörtern, mit passenden Artikeln und Pronomen. Verifikation: `grep -i vorlage lib/l10n/app_de.arb` ist leer; die Widget-Tests finden „Workout rudern“, den Tab „Workouts“, „Workout anlegen“ und „Workout löschen?“.
-- [ ] 3.2 Englische Texte nach D1 und D2: „template“ → „workout“, Health-Connect-Texte → „exercise sessions“. Verifikation: `grep -i template lib/l10n/app_en.arb` findet nur `@`-Beschreibungen, die selbst schon angepasst sind (also keine); der englische Widget-Test findet „Workouts“.
+- [x] 3.2 Englische Texte nach D1 und D2: „template“ → „workout“, Health-Connect-Texte → „exercise sessions“. Verifikation: `grep -i template lib/l10n/app_en.arb` findet nur `@`-Beschreibungen, die selbst schon angepasst sind (also keine); der englische Widget-Test findet „Workouts“.
 
 ## 4. Session-Dateien
 

@@ -18,7 +18,7 @@ Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests 
 ### `rename-workouts`
 
 - **Ziel**: „Vorlage“ heisst überall „Workout“: Texte (DE/EN), Code, Datenbank (Schema 11), Export, Specs und Doku.
-- **Branch**: Planung auf `docs/rename-workouts-proposal`, Umsetzung auf `feature/rename-workouts`, Stand 2026-11-07 4/9.
+- **Branch**: Planung auf `docs/rename-workouts-proposal`, Umsetzung auf `feature/rename-workouts`, Stand 2026-11-07 5/9.
 - **Entschieden** (Nutzer, 2026-11-07): Der neue Begriff ist „Workout“, und es wird alles umbenannt, nicht nur die Texte.
 - **Annahmen**, beim Review bestätigen:
   - Die englischen Health-Connect-Texte sprechen von „exercise sessions“, die Klasse `HealthWorkout` heisst `HealthExercise` (D2).

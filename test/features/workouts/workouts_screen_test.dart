@@ -86,7 +86,7 @@ void main() {
       locale: const Locale('en'),
     );
 
-    expect(find.text('New template'), findsOneWidget);
+    expect(find.text('New workout'), findsOneWidget);
     expect(find.text('Fixed number'), findsOneWidget);
     expect(find.text('Open until stop'), findsOneWidget);
     expect(find.text('laps'), findsOneWidget);
@@ -96,6 +96,17 @@ void main() {
 
     expect(find.text('The name is missing.'), findsOneWidget);
     expect(find.text('Choose a course.'), findsOneWidget);
+    await disposeWidgetsWithDatabase(tester);
+  });
+
+  testWidgets('lists the workouts in English', (tester) async {
+    final setup = WorkoutSetup();
+    await setup.addCourse(tester, 'Seerunde');
+    await setup.pump(tester, locale: const Locale('en'));
+
+    expect(find.text('Row a workout'), findsOneWidget);
+    expect(find.text('Workouts'), findsOneWidget);
+    expect(find.text('No workouts yet.'), findsOneWidget);
     await disposeWidgetsWithDatabase(tester);
   });
 
