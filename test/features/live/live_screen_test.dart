@@ -321,6 +321,114 @@ void main() {
     expect(find.textContaining('Puls'), findsNothing);
   });
 
+  // The level with its oar blades below the stroke rate card in landscape (live-zone-targets, Design D7).
+  group('resistance card in landscape', () {
+    setUpAll(loadAppFonts);
+
+    testWidgets(
+      'stands below the stroke rate card as wide as it and takes the level from the watts',
+      (tester) async {
+        final control = _Levels();
+        final harness = _Harness();
+        await harness.pump(
+          tester,
+          size: const Size(844, 390),
+          recording: _onCourse(),
+          source: _settable(control),
+        );
+        await harness.emit(tester, _tick(resistanceLevel: 6));
+
+        final stroke = tester.getRect(find.byType(StrokeRateCard));
+        final card = tester.getRect(find.byKey(const Key('resistance-card')));
+        expect(card.top, greaterThanOrEqualTo(stroke.bottom));
+        expect(card.top - stroke.bottom, lessThan(10));
+        expect(card.left, stroke.left);
+        expect(card.width, stroke.width);
+        expect(
+          tester
+              .widget<Text>(find.byKey(const Key('resistance-card-level')))
+              .data,
+          '6',
+        );
+        expect(find.byKey(const Key('metric-watts')), findsOneWidget);
+        expect(find.byKey(const Key('metric-resistance')), findsNothing);
+        expect(find.byKey(const Key('resistance-raise')), findsNothing);
+
+        await tester.tap(find.byKey(const Key('resistance-card-raise')));
+        await tester.pump();
+        expect(control.levels, [7]);
+        await harness.emit(tester, _tick(resistanceLevel: 7));
+        expect(
+          tester
+              .widget<Text>(find.byKey(const Key('resistance-card-level')))
+              .data,
+          '7',
+        );
+      },
+    );
+
+    testWidgets('leaves the height to the stroke rate card without a level', (
+      tester,
+    ) async {
+      final harness = _Harness();
+      await harness.pump(
+        tester,
+        size: const Size(844, 390),
+        recording: _onCourse(),
+      );
+      await harness.emit(tester, _tick());
+
+      expect(find.byKey(const Key('resistance-card')), findsNothing);
+      final stroke = tester.getRect(find.byType(StrokeRateCard));
+      final session = tester.getRect(find.byKey(const Key('metric-elapsed')));
+      // Gap and label of the tile, but no card of 72 between them.
+      expect(session.top - stroke.bottom, lessThan(40));
+    });
+
+    for (final size in const [Size(740, 360), Size(1200, 700)]) {
+      for (final curves in [true, false]) {
+        testWidgets(
+          'fits at ${size.width.toInt()} × ${size.height.toInt()}${curves ? ' with force curves' : ''}',
+          (tester) async {
+            final harness = _Harness();
+            await harness.pump(
+              tester,
+              size: size,
+              recording: _onCourse(),
+              // The PM5 fake has force curves; the FTMS rower none, but a level to set.
+              source: curves ? null : _settable(_Levels()),
+            );
+            await harness.emit(
+              tester,
+              _tick(heartRate: 151, calories: 1187, resistanceLevel: 15),
+            );
+            if (curves) {
+              for (final curve in _fixtureCurves().take(3)) {
+                await harness.emit(tester, curve);
+              }
+            }
+
+            // Overflows would be reported as exceptions and fail the test.
+            final view = find.byKey(const ValueKey(LiveLayout.landscape));
+            expect(view, findsOneWidget);
+            _expectLargestPace(tester, view, const Key('pace-box-pace'));
+            for (final key in [
+              'resistance-card',
+              'resistance-card-level',
+              'metric-spm',
+              'metric-elapsed',
+              'metric-watts',
+            ]) {
+              final rect = tester.getRect(find.byKey(Key(key)));
+              expect(rect.bottom, lessThanOrEqualTo(size.height), reason: key);
+              expect(rect.right, lessThanOrEqualTo(size.width), reason: key);
+            }
+          },
+        );
+      }
+    }
+  });
+
   group('resistance level', () {
     for (final workout in [false, true]) {
       testWidgets(
@@ -685,7 +793,11 @@ void main() {
             'metric-watts',
             'metric-hr',
             'metric-rr',
-            if (!curves) 'metric-resistance',
+            // In landscape the level has a card of its own below the stroke rate (live-zone-targets, Design D7).
+            if (!curves)
+              LiveLayout.of(size) == LiveLayout.landscape
+                  ? 'resistance-card-level'
+                  : 'metric-resistance',
           ]) {
             final rect = tester.getRect(find.byKey(Key(key)));
             expect(rect.bottom, lessThanOrEqualTo(size.height), reason: key);

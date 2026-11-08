@@ -16,6 +16,7 @@ import 'metric_tile.dart';
 import 'watts_tile.dart';
 import 'pace_box.dart';
 import 'progress_frame.dart';
+import 'resistance_card.dart';
 import 'stroke_rate_card.dart';
 import 'upcoming_zone.dart';
 
@@ -183,7 +184,7 @@ class CourseLiveView extends StatelessWidget {
         valueShareOfPace;
     final curve = forceCurves != null && inner.height >= 260;
     final valueSize = math.min(48.0, cap);
-    final tiles = _lapTiles(context, valueSize);
+    final tiles = _lapTiles(context, valueSize, showResistance: false);
     return Padding(
       key: const ValueKey(LiveLayout.landscape),
       padding: padding,
@@ -210,6 +211,8 @@ class CourseLiveView extends StatelessWidget {
                     ),
                   ),
                 ),
+                // The level with its oar blades right below the stroke rate, as wide as it (Design D7).
+                ResistanceCard(tick: tick, fontSize: valueSize),
                 // Below the stroke rate, as five tiles do not fit into the side column on a phone.
                 const SizedBox(height: 6),
                 SizedBox(
@@ -328,7 +331,11 @@ class CourseLiveView extends StatelessWidget {
   }
 
   /// Lap time, watts and heart rate (only with a monitor).
-  List<Widget> _lapTiles(BuildContext context, double fontSize) {
+  List<Widget> _lapTiles(
+    BuildContext context,
+    double fontSize, {
+    bool showResistance = true,
+  }) {
     final l10n = context.l10n;
     final heartRate = tick?.heartRate;
     return [
@@ -339,7 +346,12 @@ class CourseLiveView extends StatelessWidget {
         fontSize: fontSize,
         compact: true,
       ),
-      WattsTile(tick: tick, fontSize: fontSize, compact: true),
+      WattsTile(
+        tick: tick,
+        fontSize: fontSize,
+        compact: true,
+        showResistance: showResistance,
+      ),
       if (heartRate != null)
         MetricTile(
           label: l10n.metricHeartRate,
