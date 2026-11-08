@@ -9,7 +9,7 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow`, `rename-workouts` und `workout-course-chain` archiviert.
+Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow`, `rename-workouts` und `workout-course-chain` archiviert. Geplant: `live-zone-targets` (Zielwerte der Zone immer unter der Pace, Zonen im Fortschrittsrahmen in Härte-Farben, Karte „Stufe“ mit Ruderblatt-Tasten unter der Schlagzahl im Querformat) auf `feature/live-zone-targets`, 0/11.
 
 ## Überblick
 
