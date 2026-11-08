@@ -4,7 +4,7 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 ## 1. Starten ohne Speichern
 
-- [ ] 1.1 Knopf „Starten ohne Speichern“ nach D1 mit neuem Text `workoutStartUnsaved` (de „Starten ohne Speichern“, en „Start without saving“), Start nach D2 und D3. Verifikation in `workout_editor_screen_test.dart`:
+- [x] 1.1 Knopf „Starten ohne Speichern“ nach D1 mit neuem Text `workoutStartUnsaved` (de „Starten ohne Speichern“, en „Start without saving“), Start nach D2 und D3. Verifikation in `workout_editor_screen_test.dart`:
   - Neues Workout ohne Namen mit drei Strecken und 1 Runde: der Knopf öffnet den Live-Screen mit einem Plan aus diesen drei Strecken, `LapCount(1)` und ohne Workout; die Workout-Liste bleibt leer.
   - Ohne Strecke: kein Live-Screen, die Meldung zur fehlenden Strecke erscheint.
   - Bestehendes „Seerunde x3“ auf 1 Runde gestellt und ohne Speichern gestartet: der Plan hat 1 Runde, das gespeicherte Workout weiter 3.

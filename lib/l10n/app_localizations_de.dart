@@ -760,6 +760,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get workoutCourseMissing => 'Wähle eine Strecke.';
 
   @override
+  String get workoutStartUnsaved => 'Starten ohne Speichern';
+
+  @override
   String get workoutCourses => 'Strecken';
 
   @override

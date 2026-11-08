@@ -754,6 +754,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get workoutCourseMissing => 'Choose a course.';
 
   @override
+  String get workoutStartUnsaved => 'Start without saving';
+
+  @override
   String get workoutCourses => 'Courses';
 
   @override
