@@ -26,11 +26,11 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 ## 4. Stufe im Querformat
 
-- [ ] 4.1 `ResistanceCard` nach D7. Verifikation in `resistance_card_test.dart`: zeigt „6“ unter „STUFE“; Tipp rechts ruft `step(1)`, links `step(-1)`; bei Stufe 15 von 15 ist rechts gesperrt; ohne setzbare Stufe keine Tasten; bei Ablehnung der Text „abgelehnt“; die Tasten sind mindestens 56 × 60.
-- [ ] 4.2 Einbau in `LiveCourse._landscape` und `WattsTile(showResistance:)` nach D7. Verifikation:
+- [x] 4.1 `ResistanceCard` nach D7. Verifikation in `resistance_card_test.dart`: zeigt „6“ unter „STUFE“; Tipp rechts ruft `step(1)`, links `step(-1)`; bei Stufe 15 von 15 ist rechts gesperrt; ohne setzbare Stufe keine Tasten; bei Ablehnung der vorhandene Text „Stufe nicht gesetzt“; die Tasten sind mindestens 56 × 60.
+- [x] 4.2 Einbau in `LiveCourse._landscape` und `WattsTile(showResistance:)` nach D7. Verifikation:
   - `live_screen_test.dart`: im Querformat mit FTMS-Simulator steht die Karte unter der Schlagzahlkarte und hat dieselbe Breite; die Watt-Kachel zeigt keine Stufe; ohne gemeldete Stufe (PM5-Simulator) gibt es keine Karte.
   - Im Hochformat steht die Stufe wie bisher unter den Watt.
-  - `live_layout_test.dart`: 740 × 360 und 1200 × 700 im Querformat ohne Overflow, mit und ohne Kraftkurve.
+  - `live_screen_test.dart` (dort liegen die Overflow-Tests, `live_layout_test.dart` prüft nur die Wahl des Layouts): 740 × 360 und 1200 × 700 im Querformat ohne Overflow, mit und ohne Kraftkurve.
 
 ## 5. Doku und Abschluss
 
