@@ -33,13 +33,17 @@ const staleAfter = Duration(seconds: 3);
 
 /// The live rowing metrics, readable from the seat.
 class LiveScreen extends ConsumerStatefulWidget {
-  const LiveScreen({super.key, this.plan, this.ghost = true});
+  const LiveScreen({super.key, this.plan, this.ghost = true, this.backTo});
 
   /// Made ready as a session as soon as the source is connected; it starts with the first stroke.
   final SessionPlan? plan;
 
   /// Whether the ghosts of [plan] run in this session (template-screen, Design D4).
   final bool ghost;
+
+  /// Where back and "done" lead instead of the start screen, e.g. the workout
+  /// editor that started [plan] without saving (adhoc-workout, Design D2).
+  final Route<dynamic>? backTo;
 
   @override
   ConsumerState<LiveScreen> createState() => _LiveScreenState();
@@ -159,7 +163,9 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 
   var _leaving = false;
 
-  /// Back or Esc: back to the start screen, the rower stays connected; a replay goes back to the sessions.
+  bool _isBack(Route<dynamic> route) => route == widget.backTo || route.isFirst;
+
+  /// Back or Esc: back to the start screen or [LiveScreen.backTo], the rower stays connected; a replay goes back to the sessions.
   Future<void> _leave() async {
     if (_leaving) return;
     _leaving = true;
@@ -171,7 +177,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     if (!mounted) return;
     replay
         ? Navigator.of(context).pop()
-        : Navigator.of(context).popUntil((route) => route.isFirst);
+        : Navigator.of(context).popUntil(_isBack);
   }
 
   /// A replay is no connection to keep; it ends with the live display.
@@ -191,10 +197,10 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     }
   }
 
-  /// "Done" in the summary: back to the start screen, the rower stays connected.
+  /// "Done" in the summary: back to the start screen or [LiveScreen.backTo], the rower stays connected.
   Future<void> _leaveToStart() async {
     await _endReplay();
-    if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
+    if (mounted) Navigator.of(context).popUntil(_isBack);
   }
 
   /// Starts a session, or ends the running one; [short] for the narrow column next to the pace box.

@@ -81,6 +81,7 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
       context,
       ref,
       plan: SessionPlan(courses: courses, length: _length),
+      returnHere: true,
     );
   }
 

@@ -33,14 +33,18 @@ Future<void> connectRower(WidgetRef ref, RowerChoice choice) async {
 
 /// Rows with the chosen rower, freely or [plan] (Design D6). Without a
 /// chosen rower it opens "Geräte wählen" instead. Without [ghost] no ghost
-/// runs in the session of [plan] (template-screen, Design D4).
+/// runs in the session of [plan] (template-screen, Design D4). With
+/// [returnHere] the live display goes back to the screen of [context] instead
+/// of the start screen (adhoc-workout, Design D2).
 Future<void> startRowing(
   BuildContext context,
   WidgetRef ref, {
   SessionPlan? plan,
   bool ghost = true,
+  bool returnHere = false,
 }) async {
   final navigator = Navigator.of(context);
+  final origin = returnHere ? ModalRoute.of(context) : null;
   final choice = ref.read(chosenRowerProvider);
   if (choice == null) {
     await navigator.push(
@@ -58,7 +62,7 @@ Future<void> startRowing(
   }
   await navigator.push(
     MaterialPageRoute<void>(
-      builder: (_) => LiveScreen(plan: plan, ghost: ghost),
+      builder: (_) => LiveScreen(plan: plan, ghost: ghost, backTo: origin),
     ),
   );
 }
