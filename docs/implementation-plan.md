@@ -9,7 +9,7 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-08, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow`, `rename-workouts` und `workout-course-chain` archiviert. Geplant und auf main: `live-zone-targets` (Zielwerte der Zone immer unter der Pace, Zonen im Fortschrittsrahmen in Härte-Farben, Karte „Stufe“ mit Ruderblatt-Tasten unter der Schlagzahl im Querformat), 0/11; `adhoc-workout` (Workout-Editor startet die Strecken ohne zu speichern), 0/5.
+Stand: 2026-11-08, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow`, `rename-workouts` und `workout-course-chain` archiviert. In Arbeit: `live-zone-targets` (Zielwerte der Zone immer unter der Pace, Zonen im Fortschrittsrahmen in Härte-Farben, Karte „Stufe“ mit Ruderblatt-Tasten unter der Schlagzahl im Querformat) auf `feature/live-zone-targets`, 1/11: gemeinsame Härte-Farben für Strecke und Live. Geplant und auf main: `adhoc-workout` (Workout-Editor startet die Strecken ohne zu speichern), 0/5.
 
 ## Überblick
 

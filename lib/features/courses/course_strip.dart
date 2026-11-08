@@ -77,7 +77,7 @@ class CourseStrip extends StatelessWidget {
                               maxLines: 1,
                               softWrap: false,
                               overflow: TextOverflow.ellipsis,
-                              style: label?.copyWith(color: _textOn(colors[i])),
+                              style: label?.copyWith(color: textOn(colors[i])),
                             )
                           : null,
                     ),
@@ -89,20 +89,9 @@ class CourseStrip extends StatelessWidget {
     );
   }
 
-  static Color _textOn(Color background) =>
-      ThemeData.estimateBrightnessForColor(background) == Brightness.light
-      ? AppColors.bg
-      : AppColors.text;
-
   /// The colour of each segment: free gaps [AppColors.line], zones by their
   /// [zoneIntensity], independent of the other segments.
   static List<Color> segmentColors(List<CourseSegment> segments) => [
-    for (final s in segments)
-      switch (zoneIntensity(s)) {
-        null => AppColors.line,
-        ZoneIntensity.easy => AppColors.intensityEasy,
-        ZoneIntensity.medium => AppColors.intensityMedium,
-        ZoneIntensity.hard => AppColors.intensityHard,
-      },
+    for (final s in segments) intensityColor(zoneIntensity(s)),
   ];
 }

@@ -4,7 +4,7 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 ## 1. Farben teilen
 
-- [ ] 1.1 `intensityColor(ZoneIntensity?)`, `intensityDim(Color)` und die Wahl von heller oder dunkler Schrift (`textOn`) nach D1/D6 an einer Stelle in `lib/app/design_tokens.dart`; `CourseStrip` nutzt sie. Verifikation: `course_strip_test.dart` bleibt grün; ein neuer Test bildet `null`, leicht, mittel und hart auf `line` und die drei Farben ab und prüft, dass `intensityDim` dieselbe Farbe mit geringerer Deckkraft ist.
+- [x] 1.1 `intensityColor(ZoneIntensity?)`, `intensityDim(Color)` und die Wahl von heller oder dunkler Schrift (`textOn`) nach D1/D6 an einer Stelle in `lib/app/design_tokens.dart`; `CourseStrip` nutzt sie. Verifikation: `course_strip_test.dart` bleibt grün; ein neuer Test bildet `null`, leicht, mittel und hart auf `line` und die drei Farben ab und prüft, dass `intensityDim` dieselbe Farbe mit geringerer Deckkraft ist.
 
 ## 2. Fortschrittsrahmen
 

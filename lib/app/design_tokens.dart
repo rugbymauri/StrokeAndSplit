@@ -1,5 +1,7 @@
 import 'package:flutter/painting.dart';
 
+import '../data/courses/zone_intensity.dart';
+
 /// The colours of the app's dark design (design D1 of the change `ui-design`).
 abstract final class AppColors {
   /// Background of the screens.
@@ -65,6 +67,31 @@ abstract final class AppColors {
 
   /// The dot of a connected erg in the live display's app bar.
   static const connected = Color(0xFF4CD07D);
+}
+
+/// The colour of a zone of [intensity] wherever zones are shown, in course
+/// bars and live (change `live-zone-targets`, Design D1); a free segment is
+/// [AppColors.line].
+Color intensityColor(ZoneIntensity? intensity) => switch (intensity) {
+  null => AppColors.line,
+  ZoneIntensity.easy => AppColors.intensityEasy,
+  ZoneIntensity.medium => AppColors.intensityMedium,
+  ZoneIntensity.hard => AppColors.intensityHard,
+};
+
+/// How strongly the not yet rowed part of a zone shows its colour.
+const intensityDimAlpha = 0.45;
+
+/// [color] muted for the part of a zone not rowed yet.
+Color intensityDim(Color color) => color.withValues(alpha: intensityDimAlpha);
+
+/// Dark or light text, whichever reads better on [background] (as
+/// `ThemeData.estimateBrightnessForColor`).
+Color textOn(Color background) {
+  final luminance = background.computeLuminance();
+  return (luminance + 0.05) * (luminance + 0.05) > 0.15
+      ? AppColors.bg
+      : AppColors.text;
 }
 
 /// The bundled font families (design D1).
