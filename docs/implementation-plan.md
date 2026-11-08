@@ -9,7 +9,7 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow`, `rename-workouts` und `workout-course-chain` archiviert.
+Stand: 2026-11-07, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow`, `rename-workouts` und `workout-course-chain` archiviert. Geplant: `adhoc-workout` (Workout-Editor startet die Strecken ohne zu speichern) auf `feature/adhoc-workout`, 0/5.
 
 ## Überblick
 
