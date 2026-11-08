@@ -204,6 +204,7 @@
   "workoutEdit": "Edit workout",
   "workoutNameMissing": "The name is missing.",
   "workoutCourseMissing": "Choose a course.",
+  "workoutStartUnsaved": "Start without saving",
   "workoutLapsUnit": "{laps, plural, =1{lap} other{laps}}",
   "workoutCourses": "Courses",
   "workoutCourseAdd": "Append course",

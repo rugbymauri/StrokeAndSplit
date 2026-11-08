@@ -1327,6 +1327,12 @@ abstract class AppLocalizations {
   /// **'Wähle eine Strecke.'**
   String get workoutCourseMissing;
 
+  /// Workout editor: button that rows the composed courses once without creating or changing a workout
+  ///
+  /// In de, this message translates to:
+  /// **'Starten ohne Speichern'**
+  String get workoutStartUnsaved;
+
   /// Workout editor: label above the list of courses rowed one after the other
   ///
   /// In de, this message translates to:

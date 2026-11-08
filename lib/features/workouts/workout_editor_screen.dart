@@ -8,6 +8,7 @@ import '../../data/sessions/session_plan.dart';
 import '../../data/workouts/workout.dart';
 import '../../data/workouts/workout_providers.dart';
 import '../../l10n/l10n.dart';
+import '../connection/rower_connection.dart';
 import '../courses/course_strip.dart';
 import '../courses/courses_screen.dart';
 import '../live/formatters.dart';
@@ -61,6 +62,29 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
       );
     }
     if (mounted) Navigator.of(context).pop();
+  }
+
+  /// Rows the composed courses once with the chosen length, without creating
+  /// or changing a workout; the editor stays open below the live screen
+  /// (adhoc-workout, Design D1–D3).
+  Future<void> _startUnsaved() async {
+    final repository = ref.read(courseRepositoryProvider);
+    // The current version of each course; a deleted one drops out.
+    final courses = [
+      for (final c in _courses)
+        if (await repository.get(c.id) case final current?) current,
+    ];
+    if (!mounted) return;
+    if (courses.isEmpty) {
+      setState(() => _errors = [context.l10n.workoutCourseMissing]);
+      return;
+    }
+    setState(() => _errors = []);
+    await startRowing(
+      context,
+      ref,
+      plan: SessionPlan(courses: courses, length: _length),
+    );
   }
 
   /// Lets the rower pick a course: of the axis of the others, or of both
@@ -242,6 +266,12 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
                 ],
                 const SizedBox(height: 24),
                 FilledButton(onPressed: _save, child: Text(l10n.actionSave)),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  key: const Key('workout-start-unsaved'),
+                  onPressed: _startUnsaved,
+                  child: Text(l10n.workoutStartUnsaved),
+                ),
               ],
             ),
           ),

@@ -1072,6 +1072,10 @@
   "@workoutCourseMissing": {
     "description": "Workout editor: no course chosen"
   },
+  "workoutStartUnsaved": "Starten ohne Speichern",
+  "@workoutStartUnsaved": {
+    "description": "Workout editor: button that rows the composed courses once without creating or changing a workout"
+  },
   "workoutCourses": "Strecken",
   "@workoutCourses": {
     "description": "Workout editor: label above the list of courses rowed one after the other"

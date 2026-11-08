@@ -1,4 +1,7 @@
 import 'package:strokesplit/data/courses/course.dart';
+import 'package:strokesplit/data/sessions/session_providers.dart';
+import 'package:strokesplit/data/sources/erg_source_providers.dart';
+import 'package:strokesplit/features/live/live_screen.dart';
 import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/features/workouts/workout_editor_screen.dart';
 import 'package:flutter/material.dart';
@@ -282,5 +285,160 @@ void main() {
     await tester.pump();
     expect(tester.takeException(), isNull);
     await disposeWidgetsWithDatabase(tester);
+  });
+
+  group('Starten ohne Speichern', () {
+    final button = find.byKey(const Key('workout-start-unsaved'));
+    Finder editorList() => find
+        .descendant(
+          of: find.byType(WorkoutEditorScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first;
+
+    Future<void> showButton(WidgetTester tester) async {
+      await tester.scrollUntilVisible(button, 100, scrollable: editorList());
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> startUnsaved(WidgetTester tester) async {
+      await showButton(tester);
+      await tester.tap(button);
+      for (var i = 0; i < 10; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 10)),
+        );
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+    }
+
+    Future<void> stopRowing(WidgetTester tester) async {
+      await setup.container.read(sessionRecorderProvider.notifier).stop();
+      await setup.container.read(activeErgSourceProvider.notifier).clear();
+    }
+
+    /// Back from the live screen to the editor, as after the summary.
+    Future<void> backToEditor(WidgetTester tester) async {
+      tester
+          .state<NavigatorState>(find.byType(Navigator).first)
+          .popUntil((route) => route.isFirst);
+      await setup.settle(tester);
+      await tester.drag(editorList(), const Offset(0, 3000));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets(
+      'Kette ohne Namen starten: rows the three courses, no workout',
+      (tester) async {
+        await addCourses(tester);
+        await openEditor(tester);
+        for (final name in ['Einrudern', '2 km Intervall', 'Ausrudern']) {
+          await tapAppend(tester);
+          await pick(tester, name);
+        }
+        await stepTo(tester, const Key('workout-laps'), 1);
+
+        await startUnsaved(tester);
+
+        expect(find.byType(LiveScreen), findsOneWidget);
+        final plan = setup.container.read(sessionRecorderProvider)?.plan;
+        expect(
+          [for (final c in plan!.courses) c.id],
+          [einrudern, intervall, ausrudern],
+        );
+        expect(plan.length, const LapCount(1));
+        expect(plan.workout, isNull);
+        expect(await tester.runAsync(setup.workouts.all), isEmpty);
+
+        await stopRowing(tester);
+        await backToEditor(tester);
+        // Zurück im Editor: everything as it was set.
+        expect(find.byType(WorkoutEditorScreen), findsOneWidget);
+        expect(cards(tester), ['Einrudern', '2 km Intervall', 'Ausrudern']);
+        expect(stepperValue(tester, const Key('workout-laps')), 1);
+        expect(await tester.runAsync(setup.workouts.all), isEmpty);
+        await disposeWidgetsWithDatabase(tester);
+      },
+    );
+
+    testWidgets('Ohne Strecke: no session, the editor names the course', (
+      tester,
+    ) async {
+      await addCourses(tester);
+      await openEditor(tester);
+
+      await startUnsaved(tester);
+
+      expect(find.byType(LiveScreen), findsNothing);
+      expect(setup.container.read(sessionRecorderProvider), isNull);
+      expect(find.text('Wähle eine Strecke.'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets(
+      'Bestehendes Workout geändert starten: the saved one keeps 3 laps',
+      (tester) async {
+        await addCourses(tester);
+        await openEditor(
+          tester,
+          courseIds: [einrudern],
+          length: const LapCount(3),
+        );
+        await stepTo(tester, const Key('workout-laps'), 1);
+
+        await startUnsaved(tester);
+
+        final plan = setup.container.read(sessionRecorderProvider)?.plan;
+        expect((plan?.length, plan?.workout), (const LapCount(1), null));
+        final saved = (await tester.runAsync(setup.workouts.all))!.single;
+        expect(saved.length, const LapCount(3));
+        await stopRowing(tester);
+        await disposeWidgetsWithDatabase(tester);
+      },
+    );
+
+    testWidgets('rows the current version of a course edited meanwhile', (
+      tester,
+    ) async {
+      await addCourses(tester);
+      await openEditor(tester, courseIds: [einrudern]);
+      await tester.runAsync(() async {
+        await setup.courses.rename(einrudern, 'Einrudern lang');
+        await setup.courses.updateDefinition(
+          einrudern,
+          CourseDefinition.single(axis: CourseAxis.distance, length: 800),
+        );
+      });
+
+      await startUnsaved(tester);
+
+      final course = setup.container
+          .read(sessionRecorderProvider)
+          ?.plan
+          ?.courses
+          .single;
+      expect(
+        (course?.name, course?.definition.length),
+        ('Einrudern lang', 800),
+      );
+      await stopRowing(tester);
+      await disposeWidgetsWithDatabase(tester);
+    });
+
+    testWidgets('fits 400 × 400 without overflow with both buttons', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await addCourses(tester);
+      await openEditor(tester, courseIds: [einrudern, intervall]);
+
+      await showButton(tester);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Starten ohne Speichern'), findsOneWidget);
+      await disposeWidgetsWithDatabase(tester);
+    });
   });
 }
