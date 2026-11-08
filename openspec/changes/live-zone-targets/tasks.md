@@ -8,8 +8,8 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 ## 2. Fortschrittsrahmen
 
-- [ ] 2.1 `FrameTrack.zones` mit Härte nach D2; `ProgressFrameModel.of` setzt sie, die Abschnittsspur bekommt die Härte des aktuellen Segments nach D3. Verifikation: `progress_frame_model_test.dart` prüft für eine Strecke mit leichter Zone 0–500 m und harter Zone 500–1000 m die Härten auf Strecken- und Rundenspur und auf der Abschnittsspur in beiden Zonen sowie `null` in einem freien Abschnitt.
-- [ ] 2.2 Painter nach D2/D3: Zonen auf Strecken- und Rundenspur gedämpft und bis `share` kräftig in Härte-Farbe; Abschnittsspur leer gedämpft in Härte-Farbe, gefüllt im Zustand bzw. bei Zone ohne Pace-Band in Härte-Farbe. Verifikation:
+- [x] 2.1 `FrameTrack.zones` mit Härte nach D2; `ProgressFrameModel.of` setzt sie, die Abschnittsspur bekommt die Härte des aktuellen Segments nach D3. Verifikation: `progress_frame_model_test.dart` prüft für eine Strecke mit leichter Zone 0–500 m und harter Zone 500–1000 m die Härten auf Strecken- und Rundenspur und auf der Abschnittsspur in beiden Zonen sowie `null` in einem freien Abschnitt.
+- [x] 2.2 Painter nach D2/D3: Zonen auf Strecken- und Rundenspur gedämpft und bis `share` kräftig in Härte-Farbe; Abschnittsspur leer gedämpft in Härte-Farbe, gefüllt im Zustand bzw. bei Zone ohne Pace-Band in Härte-Farbe. Verifikation:
   - `progress_frame_test.dart`: Goldens neu erzeugt (`--update-goldens`) und angesehen; ein neuer Golden mit leichter, mittlerer und harter Zone und einer Zone nur mit Stufe.
   - Ein Test prüft `segmentColor` für eine Zone mit Pace-Band unverändert (blau/orange).
 

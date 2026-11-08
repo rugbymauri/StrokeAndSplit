@@ -1,5 +1,6 @@
 import 'package:strokesplit/app/design_tokens.dart';
 import 'package:strokesplit/data/courses/lap_tracker.dart';
+import 'package:strokesplit/data/courses/zone_intensity.dart';
 import 'package:strokesplit/features/live/progress_frame.dart';
 import 'package:strokesplit/features/live/progress_frame_model.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +16,13 @@ ProgressFrameModel _filled(double share, {bool openLaps = false}) =>
       lap: FrameTrack(
         share: share,
         boundaries: const [0.2, 0.8],
-        zones: const [(0.2, 0.8)],
+        zones: const [(0.2, 0.8, ZoneIntensity.medium)],
       ),
-      segment: FrameTrack(share: share, boundaries: const []),
+      segment: FrameTrack(
+        share: share,
+        boundaries: const [],
+        zones: const [(0.0, 1.0, ZoneIntensity.medium)],
+      ),
       courseDone: openLaps ? null : share * 3000,
       courseLength: openLaps ? null : 3000,
       lapRemaining: 1000 - share * 1000,
@@ -143,6 +148,82 @@ void main() {
       );
     });
   }
+
+  // Every zone in the colour of its hardness, here an easy, a medium and a hard zone and,
+  // on the segment track, a zone with only a level that fills in its hardness (live-zone-targets, D2/D3).
+  testWidgets('paints the zones in the colours of their hardness', (
+    tester,
+  ) async {
+    const zones = [
+      (0.1, 0.3, ZoneIntensity.easy),
+      (0.4, 0.6, ZoneIntensity.medium),
+      (0.7, 0.9, ZoneIntensity.hard),
+    ];
+    await _pump(
+      tester,
+      ProgressFrame(
+        model: ProgressFrameModel(
+          course: const FrameTrack(
+            share: 0.55,
+            boundaries: [0.5],
+            zones: [
+              (0.05, 0.15, ZoneIntensity.easy),
+              (0.2, 0.3, ZoneIntensity.medium),
+              (0.35, 0.45, ZoneIntensity.hard),
+              (0.55, 0.65, ZoneIntensity.easy),
+              (0.7, 0.8, ZoneIntensity.medium),
+              (0.85, 0.95, ZoneIntensity.hard),
+            ],
+          ),
+          lap: const FrameTrack(
+            share: 0.65,
+            boundaries: [0.1, 0.3, 0.4, 0.6, 0.7, 0.9],
+            zones: zones,
+          ),
+          segment: const FrameTrack(
+            share: 0.5,
+            boundaries: [],
+            zones: [(0.0, 1.0, ZoneIntensity.hard)],
+          ),
+          courseDone: 1100,
+          courseLength: 2000,
+          lapRemaining: 350,
+          segmentRemaining: 100,
+        ),
+        pace: BandStatus.none,
+      ),
+    );
+
+    await expectLater(
+      find.byKey(_frame),
+      matchesGoldenFile('goldens/progress_frame_intensity.png'),
+    );
+  });
+
+  test('fills the segment track in the zone status, or the hardness of a zone without a pace band', () {
+    const hard = FrameTrack(
+      share: 0.5,
+      boundaries: [],
+      zones: [(0.0, 1.0, ZoneIntensity.hard)],
+    );
+    const free = FrameTrack(share: 0.5, boundaries: []);
+    expect(
+      ProgressFramePainter.segmentFill(hard, BandStatus.inBand),
+      AppColors.zoneIn,
+    );
+    expect(
+      ProgressFramePainter.segmentFill(hard, BandStatus.above),
+      AppColors.zoneOut,
+    );
+    expect(
+      ProgressFramePainter.segmentFill(hard, BandStatus.none),
+      AppColors.intensityHard,
+    );
+    expect(
+      ProgressFramePainter.segmentFill(free, BandStatus.none),
+      AppColors.textMuted,
+    );
+  });
 
   test('colours the segment track by the zone status of the pace', () {
     expect(

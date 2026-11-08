@@ -1,5 +1,6 @@
 import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/lap_tracker.dart';
+import 'package:strokesplit/data/courses/zone_intensity.dart';
 import 'package:strokesplit/features/live/progress_frame_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -97,19 +98,49 @@ void main() {
     expect(frame.segment.boundaries, isEmpty);
   });
 
-  test('marks the zones on the lap track only', () {
+  test('marks the zones of every lap on the course and lap track', () {
     final frame = ProgressFrameModel.of(
-      _rowed(_seerunde, 1460, laps: 3),
+      _rowed(_seerunde, 1460, laps: 2),
       _seerunde,
     );
 
-    expect(frame.lap.zones, [(0.2, 0.8)]);
-    expect(frame.course!.zones, isEmpty);
-    expect(frame.segment.zones, isEmpty);
+    // "Tempo" 2:05–2:10 is hard.
+    expect(frame.lap.zones, [(0.2, 0.8, ZoneIntensity.hard)]);
+    expect(frame.course!.zones, [
+      (0.1, 0.4, ZoneIntensity.hard),
+      (0.6, 0.9, ZoneIntensity.hard),
+    ]);
     expect(
       ProgressFrameModel.of(_timed(_intervals, 30), _intervals).lap.zones,
-      [(0.25, 0.75)],
+      [(0.25, 0.75, ZoneIntensity.hard)],
     );
+  });
+
+  test('gives each zone its own hardness', () {
+    const mixed = CourseDefinition(
+      axis: CourseAxis.distance,
+      length: 1000,
+      segments: [
+        CourseSegment(length: 500, spmMin: 18, spmMax: 20, zoneName: 'Leicht'),
+        CourseSegment(length: 500, resistanceLevel: 12, zoneName: 'Kraft'),
+      ],
+    );
+
+    final inEasy = ProgressFrameModel.of(_rowed(mixed, 300), mixed);
+    final inHard = ProgressFrameModel.of(_rowed(mixed, 700), mixed);
+
+    expect(inEasy.lap.zones, [
+      (0.0, 0.5, ZoneIntensity.easy),
+      (0.5, 1.0, ZoneIntensity.hard),
+    ]);
+    expect(inEasy.segment.zones, [(0.0, 1.0, ZoneIntensity.easy)]);
+    expect(inHard.segment.zones, [(0.0, 1.0, ZoneIntensity.hard)]);
+  });
+
+  test('has no zone on the segment track in a free segment', () {
+    final frame = ProgressFrameModel.of(_rowed(_seerunde, 100), _seerunde);
+
+    expect(frame.segment.zones, isEmpty);
   });
 
   test('marks a zone with only a level on the lap track', () {
@@ -127,7 +158,7 @@ void main() {
       ],
     );
     expect(ProgressFrameModel.of(_rowed(kraft, 100), kraft).lap.zones, [
-      (0.5, 1.0),
+      (0.5, 1.0, ZoneIntensity.hard),
     ]);
   });
 
