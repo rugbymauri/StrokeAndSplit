@@ -34,6 +34,6 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 ## 5. Doku und Abschluss
 
-- [ ] 5.1 README, Abschnitt Live-Anzeige: Zielwertzeile, Härte-Farben im Rahmen und Karte „Stufe“ im Querformat beschreiben. Verifikation: der Abschnitt widerspricht den Specs nicht.
+- [x] 5.1 README, Abschnitt Live-Anzeige: Zielwertzeile, Härte-Farben im Rahmen und Karte „Stufe“ im Querformat beschreiben. Verifikation: der Abschnitt widerspricht den Specs nicht.
 - [ ] 5.2 Gesamtprüfung in der Linux-App (Scratch-DB, Simulator und Simulator (FTMS)): Strecke mit leichter, mittlerer und harter Zone und einer Zone nur mit Stufe rudern, im Querformat die Karte „Stufe“ mit den Tasten bedienen; Zielwertzeile, Hinweis, Farben im Rahmen, Legendenpunkt und kommende Zone ansehen, gedämpfte Töne bei Bedarf nachstellen und in D1 nachtragen. Verifikation: Screenshots; `make check` grün.
 - [ ] 5.3 Am Handy (Nutzer): ein Workout mit Zonen rudern, Zielwerte und Farben gut lesbar; quer am Woodrower die Stufe mit den Tasten unter der Schlagzahl ändern.
