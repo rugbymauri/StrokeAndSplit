@@ -52,6 +52,7 @@ class UpcomingPill extends StatefulWidget {
   const UpcomingPill({
     super.key,
     required this.text,
+    required this.color,
     this.textKey,
     this.scaleDown = false,
     this.dense = false,
@@ -61,6 +62,9 @@ class UpcomingPill extends StatefulWidget {
   static const period = Duration(milliseconds: 900);
 
   final String text;
+
+  /// The hardness of the coming zone, as in the course strip (live-zone-targets, Design D6).
+  final Color color;
   final Key? textKey;
 
   /// Shrinks the text to fit instead of cutting it off, like [ZonePill.scaleDown].
@@ -96,11 +100,12 @@ class _UpcomingPillState extends State<UpcomingPill>
 
   @override
   Widget build(BuildContext context) {
+    final foreground = textOn(widget.color);
     final text = Text(
       widget.text,
       key: widget.textKey,
       style: AppTextStyles.button.copyWith(
-        color: AppColors.bg,
+        color: foreground,
         fontWeight: FontWeight.w600,
       ),
       maxLines: 1,
@@ -108,7 +113,7 @@ class _UpcomingPillState extends State<UpcomingPill>
     );
     final pill = DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.upcoming,
+        color: widget.color,
         borderRadius: BorderRadius.circular(ZonePill.radius),
       ),
       child: Padding(
@@ -118,7 +123,7 @@ class _UpcomingPillState extends State<UpcomingPill>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.double_arrow, size: 18, color: AppColors.bg),
+            Icon(Icons.double_arrow, size: 18, color: foreground),
             SizedBox(width: widget.dense ? AppSpacing.xs : AppSpacing.s),
             Flexible(
               child: widget.scaleDown

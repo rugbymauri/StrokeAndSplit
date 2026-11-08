@@ -56,9 +56,6 @@ abstract final class AppColors {
   /// A hard zone.
   static const intensityHard = Color(0xFFB8443F);
 
-  /// The bands of the zone that starts in a few seconds.
-  static const upcoming = Color(0xFFFFD84A);
-
   /// The force curve of the previous stroke, behind the last one.
   static const previousCurve = Color(0xFF5A646E);
 

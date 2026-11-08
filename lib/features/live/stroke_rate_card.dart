@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/design_tokens.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/lap_tracker.dart';
+import '../../data/courses/zone_intensity.dart';
 import '../../l10n/l10n.dart';
 import 'formatters.dart';
 import 'live_text_styles.dart';
@@ -73,6 +74,7 @@ class StrokeRateCard extends StatelessWidget {
       _ when upcoming != null && upcoming.hasSpmBand => UpcomingPill(
         key: const Key('stroke-card-upcoming'),
         text: l10n.hintUpcoming('${upcoming.spmMin}–${upcoming.spmMax} spm'),
+        color: intensityColor(zoneIntensity(upcoming)),
         textKey: const Key('stroke-card-upcoming-band'),
         // Band and unit belong together, so it shrinks rather than wrapping in a narrow card.
         scaleDown: true,
