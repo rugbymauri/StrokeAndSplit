@@ -1,12 +1,19 @@
 import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/data/courses/course_repository.dart';
+import 'package:strokesplit/data/db/database.dart';
 import 'package:strokesplit/data/courses/lap_tracker.dart';
 import 'package:strokesplit/data/sessions/session_plan.dart';
 import 'package:strokesplit/data/sessions/session_providers.dart';
 import 'package:strokesplit/data/sources/erg_source.dart';
 import 'package:strokesplit/data/sources/erg_source_providers.dart';
 import 'package:strokesplit/data/sources/simulated_source.dart';
+import 'package:strokesplit/data/statistics/ranking.dart';
+import 'package:strokesplit/data/statistics/ranking_repository.dart';
 import 'package:strokesplit/data/workouts/workout_repository.dart';
+import 'package:strokesplit/features/sessions/plan_label.dart';
+import 'package:strokesplit/l10n/l10n.dart';
+import 'package:drift/drift.dart' show Value;
+import 'package:flutter/widgets.dart' show Locale;
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -213,4 +220,84 @@ void main() {
       source.stop();
     });
   });
+
+  test(
+    'a chain rowed without saving belongs to no workout (adhoc-workout)',
+    () {
+      final db = openTestDatabase();
+      final source = SimulatedSource(seed: 1);
+      final container = ProviderContainer(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          activeErgSourceProvider.overrideWith(() => _Fixed(source)),
+        ],
+      );
+      addTearDown(container.dispose);
+      final rankings = RankingRepository(db);
+
+      fakeAsync((async) {
+        final (courses, workoutId) = _run(async, () async {
+          final repository = CourseRepository(db);
+          final courses = [
+            for (final c in [_einrudern, _intervall, _ausrudern])
+              (await repository.get(
+                await repository.create(c.name, c.definition),
+              ))!,
+          ];
+          // The same courses saved as a workout: the session must not count there.
+          final workoutId = await WorkoutRepository(db).create(
+            'Intervalltraining',
+            courseIds: [for (final c in courses) c.id],
+            length: const LapCount(1),
+          );
+          return (courses, workoutId);
+        });
+        _run(async, () async {
+          await source.start();
+          await container
+              .read(sessionRecorderProvider.notifier)
+              .start(
+                plan: SessionPlan(courses: courses, length: const LapCount(1)),
+              );
+        });
+        async.elapse(const Duration(milliseconds: 500));
+        final id = container.read(sessionRecorderProvider)!.sessionId!;
+        // 3000 m at 2:10 /500 m take 13 min.
+        async.elapse(const Duration(minutes: 14));
+        expect(container.read(sessionRecorderProvider), isNull);
+        source.stop();
+        // Recorded with the simulator, counted as if rowed on a PM5.
+        _run(
+          async,
+          () => (db.update(db.sessions)..where((s) => s.id.equals(id))).write(
+            const SessionsCompanion(source: Value(ErgSourceKind.pm5)),
+          ),
+        );
+
+        final rows = _run(async, db.select(db.sessionCourses).get);
+        expect(rows, hasLength(3));
+        final session = _run(
+          async,
+          (db.select(db.sessions)..where((s) => s.id.equals(id))).getSingle,
+        );
+        expect((session.workoutId, session.workoutName), (null, null));
+        final de = lookupAppLocalizations(const Locale('de'));
+        expect(
+          sessionName(de, session, Course.chain(courses).name),
+          'Einrudern + 2 km Intervall + Ausrudern · 1 Runde',
+        );
+        List<RankingEntry> entries(List<Ranking> rankings) => [
+          for (final r in rankings) ...r.entries,
+        ];
+        expect(
+          entries(_run(async, () => rankings.course(courses[1].id))),
+          hasLength(1),
+        );
+        expect(
+          entries(_run(async, () => rankings.workout(workoutId))),
+          isEmpty,
+        );
+      });
+    },
+  );
 }
