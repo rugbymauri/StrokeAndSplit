@@ -14,6 +14,6 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 ## 2. Doku und Abschluss
 
-- [ ] 2.1 README, Abschnitt Workouts: „Starten ohne Speichern“ beschreiben. Verifikation: der Abschnitt widerspricht dem Spec nicht.
+- [x] 2.1 README, Abschnitt Workouts: „Starten ohne Speichern“ beschreiben. Verifikation: der Abschnitt widerspricht dem Spec nicht.
 - [ ] 2.2 Gesamtprüfung in der Linux-App (Scratch-DB, Simulator): Kette ohne Namen ohne Speichern rudern, Liste, Zusammenfassung und Rückkehr in den Editor prüfen. Verifikation: Screenshots; `make check` grün.
 - [ ] 2.3 Am Handy (Nutzer): eine Kette ohne Speichern rudern.
