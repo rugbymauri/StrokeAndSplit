@@ -6,6 +6,7 @@ import '../../app/design_tokens.dart';
 import '../../app/widgets/ghost_symbol.dart';
 import '../../data/courses/course.dart';
 import '../../data/courses/lap_tracker.dart';
+import '../../data/courses/zone_intensity.dart';
 import '../../data/ghost/ghost.dart';
 import '../../l10n/l10n.dart';
 import '../courses/course_format.dart';
@@ -66,12 +67,15 @@ class PaceBox extends StatelessWidget {
   /// Room for the zone status, kept free without one so the pace stays put.
   static const statusHeight = 32.0;
 
-  /// The height inside the frame below which the content shrinks as a whole.
-  static const minContentHeight = 260.0;
+  /// The line with the targets of the part being rowed, below the zone status (live-zone-targets, Design D4).
+  static const targetsHeight = 20.0;
 
-  /// What the content takes besides the pace, generously: label, zone status, divider and
+  /// The height inside the frame below which the content shrinks as a whole.
+  static const minContentHeight = 260.0 + targetsHeight;
+
+  /// What the content takes besides the pace, generously: label, zone status, targets, divider and
   /// legend including the average pace and the ghost line, so [paceFontSizeFor] holds with or without a ghost.
-  static const _aroundPace = 190.0;
+  static const _aroundPace = 190.0 + targetsHeight;
 
   /// At least the font size of the pace in a box of [size], so values next to the
   /// box can be kept smaller.
@@ -164,11 +168,28 @@ class PaceBox extends StatelessWidget {
                               'pace-box-zone-${hint.inZone ? 'in' : 'out'}',
                             ),
                             hint: hint,
-                            band: _paceBand(segment),
                             textKey: const Key('pace-box-status'),
                             filled: true,
                           ),
                         ),
+                ),
+                // All targets of the part, whether in the zone or not; the band left the pill for it.
+                SizedBox(
+                  height: targetsHeight,
+                  child: Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        zoneTargets(l10n, segment),
+                        key: const Key('pace-box-targets'),
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.text,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                        maxLines: 1,
+                      ),
+                    ),
+                  ),
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: AppSpacing.s),
@@ -205,9 +226,11 @@ class PaceBox extends StatelessWidget {
                 ),
                 _LegendLine(
                   key: const Key('pace-box-segment'),
-                  marker: _Dot(
-                    ProgressFramePainter.segmentColor(progress.pace),
-                  ),
+                  // The hardness of the zone as on the tracks, grey in a free part (Design D6).
+                  marker: _Dot(switch (zoneIntensity(segment)) {
+                    null => AppColors.textMuted,
+                    final intensity => intensityColor(intensity),
+                  }),
                   // The zone the rower is in, or a free gap (Change zones, Design D7).
                   label: switch ((
                     courseName,

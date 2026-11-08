@@ -2,6 +2,7 @@ import 'package:strokesplit/data/courses/course.dart';
 import 'package:strokesplit/app/design_tokens.dart';
 import 'package:strokesplit/app/widgets/ghost_symbol.dart';
 import 'package:strokesplit/data/courses/lap_tracker.dart';
+import 'package:strokesplit/data/courses/zone_intensity.dart';
 import 'package:strokesplit/data/ghost/ghost.dart';
 import 'package:strokesplit/features/live/pace_box.dart';
 import 'package:strokesplit/features/live/progress_frame.dart';
@@ -15,9 +16,14 @@ const _tempo = CourseSegment(
   length: 600,
   paceFastCs: 12500,
   paceSlowCs: 13000,
+  spmMin: 20,
+  spmMax: 22,
+  resistanceLevel: 8,
   zoneId: 1,
   zoneName: 'Tempo',
 );
+
+const _tempoTargets = 'Tempo · 2:05–2:10 · 20–22 spm · Stufe 8';
 const _free = CourseSegment(length: 200);
 
 /// 1000 m with the zone "Tempo" from 200 to 800 m.
@@ -113,24 +119,21 @@ const _course = CourseDefinition(
 );
 
 void main() {
-  testWidgets(
-    'shows the pace in the zone with its band, the lap and the zone',
-    (tester) async {
-      await _pump(tester, _at(460));
+  testWidgets('shows the pace in the zone, its targets, the lap and the zone', (
+    tester,
+  ) async {
+    await _pump(tester, _at(460));
 
-      expect(_text(tester, const Key('pace-box-pace')), '2:07');
-      expect(find.text('PACE /500 M'), findsOneWidget);
-      expect(find.byKey(const Key('pace-box-zone-in')), findsOneWidget);
-      expect(
-        _text(tester, const Key('pace-box-status')),
-        'In der Zone · 2:05–2:10',
-      );
-      expect(find.byIcon(Icons.check_circle), findsOneWidget);
-      _expectLine(const Key('pace-box-course'), 'Gesamt', '1 460 / 3 000 m');
-      _expectLine(const Key('pace-box-lap'), 'Runde 2 / 3', 'noch 540 m');
-      _expectLine(const Key('pace-box-segment'), 'Tempo', 'noch 340 m');
-    },
-  );
+    expect(_text(tester, const Key('pace-box-pace')), '2:07');
+    expect(find.text('PACE /500 M'), findsOneWidget);
+    expect(find.byKey(const Key('pace-box-zone-in')), findsOneWidget);
+    expect(_text(tester, const Key('pace-box-status')), 'In der Zone');
+    expect(_text(tester, const Key('pace-box-targets')), _tempoTargets);
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    _expectLine(const Key('pace-box-course'), 'Gesamt', '1 460 / 3 000 m');
+    _expectLine(const Key('pace-box-lap'), 'Runde 2 / 3', 'noch 540 m');
+    _expectLine(const Key('pace-box-segment'), 'Tempo', 'noch 340 m');
+  });
 
   testWidgets(
     'shows the average pace of the session, or none before the first metre',
@@ -158,10 +161,8 @@ void main() {
 
       expect(_text(tester, const Key('pace-box-pace')), '2:13');
       expect(find.byKey(const Key('pace-box-zone-out')), findsOneWidget);
-      expect(
-        _text(tester, const Key('pace-box-status')),
-        'Schneller · 2:05–2:10',
-      );
+      expect(_text(tester, const Key('pace-box-status')), 'Schneller');
+      expect(_text(tester, const Key('pace-box-targets')), _tempoTargets);
       expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
     },
   );
@@ -185,6 +186,7 @@ void main() {
     );
 
     _expectLine(const Key('pace-box-segment'), 'frei', 'noch 100 m');
+    expect(_text(tester, const Key('pace-box-targets')), 'frei');
     expect(find.byKey(const Key('pace-box-status')), findsNothing);
     expect(find.byIcon(Icons.check_circle), findsNothing);
     expect(find.byIcon(Icons.arrow_upward), findsNothing);
@@ -203,9 +205,75 @@ void main() {
     await _pump(tester, _at(460, segment: kraft, pace: BandStatus.none));
 
     _expectLine(const Key('pace-box-segment'), 'Kraft', 'noch 340 m');
+    expect(_text(tester, const Key('pace-box-targets')), 'Kraft · Stufe 12');
     expect(find.byKey(const Key('pace-box-status')), findsNothing);
     expect(find.byIcon(Icons.check_circle), findsNothing);
   });
+
+  testWidgets(
+    'keeps the pace in place in the zone, out of it and in a free gap',
+    (tester) async {
+      Rect pace() => tester.getRect(find.byKey(const Key('pace-box-pace')));
+
+      await _pump(tester, _at(460));
+      final inZone = pace();
+      await _pump(tester, _at(460, pace: BandStatus.above));
+      expect(pace(), inZone);
+      await _pump(
+        tester,
+        _at(100, segment: _free, index: 0, pace: BandStatus.none),
+      );
+      expect(pace(), inZone);
+    },
+  );
+
+  testWidgets('fits a long zone name into 400 × 400 without overflow', (
+    tester,
+  ) async {
+    const long = CourseSegment(
+      length: 600,
+      paceFastCs: 12500,
+      paceSlowCs: 13000,
+      spmMin: 20,
+      spmMax: 22,
+      resistanceLevel: 8,
+      zoneName: 'Langer Schwellenblock vor dem Endspurt',
+    );
+
+    await _pump(tester, _at(460, segment: long), size: const Size(400, 400));
+
+    expect(tester.takeException(), isNull);
+    expect(
+      _text(tester, const Key('pace-box-targets')),
+      'Langer Schwellenblock vor dem Endspurt · 2:05–2:10 · 20–22 spm · Stufe 8',
+    );
+  });
+
+  testWidgets(
+    'marks the segment line in the hardness of the zone, grey when free',
+    (tester) async {
+      Color? dot() =>
+          (tester
+                      .widget<DecoratedBox>(
+                        find.descendant(
+                          of: find.byKey(const Key('pace-box-segment')),
+                          matching: find.byType(DecoratedBox),
+                        ),
+                      )
+                      .decoration
+                  as BoxDecoration)
+              .color;
+
+      await _pump(tester, _at(460, pace: BandStatus.above));
+      expect(dot(), intensityColor(zoneIntensity(_tempo)));
+
+      await _pump(
+        tester,
+        _at(100, segment: _free, index: 0, pace: BandStatus.none),
+      );
+      expect(dot(), AppColors.textMuted);
+    },
+  );
 
   testWidgets(
     'tints the box in the zone colour and keeps it plain in a free gap',
@@ -290,9 +358,10 @@ void main() {
   testWidgets('speaks English', (tester) async {
     await _pump(tester, _at(460), locale: const Locale('en'));
 
+    expect(_text(tester, const Key('pace-box-status')), 'In the zone');
     expect(
-      _text(tester, const Key('pace-box-status')),
-      'In the zone · 2:05–2:10',
+      _text(tester, const Key('pace-box-targets')),
+      'Tempo · 2:05–2:10 · 20–22 spm · Level 8',
     );
     _expectLine(const Key('pace-box-course'), 'Total', '1 460 / 3 000 m');
     _expectLine(const Key('pace-box-lap'), 'Lap 2 / 3', '540 m to go');
@@ -303,10 +372,8 @@ void main() {
     await _pump(tester, _at(460, pace: BandStatus.missing), pace: null);
 
     expect(_text(tester, const Key('pace-box-pace')), '–:––');
-    expect(
-      _text(tester, const Key('pace-box-status')),
-      'Keine Pace · 2:05–2:10',
-    );
+    expect(_text(tester, const Key('pace-box-status')), 'Keine Pace');
+    expect(_text(tester, const Key('pace-box-targets')), _tempoTargets);
   });
 
   testWidgets(

@@ -15,8 +15,8 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
 
 ## 3. Pace-Box
 
-- [ ] 3.1 `zoneTargets(l10n, segment)` nach D4 mit neuem Text `zoneTargetLevel` (de „Stufe {level}“, en „level {level}“). Verifikation: Test für die Szenarien „Alle Vorgaben“, „Zone nur mit Stufe“, „Freier Abschnitt“ und „Zone ohne Namen“ aus dem Spec, auf Deutsch und Englisch.
-- [ ] 3.2 Pace-Box: Zielwertzeile `pace-box-targets` unter dem Hinweis, Hinweis ohne Band nach D5, Höhe in `_aroundPace` eingerechnet, Punkt der Abschnittszeile in Härte-Farbe nach D6. Verifikation in `pace_box_test.dart`:
+- [x] 3.1 `zoneTargets(l10n, segment)` nach D4 mit `formatSegmentBands` und dem vorhandenen Text `zoneResistanceLevelShort` (de „Stufe {level}“, en „Level {level}“). Verifikation: Test für die Szenarien „Alle Vorgaben“, „Zone nur mit Stufe“, „Freier Abschnitt“ und „Zone ohne Namen“ aus dem Spec, auf Deutsch und Englisch.
+- [x] 3.2 Pace-Box: Zielwertzeile `pace-box-targets` unter dem Hinweis, Hinweis ohne Band nach D5, Höhe in `_aroundPace` eingerechnet, Punkt der Abschnittszeile in Härte-Farbe nach D6. Verifikation in `pace_box_test.dart`:
   - In der Zone steht „In der Zone“ ohne Band und darunter „Tempo · 2:05–2:10 · 20–22 spm · Stufe 8“.
   - Bei Pace 2:13 steht „Schneller“ und dieselbe Zeile.
   - Im freien Abschnitt steht „frei“ und kein Hinweis.

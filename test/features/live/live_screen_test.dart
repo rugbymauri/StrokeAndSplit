@@ -754,7 +754,8 @@ void main() {
       expectLine('pace-box-segment', 'Tempo', 'noch 280 m');
       // 6:20 for 1 520 m of the session.
       expectLine('pace-box-average', 'Ø Pace', '2:05');
-      expect(find.text('In der Zone · 2:05–2:10'), findsOneWidget);
+      expect(find.text('In der Zone'), findsWidgets);
+      expect(find.byKey(const Key('pace-box-targets')), findsOneWidget);
       expect(find.text('In der Zone · 20–22 spm'), findsOneWidget);
       expect(find.text('24 spm'), findsOneWidget);
       expect(find.text('2:31'), findsOneWidget);
@@ -875,7 +876,7 @@ void main() {
 
       expectLine('pace-box-lap', 'Lap 2 / 3', '480 m to go');
       expectLine('pace-box-segment', 'Tempo', '280 m to go');
-      expect(find.text('Faster · 2:05–2:10'), findsOneWidget);
+      expect(find.text('Faster'), findsOneWidget);
       expect(find.text('More strokes'), findsOneWidget);
       expect(find.text('20–22 spm'), findsOneWidget);
       for (final label in [
@@ -923,7 +924,7 @@ void main() {
 
         expect(find.byKey(const Key('pace-box-zone-out')), findsOneWidget);
         expect(find.byKey(const Key('stroke-card-zone-out')), findsOneWidget);
-        expect(find.text('Schneller · 2:05–2:10'), findsOneWidget);
+        expect(find.text('Schneller'), findsOneWidget);
         expect(find.byIcon(Icons.arrow_upward), findsNWidgets(2));
         expect(find.text('Mehr Schläge'), findsOneWidget);
         expect(find.text('20–22 spm'), findsOneWidget);
@@ -1628,8 +1629,9 @@ void main() {
           ]) {
             expect(height(tester, key), greaterThan(30), reason: key);
           }
-          // 56 before Barlow, whose lower digits leave room for the force curve on a narrow phone as well.
-          expect(height(tester, 'metric-spm'), greaterThan(56));
+          // 56 before Barlow, whose lower digits leave room for the force curve on a narrow phone as well;
+          // a little less since the line with the zone targets takes room from the pace box (live-zone-targets).
+          expect(height(tester, 'metric-spm'), greaterThan(50));
           expect(find.text('Kraft'), findsOneWidget);
           // 12 and 13 before.
           expect(fontSize(tester, 'Watt'), lessThanOrEqualTo(10));
@@ -1729,8 +1731,9 @@ void main() {
       );
       await harness.emit(tester, _tick());
 
-      // 68 before; the shrunk content kept its full width.
-      expect(height(tester, 'pace-box-pace'), greaterThan(90));
+      // 68 before; the shrunk content kept its full width. Above 90 before the line with the
+      // zone targets took its share of the height (live-zone-targets).
+      expect(height(tester, 'pace-box-pace'), greaterThan(80));
       expect(height(tester, 'metric-watts'), greaterThan(40));
     });
   });

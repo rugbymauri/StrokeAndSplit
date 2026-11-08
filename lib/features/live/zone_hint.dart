@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../app/design_tokens.dart';
+import '../../data/courses/course.dart';
 import '../../data/courses/lap_tracker.dart';
 import '../../l10n/l10n.dart';
+import '../courses/course_format.dart';
+
+/// All targets of the part being rowed, e.g. `Tempo · 2:05–2:10 · 20–22 spm · Stufe 8`,
+/// `Zone · 2:20–2:25` without a name, or `frei` (live-zone-targets, Design D4).
+String zoneTargets(AppLocalizations l10n, CourseSegment segment) =>
+    segment.isFree
+    ? l10n.segmentFree
+    : [
+        segment.zoneName ?? l10n.segmentZone,
+        formatSegmentBands(l10n, segment),
+      ].join(' · ');
 
 /// How a zone is shown on a value: colour, symbol and a word, so it does
 /// not depend on colour alone.
