@@ -93,6 +93,15 @@ class ProgressFramePainter extends CustomPainter {
     BandStatus.missing => AppColors.zoneOut,
   };
 
+  /// The colour of the rowed part of the segment track: the zone status of the pace
+  /// in a zone with a pace band, the hardness of a zone without one, neutral when free.
+  static Color segmentFill(FrameTrack segment, BandStatus? pace) =>
+      switch ((pace, segment.zones)) {
+        (null || BandStatus.none, [(_, _, final intensity), ...]) =>
+          intensityColor(intensity),
+        _ => segmentColor(pace),
+      };
+
   /// The colour of the box for the zone status of the pace: tinted like the stroke rate card in a band,
   /// plain in a free gap.
   static Color boxColor(BandStatus? pace) => switch (pace) {
@@ -117,8 +126,14 @@ class ProgressFramePainter extends CustomPainter {
       if (model.course case final course?)
         (course, AppColors.track, AppColors.text, ghost?.course),
       (model.lap, AppColors.track, AppColors.textMuted, ghost?.lap),
-      (model.segment, AppColors.trackInner, segmentColor(pace), ghost?.segment),
+      (
+        model.segment,
+        AppColors.trackInner,
+        segmentFill(model.segment, pace),
+        ghost?.segment,
+      ),
     ];
+    final segmentTrack = tracks.length - 1;
     final metrics = [
       for (var i = 0; i < tracks.length; i++)
         _outline(box, trackWidth / 2 + i * (trackWidth + trackGap)),
@@ -140,11 +155,13 @@ class ProgressFramePainter extends CustomPainter {
           stroke..color = filled,
         );
       }
-      // Zones stand out brighter than the free parts, empty and filled.
-      for (final (start, end) in track.zones) {
+      // Zones in the colour of their hardness: muted ahead, full where rowed; on the
+      // segment track the rowed part keeps the zone status of the pace (live-zone-targets, D2/D3).
+      for (final (start, end, intensity) in track.zones) {
+        final color = intensityColor(intensity);
         canvas.drawPath(
           metric.extractPath(start * metric.length, end * metric.length),
-          stroke..color = AppColors.trackZone,
+          stroke..color = intensityDim(color),
         );
         final filledEnd = end < track.share ? end : track.share;
         if (filledEnd > start) {
@@ -153,7 +170,7 @@ class ProgressFramePainter extends CustomPainter {
               start * metric.length,
               filledEnd * metric.length,
             ),
-            stroke..color = AppColors.text,
+            stroke..color = i == segmentTrack ? filled : color,
           );
         }
       }
