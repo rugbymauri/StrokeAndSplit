@@ -22,7 +22,7 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
   - Im freien Abschnitt steht „frei“ und kein Hinweis.
   - Die Pace steht in allen drei Fällen an derselben Stelle.
   - 400 × 400 ohne Overflow, auch mit langem Zonennamen.
-- [ ] 3.3 Kommende Zone nach D6 in Härte-Farbe in Pace-Box und Schlagzahlkarte. Verifikation: `upcoming_zone_test.dart` prüft die Farbe für eine harte kommende Zone und lesbare Schrift auf allen drei Farben; `live_screen_test.dart` bleibt grün.
+- [x] 3.3 Kommende Zone nach D6 in Härte-Farbe in Pace-Box und Schlagzahlkarte. Verifikation: `upcoming_zone_test.dart` prüft die Farbe für eine harte kommende Zone und lesbare Schrift auf allen drei Farben; `live_screen_test.dart` bleibt grün.
 
 ## 4. Stufe im Querformat
 

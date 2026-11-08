@@ -157,6 +157,7 @@ class PaceBox extends StatelessWidget {
                           child: UpcomingPill(
                             key: const Key('pace-box-upcoming'),
                             text: l10n.hintUpcoming(_paceBand(upcoming!)!),
+                            color: intensityColor(zoneIntensity(upcoming!)),
                             textKey: const Key('pace-box-upcoming-band'),
                           ),
                         )

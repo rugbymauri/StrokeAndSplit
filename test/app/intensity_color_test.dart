@@ -35,7 +35,6 @@ void main() {
       AppColors.intensityEasy,
       AppColors.intensityMedium,
       AppColors.intensityHard,
-      AppColors.upcoming,
       AppColors.text,
     ]) {
       expect(

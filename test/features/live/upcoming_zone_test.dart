@@ -113,17 +113,22 @@ void main() {
   });
 
   group('UpcomingPill', () {
-    Future<void> pump(WidgetTester tester, {bool disableAnimations = false}) =>
-        tester.pumpWidget(
-          LocalizedApp(
-            home: MediaQuery(
-              data: MediaQueryData(disableAnimations: disableAnimations),
-              child: const Scaffold(
-                body: Center(child: UpcomingPill(text: 'Gleich 1:55–2:00')),
-              ),
+    Future<void> pump(
+      WidgetTester tester, {
+      bool disableAnimations = false,
+      Color color = AppColors.intensityHard,
+    }) => tester.pumpWidget(
+      LocalizedApp(
+        home: MediaQuery(
+          data: MediaQueryData(disableAnimations: disableAnimations),
+          child: Scaffold(
+            body: Center(
+              child: UpcomingPill(text: 'Gleich 1:55–2:00', color: color),
             ),
           ),
-        );
+        ),
+      ),
+    );
 
     double opacity(WidgetTester tester) => tester
         .widget<Opacity>(
@@ -134,7 +139,7 @@ void main() {
         )
         .opacity;
 
-    testWidgets('blinks in yellow', (tester) async {
+    testWidgets('blinks in the colour of a hard zone', (tester) async {
       await pump(tester);
       final fill = tester.widget<DecoratedBox>(
         find.descendant(
@@ -142,12 +147,40 @@ void main() {
           matching: find.byType(DecoratedBox),
         ),
       );
-      expect((fill.decoration as BoxDecoration).color, AppColors.upcoming);
+      expect((fill.decoration as BoxDecoration).color, AppColors.intensityHard);
       expect(opacity(tester), 1);
       await tester.pump(const Duration(milliseconds: 700));
       expect(opacity(tester), lessThan(1));
       await tester.pump(const Duration(milliseconds: 300));
       expect(opacity(tester), 1);
+    });
+
+    testWidgets('keeps text and symbol readable on every hardness', (
+      tester,
+    ) async {
+      double contrast(Color a, Color b) {
+        final (light, dark) = switch ((
+          a.computeLuminance(),
+          b.computeLuminance(),
+        )) {
+          (final x, final y) when x > y => (x, y),
+          (final x, final y) => (y, x),
+        };
+        return (light + 0.05) / (dark + 0.05);
+      }
+
+      for (final color in [
+        AppColors.intensityEasy,
+        AppColors.intensityMedium,
+        AppColors.intensityHard,
+      ]) {
+        await pump(tester, color: color);
+        final text = tester.widget<Text>(find.text('Gleich 1:55–2:00'));
+        final icon = tester.widget<Icon>(find.byIcon(Icons.double_arrow));
+        expect(text.style!.color, icon.color);
+        // Large bold text on a pill: at least the WCAG ratio for large text.
+        expect(contrast(text.style!.color!, color), greaterThanOrEqualTo(3));
+      }
     });
 
     testWidgets('stays lit when the platform asks for less motion', (

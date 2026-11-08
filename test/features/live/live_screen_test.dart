@@ -1738,7 +1738,7 @@ void main() {
     });
   });
 
-  // The bands of the next zone blink in yellow below the pace and on the stroke rate card (Design D3).
+  // The bands of the next zone blink in its hardness colour below the pace and on the stroke rate card (Design D3).
   group('upcoming zone', () {
     setUpAll(loadAppFonts);
 
