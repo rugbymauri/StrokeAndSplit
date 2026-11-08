@@ -70,10 +70,7 @@ class _WorkoutEditorScreenState extends ConsumerState<WorkoutEditorScreen> {
   Future<void> _startUnsaved() async {
     final repository = ref.read(courseRepositoryProvider);
     // The current version of each course; a deleted one drops out.
-    final courses = [
-      for (final c in _courses)
-        if (await repository.get(c.id) case final current?) current,
-    ];
+    final courses = [for (final c in _courses) ?await repository.get(c.id)];
     if (!mounted) return;
     if (courses.isEmpty) {
       setState(() => _errors = [context.l10n.workoutCourseMissing]);
