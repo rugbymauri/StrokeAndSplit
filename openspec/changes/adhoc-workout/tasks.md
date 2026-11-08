@@ -10,7 +10,7 @@ Keine Schema-Änderung. Neue Texte nur über `lib/l10n/app_de.arb` und `lib/l10n
   - Bestehendes „Seerunde x3“ auf 1 Runde gestellt und ohne Speichern gestartet: der Plan hat 1 Runde, das gespeicherte Workout weiter 3.
   - Nach dem Schliessen des Live-Screens steht der Editor mit denselben Strecken und derselben Länge da.
   - 400 × 400 ohne Overflow mit beiden Knöpfen.
-- [ ] 1.2 Aufzeichnung einer Kette ohne Workout. Verifikation: Test in `session_course_chain_test.dart`: Session mit drei Strecken ohne Workout speichert drei Einträge in `session_courses`, `workoutId` und `workoutName` sind leer, `sessionName` ergibt „Einrudern + 2 km Intervall + Ausrudern · 1 Runde“; die Rangliste von „2 km Intervall“ enthält den Abschnitt, `rankings.workout` hat keinen Eintrag dafür.
+- [x] 1.2 Aufzeichnung einer Kette ohne Workout. Verifikation: Test in `session_course_chain_test.dart`: Session mit drei Strecken ohne Workout speichert drei Einträge in `session_courses`, `workoutId` und `workoutName` sind leer, `sessionName` ergibt „Einrudern + 2 km Intervall + Ausrudern · 1 Runde“; die Rangliste von „2 km Intervall“ enthält den Abschnitt, `rankings.workout` hat keinen Eintrag dafür.
 
 ## 2. Doku und Abschluss
 
