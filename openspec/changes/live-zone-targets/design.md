@@ -24,7 +24,7 @@
 
 ## Decisions
 
-**D1: Eine Abbildung Härte → Farbe für Strecke und Live.** `intensityColor(ZoneIntensity?)` in `lib/app/design_tokens.dart` (neben den Farben): `null` → `AppColors.line`, sonst die drei Härte-Farben. `CourseStrip.segmentColors` nutzt sie statt der eigenen Abbildung. Dazu `intensityDim(Color)` für den gedämpften Ton: dieselbe Farbe mit etwa 45 % Deckkraft über dem Spurgrund. Der genaue Wert wird beim Linux-Test so gewählt, dass gedämpft und kräftig klar verschieden sind und gedämpftes Orange nicht wie „ausserhalb“ aussieht.
+**D1: Eine Abbildung Härte → Farbe für Strecke und Live.** `intensityColor(ZoneIntensity?)` in `lib/app/design_tokens.dart` (neben den Farben): `null` → `AppColors.line`, sonst die drei Härte-Farben. `CourseStrip.segmentColors` nutzt sie statt der eigenen Abbildung. Dazu `intensityDim(Color)` für den gedämpften Ton: dieselbe Farbe mit etwa 45 % Deckkraft über dem Spurgrund. Der genaue Wert wird beim Linux-Test so gewählt, dass gedämpft und kräftig klar verschieden sind und gedämpftes Orange nicht wie „ausserhalb“ aussieht. Im Linux-Test (2026-11-08) bestätigt: 45 % trennt gedämpft und kräftig klar, gedämpftes Orange wirkt bräunlich und nicht wie „ausserhalb“.
 
 **D2: Zonen einer Spur tragen ihre Härte.** `FrameTrack.zones` wird zu einer Liste von `(start, end, intensity)`. `ProgressFrameModel.of` setzt die Härte aus dem Segment der Strecke. Für die Strecken- und Rundenspur malt der Painter jede Zone gedämpft und bis zum Anteil `share` kräftig in ihrer Farbe, statt `trackZone`/`text`. Freie Teile bleiben wie bisher (`track` leer, `text` bzw. `textMuted` gefüllt).
 
