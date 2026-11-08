@@ -23,7 +23,7 @@
 
 Alternative: der Knopf in der App-Leiste. Verworfen, weil „Speichern“ dort schon als Symbol steht und zwei Symbole schwer zu unterscheiden sind.
 
-**D2: Der Editor bleibt offen.** `startRowing` legt den Live-Screen über den Editor; nach der Zusammenfassung kehrt der Navigator dorthin zurück, und der State mit Strecken und Länge ist unverändert. Nichts wird gespeichert, bis der Nutzer „Speichern“ tippt.
+**D2: Der Editor bleibt offen.** `startRowing` legt den Live-Screen über den Editor. „Fertig“ in der Zusammenfassung und Zurück im Live-Screen führen sonst zum Startbildschirm (`popUntil(isFirst)`) und würden den Editor schliessen; deshalb gibt `startRowing(returnHere: true)` dem `LiveScreen` die Route des Editors als `backTo` mit, und beide kehren dorthin zurück. Der State mit Strecken und Länge ist danach unverändert. Nichts wird gespeichert, bis der Nutzer „Speichern“ tippt. Workout- und Strecken-Startscreen führen weiter zum Startbildschirm.
 
 **D3: Aktuelle Version der Strecken.** `_courses` hält die Strecken so, wie sie beim Öffnen bzw. Wählen geladen wurden. Vor dem Start werden sie über `CourseRepository.get` neu gelesen, damit eine inzwischen bearbeitete Strecke in ihrer aktuellen Version gerudert wird; eine gelöschte Strecke fällt dabei weg, und ohne Strecken startet nichts.
 

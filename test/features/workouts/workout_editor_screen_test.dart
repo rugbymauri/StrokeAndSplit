@@ -317,21 +317,22 @@ void main() {
       await setup.container.read(activeErgSourceProvider.notifier).clear();
     }
 
-    /// Back from the live screen to the editor, as after the summary.
-    Future<void> backToEditor(WidgetTester tester) async {
-      tester
-          .state<NavigatorState>(find.byType(Navigator).first)
-          .popUntil((route) => route.isFirst);
+    /// Ends the session and closes its summary with "Fertig".
+    Future<void> endAndClose(WidgetTester tester) async {
+      await tester.tap(find.text('Beenden'));
       await setup.settle(tester);
-      await tester.drag(editorList(), const Offset(0, 3000));
-      await tester.pumpAndSettle();
+      await tester.tap(find.text('Fertig'));
+      await setup.settle(tester);
     }
 
     testWidgets(
       'Kette ohne Namen starten: rows the three courses, no workout',
       (tester) async {
         await addCourses(tester);
-        await openEditor(tester);
+        // From the list, so the start screen of the test lies below the editor.
+        await setup.pump(tester);
+        await tester.tap(find.text('Workout anlegen'));
+        await setup.settle(tester);
         for (final name in ['Einrudern', '2 km Intervall', 'Ausrudern']) {
           await tapAppend(tester);
           await pick(tester, name);
@@ -350,13 +351,15 @@ void main() {
         expect(plan.workout, isNull);
         expect(await tester.runAsync(setup.workouts.all), isEmpty);
 
-        await stopRowing(tester);
-        await backToEditor(tester);
+        await endAndClose(tester);
         // Zurück im Editor: everything as it was set.
         expect(find.byType(WorkoutEditorScreen), findsOneWidget);
+        await tester.drag(editorList(), const Offset(0, 3000));
+        await tester.pumpAndSettle();
         expect(cards(tester), ['Einrudern', '2 km Intervall', 'Ausrudern']);
         expect(stepperValue(tester, const Key('workout-laps')), 1);
         expect(await tester.runAsync(setup.workouts.all), isEmpty);
+        await stopRowing(tester);
         await disposeWidgetsWithDatabase(tester);
       },
     );
