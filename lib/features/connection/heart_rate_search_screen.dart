@@ -132,8 +132,8 @@ class _HeartRateSearchScreenState extends ConsumerState<HeartRateSearchScreen> {
                   icon: Icons.favorite_border,
                   title: monitor.name,
                   subtitle: monitor == paired
-                      ? '${l10n.devicesStrapPaired} · ${monitor.id}'
-                      : monitor.id,
+                      ? '${l10n.devicesStrapPaired} · ${monitor.id.toUpperCase()}'
+                      : monitor.id.toUpperCase(),
                   selected: monitor == paired,
                   onTap: () => _pair(monitor),
                 ),

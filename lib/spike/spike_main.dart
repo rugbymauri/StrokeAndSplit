@@ -10,15 +10,16 @@ import 'dart:typed_data';
 
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:universal_ble/universal_ble.dart';
 
 import '../data/sources/ble/ble_transport.dart';
 import '../data/sources/ble/rower_scan_filter.dart';
+import '../data/sources/ble/universal_ble_transport.dart';
 import 'raw_log_writer.dart';
 
-Guid _pm5Uuid(String shortId) =>
-    Guid('ce06$shortId-43e5-11e4-916c-0800200c9a66');
+String _pm5Uuid(String shortId) =>
+    BleUuidParser.string('ce06$shortId-43e5-11e4-916c-0800200c9a66');
 
 final _rowingService = _pm5Uuid('0030');
 final _sampleRate = _pm5Uuid('0034');
@@ -27,7 +28,7 @@ final _sampleRate = _pm5Uuid('0034');
 /// reported as missing and the recording continues.
 const _subscribedIds = ['0031', '0032', '0033', '0035', '0036', '003d'];
 
-final _ftmsService = Guid(FtmsIds.service);
+final _ftmsService = BleUuidParser.string(FtmsIds.service);
 
 /// Recorded FTMS characteristics: rower data, machine status and the answers
 /// on the control point (Design D12).
@@ -73,11 +74,12 @@ class _SpikeScreenState extends State<SpikeScreen> {
   final _lastHex = <String, String>{};
   final _subscriptions = <StreamSubscription<List<int>>>[];
   final _found = <String, FoundRower>{};
-  BluetoothDevice? _device;
+  BleDevice? _device;
   var _recordedIds = _subscribedIds;
   RawLogWriter? _writer;
-  StreamSubscription<List<ScanResult>>? _scanSubscription;
-  BluetoothCharacteristic? _controlPoint;
+  StreamSubscription<BleDevice>? _scanSubscription;
+  Timer? _scanTimer;
+  BleCharacteristic? _controlPoint;
   var _level = 5;
   int? _reportedLevel;
 
@@ -94,52 +96,36 @@ class _SpikeScreenState extends State<SpikeScreen> {
 
   Future<void> _scan() async {
     _say('Suche Rudergeräte …');
-    _scanSubscription ??= FlutterBluePlus.scanResults.listen(
-      (results) => _addFound(
-        results.map((r) {
-          final data = r.advertisementData;
-          return rowerFromAdvertisement(
-            id: r.device.remoteId.str,
-            name: r.device.platformName.isNotEmpty
-                ? r.device.platformName
-                : data.advName,
-            serviceIds: [
-              for (final uuid in data.serviceUuids) uuid.str.toLowerCase(),
-            ],
-            serviceData: {
-              for (final MapEntry(:key, :value) in data.serviceData.entries)
-                key.str.toLowerCase(): value,
-            },
-          );
-        }),
-      ),
+    _scanSubscription ??= UniversalBle.scanStream.listen(
+      (device) => _addFound([
+        rowerFromAdvertisement(
+          id: device.deviceId,
+          name: device.name ?? '',
+          serviceIds: device.services.map(shortServiceId),
+          serviceData: {
+            for (final MapEntry(:key, :value) in device.serviceData.entries)
+              shortServiceId(key): value,
+          },
+        ),
+      ]),
     );
     try {
-      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
-      // The Linux backend only reports devices BlueZ discovers anew; a PM5
-      // already in the BlueZ cache would never show up in the scan results.
-      if (Platform.isLinux) {
-        final cached = await FlutterBluePlus.systemDevices([]);
-        _addFound(
-          cached.map(
-            (d) => rowerFromAdvertisement(
-              id: d.remoteId.str,
-              name: d.platformName,
-            ),
-          ),
-        );
-      }
+      // On Linux the scan also reports the devices already in the BlueZ cache.
+      await UniversalBle.startScan();
+      _scanTimer?.cancel();
+      _scanTimer = Timer(const Duration(seconds: 15), UniversalBle.stopScan);
     } catch (e) {
       _say('Scan fehlgeschlagen: $e');
     }
   }
 
   Future<void> _connect(FoundRower rower) async {
-    await FlutterBluePlus.stopScan();
-    final device = BluetoothDevice.fromId(rower.id);
+    _scanTimer?.cancel();
+    await UniversalBle.stopScan();
+    final device = BleDevice(deviceId: rower.id, name: rower.name);
     _say('Verbinde mit ${rower.name} …');
     try {
-      await device.connect(license: License.nonprofit);
+      await device.connect();
       final services = await device.discoverServices();
       final writer = await RawLogWriter.create(
         await _logDirectory(),
@@ -163,7 +149,7 @@ class _SpikeScreenState extends State<SpikeScreen> {
   }
 
   Future<void> _recordPm5(
-    List<BluetoothService> services,
+    List<BleService> services,
     RawLogWriter writer,
   ) async {
     final rowing = services.firstWhere((s) => s.uuid == _rowingService);
@@ -187,12 +173,13 @@ class _SpikeScreenState extends State<SpikeScreen> {
   }
 
   Future<void> _recordFtms(
-    List<BluetoothService> services,
+    List<BleService> services,
     RawLogWriter writer,
   ) async {
     final ftms = services.firstWhere((s) => s.uuid == _ftmsService);
-    BluetoothCharacteristic? characteristic(String id) =>
-        ftms.characteristics.where((c) => c.uuid == Guid(id)).firstOrNull;
+    BleCharacteristic? characteristic(String id) => ftms.characteristics
+        .where((c) => c.uuid == BleUuidParser.string(id))
+        .firstOrNull;
 
     final feature = characteristic(FtmsIds.feature);
     if (feature != null) {
@@ -286,7 +273,7 @@ class _SpikeScreenState extends State<SpikeScreen> {
   }
 
   Future<void> _record(
-    BluetoothCharacteristic? characteristic,
+    BleCharacteristic? characteristic,
     String id,
     RawLogWriter writer,
   ) async {
@@ -304,7 +291,7 @@ class _SpikeScreenState extends State<SpikeScreen> {
         });
       }),
     );
-    await characteristic.setNotifyValue(true);
+    await characteristic.notifications.subscribe();
   }
 
   static String _hex(List<int> bytes) =>

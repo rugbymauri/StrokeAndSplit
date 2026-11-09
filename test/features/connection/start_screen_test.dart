@@ -28,9 +28,9 @@ import '../../support/test_database.dart';
 
 import 'package:strokesplit/data/sessions/session_plan.dart';
 
-const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _pm5 = FoundRower(id: 'c0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _h10 = FoundHeartRateMonitor(
-  id: 'A0:9E:1A:00:00:01',
+  id: 'a0:9e:1a:00:00:01',
   name: 'Polar H10 1A2B3C4D',
 );
 

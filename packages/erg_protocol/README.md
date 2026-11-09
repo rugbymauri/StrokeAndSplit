@@ -185,7 +185,7 @@ Nach dem Verbinden: Indicate aktivieren, `0x00` (Request Control) schreiben und 
 
 ## Plattformen
 
-- **Linux (BlueZ), Fedora 44:** Verbinden, Sample Rate setzen und alle fünf Notifications funktionieren mit `flutter_blue_plus` 2.x. Allerdings meldet der Scan nur Geräte, die BlueZ *neu* entdeckt. Ein PM5, der schon im BlueZ-Cache ist, erscheint nur über `FlutterBluePlus.systemDevices`. Ausserdem ignoriert das Linux-Backend Namensfilter beim Scan, deshalb filtert die App selbst nach `PM5`.
+- **Linux (BlueZ), Fedora 44:** Verbinden, Sample Rate setzen und alle fünf Notifications funktionieren (geprüft mit `flutter_blue_plus` 2.x, die App nutzt inzwischen `universal_ble`). Mit `flutter_blue_plus` meldete der Scan nur Geräte, die BlueZ *neu* entdeckt; ein PM5 im BlueZ-Cache erschien nur über `systemDevices`. Der Scan von `universal_ble` meldet auch die Geräte im BlueZ-Cache. Die App filtert selbst nach `PM5`, weil sie beim Scan keinen Namensfilter setzt.
 - **Android:** am PM5 verifiziert (Pixel 8 Pro, Android 17), gleiches Verhalten wie unter Linux: Status-Pakete alle 250 ms, `0035` zweimal pro Schlag.
 
 ## Fixtures

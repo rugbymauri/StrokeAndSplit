@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fake_ble_transport.dart';
 
 const _ftms = FoundRower(
-  id: 'AA:BB:CC:DD:EE:FF',
+  id: 'aa:bb:cc:dd:ee:ff',
   name: 'Stroke & Split FTMS',
   protocol: ErgProtocol.ftms,
 );
@@ -29,6 +29,14 @@ void main() {
       (device.name, device.protocol),
       ('Stroke & Split FTMS', ErgProtocol.ftms),
     );
+  });
+
+  test('matches a rower stored with an upper-case MAC', () {
+    const stored =
+        '{"id": "AA:BB:CC:DD:EE:FF", "name": "Stroke & Split FTMS", '
+        '"protocol": "ftms"}';
+
+    expect(RowerChoice.decode(stored), const RowerChoice.device(_ftms));
   });
 
   test('nothing stored or something unreadable means no choice', () {

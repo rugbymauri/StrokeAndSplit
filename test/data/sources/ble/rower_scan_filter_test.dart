@@ -3,7 +3,7 @@ import 'package:erg_protocol/erg_protocol.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const id = 'C0:00:00:00:00:01';
+  const id = 'c0:00:00:00:00:01';
   const rower = [0x01, 0x10, 0x00];
   const bike = [0x01, 0x20, 0x00];
 

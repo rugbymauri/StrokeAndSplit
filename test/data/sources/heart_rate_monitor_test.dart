@@ -17,18 +17,18 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/fake_erg_source.dart';
 import '../../support/fake_heart_rate_transport.dart';
 
-const _pm5 = FoundRower(id: 'C0:00:00:00:00:01', name: 'PM5 430000001 Row');
+const _pm5 = FoundRower(id: 'c0:00:00:00:00:01', name: 'PM5 430000001 Row');
 const _ftms = FoundRower(
-  id: 'AA:BB:CC:DD:EE:FF',
+  id: 'aa:bb:cc:dd:ee:ff',
   name: 'Stroke & Split FTMS',
   protocol: ErgProtocol.ftms,
 );
 const _h10 = FoundHeartRateMonitor(
-  id: 'A0:9E:1A:12:34:56',
+  id: 'a0:9e:1a:12:34:56',
   name: 'Polar H10 1A2B3C4D',
 );
 const _tickr = FoundHeartRateMonitor(
-  id: 'C1:11:22:33:44:55',
+  id: 'c1:11:22:33:44:55',
   name: 'TICKR 1234',
 );
 

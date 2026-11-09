@@ -23,6 +23,14 @@ void main() {
     expect((decoded.id, decoded.name), (_polar.id, _polar.name));
   });
 
+  test('matches a strap stored with an upper-case MAC', () {
+    final decoded = decodeHeartRateMonitor(
+      '{"id": "AA:BB:CC:DD:EE:01", "name": "HRM-Pro"}',
+    )!;
+
+    expect(decoded.id, 'aa:bb:cc:dd:ee:01');
+  });
+
   test('nothing stored or something unreadable means no strap', () {
     expect(decodeHeartRateMonitor(null), isNull);
     expect(decodeHeartRateMonitor('{"id": "11:22"}'), isNull);

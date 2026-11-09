@@ -9,11 +9,18 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-08, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow`, `rename-workouts` und `workout-course-chain` archiviert. In Arbeit: `live-zone-targets` (Zielwerte der Zone immer unter der Pace, Zonen im Fortschrittsrahmen in Härte-Farben, Karte „Stufe“ mit Ruderblatt-Tasten unter der Schlagzahl im Querformat) in main (PR #22), 10/11: gemeinsame Härte-Farben für Strecke und Live, Zonen im Fortschrittsrahmen in Härte-Farben, Zielwertzeile unter der Pace, kommende Zone in Härte-Farbe, Karte „Stufe“ im Querformat, README, Linux-Test; offen nur Gerätetest 5.3. In Arbeit: `adhoc-workout` (Workout-Editor startet die Strecken ohne zu speichern) auf `feature/adhoc-workout`, 4/5: Knopf „Starten ohne Speichern“ im Editor, Rückkehr in den Editor nach „Fertig“, Aufzeichnung ohne Workout geprüft, README, Linux-Test; offen nur Gerätetest 2.3.
+Stand: 2026-11-09, alle umgesetzten Changes archiviert; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. `zone-intensity-colors`, `course-editor-flow`, `rename-workouts` und `workout-course-chain` archiviert. In Arbeit: `live-zone-targets` (Zielwerte der Zone immer unter der Pace, Zonen im Fortschrittsrahmen in Härte-Farben, Karte „Stufe“ mit Ruderblatt-Tasten unter der Schlagzahl im Querformat) in main (PR #22), 10/11: gemeinsame Härte-Farben für Strecke und Live, Zonen im Fortschrittsrahmen in Härte-Farben, Zielwertzeile unter der Pace, kommende Zone in Härte-Farbe, Karte „Stufe“ im Querformat, README, Linux-Test; offen nur Gerätetest 5.3. In Arbeit: `adhoc-workout` (Workout-Editor startet die Strecken ohne zu speichern) auf `feature/adhoc-workout`, 4/5: Knopf „Starten ohne Speichern“ im Editor, Rückkehr in den Editor nach „Fertig“, Aufzeichnung ohne Workout geprüft, README, Linux-Test; offen nur Gerätetest 2.3. In Arbeit: `universal-ble` (Bluetooth über universal_ble statt flutter_blue_plus) auf `feat/universal_ble` (PR #16), 10/14; offen Gerätetests 4.1–4.3 und CI-Release-Builds 4.4.
 
 ## Überblick
 
 Die archivierten Changes stehen unter „Erledigt“, ihre offenen Gerätetests unter „Offene Punkte“.
+
+### In Arbeit: `universal-ble`
+
+Branch `feat/universal_ble`. BLE von `flutter_blue_plus` (nur nicht-kommerziell frei) auf `universal_ble` 3.2.0 (BSD-3) umgestellt, ohne Verhaltensänderung (`skip_specs`). Code, Tests, Spike und Doku fertig (Tasks 1–3); `wakelock_plus` ist nicht mehr gepinnt (1.8.2). Offen: Gerätetests 4.1–4.3 (Nutzer) und Release-Builds der CI (4.4).
+
+- Geräte-IDs kommen von `universal_ble` klein geschrieben; gemerkte Geräte mit gross geschriebener MAC werden beim Lesen klein geschrieben, die Geräteliste zeigt die MAC weiterhin gross.
+- Linux: Der Umweg über `systemDevices` für Geräte im BlueZ-Cache ist entfallen, weil der Scan sie selbst meldet; im Gerätetest 4.1 bestätigen.
 
 ## Offene Entscheide
 

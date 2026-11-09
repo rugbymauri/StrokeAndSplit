@@ -359,4 +359,4 @@ Strecken und Zonen kommen mit, soweit eine exportierte Session auf ihnen geruder
 
 ## Lizenzhinweis
 
-Die BLE-Bibliothek `flutter_blue_plus` 2.x ist für nicht-kommerzielle Nutzung frei (`License.nonprofit`). Für eine kommerzielle Nutzung ist eine Lizenz nötig oder ein Wechsel auf eine Alternative wie `universal_ble` (siehe Design D4 im Change `foundation`).
+Bluetooth läuft über `universal_ble` (BSD-3-Clause). Bis zum Change `universal-ble` nutzte die App `flutter_blue_plus` 2.x, das nur für nicht-kommerzielle Nutzung frei ist; diese Bindung entfällt damit.

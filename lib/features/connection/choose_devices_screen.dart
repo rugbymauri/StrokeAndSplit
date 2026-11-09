@@ -188,7 +188,7 @@ class _ChooseDevicesScreenState extends ConsumerState<ChooseDevicesScreen> {
                       RowerChoice.device(device),
                       Icons.rowing,
                       device.name,
-                      '${_kind(device.protocol)} · ${device.id}',
+                      '${_kind(device.protocol)} · ${device.id.toUpperCase()}',
                       key: Key('rower-${device.id}'),
                     ),
                   if (missing != null && !_found.contains(missing))
@@ -306,7 +306,7 @@ class _StrapSection extends ConsumerWidget {
           title: paired?.name ?? l10n.devicesNoStrap,
           subtitle: paired == null
               ? l10n.devicesNoStrapHint
-              : '${l10n.devicesStrapPaired} · ${paired.id}',
+              : '${l10n.devicesStrapPaired} · ${paired.id.toUpperCase()}',
           onTap: enabled ? search : null,
         ),
         const SizedBox(height: AppSpacing.m),

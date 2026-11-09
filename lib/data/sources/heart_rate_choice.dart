@@ -11,7 +11,8 @@ FoundHeartRateMonitor? decodeHeartRateMonitor(String? value) {
   try {
     final map = jsonDecode(value) as Map<String, Object?>;
     return FoundHeartRateMonitor(
-      id: map['id']! as String,
+      // Stored before universal_ble, an id may be an upper-case MAC.
+      id: (map['id']! as String).toLowerCase(),
       name: map['name']! as String,
     );
   } on Object {
