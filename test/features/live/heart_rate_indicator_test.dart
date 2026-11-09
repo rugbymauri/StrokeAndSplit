@@ -52,6 +52,7 @@ Future<FakeHeartRateTransport> _pump(
   WidgetTester tester,
   ErgSource source, {
   bool paired = true,
+  bool wait = true,
   HeartRateConnectException? connectError,
 }) async {
   final straps = FakeHeartRateTransport(connectError: connectError);
@@ -69,13 +70,35 @@ Future<FakeHeartRateTransport> _pump(
     ),
   );
   await tester.pump();
+  // The strap connects once the rower reported no heart rate for 5 seconds.
+  if (wait) await tester.pump(const Duration(seconds: 5));
   return straps;
 }
 
-Future<BleRowerSource> _rower([FoundRower device = _pm5]) async {
-  final source = BleRowerSource(transport: FakeBleTransport(), device: device);
+Future<BleRowerSource> _rower([
+  FoundRower device = _pm5,
+  FakeBleTransport? transport,
+]) async {
+  final source = BleRowerSource(
+    transport: transport ?? FakeBleTransport(),
+    device: device,
+  );
   await source.start();
   return source;
+}
+
+/// Sends one FTMS Rower Data record with the rower's own heart rate.
+Future<void> _rowerHeartRate(
+  WidgetTester tester,
+  FakeBleTransport rowers,
+  int bpm,
+) async {
+  final packet = const FtmsEncoder().encode(
+    RowerData(strokeRate: 24, totalDistance: 10, heartRate: bpm),
+    at: Duration.zero,
+  );
+  rowers.links.single.notify(packet.characteristicId, packet.bytes);
+  await tester.pump();
 }
 
 void main() {
@@ -110,6 +133,8 @@ void main() {
 
       straps.connectError = _busy;
       straps.links.single.drop();
+      // The drop reaches the strap in one frame and the display in the next.
+      await tester.pump();
       await tester.pump();
 
       expect(_dotColor(tester), AppColors.zoneOut);
@@ -169,4 +194,64 @@ void main() {
     expect(_dot, findsNothing);
     expect(straps.attempts, isEmpty);
   });
+
+  testWidgets('shows the rower\'s heart rate like a connected strap', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final rowers = FakeBleTransport();
+    final straps = await _pump(
+      tester,
+      await _rower(_ftms, rowers),
+      wait: false,
+    );
+
+    await _rowerHeartRate(tester, rowers, 95);
+    await tester.pump(const Duration(minutes: 1));
+
+    expect(straps.attempts, isEmpty);
+    expect(_dotColor(tester), AppColors.connected);
+    expect(find.bySemanticsLabel('Pulsgurt: Verbunden'), findsOneWidget);
+    expect(_notice, findsNothing);
+    semantics.dispose();
+  });
+
+  testWidgets('hides the notice once the strap is cancelled', (tester) async {
+    await _pump(tester, await _rower(), connectError: _busy);
+    expect(_notice, findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('heart-rate-cancel')));
+    await tester.pump();
+
+    expect(_notice, findsNothing);
+    final ring = tester.widget<Container>(_dot).decoration! as BoxDecoration;
+    expect(ring.color, isNull);
+    expect(ring.border!.top.color, AppColors.textMuted);
+    expect(find.byKey(const Key('connection-dot')), findsOneWidget);
+  });
+
+  testWidgets('cancels the notice by itself after a minute', (tester) async {
+    await _pump(tester, await _rower(), connectError: _busy);
+
+    await tester.pump(const Duration(seconds: 59));
+    expect(_notice, findsOneWidget);
+    await tester.pump(const Duration(seconds: 1));
+    expect(_notice, findsNothing);
+  });
+
+  for (final size in [const Size(400, 400), const Size(740, 360)]) {
+    testWidgets(
+      'fits the notice with both buttons at ${size.width.toInt()}×${size.height.toInt()}',
+      (tester) async {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await _pump(tester, await _rower(), connectError: _busy);
+
+        expect(find.text('Abbrechen'), findsOneWidget);
+        expect(find.text('Erneut versuchen'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 }

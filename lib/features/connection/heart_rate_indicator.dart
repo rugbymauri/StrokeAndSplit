@@ -21,26 +21,32 @@ HeartRateMonitorState? _shownState(WidgetRef ref) {
 
 String _phaseLabel(AppLocalizations l10n, HeartRateMonitorPhase phase) =>
     switch (phase) {
-      HeartRateMonitorPhase.connected => l10n.stateConnected,
+      // The rower's heart rate counts like a connected strap (Design D5).
+      HeartRateMonitorPhase.connected ||
+      HeartRateMonitorPhase.fromRower => l10n.stateConnected,
       HeartRateMonitorPhase.connecting => l10n.stateConnecting,
       HeartRateMonitorPhase.reconnecting => l10n.stateReconnecting,
       HeartRateMonitorPhase.ready => l10n.heartRateStateWaiting,
       HeartRateMonitorPhase.disconnected ||
+      HeartRateMonitorPhase.cancelled ||
       HeartRateMonitorPhase.notPaired => l10n.stateDisconnected,
     };
 
 Color _phaseColor(HeartRateMonitorPhase phase) => switch (phase) {
-  HeartRateMonitorPhase.connected => AppColors.connected,
+  HeartRateMonitorPhase.connected ||
+  HeartRateMonitorPhase.fromRower => AppColors.connected,
   HeartRateMonitorPhase.connecting ||
   HeartRateMonitorPhase.reconnecting => AppColors.zoneOut,
   HeartRateMonitorPhase.ready ||
   HeartRateMonitorPhase.disconnected ||
+  HeartRateMonitorPhase.cancelled ||
   HeartRateMonitorPhase.notPaired => AppColors.textMuted,
 };
 
 /// The strap's connection state as a small heart with a dot, next to the
-/// rower's `ConnectionIndicator`: green when connected, orange while
-/// (re)connecting and an empty grey ring otherwise. Screen readers read the state.
+/// rower's `ConnectionIndicator`: green when connected or when the rower
+/// reports the heart rate, orange while (re)connecting and an empty grey ring
+/// otherwise. Screen readers read the state.
 class HeartRateIndicator extends ConsumerWidget {
   const HeartRateIndicator({super.key});
 
@@ -55,6 +61,7 @@ class HeartRateIndicator extends ConsumerWidget {
     final color = _phaseColor(state.phase);
     final filled = switch (state.phase) {
       HeartRateMonitorPhase.connected ||
+      HeartRateMonitorPhase.fromRower ||
       HeartRateMonitorPhase.connecting ||
       HeartRateMonitorPhase.reconnecting => true,
       _ => false,
@@ -92,7 +99,8 @@ class HeartRateIndicator extends ConsumerWidget {
 }
 
 /// The strap's state as text below the app bar while it reconnects or after it
-/// failed, then with the reason and a button to try again.
+/// failed, then with the reason and buttons to give up or try again; nothing
+/// once it is given up or the rower reports the heart rate (Design D5).
 class HeartRateNotice extends ConsumerWidget {
   const HeartRateNotice({super.key});
 
@@ -118,34 +126,46 @@ class HeartRateNotice extends ConsumerWidget {
     };
     if (state == null || text == null) return const SizedBox.shrink();
     final failed = state.phase == HeartRateMonitorPhase.disconnected;
+    final notifier = ref.read(heartRateMonitorProvider.notifier);
+    final message = Text(
+      text,
+      style: AppTextStyles.caption.copyWith(
+        color: failed ? AppColors.zoneOutText : AppColors.zoneOut,
+      ),
+      maxLines: failed ? 3 : 1,
+      overflow: TextOverflow.ellipsis,
+    );
     return Padding(
       key: const Key('heart-rate-notice'),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.l,
         vertical: AppSpacing.xs,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              text,
-              style: AppTextStyles.caption.copyWith(
-                color: failed ? AppColors.zoneOutText : AppColors.zoneOut,
-              ),
-              maxLines: failed ? 3 : 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          if (failed) ...[
-            const SizedBox(width: AppSpacing.s),
-            TextButton(
-              onPressed: () =>
-                  ref.read(heartRateMonitorProvider.notifier).retry(),
-              child: Text(l10n.heartRateRetry),
-            ),
-          ],
-        ],
-      ),
+      // The buttons sit below the text, so both fit on a narrow screen.
+      child: failed
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                message,
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: AppSpacing.s,
+                  children: [
+                    TextButton(
+                      key: const Key('heart-rate-cancel'),
+                      onPressed: notifier.cancel,
+                      child: Text(l10n.actionCancel),
+                    ),
+                    TextButton(
+                      key: const Key('heart-rate-retry'),
+                      onPressed: notifier.retry,
+                      child: Text(l10n.heartRateRetry),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          : message,
     );
   }
 }
