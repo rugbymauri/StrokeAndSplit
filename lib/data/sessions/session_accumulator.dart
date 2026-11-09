@@ -15,7 +15,6 @@ class SessionBatch {
     required this.rawPackets,
     this.laps = const [],
     this.lapSegments = const [],
-    this.rrIntervals = const [],
     this.pauses = const [],
   });
 
@@ -24,7 +23,6 @@ class SessionBatch {
   final List<RawPacketsCompanion> rawPackets;
   final List<LapsCompanion> laps;
   final List<LapSegmentsCompanion> lapSegments;
-  final List<RrIntervalsCompanion> rrIntervals;
   final List<PausesCompanion> pauses;
 
   bool get isEmpty =>
@@ -33,7 +31,6 @@ class SessionBatch {
       rawPackets.isEmpty &&
       laps.isEmpty &&
       lapSegments.isEmpty &&
-      rrIntervals.isEmpty &&
       pauses.isEmpty;
 }
 
@@ -79,7 +76,6 @@ class SessionAccumulator {
   var _samples = <SamplesCompanion>[];
   var _strokes = <StrokesCompanion>[];
   var _rawPackets = <RawPacketsCompanion>[];
-  var _rrIntervals = <RrIntervalsCompanion>[];
 
   /// Distance and session time (wall clock without pauses) since the session started.
   SessionProgress get progress => SessionProgress(
@@ -147,7 +143,6 @@ class SessionAccumulator {
             in tracker?.takeSegments() ?? const <SegmentResult>[])
           segmentCompanion(sessionId, segment),
       ],
-      rrIntervals: _rrIntervals,
       pauses: [
         for (final pause in _pause.takePauses())
           PausesCompanion.insert(
@@ -160,7 +155,6 @@ class SessionAccumulator {
     _samples = [];
     _strokes = [];
     _rawPackets = [];
-    _rrIntervals = [];
     return batch;
   }
 
@@ -176,8 +170,6 @@ class SessionAccumulator {
       case StrokeForceCurve():
         // Kept as raw packets only; a replay decodes them again.
         break;
-      case HeartBeatIntervals():
-        _onHeartBeats(event);
     }
   }
 
@@ -227,22 +219,6 @@ class SessionAccumulator {
         activeMs: Value(activeMs),
       ),
     );
-  }
-
-  /// Stores each interval at the time it ended (Design D4), on the wall-clock
-  /// axis of the raw packets: unlike the rower's clock it keeps running in a
-  /// pause, while the heart keeps beating.
-  void _onHeartBeats(HeartBeatIntervals beats) {
-    final first = _firstPacketTime!;
-    for (final (i, end) in beats.intervalEnds.indexed) {
-      _rrIntervals.add(
-        RrIntervalsCompanion.insert(
-          sessionId: sessionId,
-          tMs: (end - first).inMilliseconds,
-          rrMs: beats.intervalsMs[i],
-        ),
-      );
-    }
   }
 
   void _onStroke(Stroke stroke) {

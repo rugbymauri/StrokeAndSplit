@@ -35,9 +35,7 @@ RawRecording pm5ToFtms(
             lastRecord = packet.time;
             records.add((at: packet.time, tick: event, strokes: strokes));
           }
-        case WorkoutStateChanged() ||
-            HeartBeatIntervals() ||
-            StrokeForceCurve():
+        case WorkoutStateChanged() || StrokeForceCurve():
           break;
       }
     }

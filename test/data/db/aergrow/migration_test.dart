@@ -21,6 +21,7 @@ import 'generated/schema_v7.dart' as v7;
 import 'generated/schema_v8.dart' as v8;
 import 'generated/schema_v10.dart' as v10;
 import 'generated/schema_v11.dart' as v11;
+import 'generated/schema_v12.dart' as v12;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -508,10 +509,9 @@ void main() {
         db.sessions,
       )..orderBy([(s) => OrderingTerm.asc(s.id)])).get();
       expect(
-        sessions.map((s) => (s.averageHeartRate, s.maxHeartRate, s.rmssdMs)),
-        everyElement((null, null, null)),
+        sessions.map((s) => (s.averageHeartRate, s.maxHeartRate)),
+        everyElement((null, null)),
       );
-      expect(await db.select(db.rrIntervals).get(), isEmpty);
     }
 
     test('keeps the sessions of version 5 without pulse summary', () async {
@@ -583,33 +583,6 @@ void main() {
       final session = (await db.select(db.sessions).get()).single;
       expect((session.protocol, session.strokeCount), (ErgProtocol.pm5, 20));
       await expectNoPulseSummary(db);
-      await db.close();
-    });
-
-    test('stores RR intervals and deletes them with their session', () async {
-      final db = openTestDatabase();
-      final id = await db
-          .into(db.sessions)
-          .insert(
-            SessionsCompanion.insert(
-              startedAt: DateTime(2026, 10, 16),
-              status: SessionStatus.complete,
-              source: ErgSourceKind.pm5,
-            ),
-          );
-      await db.batch(
-        (b) => b.insertAll(db.rrIntervals, [
-          RrIntervalsCompanion.insert(sessionId: id, tMs: 800, rrMs: 800),
-          RrIntervalsCompanion.insert(sessionId: id, tMs: 1610, rrMs: 810),
-        ]),
-      );
-      expect(
-        (await db.select(db.rrIntervals).get()).map((r) => (r.tMs, r.rrMs)),
-        [(800, 800), (1610, 810)],
-      );
-
-      await (db.delete(db.sessions)..where((s) => s.id.equals(id))).go();
-      expect(await db.select(db.rrIntervals).get(), isEmpty);
       await db.close();
     });
   });
@@ -947,6 +920,98 @@ void main() {
       expect(unlinked.workoutId, isNull);
       await (db.delete(db.sessions)..where((s) => s.id.equals(onCourse))).go();
       expect(await db.select(db.sessionCourses).get(), isEmpty);
+      await db.close();
+    });
+  });
+
+  group('to version 13', () {
+    test('deletes the RR intervals and RMSSD and keeps the session', () async {
+      final schema = await verifier.schemaAt(12);
+      final old = v12.DatabaseAtV12(schema.newConnection());
+      final id = await old
+          .into(old.sessions)
+          .insert(
+            v12.SessionsCompanion.insert(
+              startedAt: 0,
+              status: 'complete',
+              source: 'ftms',
+              protocol: const Value('ftms'),
+              durationMs: const Value(60000),
+              distanceDm: const Value(2500),
+              strokeCount: const Value(24),
+              averageHeartRate: const Value(142),
+              maxHeartRate: const Value(151),
+              rmssdMs: const Value(16),
+            ),
+          );
+      await old.batch((b) {
+        b.insert(
+          old.samples,
+          v12.SamplesCompanion.insert(
+            sessionId: id,
+            tMs: 60000,
+            distanceDm: 2500,
+            heartRate: const Value(151),
+          ),
+        );
+        b.insert(
+          old.strokes,
+          v12.StrokesCompanion.insert(
+            sessionId: id,
+            tMs: 59000,
+            distanceDm: 2460,
+            strokeNumber: 24,
+          ),
+        );
+        b.insert(
+          old.rawPackets,
+          v12.RawPacketsCompanion.insert(
+            sessionId: id,
+            tMs: 500,
+            characteristicId: '2a37',
+            bytes: Uint8List.fromList([0x10, 142, 0x20, 0x03]),
+          ),
+        );
+        b.insertAll(old.rrIntervals, [
+          v12.RrIntervalsCompanion.insert(sessionId: id, tMs: 800, rrMs: 800),
+          v12.RrIntervalsCompanion.insert(sessionId: id, tMs: 1610, rrMs: 810),
+        ]);
+      });
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 13);
+
+      final session = (await db.select(db.sessions).get()).single;
+      expect(
+        (
+          session.id,
+          session.distanceDm,
+          session.strokeCount,
+          session.averageHeartRate,
+          session.maxHeartRate,
+        ),
+        (id, 2500, 24, 142, 151),
+      );
+      expect((await db.select(db.samples).get()).single.heartRate, 151);
+      expect((await db.select(db.strokes).get()).single.strokeNumber, 24);
+      expect(
+        (await db.select(db.rawPackets).get()).single.characteristicId,
+        '2a37',
+      );
+      expect(
+        await db
+            .customSelect(
+              "SELECT name FROM sqlite_master WHERE name LIKE 'rr_intervals%'",
+            )
+            .get(),
+        isEmpty,
+      );
+      expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+
+      // The rebuilt sessions table keeps its foreign keys.
+      await (db.delete(db.sessions)..where((s) => s.id.equals(id))).go();
+      expect(await db.select(db.samples).get(), isEmpty);
       await db.close();
     });
   });

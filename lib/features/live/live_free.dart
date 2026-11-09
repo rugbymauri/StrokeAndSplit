@@ -22,16 +22,12 @@ class FreeLiveView extends StatelessWidget {
     required this.tick,
     required this.session,
     required this.action,
-    this.rrIntervalMs,
     this.outdated = false,
     this.forceCurves,
     this.status,
   });
 
   final StatusTick? tick;
-
-  /// The last RR interval from the strap, shown after the heart rate; null without a recent one.
-  final int? rrIntervalMs;
 
   /// Time and distance of the running session, shown instead of the rower's.
   final SessionProgress? session;
@@ -91,14 +87,7 @@ class FreeLiveView extends StatelessWidget {
           const SizedBox(height: _gap),
           SizedBox(
             height: 48,
-            child: _dim(
-              _SideValues(
-                tick: tick,
-                rrIntervalMs: rrIntervalMs,
-                session: session,
-                card: true,
-              ),
-            ),
+            child: _dim(_SideValues(tick: tick, session: session, card: true)),
           ),
           if (curve) ...[
             const SizedBox(height: _gap),
@@ -177,12 +166,7 @@ class FreeLiveView extends StatelessWidget {
                 SizedBox(
                   height: sideHeight,
                   child: _dim(
-                    _SideValues(
-                      tick: tick,
-                      rrIntervalMs: rrIntervalMs,
-                      session: session,
-                      card: false,
-                    ),
+                    _SideValues(tick: tick, session: session, card: false),
                   ),
                 ),
               ],
@@ -276,13 +260,11 @@ class FreeLiveView extends StatelessWidget {
 class _SideValues extends StatelessWidget {
   const _SideValues({
     required this.tick,
-    required this.rrIntervalMs,
     required this.session,
     required this.card,
   });
 
   final StatusTick? tick;
-  final int? rrIntervalMs;
   final SessionProgress? session;
 
   /// On a card as in portrait, or plain as in landscape.
@@ -301,8 +283,6 @@ class _SideValues extends StatelessWidget {
           formatWhole(heartRate),
           const Key('metric-hr'),
           icon: const HeartIcon(),
-          note: rrIntervalMs == null ? null : formatRrInterval(rrIntervalMs!),
-          noteKey: const Key('metric-rr'),
         ),
       if (calories != null)
         _item(
@@ -349,14 +329,7 @@ class _SideValues extends StatelessWidget {
     session?.elapsed ?? tick?.elapsed ?? Duration.zero,
   );
 
-  Widget _item(
-    String label,
-    String value,
-    Key key, {
-    Widget? icon,
-    String? note,
-    Key? noteKey,
-  }) {
+  Widget _item(String label, String value, Key key, {Widget? icon}) {
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Row(
@@ -383,17 +356,6 @@ class _SideValues extends StatelessWidget {
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
-          if (note != null) ...[
-            const SizedBox(width: 6),
-            Text(
-              note,
-              key: noteKey,
-              style: AppTextStyles.caption.copyWith(
-                fontSize: 12,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
-          ],
         ],
       ),
     );

@@ -9,13 +9,12 @@ import 'heart_rate_measurement.dart';
 class HeartRateEncoder {
   const HeartRateEncoder();
 
-  /// A measurement with [heartRate] and optional RR [intervalsMs].
+  /// A measurement with [heartRate].
   ///
   /// The heart rate is written as uint16 when [wide] is set or it does not fit
   /// in one byte. [energyExpended] adds the field that readers have to skip.
   RawPacket encode({
     required int heartRate,
-    List<int> intervalsMs = const [],
     bool wide = false,
     int? energyExpended,
     required Duration at,
@@ -26,14 +25,10 @@ class HeartRateEncoder {
         (useWide ? HeartRateMeasurement.wideHeartRateFlag : 0) |
             (energyExpended != null
                 ? HeartRateMeasurement.energyExpendedFlag
-                : 0) |
-            (intervalsMs.isNotEmpty ? HeartRateMeasurement.intervalsFlag : 0),
+                : 0),
       );
     useWide ? _u16(bytes, heartRate) : bytes.addByte(heartRate);
     if (energyExpended != null) _u16(bytes, energyExpended);
-    for (final interval in intervalsMs) {
-      _u16(bytes, (interval * 1024 / 1000).round());
-    }
     return RawPacket(
       time: at,
       characteristicId: HeartRateIds.measurement,

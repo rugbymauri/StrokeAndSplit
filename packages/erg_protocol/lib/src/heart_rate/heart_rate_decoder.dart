@@ -10,8 +10,7 @@ import 'heart_rate_measurement.dart';
 /// gets the strap's heart rate while its last value is at most
 /// [strapTimeout] old, else keeps the rower's one, which may be null. Ages
 /// are measured on the packet times, so live data, a replay and an import
-/// yield the same result. Every measurement with RR intervals becomes a
-/// [HeartBeatIntervals].
+/// yield the same result.
 class HeartRateDecoder implements ErgDecoder {
   HeartRateDecoder(this.inner, {this.onWarning});
 
@@ -27,7 +26,6 @@ class HeartRateDecoder implements ErgDecoder {
   int? _strapHeartRate;
   Duration? _strapTime;
   Duration? _lastRowerPacketTime;
-  var _lastElapsed = Duration.zero;
 
   @override
   List<RowingEvent> decode(RawPacket packet) {
@@ -55,14 +53,7 @@ class HeartRateDecoder implements ErgDecoder {
       _strapHeartRate = measurement.heartRate;
       _strapTime = packet.time;
     }
-    if (measurement.intervalsMs.isEmpty) return const [];
-    return [
-      HeartBeatIntervals(
-        elapsed: _lastElapsed,
-        time: packet.time,
-        intervalsMs: measurement.intervalsMs,
-      ),
-    ];
+    return const [];
   }
 
   List<RowingEvent> _withStrap(List<RowingEvent> events, Duration? time) {
@@ -83,10 +74,6 @@ class HeartRateDecoder implements ErgDecoder {
     ];
   }
 
-  StatusTick _onTick(StatusTick tick, int? strapHeartRate) {
-    _lastElapsed = tick.elapsed;
-    return strapHeartRate == null
-        ? tick
-        : tick.copyWith(heartRate: strapHeartRate);
-  }
+  StatusTick _onTick(StatusTick tick, int? strapHeartRate) =>
+      strapHeartRate == null ? tick : tick.copyWith(heartRate: strapHeartRate);
 }

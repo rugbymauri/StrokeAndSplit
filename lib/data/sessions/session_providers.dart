@@ -45,12 +45,6 @@ final sessionLapsProvider = StreamProvider.family<List<LapRow>, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).watchLaps(id),
 );
 
-/// The RR intervals of a stored session, oldest first; empty without a strap.
-final sessionRrIntervalsProvider =
-    FutureProvider.family<List<RrIntervalRow>, int>(
-      (ref, id) => ref.watch(sessionRepositoryProvider).rrIntervals(id),
-    );
-
 /// The lowest heart rate of a stored session; null without one.
 final sessionMinHeartRateProvider = FutureProvider.family<int?, int>(
   (ref, id) => ref.watch(sessionRepositoryProvider).minHeartRate(id),

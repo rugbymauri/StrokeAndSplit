@@ -64,7 +64,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get devicesNoStrapHint =>
-      'Optional, for heart rate and RR intervals straight from the strap';
+      'Optional, for heart rate straight from the strap';
 
   @override
   String get devicesStrapPaired => 'Paired';
@@ -555,14 +555,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionMaxHeartRate => 'Max heart rate';
 
   @override
-  String get summaryRrIntervals => 'RR intervals';
-
-  @override
-  String summaryRrCurve(int min, int max) {
-    return 'RR intervals over the session, between $min and $max ms';
-  }
-
-  @override
   String get summaryPace => 'Pace /500 m';
 
   @override
@@ -577,11 +569,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String summaryPaceCurve(String fastest, String slowest, String average) {
     return 'Pace over the session between $fastest and $slowest, $average on average';
-  }
-
-  @override
-  String summaryRmssd(int ms) {
-    return 'HRV (RMSSD) $ms ms';
   }
 
   @override

@@ -36,7 +36,6 @@ Map<String, Object?> _summary(SessionRow s) => {
   'strokeCount': s.strokeCount,
   'averageHeartRate': s.averageHeartRate,
   'maxHeartRate': s.maxHeartRate,
-  'rmssdMs': s.rmssdMs,
   'pauseCount': s.pauseCount,
   'pausedMs': s.pausedMs,
 };

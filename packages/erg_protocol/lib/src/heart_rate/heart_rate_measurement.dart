@@ -3,19 +3,14 @@ import 'dart:typed_data';
 /// One Heart Rate Measurement notification (`0x2A37`) of a chest strap.
 ///
 /// Flags in byte 0: bit 0 selects uint8 or uint16 for the heart rate, bit 3
-/// announces Energy Expended (skipped), bit 4 RR intervals. The sensor
-/// contact bits are ignored.
+/// announces Energy Expended, bit 4 RR intervals; both are only checked for
+/// their length (Change remove-rr-intervals, Design D1). The sensor contact
+/// bits are ignored.
 class HeartRateMeasurement {
-  HeartRateMeasurement({
-    required this.heartRate,
-    List<int> intervalsMs = const [],
-  }) : intervalsMs = List.unmodifiable(intervalsMs);
+  const HeartRateMeasurement({required this.heartRate});
 
   /// Beats per minute as sent by the strap.
   final int heartRate;
-
-  /// RR intervals in milliseconds, oldest first; empty when the strap sent none.
-  final List<int> intervalsMs;
 
   static const wideHeartRateFlag = 0x01;
   static const energyExpendedFlag = 0x08;
@@ -37,20 +32,16 @@ class HeartRateMeasurement {
       if (bytes.length < offset) return null;
     }
 
-    final intervals = <int>[];
-    if (flags & intervalsFlag != 0) {
-      // A trailing odd byte is a cut off interval. The flag without any
-      // interval is accepted, the heart rate is still valid then.
-      if ((bytes.length - offset).isOdd) return null;
-      for (; offset < bytes.length; offset += 2) {
-        intervals.add((_u16(bytes, offset) * 1000 / 1024).round());
-      }
+    // A trailing odd byte is a cut off RR interval. The flag without any
+    // interval is accepted, the heart rate is still valid then.
+    if (flags & intervalsFlag != 0 && (bytes.length - offset).isOdd) {
+      return null;
     }
-    return HeartRateMeasurement(heartRate: heartRate, intervalsMs: intervals);
+    return HeartRateMeasurement(heartRate: heartRate);
   }
 
   @override
-  String toString() => 'HeartRateMeasurement(hr: $heartRate, rr: $intervalsMs)';
+  String toString() => 'HeartRateMeasurement(hr: $heartRate)';
 }
 
 int _u16(Uint8List b, int offset) => b[offset] | b[offset + 1] << 8;

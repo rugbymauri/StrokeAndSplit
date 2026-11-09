@@ -579,17 +579,6 @@ class $SessionsTable extends Sessions
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _rmssdMsMeta = const VerificationMeta(
-    'rmssdMs',
-  );
-  @override
-  late final GeneratedColumn<int> rmssdMs = GeneratedColumn<int>(
-    'rmssd_ms',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
   static const VerificationMeta _pauseCountMeta = const VerificationMeta(
     'pauseCount',
   );
@@ -648,7 +637,6 @@ class $SessionsTable extends Sessions
     imported,
     averageHeartRate,
     maxHeartRate,
-    rmssdMs,
     pauseCount,
     pausedMs,
     healthExportedAt,
@@ -793,12 +781,6 @@ class $SessionsTable extends Sessions
         ),
       );
     }
-    if (data.containsKey('rmssd_ms')) {
-      context.handle(
-        _rmssdMsMeta,
-        rmssdMs.isAcceptableOrUnknown(data['rmssd_ms']!, _rmssdMsMeta),
-      );
-    }
     if (data.containsKey('pause_count')) {
       context.handle(
         _pauseCountMeta,
@@ -915,10 +897,6 @@ class $SessionsTable extends Sessions
         DriftSqlType.int,
         data['${effectivePrefix}max_heart_rate'],
       ),
-      rmssdMs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}rmssd_ms'],
-      ),
       pauseCount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}pause_count'],
@@ -980,7 +958,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
   final bool imported;
   final int? averageHeartRate;
   final int? maxHeartRate;
-  final int? rmssdMs;
   final int pauseCount;
   final int pausedMs;
 
@@ -1008,7 +985,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     required this.imported,
     this.averageHeartRate,
     this.maxHeartRate,
-    this.rmssdMs,
     required this.pauseCount,
     required this.pausedMs,
     this.healthExportedAt,
@@ -1070,9 +1046,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     if (!nullToAbsent || maxHeartRate != null) {
       map['max_heart_rate'] = Variable<int>(maxHeartRate);
     }
-    if (!nullToAbsent || rmssdMs != null) {
-      map['rmssd_ms'] = Variable<int>(rmssdMs);
-    }
     map['pause_count'] = Variable<int>(pauseCount);
     map['paused_ms'] = Variable<int>(pausedMs);
     if (!nullToAbsent || healthExportedAt != null) {
@@ -1125,9 +1098,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       maxHeartRate: maxHeartRate == null && nullToAbsent
           ? const Value.absent()
           : Value(maxHeartRate),
-      rmssdMs: rmssdMs == null && nullToAbsent
-          ? const Value.absent()
-          : Value(rmssdMs),
       pauseCount: Value(pauseCount),
       pausedMs: Value(pausedMs),
       healthExportedAt: healthExportedAt == null && nullToAbsent
@@ -1170,7 +1140,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       imported: serializer.fromJson<bool>(json['imported']),
       averageHeartRate: serializer.fromJson<int?>(json['averageHeartRate']),
       maxHeartRate: serializer.fromJson<int?>(json['maxHeartRate']),
-      rmssdMs: serializer.fromJson<int?>(json['rmssdMs']),
       pauseCount: serializer.fromJson<int>(json['pauseCount']),
       pausedMs: serializer.fromJson<int>(json['pausedMs']),
       healthExportedAt: serializer.fromJson<DateTime?>(
@@ -1208,7 +1177,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       'imported': serializer.toJson<bool>(imported),
       'averageHeartRate': serializer.toJson<int?>(averageHeartRate),
       'maxHeartRate': serializer.toJson<int?>(maxHeartRate),
-      'rmssdMs': serializer.toJson<int?>(rmssdMs),
       'pauseCount': serializer.toJson<int>(pauseCount),
       'pausedMs': serializer.toJson<int>(pausedMs),
       'healthExportedAt': serializer.toJson<DateTime?>(healthExportedAt),
@@ -1236,7 +1204,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     bool? imported,
     Value<int?> averageHeartRate = const Value.absent(),
     Value<int?> maxHeartRate = const Value.absent(),
-    Value<int?> rmssdMs = const Value.absent(),
     int? pauseCount,
     int? pausedMs,
     Value<DateTime?> healthExportedAt = const Value.absent(),
@@ -1269,7 +1236,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
         ? averageHeartRate.value
         : this.averageHeartRate,
     maxHeartRate: maxHeartRate.present ? maxHeartRate.value : this.maxHeartRate,
-    rmssdMs: rmssdMs.present ? rmssdMs.value : this.rmssdMs,
     pauseCount: pauseCount ?? this.pauseCount,
     pausedMs: pausedMs ?? this.pausedMs,
     healthExportedAt: healthExportedAt.present
@@ -1322,7 +1288,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
       maxHeartRate: data.maxHeartRate.present
           ? data.maxHeartRate.value
           : this.maxHeartRate,
-      rmssdMs: data.rmssdMs.present ? data.rmssdMs.value : this.rmssdMs,
       pauseCount: data.pauseCount.present
           ? data.pauseCount.value
           : this.pauseCount,
@@ -1356,7 +1321,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           ..write('imported: $imported, ')
           ..write('averageHeartRate: $averageHeartRate, ')
           ..write('maxHeartRate: $maxHeartRate, ')
-          ..write('rmssdMs: $rmssdMs, ')
           ..write('pauseCount: $pauseCount, ')
           ..write('pausedMs: $pausedMs, ')
           ..write('healthExportedAt: $healthExportedAt')
@@ -1386,7 +1350,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
     imported,
     averageHeartRate,
     maxHeartRate,
-    rmssdMs,
     pauseCount,
     pausedMs,
     healthExportedAt,
@@ -1415,7 +1378,6 @@ class SessionRow extends DataClass implements Insertable<SessionRow> {
           other.imported == this.imported &&
           other.averageHeartRate == this.averageHeartRate &&
           other.maxHeartRate == this.maxHeartRate &&
-          other.rmssdMs == this.rmssdMs &&
           other.pauseCount == this.pauseCount &&
           other.pausedMs == this.pausedMs &&
           other.healthExportedAt == this.healthExportedAt);
@@ -1442,7 +1404,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
   final Value<bool> imported;
   final Value<int?> averageHeartRate;
   final Value<int?> maxHeartRate;
-  final Value<int?> rmssdMs;
   final Value<int> pauseCount;
   final Value<int> pausedMs;
   final Value<DateTime?> healthExportedAt;
@@ -1467,7 +1428,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.imported = const Value.absent(),
     this.averageHeartRate = const Value.absent(),
     this.maxHeartRate = const Value.absent(),
-    this.rmssdMs = const Value.absent(),
     this.pauseCount = const Value.absent(),
     this.pausedMs = const Value.absent(),
     this.healthExportedAt = const Value.absent(),
@@ -1493,7 +1453,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     this.imported = const Value.absent(),
     this.averageHeartRate = const Value.absent(),
     this.maxHeartRate = const Value.absent(),
-    this.rmssdMs = const Value.absent(),
     this.pauseCount = const Value.absent(),
     this.pausedMs = const Value.absent(),
     this.healthExportedAt = const Value.absent(),
@@ -1521,7 +1480,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Expression<bool>? imported,
     Expression<int>? averageHeartRate,
     Expression<int>? maxHeartRate,
-    Expression<int>? rmssdMs,
     Expression<int>? pauseCount,
     Expression<int>? pausedMs,
     Expression<DateTime>? healthExportedAt,
@@ -1547,7 +1505,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       if (imported != null) 'imported': imported,
       if (averageHeartRate != null) 'average_heart_rate': averageHeartRate,
       if (maxHeartRate != null) 'max_heart_rate': maxHeartRate,
-      if (rmssdMs != null) 'rmssd_ms': rmssdMs,
       if (pauseCount != null) 'pause_count': pauseCount,
       if (pausedMs != null) 'paused_ms': pausedMs,
       if (healthExportedAt != null) 'health_exported_at': healthExportedAt,
@@ -1575,7 +1532,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     Value<bool>? imported,
     Value<int?>? averageHeartRate,
     Value<int?>? maxHeartRate,
-    Value<int?>? rmssdMs,
     Value<int>? pauseCount,
     Value<int>? pausedMs,
     Value<DateTime?>? healthExportedAt,
@@ -1601,7 +1557,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
       imported: imported ?? this.imported,
       averageHeartRate: averageHeartRate ?? this.averageHeartRate,
       maxHeartRate: maxHeartRate ?? this.maxHeartRate,
-      rmssdMs: rmssdMs ?? this.rmssdMs,
       pauseCount: pauseCount ?? this.pauseCount,
       pausedMs: pausedMs ?? this.pausedMs,
       healthExportedAt: healthExportedAt ?? this.healthExportedAt,
@@ -1677,9 +1632,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
     if (maxHeartRate.present) {
       map['max_heart_rate'] = Variable<int>(maxHeartRate.value);
     }
-    if (rmssdMs.present) {
-      map['rmssd_ms'] = Variable<int>(rmssdMs.value);
-    }
     if (pauseCount.present) {
       map['pause_count'] = Variable<int>(pauseCount.value);
     }
@@ -1715,7 +1667,6 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
           ..write('imported: $imported, ')
           ..write('averageHeartRate: $averageHeartRate, ')
           ..write('maxHeartRate: $maxHeartRate, ')
-          ..write('rmssdMs: $rmssdMs, ')
           ..write('pauseCount: $pauseCount, ')
           ..write('pausedMs: $pausedMs, ')
           ..write('healthExportedAt: $healthExportedAt')
@@ -6861,271 +6812,6 @@ class SessionCoursesCompanion extends UpdateCompanion<SessionCourseRow> {
   }
 }
 
-class $RrIntervalsTable extends RrIntervals
-    with TableInfo<$RrIntervalsTable, RrIntervalRow> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $RrIntervalsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
-    'sessionId',
-  );
-  @override
-  late final GeneratedColumn<int> sessionId = GeneratedColumn<int>(
-    'session_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES sessions (id) ON DELETE CASCADE',
-    ),
-  );
-  static const VerificationMeta _tMsMeta = const VerificationMeta('tMs');
-  @override
-  late final GeneratedColumn<int> tMs = GeneratedColumn<int>(
-    't_ms',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _rrMsMeta = const VerificationMeta('rrMs');
-  @override
-  late final GeneratedColumn<int> rrMs = GeneratedColumn<int>(
-    'rr_ms',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [sessionId, tMs, rrMs];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'rr_intervals';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<RrIntervalRow> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('session_id')) {
-      context.handle(
-        _sessionIdMeta,
-        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_sessionIdMeta);
-    }
-    if (data.containsKey('t_ms')) {
-      context.handle(
-        _tMsMeta,
-        tMs.isAcceptableOrUnknown(data['t_ms']!, _tMsMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_tMsMeta);
-    }
-    if (data.containsKey('rr_ms')) {
-      context.handle(
-        _rrMsMeta,
-        rrMs.isAcceptableOrUnknown(data['rr_ms']!, _rrMsMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_rrMsMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => const {};
-  @override
-  RrIntervalRow map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return RrIntervalRow(
-      sessionId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}session_id'],
-      )!,
-      tMs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}t_ms'],
-      )!,
-      rrMs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}rr_ms'],
-      )!,
-    );
-  }
-
-  @override
-  $RrIntervalsTable createAlias(String alias) {
-    return $RrIntervalsTable(attachedDatabase, alias);
-  }
-}
-
-class RrIntervalRow extends DataClass implements Insertable<RrIntervalRow> {
-  final int sessionId;
-  final int tMs;
-  final int rrMs;
-  const RrIntervalRow({
-    required this.sessionId,
-    required this.tMs,
-    required this.rrMs,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['session_id'] = Variable<int>(sessionId);
-    map['t_ms'] = Variable<int>(tMs);
-    map['rr_ms'] = Variable<int>(rrMs);
-    return map;
-  }
-
-  RrIntervalsCompanion toCompanion(bool nullToAbsent) {
-    return RrIntervalsCompanion(
-      sessionId: Value(sessionId),
-      tMs: Value(tMs),
-      rrMs: Value(rrMs),
-    );
-  }
-
-  factory RrIntervalRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return RrIntervalRow(
-      sessionId: serializer.fromJson<int>(json['sessionId']),
-      tMs: serializer.fromJson<int>(json['tMs']),
-      rrMs: serializer.fromJson<int>(json['rrMs']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'sessionId': serializer.toJson<int>(sessionId),
-      'tMs': serializer.toJson<int>(tMs),
-      'rrMs': serializer.toJson<int>(rrMs),
-    };
-  }
-
-  RrIntervalRow copyWith({int? sessionId, int? tMs, int? rrMs}) =>
-      RrIntervalRow(
-        sessionId: sessionId ?? this.sessionId,
-        tMs: tMs ?? this.tMs,
-        rrMs: rrMs ?? this.rrMs,
-      );
-  RrIntervalRow copyWithCompanion(RrIntervalsCompanion data) {
-    return RrIntervalRow(
-      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
-      tMs: data.tMs.present ? data.tMs.value : this.tMs,
-      rrMs: data.rrMs.present ? data.rrMs.value : this.rrMs,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('RrIntervalRow(')
-          ..write('sessionId: $sessionId, ')
-          ..write('tMs: $tMs, ')
-          ..write('rrMs: $rrMs')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(sessionId, tMs, rrMs);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is RrIntervalRow &&
-          other.sessionId == this.sessionId &&
-          other.tMs == this.tMs &&
-          other.rrMs == this.rrMs);
-}
-
-class RrIntervalsCompanion extends UpdateCompanion<RrIntervalRow> {
-  final Value<int> sessionId;
-  final Value<int> tMs;
-  final Value<int> rrMs;
-  final Value<int> rowid;
-  const RrIntervalsCompanion({
-    this.sessionId = const Value.absent(),
-    this.tMs = const Value.absent(),
-    this.rrMs = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  RrIntervalsCompanion.insert({
-    required int sessionId,
-    required int tMs,
-    required int rrMs,
-    this.rowid = const Value.absent(),
-  }) : sessionId = Value(sessionId),
-       tMs = Value(tMs),
-       rrMs = Value(rrMs);
-  static Insertable<RrIntervalRow> custom({
-    Expression<int>? sessionId,
-    Expression<int>? tMs,
-    Expression<int>? rrMs,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (sessionId != null) 'session_id': sessionId,
-      if (tMs != null) 't_ms': tMs,
-      if (rrMs != null) 'rr_ms': rrMs,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  RrIntervalsCompanion copyWith({
-    Value<int>? sessionId,
-    Value<int>? tMs,
-    Value<int>? rrMs,
-    Value<int>? rowid,
-  }) {
-    return RrIntervalsCompanion(
-      sessionId: sessionId ?? this.sessionId,
-      tMs: tMs ?? this.tMs,
-      rrMs: rrMs ?? this.rrMs,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (sessionId.present) {
-      map['session_id'] = Variable<int>(sessionId.value);
-    }
-    if (tMs.present) {
-      map['t_ms'] = Variable<int>(tMs.value);
-    }
-    if (rrMs.present) {
-      map['rr_ms'] = Variable<int>(rrMs.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('RrIntervalsCompanion(')
-          ..write('sessionId: $sessionId, ')
-          ..write('tMs: $tMs, ')
-          ..write('rrMs: $rrMs, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $PausesTable extends Pauses with TableInfo<$PausesTable, PauseRow> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -7415,7 +7101,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LapsTable laps = $LapsTable(this);
   late final $LapSegmentsTable lapSegments = $LapSegmentsTable(this);
   late final $SessionCoursesTable sessionCourses = $SessionCoursesTable(this);
-  late final $RrIntervalsTable rrIntervals = $RrIntervalsTable(this);
   late final $PausesTable pauses = $PausesTable(this);
   late final Index samplesSessionTime = Index(
     'samples_session_time',
@@ -7432,10 +7117,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index courseVersionsCourse = Index(
     'course_versions_course',
     'CREATE INDEX course_versions_course ON course_versions (course_id, version)',
-  );
-  late final Index rrIntervalsSessionTime = Index(
-    'rr_intervals_session_time',
-    'CREATE INDEX rr_intervals_session_time ON rr_intervals (session_id, t_ms)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -7455,13 +7136,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     laps,
     lapSegments,
     sessionCourses,
-    rrIntervals,
     pauses,
     samplesSessionTime,
     strokesSessionTime,
     rawPacketsSessionTime,
     courseVersionsCourse,
-    rrIntervalsSessionTime,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -7527,13 +7206,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('session_courses', kind: UpdateKind.delete)],
-    ),
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'sessions',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('rr_intervals', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -7952,7 +7624,6 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   Value<bool> imported,
   Value<int?> averageHeartRate,
   Value<int?> maxHeartRate,
-  Value<int?> rmssdMs,
   Value<int> pauseCount,
   Value<int> pausedMs,
   Value<DateTime?> healthExportedAt,
@@ -7978,7 +7649,6 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<bool> imported,
   Value<int?> averageHeartRate,
   Value<int?> maxHeartRate,
-  Value<int?> rmssdMs,
   Value<int> pauseCount,
   Value<int> pausedMs,
   Value<DateTime?> healthExportedAt,
@@ -8116,24 +7786,6 @@ final class $$SessionsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$RrIntervalsTable, List<RrIntervalRow>>
-  _rrIntervalsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.rrIntervals,
-    aliasName: 'sessions__id__rr_intervals__session_id',
-  );
-
-  $$RrIntervalsTableProcessedTableManager get rrIntervalsRefs {
-    final manager = $$RrIntervalsTableTableManager(
-      $_db,
-      $_db.rrIntervals,
-    ).filter((f) => f.sessionId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_rrIntervalsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
   static MultiTypedResultKey<$PausesTable, List<PauseRow>> _pausesRefsTable(
     _$AppDatabase db,
   ) => MultiTypedResultKey.fromTable(
@@ -8258,11 +7910,6 @@ class $$SessionsTableFilterComposer
 
   ColumnFilters<int> get maxHeartRate => $composableBuilder(
     column: $table.maxHeartRate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get rmssdMs => $composableBuilder(
-    column: $table.rmssdMs,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8454,31 +8101,6 @@ class $$SessionsTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> rrIntervalsRefs(
-    Expression<bool> Function($$RrIntervalsTableFilterComposer f) f,
-  ) {
-    final $$RrIntervalsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.rrIntervals,
-      getReferencedColumn: (t) => t.sessionId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$RrIntervalsTableFilterComposer(
-            $db: $db,
-            $table: $db.rrIntervals,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
   Expression<bool> pausesRefs(
     Expression<bool> Function($$PausesTableFilterComposer f) f,
   ) {
@@ -8606,11 +8228,6 @@ class $$SessionsTableOrderingComposer
 
   ColumnOrderings<int> get maxHeartRate => $composableBuilder(
     column: $table.maxHeartRate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get rmssdMs => $composableBuilder(
-    column: $table.rmssdMs,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -8742,9 +8359,6 @@ class $$SessionsTableAnnotationComposer
     column: $table.maxHeartRate,
     builder: (column) => column,
   );
-
-  GeneratedColumn<int> get rmssdMs =>
-      $composableBuilder(column: $table.rmssdMs, builder: (column) => column);
 
   GeneratedColumn<int> get pauseCount => $composableBuilder(
     column: $table.pauseCount,
@@ -8932,31 +8546,6 @@ class $$SessionsTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> rrIntervalsRefs<T extends Object>(
-    Expression<T> Function($$RrIntervalsTableAnnotationComposer a) f,
-  ) {
-    final $$RrIntervalsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.rrIntervals,
-      getReferencedColumn: (t) => t.sessionId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$RrIntervalsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.rrIntervals,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
   Expression<T> pausesRefs<T extends Object>(
     Expression<T> Function($$PausesTableAnnotationComposer a) f,
   ) {
@@ -9004,7 +8593,6 @@ class $$SessionsTableTableManager
             bool lapsRefs,
             bool lapSegmentsRefs,
             bool sessionCoursesRefs,
-            bool rrIntervalsRefs,
             bool pausesRefs,
           })
         > {
@@ -9041,7 +8629,6 @@ class $$SessionsTableTableManager
                 Value<bool> imported = const Value.absent(),
                 Value<int?> averageHeartRate = const Value.absent(),
                 Value<int?> maxHeartRate = const Value.absent(),
-                Value<int?> rmssdMs = const Value.absent(),
                 Value<int> pauseCount = const Value.absent(),
                 Value<int> pausedMs = const Value.absent(),
                 Value<DateTime?> healthExportedAt = const Value.absent(),
@@ -9066,7 +8653,6 @@ class $$SessionsTableTableManager
                 imported: imported,
                 averageHeartRate: averageHeartRate,
                 maxHeartRate: maxHeartRate,
-                rmssdMs: rmssdMs,
                 pauseCount: pauseCount,
                 pausedMs: pausedMs,
                 healthExportedAt: healthExportedAt,
@@ -9093,7 +8679,6 @@ class $$SessionsTableTableManager
                 Value<bool> imported = const Value.absent(),
                 Value<int?> averageHeartRate = const Value.absent(),
                 Value<int?> maxHeartRate = const Value.absent(),
-                Value<int?> rmssdMs = const Value.absent(),
                 Value<int> pauseCount = const Value.absent(),
                 Value<int> pausedMs = const Value.absent(),
                 Value<DateTime?> healthExportedAt = const Value.absent(),
@@ -9118,7 +8703,6 @@ class $$SessionsTableTableManager
                 imported: imported,
                 averageHeartRate: averageHeartRate,
                 maxHeartRate: maxHeartRate,
-                rmssdMs: rmssdMs,
                 pauseCount: pauseCount,
                 pausedMs: pausedMs,
                 healthExportedAt: healthExportedAt,
@@ -9140,7 +8724,6 @@ class $$SessionsTableTableManager
                 lapsRefs = false,
                 lapSegmentsRefs = false,
                 sessionCoursesRefs = false,
-                rrIntervalsRefs = false,
                 pausesRefs = false,
               }) {
                 return PrefetchHooks(
@@ -9152,7 +8735,6 @@ class $$SessionsTableTableManager
                     if (lapsRefs) db.laps,
                     if (lapSegmentsRefs) db.lapSegments,
                     if (sessionCoursesRefs) db.sessionCourses,
-                    if (rrIntervalsRefs) db.rrIntervals,
                     if (pausesRefs) db.pauses,
                   ],
                   addJoins:
@@ -9303,26 +8885,6 @@ class $$SessionsTableTableManager
                           referencedColumn: 'session_id',
                           typedResults: items,
                         ),
-                      if (rrIntervalsRefs)
-                        await $_getPrefetchedDataByColumns<
-                          SessionRow,
-                          $SessionsTable,
-                          RrIntervalRow,
-                          $RrIntervalsTable
-                        >(
-                          currentTable: table,
-                          referencedTable: $$SessionsTableReferences
-                              ._rrIntervalsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$SessionsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).rrIntervalsRefs,
-                          currentColumn: 'id',
-                          referencedColumn: 'session_id',
-                          typedResults: items,
-                        ),
                       if (pausesRefs)
                         await $_getPrefetchedDataByColumns<
                           SessionRow,
@@ -9371,7 +8933,6 @@ typedef $$SessionsTableProcessedTableManager =
         bool lapsRefs,
         bool lapSegmentsRefs,
         bool sessionCoursesRefs,
-        bool rrIntervalsRefs,
         bool pausesRefs,
       })
     >;
@@ -13763,283 +13324,6 @@ typedef $$SessionCoursesTableProcessedTableManager =
       SessionCourseRow,
       PrefetchHooks Function({bool sessionId, bool courseVersionId})
     >;
-typedef $$RrIntervalsTableCreateCompanionBuilder =
-    RrIntervalsCompanion Function({
-      required int sessionId,
-      required int tMs,
-      required int rrMs,
-      Value<int> rowid,
-    });
-typedef $$RrIntervalsTableUpdateCompanionBuilder =
-    RrIntervalsCompanion Function({
-      Value<int> sessionId,
-      Value<int> tMs,
-      Value<int> rrMs,
-      Value<int> rowid,
-    });
-
-final class $$RrIntervalsTableReferences
-    extends BaseReferences<_$AppDatabase, $RrIntervalsTable, RrIntervalRow> {
-  $$RrIntervalsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $SessionsTable _sessionIdTable(_$AppDatabase db) =>
-      db.sessions.createAlias('rr_intervals__session_id__sessions__id');
-
-  $$SessionsTableProcessedTableManager get sessionId {
-    final $_column = $_itemColumn<int>('session_id')!;
-
-    final manager = $$SessionsTableTableManager(
-      $_db,
-      $_db.sessions,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
-class $$RrIntervalsTableFilterComposer
-    extends Composer<_$AppDatabase, $RrIntervalsTable> {
-  $$RrIntervalsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get tMs => $composableBuilder(
-    column: $table.tMs,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get rrMs => $composableBuilder(
-    column: $table.rrMs,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$SessionsTableFilterComposer get sessionId {
-    final $$SessionsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.sessionId,
-      referencedTable: $db.sessions,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$SessionsTableFilterComposer(
-            $db: $db,
-            $table: $db.sessions,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$RrIntervalsTableOrderingComposer
-    extends Composer<_$AppDatabase, $RrIntervalsTable> {
-  $$RrIntervalsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get tMs => $composableBuilder(
-    column: $table.tMs,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get rrMs => $composableBuilder(
-    column: $table.rrMs,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$SessionsTableOrderingComposer get sessionId {
-    final $$SessionsTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.sessionId,
-      referencedTable: $db.sessions,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$SessionsTableOrderingComposer(
-            $db: $db,
-            $table: $db.sessions,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$RrIntervalsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $RrIntervalsTable> {
-  $$RrIntervalsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get tMs =>
-      $composableBuilder(column: $table.tMs, builder: (column) => column);
-
-  GeneratedColumn<int> get rrMs =>
-      $composableBuilder(column: $table.rrMs, builder: (column) => column);
-
-  $$SessionsTableAnnotationComposer get sessionId {
-    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.sessionId,
-      referencedTable: $db.sessions,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$SessionsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.sessions,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$RrIntervalsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $RrIntervalsTable,
-          RrIntervalRow,
-          $$RrIntervalsTableFilterComposer,
-          $$RrIntervalsTableOrderingComposer,
-          $$RrIntervalsTableAnnotationComposer,
-          $$RrIntervalsTableCreateCompanionBuilder,
-          $$RrIntervalsTableUpdateCompanionBuilder,
-          (RrIntervalRow, $$RrIntervalsTableReferences),
-          RrIntervalRow,
-          PrefetchHooks Function({bool sessionId})
-        > {
-  $$RrIntervalsTableTableManager(_$AppDatabase db, $RrIntervalsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$RrIntervalsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$RrIntervalsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$RrIntervalsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> sessionId = const Value.absent(),
-                Value<int> tMs = const Value.absent(),
-                Value<int> rrMs = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => RrIntervalsCompanion(
-                sessionId: sessionId,
-                tMs: tMs,
-                rrMs: rrMs,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required int sessionId,
-                required int tMs,
-                required int rrMs,
-                Value<int> rowid = const Value.absent(),
-              }) => RrIntervalsCompanion.insert(
-                sessionId: sessionId,
-                tMs: tMs,
-                rrMs: rrMs,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable<$RrIntervalsTable, RrIntervalRow>(table),
-                  $$RrIntervalsTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback: ({sessionId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (sessionId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.sessionId,
-                        referencedTable: $$RrIntervalsTableReferences
-                            ._sessionIdTable(db),
-                        referencedColumn: $$RrIntervalsTableReferences
-                            ._sessionIdTable(db)
-                            .id,
-                      ) as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$RrIntervalsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $RrIntervalsTable,
-      RrIntervalRow,
-      $$RrIntervalsTableFilterComposer,
-      $$RrIntervalsTableOrderingComposer,
-      $$RrIntervalsTableAnnotationComposer,
-      $$RrIntervalsTableCreateCompanionBuilder,
-      $$RrIntervalsTableUpdateCompanionBuilder,
-      (RrIntervalRow, $$RrIntervalsTableReferences),
-      RrIntervalRow,
-      PrefetchHooks Function({bool sessionId})
-    >;
 typedef $$PausesTableCreateCompanionBuilder = PausesCompanion Function({
   required int sessionId,
   required int startWallMs,
@@ -14346,8 +13630,6 @@ class $AppDatabaseManager {
       $$LapSegmentsTableTableManager(_db, _db.lapSegments);
   $$SessionCoursesTableTableManager get sessionCourses =>
       $$SessionCoursesTableTableManager(_db, _db.sessionCourses);
-  $$RrIntervalsTableTableManager get rrIntervals =>
-      $$RrIntervalsTableTableManager(_db, _db.rrIntervals);
   $$PausesTableTableManager get pauses =>
       $$PausesTableTableManager(_db, _db.pauses);
 }

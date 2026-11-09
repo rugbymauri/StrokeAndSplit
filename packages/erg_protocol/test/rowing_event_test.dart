@@ -45,32 +45,4 @@ void main() {
       expect(_tick.copyWith(heartRate: 142).resistanceLevel, 7);
     });
   });
-
-  group('HeartBeatIntervals', () {
-    test('lets the last interval end at the receive time and earlier ones before it', () {
-      final event = HeartBeatIntervals(
-        elapsed: const Duration(seconds: 10),
-        time: const Duration(seconds: 12),
-        intervalsMs: [812, 790],
-      );
-
-      expect(event.intervalEnds, [
-        const Duration(milliseconds: 11210),
-        const Duration(seconds: 12),
-      ]);
-    });
-
-    test('keeps its own copy of the intervals', () {
-      final intervals = [800];
-      final event = HeartBeatIntervals(
-        elapsed: Duration.zero,
-        time: Duration.zero,
-        intervalsMs: intervals,
-      );
-      intervals.add(900);
-
-      expect(event.intervalsMs, [800]);
-      expect(() => event.intervalsMs.add(1), throwsUnsupportedError);
-    });
-  });
 }

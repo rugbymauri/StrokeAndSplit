@@ -31,7 +31,6 @@ class CourseLiveView extends StatelessWidget {
     required this.tick,
     this.session,
     required this.lap,
-    this.rrIntervalMs,
     required this.course,
     required this.action,
     required this.shortAction,
@@ -49,8 +48,6 @@ class CourseLiveView extends StatelessWidget {
   /// Time and distance of the running session; its time is shown instead of the rower's.
   final SessionProgress? session;
 
-  /// The last RR interval from the strap, shown below the heart rate; null without a recent one.
-  final int? rrIntervalMs;
   final LapProgress lap;
   final CourseDefinition course;
 
@@ -359,10 +356,6 @@ class CourseLiveView extends StatelessWidget {
           valueKey: const Key('metric-hr'),
           fontSize: fontSize,
           icon: const HeartIcon(size: 12),
-          footnote: rrIntervalMs == null
-              ? null
-              : formatRrInterval(rrIntervalMs!),
-          footnoteKey: const Key('metric-rr'),
           compact: true,
         ),
     ];

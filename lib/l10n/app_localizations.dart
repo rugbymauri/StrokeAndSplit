@@ -203,7 +203,7 @@ abstract class AppLocalizations {
   /// Choose devices: explanation below 'Kein Gurt', the strap is optional
   ///
   /// In de, this message translates to:
-  /// **'Optional, für Puls und RR-Intervalle direkt vom Gurt'**
+  /// **'Optional, für den Puls direkt vom Gurt'**
   String get devicesNoStrapHint;
 
   /// Choose devices: line below the name of the paired heart rate strap
@@ -1003,18 +1003,6 @@ abstract class AppLocalizations {
   /// **'Max. Puls'**
   String get sessionMaxHeartRate;
 
-  /// Summary: title above the curve of the intervals from one heart beat to the next, as sent by the heart rate strap
-  ///
-  /// In de, this message translates to:
-  /// **'RR-Intervalle'**
-  String get summaryRrIntervals;
-
-  /// Summary: screen reader text of the curve of the RR intervals over the session
-  ///
-  /// In de, this message translates to:
-  /// **'Verlauf der RR-Intervalle zwischen {min} und {max} ms'**
-  String summaryRrCurve(int min, int max);
-
   /// Summary: title above the curve of the pace over the session
   ///
   /// In de, this message translates to:
@@ -1044,12 +1032,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Verlauf der Pace zwischen {fastest} und {slowest}, im Durchschnitt {average}'**
   String summaryPaceCurve(String fastest, String slowest, String average);
-
-  /// Summary: heart rate variability of the session as RMSSD in whole milliseconds
-  ///
-  /// In de, this message translates to:
-  /// **'HRV (RMSSD) {ms} ms'**
-  String summaryRmssd(int ms);
 
   /// Summary: heading above the laps, written in capitals
   ///

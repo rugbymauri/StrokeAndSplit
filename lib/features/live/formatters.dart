@@ -53,9 +53,6 @@ String formatWhole(int? value) => value?.toString() ?? _noValue;
 String? formatResistanceLevel(AppLocalizations l10n, int? level) =>
     level == null ? null : l10n.metricResistanceLevel(level);
 
-/// An RR interval in whole milliseconds, e.g. "812 ms".
-String formatRrInterval(int milliseconds) => '$milliseconds ms';
-
 /// Average stroke rate with one decimal, e.g. `22,5` in German, `22.5` in English.
 String formatStrokeRate(AppLocalizations l10n, double? strokeRate) =>
     strokeRate == null
