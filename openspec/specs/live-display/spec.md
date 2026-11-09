@@ -46,6 +46,17 @@ Solange das Live-Display offen und eine Datenquelle verbunden ist, SHALL die App
 - **WHEN** der Nutzer 30 Minuten rudert, ohne den Bildschirm zu berühren
 - **THEN** bleibt der Bildschirm eingeschaltet
 
+### Requirement: Statusleiste ausblenden
+Solange das Live-Display offen ist, SHALL die App unter Android die Statusleiste mit Uhrzeit und Akkustand ausblenden; die Navigationsleiste MUST sichtbar bleiben. Verlässt der Nutzer das Live-Display, MUST die Statusleiste wieder erscheinen.
+
+#### Scenario: Live-Display öffnen
+- **WHEN** der Nutzer unter Android das Live-Display öffnet, ob verbunden oder nicht
+- **THEN** ist oben keine Statusleiste mit Uhrzeit und Akkustand zu sehen, und die Navigationsleiste bleibt
+
+#### Scenario: Live-Display verlassen
+- **WHEN** der Nutzer das Live-Display zum Startbildschirm verlässt
+- **THEN** zeigt der Startbildschirm die Statusleiste wieder
+
 ### Requirement: Veraltete Daten kennzeichnen
 Treffen länger als 3 Sekunden keine Daten von der Datenquelle ein, SHALL das Live-Display die Werte als veraltet kennzeichnen, statt den letzten Stand unkommentiert stehen zu lassen.
 
