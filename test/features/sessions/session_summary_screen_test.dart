@@ -771,13 +771,11 @@ void main() {
   });
 
   group('heart rate', () {
-    /// Stores a PM5 session with the given heart rate summary and RR intervals.
+    /// Stores a PM5 session with the given heart rate summary and samples.
     Future<int> heartRateSession(
       AppDatabase db, {
       int? average,
       int? max,
-      int? rmssd,
-      List<(int, int)> intervals = const [],
       List<int?> heartRates = const [],
     }) async {
       final id = await db
@@ -791,16 +789,8 @@ void main() {
               distanceDm: const Value(25120),
               averageHeartRate: Value(average),
               maxHeartRate: Value(max),
-              rmssdMs: Value(rmssd),
             ),
           );
-      for (final (tMs, rrMs) in intervals) {
-        await db
-            .into(db.rrIntervals)
-            .insert(
-              RrIntervalsCompanion.insert(sessionId: id, tMs: tMs, rrMs: rrMs),
-            );
-      }
       for (final (i, heartRate) in heartRates.indexed) {
         await db
             .into(db.samples)
@@ -816,53 +806,29 @@ void main() {
       return id;
     }
 
-    testWidgets(
-      'shows average and maximum, the RR curve and the RMSSD with RR intervals',
-      (tester) async {
-        final semantics = tester.ensureSemantics();
-        final db = openTestDatabase();
-        final id = await tester.runAsync(
-          () => heartRateSession(
-            db,
-            average: 142,
-            max: 171,
-            rmssd: 16,
-            intervals: [(800, 800), (1610, 810), (2400, 790)],
-            // A lost contact sends 0 or nothing, which is no heart rate.
-            heartRates: [null, 0, 118, 142, 171],
-          ),
-        );
-        await _pump(tester, db, id!);
+    testWidgets('shows average, minimum and maximum without any RR values', (
+      tester,
+    ) async {
+      final db = openTestDatabase();
+      final id = await tester.runAsync(
+        () => heartRateSession(
+          db,
+          average: 142,
+          max: 171,
+          // A lost contact sends 0 or nothing, which is no heart rate.
+          heartRates: [null, 0, 118, 142, 171],
+        ),
+      );
+      await _pump(tester, db, id!);
 
-        expect(find.text('Ø Puls 142'), findsOneWidget);
-        expect(find.text('Min. Puls 118'), findsOneWidget);
-        expect(find.text('Max. Puls 171'), findsOneWidget);
-        expect(find.text('RR-INTERVALLE'), findsOneWidget);
-        expect(find.byKey(const Key('summary-rr-curve')), findsOneWidget);
-        expect(find.text('HRV (RMSSD) 16 ms'), findsOneWidget);
-        expect(find.text('810 ms'), findsOneWidget);
-        expect(find.text('790 ms'), findsOneWidget);
-        expect(
-          find.bySemanticsLabel(
-            'Verlauf der RR-Intervalle zwischen 790 und 810 ms',
-          ),
-          findsOneWidget,
-        );
-        final painter =
-            tester
-                    .widget<CustomPaint>(
-                      find.descendant(
-                        of: find.byKey(const Key('summary-rr-curve')),
-                        matching: find.byType(CustomPaint),
-                      ),
-                    )
-                    .painter!
-                as RrCurvePainter;
-        expect(painter.points, [(800, 800), (1610, 810), (2400, 790)]);
-        semantics.dispose();
-        await disposeWidgetsWithDatabase(tester);
-      },
-    );
+      expect(find.text('Ø Puls 142'), findsOneWidget);
+      expect(find.text('Min. Puls 118'), findsOneWidget);
+      expect(find.text('Max. Puls 171'), findsOneWidget);
+      expect(find.text('RR-INTERVALLE'), findsNothing);
+      expect(find.textContaining('RMSSD'), findsNothing);
+      expect(find.textContaining(' ms'), findsNothing);
+      await disposeWidgetsWithDatabase(tester);
+    });
 
     testWidgets(
       'shows only average and maximum with the heart rate from the rower',
@@ -880,9 +846,6 @@ void main() {
           findsNothing,
           reason: 'no samples with a heart rate',
         );
-        expect(find.text('RR-INTERVALLE'), findsNothing);
-        expect(find.byKey(const Key('summary-rr-curve')), findsNothing);
-        expect(find.textContaining('RMSSD'), findsNothing);
         await disposeWidgetsWithDatabase(tester);
       },
     );
@@ -895,28 +858,19 @@ void main() {
       await _pump(tester, db, id!);
 
       expect(find.textContaining('Puls'), findsNothing);
-      expect(find.text('RR-INTERVALLE'), findsNothing);
-      expect(find.textContaining('RMSSD'), findsNothing);
       await disposeWidgetsWithDatabase(tester);
     });
 
     testWidgets('shows the heart rate values in English', (tester) async {
       final db = openTestDatabase();
       final id = await tester.runAsync(
-        () => heartRateSession(
-          db,
-          average: 142,
-          max: 171,
-          rmssd: 16,
-          intervals: [(800, 800), (1610, 810), (2400, 790)],
-        ),
+        () => heartRateSession(db, average: 142, max: 171),
       );
       await _pump(tester, db, id!, locale: const Locale('en'));
 
       expect(find.text('Ø Heart rate 142'), findsOneWidget);
       expect(find.text('Max heart rate 171'), findsOneWidget);
-      expect(find.text('RR INTERVALS'), findsOneWidget);
-      expect(find.text('HRV (RMSSD) 16 ms'), findsOneWidget);
+      expect(find.textContaining('RMSSD'), findsNothing);
       await disposeWidgetsWithDatabase(tester);
     });
   });

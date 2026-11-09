@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:erg_protocol/erg_protocol.dart';
 import 'package:test/test.dart';
 
@@ -56,16 +58,8 @@ class _Session {
     return _feed(packets).whereType<StatusTick>().single;
   }
 
-  List<RowingEvent> strap(
-    Duration at,
-    int heartRate, {
-    List<int> intervalsMs = const [],
-  }) => _feed([
-    _strap.encode(heartRate: heartRate, intervalsMs: intervalsMs, at: at),
-  ]);
-
-  List<HeartBeatIntervals> get intervals =>
-      events.whereType<HeartBeatIntervals>().toList();
+  List<RowingEvent> strap(Duration at, int heartRate) =>
+      _feed([_strap.encode(heartRate: heartRate, at: at)]);
 }
 
 void main() {
@@ -140,59 +134,17 @@ void main() {
       });
     });
 
-    group('${protocol.name}: RR intervals', () {
-      test('emits the intervals of a measurement in their order', () {
-        final session = _Session(protocol)
-          ..rower(_s(10), heartRate: rowerHeartRate);
-        final events = session.strap(_s(10.4), 142, intervalsMs: [812, 790]);
-
-        final intervals = events.single as HeartBeatIntervals;
-        expect(intervals.intervalsMs, [812, 790]);
-        expect(intervals.time, _s(10.4));
-        expect(
-          intervals.elapsed,
-          session.events.whereType<StatusTick>().last.elapsed,
-        );
-      });
-
-      test(
-        'emits one event per measurement with intervals and none without',
-        () {
-          final session = _Session(protocol)
-            ..strap(_s(1), 70, intervalsMs: [850])
-            ..strap(_s(2), 71)
-            ..strap(_s(3), 72, intervalsMs: [840, 845]);
-          expect(session.intervals.map((e) => e.intervalsMs), [
-            [850],
-            [840, 845],
-          ]);
-        },
-      );
-
-      test('emits none when the heart rate comes from the rower only', () {
-        final session = _Session(protocol);
-        for (var t = 1; t <= 5; t++) {
-          session.rower(_s(t), heartRate: rowerHeartRate);
-        }
-        expect(session.intervals, isEmpty);
-      });
-    });
-
     group('${protocol.name}: cut off measurement', () {
       test('is dropped with a warning while the rower data goes on', () {
         final session = _Session(protocol)
           ..strap(_s(10), 142)
           ..rower(_s(10), heartRate: rowerHeartRate);
-        final cut = _strap.encode(
-          heartRate: 150,
-          intervalsMs: [812],
-          at: _s(13),
-        );
+        // The RR flag with half an interval after the heart rate.
         final events = session.decoder.decode(
           RawPacket(
-            time: cut.time,
-            characteristicId: cut.characteristicId,
-            bytes: cut.bytes.sublist(0, 3),
+            time: _s(13),
+            characteristicId: HeartRateIds.measurement,
+            bytes: Uint8List.fromList([0x10, 150, 0x40]),
           ),
         );
 
@@ -232,10 +184,9 @@ void main() {
   });
 
   test('a strap packet never reaches the rower decoder', () {
-    final session = _Session(ErgProtocol.pm5)
-      ..strap(_s(1), 142, intervalsMs: [800]);
+    final session = _Session(ErgProtocol.pm5)..strap(_s(1), 142);
     expect(_Session.warnings, isEmpty);
-    expect(session.events.single, isA<HeartBeatIntervals>());
+    expect(session.events, isEmpty);
   });
 
   test('applies the strap to status ticks emitted on flush', () {

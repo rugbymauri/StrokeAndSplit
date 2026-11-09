@@ -172,11 +172,9 @@ class Sessions extends Table {
   /// statistics, Design D3). Sessions before schema 5 count as recorded here.
   BoolColumn get imported => boolean().withDefault(const Constant(false))();
 
-  // Pulse summary (Change heart-rate, Design D5); null without heart rate or,
-  // for RMSSD, with fewer than two RR intervals.
+  // Pulse summary (Change heart-rate, Design D5); null without heart rate.
   IntColumn get averageHeartRate => integer().nullable()();
   IntColumn get maxHeartRate => integer().nullable()();
-  IntColumn get rmssdMs => integer().nullable()();
 
   // Pause summary (Change auto-pause, Design D3); sessions before schema 7 have none.
   IntColumn get pauseCount => integer().withDefault(const Constant(0))();
@@ -239,17 +237,6 @@ class RawPackets extends Table {
   IntColumn get tMs => integer()();
   TextColumn get characteristicId => text()();
   BlobColumn get bytes => blob()();
-}
-
-/// The beat-to-beat intervals of a strap (Change heart-rate, Design D4/D5),
-/// each at the session time it ended.
-@DataClassName('RrIntervalRow')
-@TableIndex(name: 'rr_intervals_session_time', columns: {#sessionId, #tMs})
-class RrIntervals extends Table {
-  IntColumn get sessionId =>
-      integer().references(Sessions, #id, onDelete: KeyAction.cascade)();
-  IntColumn get tMs => integer()();
-  IntColumn get rrMs => integer()();
 }
 
 /// The laps of a session on a course. The `*WallMs` times are session times
@@ -336,7 +323,6 @@ class LapSegments extends Table {
     Laps,
     LapSegments,
     SessionCourses,
-    RrIntervals,
     Pauses,
   ],
 )
@@ -359,7 +345,7 @@ class AppDatabase extends _$AppDatabase {
   );
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -478,6 +464,12 @@ class AppDatabase extends _$AppDatabase {
           'SELECT id, 0, course_version_id, 0 FROM sessions '
           'WHERE course_version_id IS NOT NULL',
         );
+        await m.alterTable(TableMigration(schema.sessions));
+      },
+      // No RR intervals any more (Change remove-rr-intervals, Design D3): the
+      // strap's raw packets keep them; rebuilding sessions drops RMSSD.
+      from12To13: (m, schema) async {
+        await m.deleteTable('rr_intervals');
         await m.alterTable(TableMigration(schema.sessions));
       },
     ),

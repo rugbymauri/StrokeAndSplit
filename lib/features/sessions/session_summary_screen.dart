@@ -111,9 +111,6 @@ class _Summary extends ConsumerWidget {
     final places =
         ref.watch(sessionPlacesProvider(session.id)).value ??
         SessionPlaces.none;
-    final rr =
-        ref.watch(sessionRrIntervalsProvider(session.id)).value ??
-        const <RrIntervalRow>[];
     final pace =
         ref.watch(sessionPaceTrackProvider(session.id)).value ??
         PaceTrack.empty;
@@ -178,10 +175,6 @@ class _Summary extends ConsumerWidget {
                   if (pace.steps.length >= 2) ...[
                     const SizedBox(height: AppSpacing.xl),
                     _Pace(track: pace, averageCs: session.averagePaceCs),
-                  ],
-                  if (rr.length >= 2 || session.rmssdMs != null) ...[
-                    const SizedBox(height: AppSpacing.xl),
-                    _RrIntervals(intervals: rr, rmssdMs: session.rmssdMs),
                   ],
                 ],
               ),
@@ -884,115 +877,4 @@ class PaceCurvePainter extends CustomPainter {
   @override
   bool shouldRepaint(PaceCurvePainter oldDelegate) =>
       oldDelegate.steps != steps || oldDelegate.averageCs != averageCs;
-}
-
-/// The RR intervals over the session as a curve and the heart rate
-/// variability as RMSSD (heart-rate, Design D8).
-class _RrIntervals extends StatelessWidget {
-  const _RrIntervals({required this.intervals, required this.rmssdMs});
-
-  final List<RrIntervalRow> intervals;
-  final int? rmssdMs;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final rmssdMs = this.rmssdMs;
-    final curve = intervals.length >= 2;
-    final shortest = curve ? intervals.map((i) => i.rrMs).reduce(math.min) : 0;
-    final longest = curve ? intervals.map((i) => i.rrMs).reduce(math.max) : 0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(l10n.summaryRrIntervals.toUpperCase(), style: AppTextStyles.label),
-        const SizedBox(height: AppSpacing.m),
-        _Card(
-          padding: const EdgeInsets.all(AppSpacing.l),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (rmssdMs != null)
-                Text(
-                  l10n.summaryRmssd(rmssdMs),
-                  key: const Key('summary-rmssd'),
-                  style: AppTextStyles.subtitle.copyWith(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              if (curve) ...[
-                if (rmssdMs != null) const SizedBox(height: AppSpacing.m),
-                Text('$longest ms', style: AppTextStyles.caption),
-                const SizedBox(height: AppSpacing.xs),
-                Semantics(
-                  container: true,
-                  label: l10n.summaryRrCurve(shortest, longest),
-                  child: SizedBox(
-                    key: const Key('summary-rr-curve'),
-                    height: 120,
-                    child: CustomPaint(
-                      painter: RrCurvePainter([
-                        for (final i in intervals) (i.tMs, i.rrMs),
-                      ]),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text('$shortest ms', style: AppTextStyles.caption),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// RR intervals as one line: their end time across, their length upwards,
-/// scaled from the shortest to the longest.
-class RrCurvePainter extends CustomPainter {
-  RrCurvePainter(this.points);
-
-  /// (end time, interval) in milliseconds, ordered by end time.
-  final List<(int, int)> points;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final grid = Paint()
-      ..color = AppColors.line
-      ..strokeWidth = 1;
-    canvas
-      ..drawLine(Offset.zero, Offset(size.width, 0), grid)
-      ..drawLine(Offset(0, size.height), Offset(size.width, size.height), grid);
-    if (points.length < 2) return;
-    final first = points.first.$1;
-    final span = math.max(1, points.last.$1 - first);
-    final shortest = points.map((p) => p.$2).reduce(math.min);
-    final range = math.max(
-      1,
-      points.map((p) => p.$2).reduce(math.max) - shortest,
-    );
-    final path = Path();
-    for (final (i, (t, rr)) in points.indexed) {
-      final offset = Offset(
-        (t - first) / span * size.width,
-        size.height - (rr - shortest) / range * size.height,
-      );
-      i == 0
-          ? path.moveTo(offset.dx, offset.dy)
-          : path.lineTo(offset.dx, offset.dy);
-    }
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = AppColors.zoneOut
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5
-        ..strokeJoin = StrokeJoin.round,
-    );
-  }
-
-  @override
-  bool shouldRepaint(RrCurvePainter oldDelegate) =>
-      oldDelegate.points != points;
 }

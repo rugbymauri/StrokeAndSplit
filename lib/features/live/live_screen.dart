@@ -53,9 +53,8 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   StatusTick? _tick;
 
   /// The last RR intervals from the strap, shown while they are recent.
-  HeartBeatIntervals? _beats;
 
-  /// The force curves of the last strokes; they belong to the source, like [_beats].
+  /// The force curves of the last strokes; they belong to the source.
   var _forceCurves = const ForceCurves();
   var _stale = false;
   Timer? _staleTimer;
@@ -106,7 +105,6 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   void _listen(Stream<RowingEvent> events) {
     _events?.cancel();
     // RR intervals of a previous source never belong to the next one.
-    _beats = null;
     _forceCurves = const ForceCurves();
     _restartStaleTimer();
     _events = events.listen((event) {
@@ -116,25 +114,10 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
           _tick = event;
           _stale = false;
         });
-      } else if (event is HeartBeatIntervals) {
-        setState(() => _beats = event);
       } else if (event is StrokeForceCurve) {
         setState(() => _forceCurves = _forceCurves.add(event));
       }
     });
-  }
-
-  /// The last RR interval in ms; null without one or once the latest tick is
-  /// more than [staleAfter] past it (heart-rate, Design D8). A tick carries no
-  /// packet time, so both compare by the rower's elapsed time; this works the
-  /// same in a replay.
-  int? get _rrIntervalMs {
-    final beats = _beats;
-    final tick = _tick;
-    if (beats == null || tick == null || beats.intervalsMs.isEmpty) return null;
-    final age = tick.elapsed - beats.elapsed;
-    if (age.isNegative || age > staleAfter) return null;
-    return beats.intervalsMs.last;
   }
 
   void _restartStaleTimer() {
@@ -251,7 +234,6 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
         : ghostShares(lap, plan.definition, ghosts);
     return CourseLiveView(
       tick: _tick,
-      rrIntervalMs: _rrIntervalMs,
       session: recording?.progress,
       lap: lap,
       course: plan.definition,
@@ -316,7 +298,6 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                     ),
                     _ => FreeLiveView(
                       tick: _tick,
-                      rrIntervalMs: _rrIntervalMs,
                       session: recording?.progress,
                       outdated: _stale,
                       forceCurves: forceCurves,

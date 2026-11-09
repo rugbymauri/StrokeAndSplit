@@ -568,68 +568,22 @@ void main() {
     });
   });
 
-  group('RR interval', () {
-    HeartBeatIntervals beats(List<int> intervalsMs) => HeartBeatIntervals(
-      elapsed: _elapsed,
-      time: const Duration(seconds: 754),
-      intervalsMs: intervalsMs,
-    );
-
+  group('heart rate', () {
     for (final workout in [false, true]) {
       testWidgets(
-        'shows the last one at the heart rate${workout ? ' on a workout' : ''}',
+        'shows only the heart rate, without a value after it or its source'
+        '${workout ? ' on a workout' : ''}',
         (tester) async {
           final harness = _Harness();
           await harness.pump(tester, recording: workout ? _onCourse() : null);
           await harness.emit(tester, _tick(heartRate: 151));
-          await harness.emit(tester, beats([790, 812]));
 
           expect(find.byKey(const Key('metric-hr')), findsOneWidget);
-          expect(find.text('812 ms'), findsOneWidget);
-          expect(find.text('790 ms'), findsNothing);
+          expect(find.textContaining(' ms'), findsNothing);
+          expect(find.textContaining('Gurt'), findsNothing);
         },
       );
     }
-
-    testWidgets(
-      'shows none with the heart rate only from the rower, and no source of it',
-      (tester) async {
-        final harness = _Harness();
-        await harness.pump(tester);
-        await harness.emit(tester, _tick(heartRate: 151));
-
-        expect(find.text('Puls 151'), findsOneWidget);
-        expect(find.byKey(const Key('metric-rr')), findsNothing);
-        expect(find.textContaining('ms'), findsNothing);
-        expect(find.textContaining('Gurt'), findsNothing);
-      },
-    );
-
-    testWidgets(
-      'hides an RR interval more than 3 seconds older than the latest tick',
-      (tester) async {
-        final harness = _Harness();
-        await harness.pump(tester);
-        await harness.emit(tester, _tick(heartRate: 151));
-        await harness.emit(tester, beats([812]));
-
-        await harness.emit(
-          tester,
-          _tick(heartRate: 151, elapsed: _elapsed + const Duration(seconds: 3)),
-        );
-        expect(find.text('812 ms'), findsOneWidget);
-
-        await harness.emit(
-          tester,
-          _tick(
-            heartRate: 151,
-            elapsed: _elapsed + const Duration(milliseconds: 3100),
-          ),
-        );
-        expect(find.text('812 ms'), findsNothing);
-        expect(find.text('Puls 151'), findsOneWidget);
-      },
-    );
   });
 
   group('force curve', () {
@@ -750,14 +704,6 @@ void main() {
             resistanceLevel: curves ? null : 15,
           ),
         );
-        await harness.emit(
-          tester,
-          HeartBeatIntervals(
-            elapsed: _elapsed,
-            time: Duration.zero,
-            intervalsMs: [812],
-          ),
-        );
         if (curves) {
           for (final curve in _fixtureCurves().take(3)) {
             await harness.emit(tester, curve);
@@ -792,7 +738,6 @@ void main() {
             'metric-lap-time',
             'metric-watts',
             'metric-hr',
-            'metric-rr',
             // In landscape the level has a card of its own below the stroke rate (live-zone-targets, Design D7).
             if (!curves)
               LiveLayout.of(size) == LiveLayout.landscape
