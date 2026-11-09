@@ -24,7 +24,7 @@ Keine Schema-Änderung und keine neuen Texte („Abbrechen“ ist `actionCancel`
   - Bei `cancelled` ist es der leere graue Ring ohne Meldung.
   - Bei `disconnected` gibt es „Abbrechen“ und „Erneut versuchen“; „Abbrechen“ ruft `cancel()`.
   - 400 × 400 hoch und 740 × 360 quer mit der längsten Meldung ohne Overflow.
-- [ ] 2.2 README, Abschnitt Pulsgurt: Puls vom Rudergerät ohne Gurtversuch, „Abbrechen“ und Abbruch nach 60 Sekunden. Verifikation: der Abschnitt widerspricht der Spec nicht.
+- [x] 2.2 README, Abschnitt Pulsgurt: Puls vom Rudergerät ohne Gurtversuch, „Abbrechen“ und Abbruch nach 60 Sekunden. Verifikation: der Abschnitt widerspricht der Spec nicht.
 
 ## 3. Abschluss
 
