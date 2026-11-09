@@ -52,8 +52,6 @@ class LiveScreen extends ConsumerStatefulWidget {
 class _LiveScreenState extends ConsumerState<LiveScreen> {
   StatusTick? _tick;
 
-  /// The last RR intervals from the strap, shown while they are recent.
-
   /// The force curves of the last strokes; they belong to the source.
   var _forceCurves = const ForceCurves();
   var _stale = false;
@@ -108,7 +106,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
 
   void _listen(Stream<RowingEvent> events) {
     _events?.cancel();
-    // RR intervals of a previous source never belong to the next one.
+    // Force curves of a previous source never belong to the next one.
     _forceCurves = const ForceCurves();
     _restartStaleTimer();
     _events = events.listen((event) {
