@@ -254,6 +254,7 @@ class _Harness {
   // Synchronous, so an emitted event is handled before the next frame.
   final events = StreamController<RowingEvent>.broadcast(sync: true);
   final wakelock = FakeWakelock();
+  final systemBars = FakeSystemBars();
 
   Future<void> pump(
     WidgetTester tester, {
@@ -277,6 +278,7 @@ class _Harness {
           ergConnectionStateProvider.overrideWithValue(AsyncData(state)),
           rowingEventsProvider.overrideWithValue(events.stream),
           wakelockProvider.overrideWithValue(wakelock),
+          systemBarsProvider.overrideWithValue(systemBars),
           if (recording != null)
             sessionRecorderProvider.overrideWith(() => _Recording(recording)),
           if (db != null) databaseProvider.overrideWithValue(db),
@@ -1232,6 +1234,17 @@ void main() {
       expect(harness.wakelock.enabled, isFalse);
     },
   );
+
+  testWidgets('hides the status bar and shows it again when left', (
+    tester,
+  ) async {
+    final harness = _Harness();
+    await harness.pump(tester, state: ErgConnectionState.disconnected);
+    expect(harness.systemBars.statusBarHidden, isTrue);
+
+    await tester.pumpWidget(const SizedBox());
+    expect(harness.systemBars.statusBarHidden, isFalse);
+  });
 
   group('with ghosts', () {
     late AppDatabase db;

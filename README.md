@@ -171,7 +171,7 @@ Die App startet auf Deutsch. Das Sprach-Symbol oben rechts auf „Geräte wähle
 
 ```
 lib/
-  app/                 App-Rahmen und Plattformdienste (BLE, Wakelock, Dateien)
+  app/                 App-Rahmen und Plattformdienste (BLE, Wakelock, Statusleiste, Dateien)
   data/
     sources/           Datenquellen: PM5 (BLE), Simulator, Replay
     db/                drift-Schema (SQLite)
