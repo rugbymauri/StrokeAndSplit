@@ -1,7 +1,7 @@
 # heart-rate-monitor Specification
 
 ## Purpose
-Verbindet die App direkt per Bluetooth LE mit einem Brustgurt, damit Puls und RR-Intervalle unabhängig vom Rudergerät und ohne dessen Kopplungsmenü ankommen.
+Verbindet die App direkt per Bluetooth LE mit einem Brustgurt, damit der Puls unabhängig vom Rudergerät und ohne dessen Kopplungsmenü ankommen.
 
 ## Requirements
 
