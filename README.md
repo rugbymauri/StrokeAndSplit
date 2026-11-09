@@ -140,16 +140,16 @@ Der Schalter **Gegen den Ghost rudern** auf dem Screen des Workouts und dem Star
 
 ### Pulsgurt
 
-Ein Brustgurt mit dem Bluetooth-Standard Heart Rate (z.B. Polar H10) liefert Puls und RR-Intervalle direkt an die App, unabhängig vom Rudergerät. Er ist optional.
+Ein Brustgurt mit dem Bluetooth-Standard Heart Rate (z.B. Polar H10) liefert den Puls direkt an die App, unabhängig vom Rudergerät. Er ist optional.
 
 1. In **Geräte wählen** unter **Pulsgurt** auf **Gurt koppeln** tippen. Die Gurt-Suche listet nur Gurte, keine Rudergeräte. Findet sie in 15 s keinen, zeigt sie Tipps: Elektroden anfeuchten und Gurt anlegen, Gurt von anderen Apps oder Uhren trennen. Gurt antippen koppelt ihn. Die App merkt ihn sich über einen Neustart hinaus, **Gurt wechseln** wählt einen anderen, **Vergessen** entkoppelt ihn. **Weiter** hängt nur vom Rudergerät ab, der Startbildschirm zeigt den Gurt neben dem Rudergerät.
 2. Sobald die App mit einem PM5 oder FTMS-Rudergerät verbunden ist, verbindet sie den gekoppelten Gurt von selbst. Mit Simulator oder Replay verbindet sie keinen Gurt. Bricht die Verbindung ab, versucht sie es 30 s lang erneut, ein Ausfall des Gurts stört Rudergerät und Session nicht. Wird das Rudergerät bewusst getrennt, trennt sie auch den Gurt.
 
 Für den Puls gilt: Gurt vor Rudergerät vor kein Puls. Der Gurt zählt, solange seine letzte Messung höchstens 3 s alt ist, sonst gilt der Puls des PM5 bzw. FTMS-Rudergeräts. Woher der Puls stammt, zeigt die App nicht an. Ohne Puls fehlt der Wert.
 
-Im Live-Display steht in der Kopfzeile neben der Verbindung des Rudergeräts ein Herz mit Punkt für den Gurt: grün verbunden, orange beim (Wieder-)Verbinden, leerer Ring wartend oder getrennt. Scheitert die Verbindung, erscheint eine Meldung mit dem Hinweis, dass viele Gurte nur eine oder zwei Bluetooth-Verbindungen gleichzeitig erlauben, und **Erneut versuchen**. Beim Puls steht klein das letzte RR-Intervall (z.B. „812 ms“), es verschwindet, wenn 3 s lang keines nachkommt.
+Im Live-Display steht in der Kopfzeile neben der Verbindung des Rudergeräts ein Herz mit Punkt für den Gurt: grün verbunden, orange beim (Wieder-)Verbinden, leerer Ring wartend oder getrennt. Scheitert die Verbindung, erscheint eine Meldung mit dem Hinweis, dass viele Gurte nur eine oder zwei Bluetooth-Verbindungen gleichzeitig erlauben, und **Erneut versuchen**.
 
-Die Zusammenfassung zeigt **Ø Puls** und **Max. Puls**, sobald es einen Puls gab, mit Gurt dazu die Kurve der RR-Intervalle und „HRV (RMSSD) 16 ms“ (ab zwei Intervallen, aus den ungefilterten Intervallen). Die Gurt-Pakete werden wie die des Rudergeräts aufgezeichnet, exportiert und beim Import neu ausgewertet.
+Die Zusammenfassung zeigt **Ø Puls** und **Max. Puls**, sobald es einen Puls gab. Die Gurt-Pakete werden wie die des Rudergeräts aufgezeichnet, exportiert und beim Import neu ausgewertet.
 
 ### Health Connect
 
@@ -209,7 +209,7 @@ Zahlen mit Mehrzahl über `plural`, Namen in Anführungszeichen stehen samt Zeic
 
 ## Dateiformat `.strokesplit`
 
-gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format (`"format": "strokesplit-raw"`), Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Pakete eines Pulsgurts stehen mit `"c": "2a37"` auf derselben Zeitachse, der `session`-Block im Header enthält, sofern vorhanden, `averageHeartRate`, `maxHeartRate` und `rmssdMs`. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren. Dateien von vor der Umbenennung (Endung `.aergrow`, Format `aergrow-raw`) liest der Import weiterhin, die Test-Fixtures sind bewusst in diesem alten Format.
+gzip-komprimiertes JSON Lines. Die erste Zeile ist ein Header mit Format (`"format": "strokesplit-raw"`), Quelle, Protokoll, Gerät, Startzeit und Zusammenfassung, danach folgt pro Rohpaket eine Zeile `{"t": ms, "c": "0031", "b": "<base64>"}`. `protocol` ist `pm5` oder `ftms` und bestimmt, wie die Rohpakete dekodiert werden (`c` ist bei FTMS z.B. `2ad1`). Dateien von vor FTMS haben kein `protocol` und gelten als PM5. Die Zeit `t` ist die Wanduhr seit dem ersten Paket. Pakete eines Pulsgurts stehen mit `"c": "2a37"` auf derselben Zeitachse, der `session`-Block im Header enthält, sofern vorhanden, `averageHeartRate` und `maxHeartRate`; ein `rmssdMs` aus Dateien früherer Versionen ignoriert der Import. Beim Import werden Messwerte und Zusammenfassung aus den Rohpaketen neu berechnet. Unkomprimierte Spike-Mitschnitte (`.jsonl`) lassen sich ebenfalls importieren. Dateien von vor der Umbenennung (Endung `.aergrow`, Format `aergrow-raw`) liest der Import weiterhin, die Test-Fixtures sind bewusst in diesem alten Format.
 
 Eine Session auf einem Workout hat im Header zusätzlich das Workout und die geruderten Versionen seiner Strecken in ihrer Reihenfolge, jede mit `firstSegment`, dem Index ihres ersten Segments in der Runde:
 
