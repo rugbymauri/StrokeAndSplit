@@ -20,6 +20,9 @@ class FakeBleTransport implements BleTransport {
   /// Thrown by [scan] after the readiness check passed.
   Object? scanError;
 
+  /// The links handed out, the latest last.
+  final links = <FakeRowerLink>[];
+
   @override
   Future<BluetoothReadiness> readiness() async => readinessValue;
 
@@ -37,16 +40,25 @@ class FakeBleTransport implements BleTransport {
   Future<RowerLink> connect(FoundRower device) async {
     final error = connectError;
     if (error != null) throw error;
-    return _IdleLink();
+    final link = FakeRowerLink();
+    links.add(link);
+    return link;
   }
 }
 
-class _IdleLink implements RowerLink {
+/// A rower connection that stays up and sends what the test feeds it.
+class FakeRowerLink implements RowerLink {
+  final _notifications = StreamController<(String, List<int>)>.broadcast();
+
   @override
   ResistanceControl? get resistanceControl => null;
 
   @override
-  Stream<(String, List<int>)> get notifications => const Stream.empty();
+  Stream<(String, List<int>)> get notifications => _notifications.stream;
+
+  /// Sends [bytes] as a notification of [characteristicId].
+  void notify(String characteristicId, List<int> bytes) =>
+      _notifications.add((characteristicId, bytes));
 
   @override
   Future<void> get lost => Completer<void>().future;

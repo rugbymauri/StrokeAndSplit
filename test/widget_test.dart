@@ -27,7 +27,7 @@ void main() {
   });
 
   testWidgets(
-    'connects the paired strap as soon as the rower is connected, before the live display',
+    'connects the paired strap once the rower is connected, before the live display',
     (tester) async {
       const h10 = FoundHeartRateMonitor(
         id: 'A0:9E:1A:12:34:56',
@@ -61,7 +61,13 @@ void main() {
             ),
           );
       await tester.pump();
+      expect(
+        straps.attempts,
+        isEmpty,
+        reason: 'waits for the rower\'s heart rate',
+      );
 
+      await tester.pump(const Duration(seconds: 5));
       expect(straps.attempts, [h10]);
       await tester.pump(const Duration(seconds: 15));
     },

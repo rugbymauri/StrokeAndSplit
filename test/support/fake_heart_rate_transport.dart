@@ -17,6 +17,9 @@ class FakeHeartRateTransport implements HeartRateTransport {
   /// Thrown by every connect attempt while set, e.g. a strap busy at a watch.
   HeartRateConnectException? connectError;
 
+  /// Answers the next connect attempt once the test completes it, then clears.
+  Completer<HeartRateLink>? pending;
+
   /// Monitors of all connect attempts, successful or not.
   final attempts = <FoundHeartRateMonitor>[];
 
@@ -41,6 +44,10 @@ class FakeHeartRateTransport implements HeartRateTransport {
     attempts.add(monitor);
     final error = connectError;
     if (error != null) throw error;
+    if (pending case final answer?) {
+      pending = null;
+      return answer.future;
+    }
     final link = FakeHeartRateLink(monitor);
     links.add(link);
     return link;
