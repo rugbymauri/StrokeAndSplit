@@ -77,3 +77,14 @@ class FakeWakelock implements Wakelock {
   @override
   Future<void> disable() async => enabled = false;
 }
+
+/// Records whether the status bar is hidden.
+class FakeSystemBars implements SystemBars {
+  var statusBarHidden = false;
+
+  @override
+  Future<void> hideStatusBar() async => statusBarHidden = true;
+
+  @override
+  Future<void> show() async => statusBarHidden = false;
+}

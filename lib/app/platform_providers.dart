@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -42,6 +43,33 @@ class PluginWakelock implements Wakelock {
 
   @override
   Future<void> disable() => WakelockPlus.disable();
+}
+
+/// Hides the status bar with time and battery; replaced by a fake in tests.
+final systemBarsProvider = Provider<SystemBars>(
+  (ref) => const PluginSystemBars(),
+);
+
+abstract interface class SystemBars {
+  /// Hides the status bar and keeps the navigation bar.
+  Future<void> hideStatusBar();
+
+  /// Shows all system bars again, edge to edge as the app starts.
+  Future<void> show();
+}
+
+class PluginSystemBars implements SystemBars {
+  const PluginSystemBars();
+
+  @override
+  Future<void> hideStatusBar() => SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.bottom],
+  );
+
+  @override
+  Future<void> show() =>
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 }
 
 /// Saving and opening session files; replaced by a fake in tests.

@@ -61,12 +61,16 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
   StreamSubscription<RowingEvent>? _events;
   Wakelock? _wakelock;
   var _wakelockOn = false;
+  late final SystemBars _systemBars;
   var _planStarted = false;
 
   @override
   void initState() {
     super.initState();
     _wakelock = ref.read(wakelockProvider);
+    // The live display uses the whole screen, without time and battery.
+    _systemBars = ref.read(systemBarsProvider);
+    _systemBars.hideStatusBar();
     ref.listenManual(
       rowingEventsProvider,
       (_, events) => _listen(events),
@@ -141,6 +145,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     _events?.cancel();
     _staleTimer?.cancel();
     if (_wakelockOn) _wakelock?.disable();
+    _systemBars.show();
     super.dispose();
   }
 
