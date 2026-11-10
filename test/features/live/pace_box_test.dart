@@ -318,6 +318,25 @@ void main() {
   );
 
   testWidgets(
+    'names the lap without a number and leaves out the course with a single lap',
+    (tester) async {
+      await _pump(tester, _at(460, laps: 1, lap: 1));
+
+      _expectLine(const Key('pace-box-lap'), 'Runde', 'noch 540 m');
+      _expectLine(const Key('pace-box-segment'), 'Tempo', 'noch 340 m');
+      expect(find.byKey(const Key('pace-box-course')), findsNothing);
+
+      await _pump(
+        tester,
+        _at(460, laps: 1, lap: 1),
+        locale: const Locale('en'),
+      );
+      _expectLine(const Key('pace-box-lap'), 'Lap', '540 m to go');
+      expect(find.byKey(const Key('pace-box-course')), findsNothing);
+    },
+  );
+
+  testWidgets(
     'shows the rowing time left and the lap without a total with a time limit',
     (tester) async {
       // 30 minutes, after 15:00.4 of rowing time without pauses.

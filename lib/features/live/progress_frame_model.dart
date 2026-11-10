@@ -100,8 +100,9 @@ class ProgressFrameModel {
       );
     }
     final laps = progress.plannedLaps;
-    // With an open number of laps the whole length is unknown.
-    if (laps == null) {
+    // With an open number of laps the whole length is unknown; with a single
+    // lap the course track would only repeat the lap track (live-single-lap-frame).
+    if (laps == null || laps == 1) {
       return ProgressFrameModel(
         course: null,
         lap: lap,
@@ -139,12 +140,12 @@ class ProgressFrameModel {
     );
   }
 
-  /// The outer track; null with an open number of laps and no time limit.
+  /// The outer track; null with an open number of laps or a single lap and no time limit.
   final FrameTrack? course;
   final FrameTrack lap;
   final FrameTrack segment;
 
-  /// Rowed and planned over all laps; null with an open number of laps or a time limit.
+  /// Rowed and planned over all laps; null without an outer track of laps.
   final double? courseDone;
   final int? courseLength;
 

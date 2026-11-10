@@ -391,6 +391,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get paceBoxLap => 'Runde';
+
+  @override
   String paceBoxLapOf(int lap, int laps) {
     return 'Runde $lap / $laps';
   }

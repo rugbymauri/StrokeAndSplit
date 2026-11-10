@@ -221,6 +221,8 @@ class PaceBox extends StatelessWidget {
                   marker: const _Dot(AppColors.textMuted),
                   label: switch (progress.plannedLaps) {
                     null => l10n.courseLap(progress.lap),
+                    // The only lap needs no number (live-single-lap-frame).
+                    1 => l10n.paceBoxLap,
                     final laps => l10n.paceBoxLapOf(progress.lap, laps),
                   },
                   value: l10n.courseRest(_amount(model.lapRemaining)),

@@ -194,6 +194,30 @@ void main() {
     expect(frame.segmentRemaining, closeTo(100, 1e-9));
   });
 
+  test('leaves out the course track with a single lap', () {
+    final frame = ProgressFrameModel.of(
+      _rowed(_seerunde, 460, laps: 1),
+      _seerunde,
+    );
+
+    expect(frame.course, isNull);
+    expect((frame.courseDone, frame.courseLength), (null, null));
+    expect(frame.lap.share, closeTo(0.46, 0.005));
+    expect(frame.lap.boundaries, [0.2, 0.8]);
+    expect(frame.lapRemaining, closeTo(540, 0.001));
+    expect(frame.segmentRemaining, closeTo(340, 0.001));
+  });
+
+  test('keeps the course track with two laps', () {
+    final frame = ProgressFrameModel.of(
+      _rowed(_seerunde, 460, laps: 2),
+      _seerunde,
+    );
+
+    expect(frame.course!.share, closeTo(0.23, 0.005));
+    expect(frame.course!.boundaries, [0.5]);
+  });
+
   group('with a time limit', () {
     test('fills the outer track by the rowing time, without notches', () {
       // In lap 3 of an open number of laps, after 15 of 30 minutes.

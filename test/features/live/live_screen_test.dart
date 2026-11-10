@@ -841,7 +841,7 @@ void main() {
     });
 
     testWidgets(
-      'names the current course before the zone only with several courses',
+      'names the course before the zone with several courses and the only lap without a number',
       (tester) async {
         Course course(int id, String name, CourseDefinition definition) =>
             Course(
@@ -907,6 +907,9 @@ void main() {
         await harness.emit(tester, _tick());
 
         expectLine('pace-box-segment', '2 km Intervall · frei', 'noch 200 m');
+        // One lap over the whole chain: no total track, the lap without a number.
+        expectLine('pace-box-lap', 'Runde', 'noch 2\u00A0200 m');
+        expect(find.byKey(const Key('pace-box-course')), findsNothing);
       },
     );
 

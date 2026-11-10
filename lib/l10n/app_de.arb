@@ -527,6 +527,10 @@
       "segment": {"type": "String"}
     }
   },
+  "paceBoxLap": "Runde",
+  "@paceBoxLap": {
+    "description": "Pace box: legend line of the lap track when exactly one lap is planned, without a number"
+  },
   "paceBoxLapOf": "Runde {lap} / {laps}",
   "@paceBoxLapOf": {
     "description": "Pace box: legend line of the lap track with the current lap and the planned number of laps, e.g. 'Runde 2 / 3'",
