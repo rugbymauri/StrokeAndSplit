@@ -388,6 +388,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get paceBoxLap => 'Lap';
+
+  @override
   String paceBoxLapOf(int lap, int laps) {
     return 'Lap $lap / $laps';
   }

@@ -715,6 +715,12 @@ abstract class AppLocalizations {
   /// **'{course} · {segment}'**
   String paceBoxCourseSegment(String course, String segment);
 
+  /// Pace box: legend line of the lap track when exactly one lap is planned, without a number
+  ///
+  /// In de, this message translates to:
+  /// **'Runde'**
+  String get paceBoxLap;
+
   /// Pace box: legend line of the lap track with the current lap and the planned number of laps, e.g. 'Runde 2 / 3'
   ///
   /// In de, this message translates to:
