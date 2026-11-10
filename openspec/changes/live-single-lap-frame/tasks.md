@@ -8,5 +8,5 @@
 ## 2. Dokumentation und Test
 
 - [x] 2.1 README-Abschnitt zum Fortschrittsrahmen nachführen (bei einer Runde fehlt die äussere Spur, Legende „Runde“).
-- [ ] 2.2 Linux-Test mit dem Simulator: Workout mit einer Runde starten, Rahmen mit zwei Spuren und Legende ohne „Gesamt“; Workout mit drei Runden weiterhin mit drei Spuren.
+- [x] 2.2 Linux-Test mit dem Simulator: Workout mit einer Runde starten, Rahmen mit zwei Spuren und Legende ohne „Gesamt“; Workout mit drei Runden weiterhin mit drei Spuren.
 - [ ] 2.3 Am Gerät (Nutzer): Workout mit einer Runde rudern, keine äussere Spur, Legende „Runde · noch …“.
