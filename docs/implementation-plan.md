@@ -9,7 +9,7 @@ Reihenfolge, Abhängigkeiten und offene Punkte der geplanten OpenSpec-Changes. D
 - wenn Neues auftaucht (Bug, Nacharbeit, Idee), unter „Offene Punkte“ oder beim betroffenen Change,
 - beim Archivieren: den Change nach „Erledigt“ verschieben und die Changes danach auf Folgen prüfen.
 
-Stand: 2026-11-12, alle umgesetzten Changes archiviert, keine aktiven Changes; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. Zuletzt archiviert: `live-zone-targets`, `adhoc-workout`, `remove-rr-intervals`, `heart-rate-from-rower`, `live-hide-status-bar` und `live-single-lap-frame`; ihre offenen Gerätetests stehen unter „Offene Punkte“.
+Stand: 2026-11-12, alle umgesetzten Changes archiviert, keine aktiven Changes, Gerätetests der zuletzt archivierten Changes bestätigt; `gitlab-pipeline` gelöscht (Nutzer), CI und Releases laufen über GitHub Actions. Zuletzt archiviert: `live-zone-targets`, `adhoc-workout`, `remove-rr-intervals`, `heart-rate-from-rower`, `live-hide-status-bar` und `live-single-lap-frame`; ihre Gerätetests hat der Nutzer bestätigt.
 
 ## Überblick
 
@@ -69,11 +69,11 @@ Manuelle Tests archivierter Changes (Nutzer):
 - [ ] `template-screen` 4.3: am Handy Workout öffnen, Schalter und „Starten“ ohne Scrollen erreichbar, Session ohne Ghost.
 - [ ] `course-rowing-free` 7.3: eine Strecke mit Dauer am Rudergerät rudern, Ende und Titel prüfen.
 - [ ] `zone-level-only` 3.3: am Woodrower eine Strecke mit einer Zone nur mit Stufe rudern, Stufe wechselt mit der Zone.
-- [ ] `live-zone-targets` 5.3: am Handy ein Workout mit Zonen rudern, Zielwerte und Farben gut lesbar; quer am Woodrower die Stufe mit den Tasten unter der Schlagzahl ändern.
-- [ ] `adhoc-workout` 2.3: am Handy eine Kette ohne Speichern rudern.
-- [ ] `heart-rate-from-rower` 3.2: am Woodrower mit dem Gurt am Rudergerät gekoppelt keine Meldung, Herz grün, Puls läuft; Gurt vom Rudergerät trennen und an einer Uhr verbinden: Meldung, „Abbrechen“, Ablauf nach 60 s.
-- [ ] `live-hide-status-bar` 1.2: am Android-Gerät Live-Display öffnen, keine Statusleiste, Navigationsleiste sichtbar; zurück, Statusleiste wieder da.
-- [ ] `live-single-lap-frame` 2.3: am Gerät ein Workout mit einer Runde rudern, keine äussere Spur, Legende „Runde · noch …“.
+- [x] `live-zone-targets` 5.3: am Handy ein Workout mit Zonen rudern, Zielwerte und Farben gut lesbar; quer am Woodrower die Stufe mit den Tasten unter der Schlagzahl ändern.
+- [x] `adhoc-workout` 2.3: am Handy eine Kette ohne Speichern rudern.
+- [x] `heart-rate-from-rower` 3.2: am Woodrower mit dem Gurt am Rudergerät gekoppelt keine Meldung, Herz grün, Puls läuft; Gurt vom Rudergerät trennen und an einer Uhr verbinden: Meldung, „Abbrechen“, Ablauf nach 60 s.
+- [x] `live-hide-status-bar` 1.2: am Android-Gerät Live-Display öffnen, keine Statusleiste, Navigationsleiste sichtbar; zurück, Statusleiste wieder da.
+- [x] `live-single-lap-frame` 2.3: am Gerät ein Workout mit einer Runde rudern, keine äussere Spur, Legende „Runde · noch …“.
 - iOS und macOS bleiben ungetestet, es gibt keinen Mac.
 
 Vor einer Veröffentlichung im Play Store:
@@ -111,9 +111,9 @@ Nacharbeit:
 | `course-editor-flow` | 2026-11-07 | Eigener Screen „Zone einbauen“ (Start zuerst, Zonen nach Härte), Verschieben mit den Ruderblatt-Tasten, Editoren im sicheren Bereich; Gerätetest 3.3 vom Nutzer bestätigt. Die Annahmen (Tipp markiert, Nachbarzone als Anschlag, Tipp baut ein, andere Achse ausgeblendet) kamen mit dem Merge, einzeln bestätigt hat sie der Nutzer nicht |
 | `rename-workouts` | 2026-11-07 | „Vorlage“ heisst überall „Workout“: Texte DE/EN, Code, Datenbank (Schema 11), Export (Import liest weiter `template`), Specs (`session-templates` → `workouts`) und README; Health-Connect-Einträge heissen auf Englisch „exercise sessions“. Gerätetest 5.3 vom Nutzer bestätigt. Szenario-Titel und Purpose-Abschnitte mit „Vorlage“ beim Archivieren direkt in den Haupt-Specs umbenannt |
 | `workout-course-chain` | 2026-11-07 | Mehrere Strecken hintereinander als eine Runde, Runden, Dauer oder offen fürs ganze Workout (Schema 12, `session_courses`); aktuelle Strecke im Live-Display, Ranglisten von Strecke, Zone und Workout bei Ketten, Ghost der Rundenspur aus der schnellsten früheren Runde mit derselben Folge von Streckenlängen, Export mit `courses` (ältere App-Versionen lesen ihn nicht), Strecke löschen entfernt sie aus Ketten. Linux-Test und Gerätetest 6.3 bestanden. Purpose der Spec `workouts` beim Archivieren nachgeführt |
-| `live-zone-targets` | 2026-11-12 | Zielwerte der Zone unter der Pace, Zonen im Fortschrittsrahmen in Härte-Farben, Karte „Stufe“ im Querformat (PR #22); 5.3 offen |
-| `adhoc-workout` | 2026-11-12 | Workout-Editor startet die Strecken ohne zu speichern (PR #23); 2.3 offen |
+| `live-zone-targets` | 2026-11-12 | Zielwerte der Zone unter der Pace, Zonen im Fortschrittsrahmen in Härte-Farben, Karte „Stufe“ im Querformat (PR #22); Gerätetest 5.3 vom Nutzer bestätigt |
+| `adhoc-workout` | 2026-11-12 | Workout-Editor startet die Strecken ohne zu speichern (PR #23); Gerätetest 2.3 vom Nutzer bestätigt |
 | `remove-rr-intervals` | 2026-11-12 | RR-Intervalle und RMSSD entfernt, Schema 13 (PR #25) |
-| `heart-rate-from-rower` | 2026-11-12 | Kein Gurtversuch bei Puls vom Rudergerät, Gurt-Meldung mit „Abbrechen“ und Abbruch nach 60 s (PR #26); 3.2 offen |
-| `live-hide-status-bar` | 2026-11-12 | Statusleiste im Live-Display unter Android ausgeblendet (PR #27); 1.2 offen. Mit `--skip-specs` archiviert, die Anforderung stand schon in der Spec |
-| `live-single-lap-frame` | 2026-11-12 | Bei genau einer Runde keine äussere Gesamtspur (PR #28); 2.3 offen. „Fortschrittsrahmen um die Pace“ beim Archivieren von Hand mit der Fassung aus `live-zone-targets` zusammengeführt |
+| `heart-rate-from-rower` | 2026-11-12 | Kein Gurtversuch bei Puls vom Rudergerät, Gurt-Meldung mit „Abbrechen“ und Abbruch nach 60 s (PR #26); Gerätetest 3.2 vom Nutzer bestätigt |
+| `live-hide-status-bar` | 2026-11-12 | Statusleiste im Live-Display unter Android ausgeblendet (PR #27); Gerätetest 1.2 vom Nutzer bestätigt. Mit `--skip-specs` archiviert, die Anforderung stand schon in der Spec |
+| `live-single-lap-frame` | 2026-11-12 | Bei genau einer Runde keine äussere Gesamtspur (PR #28); Gerätetest 2.3 vom Nutzer bestätigt. „Fortschrittsrahmen um die Pace“ beim Archivieren von Hand mit der Fassung aus `live-zone-targets` zusammengeführt |
