@@ -148,17 +148,6 @@ Die App SHALL als Herzfrequenz den Wert des direkt verbundenen Gurts verwenden, 
 - **WHEN** der direkt verbundene Gurt seit mehr als 3 Sekunden nichts gesendet hat und das Rudergerät keinen Puls meldet
 - **THEN** ist die Herzfrequenz „nicht vorhanden“
 
-### Requirement: RR-Intervalle bereitstellen
-Sendet der direkt verbundene Gurt RR-Intervalle (Abstand zwischen zwei Herzschlägen), SHALL die App jedes Intervall in Millisekunden mit seinem Empfangszeitpunkt bereitstellen. Ohne RR-Intervalle vom Gurt MUST NOT ein Intervall erfunden oder aus dem Puls abgeleitet werden.
-
-#### Scenario: Gurt mit RR-Intervallen
-- **WHEN** der Gurt in einer Messung zwei RR-Intervalle von 812 ms und 790 ms sendet
-- **THEN** stellt die App beide Intervalle in dieser Reihenfolge bereit
-
-#### Scenario: Puls nur über das Rudergerät
-- **WHEN** der Puls nur vom Rudergerät kommt, ob PM5 oder FTMS
-- **THEN** stellt die App keine RR-Intervalle bereit
-
 ### Requirement: Gurt-Messungen tolerant lesen
 Die App SHALL Puls-Messungen des Gurts in beiden Formaten des Standards (8 und 16 Bit) lesen, auch mit oder ohne Energie- und RR-Angaben. Unvollständige Messungen MUST verworfen und protokolliert werden, ohne die übrigen Messwerte zu beeinflussen.
 
