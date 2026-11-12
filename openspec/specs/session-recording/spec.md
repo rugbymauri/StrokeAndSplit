@@ -37,7 +37,7 @@ Setzt das Rudergerät während einer laufenden Session Zeit oder Distanz zurück
 - **THEN** zählt die Session ab 1200 m weiter, sobald wieder gerudert wird
 
 ### Requirement: Session vollständig speichern
-Die App SHALL zu jeder Session eine Zusammenfassung (Startzeitpunkt, Dauer, Distanz, Durchschnittspace, Durchschnittswatt, Durchschnittsschlagzahl, Anzahl Schläge, Anzahl und Gesamtdauer der Pausen, Durchschnitts- und Maximalpuls falls vorhanden, Datenquelle, Geräteart) sowie den zeitlichen Verlauf aller Messwerte, RR-Intervalle und Schlag-Ereignisse lokal speichern. Schlagdetails, die das Gerät nicht liefert, MUST als „nicht vorhanden“ gespeichert werden. Dauer, Durchschnittspace und Durchschnittsschlagzahl MUST auf der Sessionzeit ohne Pausen beruhen.
+Die App SHALL zu jeder Session eine Zusammenfassung (Startzeitpunkt, Dauer, Distanz, Durchschnittspace, Durchschnittswatt, Durchschnittsschlagzahl, Anzahl Schläge, Anzahl und Gesamtdauer der Pausen, Durchschnitts- und Maximalpuls falls vorhanden, Datenquelle, Geräteart) sowie den zeitlichen Verlauf aller Messwerte und Schlag-Ereignisse lokal speichern. Schlagdetails, die das Gerät nicht liefert, MUST als „nicht vorhanden“ gespeichert werden. Dauer, Durchschnittspace und Durchschnittsschlagzahl MUST auf der Sessionzeit ohne Pausen beruhen.
 
 #### Scenario: Session nach App-Neustart
 - **WHEN** der Nutzer eine Session beendet und die App neu startet
@@ -49,7 +49,7 @@ Die App SHALL zu jeder Session eine Zusammenfassung (Startzeitpunkt, Dauer, Dist
 
 #### Scenario: Session mit Puls
 - **WHEN** der Nutzer eine Session mit Puls beendet, ob vom Gurt oder vom Rudergerät
-- **THEN** zeigt die Zusammenfassung Durchschnitts- und Maximalpuls als ganze Schläge pro Minute
+- **THEN** zeigt die Zusammenfassung Durchschnitts- und Maximalpuls als ganze Schläge pro Minute und keine weiteren Pulswerte
 
 #### Scenario: Session ohne Puls
 - **WHEN** der Nutzer eine Session ohne Puls beendet
@@ -58,6 +58,10 @@ Die App SHALL zu jeder Session eine Zusammenfassung (Startzeitpunkt, Dauer, Dist
 #### Scenario: Bestehende Sessions nach dem Update
 - **WHEN** die App mit Sessions aus einer früheren Version auf diese Version aktualisiert wird
 - **THEN** sind alle Sessions mit Zusammenfassung, Verlauf, vollständigen Schlagdetails und Replay weiterhin vorhanden, gelten als PM5-Sessions, sofern sie mit einem PM5 aufgezeichnet wurden, und haben keine Pulszusammenfassung
+
+#### Scenario: Sessions mit RR-Intervallen nach dem Update
+- **WHEN** die App mit Sessions, zu denen RR-Intervalle und RMSSD gespeichert sind, auf diese Version aktualisiert wird
+- **THEN** sind diese Sessions mit Zusammenfassung, Durchschnitts- und Maximalpuls, Verlauf und Replay weiterhin vorhanden, und RR-Intervalle und RMSSD sind nicht mehr gespeichert
 
 #### Scenario: Zusammenfassung mit Pausen
 - **WHEN** der Nutzer 10 Minuten rudert und dazwischen zweimal je etwa eine Minute stillsitzt
@@ -87,11 +91,15 @@ Für Sessions mit einem echten Rudergerät SHALL die App die empfangenen Rohdate
 
 #### Scenario: Replay einer Session mit direkt verbundenem Gurt
 - **WHEN** eine Session abgespielt wird, bei der ein Gurt direkt verbunden war, ob mit PM5 oder FTMS-Rudergerät
-- **THEN** ergeben sich derselbe Puls und dieselben RR-Intervalle wie bei der Aufzeichnung
+- **THEN** ergibt sich derselbe Puls wie bei der Aufzeichnung
 
 #### Scenario: Export und Import mit Gurt-Daten
 - **WHEN** eine Session mit direkt verbundenem Gurt exportiert und auf einem anderen Gerät importiert wird
-- **THEN** zeigt die importierte Session denselben Puls, dieselben RR-Intervalle und dieselbe Zusammenfassung
+- **THEN** zeigt die importierte Session denselben Puls und dieselbe Zusammenfassung
+
+#### Scenario: Import einer Datei mit RMSSD
+- **WHEN** der Nutzer eine Datei importiert, die mit einer früheren Version exportiert wurde und im Header einen RMSSD-Wert enthält
+- **THEN** importiert die App die Session ohne Fehler, mit Puls und Zusammenfassung aus den Rohpaketen und ohne RMSSD
 
 ### Requirement: Sessions auflisten
 Die App SHALL eine Liste aller gespeicherten Sessions anzeigen, neueste zuerst, mit Datum, Dauer, Distanz und Durchschnittspace.
@@ -162,21 +170,6 @@ Die App SHALL die Kurvenpakete einer Session als Rohdaten mitspeichern, exportie
 #### Scenario: Export und Import
 - **WHEN** der Nutzer eine Session mit Kraftkurven exportiert und wieder importiert
 - **THEN** zeigt das Replay der importierten Session dieselben Kurven
-
-### Requirement: RR-Intervalle in der Zusammenfassung
-Enthält eine Session RR-Intervalle, SHALL die Zusammenfassung ihren Verlauf über die Session als Kurve sowie die Herzratenvariabilität als RMSSD in ganzen Millisekunden zeigen. Ohne RR-Intervalle MUST NOT Kurve oder RMSSD erscheinen.
-
-#### Scenario: Session mit RR-Intervallen
-- **WHEN** der Nutzer eine Session beendet, bei der der Gurt RR-Intervalle gesendet hat
-- **THEN** zeigt die Zusammenfassung die RR-Kurve und den RMSSD-Wert
-
-#### Scenario: RMSSD-Berechnung
-- **WHEN** eine Session die RR-Intervalle 800, 810 und 790 ms enthält
-- **THEN** beträgt der RMSSD 16 ms (Wurzel aus dem Mittel von 10² und 20²)
-
-#### Scenario: Puls nur über das Rudergerät
-- **WHEN** der Nutzer eine Session beendet, bei der der Puls nur vom Rudergerät kam
-- **THEN** zeigt die Zusammenfassung Durchschnitts- und Maximalpuls, aber weder RR-Kurve noch RMSSD
 
 ### Requirement: Session-Dateien unter dem neuen Namen
 Exportierte Sessions SHALL die Endung `.strokesplit` und den Formatnamen `strokesplit-raw` tragen. Der Import MUST weiterhin Dateien mit der Endung `.aergrow` und dem Formatnamen `aergrow-raw` annehmen und daraus dieselbe Session erzeugen wie vor der Umbenennung.
