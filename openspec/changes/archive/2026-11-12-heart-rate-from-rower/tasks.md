@@ -29,4 +29,4 @@ Keine Schema-Änderung und keine neuen Texte („Abbrechen“ ist `actionCancel`
 ## 3. Abschluss
 
 - [x] 3.1 Gesamtprüfung in der Linux-App mit Scratch-DB, Simulator (FTMS) und gekoppeltem Test-Gurt, soweit ohne echtes Gerät möglich (z. B. mit einem Gurt-Transport, der scheitert): Meldung mit beiden Knöpfen, Abbrechen, Ablauf nach 60 s. Verifikation: Screenshots; `make check` grün.
-- [ ] 3.2 Am Woodrower (Nutzer): Gurt am Rudergerät gekoppelt, in der App ebenfalls gekoppelt; keine Meldung, Herz grün, Puls läuft. Danach Gurt vom Rudergerät trennen und an einer Uhr verbinden: Meldung, „Abbrechen“ und Ablauf nach 60 s.
+- [x] 3.2 Am Woodrower (Nutzer): Gurt am Rudergerät gekoppelt, in der App ebenfalls gekoppelt; keine Meldung, Herz grün, Puls läuft. Danach Gurt vom Rudergerät trennen und an einer Uhr verbinden: Meldung, „Abbrechen“ und Ablauf nach 60 s.
